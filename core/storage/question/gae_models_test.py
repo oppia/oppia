@@ -26,11 +26,10 @@ from core.domain import skill_services
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
-import feconf
 import python_utils
 
-(base_models, question_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.question, models.NAMES.user])
+(base_models, question_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.question])
 
 
 class QuestionModelUnitTests(test_utils.GenericTestBase):
@@ -584,44 +583,6 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(question_summaries), 2)
         self.assertEqual(question_summaries[0].id, 'question_1')
         self.assertEqual(question_summaries[1].id, 'question_2')
-
-
-class QuestionRightsSnapshotContentModelTests(test_utils.GenericTestBase):
-    """Test the QuestionRightsSnapshotContentModel class."""
-
-    SNAPSHOT_ID = '1'
-    USER_1_USER_ID = 'user_id_1'
-    USER_1_GAE_ID = 'gae_id_1'
-
-    def setUp(self):
-        super(QuestionRightsSnapshotContentModelTests, self).setUp()
-        user_models.UserSettingsModel(
-            id=self.USER_1_USER_ID,
-            gae_id=self.USER_1_GAE_ID,
-            email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-
-    def test_migrate_snapshot_model(self):
-        original_rights_model = question_models.QuestionRightsModel(
-            id=self.SNAPSHOT_ID,
-            creator_id=self.USER_1_GAE_ID)
-        original_rights_snapshot_model = (
-            question_models.QuestionRightsSnapshotContentModel(
-                id=self.SNAPSHOT_ID,
-                content=original_rights_model.to_dict()))
-        original_rights_snapshot_model.migrate_snapshot_model()
-
-        migrated_rights_snapshot_model = (
-            question_models.QuestionRightsSnapshotContentModel.get_by_id(
-                self.SNAPSHOT_ID))
-        self.assertEqual(
-            original_rights_snapshot_model.last_updated,
-            migrated_rights_snapshot_model.last_updated)
-
-        migrated_rights_model = question_models.QuestionRightsModel(
-            **migrated_rights_snapshot_model.content)
-        self.assertEqual(self.USER_1_USER_ID, migrated_rights_model.creator_id)
 
 
 class QuestionRightsModelUnitTest(test_utils.GenericTestBase):

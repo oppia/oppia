@@ -20,18 +20,25 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 
+from constants import constants
 from core.domain import user_id_migration
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
-(user_models, feedback_models, exp_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
+(
+    base_models, collection_models,
+    exp_models, feedback_models, question_models,
+    skill_models, topic_models, user_models) = models.Registry.import_models(
+        [models.NAMES.base_model, models.NAMES.collection,
+         models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
+         models.NAMES.skill, models.NAMES.topic, models.NAMES.user])
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
 
 class UserIdMigrationJobTests(test_utils.GenericTestBase):
-    """Tests for tuser id migration job."""
+    """Tests for user id migration job."""
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
@@ -403,3 +410,214 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 original_models[i].created_on, migrated_model.created_on)
             self.assertEqual(
                 original_models[i].last_updated, migrated_model.last_updated)
+
+
+class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
+    """Tests for snapshot user id migration job."""
+    SNAPSHOT_ID = '2'
+    USER_1_USER_ID = 'user_id_1'
+    USER_1_GAE_ID = 'gae_id_1'
+    USER_2_USER_ID = 'user_id_2'
+    USER_2_GAE_ID = 'gae_id_2'
+    USER_3_USER_ID = 'user_id_3'
+    USER_3_GAE_ID = 'gae_id_3'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_id_migration.SnapshotsUserIdMigrationJob.create_new()
+        user_id_migration.SnapshotsUserIdMigrationJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration.SnapshotsUserIdMigrationJob.get_output(job_id))
+        eval_output = [
+            ast.literal_eval(stringified_item) for
+            stringified_item in stringified_output]
+        return eval_output
+
+    def setUp(self):
+        super(SnapshotsUserIdMigrationJobTests, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_1_USER_ID,
+            gae_id=self.USER_1_GAE_ID,
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_2_USER_ID,
+            gae_id=self.USER_2_GAE_ID,
+            email='some.different@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_3_USER_ID,
+            gae_id=self.USER_3_GAE_ID,
+            email='some.different@email.cz',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+
+    def test_migrate_collection_rights_snapshot_model(self):
+        original_rights_model = collection_models.CollectionRightsModel(
+            id=self.SNAPSHOT_ID,
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        original_rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output[0], [u'SUCCESS - CollectionRightsSnapshotContentModel', 1])
+
+        migrated_rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                self.SNAPSHOT_ID))
+        self.assertEqual(
+            original_rights_snapshot_model.last_updated,
+            migrated_rights_snapshot_model.last_updated)
+
+        migrated_rights_model = collection_models.CollectionRightsModel(
+            **migrated_rights_snapshot_model.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID],
+            migrated_rights_model.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model.viewer_ids)
+
+    def test_migrate_exploration_rights_snapshot_model(self):
+        original_rights_model = exp_models.ExplorationRightsModel(
+            id=self.SNAPSHOT_ID,
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        original_rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output[0],
+            [u'SUCCESS - ExplorationRightsSnapshotContentModel', 1])
+
+        migrated_rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                self.SNAPSHOT_ID))
+        self.assertEqual(
+            original_rights_snapshot_model.last_updated,
+            migrated_rights_snapshot_model.last_updated)
+
+        migrated_rights_model = exp_models.ExplorationRightsModel(
+            **migrated_rights_snapshot_model.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID],
+            migrated_rights_model.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model.viewer_ids)
+
+    def test_migrate_question_rights_snapshot_model(self):
+        original_rights_model = question_models.QuestionRightsModel(
+            id=self.SNAPSHOT_ID,
+            creator_id=self.USER_1_GAE_ID)
+        original_rights_snapshot_model = (
+            question_models.QuestionRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output[0], [u'SUCCESS - QuestionRightsSnapshotContentModel', 1])
+
+        migrated_rights_snapshot_model = (
+            question_models.QuestionRightsSnapshotContentModel.get_by_id(
+                self.SNAPSHOT_ID))
+        self.assertEqual(
+            original_rights_snapshot_model.last_updated,
+            migrated_rights_snapshot_model.last_updated)
+
+        migrated_rights_model = question_models.QuestionRightsModel(
+            **migrated_rights_snapshot_model.content)
+        self.assertEqual(self.USER_1_USER_ID, migrated_rights_model.creator_id)
+
+    def test_migrate_skill_rights_snapshot_model(self):
+        original_rights_model = skill_models.SkillRightsModel(
+            id=self.SNAPSHOT_ID,
+            creator_id=self.USER_1_GAE_ID)
+        original_rights_snapshot_model = (
+            skill_models.SkillRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output[0], [u'SUCCESS - SkillRightsSnapshotContentModel', 1])
+
+        migrated_rights_snapshot_model = (
+            skill_models.SkillRightsSnapshotContentModel.get_by_id(
+                self.SNAPSHOT_ID))
+        self.assertEqual(
+            original_rights_snapshot_model.last_updated,
+            migrated_rights_snapshot_model.last_updated)
+
+        migrated_rights_model = skill_models.SkillRightsModel(
+            **migrated_rights_snapshot_model.content)
+        self.assertEqual(self.USER_1_USER_ID, migrated_rights_model.creator_id)
+
+    def test_migrate_topic_rights_snapshot_model(self):
+        original_rights_model = topic_models.TopicRightsModel(
+            manager_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID])
+        original_rights_snapshot_model = (
+            topic_models.TopicRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output[0], [u'SUCCESS - TopicRightsSnapshotContentModel', 1])
+
+        migrated_rights_snapshot_model = (
+            topic_models.TopicRightsSnapshotContentModel.get_by_id(
+                self.SNAPSHOT_ID))
+        self.assertEqual(
+            original_rights_snapshot_model.last_updated,
+            migrated_rights_snapshot_model.last_updated)
+
+        migrated_rights_model = topic_models.TopicRightsModel(
+            **migrated_rights_snapshot_model.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.manager_ids)

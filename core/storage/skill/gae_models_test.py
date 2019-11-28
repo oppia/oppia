@@ -22,10 +22,9 @@ from constants import constants
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
-(base_models, skill_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.skill, models.NAMES.user])
+(base_models, skill_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.skill])
 
 
 class SkillModelUnitTest(test_utils.GenericTestBase):
@@ -89,44 +88,6 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assert_model_fields_equal(
             skill_models.SkillSummaryModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
-
-
-class SkillRightsSnapshotContentModelTests(test_utils.GenericTestBase):
-    """Test the SkillRightsSnapshotContentModel class."""
-
-    SNAPSHOT_ID = '1'
-    USER_1_USER_ID = 'user_id_1'
-    USER_1_GAE_ID = 'gae_id_1'
-
-    def setUp(self):
-        super(SkillRightsSnapshotContentModelTests, self).setUp()
-        user_models.UserSettingsModel(
-            id=self.USER_1_USER_ID,
-            gae_id=self.USER_1_GAE_ID,
-            email='some@email.com',
-            role=feconf.ROLE_ID_COLLECTION_EDITOR
-        ).put()
-
-    def test_migrate_snapshot_model(self):
-        original_rights_model = skill_models.SkillRightsModel(
-            id=self.SNAPSHOT_ID,
-            creator_id=self.USER_1_GAE_ID)
-        original_rights_snapshot_model = (
-            skill_models.SkillRightsSnapshotContentModel(
-                id=self.SNAPSHOT_ID,
-                content=original_rights_model.to_dict()))
-        original_rights_snapshot_model.migrate_snapshot_model()
-
-        migrated_rights_snapshot_model = (
-            skill_models.SkillRightsSnapshotContentModel.get_by_id(
-                self.SNAPSHOT_ID))
-        self.assertEqual(
-            original_rights_snapshot_model.last_updated,
-            migrated_rights_snapshot_model.last_updated)
-
-        migrated_rights_model = skill_models.SkillRightsModel(
-            **migrated_rights_snapshot_model.content)
-        self.assertEqual(self.USER_1_USER_ID, migrated_rights_model.creator_id)
 
 
 class SkillRightsModelUnitTest(test_utils.GenericTestBase):

@@ -23,7 +23,7 @@ from core.platform import models
 
 (
     base_models, collection_models,
-    exploration_models, question_models, skill_models,
+    exp_models, question_models, skill_models,
     topic_models, user_models) = models.Registry.import_models(
         [models.NAMES.base_model, models.NAMES.collection,
          models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
@@ -120,25 +120,130 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     contain user ID and replacing it with new user ID.
     """
 
+    @staticmethod
+    def _migrate_collection(rights_snapshot_model):
+        """Migrate CollectionRightsModel to use the new user ID in the
+        owner_ids, editor_ids, voice_artist_ids and viewer_ids.
+        """
+        reconstituted_rights_model = collection_models.CollectionRightsModel(
+            **rights_snapshot_model.content)
+        reconstituted_rights_model.owner_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
+            for gae_id in reconstituted_rights_model.owner_ids]
+        reconstituted_rights_model.editor_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
+            for gae_id in reconstituted_rights_model.editor_ids]
+        reconstituted_rights_model.voice_artist_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
+            for gae_id in reconstituted_rights_model.voice_artist_ids]
+        reconstituted_rights_model.viewer_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
+            for gae_id in reconstituted_rights_model.viewer_ids]
+        rights_snapshot_model.content = reconstituted_rights_model.to_dict()
+        rights_snapshot_model.put(update_last_updated_time=False)
+
+    @staticmethod
+    def _migrate_exploration(rights_snapshot_model):
+        """Migrate ExplorationRightsModel to use the new user ID in the
+        owner_ids, editor_ids, voice_artist_ids and viewer_ids.
+        """
+        reconstituted_rights_model = exp_models.ExplorationRightsModel(
+            **rights_snapshot_model.content)
+        reconstituted_rights_model.owner_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
+            for gae_id in reconstituted_rights_model.owner_ids]
+        reconstituted_rights_model.editor_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
+            for gae_id in reconstituted_rights_model.editor_ids]
+        reconstituted_rights_model.voice_artist_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
+            for gae_id in reconstituted_rights_model.voice_artist_ids]
+        reconstituted_rights_model.viewer_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
+            for gae_id in reconstituted_rights_model.viewer_ids]
+        rights_snapshot_model.content = reconstituted_rights_model.to_dict()
+        rights_snapshot_model.put(update_last_updated_time=False)
+
+    @staticmethod
+    def _migrate_question(rights_snapshot_model):
+        """Migrate QuestionRightsModel to use the new user ID in the owner_ids,
+        editor_ids, voice_artist_ids and viewer_ids.
+        """
+        reconstituted_rights_model = question_models.QuestionRightsModel(
+            **rights_snapshot_model.content)
+        reconstituted_rights_model.creator_id = (
+            user_models.UserSettingsModel.get_by_gae_id(
+                reconstituted_rights_model.creator_id).id)
+        rights_snapshot_model.content = reconstituted_rights_model.to_dict()
+        rights_snapshot_model.put(update_last_updated_time=False)
+
+    @staticmethod
+    def _migrate_skill(rights_snapshot_model):
+        """Migrate SkillRightsModel to use the new user ID in the owner_ids,
+        editor_ids, voice_artist_ids and viewer_ids.
+        """
+        reconstituted_rights_model = skill_models.SkillRightsModel(
+            **rights_snapshot_model.content)
+        reconstituted_rights_model.creator_id = (
+            user_models.UserSettingsModel.get_by_gae_id(
+                reconstituted_rights_model.creator_id).id)
+        rights_snapshot_model.content = reconstituted_rights_model.to_dict()
+        rights_snapshot_model.put(update_last_updated_time=False)
+
+    @staticmethod
+    def _migrate_topic(rights_snapshot_model):
+        """Migrate TopicRightsModel to use the new user ID in the owner_ids,
+        editor_ids, voice_artist_ids and viewer_ids.
+        """
+        reconstituted_rights_model = topic_models.TopicRightsModel(
+            **rights_snapshot_model.content)
+        reconstituted_rights_model.manager_ids = [
+            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
+            for gae_id in reconstituted_rights_model.manager_ids]
+        rights_snapshot_model.content = reconstituted_rights_model.to_dict()
+        rights_snapshot_model.put(update_last_updated_time=False)
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         return [collection_models.CollectionRightsSnapshotContentModel,
-                exploration_models.ExplorationRightsSnapshotContentModel,
+                exp_models.ExplorationRightsSnapshotContentModel,
                 question_models.QuestionRightsSnapshotContentModel,
                 skill_models.SkillRightsSnapshotContentModel,
                 topic_models.TopicRightsSnapshotContentModel]
 
     @staticmethod
-    def map(snapshot_model):
+    def map(rights_snapshot_model):
         """Implements the map function for this job."""
-        snapshot_model.migrate_snapshot_model()
-        yield ('SUCCESS', snapshot_model.id)
+        if isinstance(
+                rights_snapshot_model,
+                collection_models.CollectionRightsSnapshotContentModel):
+            SnapshotsUserIdMigrationJob._migrate_collection(
+                rights_snapshot_model)
+        elif isinstance(
+                rights_snapshot_model,
+                exp_models.ExplorationRightsSnapshotContentModel):
+            SnapshotsUserIdMigrationJob._migrate_exploration(
+                rights_snapshot_model)
+        elif isinstance(
+                rights_snapshot_model,
+                question_models.QuestionRightsSnapshotContentModel):
+            SnapshotsUserIdMigrationJob._migrate_question(rights_snapshot_model)
+        elif isinstance(
+                rights_snapshot_model,
+                skill_models.SkillRightsSnapshotContentModel):
+            SnapshotsUserIdMigrationJob._migrate_skill(rights_snapshot_model)
+        elif isinstance(
+                rights_snapshot_model,
+                topic_models.TopicRightsSnapshotContentModel):
+            SnapshotsUserIdMigrationJob._migrate_topic(rights_snapshot_model)
+        class_name = rights_snapshot_model.__class__.__name__
+        yield ('SUCCESS - %s' % class_name, rights_snapshot_model.id)
 
     @staticmethod
     def reduce(key, ids):
         """Implements the reduce function for this job."""
-        yield (key, ids)
+        yield (key, len(ids))
 
 
 class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):

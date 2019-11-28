@@ -149,26 +149,6 @@ class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
 
-    def migrate_snapshot_model(self):
-        """Migrate model to use the new user ID in the owner_ids, editor_ids,
-        voice_artist_ids and viewer_ids.
-        """
-        reconstituted_rights_model = CollectionRightsModel(**self.content)
-        reconstituted_rights_model.owner_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.owner_ids]
-        reconstituted_rights_model.editor_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.editor_ids]
-        reconstituted_rights_model.voice_artist_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.voice_artist_ids]
-        reconstituted_rights_model.viewer_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.viewer_ids]
-        self.content = reconstituted_rights_model.to_dict()
-        self.put(update_last_updated_time=False)
-
 
 class CollectionRightsModel(base_models.VersionedModel):
     """Storage model for rights related to a collection.
