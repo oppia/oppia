@@ -90,16 +90,18 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 thread.second_last_message_text = messages[-2].text
                 thread.second_last_message_author_id = messages[-2].author_id
 
+        # Updates for status changes.
         if (len(messages) >= 2 and
                 messages[-1].updated_status is not None and
                 messages[-1].updated_status != messages[-2].updated_status):
-            expected_updated_status = messages[-1].updated_status
+            if thread.updated_status != messages[-1].updated_status:
+                action_taken = 'Updated'
+                thread.updated_status = messages[-1].updated_status
         else:
-            expected_updated_status = None
+            if thread.updated_status is not None
+                action_taken = 'Updated'
+                thread.updated_status = None
 
-        if thread.updated_status != expected_updated_status:
-            action_taken = 'Updated'
-            thread.updated_status = expected_updated_status
 
         if action_taken:
             thread.put()
