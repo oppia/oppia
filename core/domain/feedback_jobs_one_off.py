@@ -69,14 +69,12 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 thread.last_message_id = None
                 thread.last_message_text = None
                 thread.last_message_author_id = None
-                thread.updated_status = None
         else:
             if thread.last_message_id != messages[-1].message_id:
                 action_taken = 'Updated'
                 thread.last_message_id = messages[-1].message_id
                 thread.last_message_text = messages[-1].text
                 thread.last_message_author_id = messages[-1].author_id
-                thread.updated_status = messages[-1].updated_status
 
         # Updates for second-to-last message.
         if len(messages) < 2:
@@ -92,16 +90,16 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 thread.second_last_message_text = messages[-2].text
                 thread.second_last_message_author_id = messages[-2].author_id
 
-        updated_status = (
-            None if len(messages) < 2 else messages[-1].updated_status)
-        if updated_status is not None and all(
-                m.updated_status is None or m.updated_status == updated_status
-                for m in reversed(messages)):
-            updated_status = None
+        if (len(messages) >= 2 and
+                messages[-1].updated_status is not None and
+                messages[-1].updated_status != messages[-2].updated_status):
+            expected_updated_status = messages[-1].updated_status
+        else:
+            expected_updated_status = None
 
-        if thread.updated_status != updated_status:
+        if thread.updated_status != expected_updated_status:
             action_taken = 'Updated'
-            thread.updated_status = updated_status
+            thread.updated_status = expected_updated_status
 
         if action_taken:
             thread.put()

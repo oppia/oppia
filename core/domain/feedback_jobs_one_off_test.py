@@ -160,7 +160,6 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
     def _clear_message_cache(self, thread_id):
         """Forcibly clears the message cache of the given thread."""
         thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        thread.updated_status = None
         thread.last_message_id = None
         thread.last_message_text = None
         thread.last_message_author_id = None
@@ -304,8 +303,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         thread_id = feedback_services.create_thread(
             'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
         feedback_services.create_message(
-            thread_id, self.editor_id, feedback_models.STATUS_CHOICES_OPEN,
-            None, 'second text')
+            thread_id, self.editor_id, None, None, 'second text')
         thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         thread.updated_status = feedback_models.STATUS_CHOICES_OPEN
         thread.put()
