@@ -178,8 +178,8 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         thread = feedback_services.get_thread(thread_id)
         self.assertEqual(thread.last_message_text, 'first text')
         self.assertEqual(thread.last_message_author_id, self.editor_id)
-        self.assertEqual(thread.second_last_message_text, None)
-        self.assertEqual(thread.second_last_message_author_id, None)
+        self.assertIsNone(thread.second_last_message_text)
+        self.assertIsNone(thread.second_last_message_author_id)
 
     def test_no_changes_made_to_fresh_thread_with_two_messages(self):
         thread_id = feedback_services.create_thread(
