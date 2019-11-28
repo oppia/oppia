@@ -40,8 +40,8 @@ angular.module('oppia').directive('voiceoverOpportunities', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/community-dashboard-page/translation-opportunities/' +
-      'translation-opportunities.directive.html'),
+        '/pages/community-dashboard-page/voiceover-opportunities/' +
+      'voiceover-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$uibModal', 'AlertsService',
