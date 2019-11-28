@@ -211,6 +211,30 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(thread.second_last_message_text, 'second text')
         self.assertEqual(thread.second_last_message_author_id, self.editor_id)
 
+    def test_no_changes_made_to_thread_with_same_status(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, None, None, 'second text')
+
+        self.assertEqual(self._run_one_off_job(), [])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertIsNone(thread.updated_status)
+
+    def test_no_changes_made_to_thread_with_updated_status(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, feedback_models.STATUS_CHOICES_IGNORED,
+            None, 'second text')
+
+        self.assertEqual(self._run_one_off_job(), [])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(
+            thread.updated_status, feedback_models.STATUS_CHOICES_IGNORED)
+
     def test_cache_updated_for_stale_thread_with_one_message(self):
         thread_id = feedback_services.create_thread(
             'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
@@ -221,26 +245,6 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         thread = feedback_services.get_thread(thread_id)
         self.assertEqual(thread.last_message_text, 'first text')
         self.assertEqual(thread.last_message_author_id, self.editor_id)
-        self.assertIsNone(thread.second_last_message_text)
-        self.assertIsNone(thread.second_last_message_author_id)
-
-    def test_invalid_cache_updated_for_stale_thread_with_one_message(self):
-        thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
-        thread_model = (
-            feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
-        thread_model.second_last_message_id = 1
-        thread_model.second_last_message_text = 'non-existing second text'
-        thread_model.second_last_message_author_id = self.editor_id
-        thread_model.put()
-
-        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
-
-        thread = feedback_services.get_thread(thread_id)
-        self.assertEqual(thread.last_message_id, 0)
-        self.assertEqual(thread.last_message_text, 'first text')
-        self.assertEqual(thread.last_message_author_id, self.editor_id)
-        self.assertIsNone(thread.second_last_message_id)
         self.assertIsNone(thread.second_last_message_text)
         self.assertIsNone(thread.second_last_message_author_id)
 
@@ -280,6 +284,57 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(thread.second_last_message_text, 'second text')
         self.assertEqual(thread.second_last_message_author_id, self.editor_id)
 
+    def test_cache_updated_for_stale_thread_with_updated_status(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, feedback_models.STATUS_CHOICES_IGNORED,
+            None, 'second text')
+        thread = feedback_models.GeneralFeedbackThreadModel.create(thread_id)
+        thread.updated_status = None
+        thread.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(
+            thread.updated_status, feedback_models.STATUS_CHOICES_IGNORED)
+
+    def test_cache_updated_for_stale_thread_with_same_status(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        feedback_services.create_message(
+            thread_id, self.editor_id, feedback_models.STATUS_CHOICES_OPEN,
+            None, 'second text')
+        thread = feedback_models.GeneralFeedbackThreadModel.create(thread_id)
+        thread.updated_status = feedback_models.STATUS_CHOICES_OPEN
+        thread.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertIsNone(thread.updated_status)
+
+    def test_invalid_cache_updated_for_stale_thread_with_one_message(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+        thread_model = (
+            feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+        thread_model.second_last_message_id = 1
+        thread_model.second_last_message_text = 'non-existing second text'
+        thread_model.second_last_message_author_id = self.editor_id
+        thread_model.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        thread = feedback_services.get_thread(thread_id)
+        self.assertEqual(thread.last_message_id, 0)
+        self.assertEqual(thread.last_message_text, 'first text')
+        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        self.assertIsNone(thread.second_last_message_id)
+        self.assertIsNone(thread.second_last_message_text)
+        self.assertIsNone(thread.second_last_message_author_id)
+
     def test_invalid_cache_updated_for_stale_thread_with_no_messages(self):
         thread_id = (
             feedback_models.GeneralFeedbackThreadModel.generate_new_thread_id(
@@ -291,7 +346,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         thread.status = feedback_models.STATUS_CHOICES_OPEN
         thread.subject = 'Feedback'
         thread.has_suggestion = False
-        thread.updated_status = None
+        thread.updated_status = feedback_models.STATUS_CHOICES_OPEN
         thread.message_count = 0
         thread.last_message_id = 1
         thread.last_message_text = 'non-existing second text'
@@ -304,6 +359,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
         thread = feedback_services.get_thread(thread_id)
+        self.assertIsNone(thread.updated_status)
         self.assertIsNone(thread.last_message_id)
         self.assertIsNone(thread.last_message_text)
         self.assertIsNone(thread.last_message_author_id)
