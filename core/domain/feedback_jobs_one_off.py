@@ -103,7 +103,6 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             action_taken = 'Updated'
             thread.updated_status = updated_status
 
-
         if action_taken:
             thread.put()
             yield (action_taken, 1)
