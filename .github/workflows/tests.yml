@@ -21,5 +21,10 @@ jobs:
         run: |
           sudo pip install coverage
           sudo pip install webtest
+      - name: Install Code Climate
+        run: |
+          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          chmod +x ./cc-test-reporter
+          ./cc-test-reporter before-build
       - name: run backend
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
