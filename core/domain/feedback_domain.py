@@ -113,18 +113,6 @@ class FeedbackThread(python_utils.OBJECT):
                 if self.second_last_message_author_id else None),
         }
 
-    def get_full_message_id(self, message_id):
-        """Returns the full id of the message.
-
-        Args:
-            message_id: int. The id of the message for which we have to fetch
-                the complete message id.
-
-        Returns:
-            str. The full id corresponding to the given message id.
-        """
-        return '.'.join([self.id, python_utils.UNICODE(message_id)])
-
 
 class FeedbackMessage(python_utils.OBJECT):
     """Domain object for a feedback message.

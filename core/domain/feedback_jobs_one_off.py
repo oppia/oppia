@@ -59,44 +59,48 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(thread):
         """Implements the map function for this job."""
-        messages = feedback_services.get_messages(thread.id)
+        last_message, second_last_message = (
+            feedback_models.GeneralFeedbackMessageModel.get_multi(
+                feedback_services.get_last_two_message_ids(thread)))
         action_taken = None
 
         # Updates for last message.
-        if len(messages) < 1:
+        if last_message is None:
             if thread.last_message_id is not None:
                 action_taken = 'Updated'
                 thread.last_message_id = None
                 thread.last_message_text = None
                 thread.last_message_author_id = None
         else:
-            if thread.last_message_id != messages[-1].message_id:
+            if thread.last_message_id != last_message.message_id:
                 action_taken = 'Updated'
-                thread.last_message_id = messages[-1].message_id
-                thread.last_message_text = messages[-1].text
-                thread.last_message_author_id = messages[-1].author_id
+                thread.last_message_id = last_message.message_id
+                thread.last_message_text = last_message.text
+                thread.last_message_author_id = last_message.author_id
 
         # Updates for second-to-last message.
-        if len(messages) < 2:
+        if second_last_message is None:
             if thread.second_last_message_id is not None:
                 action_taken = 'Updated'
                 thread.second_last_message_id = None
                 thread.second_last_message_text = None
                 thread.second_last_message_author_id = None
         else:
-            if thread.second_last_message_id != messages[-2].message_id:
+            if thread.second_last_message_id != second_last_message.message_id:
                 action_taken = 'Updated'
-                thread.second_last_message_id = messages[-2].message_id
-                thread.second_last_message_text = messages[-2].text
-                thread.second_last_message_author_id = messages[-2].author_id
+                thread.second_last_message_id = second_last_message.message_id
+                thread.second_last_message_text = second_last_message.text
+                thread.second_last_message_author_id = (
+                    second_last_message.author_id)
 
         # Updates for status changes.
-        if (len(messages) >= 2 and
-                messages[-1].updated_status is not None and
-                messages[-1].updated_status != messages[-2].updated_status):
-            if thread.updated_status != messages[-1].updated_status:
+        if (last_message is not None and second_last_message is not None and
+                last_message.updated_status is not None and
+                last_message.updated_status != (
+                    second_last_message.updated_status)):
+            if thread.updated_status != last_message.updated_status:
                 action_taken = 'Updated'
-                thread.updated_status = messages[-1].updated_status
+                thread.updated_status = last_message.updated_status
         else:
             if thread.updated_status is not None:
                 action_taken = 'Updated'

@@ -314,9 +314,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         last_two_message_ids = (
             feedback_services.get_last_two_message_ids(thread_1))
-        self.assertEqual(
-            last_two_message_ids,
-            [thread_1.get_full_message_id(4), thread_1.get_full_message_id(3)])
+        self.assertEqual(last_two_message_ids, [
+            feedback_services.get_full_message_id(thread_1, 4),
+            feedback_services.get_full_message_id(thread_1, 3),
+        ])
 
         # Check what happens in case the thread has only one message.
         thread_1 = feedback_domain.FeedbackThread(
@@ -329,8 +330,10 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             feedback_services.get_last_two_message_ids(thread_1))
         # The second last message should be given an id of -1 as it doesn't
         # exist.
-        self.assertEqual(
-            last_two_message_ids, [thread_1.get_full_message_id(0), None])
+        self.assertEqual(last_two_message_ids, [
+            feedback_services.get_full_message_id(thread_1, 0),
+            None,
+        ])
 
     def test_get_thread_summaries(self):
         feedback_services.create_thread(

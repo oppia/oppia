@@ -420,6 +420,20 @@ def _get_thread_from_model(thread_model):
         thread_model.second_last_message_author_id)
 
 
+def get_full_message_id(thread_id, message_id):
+    """Returns the full id of the message.
+
+    Args:
+        thread_id: str. The ID of the thread to build the message id for.
+        message_id: int. The id of the message for which we have to fetch
+            the complete message id.
+
+    Returns:
+        str. The full id corresponding to the given message id.
+    """
+    return '.'.join([thread_id, python_utils.UNICODE(message_id)])
+
+
 def get_last_two_message_ids(thread):
     """Returns the full message ids of the last two messages of the thread.
     If the thread has only one message, the id of the second last message is
@@ -432,7 +446,7 @@ def get_last_two_message_ids(thread):
         list(str|None). The ids of the last two messages of the thread. If
             the message does not exist, None is returned.
     """
-    return [thread.get_full_message_id(i) if i >= 0 else None
+    return [get_full_message_id(thread.id, i) if i >= 0 else None
             for i in python_utils.RANGE(
                 thread.message_count - 1, thread.message_count - 3, -1)]
 
