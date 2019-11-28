@@ -55,8 +55,8 @@ describe('Context service', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
-      spyOn(urlService, 'getPathname').and
-        .returnValue('/embed/exploration/123');
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/embed/exploration/123');
     });
 
     it('should correctly set editor context to exploration editor', () => {

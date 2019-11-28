@@ -24,7 +24,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ExplorationDraftObjectFactory } from
+import {ExplorationDraft, ExplorationDraftObjectFactory} from
   'domain/exploration/ExplorationDraftObjectFactory';
 
 @Injectable({
@@ -93,8 +93,7 @@ export class LocalStorageService {
    * @returns {Object} The local save draft object if it exists,
    *   else null.
    */
-  // TODO(#7176): Replace 'any' with the exact type.
-  getExplorationDraft(explorationId: string): any {
+  getExplorationDraft(explorationId: string): ExplorationDraft | null {
     if (this.storage) {
       let draftDict = JSON.parse(
         this.storage.getItem(this._createExplorationDraftKey(explorationId)));
@@ -111,7 +110,6 @@ export class LocalStorageService {
    * @param {String} explorationId - The exploration id of the change list
    *   to be removed.
    */
-  // TODO(#7176): Replace 'any' with the exact type.
   removeExplorationDraft(explorationId: string): void {
     if (this.storage) {
       this.storage.removeItem(this._createExplorationDraftKey(explorationId));
