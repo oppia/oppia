@@ -113,7 +113,10 @@ def cancel_operation():
     python_utils.PRINT('List of operations in progress:\n')
     check_backup_restoration_status()
     python_utils.PRINT(
-        'Enter the name of the operation to cancel from the above list.')
+        'Enter the name of the operation to cancel from the above list. '
+        'The name of an operation is listed in the field called "name". '
+        'Check the example here: https://stackoverflow.com/a/53630367 for '
+        'details.\n')
     operation_name = python_utils.INPUT()
     common.run_cmd([
         GCLOUD_PATH, 'datastore', 'operations', 'cancel', operation_name])

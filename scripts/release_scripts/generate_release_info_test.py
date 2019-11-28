@@ -110,6 +110,19 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
             tags = generate_release_info.get_current_version_tag(self.mock_repo)
         self.assertEqual(tags, 'tag-1')
 
+    def test_get_current_version_tag_with_multiple_hotfix_branches(self):
+        def mock_get_tags(unused_self):
+            return ['tag-0', 'tag-1', 'tag-2']
+        def mock_get_current_branch_name():
+            return 'release-1.2.3-hotfix-2'
+        get_tags_swap = self.swap(
+            github.Repository.Repository, 'get_tags', mock_get_tags)
+        branch_name_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_current_branch_name)
+        with branch_name_swap, get_tags_swap:
+            tags = generate_release_info.get_current_version_tag(self.mock_repo)
+        self.assertEqual(tags, 'tag-1')
+
     def test_get_extra_commits_in_new_release(self):
         def mock_run_cmd(unused_cmd):
             return '+ sha1 commit1\n+ sha2 commit2\n- sha3 commit3'

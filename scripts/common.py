@@ -157,10 +157,15 @@ def get_current_release_version(release_branch_name):
     Returns:
         str. The version of release.
     """
-    release_version = release_branch_name[len(RELEASE_BRANCH_NAME_PREFIX):]
-    if 'hotfix' in release_branch_name:
-        release_version = release_version[:release_version.find('hotfix') - 1]
-    return release_version
+    release_match = re.match(r'release-(\d+\.\d+\.\d+)$', release_branch_name)
+    hotfix_match = re.match(
+        r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$', release_branch_name)
+    if release_match:
+        return release_match.group(1)
+    elif hotfix_match:
+        return hotfix_match.group(1)
+    else:
+        raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
 def is_current_branch_a_release_branch():
