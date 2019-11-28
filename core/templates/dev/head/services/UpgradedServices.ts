@@ -107,6 +107,8 @@ import { StateEditorService } from
   'components/state-editor/state-editor-properties-services/state-editor.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
@@ -286,6 +288,18 @@ export class UpgradedServices {
         upgradedServices['HintObjectFactory'],
         upgradedServices['SolutionObjectFactory'],
         upgradedServices['OutcomeObjectFactory']);
+
+    // Group 7: Services depending on groups 1-6.
+    upgradedServices['StateObjectFactory'] = new StateObjectFactory(
+      upgradedServices['InteractionObjectFactory'],
+      upgradedServices['ParamChangesObjectFactory'],
+      upgradedServices['RecordedVoiceoversObjectFactory'],
+      upgradedServices['SubtitledHtmlObjectFactory'],
+      upgradedServices['WrittenTranslationsObjectFactory']);
+
+    // Group 8: Services depending on groups 1-7.
+    upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
+      upgradedServices['StateObjectFactory']);
     /* eslint-enable dot-notation */
     return upgradedServices;
   }
