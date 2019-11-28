@@ -31,7 +31,8 @@ import { SubtitledHtmlObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 
-const constants = require('constants.ts');
+const CONSTANTS = require('constants.ts');
+
 export class State {
   name;
   classifierModelId;
@@ -99,7 +100,7 @@ export class StateObjectFactory {
     private writtenTranslationsObject: WrittenTranslationsObjectFactory) {}
 
   createDefaultState(newStateName: string): State {
-    var newStateTemplate = constants.NEW_STATE_TEMPLATE;
+    var newStateTemplate = CONSTANTS.NEW_STATE_TEMPLATE;
     var newState = this.createFromBackendDict(newStateName, {
       classifier_model_id: newStateTemplate.classifier_model_id,
       content: newStateTemplate.content,
