@@ -226,7 +226,7 @@
         "before": false
       }
     ],
-    "@typescript-eslint/semi": ["error"],
+    "@typescript-eslint/semi": ["error", "always"],
     "wrap-iife": [
       "error",
       "any"
