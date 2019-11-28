@@ -24,7 +24,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import {ExplorationDraft, ExplorationDraftObjectFactory} from
+import { ExplorationDraft, ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 
 @Injectable({
