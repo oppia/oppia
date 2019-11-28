@@ -54,3 +54,8 @@ class ActivityReferencesModel(base_models.BaseModel):
             entity.put()
 
         return entity
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return base_models.TAKEOUT_POLICY_NOT_NEEDED

@@ -63,3 +63,8 @@ class RoleQueryAuditModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.query(cls.user_id == user_id).get() is not None
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return base_models.TAKEOUT_POLICY_NOT_NEEDED

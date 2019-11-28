@@ -19,14 +19,17 @@ from __future__ import absolute_import   # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
+import sys
+import inspect
 
 from core.platform import models
 
 (
-    collection_models, email_models, exploration_models, feedback_models,
+    base_model, collection_models, email_models, exploration_models, feedback_models,
     suggestion_models, user_models) = models.Registry.import_models([
-        models.NAMES.collection, models.NAMES.email, models.NAMES.exploration,
-        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user])
+        models.NAMES.base_model, models.NAMES.collection, models.NAMES.email, \
+        models.NAMES.exploration, models.NAMES.feedback, models.NAMES.suggestion, 
+        models.NAMES.user])
 
 
 def export_data_for_user(user_id):
@@ -42,34 +45,27 @@ def export_data_for_user(user_id):
                                 model export policy>
         }
     """
-    models_to_export = [
-        user_models.UserStatsModel,
-        user_models.UserSettingsModel,
-        user_models.UserSubscriptionsModel,
-        user_models.UserSkillMasteryModel,
-        user_models.UserContributionsModel,
-        user_models.ExplorationUserDataModel,
-        user_models.CompletedActivitiesModel,
-        user_models.IncompleteActivitiesModel,
-        user_models.ExpUserLastPlaythroughModel,
-        user_models.LearnerPlaylistModel,
-        user_models.CollectionProgressModel,
-        user_models.StoryProgressModel,
-        feedback_models.GeneralFeedbackThreadModel,
-        feedback_models.GeneralFeedbackMessageModel,
-        collection_models.CollectionRightsModel,
-        suggestion_models.GeneralSuggestionModel,
-        exploration_models.ExplorationRightsModel,
-        email_models.GeneralFeedbackEmailReplyToIdModel
-    ]
+    all_models = []
+    model_names_list = [model_name for model_name in dir(models.NAMES) if not model_name.startswith('__')]
+    model_modules = models.Registry.import_models(model_names_list)
+    for model_module in model_modules:
+        for name, obj in inspect.getmembers(model_module):
+            if inspect.isclass(obj):
+                all_models.append(obj)
+
+    # # Exclude the BaseModel.
+    # print(all_models)
+    # all_models.remove(base_model)
 
     exported_data = dict()
-    for model in models_to_export:
+    for model in all_models:
         # Split the model name by uppercase characters.
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
         # Join the split name with underscores and add _data for final name.
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
-        exported_data[final_name] = model.export_data(user_id)
+        export_result = model.export_data(user_id)
+        if export_result != base_model.TAKEOUT_POLICY_NOT_NEEDED:
+            exported_data[final_name] = model.export_data(user_id)
 
     # Combine the data into a single dictionary.
     return exported_data
