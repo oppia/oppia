@@ -16,15 +16,18 @@
  * @fileoverview Service for managing CSRF tokens.
  */
 
+// This needs to be imported first instead of using the global definition
+// because Angular doesn't support global definitions and every library used
+// needs to be imported explicitly.
+
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import $ from 'jquery';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CsrfTokenService {
-  constructor(private httpClient: HttpClient) {}
   tokenPromise = null;
 
   initializeToken() {
@@ -32,10 +35,20 @@ export class CsrfTokenService {
       throw new Error('Token request has already been made');
     }
 
-    this.tokenPromise = this.httpClient.get('/csrfhandler').toPromise()
-      .then((response: any) => {
-        return response.token;
-      });
+    // We use jQuery here instead of Angular's $http, since the latter creates
+    // a circular dependency.
+    this.tokenPromise = $.ajax({
+      url: '/csrfhandler',
+      type: 'GET',
+      dataType: 'text',
+      dataFilter: function(data: any) {
+        // Remove the protective XSSI (cross-site scripting inclusion) prefix.
+        let actualData = data.substring(5);
+        return JSON.parse(actualData);
+      },
+    }).then(function(response: any) {
+      return response.token;
+    });
   }
 
   getTokenAsync() {

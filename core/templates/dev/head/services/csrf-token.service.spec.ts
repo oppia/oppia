@@ -16,34 +16,27 @@
  * @fileoverview Unit tests for the csrf service
  */
 
-import { HttpClientTestingModule, HttpTestingController }
-  from '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+// This needs to be imported first instead of using the global definition
+// because Angular doesn't support global definitions and every library used
+// needs to be imported explicitly.
+import $ from 'jquery';
 
 import { CsrfTokenService } from 'services/csrf-token.service';
 
-describe('Csrf Token Service', () => {
+describe('Csrf Token Service', function() {
   let csrfTokenService: CsrfTokenService = null;
-  let httpTestingController: HttpTestingController = null;
-
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [CsrfTokenService]
-    });
+    csrfTokenService = new CsrfTokenService();
 
-    httpTestingController = TestBed.get(HttpTestingController);
-    csrfTokenService = TestBed.get(CsrfTokenService);
+    // This ts ignore is because returnValue is expecting a jqXHR<any>
+    // and wherease a Promise<{token: string}> is being provided.
+    // @ts-ignore
+    spyOn($, 'ajax').and.returnValue(Promise.resolve(
+      {token: 'sample-csrf-token'}));
   });
 
   it('should correctly set the csrf token', (done) => {
     csrfTokenService.initializeToken();
-
-    let req = httpTestingController.expectOne('/csrfhandler');
-    expect(req.request.method).toEqual('GET');
-    req.flush(Promise.resolve(
-      {token: 'sample-csrf-token'}
-    ));
 
     csrfTokenService.getTokenAsync().then(function(token) {
       expect(token).toEqual('sample-csrf-token');
