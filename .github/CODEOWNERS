@@ -134,6 +134,7 @@
 /core/templates/dev/head/components/state-editor/ @aks681
 /core/templates/dev/head/services/compute-graph.service.ts @aks681
 /core/templates/dev/head/services/context.service*.ts @aks681
+/core/templates/dev/head/services/debug-info-tracker.service*.ts @aks681
 /core/templates/dev/head/services/editability.service*.ts @aks681
 /core/templates/dev/head/services/exploration-features*.ts @aks681
 /core/templates/dev/head/services/exploration-html-formatter.service*.ts @aks681
