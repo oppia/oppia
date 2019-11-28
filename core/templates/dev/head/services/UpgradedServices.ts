@@ -36,6 +36,7 @@ import { ChangesInHumanReadableFormService } from
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ContextService } from 'services/context.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -56,7 +57,6 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
@@ -72,6 +72,7 @@ import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
@@ -102,6 +103,8 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StopwatchObjectFactory } from
+  'domain/utilities/StopwatchObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
@@ -126,6 +129,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import {MessengerService} from './messenger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -172,6 +176,7 @@ export class UpgradedServices {
       new PlaythroughIssueObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
+    upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
@@ -201,6 +206,8 @@ export class UpgradedServices {
       new HintObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['HtmlEscaperService'] =
       new HtmlEscaperService(upgradedServices['LoggerService']);
+    upgradedServices['LocalStorageService'] = new LocalStorageService(
+      upgradedServices['ExplorationDraftObjectFactory']);
     upgradedServices['MetaTagCustomizationService'] =
       new MetaTagCustomizationService(upgradedServices['WindowRef']);
     upgradedServices['NumberWithUnitsObjectFactory'] =
@@ -250,9 +257,13 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['MessengerService'] = new MessengerService(
+      upgradedServices['LoggerService'], upgradedServices['WindowRef']);
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
+    upgradedServices['ContextService'] = new ContextService(
+      upgradedServices['UrlService']);
 
     // Group 4: Services depending on groups 1,2 and 3.
     upgradedServices['ExplorationHtmlFormatterService'] =
