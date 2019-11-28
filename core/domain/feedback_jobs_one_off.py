@@ -68,12 +68,14 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 thread.last_message_id = None
                 thread.last_message_text = None
                 thread.last_message_author_id = None
+                thread.updated_status = None
         else:
             if thread.last_message_id != messages[-1].message_id:
                 action_taken = 'Updated'
                 thread.last_message_id = messages[-1].message_id
                 thread.last_message_text = messages[-1].text
                 thread.last_message_author_id = messages[-1].author_id
+                thread.updated_status = messages[-1].updated_status
 
         if len(messages) < 2:
             if thread.second_last_message_id is not None:

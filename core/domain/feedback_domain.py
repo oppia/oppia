@@ -42,6 +42,8 @@ class FeedbackThread(python_utils.OBJECT):
             created.
         last_updated: datetime.datetime. The time when the feedback thread
             was last updated.
+        updated_status: str. The change in status since the last message, if
+            any.
         last_message_id: int. The id of the last message in the thread.
         last_message_text: str. The text of the last message in the thread.
         last_message_author_id: str. The author id of the last message in the
@@ -57,9 +59,10 @@ class FeedbackThread(python_utils.OBJECT):
     def __init__(
             self, thread_id, entity_type, entity_id, state_name,
             original_author_id, status, subject, summary, has_suggestion,
-            message_count, created_on, last_updated, last_message_id,
-            last_message_text, last_message_author_id, second_last_message_id,
-            second_last_message_text, second_last_message_author_id):
+            message_count, created_on, last_updated, updated_status,
+            last_message_id, last_message_text, last_message_author_id,
+            second_last_message_id, second_last_message_text,
+            second_last_message_author_id):
         """Initializes a FeedbackThread object."""
 
         self.id = thread_id
@@ -75,6 +78,7 @@ class FeedbackThread(python_utils.OBJECT):
 
         self.created_on = created_on
         self.last_updated = last_updated
+        self.updated_status = updated_status
         self.last_message_id = last_message_id
         self.last_message_text = last_message_text
         self.last_message_author_id = last_message_author_id
@@ -98,6 +102,7 @@ class FeedbackThread(python_utils.OBJECT):
             'summary': self.summary,
             'thread_id': self.id,
             'message_count': self.message_count,
+            'updated_status': self.updated_status,
             'last_message_text': self.last_message_text,
             'last_message_author': (
                 user_services.get_username(self.last_message_author_id)

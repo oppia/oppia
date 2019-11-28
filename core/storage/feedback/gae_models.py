@@ -74,6 +74,8 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     has_suggestion = ndb.BooleanProperty(
         indexed=True, default=False, required=True)
 
+    # The change in status since the last message, if any.
+    updated_status = ndb.StringProperty(choices=STATUS_CHOICES, indexed=True)
     # Cached value of the number of messages in the thread.
     message_count = ndb.IntegerProperty(indexed=True, default=0)
     # Cached ID of the last message in the thread.
