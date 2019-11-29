@@ -57,7 +57,6 @@ import time
 import python_utils
 
 from . import common
-from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
@@ -488,10 +487,10 @@ def main(args=None):
 
     if parsed_args.generate_coverage_report:
         subprocess.check_call(['coverage', 'combine'])
-        process = subprocess.Popen([
-            'coverage', 'report',
-            '--omit="%s*","third_party/*","/usr/share/*"'
-            % common.OPPIA_TOOLS_DIR, '--show-missing', '--skip-covered'],
+        process = subprocess.Popen(
+            ['coverage', 'report',
+             '--omit="%s*","third_party/*","/usr/share/*"'
+             % common.OPPIA_TOOLS_DIR, '--show-missing', '--skip-covered'],
             stdout=subprocess.PIPE)
 
         report_stdout = process.stdout.read()
