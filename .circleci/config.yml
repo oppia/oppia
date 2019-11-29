@@ -113,6 +113,33 @@ jobs:
             codecov --file ../karma_coverage_reports/lcov.info -F frontend
           when: on_success
 
+  backend_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run:
+          <<: *install_dependencies
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run: sudo pip install webtest
+      - run: sudo pip install coverage
+      - run:
+          name: Run backend tests
+          command: |
+            python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
+      - run:
+          <<: *install_cc
+      - run:
+          name: Generate backend coverage report
+          command: |
+            sudo pip install codecov
+            codecov -F backend
+            ./cc-test-reporter format-coverage -t coverage.py coverage.xml
+            ./cc-test-reporter sum-coverage coverage/codeclimate.json
+            ./cc-test-reporter upload-coverage
+          when: on_success
+
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
