@@ -16,86 +16,104 @@
  * @fileoverview Utility services for explorations which may be shared by both
  * the learner and editor views.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
-require('services/extension-tag-assembler.service.ts');
-require('services/html-escaper.service.ts');
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ExtensionTagAssemblerService } from
+  'services/extension-tag-assembler.service';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+
+interface InteractionArgs {
+  choices : {
+    value: string;
+  };
+}
 
 // A service that provides a number of utility functions useful to both the
 // editor and player.
-angular.module('oppia').factory('ExplorationHtmlFormatterService', [
-  '$filter', 'ExtensionTagAssemblerService', 'HtmlEscaperService',
-  function(
-      $filter, ExtensionTagAssemblerService, HtmlEscaperService) {
-    return {
-      /**
-       * @param {string} interactionId - The interaction id.
-       * @param {object} interactionCustomizationArgSpecs - The various
-       *   attributes that the interaction depends on.
-       * @param {boolean} parentHasLastAnswerProperty - If this function is
-       *   called in the exploration_player view (including the preview mode),
-       *   callers should ensure that parentHasLastAnswerProperty is set to
-       *   true and $scope.lastAnswer =
-       *   PlayerTranscriptService.getLastAnswerOnDisplayedCard(index) is set on
-       *   the parent controller of the returned tag.
-       *   Otherwise, parentHasLastAnswerProperty should be set to false.
-       * @param {string} labelForFocusTarget - The label for setting focus on
-       *   the interaction.
-       */
-      getInteractionHtml: function(
-          interactionId, interactionCustomizationArgSpecs,
-          parentHasLastAnswerProperty, labelForFocusTarget) {
-        var htmlInteractionId = $filter('camelCaseToHyphens')(interactionId);
-        var element = $('<oppia-interactive-' + htmlInteractionId + '>');
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationHtmlFormatterService {
+  constructor(
+    private camelCaseToHyphens: CamelCaseToHyphensPipe,
+    private extensionTagAssembler: ExtensionTagAssemblerService,
+    private htmlEscaper: HtmlEscaperService) {}
+  /**
+   * @param {string} interactionId - The interaction id.
+   * @param {object} interactionCustomizationArgSpecs - The various
+   *   attributes that the interaction depends on.
+   * @param {boolean} parentHasLastAnswerProperty - If this function is
+   *   called in the exploration_player view (including the preview mode),
+   *   callers should ensure that parentHasLastAnswerProperty is set to
+   *   true and $scope.lastAnswer =
+   *   PlayerTranscriptService.getLastAnswerOnDisplayedCard(index) is set on
+   *   the parent controller of the returned tag.
+   *   Otherwise, parentHasLastAnswerProperty should be set to false.
+   * @param {string} labelForFocusTarget - The label for setting focus on
+   *   the interaction.
+   */
+  getInteractionHtml(
+      interactionId: string, interactionCustomizationArgSpecs: object,
+      parentHasLastAnswerProperty: boolean,
+      labelForFocusTarget: string): string {
+    var htmlInteractionId = this.camelCaseToHyphens.transform(interactionId);
+    var element = $('<oppia-interactive-' + htmlInteractionId + '>');
 
-        element = (
-          ExtensionTagAssemblerService.formatCustomizationArgAttrs(
-            element, interactionCustomizationArgSpecs));
-        element.attr('last-answer', parentHasLastAnswerProperty ?
-          'lastAnswer' : 'null');
-        if (labelForFocusTarget) {
-          element.attr('label-for-focus-target', labelForFocusTarget);
-        }
-        return element.get(0).outerHTML;
-      },
-
-      getAnswerHtml: function(
-          answer, interactionId, interactionCustomizationArgs) {
-        // TODO(sll): Get rid of this special case for multiple choice.
-        var interactionChoices = null;
-        if (interactionCustomizationArgs.choices) {
-          interactionChoices = interactionCustomizationArgs.choices.value;
-        }
-
-        var el = $(
-          '<oppia-response-' + $filter('camelCaseToHyphens')(
-            interactionId) + '>');
-        el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
-        if (interactionChoices) {
-          el.attr('choices', HtmlEscaperService.objToEscapedJson(
-            interactionChoices));
-        }
-        return ($('<div>').append(el)).html();
-      },
-
-      getShortAnswerHtml: function(
-          answer, interactionId, interactionCustomizationArgs) {
-        // TODO(sll): Get rid of this special case for multiple choice.
-        var interactionChoices = null;
-        if (interactionCustomizationArgs.choices) {
-          interactionChoices = interactionCustomizationArgs.choices.value;
-        }
-
-        var el = $(
-          '<oppia-short-response-' + $filter('camelCaseToHyphens')(
-            interactionId) + '>');
-        el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
-        if (interactionChoices) {
-          el.attr('choices', HtmlEscaperService.objToEscapedJson(
-            interactionChoices));
-        }
-        return ($('<span>').append(el)).html();
-      }
-    };
+    element = (
+      this.extensionTagAssembler.formatCustomizationArgAttrs(
+        element, interactionCustomizationArgSpecs));
+    element.attr('last-answer', parentHasLastAnswerProperty ?
+      'lastAnswer' : 'null');
+    if (labelForFocusTarget) {
+      element.attr('label-for-focus-target', labelForFocusTarget);
+    }
+    return element.get(0).outerHTML;
   }
-]);
+
+  getAnswerHtml(
+      answer: string, interactionId: string,
+      interactionCustomizationArgs: InteractionArgs): string {
+    // TODO(sll): Get rid of this special case for multiple choice.
+    var interactionChoices = null;
+    if (interactionCustomizationArgs.choices) {
+      interactionChoices = interactionCustomizationArgs.choices.value;
+    }
+
+    var el = $(
+      '<oppia-response-' + this.camelCaseToHyphens.transform(
+        interactionId) + '>');
+    el.attr('answer', this.htmlEscaper.objToEscapedJson(answer));
+    if (interactionChoices) {
+      el.attr('choices', this.htmlEscaper.objToEscapedJson(
+        interactionChoices));
+    }
+    return ($('<div>').append(el)).html();
+  }
+
+  getShortAnswerHtml(
+      answer: string, interactionId: string,
+      interactionCustomizationArgs: InteractionArgs) : string {
+    // TODO(sll): Get rid of this special case for multiple choice.
+    var interactionChoices = null;
+    if (interactionCustomizationArgs.choices) {
+      interactionChoices = interactionCustomizationArgs.choices.value;
+    }
+
+    var el = $(
+      '<oppia-short-response-' + this.camelCaseToHyphens.transform(
+        interactionId) + '>');
+    el.attr('answer', this.htmlEscaper.objToEscapedJson(answer));
+    if (interactionChoices) {
+      el.attr('choices', this.htmlEscaper.objToEscapedJson(
+        interactionChoices));
+    }
+    return ($('<span>').append(el)).html();
+  }
+}
+
+angular.module('oppia').factory(
+  'ExplorationHtmlFormatterService',
+  downgradeInjectable(ExplorationHtmlFormatterService));

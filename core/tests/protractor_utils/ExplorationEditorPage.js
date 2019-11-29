@@ -175,19 +175,20 @@ var ExplorationEditorPage = function() {
       '.select2-selection__rendered')).getText();
     const explorationLanguage = element(by.css(
       '.protractor-test-exploration-language-select'
-    )).element(by.sel('option:checked')).getText();
+    )).$('option:checked').getText();
     const explorationTags = element.all(by.css(
       '.select2-selection__choice'
     ));
-
     waitFor.visibilityOf(explorationTitle,
       'Exploration Goal taking too long to appear');
     expect(explorationTitle.getAttribute('value')).toMatch(title);
-    expect(explorationCategory.getAttribute('value')).toMatch(category);
+    expect(explorationCategory).toMatch(category);
     expect(explorationObjective.getAttribute('value')).toMatch(objective);
-    expect(explorationLanguage.sel).toMatch(language);
-    explorationTags.forEach(function(explorationTag, index) {
-      expect(explorationTag.getText()).toMatch(tags[index]);
+    expect(explorationLanguage).toMatch(language);
+    explorationTags.then(function(elems) {
+      elems.forEach(function(explorationTag, index) {
+        expect(explorationTag.getText()).toMatch(tags[index]);
+      });
     });
   };
 

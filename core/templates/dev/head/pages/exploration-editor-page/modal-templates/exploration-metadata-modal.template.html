@@ -27,7 +27,7 @@
 
   <p ng-if="askForLanguageCheck">
     Verify the language: is your exploration written in this language?
-    <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()"
+    <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getSupportedContentLanguages()"
             width="100%">
     </select>
   </p>

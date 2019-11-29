@@ -67,6 +67,7 @@
     "gulp": "^4.0.1",
     "gulp-concat": "^2.6.1",
     "html-dnd": "^1.2.1",
+    "html-loader": "^0.5.5",
     "html-webpack-plugin": "4.0.0-beta.8",
     "htmllint": "^0.8.0",
     "htmllint-cli": "github:oppia/htmllint-cli#01a8b74",
@@ -109,5 +110,9 @@
     "yargs": "^13.2.2",
     "zone.js": "^0.9.1"
   },
-  "keywords": []
+  "keywords": [],
+  "dependencies": {
+    "gif-frames": "^1.0.1",
+    "gifshot": "^0.4.5"
+  }
 }

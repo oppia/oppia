@@ -61,6 +61,10 @@ angular.module('oppia').directive('rubricsEditor', [
             return true;
           };
 
+          ctrl.isExplanationEmpty = function(explanation) {
+            return explanation === '<p></p>' || explanation === '';
+          };
+
           ctrl.setActiveDifficultyIndex = function(index) {
             ctrl.activeRubricIndex = index;
           };

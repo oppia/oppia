@@ -473,7 +473,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         suggestion_id: str. The ID of the suggestion.
         suggestion_type: str. The type of the suggestion.
         target_type: str. The type of target entity being edited, for this
-            subclass, target type is 'topic'.
+            subclass, target type is 'skill'.
         target_id: str. The ID of the topic the question was submitted to.
         target_version_at_submission: int. The version number of the target
             topic at the time of creation of the suggestion.
@@ -496,7 +496,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         """
         self.suggestion_id = suggestion_id
         self.suggestion_type = suggestion_models.SUGGESTION_TYPE_ADD_QUESTION
-        self.target_type = suggestion_models.TARGET_TYPE_TOPIC
+        self.target_type = suggestion_models.TARGET_TYPE_SKILL
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.status = status

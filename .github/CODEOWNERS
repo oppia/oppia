@@ -50,7 +50,9 @@
 # Community contribution project
 /core/controllers/community_dashboard*.py @DubeySandeep
 /core/domain/opportunity*.py @DubeySandeep
+/core/domain/voiceover_services*.py @DubeySandeep
 /core/storage/opportunity/ @DubeySandeep
+/core/templates/dev/head/domain/opportunity @DubeySandeep
 /core/templates/dev/head/pages/community-dashboard-page/ @DubeySandeep
 
 
@@ -132,6 +134,7 @@
 /core/templates/dev/head/components/state-editor/ @aks681
 /core/templates/dev/head/services/compute-graph.service.ts @aks681
 /core/templates/dev/head/services/context.service*.ts @aks681
+/core/templates/dev/head/services/debug-info-tracker.service*.ts @aks681
 /core/templates/dev/head/services/editability.service*.ts @aks681
 /core/templates/dev/head/services/exploration-features*.ts @aks681
 /core/templates/dev/head/services/exploration-html-formatter.service*.ts @aks681
@@ -275,6 +278,7 @@
 /core/templates/dev/head/components/skill-mastery/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/components/skills-mastery-list/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
+/core/templates/dev/head/domain/review_test/ @nishantwrp @sophiewu6 @vinitamurthi
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/services/questions-list.service.ts @sophiewu6 @vinitamurthi
@@ -351,6 +355,7 @@
 /core/templates/dev/head/app.constants.ajs.ts @ankita240796
 /core/templates/dev/head/combined-tests.spec.ts @ankita240796
 /core/templates/dev/head/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @Jamesjay4199
+/core/templates/dev/head/pages/interaction-specs.constants.ts @bansalnitish
 /core/templates/dev/head/I18nFooter.ts @nithusha21
 /core/templates/dev/head/i18n-footer.directive.html @nithusha21
 /core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @YashJipkate
@@ -424,6 +429,7 @@
 /core/controllers/pages*.py @jamesjay4199 @vojtechjelinek
 /core/controllers/custom_landing_pages*.py @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/contact-page/ @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/pages/delete-account-page/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/donate-page/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/error-pages/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/get-started-page/ @jamesjay4199 @vojtechjelinek
@@ -456,6 +462,10 @@
 
 # Typings.
 /typings @ankita240796
+
+
+# User Data Takeout.
+/core/domain/takeout_service*.py @vojtechjelinek @seanlip
 
 
 # User’s profile page.
