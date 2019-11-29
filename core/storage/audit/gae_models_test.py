@@ -68,7 +68,7 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             audit_models.RoleQueryAuditModel.get_user_id_migration_field(),
             audit_models.RoleQueryAuditModel.user_id)
 

@@ -49,11 +49,14 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 # Enums are evaluated as classes in Python and they should use PascalCase,
 # but using UPPER_CASE seems more appropriate here.
 USER_ID_MIGRATION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'COPY',
-    'COPY_PART',
-    'ONE_FIELD',
-    'CUSTOM',
-    'NOT_APPLICABLE'
+    'COPY',  # User ID is used as model ID thus the model needs to be recreated.
+    'COPY_PART',  # User id is used as first part of the model ID thus the model
+                  # needs to be recreated.
+    'ONE_FIELD',  # One field in the model contains user ID thus the value in
+                  # that field needs to be changed.
+    'CUSTOM',  # Multiple fields in the model contain user ID, values in all
+               # these fields need to be changed.
+    'NOT_APPLICABLE'  # The model doesn't contain any field with user ID.
 )
 
 # Constant used when retrieving big number of models.

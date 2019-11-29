@@ -84,7 +84,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             feedback_models.GeneralFeedbackThreadModel
             .get_user_id_migration_field(),
             feedback_models.GeneralFeedbackThreadModel.original_author_id)
@@ -173,7 +173,7 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             feedback_models.GeneralFeedbackMessageModel
             .get_user_id_migration_field(),
             feedback_models.GeneralFeedbackMessageModel.author_id)
@@ -351,7 +351,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             feedback_models.GeneralFeedbackThreadUserModel
             .get_user_id_migration_field(),
             feedback_models.GeneralFeedbackThreadUserModel.user_id)

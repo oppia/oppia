@@ -313,7 +313,8 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
 
             # We remove the manager_id form manager_ids to to verify that the
             # manager_id is still found in TopicRightsSnapshotContentModel.
-            topic_rights = topic_models.TopicRightsModel.get_by_id('topic_id')
+            topic_rights = topic_models.TopicRightsModel.get_by_id(
+                self.TOPIC_1_ID)
             topic_rights.manager_ids = ['different_manager_id']
             topic_rights.commit(
                 'committer_id',

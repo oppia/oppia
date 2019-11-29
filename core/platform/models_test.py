@@ -192,6 +192,7 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         """Tests get_all_storage_model_classes."""
         classes = self.registry_instance.get_all_storage_model_classes()
         self.assertIsNot(classes, [])
+        self.assertIsNot(classes, [])
 
     def test_import_current_user_services(self):
         """Tests import current user services function."""

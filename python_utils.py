@@ -33,7 +33,7 @@ sys.path.insert(0, _YAML_PATH)
 # pylint: disable=wrong-import-order
 import yaml  # isort:skip
 
-import builtins # isort:skip
+import builtins  # isort:skip
 import future.utils  # isort:skip
 import past.builtins  # isort:skip
 import past.utils  # isort:skip

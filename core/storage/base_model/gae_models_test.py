@@ -48,8 +48,9 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.has_reference_to_user_id('user_id')
 
     def test_get_user_id_migration_policy(self):
-        with self.assertRaises(NotImplementedError):
-            base_models.BaseModel.get_user_id_migration_policy()
+        self.assertEqual(
+            base_models.BaseModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_get_user_id_migration_field(self):
         with self.assertRaises(NotImplementedError):
@@ -175,7 +176,7 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             base_models.BaseCommitLogEntryModel.get_user_id_migration_field(),
             base_models.BaseCommitLogEntryModel.user_id)
 
@@ -195,7 +196,7 @@ class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assertEqual(
+        self.assert_model_fields_equal(
             base_models.BaseSnapshotMetadataModel.get_user_id_migration_field(),
             base_models.BaseSnapshotMetadataModel.committer_id)
 

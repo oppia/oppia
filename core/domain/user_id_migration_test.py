@@ -203,14 +203,14 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             last_played_state_name='start'))
         original_models[-1].put()
         original_models.append(user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (self.user_b_id, 'exp_id'),
+            id='%s.%s' % (user_b_id, 'exp_id'),
             user_id=user_b_id,
             exploration_id='exp_id',
             last_played_exp_version=3,
             last_played_state_name='start'))
         original_models[-1].put()
         original_models.append(user_models.ExpUserLastPlaythroughModel(
-            id='%s.%s' % (self.user_c_id, 'exp_id'),
+            id='%s.%s' % (user_c_id, 'exp_id'),
             user_id=user_c_id,
             exploration_id='exp_id',
             last_played_exp_version=4,
@@ -375,14 +375,14 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             has_email_been_sent=False))
         original_models[-1].put()
         original_models.append(user_models.UserContributionScoringModel(
-            id='%s.%s' % ('score_category', self.user_b_id),
+            id='%s.%s' % ('score_category', user_b_id),
             user_id=user_b_id,
             score_category='score_category',
             score=2,
             has_email_been_sent=False))
         original_models[-1].put()
         original_models.append(user_models.UserContributionScoringModel(
-            id='%s.%s' % ('score_category', self.user_c_id),
+            id='%s.%s' % ('score_category', user_c_id),
             user_id=user_c_id,
             score_category='score_category',
             score=2,
