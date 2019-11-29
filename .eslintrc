@@ -22,7 +22,7 @@
   "rules": {
     "angular/di": [
       "error",
-      "array",
+      "array"
     ],
     "angular/di-unused": "error",
     "angular/directive-restrict": [
@@ -226,7 +226,10 @@
         "before": false
       }
     ],
-    "@typescript-eslint/semi": ["error", "always"],
+    "@typescript-eslint/semi": [
+      "error",
+      "always"
+    ],
     "wrap-iife": [
       "error",
       "any"
