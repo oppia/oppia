@@ -241,7 +241,7 @@ def _check_all_tasks(tasks):
             log(task_details)
 
 
-def _execute_tasks(tasks, batch_size=24):
+def _execute_tasks(tasks, batch_size=12):
     """Starts all tasks and checks the results.
 
     Runs no more than 'batch_size' tasks at a time.
