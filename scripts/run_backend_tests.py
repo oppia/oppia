@@ -89,6 +89,10 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
+DIRS_TO_ADD_TO_SYS_PYTHONPATH = [
+    os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')
+]
+
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
@@ -212,7 +216,7 @@ class TestingTaskSpec(python_utils.OBJECT):
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                'coverage', 'run', '-p', TEST_RUNNER_PATH,
+                'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
         else:
             exc_list = ['python', TEST_RUNNER_PATH, test_target_flag]
@@ -337,14 +341,27 @@ def main(args=None):
             raise Exception('Directory %s does not exist.' % directory)
         sys.path.insert(0, directory)
 
+    pythonpath_starting_index = 0
+    if not os.environ.get('PYTHONPATH'):
+       os.environ['PYTHONPATH'] = DIRS_TO_ADD_TO_SYS_PYTHONPATH[0]
+       pythonpath_starting_index = 1
+
+    for i in range(
+        pythonpath_starting_index, len(DIRS_TO_ADD_TO_SYS_PYTHONPATH)):
+        if not os.path.exists(os.path.dirname(directory)):
+            raise Exception('Directory %s does not exist.' % directory)
+        os.environ['PYTHONPATH'] = '%s:%s' % (
+            DIRS_TO_ADD_TO_SYS_PYTHONPATH[i], os.environ.get('PYTHONPATH'))
+
     import dev_appserver
     dev_appserver.fix_sys_path()
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT('Checking whether coverage is installed')
-        if subprocess.call(['pip', 'show', 'coverage']) != 0:
-            raise Exception('Coverage is not installed, please install '
-                            'coverage using pip at the system level.')
+        if not os.path.exists(
+                os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')):
+            raise Exception('Coverage is not installed, please run the start ' +
+                            'script.')
 
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
@@ -486,9 +503,9 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call(['coverage', 'combine'])
+        subprocess.check_call(['python', COVERAGE_PATH, 'combine'])
         process = subprocess.Popen(
-            ['coverage', 'report',
+            ['python', COVERAGE_PATH, 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
              % common.OPPIA_TOOLS_DIR, '--show-missing', '--skip-covered'],
             stdout=subprocess.PIPE)

@@ -217,6 +217,7 @@ def main(args=None):
     setup.main(args=[])
     setup_gae.main(args=[])
     pip_dependencies = [
+        ('coverage', '4.5.4', common.OPPIA_TOOLS_DIR),
         ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
         ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
