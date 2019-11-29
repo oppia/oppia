@@ -495,7 +495,8 @@ def main(args=None):
 
         report_stdout = process.stdout.read()
         python_utils.PRINT(report_stdout)
-        python_utils.PRINT('Files that are not reported have 100\% \coverage.')
+        python_utils.PRINT(
+            'Files that are not reported have complete coverage.')
 
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
