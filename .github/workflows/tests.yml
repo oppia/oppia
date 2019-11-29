@@ -13,18 +13,9 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
-      - name: install pre
-        run: sudo apt-get install -y curl python-setuptools git python-dev python-pip python-yaml
       - name: Install third party
         run: python -m scripts.install_third_party_libs
-      - name: Install coverage packages
-        run: |
-          sudo pip install coverage
-          sudo pip install webtest
-      - name: Install Code Climate
-        run: |
-          curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-          chmod +x ./cc-test-reporter
-          ./cc-test-reporter before-build
+      - name: Install coverage
+        run: pip install coverage
       - name: run backend
         run: PYTHONIOENCODING=utf-8 python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests

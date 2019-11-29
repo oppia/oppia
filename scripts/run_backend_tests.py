@@ -99,7 +99,6 @@ ALL_ERRORS = []
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
-
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
     python -m scripts.run_backend_tests
@@ -214,7 +213,7 @@ class TestingTaskSpec(python_utils.OBJECT):
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
+                'coverage', 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
         else:
             exc_list = ['python', TEST_RUNNER_PATH, test_target_flag]
@@ -343,15 +342,10 @@ def main(args=None):
     dev_appserver.fix_sys_path()
 
     if parsed_args.generate_coverage_report:
-        python_utils.PRINT(
-            'Checking whether coverage is installed in %s'
-            % common.OPPIA_TOOLS_DIR)
-        if not os.path.exists(
-                os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')):
-            python_utils.PRINT('Installing coverage')
-            install_third_party_libs.pip_install(
-                'coverage', '4.5.4',
-                os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'))
+        python_utils.PRINT('Checking whether coverage is installed')
+        if subprocess.call(['which', 'coverage']) != 0:
+            raise Exception('Coverage is not installed, please install '
+                            'coverage using pip at the system level.')
 
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
@@ -493,14 +487,20 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call(['python', COVERAGE_PATH, 'combine'])
-        subprocess.check_call([
-            'python', COVERAGE_PATH, 'report',
+        subprocess.check_call(['coverage', 'combine'])
+        process = subprocess.Popen([
+            'coverage', 'report',
             '--omit="%s*","third_party/*","/usr/share/*"'
-            % common.OPPIA_TOOLS_DIR, '--show-missing'])
+            % common.OPPIA_TOOLS_DIR, '--show-missing', '--skip-covered'],
+            stdout=subprocess.PIPE)
 
-        python_utils.PRINT('Generating xml coverage report...')
-        subprocess.check_call(['python', COVERAGE_PATH, 'xml'])
+        report_stdout = process.stdout.read()
+        python_utils.PRINT(report_stdout)
+
+        coverage_result = re.search(
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
+        if coverage_result.group('total') != '100':
+            raise Exception('Backend test coverage is not 100%')
 
     python_utils.PRINT('')
     python_utils.PRINT('Done!')
