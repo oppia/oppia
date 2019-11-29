@@ -1536,7 +1536,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
         output = self.run_one_off_job()
         self.assertEqual(
             output, [u'[u\'Deleted all stats\', [u"{u\'exp_id\': \'EXP_ID_1\', '
-                      'u\'number_of_models\': 5}"]]', u'[u\'No change\', 1]'])
+                     'u\'number_of_models\': 5}"]]', u'[u\'No change\', 1]'])
 
         all_models = (
             stats_models.ExplorationStatsModel.get_multi_stats_models(

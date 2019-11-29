@@ -1263,7 +1263,7 @@ class RegenerateMissingV2StatsModelsOneOffJob(
             stats_models.ExplorationStatsModel.delete_multi(all_existent_models)
             yield (
                 'Deleted all stats', {
-                    'exp_id' : exp.id,
+                    'exp_id': exp.id,
                     'number_of_models': len(all_existent_models)
                 })
             return
