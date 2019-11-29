@@ -343,15 +343,16 @@ def main(args=None):
 
     pythonpath_starting_index = 0
     if not os.environ.get('PYTHONPATH'):
-       os.environ['PYTHONPATH'] = DIRS_TO_ADD_TO_SYS_PYTHONPATH[0]
-       pythonpath_starting_index = 1
+        os.environ['PYTHONPATH'] = DIRS_TO_ADD_TO_SYS_PYTHONPATH[0]
+        pythonpath_starting_index = 1
 
-    for i in range(
-        pythonpath_starting_index, len(DIRS_TO_ADD_TO_SYS_PYTHONPATH)):
+    for i in python_utils.RANGE(
+            pythonpath_starting_index, len(DIRS_TO_ADD_TO_SYS_PYTHONPATH)):
+        directory = DIRS_TO_ADD_TO_SYS_PYTHONPATH[i]
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
         os.environ['PYTHONPATH'] = '%s:%s' % (
-            DIRS_TO_ADD_TO_SYS_PYTHONPATH[i], os.environ.get('PYTHONPATH'))
+            directory, os.environ.get('PYTHONPATH'))
 
     import dev_appserver
     dev_appserver.fix_sys_path()
