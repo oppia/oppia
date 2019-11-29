@@ -342,7 +342,7 @@ def main(args=None):
 
     if parsed_args.generate_coverage_report:
         python_utils.PRINT('Checking whether coverage is installed')
-        if subprocess.call(['which', 'coverage']) != 0:
+        if subprocess.call(['pip', 'show', 'coverage']) != 0:
             raise Exception('Coverage is not installed, please install '
                             'coverage using pip at the system level.')
 
