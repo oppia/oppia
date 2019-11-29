@@ -104,8 +104,8 @@ def pip_install(package, version, install_path):
         raise Exception
 
     subprocess.check_call([
-        'pip', 'install', '%s==%s' % (package, version), '--target',
-        install_path])
+        'python', '-m', 'pip', 'install', '%s==%s' % (package, version),
+        '--target', install_path])
 
 
 def install_skulpt(parsed_args):
