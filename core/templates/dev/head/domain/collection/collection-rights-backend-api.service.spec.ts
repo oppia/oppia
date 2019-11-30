@@ -71,7 +71,7 @@ describe('Collection rights backend API service', function() {
     // PUT request. The typical expect() syntax with a passed-in object payload
     // does not seem to be working correctly.
     $httpBackend.expect(
-      'PUT', '/collection_editor_handler/publish/0').respond(200);
+      'PUT', '/collection_editor_handler/publish/0').respond(400);
     CollectionRightsBackendApiService.setCollectionPublic('0', 1).then(
       successHandler, failHandler);
     $httpBackend.flush();
