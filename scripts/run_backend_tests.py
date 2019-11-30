@@ -516,6 +516,9 @@ def main(args=None):
         python_utils.PRINT(
             'Files that are not reported have complete coverage.')
 
+        python_utils.PRINT('Generating xml coverage report...')
+        subprocess.check_call(['python', COVERAGE_PATH, 'xml'])
+
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
         if coverage_result.group('total') != '100':
