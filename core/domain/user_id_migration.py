@@ -83,7 +83,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             new_models.append(model_class(**model_values))
 
         def _replace_models():
-            """Replace old model with new one."""
+            """Replace old models with a new ones."""
             model_class.put_multi(new_models, update_last_updated_time=False)
             model_class.delete_multi(old_models)
 
