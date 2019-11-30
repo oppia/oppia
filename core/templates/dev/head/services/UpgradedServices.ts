@@ -142,7 +142,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import {TextInputPredictionService} from "../../../../../extensions/interactions/TextInput/text-input-prediction.service";
+import {TextInputPredictionService} from "interactions/TextInput/text-input-prediction.service";
 import {CountVectorizerService} from "classifiers/count-vectorizer.service";
 import {SVMPredictionService} from "classifiers/svm-prediction.service";
 import {PredictionResultObjectFactory} from "domain/classifier/PredictionResultObjectFactory";
