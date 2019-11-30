@@ -107,6 +107,7 @@ import { SubtitledHtmlObjectFactory } from
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -126,6 +127,10 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import {TextInputPredictionService} from "../../../../../extensions/interactions/TextInput/text-input-prediction.service";
+import {CountVectorizerService} from "classifiers/count-vectorizer.service";
+import {SVMPredictionService} from "classifiers/svm-prediction.service";
+import {PredictionResultObjectFactory} from "domain/classifier/PredictionResultObjectFactory";
 
 @Injectable({
   providedIn: 'root'
@@ -143,6 +148,7 @@ export class UpgradedServices {
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
+    upgradedServices['CountVectorizerService'] = new CountVectorizerService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
@@ -170,12 +176,15 @@ export class UpgradedServices {
       new ParamChangeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
+    upgradedServices['PredictionResultObjectFactory'] =
+        new PredictionResultObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory();
+    upgradedServices['TextInputTokenizer'] = new TextInputTokenizer();
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
@@ -224,6 +233,9 @@ export class UpgradedServices {
       new SidebarStatusService(upgradedServices['WindowDimensionsService']);
     upgradedServices['SiteAnalyticsService'] =
       new SiteAnalyticsService(upgradedServices['WindowRef']);
+    upgradedServices['SVMPredictionService'] =
+      new SVMPredictionService(
+        upgradedServices['PredictionResultObjectFactory']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
@@ -260,6 +272,12 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['TextInputPredictionService'] =
+        new TextInputPredictionService(
+            upgradedServices['CountVectorizerService'],
+            upgradedServices['SVMPredictionService'],
+            upgradedServices['TextInputTokenizer']
+        );
 
     // Group 5: Services depending on groups 1-4.
     upgradedServices['SolutionObjectFactory'] =

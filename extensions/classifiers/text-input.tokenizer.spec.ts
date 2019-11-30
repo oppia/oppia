@@ -19,23 +19,24 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 // ^^^ This block is to be removed.
 
 describe('Text Input tokenizer', function() {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', ($provide) => {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  describe('Test text input tokenizer', function() {
-    var tokenizer;
-    beforeEach(angular.mock.inject(function($injector) {
-      tokenizer = $injector.get('TextInputTokenizer');
-    }));
-    it('should generate correct tokens for a text', function() {
+  describe('Test text input tokenizer', () => {
+    var tokenizer: TextInputTokenizer;
+    beforeEach(() => {
+      tokenizer = new TextInputTokenizer();
+    });
+    it('should generate correct tokens for a text', () => {
       var textInput = 'I don\'t know the answer to this question';
       var expectedTokens = [
         'don', 'know', 'the', 'answer', 'to', 'this', 'question'];
