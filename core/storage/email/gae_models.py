@@ -111,7 +111,7 @@ class SentEmailModel(base_models.BaseModel):
             old_user_id: str. The old user ID.
             new_user_id: str. The new user ID.
         """
-        models = []
+        migrated_models = []
         for model in cls.query(ndb.OR(
                 cls.recipient_id == old_user_id,
                 cls.sender_id == old_user_id)).fetch():
@@ -119,8 +119,9 @@ class SentEmailModel(base_models.BaseModel):
                 model.recipient_id = new_user_id
             if model.sender_id == old_user_id:
                 model.sender_id = new_user_id
-            models.append(model)
-        SentEmailModel.put_multi(models, update_last_updated_time=False)
+            migrated_models.append(model)
+        SentEmailModel.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def _generate_id(cls, intent):
@@ -412,7 +413,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """GeneralFeedbackEmailReplyToIdModel has ID that contains user id and
         one other field that contains user ID.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def get_user_id_migration_field(cls):

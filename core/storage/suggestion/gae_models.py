@@ -172,7 +172,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             old_user_id: str. The old user ID.
             new_user_id: str. The new user ID.
         """
-        models = [g]
+        migrated_models = []
         for model in cls.query(ndb.OR(
                 cls.author_id == old_user_id,
                 cls.final_reviewer_id == old_user_id)).fetch():
@@ -180,8 +180,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 model.author_id = new_user_id
             if model.final_reviewer_id == old_user_id:
                 model.final_reviewer_id = new_user_id
-            models.append(model)
-        GeneralSuggestionModel.put_multi(models, update_last_updated_time=False)
+            migrated_models.append(model)
+        GeneralSuggestionModel.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def create(
@@ -435,7 +436,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             old_user_id: str. The old user ID.
             new_user_id: str. The new user ID.
         """
-        models = []
+        migrated_models = []
         for model in cls.query(ndb.OR(
                 cls.author_id == old_user_id,
                 cls.final_reviewer_id == old_user_id)).fetch():
@@ -443,9 +444,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 model.author_id = new_user_id
             if model.final_reviewer_id == old_user_id:
                 model.final_reviewer_id = new_user_id
-            models.append(model)
-        GeneralVoiceoverApplicationModel.put(
-            models, update_last_updated_time=False)
+            migrated_models.append(model)
+        GeneralVoiceoverApplicationModel.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def get_user_voiceover_applications(cls, author_id, status=None):

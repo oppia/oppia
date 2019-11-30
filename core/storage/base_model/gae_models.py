@@ -48,15 +48,20 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 # Types of user id migration policies. The pragma comment is needed because
 # Enums are evaluated as classes in Python and they should use PascalCase,
 # but using UPPER_CASE seems more appropriate here.
+# COPY - User ID is used as model ID thus the model needs to be recreated.
+# COPY_AND_UPDATE_ONE_FIELD - User id is used as first part of the model ID thus
+#                             the model needs to be recreated.
+# ONE_FIELD - One field in the model contains user ID thus the value in that
+#             field needs to be changed.
+# CUSTOM - Multiple fields in the model contain user ID, values in all these
+#          fields need to be changed.
+# NOT_APPLICABLE - The model doesn't contain any field with user ID.
 USER_ID_MIGRATION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
-    'COPY',  # User ID is used as model ID thus the model needs to be recreated.
-    'COPY_PART',  # User id is used as first part of the model ID thus the model
-                  # needs to be recreated.
-    'ONE_FIELD',  # One field in the model contains user ID thus the value in
-                  # that field needs to be changed.
-    'CUSTOM',  # Multiple fields in the model contain user ID, values in all
-               # these fields need to be changed.
-    'NOT_APPLICABLE'  # The model doesn't contain any field with user ID.
+    'COPY',
+    'COPY_AND_UPDATE_ONE_FIELD',
+    'ONE_FIELD',
+    'CUSTOM',
+    'NOT_APPLICABLE'
 )
 
 # Constant used when retrieving big number of models.

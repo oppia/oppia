@@ -351,7 +351,7 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             email_models.GeneralFeedbackEmailReplyToIdModel
             .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.COPY_PART)
+            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
         self.assertEqual(

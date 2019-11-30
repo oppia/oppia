@@ -179,6 +179,7 @@ class ExplorationRightsSnapshotContentModel(
     """Storage model for the content of an exploration rights snapshot."""
     pass
 
+
 class ExplorationRightsModel(base_models.VersionedModel):
     """Storage model for rights related to an exploration.
 

@@ -29,6 +29,7 @@ from core.platform import models
          models.NAMES.exploration, models.NAMES.question, models.NAMES.skill,
          models.NAMES.topic, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
+transaction_services = models.Registry.import_transaction_services()
 
 
 class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
@@ -40,33 +41,64 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _copy_model_with_new_id(model_class, old_user_id, new_user_id):
-        """Create new model with same values but new id."""
+        """Create new model with same values but new id.
+
+        Args:
+            model_class: class. The class of the migrated model.
+            old_user_id: str. The old (GAE) ID of the user being migrated.
+            new_user_id: str. The newly generated ID of the user being migrated.
+        """
         old_model = model_class.get_by_id(old_user_id)
         if not old_model:
             return
         model_values = old_model.to_dict()
         model_values['id'] = new_user_id
-        model_class(**model_values).put(update_last_updated_time=False)
-        old_model.delete()
+        new_model = model_class(**model_values)
+
+        def _replace_model():
+            """Replace old model with new one."""
+            new_model.put(update_last_updated_time=False)
+            old_model.delete()
+
+        transaction_services.run_in_transaction(_replace_model)
 
     @staticmethod
     def _copy_model_with_new_id_and_user_id(
             model_class, old_user_id, new_user_id):
-        """Create new model with same values but new id and user_id."""
+        """Create new model with same values but new id and user_id.
+
+        Args:
+            model_class: class. The class of the migrated model.
+            old_user_id: str. The old (GAE) ID of the user being migrated.
+            new_user_id: str. The newly generated ID of the user being migrated.
+        """
         old_models = model_class.query(
             model_class.get_user_id_migration_field() == old_user_id).fetch()
+        new_models = []
         for old_model in old_models:
             model_values = old_model.to_dict()
-            new_id = '%s.%s' % (new_user_id, old_model.id.split('.')[1])
+            new_id = old_model.id.replace(old_user_id, new_user_id)
             model_values['id'] = new_id
             model_values['user_id'] = new_user_id
-            model_class(**model_values).put(update_last_updated_time=False)
-            old_model.delete()
+            new_models.append(model_class(**model_values))
+
+        def _replace_models():
+            """Replace old model with new one."""
+            model_class.put_multi(new_models, update_last_updated_time=False)
+            model_class.delete_multi(old_models)
+
+        transaction_services.run_in_transaction(_replace_models)
 
     @staticmethod
     def _change_model_with_one_user_id_field(
             model_class, old_user_id, new_user_id):
-        """Replace field in model with new user id."""
+        """Replace field in model with new user id.
+
+        Args:
+            model_class: class. The class of the migrated model.
+            old_user_id: str. The old (GAE) ID of the user being migrated.
+            new_user_id: str. The newly generated ID of the user being migrated.
+        """
         migration_field = model_class.get_user_id_migration_field()
         found_models = model_class.query(
             migration_field == old_user_id).fetch()
@@ -85,9 +117,10 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_model):
         """Implements the map function for this job."""
         if user_model.id != user_model.gae_id:
+            yield ('ALREADY DONE', (user_model.gae_id, ''))
             return
         old_user_id = user_model.id
-        new_user_id = user_models.UserSettingsModel.get_new_id('user')
+        new_user_id = user_models.UserSettingsModel.get_new_id('')
         for model_class in models.Registry.get_all_storage_model_classes():
             if (model_class.get_user_id_migration_policy() ==
                     base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE):
@@ -97,7 +130,8 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 UserIdMigrationJob._copy_model_with_new_id(
                     model_class, old_user_id, new_user_id)
             elif (model_class.get_user_id_migration_policy() ==
-                  base_models.USER_ID_MIGRATION_POLICY.COPY_PART):
+                  base_models.USER_ID_MIGRATION_POLICY.
+                  COPY_AND_UPDATE_ONE_FIELD):
                 UserIdMigrationJob._copy_model_with_new_id_and_user_id(
                     model_class, old_user_id, new_user_id)
             elif (model_class.get_user_id_migration_policy() ==
@@ -110,9 +144,9 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         yield ('SUCCESS', (old_user_id, new_user_id))
 
     @staticmethod
-    def reduce(key, new_user_ids):
+    def reduce(key, old_new_user_id_tuple):
         """Implements the reduce function for this job."""
-        yield (key, new_user_ids)
+        yield (key, old_new_user_id_tuple)
 
 
 class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
@@ -122,8 +156,12 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _migrate_collection(rights_snapshot_model):
-        """Migrate CollectionRightsModel to use the new user ID in the
-        owner_ids, editor_ids, voice_artist_ids and viewer_ids.
+        """Migrate CollectionRightsSnapshotContentModel to use the new user ID
+        in the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
+
+        Args:
+            rights_snapshot_model: CollectionRightsSnapshotContentModel.
+                The model that contains the old user IDs.
         """
         reconstituted_rights_model = collection_models.CollectionRightsModel(
             **rights_snapshot_model.content)
@@ -144,8 +182,12 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _migrate_exploration(rights_snapshot_model):
-        """Migrate ExplorationRightsModel to use the new user ID in the
-        owner_ids, editor_ids, voice_artist_ids and viewer_ids.
+        """Migrate ExplorationRightsSnapshotContentModel to use the new user ID
+        in the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
+
+        Args:
+            rights_snapshot_model: ExplorationRightsSnapshotContentModel.
+                The model that contains the old user IDs.
         """
         reconstituted_rights_model = exp_models.ExplorationRightsModel(
             **rights_snapshot_model.content)
@@ -166,8 +208,12 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _migrate_question(rights_snapshot_model):
-        """Migrate QuestionRightsModel to use the new user ID in the owner_ids,
-        editor_ids, voice_artist_ids and viewer_ids.
+        """Migrate QuestionRightsSnapshotContentModel to use the new user ID in
+        the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
+
+        Args:
+            rights_snapshot_model: QuestionRightsSnapshotContentModel. The
+                model that contains the old user IDs.
         """
         reconstituted_rights_model = question_models.QuestionRightsModel(
             **rights_snapshot_model.content)
@@ -179,8 +225,12 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _migrate_skill(rights_snapshot_model):
-        """Migrate SkillRightsModel to use the new user ID in the owner_ids,
-        editor_ids, voice_artist_ids and viewer_ids.
+        """Migrate SkillRightsSnapshotContentModel to use the new user ID in
+        the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
+
+        Args:
+            rights_snapshot_model: SkillRightsSnapshotContentModel. The model
+            that contains the old user IDs.
         """
         reconstituted_rights_model = skill_models.SkillRightsModel(
             **rights_snapshot_model.content)
@@ -192,8 +242,12 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _migrate_topic(rights_snapshot_model):
-        """Migrate TopicRightsModel to use the new user ID in the owner_ids,
-        editor_ids, voice_artist_ids and viewer_ids.
+        """Migrate TopicRightsSnapshotContentModel to use the new user ID in
+        the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
+
+        Args:
+            rights_snapshot_model: TopicRightsSnapshotContentModel. The model
+            that contains the old user IDs.
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **rights_snapshot_model.content)
@@ -249,7 +303,8 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for going through all the UserSettingsModels and checking
     that the gae_id is not mentioned in any of the fields that should contain
-    user_id.
+    user_id, this job also checks that all the new user IDs are 32 lowercase
+    chars long strings.
     """
 
     @classmethod
@@ -261,6 +316,9 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_model):
         """Implements the map function for this job."""
         gae_id = user_model.gae_id
+        if (len(user_model.id) != 32 or
+                not all(c.islower() for c in user_model.id)):
+            yield ('FAILURE - WRONG ID FORMAT', (gae_id, ''))
         for model_class in models.Registry.get_all_storage_model_classes():
             base_classes = [
                 base.__name__ for base in inspect.getmro(model_class)]
@@ -276,7 +334,8 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
                     base_models.DELETION_POLICY.NOT_APPLICABLE):
                 continue
             if model_class.has_reference_to_user_id(gae_id):
-                yield ('FAILURE', (gae_id, model_class.__name__))
+                yield ('FAILURE - HAS REFERENCE TO GAE ID',
+                       (gae_id, model_class.__name__))
 
         yield ('SUCCESS', (gae_id, ''))
 
@@ -288,20 +347,35 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
 
 class ModelsUserIdsHaveUserSettingsVerificationJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for going through all the UserSettingsModels and checking
-    that the gae_id is not mentioned in any of the fields that should contain
-    user_id.
+    """One-off job for going through all the models that contain user IDs, this
+    job checks that all the user IDs used in the model have their corresponding
+    UserSettingsModel defined.
     """
 
     @staticmethod
     def _check_id_exists(model):
-        """Check if UserSettingsModel exists for the model id."""
+        """Check if UserSettingsModel exists for the model id.
+
+        Args:
+            model: instance. Model being checked.
+
+        Returns:
+            True if UserSettingsModel with id as id in model exists, False
+            otherwise.
+        """
         return user_models.UserSettingsModel.get_by_id(model.id) is not None
 
     @staticmethod
     def _check_id_and_user_id_exist(model):
         """Check if UserSettingsModel exists for user_id and model id contains
         user_id.
+
+        Args:
+            model: instance. Model being checked.
+
+        Returns:
+            True if UserSettingsModel with id as user_id in model exists, False
+            otherwise.
         """
         return (
             model.user_id == model.id.split('.')[0] and
@@ -309,7 +383,16 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
 
     @staticmethod
     def _check_one_field_exists(model, model_class):
-        """Check if UserSettingsModel exists for one field."""
+        """Check if UserSettingsModel exists for one field.
+
+        Args:
+            model: instance. Model being checked.
+            model_class: class. The class of the model being checked.
+
+        Returns:
+            True if UserSettingsModel with id as user ID field in model exists,
+            False otherwise.
+        """
         verification_field = model_class.get_user_id_migration_field()
         model_values = model.to_dict()
         return user_models.UserSettingsModel.get_by_id(
@@ -332,7 +415,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             else:
                 yield ('FAILURE', model_class.__name__)
         elif (model_class.get_user_id_migration_policy() ==
-              base_models.USER_ID_MIGRATION_POLICY.COPY_PART):
+              base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD):
             if (ModelsUserIdsHaveUserSettingsVerificationJob
                     ._check_id_and_user_id_exist(model)):
                 yield ('SUCCESS', model_class.__name__)

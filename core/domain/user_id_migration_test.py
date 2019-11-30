@@ -63,8 +63,9 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         eval_output = []
         for stringified_item in stringified_output:
             items = ast.literal_eval(stringified_item)
-            user_ids = [ast.literal_eval(item) for item in items[1]]
-            eval_output.append([items[0], user_ids])
+            if items[0] == 'SUCCESS':
+                user_ids = [ast.literal_eval(item) for item in items[1]]
+                eval_output.append([items[0], user_ids])
         migrated_model_ids = sorted(
             [item for item in eval_output[0][1]], key=lambda item: item[0])
         migrated_model_ids = [item[1] for item in migrated_model_ids]
@@ -188,7 +189,39 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         self.assertIsNone(
             user_models.CompletedActivitiesModel.get_by_id(self.user_a_id))
 
-    def test_multiple_users__one_model_part_id(self):
+    def test_one_user_different_one_model_part_id(self):
+        original_model = user_models.UserContributionScoringModel(
+            id='%s.%s' % ('category', self.user_a_id),
+            user_id=self.user_a_id,
+            score_category='category',
+            score=1.5,
+            has_email_been_sent=False
+        )
+        original_model.put()
+
+        migrated_model_ids = self._run_one_off_job()
+
+        migrated_model = (
+            user_models.UserContributionScoringModel.get_by_id(
+                '%s.%s' % ('category', migrated_model_ids[0])))
+        self.assertNotEqual(
+            original_model.id, migrated_model.id)
+        self.assertNotEqual(
+            original_model.user_id, migrated_model.user_id)
+        self.assertEqual(
+            original_model.score_category, migrated_model.score_category)
+        self.assertEqual(original_model.score, migrated_model.score)
+        self.assertEqual(
+            original_model.has_email_been_sent,
+            migrated_model.has_email_been_sent)
+        self.assertEqual(original_model.created_on, migrated_model.created_on)
+        self.assertEqual(
+            original_model.last_updated, migrated_model.last_updated)
+
+        self.assertIsNone(user_models.UserContributionScoringModel.get_by_id(
+            '%s.%s' % ('category', self.user_a_id)))
+
+    def test_multiple_users_one_model_part_id(self):
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
@@ -247,6 +280,57 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 user_models.CompletedActivitiesModel.get_by_id(user_b_id))
             self.assertIsNone(
                 user_models.CompletedActivitiesModel.get_by_id(user_c_id))
+
+    def test_multiple_users_different_one_model_part_id(self):
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
+        user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
+        user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+
+        original_models = []
+        original_models.append(user_models.UserContributionScoringModel(
+            id='%s.%s' % ('score_category', self.user_a_id),
+            user_id=self.user_a_id,
+            score_category='score_category',
+            score=2,
+            has_email_been_sent=False))
+        original_models[-1].put()
+        original_models.append(user_models.UserContributionScoringModel(
+            id='%s.%s' % ('score_category', user_b_id),
+            user_id=user_b_id,
+            score_category='score_category',
+            score=2,
+            has_email_been_sent=False))
+        original_models[-1].put()
+        original_models.append(user_models.UserContributionScoringModel(
+            id='%s.%s' % ('score_category', user_c_id),
+            user_id=user_c_id,
+            score_category='score_category',
+            score=2,
+            has_email_been_sent=False))
+        original_models[-1].put()
+        original_models.sort(key=lambda model: model.user_id)
+
+        migrated_model_ids = self._run_one_off_job()
+        for i, model_id in enumerate(migrated_model_ids):
+            migrated_model = (
+                user_models.UserContributionScoringModel.get_by_id(
+                    '%s.%s' % ('score_category', model_id)))
+            self.assertNotEqual(
+                original_models[i].id, migrated_model.id)
+            self.assertNotEqual(
+                original_models[i].user_id, migrated_model.user_id)
+            self.assertEqual(
+                original_models[i].score_category,
+                migrated_model.score_category)
+            self.assertEqual(original_models[i].score, migrated_model.score)
+            self.assertEqual(
+                original_models[i].has_email_been_sent,
+                migrated_model.has_email_been_sent)
+            self.assertEqual(
+                original_models[i].created_on, migrated_model.created_on)
+            self.assertEqual(
+                original_models[i].last_updated, migrated_model.last_updated)
 
     def test_one_user_one_model_user_id_field(self):
         original_model = exp_models.ExplorationSnapshotMetadataModel(
@@ -327,85 +411,6 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
                 migrated_model.commit_message)
             self.assertEqual(
                 original_models[i].commit_cmds, migrated_model.commit_cmds)
-            self.assertEqual(
-                original_models[i].created_on, migrated_model.created_on)
-            self.assertEqual(
-                original_models[i].last_updated, migrated_model.last_updated)
-
-    def test_one_user_one_model_custom(self):
-        original_model = user_models.UserContributionScoringModel(
-            id='%s.%s' % ('score_category', self.user_a_id),
-            user_id=self.user_a_id,
-            score_category='score_category',
-            score=2,
-            has_email_been_sent=False)
-        original_model.put()
-
-        migrated_model_ids = self._run_one_off_job()
-        migrated_model = (
-            user_models.UserContributionScoringModel.get_by_id(
-                '%s.%s' % ('score_category', migrated_model_ids[0])))
-        self.assertNotEqual(
-            original_model.id, migrated_model.id)
-        self.assertNotEqual(
-            original_model.user_id, migrated_model.user_id)
-        self.assertEqual(
-            original_model.score_category, migrated_model.score_category)
-        self.assertEqual(original_model.score, migrated_model.score)
-        self.assertEqual(
-            original_model.has_email_been_sent,
-            migrated_model.has_email_been_sent)
-        self.assertEqual(
-            original_model.created_on, migrated_model.created_on)
-        self.assertEqual(
-            original_model.last_updated, migrated_model.last_updated)
-
-    def test_multiple_users_one_model_custom(self):
-        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
-        user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
-        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
-        user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
-
-        original_models = []
-        original_models.append(user_models.UserContributionScoringModel(
-            id='%s.%s' % ('score_category', self.user_a_id),
-            user_id=self.user_a_id,
-            score_category='score_category',
-            score=2,
-            has_email_been_sent=False))
-        original_models[-1].put()
-        original_models.append(user_models.UserContributionScoringModel(
-            id='%s.%s' % ('score_category', user_b_id),
-            user_id=user_b_id,
-            score_category='score_category',
-            score=2,
-            has_email_been_sent=False))
-        original_models[-1].put()
-        original_models.append(user_models.UserContributionScoringModel(
-            id='%s.%s' % ('score_category', user_c_id),
-            user_id=user_c_id,
-            score_category='score_category',
-            score=2,
-            has_email_been_sent=False))
-        original_models[-1].put()
-        original_models.sort(key=lambda model: model.user_id)
-
-        migrated_model_ids = self._run_one_off_job()
-        for i, model_id in enumerate(migrated_model_ids):
-            migrated_model = (
-                user_models.UserContributionScoringModel.get_by_id(
-                    '%s.%s' % ('score_category', model_id)))
-            self.assertNotEqual(
-                original_models[i].id, migrated_model.id)
-            self.assertNotEqual(
-                original_models[i].user_id, migrated_model.user_id)
-            self.assertEqual(
-                original_models[i].score_category,
-                migrated_model.score_category)
-            self.assertEqual(original_models[i].score, migrated_model.score)
-            self.assertEqual(
-                original_models[i].has_email_been_sent,
-                migrated_model.has_email_been_sent)
             self.assertEqual(
                 original_models[i].created_on, migrated_model.created_on)
             self.assertEqual(

@@ -18,14 +18,21 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import random
+import string
+
 from constants import constants
 from core.platform import models
 import feconf
+import python_utils
 
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+transaction_services = models.Registry.import_transaction_services()
+
+USER_ID_LENGTH = 32
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -161,6 +168,33 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code
         }
+
+    @classmethod
+    def get_new_id(cls, unused_entity_name):
+        """Gets a new id for an entity, based on its name.
+
+        The returned id is guaranteed to be unique among all instances of this
+        entity.
+
+        Args:
+            unused_entity_name: The name of the entity. Coerced to a utf-8
+                encoded string. Defaults to ''.
+
+        Returns:
+            str. New unique id for this entity class.
+
+        Raises:
+            Exception: An ID cannot be generated within a reasonable number
+                of attempts.
+        """
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+            new_id = ''.join(
+                random.choice(string.ascii_lowercase)
+                for _ in python_utils.RANGE(USER_ID_LENGTH))
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
@@ -379,7 +413,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         """ExpUserLastPlaythroughModel has ID that contains user id and
         one other field that contains user ID.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def get_user_id_migration_field(cls):
@@ -971,7 +1005,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         """ExplorationUserDataModel has ID that contains user id and one other
         field that contains user ID.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def get_user_id_migration_field(cls):
@@ -1125,7 +1159,7 @@ class CollectionProgressModel(base_models.BaseModel):
         """CollectionProgressModel has ID that contains user id and one other
         field that contains user ID.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def get_user_id_migration_field(cls):
@@ -1286,7 +1320,7 @@ class StoryProgressModel(base_models.BaseModel):
         """StoryProgressModel has ID that contains user id and one other field
         that contains user ID.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def get_user_id_migration_field(cls):
@@ -1583,7 +1617,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         """UserSkillMasteryModel has ID that contains user id and one other
         field that contains user ID.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.COPY_PART
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def get_user_id_migration_field(cls):
@@ -1666,23 +1700,12 @@ class UserContributionScoringModel(base_models.BaseModel):
         """UserContributionScoringModel has ID that contains user id and one
         other field that contains user ID.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
-    def migrate_model(cls, old_user_id, new_user_id):
-        """Migrate model to use the new user ID in the id and user_id.
-
-        Args:
-            old_user_id: str. The old user ID.
-            new_user_id: str. The new user ID.
-        """
-        for model in cls.query(cls.user_id == old_user_id).fetch():
-            model_values = model.to_dict()
-            new_id = '%s.%s' % (model.id.split('.')[0], new_user_id)
-            model_values['id'] = new_id
-            model_values['user_id'] = new_user_id
-            cls(**model_values).put(update_last_updated_time=False)
-            model.delete()
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.user_id
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):

@@ -22,9 +22,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(base_models, exp_models, user_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
-
 
 class RegistryUnitTest(test_utils.GenericTestBase):
     """Tests the Registry class interface."""
@@ -193,6 +190,9 @@ class RegistryUnitTest(test_utils.GenericTestBase):
 
     def test_get_all_storage_model_classes(self):
         """Tests get_all_storage_model_classes."""
+        from core.storage.base_model import gae_models as base_models
+        from core.storage.exploration import gae_models as exp_models
+        from core.storage.user import gae_models as user_models
         classes = self.registry_instance.get_all_storage_model_classes()
         self.assertIn(exp_models.ExplorationModel, classes)
         self.assertIn(exp_models.ExplorationSnapshotContentModel, classes)

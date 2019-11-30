@@ -466,8 +466,8 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """MaybeLeaveExplorationEventLogEntryModels are anonymized, and cannot be
-        tied back to an individual user.
+        """MaybeLeaveExplorationEventLogEntryModels are anonymized, and cannot
+        be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
@@ -771,8 +771,8 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """StateHitEventLogEntryModels are anonymized, and cannot be tied back to
-        an individual user.
+        """StateHitEventLogEntryModels are anonymized, and cannot be tied back
+        to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
