@@ -2,13 +2,17 @@ name: CI Tests
 on: [push]
 
 jobs:
-  backend:
+  frontend:
     runs-on:  ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
     steps:
       - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '2.x'
+          architecture: 'x64'
       - name: Install third party
         run: python -m scripts.install_third_party_libs
       - name: Run frontend tests
