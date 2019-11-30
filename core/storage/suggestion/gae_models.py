@@ -172,6 +172,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             old_user_id: str. The old user ID.
             new_user_id: str. The new user ID.
         """
+        models = [g]
         for model in cls.query(ndb.OR(
                 cls.author_id == old_user_id,
                 cls.final_reviewer_id == old_user_id)).fetch():
@@ -179,7 +180,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 model.author_id = new_user_id
             if model.final_reviewer_id == old_user_id:
                 model.final_reviewer_id = new_user_id
-            model.put(update_last_updated_time=False)
+            models.append(model)
+        GeneralSuggestionModel.put_multi(models, update_last_updated_time=False)
 
     @classmethod
     def create(
@@ -363,10 +365,9 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for author_id and
         final_reviewer_id.
         """
-        return (user_models.UserSettingsModel.get_by_id(self.author_id)
-                is not None and
-                user_models.UserSettingsModel.get_by_id(self.final_reviewer_id)
-                is not None)
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            [self.author_id, self.final_reviewer_id], include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
 
 class GeneralVoiceoverApplicationModel(base_models.BaseModel):
@@ -434,6 +435,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             old_user_id: str. The old user ID.
             new_user_id: str. The new user ID.
         """
+        models = []
         for model in cls.query(ndb.OR(
                 cls.author_id == old_user_id,
                 cls.final_reviewer_id == old_user_id)).fetch():
@@ -441,7 +443,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 model.author_id = new_user_id
             if model.final_reviewer_id == old_user_id:
                 model.final_reviewer_id = new_user_id
-            model.put(update_last_updated_time=False)
+            models.append(model)
+        GeneralVoiceoverApplicationModel.put(
+            models, update_last_updated_time=False)
 
     @classmethod
     def get_user_voiceover_applications(cls, author_id, status=None):
@@ -505,7 +509,6 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for author_id and
         final_reviewer_id.
         """
-        return (user_models.UserSettingsModel.get_by_id(self.author_id)
-                is not None and
-                user_models.UserSettingsModel.get_by_id(self.final_reviewer_id)
-                is not None)
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            [self.author_id, self.final_reviewer_id], include_deleted=True)
+        return all(model is not None for model in user_settings_models)

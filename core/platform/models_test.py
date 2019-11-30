@@ -22,6 +22,9 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
+(base_models, exp_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
+
 
 class RegistryUnitTest(test_utils.GenericTestBase):
     """Tests the Registry class interface."""
@@ -191,8 +194,16 @@ class RegistryUnitTest(test_utils.GenericTestBase):
     def test_get_all_storage_model_classes(self):
         """Tests get_all_storage_model_classes."""
         classes = self.registry_instance.get_all_storage_model_classes()
-        self.assertIsNot(classes, [])
-        self.assertIsNot(classes, [])
+        self.assertIn(exp_models.ExplorationModel, classes)
+        self.assertIn(exp_models.ExplorationSnapshotContentModel, classes)
+        self.assertIn(exp_models.ExplorationSnapshotMetadataModel, classes)
+        self.assertIn(user_models.UserSettingsModel, classes)
+        self.assertIn(user_models.CompletedActivitiesModel, classes)
+        self.assertNotIn(base_models.BaseModel, classes)
+        self.assertNotIn(base_models.BaseCommitLogEntryModel, classes)
+        self.assertNotIn(base_models.VersionedModel, classes)
+        self.assertNotIn(base_models.BaseSnapshotMetadataModel, classes)
+        self.assertNotIn(base_models.BaseSnapshotContentModel, classes)
 
     def test_import_current_user_services(self):
         """Tests import current user services function."""

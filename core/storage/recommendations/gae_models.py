@@ -86,3 +86,8 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         codebase.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicSimilaritiesModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

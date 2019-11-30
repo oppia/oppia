@@ -136,8 +136,9 @@ class _Gae(Platform):
 
     @classmethod
     def get_all_storage_model_classes(cls):
-        """Imports and returns all model classes that are in the storage, not
-        model classes that are just inherited from.
+        """Imports and returns all model classes that are saved in the storage,
+        NOT model classes that are just inherited from (BaseModel,
+        BaseCommitLogEntryModel, etc.).
 
         Returns:
             list(class). The corresponding storage-layer model classes.
@@ -297,7 +298,9 @@ class Registry(python_utils.OBJECT):
 
     @classmethod
     def get_all_storage_model_classes(cls):
-        """Imports and returns all the storage models.
+        """Imports and returns all model classes that are saved in the storage,
+        NOT model classes that are just inherited from (BaseModel,
+        BaseCommitLogEntryModel, etc.).
 
         Returns:
             list(class). The corresponding storage-layer model classes.

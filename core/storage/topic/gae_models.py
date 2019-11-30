@@ -384,6 +384,7 @@ class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
+    pass
 
 
 class TopicRightsModel(base_models.VersionedModel):
@@ -470,9 +471,9 @@ class TopicRightsModel(base_models.VersionedModel):
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in manager_ids."""
-        return all(
-            user_models.UserSettingsModel.get_by_id(manager_id) is not None
-            for manager_id in self.manager_ids)
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            self.manager_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

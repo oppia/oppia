@@ -148,6 +148,7 @@ class CollectionRightsSnapshotMetadataModel(
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
+    pass
 
 
 class CollectionRightsModel(base_models.VersionedModel):
@@ -254,8 +255,8 @@ class CollectionRightsModel(base_models.VersionedModel):
                 new_user_id if editor_id == old_user_id else editor_id
                 for editor_id in model.editor_ids]
             model.voice_artist_ids = [
-                new_user_id if voice_art_id == old_user_id else voice_art_id
-                for voice_art_id in model.voice_artist_ids]
+                new_user_id if v_artist_id == old_user_id else v_artist_id
+                for v_artist_id in model.voice_artist_ids]
             model.viewer_ids = [
                 new_user_id if viewer_id == old_user_id else viewer_id
                 for viewer_id in model.viewer_ids]
@@ -267,15 +268,10 @@ class CollectionRightsModel(base_models.VersionedModel):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
         editor_ids, voice_artist_ids and viewer_ids.
         """
-        return all((
-            all(user_models.UserSettingsModel.get_by_id(owner_id) is not None
-                for owner_id in self.owner_ids),
-            all(user_models.UserSettingsModel.get_by_id(editor_id) is not None
-                for editor_id in self.editor_ids),
-            all(user_models.UserSettingsModel.get_by_id(v_artist_id) is not None
-                for v_artist_id in self.voice_artist_ids),
-            all(user_models.UserSettingsModel.get_by_id(viewer_id) is not None
-                for viewer_id in self.viewer_ids)))
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            self.owner_ids + self.editor_ids + self.voice_artist_ids +
+            self.viewer_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
 
     def save(self, committer_id, commit_message, commit_cmds):
@@ -635,12 +631,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
         editor_ids, viewer_ids and contributor_ids.
         """
-        return all((
-            all(user_models.UserSettingsModel.get_by_id(owner_id) is not None
-                for owner_id in self.owner_ids),
-            all(user_models.UserSettingsModel.get_by_id(editor_id) is not None
-                for editor_id in self.editor_ids),
-            all(user_models.UserSettingsModel.get_by_id(viewer_id) is not None
-                for viewer_id in self.viewer_ids),
-            all(user_models.UserSettingsModel.get_by_id(contrib_id) is not None
-                for contrib_id in self.contributor_ids)))
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            self.owner_ids + self.editor_ids + self.viewer_ids +
+            self.contributor_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)

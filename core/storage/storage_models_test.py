@@ -52,12 +52,12 @@ class StorageModelsTest(test_utils.GenericTestBase):
     # defined because they're not used directly but only as a base classes for
     # the other models.
     BASE_CLASSES = (
+        'BaseCommitLogEntryModel',
         'BaseMapReduceBatchResultsModel',
         'BaseModel',
         'BaseSnapshotContentModel',
         'BaseSnapshotMetadataModel',
         'VersionedModel',
-        'BaseCommitLogEntryModel',
     )
 
     def _get_base_or_versioned_model_child_classes(self):
@@ -131,7 +131,13 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     msg='get_user_id_migration_policy is not defined for %s'
                     % clazz.__name__)
 
-    def test_all_model_classes_have_migrate_model(self):
+    def test_model_classes_have_get_user_id_migration_field(self):
+        for clazz in self._get_base_or_versioned_model_child_classes():
+            if (clazz.get_user_id_migration_policy() ==
+                    base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
+                self.assertTrue(hasattr(clazz, 'get_user_id_migration_field'))
+
+    def test_model_classes_have_migrate_model(self):
         for clazz in self._get_base_or_versioned_model_child_classes():
             if (clazz.get_user_id_migration_policy() ==
                     base_models.USER_ID_MIGRATION_POLICY.CUSTOM):

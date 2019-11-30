@@ -646,7 +646,7 @@ class QuestionRightsSnapshotMetadataModel(
 
 class QuestionRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question rights snapshot."""
-
+    pass
 
 class QuestionRightsModel(base_models.VersionedModel):
     """Storage model for rights related to a question.

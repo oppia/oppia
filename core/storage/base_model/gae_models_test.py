@@ -48,9 +48,8 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
             base_models.BaseModel.has_reference_to_user_id('user_id')
 
     def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            base_models.BaseModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_user_id_migration_policy()
 
     def test_get_user_id_migration_field(self):
         with self.assertRaises(NotImplementedError):

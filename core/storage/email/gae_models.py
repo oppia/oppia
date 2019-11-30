@@ -111,6 +111,7 @@ class SentEmailModel(base_models.BaseModel):
             old_user_id: str. The old user ID.
             new_user_id: str. The new user ID.
         """
+        models = []
         for model in cls.query(ndb.OR(
                 cls.recipient_id == old_user_id,
                 cls.sender_id == old_user_id)).fetch():
@@ -118,7 +119,8 @@ class SentEmailModel(base_models.BaseModel):
                 model.recipient_id = new_user_id
             if model.sender_id == old_user_id:
                 model.sender_id = new_user_id
-            model.put(update_last_updated_time=False)
+            models.append(model)
+        SentEmailModel.put_multi(models, update_last_updated_time=False)
 
     @classmethod
     def _generate_id(cls, intent):

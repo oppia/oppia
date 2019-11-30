@@ -178,8 +178,10 @@ class UserSettingsModel(base_models.BaseModel):
     @classmethod
     def get_by_gae_id(cls, gae_id):
         """Returns a user model with given GAE user ID.
+
         Args:
             gae_id: str. The GAE user ID that is being queried for.
+
         Returns:
             UserSettingsModel. The UserSettingsModel instance which has the same
             GAE user ID.
