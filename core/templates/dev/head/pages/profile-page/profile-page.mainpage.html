@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base-components/header.template.html', {"title": "Profile - Oppia"})
+    @load('base-components/header.template.html', {"title": "Profile - Oppia"})
     <style>
       .oppia-profile-h1 {
         color: #ffffff;
@@ -304,6 +304,6 @@
         </page-footer>
       </base-content>
     </div>
-    @require('../footer_js_libs.html')
+    @load('pages/footer_js_libs.html')
   </body>
 </html>

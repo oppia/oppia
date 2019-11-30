@@ -28,6 +28,8 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
+import { baseInteractionValidationService } from
+  'interactions/base-interaction-validation.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ChangesInHumanReadableFormService } from
@@ -35,6 +37,7 @@ import { ChangesInHumanReadableFormService } from
   'pages/exploration-editor-page/services/changes-in-human-readable-form.service';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
+import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
@@ -77,6 +80,10 @@ import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+/* eslint-disable max-len */
+import { NormalizeWhitespacePunctuationAndCasePipe } from
+  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+/* eslint-enable max-len */
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
 import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
@@ -84,6 +91,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+import { PencilCodeEditorRulesService } from
+  'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from
@@ -102,12 +111,18 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { TextInputRulesService } from
+  'interactions/TextInput/directives/text-input-rules.service';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
+import { TextInputValidationService } from
+  'interactions/TextInput/directives/text-input-validation.service';
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -145,8 +160,11 @@ export class UpgradedServices {
     upgradedServices['AnswerClassificationResultObjectFactory'] =
       new AnswerClassificationResultObjectFactory();
     upgradedServices['BackgroundMaskService'] = new BackgroundMaskService();
+    upgradedServices['baseInteractionValidationService'] =
+      new baseInteractionValidationService();
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
+    upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
@@ -172,6 +190,8 @@ export class UpgradedServices {
     upgradedServices['LearnerAnswerInfoObjectFactory'] =
       new LearnerAnswerInfoObjectFactory();
     upgradedServices['LoggerService'] = new LoggerService();
+    upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
+      new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
@@ -241,6 +261,9 @@ export class UpgradedServices {
         upgradedServices['ClassifierObjectFactory']);
     upgradedServices['StateEditorService'] =
       new StateEditorService(upgradedServices['SolutionValidityService']);
+    upgradedServices['TextInputValidationService'] =
+      new TextInputValidationService(
+        upgradedServices['baseInteractionValidationService']);
     upgradedServices['UrlService'] =
       new UrlService(upgradedServices['WindowRef']);
     upgradedServices['ValidatorsService'] = new ValidatorsService(
@@ -262,6 +285,13 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['PencilCodeEditorRulesService'] =
+      new PencilCodeEditorRulesService(
+        upgradedServices['NormalizeWhitespacePipe'],
+        upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
+        upgradedServices['CodeNormalizerService']);
+    upgradedServices['TextInputRulesService'] = new TextInputRulesService(
+      upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
@@ -292,6 +322,18 @@ export class UpgradedServices {
         upgradedServices['HintObjectFactory'],
         upgradedServices['SolutionObjectFactory'],
         upgradedServices['OutcomeObjectFactory']);
+
+    // Group 7: Services depending on groups 1-6.
+    upgradedServices['StateObjectFactory'] = new StateObjectFactory(
+      upgradedServices['InteractionObjectFactory'],
+      upgradedServices['ParamChangesObjectFactory'],
+      upgradedServices['RecordedVoiceoversObjectFactory'],
+      upgradedServices['SubtitledHtmlObjectFactory'],
+      upgradedServices['WrittenTranslationsObjectFactory']);
+
+    // Group 8: Services depending on groups 1-7.
+    upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
+      upgradedServices['StateObjectFactory']);
     /* eslint-enable dot-notation */
     return upgradedServices;
   }
