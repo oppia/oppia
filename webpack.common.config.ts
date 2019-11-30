@@ -20,6 +20,8 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
+const macros = require('./webpack.common.macros.ts');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -630,7 +632,15 @@ module.exports = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true
-    })
+    }),
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        macros: {
+          load: macros.load,
+          loadExtensions: macros.loadExtensions
+        },
+      },
+    }),
   ],
   module: {
     rules: [{
