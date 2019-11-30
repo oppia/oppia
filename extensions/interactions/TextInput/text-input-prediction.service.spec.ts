@@ -33,14 +33,14 @@ describe('Text Input Prediction Service', () => {
   let $scope = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
+  beforeEach(angular.mock.module('oppia', ($provide) => {
     const ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  describe('Test text prediction service', function() {
+  describe('Test text prediction service', () => {
     let predictionService: TextInputPredictionService;
     beforeEach(() => {
       predictionService = new TextInputPredictionService(
@@ -48,7 +48,7 @@ describe('Text Input Prediction Service', () => {
         new SVMPredictionService(new PredictionResultObjectFactory()),
         new TextInputTokenizer());
     });
-    beforeEach(angular.mock.inject(function($injector) {
+    beforeEach(angular.mock.inject(($injector) => {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
     }));
