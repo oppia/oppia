@@ -284,10 +284,9 @@ class SentEmailModel(base_models.BaseModel):
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for recipient_id and sender_id."""
-        return (user_models.UserSettingsModel.get_by_id(self.recipient_id)
-                is not None and
-                user_models.UserSettingsModel.get_by_id(self.sender_id)
-                is not None)
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            [self.recipient_id, self.sender_id], include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
 
 class BulkEmailModel(base_models.BaseModel):
@@ -342,7 +341,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_user_id_migration_policy():
-        """BulkEmailModel has two fields with user ID."""
+        """BulkEmailModel has one field with user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
 
     @classmethod
