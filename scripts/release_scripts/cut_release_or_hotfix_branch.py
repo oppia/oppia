@@ -111,6 +111,7 @@ def verify_target_version_compatible_with_latest_release(
         target_version):
     """Checks that the target version is consistent with the latest released
     version on GitHub.
+
     Args:
         target_version: str. The release version.
 
