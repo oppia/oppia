@@ -106,12 +106,11 @@ def pip_install(package, version, install_path):
             'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
             'page:'])
 
-        os_info = os.uname()
-        if os_info[0] == 'Darwin':
+        if common.is_mac_os():
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
-        elif os_info[0] == 'Linux':
+        elif common.is_windows_os():
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')

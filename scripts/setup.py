@@ -56,8 +56,7 @@ def test_python_version():
         python_utils.PRINT('Please use Python2.7. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
-        os_info = os.uname()
-        if os_info[0] != 'Darwin' and os_info[0] != 'Linux':
+        if not common.is_linux_os() and not common.is_mac_os():
             common.print_each_string_after_two_new_lines([
                 'It looks like you are using Windows. If you have Python '
                 'installed,',
