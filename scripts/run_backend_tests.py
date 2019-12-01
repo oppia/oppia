@@ -150,7 +150,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """
     python_path = ':'.join(sys.path)[1:]
     p = subprocess.Popen(
-        exe, stdout=stdout, stderr=stderr, env={'PYTHONPATH':python_path})
+        exe, stdout=stdout, stderr=stderr, env={'PYTHONPATH': python_path})
     last_stdout_str, last_stderr_str = p.communicate()
     # Converting to unicode to stay compatible with the rest of the strings.
     last_stdout_str = last_stdout_str.decode(encoding='utf-8')
