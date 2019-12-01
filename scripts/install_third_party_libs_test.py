@@ -63,6 +63,22 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             subprocess, 'check_call', mock_check_call)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
+    def test_tweak_yarn_executable(self):
+        
+        def mock_is_file(filename):
+            return True
+
+        def mock_rename(origin_name, new_name):
+            self.assertEqual(origin_name + '.sh', new_name)
+            mock_rename.called = True
+        mock_rename.called = False
+        isfile_swap = self.swap(os.path, 'isfile', mock_is_file)
+        rename_swap = self.swap(os, 'rename', mock_rename)
+        
+        with isfile_swap, rename_swap:
+            install_third_party_libs.tweak_yarn_executable()
+        self.assertTrue(mock_rename.called)
+
     def test_pip_install_without_import_error(self):
         with self.check_call_swap:
             install_third_party_libs.pip_install('package', 'version', 'path')
