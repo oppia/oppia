@@ -110,7 +110,7 @@ def pip_install(package, version, install_path):
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
-        elif common.is_windows_os():
+        elif common.is_linux_os():
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')
