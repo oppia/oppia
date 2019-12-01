@@ -507,5 +507,5 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.package_json_swap, self.js_or_ts_swap:
+                    with self.js_or_ts_swap:
                         pre_push_hook.main(args=[])
