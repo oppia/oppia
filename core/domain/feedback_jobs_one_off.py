@@ -62,10 +62,11 @@ class FeedbackThreadMessageCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         last_message, second_last_message = (
             feedback_models.GeneralFeedbackMessageModel.get_multi(
                 feedback_services.get_last_two_message_ids(thread)))
-        cache_updated = any(
-            [_cache_last_message(thread, last_message),
-             _cache_second_last_message(thread, second_last_message),
-             _cache_updated_status(thread, last_message, second_last_message)])
+        cache_updated = any([
+            _cache_last_message(thread, last_message),
+            _cache_second_last_message(thread, second_last_message),
+            _cache_updated_status(thread, last_message, second_last_message),
+        ])
         if cache_updated:
             thread.put()
             yield ('Updated', 1)
