@@ -1325,7 +1325,7 @@ def compile_typescript_files_continuously(project_dir):
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files in watch mode...')
     cmd = [
-        './node_modules/typescript/bin/tsc', '--project', project_dir,
+        'node', './node_modules/typescript/bin/tsc', '--project', project_dir,
         '--watch']
 
     with python_utils.open_file('tsc_output_log.txt', 'w') as out:
