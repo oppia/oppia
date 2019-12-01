@@ -111,8 +111,20 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateHintsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-hints.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StatePropertyService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-property.service';
+import { StateWrittenTranslationsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
@@ -247,6 +259,16 @@ export class UpgradedServices {
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
+    upgradedServices['StateHintsService'] = new StateHintsService(
+      upgradedServices['AlertsService']);
+    upgradedServices['StateInteractionIdService'] =
+      new StateInteractionIdService(
+        upgradedServices['AlertsService']);
+    upgradedServices['StatePropertyService'] = new StatePropertyService(
+      upgradedServices['AlertsService']);
+    upgradedServices['StateWrittenTranslationsService'] =
+      new StateWrittenTranslationsService(
+        upgradedServices['AlertsService']);
     upgradedServices['StateEditorService'] =
       new StateEditorService(upgradedServices['SolutionValidityService']);
     upgradedServices['TextInputValidationService'] =
