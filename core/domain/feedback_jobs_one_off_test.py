@@ -346,6 +346,7 @@ class FeedbackThreadMessageCacheOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
         thread = feedback_services.get_thread(thread_id)
+        self.assertIsNone(thread.updated_status)
         self.assertIsNone(thread.last_message_text)
         self.assertIsNone(thread.last_message_author_id)
         self.assertIsNone(thread.second_last_message_text)
