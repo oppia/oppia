@@ -39,6 +39,7 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -97,6 +98,8 @@ import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PredictionResultObjectFactory } from
+  'domain/classifier/PredictionResultObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -118,6 +121,7 @@ import { SubtitledHtmlObjectFactory } from
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
@@ -144,10 +148,6 @@ import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
-import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
-import { SVMPredictionService } from 'classifiers/svm-prediction.service';
-import { PredictionResultObjectFactory } from
-  'domain/classifier/PredictionResultObjectFactory';
 
 @Injectable({
   providedIn: 'root'
