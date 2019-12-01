@@ -71,10 +71,14 @@ def get_current_version_tag(repo):
     # release for which the hotfix branch is. So, if we require generation
     # of release summary in case of hotfix, we need to get the second version
     # tag. For example, if branch is release-1.2.3-hotfix-1, the first tag
-    # on github will 1.2.3 but the correct tag of previous release will be
+    # on github will be 1.2.3 but the correct tag of previous release will be
     # 1.2.2 which is required for release summary generation.
     if 'hotfix' in common.get_current_branch_name():
         return repo.get_tags()[1]
+    # This is for the normal release without any hotfix. In this case, the
+    # first tag will be of current release serving on prod. For example, if we
+    # are deploying release-1.2.3, the first tag on github will be 1.2.2 which
+    # is required for release summary generation.
     else:
         return repo.get_tags()[0]
 
