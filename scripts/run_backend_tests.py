@@ -95,7 +95,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
 # ]
 
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage')
+    os.getcwd(), os.pardir, 'oppia_tools', 'coverage-4.5.4', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -340,7 +340,7 @@ def main(args=None):
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
-        sys.path.insert(0, directory)
+        sys.path.insert(1, directory)
 
     # pythonpath_starting_index = 0
     # if not os.environ.get('PYTHONPATH'):
