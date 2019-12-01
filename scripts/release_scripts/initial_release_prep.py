@@ -180,23 +180,25 @@ def did_supported_audio_languages_change(
     """
     try:
         from constants import constants
-        supported_audio_languages_for_current_release = constants[
-            'SUPPORTED_AUDIO_LANGUAGES']
+        supported_audio_language_ids_for_current_release = [
+            lang_dict['id'] for lang_dict in constants[
+                'SUPPORTED_AUDIO_LANGUAGES']]
 
         common.run_cmd([
             'git', 'checkout',
             '%s/release-%s' % (remote_alias, previous_release_version),
             '--', 'assets/constants.ts'])
         from constants import constants
-        supported_audio_languages_for_previous_release = constants[
-            'SUPPORTED_AUDIO_LANGUAGES']
+        supported_audio_language_ids_for_previous_release = [
+            lang_dict['id'] for lang_dict in constants[
+                'SUPPORTED_AUDIO_LANGUAGES']]
     finally:
         common.run_cmd(['git', 'reset', 'assets/constants.ts'])
         common.run_cmd(['git', 'checkout', '--', 'assets/constants.ts'])
 
     return (
-        sorted(supported_audio_languages_for_current_release) != sorted(
-            supported_audio_languages_for_previous_release))
+        sorted(supported_audio_language_ids_for_current_release) != sorted(
+            supported_audio_language_ids_for_previous_release))
 
 
 def main():

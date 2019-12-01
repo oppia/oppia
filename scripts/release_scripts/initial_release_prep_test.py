@@ -23,6 +23,7 @@ import datetime
 import os
 import sys
 
+import constants
 from core.tests import test_utils
 import python_utils
 from scripts import common
@@ -178,13 +179,52 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
                 initial_release_prep.get_extra_jobs_due_to_schema_changes(
                     'upstream', '1.2.3'), ['SkillMigrationOneOffJob'])
 
-    def test_did_supported_audio_languages_change(self):
+    def test_did_supported_audio_languages_change_with_change_in_languages(
+            self):
         all_cmd_tokens = []
+        mock_constants = {
+            'SUPPORTED_AUDIO_LANGUAGES': [{
+                'id': 'en',
+                'description': 'English',
+                'relatedLanguages': ['en']}]}
+        def mock_run_cmd(cmd_tokens):
+            mock_constants['SUPPORTED_AUDIO_LANGUAGES'].append({
+                'id': 'ak',
+                'description': 'Akan',
+                'relatedLanguages': ['ak']
+            })
+            all_cmd_tokens.append(cmd_tokens)
+
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        constants_swap = self.swap(constants, 'constants', mock_constants)
+
+        with run_cmd_swap, constants_swap:
+            self.assertTrue(
+                initial_release_prep.did_supported_audio_languages_change(
+                    'upstream', '1.2.3'))
+        self.assertEqual(
+            all_cmd_tokens, [
+                [
+                    'git', 'checkout', 'upstream/release-1.2.3',
+                    '--', 'assets/constants.ts'],
+                ['git', 'reset', 'assets/constants.ts'],
+                ['git', 'checkout', '--', 'assets/constants.ts']])
+
+    def test_did_supported_audio_languages_change_without_change_in_languages(
+            self):
+        all_cmd_tokens = []
+        mock_constants = {
+            'SUPPORTED_AUDIO_LANGUAGES': [{
+                'id': 'en',
+                'description': 'English',
+                'relatedLanguages': ['en']}]}
         def mock_run_cmd(cmd_tokens):
             all_cmd_tokens.append(cmd_tokens)
-        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
 
-        with run_cmd_swap:
+        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
+        constants_swap = self.swap(constants, 'constants', mock_constants)
+
+        with run_cmd_swap, constants_swap:
             self.assertFalse(
                 initial_release_prep.did_supported_audio_languages_change(
                     'upstream', '1.2.3'))
