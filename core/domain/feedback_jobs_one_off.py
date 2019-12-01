@@ -48,6 +48,76 @@ class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
+def _cache_last_message(thread, last_message):
+    """Ensures the given thread's cache for the last message has its values set
+    to the provided message.
+
+    Args:
+        thread: feedback_models.GeneralFeedbackThreadModel.
+        last_message: feedback_models.GeneralFeedbackMessageModel.
+
+    Returns:
+        bool. Whether the cache was actually updated.
+    """
+    is_cache_updated = False
+    last_message_text = last_message and last_message.text
+    if thread.last_message_text != last_message_text:
+        thread.last_message_text = last_message_text
+        is_cache_updated = True
+    last_message_author_id = last_message and last_message.author_id
+    if thread.last_message_author_id != last_message_author_id:
+        thread.last_message_author_id = last_message_author_id
+        is_cache_updated = True
+    return is_cache_updated
+
+
+def _cache_second_last_message(thread, second_last_message):
+    """Ensures the given thread's cache for the second-to-last message has its
+    values set to the provided message.
+
+    Args:
+        thread: feedback_models.GeneralFeedbackThreadModel.
+        second_last_message: feedback_models.GeneralFeedbackMessageModel.
+
+    Returns:
+        bool. Whether the cache was actually updated.
+    """
+    is_cache_updated = False
+    second_last_message_text = second_last_message and second_last_message.text
+    if thread.second_last_message_text != second_last_message_text:
+        thread.second_last_message_text = second_last_message_text
+        is_cache_updated = True
+    second_last_message_author_id = (
+        second_last_message and second_last_message.author_id)
+    if thread.second_last_message_author_id != second_last_message_author_id:
+        thread.second_last_message_author_id = second_last_message_author_id
+        is_cache_updated = True
+    return is_cache_updated
+
+
+def _cache_updated_status(thread, last_message, second_last_message):
+    """Ensures the given thread's cache for the change-in-status is based upon
+    the actual difference between the last and second-to-last messages.
+
+    Args:
+        thread: feedback_models.GeneralFeedbackThreadModel.
+        last_message: feedback_models.GeneralFeedbackMessageModel.
+        second_last_message: feedback_models.GeneralFeedbackMessageModel.
+
+    Returns:
+        bool. Whether the cache was actually updated.
+    """
+    if (last_message and last_message.updated_status and second_last_message and
+            last_message.updated_status != second_last_message.updated_status):
+        updated_status = last_message.updated_status
+    else:
+        updated_status = None
+    if thread.updated_status != updated_status:
+        thread.updated_status = updated_status
+        return True
+    return False
+
+
 class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to populate message data cache of threads."""
 
@@ -62,53 +132,13 @@ class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         last_message, second_last_message = (
             feedback_models.GeneralFeedbackMessageModel.get_multi(
                 feedback_services.get_last_two_message_ids(thread)))
-        action_taken = None
-
-        # Updates for last message.
-        if last_message is None:
-            if thread.last_message_id is not None:
-                action_taken = 'Updated'
-                thread.last_message_id = None
-                thread.last_message_text = None
-                thread.last_message_author_id = None
-        else:
-            if thread.last_message_id != last_message.message_id:
-                action_taken = 'Updated'
-                thread.last_message_id = last_message.message_id
-                thread.last_message_text = last_message.text
-                thread.last_message_author_id = last_message.author_id
-
-        # Updates for second-to-last message.
-        if second_last_message is None:
-            if thread.second_last_message_id is not None:
-                action_taken = 'Updated'
-                thread.second_last_message_id = None
-                thread.second_last_message_text = None
-                thread.second_last_message_author_id = None
-        else:
-            if thread.second_last_message_id != second_last_message.message_id:
-                action_taken = 'Updated'
-                thread.second_last_message_id = second_last_message.message_id
-                thread.second_last_message_text = second_last_message.text
-                thread.second_last_message_author_id = (
-                    second_last_message.author_id)
-
-        # Updates for status changes.
-        if (last_message is not None and second_last_message is not None and
-                last_message.updated_status is not None and
-                last_message.updated_status != (
-                    second_last_message.updated_status)):
-            if thread.updated_status != last_message.updated_status:
-                action_taken = 'Updated'
-                thread.updated_status = last_message.updated_status
-        else:
-            if thread.updated_status is not None:
-                action_taken = 'Updated'
-                thread.updated_status = None
-
-        if action_taken:
+        is_cache_updated = any(
+            [_cache_last_message(thread, last_message),
+             _cache_second_last_message(thread, second_last_message),
+             _cache_updated_status(thread, last_message, second_last_message)])
+        if is_cache_updated:
             thread.put()
-            yield (action_taken, 1)
+            yield ('Updated', 1)
 
     @staticmethod
     def reduce(key, value_strs):

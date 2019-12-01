@@ -160,10 +160,8 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
     def _clear_message_cache(self, thread_id):
         """Forcibly clears the message cache of the given thread."""
         thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        thread.last_message_id = None
         thread.last_message_text = None
         thread.last_message_author_id = None
-        thread.second_last_message_id = None
         thread.second_last_message_text = None
         thread.second_last_message_author_id = None
         thread.put()
@@ -257,10 +255,8 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
         thread = feedback_services.get_thread(thread_id)
-        self.assertEqual(thread.last_message_id, 1)
         self.assertEqual(thread.last_message_text, 'second text')
         self.assertEqual(thread.last_message_author_id, self.editor_id)
-        self.assertEqual(thread.second_last_message_id, 0)
         self.assertEqual(thread.second_last_message_text, 'first text')
         self.assertEqual(thread.second_last_message_author_id, self.editor_id)
 
@@ -276,10 +272,8 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
         thread = feedback_services.get_thread(thread_id)
-        self.assertEqual(thread.last_message_id, 2)
         self.assertEqual(thread.last_message_text, 'third text')
         self.assertEqual(thread.last_message_author_id, self.editor_id)
-        self.assertEqual(thread.second_last_message_id, 1)
         self.assertEqual(thread.second_last_message_text, 'second text')
         self.assertEqual(thread.second_last_message_author_id, self.editor_id)
 
@@ -317,7 +311,6 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         thread_id = feedback_services.create_thread(
             'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
         thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        thread.second_last_message_id = 1
         thread.second_last_message_text = 'non-existing second text'
         thread.second_last_message_author_id = self.editor_id
         thread.put()
@@ -325,10 +318,8 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
         thread = feedback_services.get_thread(thread_id)
-        self.assertEqual(thread.last_message_id, 0)
         self.assertEqual(thread.last_message_text, 'first text')
         self.assertEqual(thread.last_message_author_id, self.editor_id)
-        self.assertIsNone(thread.second_last_message_id)
         self.assertIsNone(thread.second_last_message_text)
         self.assertIsNone(thread.second_last_message_author_id)
 
@@ -345,10 +336,8 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         thread.has_suggestion = False
         thread.updated_status = feedback_models.STATUS_CHOICES_OPEN
         thread.message_count = 0
-        thread.last_message_id = 1
         thread.last_message_text = 'non-existing second text'
         thread.last_message_author_id = self.editor_id
-        thread.second_last_message_id = 0
         thread.second_last_message_text = 'non-existing first text'
         thread.second_last_message_author_id = self.editor_id
         thread.put()
@@ -356,9 +345,7 @@ class GeneralFeedbackThreadOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
         thread = feedback_services.get_thread(thread_id)
-        self.assertIsNone(thread.last_message_id)
         self.assertIsNone(thread.last_message_text)
         self.assertIsNone(thread.last_message_author_id)
-        self.assertIsNone(thread.second_last_message_id)
         self.assertIsNone(thread.second_last_message_text)
         self.assertIsNone(thread.second_last_message_author_id)

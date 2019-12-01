@@ -44,11 +44,8 @@ class FeedbackThread(python_utils.OBJECT):
             was last updated.
         updated_status: str. The change in status since the last message, if
             any.
-        last_message_id: int. The id of the last message in the thread.
         last_message_text: str. The text of the last message in the thread.
         last_message_author_id: str. The author id of the last message in the
-            thread.
-        second_last_message_id: int. The id of the second-to-last message in the
             thread.
         second_last_message_text: str. The text of the second-to-last message in
             the thread.
@@ -60,8 +57,7 @@ class FeedbackThread(python_utils.OBJECT):
             self, thread_id, entity_type, entity_id, state_name,
             original_author_id, status, subject, summary, has_suggestion,
             message_count, created_on, last_updated, updated_status,
-            last_message_id, last_message_text, last_message_author_id,
-            second_last_message_id, second_last_message_text,
+            last_message_text, last_message_author_id, second_last_message_text,
             second_last_message_author_id):
         """Initializes a FeedbackThread object."""
 
@@ -79,10 +75,8 @@ class FeedbackThread(python_utils.OBJECT):
         self.created_on = created_on
         self.last_updated = last_updated
         self.updated_status = updated_status
-        self.last_message_id = last_message_id
         self.last_message_text = last_message_text
         self.last_message_author_id = last_message_author_id
-        self.second_last_message_id = second_last_message_id
         self.second_last_message_text = second_last_message_text
         self.second_last_message_author_id = second_last_message_author_id
 
