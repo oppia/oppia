@@ -177,14 +177,12 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
 
     last_hotfix_number = 0
     release_branch_exists = False
-    hotfix_branch_name_regex = '^%s/%s-%s-%s-\\d*$' % (
-        remote_alias, release_constants.RELEASE_BRANCH_TYPE, target_version,
-        release_constants.HOTFIX_BRANCH_TYPE)
+    hotfix_branch_name_regex = '^%s/release-%s-hotfix-\\d*$' % (
+        remote_alias, target_version)
     for branch_name in all_branches:
         branch_name = branch_name.lstrip().rstrip()
-        if branch_name == '%s/%s-%s' % (
-                remote_alias, release_constants.RELEASE_BRANCH_TYPE,
-                target_version):
+        if branch_name == '%s/release-%s' % (
+                remote_alias, target_version):
             release_branch_exists = True
         if re.match(hotfix_branch_name_regex, branch_name):
             branch_hotfix_number = int(branch_name[branch_name.rfind('-') + 1:])
@@ -205,7 +203,7 @@ def _get_release_branch_type_and_name(target_version):
         tuple(str, str). The type and name of release branch.
     """
     return (
-        release_constants.RELEASE_BRANCH_TYPE, 'release-%s' % target_version)
+        release_constants.BRANCH_TYPE_RELEASE, 'release-%s' % target_version)
 
 
 def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
@@ -219,7 +217,7 @@ def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
         tuple(str, str). The type and name of hotfix branch.
     """
     return (
-        release_constants.HOTFIX_BRANCH_TYPE, 'release-%s-hotfix-%s' % (
+        release_constants.BRANCH_TYPE_HOTFIX, 'release-%s-hotfix-%s' % (
             target_version, hotfix_number))
 
 
@@ -277,7 +275,7 @@ def execute_branch_cut():
             sys.exit()
 
     # Cut a new release or hotfix branch.
-    if new_branch_type == release_constants.HOTFIX_BRANCH_TYPE:
+    if new_branch_type == release_constants.BRANCH_TYPE_HOTFIX:
         verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
             remote_alias, target_version, hotfix_number)
         if hotfix_number == 1:

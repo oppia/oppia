@@ -146,9 +146,9 @@ def get_previous_release_version(branch_type, current_release_version):
     all_tags = subprocess.check_output(['git', 'tag'])[:-1].split('\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
     # version.
-    if branch_type == release_constants.RELEASE_BRANCH_TYPE:
+    if branch_type == release_constants.BRANCH_TYPE_RELEASE:
         previous_release_version = all_tags[-1][1:]
-    elif branch_type == release_constants.HOTFIX_BRANCH_TYPE:
+    elif branch_type == release_constants.BRANCH_TYPE_HOTFIX:
         previous_release_version = all_tags[-2][1:]
     else:
         raise Exception('Invalid branch type: %s.' % branch_type)
@@ -202,14 +202,14 @@ def update_changelog(
     with python_utils.open_file(CHANGELOG_FILEPATH, 'r') as changelog_file:
         changelog_lines = changelog_file.readlines()
 
-    if release_constants.HOTFIX_BRANCH_TYPE in branch_name:
+    if release_constants.BRANCH_TYPE_HOTFIX in branch_name:
         previous_release_version = get_previous_release_version(
-            release_constants.HOTFIX_BRANCH_TYPE, current_release_version)
+            release_constants.BRANCH_TYPE_HOTFIX, current_release_version)
         changelog_lines = remove_repetition_from_changelog(
             current_release_version, previous_release_version, changelog_lines)
     else:
         previous_release_version = get_previous_release_version(
-            release_constants.RELEASE_BRANCH_TYPE, current_release_version)
+            release_constants.BRANCH_TYPE_RELEASE, current_release_version)
         # Update only if changelog is generated before and contains info for
         # current version.
         if any(

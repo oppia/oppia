@@ -39,8 +39,8 @@ RELEASE_SUMMARY_FILEPATH = os.path.join(
 
 REMOTE_URL = 'git@github.com:oppia/oppia.git'
 
-RELEASE_BRANCH_TYPE = 'release'
-HOTFIX_BRANCH_TYPE = 'hotfix'
+BRANCH_TYPE_RELEASE = 'release'
+BRANCH_TYPE_HOTFIX = 'hotfix'
 
 RELEASE_DRIVE_URL = (
     'https://drive.google.com/drive/folders/0B9KSjiibL_WDNjJyYlEtbTNvY3c')

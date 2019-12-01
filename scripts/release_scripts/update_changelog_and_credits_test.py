@@ -129,7 +129,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
-                    release_constants.RELEASE_BRANCH_TYPE, '2.0.8'), '2.0.7')
+                    release_constants.BRANCH_TYPE_RELEASE, '2.0.8'), '2.0.7')
 
     def test_get_previous_release_version_with_hotfix(self):
         def mock_check_output(unused_cmd_tokens):
@@ -137,7 +137,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
-                    release_constants.HOTFIX_BRANCH_TYPE, '2.0.8'), '2.0.7')
+                    release_constants.BRANCH_TYPE_HOTFIX, '2.0.8'), '2.0.7')
 
     def test_get_previous_release_version_with_invalid_branch_type(self):
         def mock_check_output(unused_cmd_tokens):
