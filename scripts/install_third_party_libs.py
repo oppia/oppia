@@ -69,6 +69,24 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
     common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
 
 
+def tweak_yarn_executable():
+    """ When run yarn on Windows, the file `yarn` will be excecuted (
+    even then command specified is `yarn.cmd`). While this file is a bash
+    script, so it can not be executed. To avoid the issue, we can rename
+    this file to `yarn.sh`.
+    """
+    origin_file = os.path.join(common.YARN_PATH, 'bin', 'yarn')
+    if os.path.isfile(origin_file):
+        renamed_file = os.path.join(common.YARN_PATH, 'bin', 'yarn.sh')
+        os.rename(origin_file, renamed_file)
+
+def get_yarn_command():
+    """Get the executable file for yarn."""
+    if common.is_windows_os():
+        return 'yarn.cmd'
+    return 'yarn'
+
+
 def pip_install(package, version, install_path):
     """Installs third party libraries with pip.
 
@@ -265,8 +283,11 @@ def main(args=None):
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
 
+    if common.is_windows_os():
+        tweak_yarn_executable()
+
     # Install third-party node modules needed for the build process.
-    subprocess.check_call(['yarn'])
+    subprocess.check_call([get_yarn_command()])
 
     install_skulpt(parsed_args)
 
