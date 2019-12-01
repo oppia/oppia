@@ -46,9 +46,12 @@ getTestBed().initTestEnvironment(
   BrowserDynamicTestingModule,
   platformBrowserDynamicTesting()
 );
-// Then we find all the tests and controller, directive, service/factory files
-// Files that shouldn't be tested are exempted (from services_sources folder)
-// Note that known failing are exempted;
+// Then we find all the tests, as well as any controller, directive,
+// service/factory files.
+// All files from the services_sources folder are exempted, because they
+// shouldn't be tested(those files are just intended as data files for backend
+// tests).
+// Note that known failing files are exempted;
 // corresponding issue -> https://github.com/oppia/oppia/issues/6960).
 // TODO(YashJipkate): Fix the tests that broke down after introduction of
 // Webpack due to templateCache.
