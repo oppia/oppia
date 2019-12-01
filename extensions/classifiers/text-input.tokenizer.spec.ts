@@ -24,12 +24,6 @@ import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 
 describe('Text Input tokenizer', function() {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', ($provide) => {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
   describe('Test text input tokenizer', () => {
     var tokenizer: TextInputTokenizer;

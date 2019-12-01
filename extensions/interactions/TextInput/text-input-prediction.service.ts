@@ -24,9 +24,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
-import {SVMPredictionService} from 'classifiers/svm-prediction.service';
-import {TextInputTokenizer} from 'classifiers/text-input.tokenizer';
-import {CountVectorizerService} from 'classifiers/count-vectorizer.service';
+import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
+import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 
@@ -46,7 +46,7 @@ export class TextInputPredictionService {
       private textInputTokenizer: TextInputTokenizer) {
   }
 
-  predict(classifierData: IClassifierData, textInput: string) {
+  predict(classifierData: IClassifierData, textInput: string): number {
     /* eslint-disable camelcase */
     const cvVocabulary = classifierData.cv_vocabulary;
     const svmData = classifierData.SVM;
