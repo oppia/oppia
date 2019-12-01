@@ -31,6 +31,7 @@ import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 
 export interface IClassifierData {
+  /* eslint-disable camelcase */
   cv_vocabulary: object;
   SVM: object;
 }
@@ -46,6 +47,7 @@ export class TextInputPredictionService {
   }
 
   predict(classifierData: IClassifierData, textInput: string) {
+    /* eslint-disable camelcase */
     const cvVocabulary = classifierData.cv_vocabulary;
     const svmData = classifierData.SVM;
 
@@ -54,9 +56,9 @@ export class TextInputPredictionService {
     const textInputTokens = this.textInputTokenizer.generateTokens(textInput);
 
     const textVector = this.countVectorizerService.vectorize(
-        textInputTokens, cvVocabulary);
+      textInputTokens, cvVocabulary);
     const predictionResult = this.svmPredictionService.predict(
-        svmData, textVector);
+      svmData, textVector);
     if (predictionResult.predictionConfidence >
         this.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
       return predictionResult.predictionLabel;

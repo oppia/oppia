@@ -25,7 +25,7 @@ import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
-import { TextInputTokenizer } from "classifiers/text-input.tokenizer";
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 // ^^^ This block is to be removed.
 
 describe('Text Input Prediction Service', () => {

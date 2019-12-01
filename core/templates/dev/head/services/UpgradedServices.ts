@@ -142,10 +142,12 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import {TextInputPredictionService} from "interactions/TextInput/text-input-prediction.service";
-import {CountVectorizerService} from "classifiers/count-vectorizer.service";
-import {SVMPredictionService} from "classifiers/svm-prediction.service";
-import {PredictionResultObjectFactory} from "domain/classifier/PredictionResultObjectFactory";
+import {TextInputPredictionService} from
+  'interactions/TextInput/text-input-prediction.service';
+import {CountVectorizerService} from 'classifiers/count-vectorizer.service';
+import {SVMPredictionService} from 'classifiers/svm-prediction.service';
+import {PredictionResultObjectFactory} from
+  'domain/classifier/PredictionResultObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -303,11 +305,11 @@ export class UpgradedServices {
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
     upgradedServices['TextInputPredictionService'] =
-        new TextInputPredictionService(
-            upgradedServices['CountVectorizerService'],
-            upgradedServices['SVMPredictionService'],
-            upgradedServices['TextInputTokenizer']
-        );
+      new TextInputPredictionService(
+        upgradedServices['CountVectorizerService'],
+        upgradedServices['SVMPredictionService'],
+        upgradedServices['TextInputTokenizer']
+      );
 
     // Group 5: Services depending on groups 1-4.
     upgradedServices['SolutionObjectFactory'] =

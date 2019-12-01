@@ -31,18 +31,18 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 @Injectable({
-  'providedIn': 'root'
+  providedIn: 'root'
 })
 export class TextInputTokenizer {
   generateTokens(textInput: string) {
     var tokenizedTextInput;
-      // The default regexp select tokens of 2 or more alphanumeric
-      // characters (punctuation is completely ignored and always treated
-      // as a token separator).
-      var tokenPattern = '\\b\\w\\w+\\b';
-      var regexp = new RegExp(tokenPattern, 'g');
-      tokenizedTextInput = textInput.match(regexp);
-      return tokenizedTextInput;
+    // The default regexp select tokens of 2 or more alphanumeric
+    // characters (punctuation is completely ignored and always treated
+    // as a token separator).
+    var tokenPattern = '\\b\\w\\w+\\b';
+    var regexp = new RegExp(tokenPattern, 'g');
+    tokenizedTextInput = textInput.match(regexp);
+    return tokenizedTextInput;
   }
 }
 angular.module('oppia').factory(
