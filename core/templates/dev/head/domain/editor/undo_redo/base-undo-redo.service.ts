@@ -17,40 +17,47 @@
  * Changes may be undone, redone, or replaced.
  */
 
-require('domain/editor/editor-domain.constants.ajs.ts');
-
 /**
  * Stores a stack of changes to a domain object. Please note that only one
  * instance of this service exists at a time, so multiple undo/redo stacks are
  * not currently supported.
  */
-angular.module('oppia').factory('BaseUndoRedoService', [
-  '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
-  function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-    var BaseUndoRedoService = {};
 
-    this._appliedChanges = [];
-    this._undoneChanges = [];
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-    var _dispatchMutation = function() {
-      $rootScope.$broadcast(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
-    };
-    var _applyChange = function(changeObject, domainObject) {
+import cloneDeep from 'lodash/cloneDeep';
+
+import { EditorDomainConstants } from 'domain/editor/editor-domain.constants';
+import { EventService } from 'services/event-service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class BaseUndoRedoService {
+  constructor(private eventService: EventService) {}
+    _appliedChanges = [];
+    _undoneChanges = [];
+
+    _dispatchMutation(): void {
+      this.eventService.BroadcastEvent(
+        EditorDomainConstants.EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
+    }
+    // TODO(#7176): Replace 'any' with the exact type.
+    _applyChange(changeObject: any, domainObject: any): void {
       changeObject.applyChange(domainObject);
-      _dispatchMutation();
-    };
-    var _reverseChange = function(changeObject, domainObject) {
+      this._dispatchMutation();
+    }
+    // TODO(#7176): Replace 'any' with the exact type.
+    _reverseChange(changeObject: any, domainObject: any): void {
       changeObject.reverseChange(domainObject);
-      _dispatchMutation();
-    };
+      this._dispatchMutation();
+    }
 
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['init'] = function() {
-    /* eslint-enable dot-notation */
+    init(): void {
       this._appliedChanges = [];
       this._undoneChanges = [];
-    };
+    }
 
     /**
      * Pushes a change domain object onto the change stack and applies it to the
@@ -58,14 +65,12 @@ angular.module('oppia').factory('BaseUndoRedoService', [
      * are lost and cannot be redone. This will fire an event as defined by the
      * constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['applyChange'] = function(changeObject, domainObject) {
-    /* eslint-enable dot-notation */
-      _applyChange(changeObject, domainObject);
+    // TODO(#7176): Replace 'any' with the exact type.
+    applyChange(changeObject: any, domainObject: any): void {
+      this._applyChange(changeObject, domainObject);
       this._appliedChanges.push(changeObject);
       this._undoneChanges = [];
-    };
+    }
 
     /**
      * Undoes the last change to the provided domain object. This function
@@ -73,111 +78,95 @@ angular.module('oppia').factory('BaseUndoRedoService', [
      * will fire an event as defined by the constant
      * EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['undoChange'] = function(domainObject) {
-    /* eslint-enable dot-notation */
+    // TODO(#7176): Replace 'any' with the exact type.
+    undoChange(domainObject: any): boolean {
       if (this._appliedChanges.length !== 0) {
-        var change = this._appliedChanges.pop();
+        let change = this._appliedChanges.pop();
         this._undoneChanges.push(change);
-        _reverseChange(change, domainObject);
+        this._reverseChange(change, domainObject);
         return true;
       }
       return false;
-    };
+    }
 
     /**
      * Reverses an undo for the given domain object. This function returns false
      * if there are no changes to redo, and true if otherwise. This will fire an
      * event as defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['redoChange'] = function(domainObject) {
-    /* eslint-enable dot-notation */
+    // TODO(#7176): Replace 'any' with the exact type.
+    redoChange(domainObject: any): boolean {
       if (this._undoneChanges.length !== 0) {
-        var change = this._undoneChanges.pop();
+        let change = this._undoneChanges.pop();
         this._appliedChanges.push(change);
-        _applyChange(change, domainObject);
+        this._applyChange(change, domainObject);
         return true;
       }
       return false;
-    };
+    }
 
     /**
      * Returns the current list of changes applied to the provided domain
      * object. This list will not contain undone actions. Changes to the
      * returned list will not be reflected in this service.
      */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['getChangeList'] = function() {
-    /* eslint-enable dot-notation */
+    // TODO(#7176): Replace 'any' with the exact type.
+    getChangeList(): Array<any> {
       // TODO(bhenning): Consider integrating something like Immutable.js to
       // avoid the slice here and ensure the returned object is truly an
       // immutable copy.
       return this._appliedChanges.slice();
-    };
+    }
 
     /**
      * Returns a list of commit dict updates representing all chosen changes in
      * this service. Changes to the returned list will not affect this service.
      * Furthermore, the returned list is ready to be sent to the backend.
      */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['getCommittableChangeList'] = function() {
-    /* eslint-enable dot-notation */
-      var committableChangeList = [];
-      for (var i = 0; i < this._appliedChanges.length; i++) {
+    // TODO(#7176): Replace 'any' with the exact type.
+    getCommittableChangeList(): Array<any> {
+      let committableChangeList = [];
+      for (let i = 0; i < this._appliedChanges.length; i++) {
         committableChangeList[i] =
-          this._appliedChanges[i].getBackendChangeObject();
+            this._appliedChanges[i].getBackendChangeObject();
       }
       return committableChangeList;
-    };
+    }
 
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['setChangeList'] = function(changeList) {
-    /* eslint-enable dot-notation */
-      this._appliedChanges = angular.copy(changeList);
-    };
+    // TODO(#7176): Replace 'any' with the exact type.
+    setChangeList(changeList: any): void {
+      this._appliedChanges = cloneDeep(changeList);
+    }
 
     /**
      * Returns the number of changes that have been applied to the domain
      * object.
      */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['getChangeCount'] = function() {
-    /* eslint-enable dot-notation */
+    getChangeCount(): number {
       return this._appliedChanges.length;
-    };
+    }
 
     /**
      * Returns whether this service has any applied changes.
      */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['hasChanges'] = function() {
-    /* eslint-enable dot-notation */
+    hasChanges(): boolean {
+      /* eslint-enable dot-notation */
       return this._appliedChanges.length !== 0;
-    };
+    }
 
     /**
      * Clears the change history. This does not reverse any of the changes
      * applied from applyChange() or redoChange(). This will fire an event as
      * defined by the constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    BaseUndoRedoService['clearChanges'] = function() {
-    /* eslint-enable dot-notation */
+
+    clearChanges(): void {
       this._appliedChanges = [];
       this._undoneChanges = [];
-      _dispatchMutation();
-    };
+      this._dispatchMutation();
+    }
+}
 
-    return BaseUndoRedoService;
-  }
-]);
+angular.module('oppia').factory(
+  'BaseUndoRedoService',
+  downgradeInjectable(BaseUndoRedoService));

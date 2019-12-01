@@ -30,6 +30,8 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { BaseUndoRedoService } from
+  'domain/editor/undo_redo/base-undo-redo.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ChangesInHumanReadableFormService } from
@@ -47,6 +49,7 @@ import { DocumentAttributeCustomizationService } from
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { EventService } from 'services/event-service';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationDraftObjectFactory } from
@@ -125,6 +128,7 @@ import { TextInputValidationService } from
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { UndoRedoService } from 'domain/editor/undo_redo/undo-redo.service';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -164,6 +168,7 @@ export class UpgradedServices {
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
+    upgradedServices['EventService'] = new EventService();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
     upgradedServices['ExplorationDraftObjectFactory'] =
       new ExplorationDraftObjectFactory();
@@ -210,6 +215,8 @@ export class UpgradedServices {
     // Group 2: Services depending only on group 1.
     upgradedServices['AlertsService'] =
       new AlertsService(upgradedServices['LoggerService']);
+    upgradedServices['BaseUndoRedoService'] = new BaseUndoRedoService(
+      upgradedServices['EventService']);
     upgradedServices['ChangesInHumanReadableFormService'] =
       new ChangesInHumanReadableFormService(
         upgradedServices['UtilsService'], document);
@@ -252,6 +259,8 @@ export class UpgradedServices {
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['UndoRedoService'] = new UndoRedoService(
+      upgradedServices['EventService']);
     upgradedServices['UrlService'] =
       new UrlService(upgradedServices['WindowRef']);
     upgradedServices['ValidatorsService'] = new ValidatorsService(

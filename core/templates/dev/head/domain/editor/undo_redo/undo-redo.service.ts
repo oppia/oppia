@@ -16,12 +16,19 @@
  * @fileoverview Undo Redo Service.
  */
 
-require('domain/editor/undo_redo/base-undo-redo.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('UndoRedoService', [
-  'BaseUndoRedoService', function(BaseUndoRedoService) {
-    var child = Object.create(BaseUndoRedoService);
-    child.init();
-    return child;
-  }
-]);
+import { BaseUndoRedoService } from
+  'domain/editor/undo_redo/base-undo-redo.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UndoRedoService extends BaseUndoRedoService {
+
+}
+
+angular.module('oppia').factory(
+  'UndoRedoService',
+  downgradeInjectable(UndoRedoService));
