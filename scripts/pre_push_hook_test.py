@@ -63,9 +63,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.linter_code = 0
         def mock_start_linter(unused_files_to_lint):
             return self.linter_code
-        self.does_diff_include_package_json = False
-        def mock_does_diff_include_package_json(unused_files_to_lint):
-            return self.does_diff_include_package_json
         self.does_diff_include_js_or_ts_files = False
         def mock_does_diff_include_js_or_ts_files(unused_files_to_lint):
             return self.does_diff_include_js_or_ts_files
@@ -84,9 +81,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         self.start_linter_swap = self.swap(
             pre_push_hook, 'start_linter', mock_start_linter)
-        self.package_json_swap = self.swap(
-            pre_push_hook, 'does_diff_include_package_json',
-            mock_does_diff_include_package_json)
         self.js_or_ts_swap = self.swap(
             pre_push_hook, 'does_diff_include_js_or_ts_files',
             mock_does_diff_include_js_or_ts_files)
@@ -440,16 +434,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
     def test_does_diff_include_js_or_ts_files_with_no_file(self):
         self.assertFalse(
             pre_push_hook.does_diff_include_js_or_ts_files(
-                ['file1.html', 'file2.py']))
-
-    def test_does_diff_include_package_json_with_package_file(self):
-        self.assertTrue(
-            pre_push_hook.does_diff_include_package_json(
-                ['file1.js', 'package.json']))
-
-    def test_does_diff_include_package_json_with_no_file(self):
-        self.assertFalse(
-            pre_push_hook.does_diff_include_package_json(
                 ['file1.html', 'file2.py']))
 
     def test_repo_in_dirty_state(self):
