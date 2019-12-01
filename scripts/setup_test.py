@@ -155,8 +155,9 @@ class SetupTests(test_utils.GenericTestBase):
             'version_info', ['major', 'minor'])
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4))
-        with print_swap, os_name_swap, version_swap, self.assertRaises(Exception):
-            setup.test_python_version()
+        with print_swap, os_name_swap, version_swap:
+            with self.assertRaises(Exception):
+                setup.test_python_version()
         self.assertEqual(
             print_arr, [
                 'It looks like you are using Windows. If you have Python '

@@ -35,6 +35,7 @@ Python execution environent set up for all scripts.
 NODE_VERSION = 'v10.15.3'
 YARN_VERSION = 'v1.17.3'
 
+
 def create_directory(directory_path):
     """Creates a new directory. Does not do anything if directory already
     exists.
@@ -164,7 +165,6 @@ def main(args=None):
             'visit https://yarnpkg.com/en/docs/usage.'])
 
         # NB: Update .yarnrc if the yarn version below is changed.
-        yarn_version = 'v1.17.3'
         yarn_file_name = 'yarn-%s.tar.gz' % YARN_VERSION
         download_and_install_package(
             'https://github.com/yarnpkg/yarn/releases/download/%s/%s'

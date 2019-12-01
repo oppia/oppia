@@ -37,7 +37,7 @@ import sys
 
 sys.path.append(os.getcwd())
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
-from scripts import common
+from scripts import common  # isort:skip # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')

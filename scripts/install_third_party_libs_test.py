@@ -31,13 +31,13 @@ from core.tests import test_utils
 
 import python_utils
 
+from . import common
 from . import install_third_party
 from . import install_third_party_libs
 from . import pre_commit_hook
 from . import pre_push_hook
 from . import setup
 from . import setup_gae
-from . import common
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 
@@ -64,17 +64,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_tweak_yarn_executable(self):
-        
+        # pylint: disable=unused-argument
         def mock_is_file(filename):
             return True
-
+        # pylint: enable=unused-argument
         def mock_rename(origin_name, new_name):
             self.assertEqual(origin_name + '.sh', new_name)
             mock_rename.called = True
         mock_rename.called = False
         isfile_swap = self.swap(os.path, 'isfile', mock_is_file)
         rename_swap = self.swap(os, 'rename', mock_rename)
-        
         with isfile_swap, rename_swap:
             install_third_party_libs.tweak_yarn_executable()
         self.assertTrue(mock_rename.called)
@@ -85,7 +84,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_darwin_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', "Darwin")
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
 
 
         import pip
@@ -103,7 +102,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertFalse(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_linux_os(self):
-        os_name_swap = self.swap(common, 'OS_NAME', "Linux")
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
 
         import pip
         try:

@@ -48,21 +48,26 @@ os.environ['PATH'] = (
     '%s%s' % (NODE_PATH, os.pathsep) +
     '%s%sbin%s' % (YARN_PATH, os.sep, os.pathsep) + os.environ['PATH'])
 
+
 def is_windows_os():
     """Check if the running system is Windows."""
     return OS_NAME == 'Windows'
+
 
 def is_mac_os():
     """Check if the running system is MacOS."""
     return OS_NAME == 'Darwin'
 
+
 def is_linux_os():
     """Check if the running system is Linux."""
     return OS_NAME == 'Linux'
 
+
 def is_x64_architecture():
-    """Check if the architecture is on X64"""
+    """Check if the architecture is on X64."""
     return ARCHITECTURE == 'x86_64'
+
 
 def run_cmd(cmd_tokens):
     """Runs the command and returns the output.

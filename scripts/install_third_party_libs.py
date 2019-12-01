@@ -70,7 +70,7 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
 
 
 def tweak_yarn_executable():
-    """ When run yarn on Windows, the file `yarn` will be excecuted (
+    """When run yarn on Windows, the file `yarn` will be excecuted (
     even then command specified is `yarn.cmd`). While this file is a bash
     script, so it can not be executed. To avoid the issue, we can rename
     this file to `yarn.sh`.
@@ -79,6 +79,7 @@ def tweak_yarn_executable():
     if os.path.isfile(origin_file):
         renamed_file = os.path.join(common.YARN_PATH, 'bin', 'yarn.sh')
         os.rename(origin_file, renamed_file)
+
 
 def get_yarn_command():
     """Get the executable file for yarn."""
@@ -294,6 +295,8 @@ def main(args=None):
     python_utils.PRINT('Installing pre-commit hook for git')
     pre_commit_hook.main(args=['--install'])
 
+    # TODO(cuichenli): Once pre_commit_linter is working correctly, this
+    # condition should be removed.
     if not common.is_windows_os():
         # Install pre-push script.
         python_utils.PRINT('Installing pre-push hook for git')
