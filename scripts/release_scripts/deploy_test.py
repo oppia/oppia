@@ -303,18 +303,21 @@ class DeployTests(test_utils.GenericTestBase):
         def mock_build_scripts():
             check_function_calls['build_scripts_gets_called'] = True
         def mock_deploy_application_and_write_log_entry(
-                unused_app_name, unused_version_to_deploy_to,
+                unused_app_name, version_to_deploy_to,
                 unused_current_git_revision):
-            check_function_calls[
-                'deploy_application_and_write_log_entry_gets_called'] = True
+            if version_to_deploy_to == '1-2-3':
+                check_function_calls[
+                    'deploy_application_and_write_log_entry_gets_called'] = True
         def mock_switch_version(
-                unused_app_name, unused_current_release_version):
-            check_function_calls['switch_version_gets_called'] = True
+                unused_app_name, current_release_version):
+            if current_release_version == '1-2-3':
+                check_function_calls['switch_version_gets_called'] = True
         def mock_flush_memcache(unused_app_name):
             check_function_calls['flush_memcache_gets_called'] = True
         def mock_check_breakage(
-                unused_app_name, unused_current_release_version):
-            check_function_calls['check_breakage_gets_called'] = True
+                unused_app_name, current_release_version):
+            if current_release_version == '1-2-3':
+                check_function_calls['check_breakage_gets_called'] = True
 
         cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         preprocess_swap = self.swap(
@@ -335,6 +338,81 @@ class DeployTests(test_utils.GenericTestBase):
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.args_swap, self.exists_swap, self.check_output_swap:
+                    with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
+                        with cwd_swap, preprocess_swap, update_swap, build_swap:
+                            with deploy_swap, switch_swap, self.run_swap:
+                                with memcache_swap, check_breakage_swap:
+                                    deploy.execute_deployment()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_function_calls_with_custom_version(self):
+        check_function_calls = {
+            'preprocess_release_gets_called': False,
+            'update_and_check_indexes_gets_called': False,
+            'build_scripts_gets_called': False,
+            'deploy_application_and_write_log_entry_gets_called': False,
+            'switch_version_gets_called': False,
+            'flush_memcache_gets_called': False,
+            'check_breakage_gets_called': False
+        }
+        expected_check_function_calls = {
+            'preprocess_release_gets_called': True,
+            'update_and_check_indexes_gets_called': True,
+            'build_scripts_gets_called': True,
+            'deploy_application_and_write_log_entry_gets_called': True,
+            'switch_version_gets_called': True,
+            'flush_memcache_gets_called': True,
+            'check_breakage_gets_called': True
+        }
+        def mock_getcwd():
+            return 'deploy-oppiatestserver-release-1.2.3-%s' % (
+                deploy.CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
+        def mock_preprocess_release(unused_app_name, unused_deploy_data_path):
+            check_function_calls['preprocess_release_gets_called'] = True
+        def mock_update_and_check_indexes(unused_app_name):
+            check_function_calls['update_and_check_indexes_gets_called'] = True
+        def mock_build_scripts():
+            check_function_calls['build_scripts_gets_called'] = True
+        def mock_deploy_application_and_write_log_entry(
+                unused_app_name, version_to_deploy_to,
+                unused_current_git_revision):
+            if version_to_deploy_to == 'release-1-2-3-custom':
+                check_function_calls[
+                    'deploy_application_and_write_log_entry_gets_called'] = True
+        def mock_switch_version(
+                unused_app_name, current_release_version):
+            if current_release_version == 'release-1-2-3-custom':
+                check_function_calls['switch_version_gets_called'] = True
+        def mock_flush_memcache(unused_app_name):
+            check_function_calls['flush_memcache_gets_called'] = True
+        def mock_check_breakage(
+                unused_app_name, current_release_version):
+            if current_release_version == 'release-1-2-3-custom':
+                check_function_calls['check_breakage_gets_called'] = True
+
+        cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+        preprocess_swap = self.swap(
+            deploy, 'preprocess_release', mock_preprocess_release)
+        update_swap = self.swap(
+            deploy, 'update_and_check_indexes', mock_update_and_check_indexes)
+        build_swap = self.swap(deploy, 'build_scripts', mock_build_scripts)
+        deploy_swap = self.swap(
+            deploy, 'deploy_application_and_write_log_entry',
+            mock_deploy_application_and_write_log_entry)
+        switch_swap = self.swap(
+            deploy, 'switch_version', mock_switch_version)
+        memcache_swap = self.swap(
+            deploy, 'flush_memcache', mock_flush_memcache)
+        check_breakage_swap = self.swap(
+            deploy, 'check_breakage', mock_check_breakage)
+        args_swap = self.swap(
+            sys, 'argv', [
+                'deploy.py', '--app_name=oppiatestserver',
+                '--version=release-1.2.3-custom'])
+
+        with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
+            with self.release_script_exist_swap, self.gcloud_available_swap:
+                with args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
                         with cwd_swap, preprocess_swap, update_swap, build_swap:
                             with deploy_swap, switch_swap, self.run_swap:

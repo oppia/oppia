@@ -189,19 +189,19 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
-    def test_get_current_release_version_with_non_hotfix_branch(self):
+    def test_get_current_release_version_number_with_non_hotfix_branch(self):
         self.assertEqual(
-            common.get_current_release_version('release-1.2.3'), '1.2.3')
+            common.get_current_release_version_number('release-1.2.3'), '1.2.3')
 
-    def test_get_current_release_version_with_hotfix_branch(self):
+    def test_get_current_release_version_number_with_hotfix_branch(self):
         self.assertEqual(
-            common.get_current_release_version('release-1.2.3-hotfix-1'),
+            common.get_current_release_version_number('release-1.2.3-hotfix-1'),
             '1.2.3')
 
-    def test_get_current_release_version_with_invalid_branch(self):
+    def test_get_current_release_version_number_with_invalid_branch(self):
         with self.assertRaisesRegexp(
             Exception, 'Invalid branch name: invalid-branch.'):
-            common.get_current_release_version('invalid-branch')
+            common.get_current_release_version_number('invalid-branch')
 
     def test_is_current_branch_a_release_branch_with_release_branch(self):
         def mock_check_output(unused_cmd_tokens):

@@ -492,7 +492,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'remove_updates_and_delete_branch_gets_called'] = True
         def mock_update_changelog(
                 unused_branch_name, unused_release_summary_lines,
-                unused_current_release_version):
+                unused_current_release_version_number):
             check_function_calls['update_changelog_gets_called'] = True
         def mock_update_authors(unused_release_summary_lines):
             check_function_calls['update_authors_gets_called'] = True
@@ -505,7 +505,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'check_ordering_of_sections_gets_called'] = True
         def mock_create_branch(
                 unused_repo_fork, unused_target_branch, unused_github_username,
-                unused_current_release_version):
+                unused_current_release_version_number):
             check_function_calls['create_branch_gets_called'] = True
         def mock_input():
             return 'y'

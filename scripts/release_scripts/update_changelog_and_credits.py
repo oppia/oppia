@@ -129,12 +129,12 @@ def check_ordering_of_sections(release_summary_lines):
                     section.strip(), next_section.strip()))
 
 
-def get_previous_release_version(branch_type, current_release_version):
+def get_previous_release_version(branch_type, current_release_version_number):
     """Finds previous version given the current version.
 
     Args:
         branch_type: str. The type of the branch: release or hotfix.
-        current_release_version: str. The current release version.
+        current_release_version_number: str. The current release version.
 
     Returns:
         str. The previous version.
@@ -152,17 +152,18 @@ def get_previous_release_version(branch_type, current_release_version):
         previous_release_version = all_tags[-2][1:]
     else:
         raise Exception('Invalid branch type: %s.' % branch_type)
-    assert previous_release_version != current_release_version
+    assert previous_release_version != current_release_version_number
     return previous_release_version
 
 
 def remove_repetition_from_changelog(
-        current_release_version, previous_release_version, changelog_lines):
+        current_release_version_number, previous_release_version,
+        changelog_lines):
     """Removes information about current version from changelog before
     generation of changelog again.
 
     Args:
-        current_release_version: str. The current release version.
+        current_release_version_number: str. The current release version.
         previous_release_version: str. The previous release version.
         changelog_lines: str. The lines of changelog file.
 
@@ -173,7 +174,7 @@ def remove_repetition_from_changelog(
     current_version_start = 0
     previous_version_start = 0
     for index, line in enumerate(changelog_lines):
-        if 'v%s' % current_release_version in line:
+        if 'v%s' % current_release_version_number in line:
             current_version_start = index
         if 'v%s' % previous_release_version in line:
             previous_version_start = index
@@ -182,20 +183,20 @@ def remove_repetition_from_changelog(
 
 
 def update_changelog(
-        branch_name, release_summary_lines, current_release_version):
+        branch_name, release_summary_lines, current_release_version_number):
     """Updates CHANGELOG file.
 
     Args:
         branch_name: str. The name of the current branch.
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
-        current_release_version: str. The version of current release.
+        current_release_version_number: str. The version of current release.
     """
     python_utils.PRINT('Updating Changelog...')
     start_index = release_summary_lines.index('### Changelog:\n') + 1
     end_index = release_summary_lines.index('### Commit History:\n')
     release_version_changelog = [
-        u'v%s (%s)\n' % (current_release_version, CURRENT_DATE),
+        u'v%s (%s)\n' % (current_release_version_number, CURRENT_DATE),
         u'------------------------\n'] + release_summary_lines[
             start_index:end_index]
     changelog_lines = []
@@ -204,20 +205,23 @@ def update_changelog(
 
     if release_constants.BRANCH_TYPE_HOTFIX in branch_name:
         previous_release_version = get_previous_release_version(
-            release_constants.BRANCH_TYPE_HOTFIX, current_release_version)
+            release_constants.BRANCH_TYPE_HOTFIX,
+            current_release_version_number)
         changelog_lines = remove_repetition_from_changelog(
-            current_release_version, previous_release_version, changelog_lines)
+            current_release_version_number, previous_release_version,
+            changelog_lines)
     else:
         previous_release_version = get_previous_release_version(
-            release_constants.BRANCH_TYPE_RELEASE, current_release_version)
+            release_constants.BRANCH_TYPE_RELEASE,
+            current_release_version_number)
         # Update only if changelog is generated before and contains info for
         # current version.
         if any(
                 line.startswith(
-                    'v%s' % current_release_version
+                    'v%s' % current_release_version_number
                     ) for line in changelog_lines):
             changelog_lines = remove_repetition_from_changelog(
-                current_release_version, previous_release_version,
+                current_release_version_number, previous_release_version,
                 changelog_lines)
 
     changelog_lines[2:2] = release_version_changelog
@@ -402,7 +406,8 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
 
 
 def create_branch(
-        repo_fork, target_branch, github_username, current_release_version):
+        repo_fork, target_branch, github_username,
+        current_release_version_number):
     """Creates a new branch with updates to AUTHORS, CHANGELOG,
     CONTRIBUTORS and about-page.
 
@@ -411,7 +416,7 @@ def create_branch(
             forked repo.
         target_branch: str. The name of the target branch.
         github_username: str. The github username of the user.
-        current_release_version: str. The version of current release.
+        current_release_version_number: str. The version of current release.
     """
     python_utils.PRINT(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
@@ -432,14 +437,14 @@ def create_branch(
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia/compare/develop...%s:%s?'
         'expand=1&title=Update authors and changelog for v%s' % (
-            github_username, target_branch, current_release_version))
+            github_username, target_branch, current_release_version_number))
     python_utils.PRINT(
         'Pushed changes to Github. '
         'Please create a pull request from the %s branch\n\n'
         'Note: PR title should be exactly: '
         '"Update authors and changelog for v%s" '
         'otherwise deployment will fail.' % (
-            target_branch, current_release_version))
+            target_branch, current_release_version_number))
 
 
 def main():
@@ -470,8 +475,10 @@ def main():
     g = github.Github(personal_access_token)
     repo_fork = g.get_repo('%s/oppia' % github_username)
 
-    current_release_version = common.get_current_release_version(branch_name)
-    target_branch = 'update-changelog-for-releasev%s' % current_release_version
+    current_release_version_number = common.get_current_release_version_number(
+        branch_name)
+    target_branch = 'update-changelog-for-releasev%s' % (
+        current_release_version_number)
 
     remove_updates_and_delete_branch(repo_fork, target_branch)
 
@@ -511,7 +518,7 @@ def main():
     check_ordering_of_sections(release_summary_lines)
 
     update_changelog(
-        branch_name, release_summary_lines, current_release_version)
+        branch_name, release_summary_lines, current_release_version_number)
     update_authors(release_summary_lines)
     update_contributors(release_summary_lines)
     update_developer_names(release_summary_lines)
@@ -524,7 +531,8 @@ def main():
     common.ask_user_to_confirm(message)
 
     create_branch(
-        repo_fork, target_branch, github_username, current_release_version)
+        repo_fork, target_branch, github_username,
+        current_release_version_number)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

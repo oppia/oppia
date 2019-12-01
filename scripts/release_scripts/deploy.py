@@ -428,6 +428,7 @@ def execute_deployment():
         Exception: Invalid directory accessed during deployment.
     """
     parsed_args = _PARSER.parse_args()
+    custom_version = None
     if parsed_args.app_name:
         app_name = parsed_args.app_name
         if app_name not in [
@@ -457,8 +458,13 @@ def execute_deployment():
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'The deployment script must be run from a release branch.')
-    current_release_version = common.get_current_release_version(
-        current_branch_name).replace(DOT_CHAR, HYPHEN_CHAR)
+    if custom_version is not None:
+        current_release_version = custom_version.replace(
+            DOT_CHAR, HYPHEN_CHAR)
+    else:
+        current_release_version = current_branch_name[
+            len(common.RELEASE_BRANCH_NAME_PREFIX):].replace(
+                DOT_CHAR, HYPHEN_CHAR)
 
     # This is required to compose the release_version_library_url
     # (defined in switch_version function) correctly.
@@ -472,12 +478,13 @@ def execute_deployment():
     try:
         if app_name == APP_NAME_OPPIASERVER:
             create_release_doc()
-            release_version = common.get_current_release_version(
+            release_version_number = common.get_current_release_version_number(
                 current_branch_name)
             last_commit_message = subprocess.check_output(
                 'git log -1 --pretty=%B'.split())
             if not last_commit_message.startswith(
-                    'Update authors and changelog for v%s' % release_version):
+                    'Update authors and changelog for v%s' % (
+                        release_version_number)):
                 raise Exception(
                     'Invalid last commit message: %s.' % last_commit_message)
 
@@ -529,9 +536,7 @@ def execute_deployment():
             update_and_check_indexes(app_name)
             build_scripts()
             deploy_application_and_write_log_entry(
-                app_name, (
-                    custom_version
-                    if custom_version else current_release_version),
+                app_name, current_release_version,
                 current_git_revision)
 
             python_utils.PRINT('Returning to oppia/ root directory.')
