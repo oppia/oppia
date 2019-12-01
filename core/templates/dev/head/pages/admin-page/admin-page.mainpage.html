@@ -4,17 +4,17 @@
     <title>Oppia Admin Panel</title>
 
     <!-- Require head styles file using webpack -->
-    @require('../header_css_libs.html')
+    @load('pages/header_css_libs.html')
 
     <!-- Require head javascript file using webpack -->
-      @require('../header_js_libs.html')
+      @load('pages/header_js_libs.html')
   </head>
 
   <body>
     <service-bootstrap></service-bootstrap>
     <admin-page></admin-page>
 
-    @require('../footer_js_libs.html')
+    @load('pages/footer_js_libs.html')
     <script src="/third_party/static/ckeditor-4.12.1/ckeditor.js"></script>
   </body>
 </html>
