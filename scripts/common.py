@@ -44,8 +44,9 @@ ARCHITECTURE = platform.machine()
 
 # Add path for node which is required by the node_modules.
 os.environ['PATH'] = (
-    '%s/bin:' % NODE_PATH + '%s/bin:' % YARN_PATH + os.environ['PATH'])
-
+    '%s%sbin%s' % (NODE_PATH, os.sep, os.pathsep) +
+    '%s%s' % (NODE_PATH, os.pathsep) +
+    '%s%sbin%s' % (YARN_PATH, os.sep, os.pathsep) + os.environ['PATH'])
 
 def is_windows_os():
     """Check if the running system is Windows."""
