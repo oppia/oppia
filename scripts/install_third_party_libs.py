@@ -295,9 +295,10 @@ def main(args=None):
     python_utils.PRINT('Installing pre-commit hook for git')
     pre_commit_hook.main(args=['--install'])
 
-    # Install pre-push script.
-    python_utils.PRINT('Installing pre-push hook for git')
-    pre_push_hook.main(args=['--install'])
+    if not common.is_windows_os():
+        # Install pre-push script.
+        python_utils.PRINT('Installing pre-push hook for git')
+        pre_push_hook.main(args=['--install'])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
