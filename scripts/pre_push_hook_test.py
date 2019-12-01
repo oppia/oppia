@@ -330,10 +330,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.popen_swap:
             self.assertEqual(pre_push_hook.start_python_script('script'), 0)
 
-    def test_start_npm_audit(self):
-        with self.popen_swap:
-            self.assertEqual(pre_push_hook.start_npm_audit(), 0)
-
     def test_has_uncommitted_files(self):
         def mock_check_output(unused_cmd_tokens):
             return 'file1'
@@ -496,22 +492,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
                         pre_push_hook.main(args=[])
         self.assertTrue(
             'Push failed, please correct the linting issues above.'
-            in self.print_arr)
-
-    def test_npm_audit_failure(self):
-        self.does_diff_include_package_json = True
-        def mock_start_npm_audit():
-            return 1
-        start_npm_audit_swap = self.swap(
-            pre_push_hook, 'start_npm_audit', mock_start_npm_audit)
-        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
-            with self.collect_files_swap, self.uncommitted_files_swap:
-                with self.check_output_swap, self.start_linter_swap:
-                    with self.package_json_swap, start_npm_audit_swap:
-                        with self.assertRaises(SystemExit):
-                            pre_push_hook.main(args=[])
-        self.assertTrue(
-            'Push failed, please correct the npm audit issues above.'
             in self.print_arr)
 
     def test_frontend_test_failure(self):
