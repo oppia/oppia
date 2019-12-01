@@ -338,22 +338,6 @@ def does_diff_include_js_or_ts_files(files_to_lint):
     return False
 
 
-def does_diff_include_package_json(files_to_lint):
-    """Returns true if diff includes package.json or yarn.lock.
-
-    Args:
-        files_to_lint: list(str). List of files to be linted.
-
-    Returns:
-        bool. Whether the diff contains changes in package.json or
-            yarn.lock.
-    """
-    for filename in files_to_lint:
-        if filename == 'package.json' or filename == 'yarn.lock':
-            return True
-    return False
-
-
 def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
