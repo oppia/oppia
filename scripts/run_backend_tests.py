@@ -90,6 +90,12 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'),
 ]
 
+# Explicitly pass all current environment variables into subprocess.
+# Otherwise, there will be dll error for running coverage. (For Windows)
+SUBPROCESS_ENV = {
+    k.encode('utf-8'): v.encode('utf-8') for k, v in os.environ.items()
+}
+
 COVERAGE_PATH = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools', 'coverage-4.5.4', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
@@ -148,9 +154,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
-    python_path = ':'.join(sys.path)[1:]
-    p = subprocess.Popen(
-        exe, stdout=stdout, stderr=stderr, env={'PYTHONPATH': python_path})
+    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=SUBPROCESS_ENV)
     last_stdout_str, last_stderr_str = p.communicate()
     # Converting to unicode to stay compatible with the rest of the strings.
     last_stdout_str = last_stdout_str.decode(encoding='utf-8')
@@ -338,6 +342,10 @@ def main(args=None):
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
+
+        # The directories should only be inserted starting at index 1. See
+        # https://stackoverflow.com/a/10095099 and
+        # https://stackoverflow.com/q/10095037 for more details.
         sys.path.insert(1, directory)
 
     import dev_appserver
@@ -349,6 +357,11 @@ def main(args=None):
                 os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')):
             raise Exception('Coverage is not installed, please run the start ' +
                             'script.')
+
+        SUBPROCESS_ENV.update({
+            'PYTHONPATH'.encode(encoding='utf-8'):
+                COVERAGE_PATH.encode(encoding='utf-8')
+        })
 
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
@@ -490,16 +503,13 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        python_path = ':'.join(sys.path)[1:]
-
         subprocess.Popen(
-            ['python', COVERAGE_PATH, 'combine'],
-            env={'PYTHONPATH': python_path})
+            ['python', COVERAGE_PATH, 'combine'], env=SUBPROCESS_ENV)
         process = subprocess.Popen(
             ['python', COVERAGE_PATH, 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
              % common.OPPIA_TOOLS_DIR, '--show-missing', '--skip-covered'],
-            stdout=subprocess.PIPE, env={'PYTHONPATH': python_path})
+            stdout=subprocess.PIPE, env=SUBPROCESS_ENV)
 
         report_stdout = process.stdout.read()
         python_utils.PRINT(report_stdout)
@@ -508,7 +518,7 @@ def main(args=None):
 
         python_utils.PRINT('Generating xml coverage report...')
         subprocess.check_call(
-            ['python', COVERAGE_PATH, 'xml'], env={'PYTHONPATH': python_path})
+            ['python', COVERAGE_PATH, 'xml'], env=SUBPROCESS_ENV)
 
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
