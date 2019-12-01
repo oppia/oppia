@@ -87,11 +87,12 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.THIRD_PARTY_DIR, 'six-1.12.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'),
 ]
 
-DIRS_TO_ADD_TO_SYS_PYTHONPATH = [
-    os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')
-]
+# DIRS_TO_ADD_TO_SYS_PYTHONPATH = [
+#     os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')
+# ]
 
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage')
@@ -341,18 +342,18 @@ def main(args=None):
             raise Exception('Directory %s does not exist.' % directory)
         sys.path.insert(0, directory)
 
-    pythonpath_starting_index = 0
-    if not os.environ.get('PYTHONPATH'):
-        os.environ['PYTHONPATH'] = DIRS_TO_ADD_TO_SYS_PYTHONPATH[0]
-        pythonpath_starting_index = 1
+    # pythonpath_starting_index = 0
+    # if not os.environ.get('PYTHONPATH'):
+    #     os.environ['PYTHONPATH'] = DIRS_TO_ADD_TO_SYS_PYTHONPATH[0]
+    #     pythonpath_starting_index = 1
 
-    for i in python_utils.RANGE(
-            pythonpath_starting_index, len(DIRS_TO_ADD_TO_SYS_PYTHONPATH)):
-        directory = DIRS_TO_ADD_TO_SYS_PYTHONPATH[i]
-        if not os.path.exists(os.path.dirname(directory)):
-            raise Exception('Directory %s does not exist.' % directory)
-        os.environ['PYTHONPATH'] = '%s:%s' % (
-            directory, os.environ.get('PYTHONPATH'))
+    # for i in python_utils.RANGE(
+    #         pythonpath_starting_index, len(DIRS_TO_ADD_TO_SYS_PYTHONPATH)):
+    #     directory = DIRS_TO_ADD_TO_SYS_PYTHONPATH[i]
+    #     if not os.path.exists(os.path.dirname(directory)):
+    #         raise Exception('Directory %s does not exist.' % directory)
+    #     os.environ['PYTHONPATH'] = '%s:%s' % (
+    #         directory, os.environ.get('PYTHONPATH'))
 
     import dev_appserver
     dev_appserver.fix_sys_path()
@@ -514,7 +515,7 @@ def main(args=None):
         report_stdout = process.stdout.read()
         python_utils.PRINT(report_stdout)
         python_utils.PRINT(
-            'Files that are not reported have complete coverage.')
+            'Files that are not listed have complete coverage.')
 
         python_utils.PRINT('Generating xml coverage report...')
         subprocess.check_call(['python', COVERAGE_PATH, 'xml'])
