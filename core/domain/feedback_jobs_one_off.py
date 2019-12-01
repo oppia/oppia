@@ -48,6 +48,34 @@ class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
+class FeedbackThreadMessageCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate message data cache of threads."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [feedback_models.GeneralFeedbackThreadModel]
+
+    @staticmethod
+    def map(thread):
+        """Implements the map function for this job."""
+        last_message, second_last_message = (
+            feedback_models.GeneralFeedbackMessageModel.get_multi(
+                feedback_services.get_last_two_message_ids(thread)))
+        cache_updated = any(
+            [_cache_last_message(thread, last_message),
+             _cache_second_last_message(thread, second_last_message),
+             _cache_updated_status(thread, last_message, second_last_message)])
+        if cache_updated:
+            thread.put()
+            yield ('Updated', 1)
+
+    @staticmethod
+    def reduce(key, value_strs):
+        """Implements the reduce function for this job."""
+        yield (key, sum(int(s) for s in value_strs))
+
+
 def _cache_last_message(thread, last_message):
     """Ensures the given thread's cache for the last message has its values set
     to the provided message.
@@ -59,16 +87,16 @@ def _cache_last_message(thread, last_message):
     Returns:
         bool. Whether the cache was actually updated.
     """
-    is_cache_updated = False
+    cache_updated = False
     last_message_text = last_message and last_message.text
     if thread.last_message_text != last_message_text:
         thread.last_message_text = last_message_text
-        is_cache_updated = True
+        cache_updated = True
     last_message_author_id = last_message and last_message.author_id
     if thread.last_message_author_id != last_message_author_id:
         thread.last_message_author_id = last_message_author_id
-        is_cache_updated = True
-    return is_cache_updated
+        cache_updated = True
+    return cache_updated
 
 
 def _cache_second_last_message(thread, second_last_message):
@@ -82,17 +110,17 @@ def _cache_second_last_message(thread, second_last_message):
     Returns:
         bool. Whether the cache was actually updated.
     """
-    is_cache_updated = False
+    cache_updated = False
     second_last_message_text = second_last_message and second_last_message.text
     if thread.second_last_message_text != second_last_message_text:
         thread.second_last_message_text = second_last_message_text
-        is_cache_updated = True
+        cache_updated = True
     second_last_message_author_id = (
         second_last_message and second_last_message.author_id)
     if thread.second_last_message_author_id != second_last_message_author_id:
         thread.second_last_message_author_id = second_last_message_author_id
-        is_cache_updated = True
-    return is_cache_updated
+        cache_updated = True
+    return cache_updated
 
 
 def _cache_updated_status(thread, last_message, second_last_message):
@@ -116,31 +144,3 @@ def _cache_updated_status(thread, last_message, second_last_message):
         thread.updated_status = updated_status
         return True
     return False
-
-
-class GeneralFeedbackThreadOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job to populate message data cache of threads."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [feedback_models.GeneralFeedbackThreadModel]
-
-    @staticmethod
-    def map(thread):
-        """Implements the map function for this job."""
-        last_message, second_last_message = (
-            feedback_models.GeneralFeedbackMessageModel.get_multi(
-                feedback_services.get_last_two_message_ids(thread)))
-        is_cache_updated = any(
-            [_cache_last_message(thread, last_message),
-             _cache_second_last_message(thread, second_last_message),
-             _cache_updated_status(thread, last_message, second_last_message)])
-        if is_cache_updated:
-            thread.put()
-            yield ('Updated', 1)
-
-    @staticmethod
-    def reduce(key, value_strs):
-        """Implements the reduce function for this job."""
-        yield (key, sum(int(s) for s in value_strs))
