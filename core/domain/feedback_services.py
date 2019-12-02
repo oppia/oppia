@@ -434,7 +434,8 @@ def get_last_two_message_ids(thread):
     None.
 
     Args:
-        thread: FeedbackThread. The thread to build the message ids from.
+        thread: FeedbackThread|GeneralFeedbackThreadModel. The thread to build
+            the message ids from.
 
     Returns:
         list(str|None). The ids of the last two messages of the thread. If
