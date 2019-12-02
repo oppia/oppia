@@ -80,8 +80,6 @@ REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-NODE_FILE = os.path.join(
-    PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
@@ -1326,8 +1324,8 @@ def compile_typescript_files_continuously(project_dir):
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files in watch mode...')
     cmd = [
-        'node', './node_modules/typescript/bin/tsc', '--project', project_dir,
-        '--watch']
+        common.NODE_BIN_PATH, './node_modules/typescript/bin/tsc', '--project',
+        project_dir, '--watch']
 
     with python_utils.open_file('tsc_output_log.txt', 'w') as out:
         subprocess.Popen(cmd, stdout=out)

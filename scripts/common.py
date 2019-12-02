@@ -27,6 +27,9 @@ import subprocess
 import python_utils
 import release_constants
 
+NODE_VERSION = 'v10.15.3'
+YARN_VERSION = 'v1.17.3'
+
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
