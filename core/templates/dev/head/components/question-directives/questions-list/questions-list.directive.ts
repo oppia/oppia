@@ -67,7 +67,7 @@ angular.module('oppia').directive('questionsList', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
-        'AlertsService', 'QuestionCreationService', 'UrlService',
+        '$location', 'AlertsService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
         'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
         'QuestionObjectFactory', 'SkillDifficultyObjectFactory',
@@ -77,7 +77,7 @@ angular.module('oppia').directive('questionsList', [
         'QuestionUndoRedoService', 'UndoRedoService', 'QuestionsListService',
         function(
             $scope, $filter, $http, $q, $timeout, $uibModal, $window,
-            AlertsService, QuestionCreationService, UrlService,
+            $location, AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
             EditableSkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, SkillDifficultyObjectFactory,
@@ -513,6 +513,7 @@ angular.module('oppia').directive('questionsList', [
             ctrl.editorIsOpen = true;
             var groupedSkillSummaries = ctrl.getGroupedSkillSummaries();
             var selectedSkillId = ctrl.selectedSkillId;
+            $location.hash(questionId);
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/question-directives/modal-templates/' +
@@ -678,6 +679,7 @@ angular.module('oppia').directive('questionsList', [
             });
 
             modalInstance.result.then(function(array) {
+              $location.hash(null);
               ctrl.editorIsOpen = false;
               if (array.length > 0) {
                 EditableQuestionBackendApiService.editQuestionSkillLinks(
@@ -697,6 +699,7 @@ angular.module('oppia').directive('questionsList', [
               }
             }, function() {
               ctrl.editorIsOpen = false;
+              $location.hash(null);
             });
           };
 

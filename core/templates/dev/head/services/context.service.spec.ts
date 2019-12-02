@@ -41,6 +41,9 @@ describe('Context service', function() {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/explore/123';
+          },
+          getHash: function() {
+            return '';
           }
         });
       });
@@ -79,6 +82,9 @@ describe('Context service', function() {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/embed/exploration/123';
+          },
+          getHash: function() {
+            return '';
           }
         });
       });
@@ -150,41 +156,6 @@ describe('Context service', function() {
     });
   });
 
-  describe('behavior in the question editor view', function() {
-    var ecs = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.value('UrlService', {
-          getPathname: function() {
-            return '/question_editor/123';
-          }
-        });
-      });
-    });
-
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('ContextService');
-    }));
-
-    it('should correctly set editor context to question editor', function() {
-      ecs.init('question_editor');
-      expect(ecs.getEditorContext()).toBe('question_editor');
-    });
-
-    it('should correctly retrieve the question id', function() {
-      expect(ecs.getQuestionId()).toBe('123');
-    });
-
-    it('should correctly retrieve the page context', function() {
-      expect(ecs.getPageContext()).toBe('question_editor');
-    });
-
-    it('should correctly tell the question editor context', function() {
-      expect(ecs.isInQuestionContext()).toBe(true);
-    });
-  });
-
   describe('behavior in the topic editor view', function() {
     var ecs = null;
 
@@ -193,6 +164,9 @@ describe('Context service', function() {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/topic_editor/123';
+          },
+          getHash: function() {
+            return '';
           }
         });
       });
@@ -220,6 +194,50 @@ describe('Context service', function() {
     });
   });
 
+  describe('behavior in question editor modal', function() {
+    var provide = null;
+    var injector = null;
+
+    beforeEach(function() {
+      angular.mock.module(function($provide) {
+        provide = $provide;
+      });
+    });
+
+    beforeEach(angular.mock.inject(function($injector) {
+      injector = $injector;
+    }));
+
+    it('should correctly retrieve the values in topic editor', function() {
+      provide.value('UrlService', {
+        getPathname: function() {
+          return '/topic_editor/123';
+        },
+        getHash: function() {
+          return '#/questions#questionId';
+        }
+      });
+      var ecs = injector.get('ContextService');
+      expect(ecs.getEntityType()).toBe('question');
+      expect(ecs.getEntityId()).toBe('questionId');
+    });
+
+    it('should correctly retrieve the values in skill editor', function() {
+      provide.value('UrlService', {
+        getPathname: function() {
+          return '/skill_editor/123';
+        },
+        getHash: function() {
+          return '#/questions#questionId';
+        }
+      });
+      var ecs = injector.get('ContextService');
+      expect(ecs.getEntityType()).toBe('question');
+      expect(ecs.getEntityId()).toBe('questionId');
+    });
+  });
+
+
   describe('behavior in the subtopic viewer view', function() {
     var ecs = null;
 
@@ -228,6 +246,9 @@ describe('Context service', function() {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/subtopic/topic_id/1';
+          },
+          getHash: function() {
+            return '';
           }
         });
       });
@@ -254,6 +275,9 @@ describe('Context service', function() {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/story_editor/123';
+          },
+          getHash: function() {
+            return '';
           }
         });
       });
@@ -289,6 +313,9 @@ describe('Context service', function() {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/skill_editor/123';
+          },
+          getHash: function() {
+            return '';
           }
         });
       });
@@ -324,6 +351,9 @@ describe('Context service', function() {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/about';
+          },
+          getHash: function() {
+            return '';
           }
         });
       });
@@ -336,12 +366,6 @@ describe('Context service', function() {
     it('should throw an error when trying to retrieve the exploration id',
       function() {
         expect(ecs.getExplorationId).toThrow();
-      }
-    );
-
-    it('should throw an error when trying to retrieve the question id',
-      function() {
-        expect(ecs.getQuestionId).toThrow();
       }
     );
 

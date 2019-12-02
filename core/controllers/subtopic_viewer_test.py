@@ -29,8 +29,6 @@ import feconf
 
 class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
 
-    user_id = 'user_id'
-
     def setUp(self):
         super(BaseSubtopicViewerControllerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -43,7 +41,18 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.topic_id))
         subtopic_page_services.save_subtopic_page(
-            self.user_id, self.subtopic_page, 'Added subtopic',
+            self.admin_id, self.subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': self.subtopic_id,
+                'title': 'Sample'
+            })]
+        )
+        subtopic_page_2 = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id, 'topic_id_2'))
+        subtopic_page_services.save_subtopic_page(
+            self.admin_id, subtopic_page_2, 'Added subtopic',
             [topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
                 'subtopic_id': self.subtopic_id,
@@ -84,7 +93,7 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             state_domain.RecordedVoiceovers.from_dict(
                 self.recorded_voiceovers_dict))
         subtopic_page_services.save_subtopic_page(
-            self.user_id, self.subtopic_page, 'Updated page contents',
+            self.admin_id, self.subtopic_page, 'Updated page contents',
             [subtopic_page_domain.SubtopicPageChange({
                 'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
                 'subtopic_id': self.subtopic_id,
@@ -103,12 +112,18 @@ class SubtopicViewerPageTests(BaseSubtopicViewerControllerTests):
                 '%s/%s/%s' % (feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Name', '1'))
 
 
-    def test_no_user_can_access_subtopic_viewer_page_of_unpublished_topic(self):
+    def test_accessibility_of_subtopic_viewer_page_of_unpublished_topic(
+            self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
                 '%s/%s/%s' % (
                     feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Private_Name', '1'),
                 expected_status_int=404)
+            self.login(self.ADMIN_EMAIL)
+            self.get_html_response(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_VIEWER_URL_PREFIX, 'Private_Name', '1'))
+            self.logout()
 
 
     def test_get_fails_when_new_structures_not_enabled(self):
