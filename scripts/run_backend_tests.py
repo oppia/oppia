@@ -510,7 +510,7 @@ def main(args=None):
         process = subprocess.Popen(
             ['python', COVERAGE_PATH, 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
-             % common.OPPIA_TOOLS_DIR, '--show-missing', '--skip-covered'],
+             % common.OPPIA_TOOLS_DIR, '--show-missing'],
             stdout=subprocess.PIPE, env=SUBPROCESS_ENV)
 
         report_stdout = process.stdout.read()
