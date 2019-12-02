@@ -65,7 +65,6 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feedback_services.get_last_two_message_ids(thread)))
         cache_updated = any([
             _cache_last_message(thread, last_message),
-            _cache_second_last_message(thread, second_last_message),
             _cache_updated_status(thread, last_message, second_last_message),
         ])
         if cache_updated:
@@ -98,31 +97,6 @@ def _cache_last_message(thread, last_message):
         last_message and user_services.get_username(last_message.author_id))
     if thread.last_message_author != last_message_author:
         thread.last_message_author = last_message_author
-        cache_updated = True
-    return cache_updated
-
-
-def _cache_second_last_message(thread, second_last_message):
-    """Ensures the given thread's cache for the second-to-last message has its
-    values set to the provided message.
-
-    Args:
-        thread: feedback_models.GeneralFeedbackThreadModel.
-        second_last_message: feedback_models.GeneralFeedbackMessageModel.
-
-    Returns:
-        bool. Whether the cache was actually updated.
-    """
-    cache_updated = False
-    second_last_message_text = second_last_message and second_last_message.text
-    if thread.second_last_message_text != second_last_message_text:
-        thread.second_last_message_text = second_last_message_text
-        cache_updated = True
-    second_last_message_author = (
-        second_last_message and
-        user_services.get_username(second_last_message.author_id))
-    if thread.second_last_message_author != second_last_message_author:
-        thread.second_last_message_author = second_last_message_author
         cache_updated = True
     return cache_updated
 

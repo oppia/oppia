@@ -82,10 +82,6 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     last_message_text = ndb.StringProperty(indexed=False, default=None)
     # Cached ID of the author of the last message in the thread.
     last_message_author = ndb.StringProperty(indexed=False, default=None)
-    # Cached text of the second-to-last message in the thread.
-    second_last_message_text = ndb.StringProperty(indexed=False, default=None)
-    # Cached ID of the author of the second-to-last message in the thread.
-    second_last_message_author = ndb.StringProperty(indexed=False, default=None)
 
     @staticmethod
     def get_deletion_policy():
