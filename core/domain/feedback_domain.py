@@ -25,7 +25,7 @@ class FeedbackThread(python_utils.OBJECT):
     """Domain object for a feedback thread.
 
     Attributes:
-        thread_id: str. The feedback thread ID.
+        id: str. The feedback thread ID.
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
         state_name: str. The name of the state associated with

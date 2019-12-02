@@ -276,7 +276,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread.has_suggestion = False
         thread.updated_status = feedback_models.STATUS_CHOICES_OPEN
         thread.message_count = 0
-        thread.last_message_text = 'non-existing second text'
+        thread.last_message_text = 'non-existing message text'
         thread.last_message_author = self.EDITOR_USERNAME
         thread.put()
 
