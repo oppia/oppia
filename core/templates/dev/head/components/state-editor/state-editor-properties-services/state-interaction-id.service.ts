@@ -28,7 +28,7 @@ import { StatePropertyService } from
 })
 // TODO(sll): Add validation.
 export class StateInteractionIdService extends StatePropertyService {
-  constructor(private alertsService: AlertsService) {
+  constructor(alertsService: AlertsService) {
     super(alertsService);
     this.setterMethodKey = 'saveInteractionId';
   }

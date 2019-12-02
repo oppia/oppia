@@ -27,7 +27,7 @@ import { StatePropertyService } from
   providedIn: 'root'
 })
 export class StateHintsService extends StatePropertyService {
-  constructor(private alertsService: AlertsService) {
+  constructor(alertsService: AlertsService) {
     super(alertsService);
     this.setterMethodKey = 'saveHints';
   }

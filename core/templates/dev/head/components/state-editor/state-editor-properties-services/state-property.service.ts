@@ -15,6 +15,8 @@
 /**
  * @fileoverview Standalone services for the general state editor page.
  */
+import cloneDeep from 'lodash/cloneDeep';
+
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
@@ -35,6 +37,22 @@ export class StatePropertyService {
     this.setterMethodKey = null;
   }
 
+  private isEquivalent(a: any, b: any): boolean {
+    // Create arrays of property names.
+    var aProps = Object.getOwnPropertyNames(a);
+    var bProps = Object.getOwnPropertyNames(b);
+    if (aProps.length !== bProps.length) {
+      return false;
+    }
+    for (var i = 0; i < aProps.length; i++) {
+      var propName = aProps[i];
+      if (a[propName] !== b[propName]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   init(stateName: string, value: any): void {
     if (this.setterMethodKey === null) {
       throw 'State property setter method key cannot be null.';
@@ -43,16 +61,16 @@ export class StatePropertyService {
     this.stateName = stateName;
     // The current value of the property (which may not have been saved to
     // the frontend yet). In general, this will be bound directly to the UI.
-    this.displayed = angular.copy(value);
+    this.displayed = cloneDeep(value);
     // The previous (saved-in-the-frontend) value of the property. Here,
     // 'saved' means that this is the latest value of the property as
     // determined by the frontend change list.
-    this.savedMemento = angular.copy(value);
+    this.savedMemento = cloneDeep(value);
   }
 
   // Returns whether the current value has changed from the memento.
   hasChanged(): boolean {
-    return !angular.equals(this.savedMemento, this.displayed);
+    return !this.isEquivalent(this.savedMemento, this.displayed);
   }
 
   // Transforms the given value into a normalized form. THIS CAN BE
@@ -79,18 +97,18 @@ export class StatePropertyService {
       return;
     }
 
-    if (angular.equals(this.displayed, this.savedMemento)) {
+    if (this.isEquivalent(this.displayed, this.savedMemento)) {
       return;
     }
 
     this.alertsService.clearWarnings();
 
-    this.savedMemento = angular.copy(this.displayed);
+    this.savedMemento = cloneDeep(this.displayed);
   }
 
   // Reverts the displayed value to the saved memento.
   restoreFromMemento(): void {
-    this.displayed = angular.copy(this.savedMemento);
+    this.displayed = cloneDeep(this.savedMemento);
   }
 }
 
