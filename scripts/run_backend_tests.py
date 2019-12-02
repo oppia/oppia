@@ -87,7 +87,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.THIRD_PARTY_DIR, 'six-1.12.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
-    os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'),
 ]
 
 # Explicitly pass all current environment variables into subprocess.
@@ -96,8 +95,12 @@ SUBPROCESS_ENV = {
     k.encode('utf-8'): v.encode('utf-8') for k, v in os.environ.items()
 }
 
+COVERAGE_DIR = os.path.join(
+    os.getcwd(), os.pardir, 'oppia_tools', 'coverage-4.5.4')
+
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), os.pardir, 'oppia_tools', 'coverage-4.5.4', 'coverage')
+    COVERAGE_DIR, 'coverage')
+
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -360,7 +363,7 @@ def main(args=None):
 
         SUBPROCESS_ENV.update({
             'PYTHONPATH'.encode(encoding='utf-8'):
-                COVERAGE_PATH.encode(encoding='utf-8')
+                COVERAGE_DIR.encode(encoding='utf-8')
         })
 
     if parsed_args.test_target and parsed_args.test_path:
