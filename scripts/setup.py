@@ -80,17 +80,58 @@ def download_and_install_package(url_to_retrieve, filename):
     """
 
     python_utils.url_retrieve(url_to_retrieve, filename=filename)
-    if os.path.splitext(filename)[1] == '.zip' and common.is_windows_os():
-        # The only zip file to be installed currently is node on windows.
-        subprocess.check_call(
-            ['powershell.exe', '-c', 'expand-archive',
-             filename, '-DestinationPath',
-             common.OPPIA_TOOLS_DIR])
-    else:
-        tar = tarfile.open(name=filename)
-        tar.extractall(path=common.OPPIA_TOOLS_DIR)
-        tar.close()
+    tar = tarfile.open(name=filename)
+    tar.extractall(path=common.OPPIA_TOOLS_DIR)
+    tar.close()
     os.remove(filename)
+
+
+def download_and_install_node_on_windows(url_to_retrieve, filename):
+    """Downloads and installs node in Oppia tools directory for Windows.
+
+    Args:
+        url_to_retrieve: string. The url to retrieve node.
+        filename: string. The name of the tar file.
+    """
+    python_utils.url_retrieve(url_to_retrieve, filename=filename)
+    subprocess.check_call(
+        ['powershell.exe', '-c', 'expand-archive',
+         filename, '-DestinationPath',
+         common.OPPIA_TOOLS_DIR])
+
+
+def download_and_install_node():
+    """Download and install node to Oppia tools directory."""
+
+    if common.is_x64_architecture():
+        architecture = 'x64'
+    else:
+        architecture = 'x86'
+
+    outfile_name = 'node-download'
+
+    if common.is_windows_os():
+        extension = '.zip'
+        node_file_name = 'node-v%s-win-%s' % (
+            common.NODE_VERSION, architecture)
+        url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
+            common.NODE_VERSION, node_file_name, extension)
+        download_and_install_node_on_windows(url_to_retrieve, outfile_name)
+    else:
+        extension = '.tar.gz'
+        if common.is_mac_os():
+            node_file_name = 'node-v%s-darwin-%s' % (
+                common.NODE_VERSION, architecture)
+        elif common.is_linux_os():
+            node_file_name = 'node-v%s-linux-%s' % (
+                common.NODE_VERSION, architecture)
+        download_and_install_package(
+            'https://nodejs.org/dist/v%s/%s%s' % (
+                common.NODE_VERSION, node_file_name, extension),
+            outfile_name)
+    os.rename(
+        os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
+        common.NODE_PATH)
 
 
 def main(args=None):
@@ -121,30 +162,7 @@ def main(args=None):
         'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.NODE_PATH):
         python_utils.PRINT('Installing Node.js')
-        if common.is_x64_architecture():
-            architecture = 'x64'
-        else:
-            architecture = 'x86'
-        outfile_name = 'node-download.tgz'
-        extension = '.tar.gz'
-        if common.is_mac_os():
-            node_file_name = 'node-%s-darwin-%s' % (
-                common.NODE_VERSION, architecture)
-        elif common.is_linux_os():
-            node_file_name = 'node-%s-linux-%s' % (
-                common.NODE_VERSION, architecture)
-        elif common.is_windows_os():
-            node_file_name = 'node-%s-win-%s' % (
-                common.NODE_VERSION, architecture)
-            outfile_name = 'node-download.zip'
-            extension = '.zip'
-        download_and_install_package(
-            'https://nodejs.org/dist/v10.15.3/%s%s' % (
-                node_file_name, extension),
-            outfile_name)
-        os.rename(
-            os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
-            common.NODE_PATH)
+        download_and_install_node()
 
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
