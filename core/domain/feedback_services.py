@@ -723,11 +723,12 @@ def get_feedback_message_references(user_id):
         # Model may not exist if user has already attended to feedback.
         return []
 
-    return (
-        [feedback_domain.FeedbackMessageReference(
+    return [
+        feedback_domain.FeedbackMessageReference(
             reference['entity_type'], reference['entity_id'],
             reference['thread_id'], reference['message_id'])
-         for reference in model.feedback_message_references])
+        for reference in model.feedback_message_references
+    ]
 
 
 def _add_feedback_message_reference(user_id, reference):
