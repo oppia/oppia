@@ -104,15 +104,15 @@ angular.module('oppia').factory('ContextService', [
           this.getPageContext() === PAGE_CONTEXT.EXPLORATION_PLAYER);
       },
 
-      isInQuestionContext: function() {
-        return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
-      },
-
       getEntityId: function() {
         var pathnameArray = UrlService.getPathname().split('/');
+        var hashValues = UrlService.getHash().split('#');
         for (var i = 0; i < pathnameArray.length; i++) {
           if (pathnameArray[i] === 'embed') {
             return decodeURI(pathnameArray[i + 2]);
+          }
+          if (hashValues.length === 3 && hashValues[1] === '/questions') {
+            return decodeURI(hashValues[2]);
           }
         }
         return decodeURI(pathnameArray[2]);
@@ -120,6 +120,7 @@ angular.module('oppia').factory('ContextService', [
 
       getEntityType: function() {
         var pathnameArray = UrlService.getPathname().split('/');
+        var hashValues = UrlService.getHash().split('#');
         for (var i = 0; i < pathnameArray.length; i++) {
           if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore' ||
             (pathnameArray[i] === 'embed' &&
@@ -127,6 +128,9 @@ angular.module('oppia').factory('ContextService', [
             return ENTITY_TYPE.EXPLORATION;
           }
           if (pathnameArray[i] === 'topic_editor') {
+            if (hashValues.length === 3 && hashValues[1] === '/questions') {
+              return ENTITY_TYPE.QUESTION;
+            }
             return ENTITY_TYPE.TOPIC;
           }
           if (pathnameArray[i] === 'subtopic') {
@@ -136,6 +140,9 @@ angular.module('oppia').factory('ContextService', [
             return ENTITY_TYPE.STORY;
           }
           if (pathnameArray[i] === 'skill_editor') {
+            if (hashValues.length === 3 && hashValues[1] === '/questions') {
+              return ENTITY_TYPE.QUESTION;
+            }
             return ENTITY_TYPE.SKILL;
           }
         }
@@ -159,27 +166,6 @@ angular.module('oppia').factory('ContextService', [
             if (pathnameArray[i] === 'embed') {
               explorationId = pathnameArray[i + 2];
               return explorationId;
-            }
-          }
-
-          throw Error(
-            'ERROR: ContextService should not be used outside the ' +
-            'context of an exploration or a question.');
-        }
-      },
-
-      // Returns a string representing the questionId (obtained from the
-      // URL).
-      getQuestionId: function() {
-        if (questionId) {
-          return questionId;
-        } else {
-          // The pathname should /question_editor/{question_id}.
-          var pathnameArray = UrlService.getPathname().split('/');
-          for (var i = 0; i < pathnameArray.length; i++) {
-            if (pathnameArray[i] === 'question_editor') {
-              questionId = pathnameArray[i + 1];
-              return pathnameArray[i + 1];
             }
           }
 

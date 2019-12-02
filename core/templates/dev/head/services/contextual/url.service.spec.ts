@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the BackgroundMaskService.
+ * @fileoverview Unit tests for UrlService.
  */
 
 import { TestBed } from '@angular/core/testing';
