@@ -2330,8 +2330,12 @@ def can_access_topic_viewer_page(handler):
         topic_id = topic.id
         topic_rights = topic_services.get_topic_rights(
             topic_id, strict=False)
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
 
-        if topic_rights.topic_is_published:
+        if (
+                topic_rights.topic_is_published or
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                user_actions_info.actions):
             return handler(self, topic_name, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -2372,6 +2376,7 @@ def can_access_story_viewer_page(handler):
         story_is_published = False
         topic_is_published = False
         topic_id = story.corresponding_topic_id
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
         if topic_id:
             topic = topic_fetchers.get_topic_by_id(topic_id)
             topic_rights = topic_services.get_topic_rights(topic_id)
@@ -2381,7 +2386,10 @@ def can_access_story_viewer_page(handler):
                 if reference.story_id == story_id:
                     story_is_published = reference.story_is_published
 
-        if story_is_published and topic_is_published:
+        if (
+                (story_is_published and topic_is_published) or
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                user_actions_info.actions):
             return handler(self, story_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -2419,8 +2427,13 @@ def can_access_subtopic_viewer_page(handler):
         if topic is None:
             raise self.PageNotFoundException
 
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
         topic_rights = topic_services.get_topic_rights(topic.id)
-        if topic_rights is None or not topic_rights.topic_is_published:
+
+        if (
+                (topic_rights is None or not topic_rights.topic_is_published)
+                and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR not in
+                user_actions_info.actions):
             raise self.PageNotFoundException
 
         subtopic_is_present = any(

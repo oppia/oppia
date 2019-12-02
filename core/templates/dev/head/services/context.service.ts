@@ -111,16 +111,15 @@ export class ContextService {
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
-  isInQuestionContext(): boolean {
-    return (
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR);
-  }
-
   getEntityId(): string {
     let pathnameArray = this.urlService.getPathname().split('/');
+    let hashValues = this.urlService.getHash().split('#');
     for (let i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'embed') {
         return decodeURI(pathnameArray[i + 2]);
+      }
+      if (hashValues.length === 3 && hashValues[1] === '/questions') {
+        return decodeURI(hashValues[2]);
       }
     }
     return decodeURI(pathnameArray[2]);
@@ -129,6 +128,7 @@ export class ContextService {
   // add constants for entity type
   getEntityType(): string {
     let pathnameArray = this.urlService.getPathname().split('/');
+    let hashValues = this.urlService.getHash().split('#');
     for (let i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create' || pathnameArray[i] === 'explore' ||
           (pathnameArray[i] === 'embed' &&
@@ -136,6 +136,9 @@ export class ContextService {
         return AppConstants.ENTITY_TYPE.EXPLORATION;
       }
       if (pathnameArray[i] === 'topic_editor') {
+        if (hashValues.length === 3 && hashValues[1] === '/questions') {
+          return AppConstants.ENTITY_TYPE.QUESTION;
+        }
         return AppConstants.ENTITY_TYPE.TOPIC;
       }
       if (pathnameArray[i] === 'subtopic') {
@@ -145,6 +148,9 @@ export class ContextService {
         return AppConstants.ENTITY_TYPE.STORY;
       }
       if (pathnameArray[i] === 'skill_editor') {
+        if (hashValues.length === 3 && hashValues[1] === '/questions') {
+          return AppConstants.ENTITY_TYPE.QUESTION;
+        }
         return AppConstants.ENTITY_TYPE.SKILL;
       }
     }
@@ -168,27 +174,6 @@ export class ContextService {
         if (pathnameArray[i] === 'embed') {
           this.explorationId = pathnameArray[i + 2];
           return this.explorationId;
-        }
-      }
-
-      throw Error(
-        'ERROR: ContextService should not be used outside the ' +
-          'context of an exploration or a question.');
-    }
-  }
-
-  // Returns a string representing the questionId (obtained from the
-  // URL).
-  getQuestionId(): string {
-    if (this.questionId) {
-      return this.questionId;
-    } else {
-      // The pathname should /question_editor/{question_id}.
-      let pathnameArray = this.urlService.getPathname().split('/');
-      for (let i = 0; i < pathnameArray.length; i++) {
-        if (pathnameArray[i] === 'question_editor') {
-          this.questionId = pathnameArray[i + 1];
-          return pathnameArray[i + 1];
         }
       }
 
