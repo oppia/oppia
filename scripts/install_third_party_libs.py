@@ -295,7 +295,7 @@ def main(args=None):
     python_utils.PRINT('Installing pre-commit hook for git')
     pre_commit_hook.main(args=['--install'])
 
-    # TODO(cuichenli): Once pre_commit_linter is working correctly, this
+    # TODO(#8112): Once pre_commit_linter is working correctly, this
     # condition should be removed.
     if not common.is_windows_os():
         # Install pre-push script.
