@@ -28,7 +28,9 @@ angular.module('oppia').directive('socialButtons', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
       }]
     };
   }]);
