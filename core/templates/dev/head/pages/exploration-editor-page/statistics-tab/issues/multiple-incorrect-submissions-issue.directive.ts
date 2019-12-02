@@ -16,9 +16,9 @@
  * @fileoverview Directive for the Multiple Incorrect Submission Issue.
  */
 
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/HtmlEscaperService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/html-escaper.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
@@ -37,7 +37,7 @@ angular.module('oppia').directive('multipleIncorrectSubmissionsIssue', [
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-editor-page/statistics-tab/issues/' +
-        'mis-issue.directive.html'),
+        'multiple-incorrect-submissions-issue.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
@@ -48,8 +48,12 @@ angular.module('oppia').directive('multipleIncorrectSubmissionsIssue', [
         ctrl.stateName =
           this.finalBlock[this.index].actionCustomizationArgs.state_name.value;
 
-        var _nonSubmitActions = this.finalBlock.filter(
-          b => b.actionType !== ACTION_TYPE_ANSWER_SUBMIT);
+        var _nonSubmitActions = [];
+        for (
+          var i = 0;
+          this.finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT; i++) {
+          _nonSubmitActions.push(this.finalBlock[i]);
+        }
         ctrl.nonSubmitActions = _nonSubmitActions;
         ctrl.tableIndex = +this.actionStartIndex + i;
 

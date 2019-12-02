@@ -55,18 +55,81 @@ angular.module('oppia').factory('ImprovementModalService', [
             'playthrough-modal.template.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance', 'playthroughIndex',
-            'playthrough', 'AlertsService', 'LearnerActionRenderService',
+            '$scope', '$uibModalInstance',  'AlertsService',
+            'LearnerActionRenderService',
             'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
             function(
-                $scope, $uibModalInstance, playthroughIndex,
-                playthrough, AlertsService, LearnerActionRenderService,
+                $scope, $uibModalInstance, AlertsService,
+                LearnerActionRenderService,
                 ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
-              $scope.playthroughIndex = playthroughIndex;
+              $scope.playthroughIndex = index;
+              $scope.expandPossible = true;
 
-              $scope.startingIndices =
-                LearnerActionRenderService.getStartingIndices(
-                  playthrough.actions);
+              let currActionIndex = playthrough.actions.length - 1;
+              let expandIndices = [];
+              let actionsToDisplay = [];
+
+              /**
+               * Handles a change in state while parsing learner actions.
+               * @param {LearnerAction} action.
+               * @param {int} iterationIndex.
+               * @returns {boolean}
+               */
+              let handleChangeInState = function(action, iterationIndex) {
+                if (currActionIndex - iterationIndex >= 4) {
+                  return false;
+                }
+                actionsToDisplay.push(action)
+                return true;
+              }
+
+              /**
+               * Handles same states while parsing learner actions.
+               * @param {LearnerAction} action.
+               */
+              let handleSameState = function(action) {
+                actionsToDisplay.push(action);
+              }
+
+              /**
+               * Iterates through the learner actions and expands the set of actions to
+               * be displayed. If all learner actions have been handled, no more
+               * expansion is possible.
+               */
+              let expandActions = function() {
+                let i;
+                for (i = currActionIndex; i >= 0; i--) {
+                  let action = playthrough.actions[i];
+                  let currentStateName =
+                      action.actionCustomizationArgs.state_name.value;
+                  let latestStateName = actionsToDisplay.length === 0 ? (
+                      action.actionCustomizationArgs.state_name.value) : (
+                      actionsToDisplay[
+                      actionsToDisplay.length -
+                      1].actionCustomizationArgs.state_name.value);
+
+                  if (currentStateName !== latestStateName) {
+                    let result = handleChangeInState(action, i);
+                    if (!result) {
+                      currActionIndex = i;
+                      break;
+                    }
+                  } else {
+                    handleSameState(action);
+                  }
+                }
+                if (i === -1) {
+                  currActionIndex = -1;
+                  $scope.expandPossible = false;
+                }
+                expandIndices.push(i + 1);
+              }
+
+              expandActions()
+
+              // Index to know where to start highlighting actions.
+              let finalBlockStartIndex = currActionIndex + 1;
+
               $scope.currentBlock = 0;
 
               $scope.isIssueMIS = false;
@@ -75,16 +138,18 @@ angular.module('oppia').factory('ImprovementModalService', [
                 $scope.isIssueMIS = true;
               }
 
+              /**
+               * Renders a table for MultipleIncorrectSubmissions issue for a
+               * more friendly UI.
+               */
               $scope.renderIssueTable = function() {
                 var lars = LearnerActionRenderService;
                 var tableHtml =
                   lars.renderFinalDisplayBlockForMISIssueHTML(
-                    playthrough.actions.slice($scope.startingIndices[0]),
-                    $scope.startingIndices[0] + 1);
+                    playthrough.actions.slice(expandIndices[0]),
+                    expandIndices[0] + 1);
                 return tableHtml;
               };
-
-              $scope.numberOfBlocks = $scope.startingIndices.length - 1;
 
               /**
                * Returns the list of learner actions to currently be
@@ -93,12 +158,15 @@ angular.module('oppia').factory('ImprovementModalService', [
                */
               $scope.getActionsToRender = function() {
                 if ($scope.isIssueMIS) {
-                  return playthrough.actions.slice(
-                    $scope.startingIndices[$scope.currentBlock],
-                    $scope.startingIndices[0]);
+                  // This corresponds to the case where we display the table
+                  // for the issue.
+                  if (expandIndices.length === 1) {
+                    return [];
+                  }
+                  return actionsToDisplay.slice().reverse().slice(
+                    currActionIndex + 1, expandIndices[0]);
                 }
-                return playthrough.actions.slice(
-                  $scope.startingIndices[$scope.currentBlock]);
+                return actionsToDisplay.slice().reverse();
               };
 
               /**
@@ -116,11 +184,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                * @returns {boolean}
                */
               $scope.isActionHighlighted = function(action) {
-                if ($scope.startingIndices.length === 0) {
-                  return false;
-                }
                 return $scope.getLearnerActionIndex(action) > (
-                  $scope.startingIndices[0]);
+                  finalBlockStartIndex);
               };
 
               /**
@@ -143,12 +208,14 @@ angular.module('oppia').factory('ImprovementModalService', [
                * arrow div is hidden after the final stop is reached.
                */
               $scope.expandActionsToRender = function(pIdx) {
-                if ($scope.numberOfBlocks === 1) {
+                expandActions();
+                if (!$scope.expandPossible) {
                   $scope.currentBlock += 1;
                   document.getElementById('arrowDiv').style.display = 'none';
                 } else {
                   $scope.currentBlock += 1;
-                  if ($scope.currentBlock === $scope.numberOfBlocks) {
+                  if (actionsToDisplay.length ===
+                      playthrough.actions.length) {
                     document.getElementById('arrowDiv').style.display =
                       'none';
                   }

@@ -33,8 +33,6 @@ import { EditabilityService } from 'services/editability.service';
 import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { PlaythroughActionsStartingIndicesBuilderObjectFactory } from
-  'domain/statistics/PlaythroughActionsStartingIndicesBuilderObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
@@ -98,9 +96,6 @@ describe('Learner Action Render Service', function() {
     $provide.value(
       'ExplorationFeaturesService', new ExplorationFeaturesService());
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'PlaythroughActionsStartingIndicesBuilderObjectFactory',
-      new PlaythroughActionsStartingIndicesBuilderObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
         new SubtitledHtmlObjectFactory()));
@@ -184,76 +179,6 @@ describe('Learner Action Render Service', function() {
         $injector.get('LearnerActionRenderService');
     }));
 
-    it('should split up EarlyQuit learner actions into correct start indices.',
-      function() {
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'Continue', '', 'Welcome', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
-
-        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-        var startingIndices =
-          this.LearnerActionRenderService.getStartingIndices(learnerActions);
-
-        expect(startingIndices).toEqual([0]);
-      });
-
-    it('should split up many learner actions into different display blocks.',
-      function() {
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
-
-        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-        var startingIndices =
-          this.LearnerActionRenderService.getStartingIndices(learnerActions);
-
-        expect(startingIndices).toEqual([6, 2, 0]);
-      });
-
-    it('should assign multiple learner actions at same state to same block.',
-      function() {
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
-
-        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-        var startingIndices =
-          this.LearnerActionRenderService.getStartingIndices(learnerActions);
-
-        expect(startingIndices).toEqual([0]);
-      });
-
     it('should render correct learner actions.',
       function() {
         this.PlaythroughService.recordExplorationStartAction('stateName1');
@@ -279,39 +204,6 @@ describe('Learner Action Render Service', function() {
         expect(renderedStatements[3]).toEqual(
           '4. Left the exploration after spending a total of 120 seconds on ' +
           'card "stateName2".');
-      });
-
-    it('should render tables for MultipleIncorrectSubmissions issue block.',
-      function() {
-        var feedback = {
-          _html: 'Try again'
-        };
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
-
-        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
-        var startingIndices =
-          this.LearnerActionRenderService.getStartingIndices(learnerActions);
-
-        expect(startingIndices.length).toEqual(1);
-
-        var finalBlockHTML =
-          this.LearnerActionRenderService
-            .renderFinalDisplayBlockForMISIssueHTML(
-              learnerActions.slice(startingIndices[0]), 1);
-
-        expect(finalBlockHTML).toContain('<mis-issue');
-        expect(finalBlockHTML).toContain('final-block');
       });
   });
 });

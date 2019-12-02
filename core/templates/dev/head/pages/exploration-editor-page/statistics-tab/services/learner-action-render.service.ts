@@ -26,8 +26,6 @@
  * learner actions and then returns a giant HTML string.
  */
 
-require(
-  'domain/statistics/PlaythroughActionsStartingIndicesBuilderObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
@@ -35,17 +33,14 @@ require(
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'multiple-incorrect-submissions-issue.directive.ts');
-require('services/ExplorationHtmlFormatterService.ts');
 require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
   'ExplorationStatesService', 'HtmlEscaperService',
-  'PlaythroughActionsStartingIndicesBuilderObjectFactory',
   'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
   'ACTION_TYPE_EXPLORATION_START',
   function(
       ExplorationStatesService, HtmlEscaperService,
-      PlaythroughActionsStartingIndicesBuilderObjectFactory,
       ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
       ACTION_TYPE_EXPLORATION_START) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
@@ -98,19 +93,6 @@ angular.module('oppia').factory('LearnerActionRenderService', [
     };
 
     /**
-     * Renders the correct HTML for the table display for MultipleIncorrect
-     * issue.
-     * @param {LearnerAction[]} finalBlock.
-     * @returns {string}
-     */
-    var renderLearnerActionsTableForMultipleIncorrectIssue = function(
-        finalBlock) {
-      var el = $('<multiple-incorrect-submissions-issue>');
-      el.attr('finalBlock', HtmlEscaperService.objToEscapedJson(finalBlock));
-      return ($('<span>').append(el)).html();
-    };
-
-    /**
      * Renders the correct HTML for the learner action.
      * @param {LearnerAction} learnerAction.
      * @param {int} actionIndex.
@@ -153,42 +135,13 @@ angular.module('oppia').factory('LearnerActionRenderService', [
        */
       renderFinalDisplayBlockForMISIssueHTML: function(
           block, actionStartIndex) {
-        var el = $('<mis-issue>');
+        var el = $('<multiple-incorrect-submissions-issue>');
         el.attr('final-block', HtmlEscaperService.objToEscapedJson(block));
         el.attr('action-start-index', actionStartIndex);
         return ($('<span>').append(el)).html();
       },
       renderLearnerAction: function(learnerAction, actionIndex) {
         return renderLearnerActionHTML(learnerAction, actionIndex);
-      },
-      /**
-       * Generates an array of indices, with each index representing an index
-       * to stop the display of learner actions.
-       * @param {LearnerActions[]} learnerActions.
-       * @returns {int[]}
-       */
-      getStartingIndices: function(learnerActions) {
-        var lastIndex = learnerActions.length - 1;
-
-        var groupedStartingIndices =
-          PlaythroughActionsStartingIndicesBuilderObjectFactory.createNew(
-            lastIndex,
-            learnerActions[lastIndex].actionCustomizationArgs.state_name.value);
-
-        for (var i = lastIndex - 1; i >= 0; i--) {
-          var action = learnerActions[i];
-          var currentStateName =
-            action.actionCustomizationArgs.state_name.value;
-          if (currentStateName !== groupedStartingIndices.latestStateName) {
-            groupedStartingIndices.handleChangeInState(action);
-          } else {
-            groupedStartingIndices.handleSameState();
-          }
-        }
-
-        groupedStartingIndices.startingIndices.push(
-          groupedStartingIndices.localIndex);
-        return groupedStartingIndices.startingIndices;
       },
     };
   }]);
