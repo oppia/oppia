@@ -55,7 +55,7 @@ angular.module('oppia').factory('ImprovementModalService', [
             'playthrough-modal.template.html'),
           backdrop: true,
           controller: [
-            '$scope', '$uibModalInstance',  'AlertsService',
+            '$scope', '$uibModalInstance', 'AlertsService',
             'LearnerActionRenderService',
             'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
             function(
@@ -79,9 +79,9 @@ angular.module('oppia').factory('ImprovementModalService', [
                 if (currActionIndex - iterationIndex >= 4) {
                   return false;
                 }
-                actionsToDisplay.push(action)
+                actionsToDisplay.push(action);
                 return true;
-              }
+              };
 
               /**
                * Handles same states while parsing learner actions.
@@ -89,12 +89,12 @@ angular.module('oppia').factory('ImprovementModalService', [
                */
               let handleSameState = function(action) {
                 actionsToDisplay.push(action);
-              }
+              };
 
               /**
-               * Iterates through the learner actions and expands the set of actions to
-               * be displayed. If all learner actions have been handled, no more
-               * expansion is possible.
+               * Iterates through the learner actions and expands the set of
+               * actions to be displayed. If all learner actions have been
+               * handled, no more expansion is possible.
                */
               let expandActions = function() {
                 let i;
@@ -105,8 +105,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                   let latestStateName = actionsToDisplay.length === 0 ? (
                       action.actionCustomizationArgs.state_name.value) : (
                       actionsToDisplay[
-                      actionsToDisplay.length -
-                      1].actionCustomizationArgs.state_name.value);
+                        actionsToDisplay.length -
+                          1].actionCustomizationArgs.state_name.value);
 
                   if (currentStateName !== latestStateName) {
                     let result = handleChangeInState(action, i);
@@ -123,9 +123,9 @@ angular.module('oppia').factory('ImprovementModalService', [
                   $scope.expandPossible = false;
                 }
                 expandIndices.push(i + 1);
-              }
+              };
 
-              expandActions()
+              expandActions();
 
               // Index to know where to start highlighting actions.
               let finalBlockStartIndex = currActionIndex + 1;
