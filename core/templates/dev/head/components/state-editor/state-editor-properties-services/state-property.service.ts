@@ -16,10 +16,10 @@
  * @fileoverview Standalone services for the general state editor page.
  */
 
-import cloneDeep from 'lodash/cloneDeep';
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+
+import cloneDeep from 'lodash/cloneDeep';
 
 import { AlertsService } from 'services/alerts.service';
 import { UtilsService } from 'services/utils.service';
