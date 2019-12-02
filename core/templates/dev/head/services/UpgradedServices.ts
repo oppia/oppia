@@ -39,6 +39,7 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ContextService } from 'services/context.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
@@ -285,6 +286,8 @@ export class UpgradedServices {
       new AnswerGroupObjectFactory(
         upgradedServices['OutcomeObjectFactory'],
         upgradedServices['RuleObjectFactory']);
+    upgradedServices['ContextService'] = new ContextService(
+      upgradedServices['UrlService']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);

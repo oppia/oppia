@@ -343,7 +343,7 @@ describe('StateImprovementSuggestionService', () => {
 
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers:[CamelCaseToHyphensPipe];
+        providers: [CamelCaseToHyphensPipe]
       });
       siss = TestBed.get(StateImprovementSuggestionService);
       ssof = TestBed.get(StatesObjectFactory);

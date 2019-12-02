@@ -17,362 +17,232 @@
  *   editor page.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('services/context.service.ts');
+import { ContextService } from 'services/context.service';
+import { UrlService } from 'services/contextual/url.service';
 
-describe('Context service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+describe('Context service', () => {
+  let ecs: ContextService = null;
+  let urlService: UrlService = null;
 
-  describe('behavior in the exploration learner view', function() {
-    var ecs = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.value('UrlService', {
-          getPathname: function() {
-            return '/explore/123';
-          },
-          getHash: function() {
-            return '';
-          }
-        });
-      });
+  describe('behavior in the exploration learner view', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
     });
 
-    beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('ContextService');
-    }));
-
-    it('should correctly set editor context to exploration editor', function() {
+    it('should correctly set editor context to exploration editor', () => {
       ecs.init('exploration_editor');
       expect(ecs.getEditorContext()).toBe('exploration_editor');
     });
 
-    it('should correctly retrieve the exploration id', function() {
+    it('should correctly retrieve the exploration id', () => {
       expect(ecs.getExplorationId()).toBe('123');
     });
 
-    it('should correctly retrieve the page context', function() {
+    it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('learner');
     });
 
-    it('should correctly retrieve the correct entity type', function() {
+    it('should correctly retrieve the correct entity type', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
   });
 
-  describe('behavior in the exploration learner embed view', function() {
-    var ecs = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.value('UrlService', {
-          getPathname: function() {
-            return '/embed/exploration/123';
-          },
-          getHash: function() {
-            return '';
-          }
-        });
-      });
+  describe('behavior in the exploration learner embed view', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and
+        .returnValue('/embed/exploration/123');
     });
 
-    beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('ContextService');
-    }));
-
-    it('should correctly set editor context to exploration editor', function() {
+    it('should correctly set editor context to exploration editor', () => {
       ecs.init('exploration_editor');
       expect(ecs.getEditorContext()).toBe('exploration_editor');
     });
 
-    it('should correctly retrieve the exploration id', function() {
+    it('should correctly retrieve the exploration id', () => {
       expect(ecs.getExplorationId()).toBe('123');
     });
 
-    it('should correctly retrieve the entity id', function() {
+    it('should correctly retrieve the entity id', () => {
       expect(ecs.getEntityId()).toBe('123');
     });
 
-    it('should correctly retrieve the page context', function() {
+    it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('learner');
     });
 
-    it('should correctly retrieve the correct entity type', function() {
+    it('should correctly retrieve the correct entity type', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
   });
 
-  describe('behavior in the exploration editor view', function() {
-    var ecs = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.value('UrlService', {
-          getPathname: function() {
-            return '/create/123';
-          },
-          getHash: function() {
-            return '#/gui';
-          }
-        });
-      });
+  describe('behavior in the exploration editor view', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/create/123');
+      spyOn(urlService, 'getHash').and.returnValue('#/gui');
     });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('ContextService');
-    }));
-
-    it('should correctly retrieve the exploration id', function() {
+    it('should correctly retrieve the exploration id', () => {
       expect(ecs.getExplorationId()).toBe('123');
     });
 
-    it('should correctly retrieve the page context', function() {
+    it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('editor');
     });
 
-    it('should correctly retrieve exploration editor mode', function() {
+    it('should correctly retrieve exploration editor mode', () => {
       expect(ecs.isInExplorationEditorMode()).toBe(true);
     });
 
-    it('should correctly retrieve the correct entity type', function() {
+    it('should correctly retrieve the correct entity type', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
   });
 
-  describe('behavior in the topic editor view', function() {
-    var ecs = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.value('UrlService', {
-          getPathname: function() {
-            return '/topic_editor/123';
-          },
-          getHash: function() {
-            return '';
-          }
-        });
-      });
+  describe('behavior in the question editor view', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/question_editor/123');
     });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('ContextService');
-    }));
+    it('should correctly set editor context to question editor', () => {
+      ecs.init('question_editor');
+      expect(ecs.getEditorContext()).toBe('question_editor');
+    });
 
-    it('should correctly set editor context to topic editor', function() {
+    it('should correctly retrieve the question id', () => {
+      expect(ecs.getQuestionId()).toBe('123');
+    });
+
+    it('should correctly retrieve the page context', () => {
+      expect(ecs.getPageContext()).toBe('question_editor');
+    });
+
+    it('should correctly tell the question editor context', () => {
+      expect(ecs.isInQuestionContext()).toBe(true);
+    });
+  });
+
+  describe('behavior in the topic editor view', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+    });
+
+    it('should correctly set editor context to topic editor', () => {
       ecs.init('topic_editor');
       expect(ecs.getEditorContext()).toBe('topic_editor');
     });
 
-    it('should correctly retrieve the topic id', function() {
+    it('should correctly retrieve the topic id', () => {
       expect(ecs.getEntityId()).toBe('123');
     });
 
-    it('should correctly retrieve the entity type', function() {
+    it('should correctly retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBe('topic');
     });
 
-    it('should correctly retrieve the page context', function() {
+    it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('topic_editor');
     });
   });
 
-  describe('behavior in question editor modal', function() {
-    var provide = null;
-    var injector = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        provide = $provide;
-      });
+  describe('behavior in the subtopic viewer view', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/subtopic/topic_id/1');
     });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      injector = $injector;
-    }));
-
-    it('should correctly retrieve the values in topic editor', function() {
-      provide.value('UrlService', {
-        getPathname: function() {
-          return '/topic_editor/123';
-        },
-        getHash: function() {
-          return '#/questions#questionId';
-        }
-      });
-      var ecs = injector.get('ContextService');
-      expect(ecs.getEntityType()).toBe('question');
-      expect(ecs.getEntityId()).toBe('questionId');
-    });
-
-    it('should correctly retrieve the values in skill editor', function() {
-      provide.value('UrlService', {
-        getPathname: function() {
-          return '/skill_editor/123';
-        },
-        getHash: function() {
-          return '#/questions#questionId';
-        }
-      });
-      var ecs = injector.get('ContextService');
-      expect(ecs.getEntityType()).toBe('question');
-      expect(ecs.getEntityId()).toBe('questionId');
-    });
-  });
-
-
-  describe('behavior in the subtopic viewer view', function() {
-    var ecs = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.value('UrlService', {
-          getPathname: function() {
-            return '/subtopic/topic_id/1';
-          },
-          getHash: function() {
-            return '';
-          }
-        });
-      });
-    });
-
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('ContextService');
-    }));
-
-    it('should correctly retrieve the topic id', function() {
+    it('should correctly retrieve the topic id', () => {
       expect(ecs.getEntityId()).toBe('topic_id');
     });
 
-    it('should correctly retrieve the entity type', function() {
+    it('should correctly retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBe('subtopic');
     });
   });
 
-  describe('behavior in the story editor view', function() {
-    var ecs = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.value('UrlService', {
-          getPathname: function() {
-            return '/story_editor/123';
-          },
-          getHash: function() {
-            return '';
-          }
-        });
-      });
+  describe('behavior in the story editor view', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/story_editor/123');
     });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('ContextService');
-    }));
-
-    it('should correctly set editor context to story editor', function() {
+    it('should correctly set editor context to story editor', () => {
       ecs.init('story_editor');
       expect(ecs.getEditorContext()).toBe('story_editor');
     });
 
-    it('should correctly retrieve the story id', function() {
+    it('should correctly retrieve the story id', () => {
       expect(ecs.getEntityId()).toBe('123');
     });
 
-    it('should correctly retrieve the entity type', function() {
+    it('should correctly retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBe('story');
     });
 
-    it('should correctly retrieve the page context', function() {
+    it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('story_editor');
     });
   });
 
-  describe('behavior in the skill editor view', function() {
-    var ecs = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.value('UrlService', {
-          getPathname: function() {
-            return '/skill_editor/123';
-          },
-          getHash: function() {
-            return '';
-          }
-        });
-      });
+  describe('behavior in the skill editor view', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
     });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('ContextService');
-    }));
-
-    it('should correctly set editor context to skill editor', function() {
+    it('should correctly set editor context to skill editor', () => {
       ecs.init('skill_editor');
       expect(ecs.getEditorContext()).toBe('skill_editor');
     });
 
-    it('should correctly retrieve the skill id', function() {
+    it('should correctly retrieve the skill id', () => {
       expect(ecs.getEntityId()).toBe('123');
     });
 
-    it('should correctly retrieve the entity type', function() {
+    it('should correctly retrieve the entity type', () => {
       expect(ecs.getEntityType()).toBe('skill');
     });
 
-    it('should correctly retrieve the page context', function() {
+    it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('skill_editor');
     });
   });
 
-  describe('behavior in other pages', function() {
-    var ecs = null;
-
-    beforeEach(function() {
-      angular.mock.module(function($provide) {
-        $provide.value('UrlService', {
-          getPathname: function() {
-            return '/about';
-          },
-          getHash: function() {
-            return '';
-          }
-        });
-      });
+  describe('behavior in other pages', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+      spyOn(urlService, 'getPathname').and.returnValue('/about');
     });
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ecs = $injector.get('ContextService');
-    }));
-
     it('should throw an error when trying to retrieve the exploration id',
-      function() {
+      () => {
         expect(ecs.getExplorationId).toThrow();
       }
     );
 
-    it('should retrieve other as page context',
-      function() {
-        expect(ecs.getPageContext()).toBe('other');
-      }
+    it('should throw an error when trying to retrieve the question id', () => {
+      expect(ecs.getQuestionId).toThrow();
+    }
+    );
+
+    it('should retrieve other as page context', () => {
+      expect(ecs.getPageContext()).toBe('other');
+    }
     );
   });
 });
