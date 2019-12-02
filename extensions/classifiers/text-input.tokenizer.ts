@@ -34,7 +34,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class TextInputTokenizer {
-  generateTokens(textInput: string) {
+  generateTokens(textInput: string): RegExpMatchArray {
     var tokenizedTextInput;
     // The default regexp select tokens of 2 or more alphanumeric
     // characters (punctuation is completely ignored and always treated
@@ -45,5 +45,6 @@ export class TextInputTokenizer {
     return tokenizedTextInput;
   }
 }
+
 angular.module('oppia').factory(
   'TextInputTokenizer', downgradeInjectable(TextInputTokenizer));

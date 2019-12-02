@@ -16,10 +16,7 @@
  * @fileoverview Unit tests text input tokenizer.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
-// ^^^ This block is to be removed.
 
 describe('Text Input tokenizer', function() {
   beforeEach(angular.mock.module('oppia'));

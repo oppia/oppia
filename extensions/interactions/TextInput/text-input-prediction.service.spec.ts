@@ -50,7 +50,6 @@ describe('Text Input Prediction Service', () => {
           window.__fixtures__['core/tests/data/text_input_classifier_data'];
       const trainingData =
           window.__fixtures__['core/tests/data/text_classifier_results'];
-      const correctPredictions = 0, totalAnswers = 0;
       let predictedAnswerGroup = null;
 
       for (let i = 0; i < trainingData.length; i++) {
