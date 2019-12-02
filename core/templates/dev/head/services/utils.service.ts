@@ -36,6 +36,30 @@ export class UtilsService {
   isString(input: any): boolean {
     return (typeof input === 'string' || input instanceof String);
   }
+
+  isEquivalent(a: any, b: any): boolean {
+    // Create arrays of property names.
+    var aProps = Object.getOwnPropertyNames(a);
+    var bProps = Object.getOwnPropertyNames(b);
+    if (aProps.length !== bProps.length) {
+      return false;
+    }
+    for (var i = 0; i < aProps.length; i++) {
+      var propName = aProps[i];
+      if (typeof a[propName] !== typeof b[propName]) {
+        return false;
+      } else if (
+        typeof a[propName] === 'object' && !this.isEquivalent(
+          a[propName], b[propName])) {
+        return false;
+      } else if (
+        typeof a[propName] !== 'object' && (
+          a[propName] !== b[propName])) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 
 angular.module('oppia').factory(

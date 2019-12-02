@@ -259,16 +259,6 @@ export class UpgradedServices {
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
-    upgradedServices['StateHintsService'] = new StateHintsService(
-      upgradedServices['AlertsService']);
-    upgradedServices['StateInteractionIdService'] =
-      new StateInteractionIdService(
-        upgradedServices['AlertsService']);
-    upgradedServices['StatePropertyService'] = new StatePropertyService(
-      upgradedServices['AlertsService']);
-    upgradedServices['StateWrittenTranslationsService'] =
-      new StateWrittenTranslationsService(
-        upgradedServices['AlertsService']);
     upgradedServices['StateEditorService'] =
       new StateEditorService(upgradedServices['SolutionValidityService']);
     upgradedServices['TextInputValidationService'] =
@@ -300,6 +290,16 @@ export class UpgradedServices {
         upgradedServices['NormalizeWhitespacePipe'],
         upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
         upgradedServices['CodeNormalizerService']);
+    upgradedServices['StateHintsService'] = new StateHintsService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateInteractionIdService'] =
+      new StateInteractionIdService(
+        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StatePropertyService'] = new StatePropertyService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateWrittenTranslationsService'] =
+      new StateWrittenTranslationsService(
+        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(

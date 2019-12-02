@@ -22,13 +22,14 @@ import { AlertsService } from 'services/alerts.service';
 import { StatePropertyService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-property.service';
+import { UtilsService } from 'services/utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StateWrittenTranslationsService extends StatePropertyService {
-  constructor(alertsService: AlertsService) {
-    super(alertsService);
+  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+    super(alertsService, utilsService);
     this.setterMethodKey = 'saveWrittenTranslations';
   }
 }

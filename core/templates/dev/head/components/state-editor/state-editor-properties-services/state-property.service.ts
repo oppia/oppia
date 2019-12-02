@@ -15,12 +15,14 @@
 /**
  * @fileoverview Standalone services for the general state editor page.
  */
+
 import cloneDeep from 'lodash/cloneDeep';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AlertsService } from 'services/alerts.service';
+import { UtilsService } from 'services/utils.service';
 
 @Injectable({
   providedIn: 'root'
@@ -33,24 +35,9 @@ export class StatePropertyService {
   stateName: string;
   savedMemento: any;
 
-  constructor(private alertsService: AlertsService) {
+  constructor(private alertsService: AlertsService,
+    private utilsService: UtilsService) {
     this.setterMethodKey = null;
-  }
-
-  private isEquivalent(a: any, b: any): boolean {
-    // Create arrays of property names.
-    var aProps = Object.getOwnPropertyNames(a);
-    var bProps = Object.getOwnPropertyNames(b);
-    if (aProps.length !== bProps.length) {
-      return false;
-    }
-    for (var i = 0; i < aProps.length; i++) {
-      var propName = aProps[i];
-      if (a[propName] !== b[propName]) {
-        return false;
-      }
-    }
-    return true;
   }
 
   init(stateName: string, value: any): void {
@@ -70,7 +57,7 @@ export class StatePropertyService {
 
   // Returns whether the current value has changed from the memento.
   hasChanged(): boolean {
-    return !this.isEquivalent(this.savedMemento, this.displayed);
+    return !this.utilsService.isEquivalent(this.savedMemento, this.displayed);
   }
 
   // Transforms the given value into a normalized form. THIS CAN BE
@@ -97,7 +84,7 @@ export class StatePropertyService {
       return;
     }
 
-    if (this.isEquivalent(this.displayed, this.savedMemento)) {
+    if (this.utilsService.isEquivalent(this.displayed, this.savedMemento)) {
       return;
     }
 
