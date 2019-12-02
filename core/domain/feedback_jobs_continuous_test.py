@@ -460,9 +460,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(RealtimeFeedbackAnalyticsUnitTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def _get_swap_context(self):
         """Substitutes the jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS
@@ -580,7 +578,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, self.viewer_id, feedback_models.STATUS_CHOICES_FIXED,
+                thread_id, self.owner_id, feedback_models.STATUS_CHOICES_FIXED,
                 None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -610,7 +608,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, self.viewer_id, feedback_models.STATUS_CHOICES_FIXED,
+                thread_id, self.owner_id, feedback_models.STATUS_CHOICES_FIXED,
                 None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -623,7 +621,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, self.viewer_id, feedback_models.STATUS_CHOICES_OPEN,
+                thread_id, self.owner_id, feedback_models.STATUS_CHOICES_OPEN,
                 None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -653,7 +651,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, self.viewer_id, feedback_models.STATUS_CHOICES_FIXED,
+                thread_id, self.owner_id, feedback_models.STATUS_CHOICES_FIXED,
                 None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
@@ -666,7 +664,7 @@ class RealtimeFeedbackAnalyticsUnitTests(test_utils.GenericTestBase):
                 'exploration', exp_id, False)
             thread_id = threadlist[0].id
             feedback_services.create_message(
-                thread_id, self.viewer_id,
+                thread_id, self.owner_id,
                 feedback_models.STATUS_CHOICES_IGNORED, None, 'some text')
             self._flush_tasks_and_check_analytics(
                 exp_id, {
