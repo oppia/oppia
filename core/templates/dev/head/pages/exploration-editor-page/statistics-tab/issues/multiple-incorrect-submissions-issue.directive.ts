@@ -48,12 +48,8 @@ angular.module('oppia').directive('multipleIncorrectSubmissionsIssue', [
         ctrl.stateName =
           this.finalBlock[this.index].actionCustomizationArgs.state_name.value;
 
-        var _nonSubmitActions = [];
-        for (
-          var i = 0;
-          this.finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT; i++) {
-          _nonSubmitActions.push(this.finalBlock[i]);
-        }
+        var _nonSubmitActions = this.finalBlock.filter(
+          b => b.actionType !== ACTION_TYPE_ANSWER_SUBMIT);
         ctrl.nonSubmitActions = _nonSubmitActions;
         ctrl.tableIndex = +this.actionStartIndex + i;
 

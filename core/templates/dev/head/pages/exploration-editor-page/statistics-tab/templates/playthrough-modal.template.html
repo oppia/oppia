@@ -24,6 +24,18 @@
   </div>
 </div>
 
+<div class="expand-button" ng-click="expandPlaythroughActionsBlocks()"></div>
+<div ng-repeat="block in getVisiblePlaythroughActionsBlocks()"
+     ng-switch="block.getDirectiveName()">
+  <multiple-incorrect-submissions-issue-table
+          ng-switch-when="multiple-incorrect-submissions-issue-table"
+          data="block.getDirectiveData()">
+  </multiple-incorrect-submissions-issue-table>
+
+  <learner-action-group ng-switch-default data="block.getDirectiveData()">
+  </learner-action-group>
+</div>
+
 <div class="modal-footer">
   <button type="button" class="btn btn-secondary" ng-click="cancel()">
     Return

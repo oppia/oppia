@@ -54,14 +54,6 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/statistics-tab/templates/' +
             'playthrough-modal.template.html'),
           backdrop: true,
-          resolve: {
-            playthrough: function() {
-              return playthrough;
-            },
-            playthroughIndex: function() {
-              return index;
-            }
-          },
           controller: [
             '$scope', '$uibModalInstance', 'playthroughIndex',
             'playthrough', 'AlertsService', 'LearnerActionRenderService',
