@@ -75,6 +75,7 @@ os.environ['PATH'] = (
     os.path.join(YARN_PATH, 'bin') + os.pathsep +
     os.environ['PATH'])
 
+
 def run_cmd(cmd_tokens):
     """Runs the command and returns the output.
     Raises subprocess.CalledProcessError upon failure.
