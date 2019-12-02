@@ -45,8 +45,7 @@ class FeedbackThread(python_utils.OBJECT):
         updated_status: str. The change in status since the last message, if
             any.
         last_message_text: str. The text of the last message in the thread.
-        last_message_author: str. The author id of the last message in the
-            thread.
+        last_message_author: str. The author of the last message in the thread.
     """
 
     def __init__(
