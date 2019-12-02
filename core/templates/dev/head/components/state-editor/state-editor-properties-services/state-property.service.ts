@@ -40,6 +40,10 @@ export class StatePropertyService {
     this.setterMethodKey = null;
   }
 
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of value depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of value according to that.
   init(stateName: string, value: any): void {
     if (this.setterMethodKey === null) {
       throw 'State property setter method key cannot be null.';
@@ -62,6 +66,10 @@ export class StatePropertyService {
 
   // Transforms the given value into a normalized form. THIS CAN BE
   // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of value depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of value according to that.
   _normalize(value: any): any {
     return value;
   }
@@ -69,6 +77,10 @@ export class StatePropertyService {
   // Validates the given value and returns a boolean stating whether it
   // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
   // behavior is to always return true.
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of value depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of value according to that.
   _isValid(value: any): boolean {
     return true;
   }
