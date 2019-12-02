@@ -63,9 +63,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.linter_code = 0
         def mock_start_linter(unused_files_to_lint):
             return self.linter_code
-        self.does_diff_include_package_json = False
-        def mock_does_diff_include_package_json(unused_files_to_lint):
-            return self.does_diff_include_package_json
         self.does_diff_include_js_or_ts_files = False
         def mock_does_diff_include_js_or_ts_files(unused_files_to_lint):
             return self.does_diff_include_js_or_ts_files
@@ -84,9 +81,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         self.start_linter_swap = self.swap(
             pre_push_hook, 'start_linter', mock_start_linter)
-        self.package_json_swap = self.swap(
-            pre_push_hook, 'does_diff_include_package_json',
-            mock_does_diff_include_package_json)
         self.js_or_ts_swap = self.swap(
             pre_push_hook, 'does_diff_include_js_or_ts_files',
             mock_does_diff_include_js_or_ts_files)
@@ -330,10 +324,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.popen_swap:
             self.assertEqual(pre_push_hook.start_python_script('script'), 0)
 
-    def test_start_npm_audit(self):
-        with self.popen_swap:
-            self.assertEqual(pre_push_hook.start_npm_audit(), 0)
-
     def test_has_uncommitted_files(self):
         def mock_check_output(unused_cmd_tokens):
             return 'file1'
@@ -446,16 +436,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.does_diff_include_js_or_ts_files(
                 ['file1.html', 'file2.py']))
 
-    def test_does_diff_include_package_json_with_package_file(self):
-        self.assertTrue(
-            pre_push_hook.does_diff_include_package_json(
-                ['file1.js', 'package.json']))
-
-    def test_does_diff_include_package_json_with_no_file(self):
-        self.assertFalse(
-            pre_push_hook.does_diff_include_package_json(
-                ['file1.html', 'file2.py']))
-
     def test_repo_in_dirty_state(self):
         def mock_has_uncommitted_files():
             return True
@@ -498,22 +478,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             'Push failed, please correct the linting issues above.'
             in self.print_arr)
 
-    def test_npm_audit_failure(self):
-        self.does_diff_include_package_json = True
-        def mock_start_npm_audit():
-            return 1
-        start_npm_audit_swap = self.swap(
-            pre_push_hook, 'start_npm_audit', mock_start_npm_audit)
-        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
-            with self.collect_files_swap, self.uncommitted_files_swap:
-                with self.check_output_swap, self.start_linter_swap:
-                    with self.package_json_swap, start_npm_audit_swap:
-                        with self.assertRaises(SystemExit):
-                            pre_push_hook.main(args=[])
-        self.assertTrue(
-            'Push failed, please correct the npm audit issues above.'
-            in self.print_arr)
-
     def test_frontend_test_failure(self):
         self.does_diff_include_js_or_ts_files = True
         def mock_start_python_script(unused_script):
@@ -543,5 +507,5 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.package_json_swap, self.js_or_ts_swap:
+                    with self.js_or_ts_swap:
                         pre_push_hook.main(args=[])
