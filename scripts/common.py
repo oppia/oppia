@@ -27,7 +27,7 @@ import subprocess
 import python_utils
 import release_constants
 
-NODE_VERSION = 'v10.15.3'
+NODE_VERSION = '10.15.3'
 YARN_VERSION = 'v1.17.3'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
