@@ -39,6 +39,7 @@ import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -97,6 +98,8 @@ import { PlaythroughIssueObjectFactory } from
   'domain/statistics/PlaythroughIssueObjectFactory';
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
+import { PredictionResultObjectFactory } from
+  'domain/classifier/PredictionResultObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -142,8 +145,10 @@ import { SubtitledHtmlObjectFactory } from
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
 import { ThreadStatusDisplayService } from
@@ -165,6 +170,8 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { TextInputPredictionService } from
+  'interactions/TextInput/text-input-prediction.service';
 
 @Injectable({
   providedIn: 'root'
@@ -185,6 +192,7 @@ export class UpgradedServices {
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
+    upgradedServices['CountVectorizerService'] = new CountVectorizerService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
@@ -214,12 +222,15 @@ export class UpgradedServices {
       new ParamChangeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
+    upgradedServices['PredictionResultObjectFactory'] =
+        new PredictionResultObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
     upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory();
+    upgradedServices['TextInputTokenizer'] = new TextInputTokenizer();
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
@@ -268,6 +279,9 @@ export class UpgradedServices {
       new SidebarStatusService(upgradedServices['WindowDimensionsService']);
     upgradedServices['SiteAnalyticsService'] =
       new SiteAnalyticsService(upgradedServices['WindowRef']);
+    upgradedServices['SVMPredictionService'] =
+      new SVMPredictionService(
+        upgradedServices['PredictionResultObjectFactory']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
@@ -334,6 +348,12 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['TextInputPredictionService'] =
+      new TextInputPredictionService(
+        upgradedServices['CountVectorizerService'],
+        upgradedServices['SVMPredictionService'],
+        upgradedServices['TextInputTokenizer']
+      );
 
     // Group 5: Services depending on groups 1-4.
     upgradedServices['SolutionObjectFactory'] =
