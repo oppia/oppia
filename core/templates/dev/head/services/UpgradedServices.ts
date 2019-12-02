@@ -114,6 +114,9 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateImprovementSuggestionService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledHtmlObjectFactory } from
@@ -201,6 +204,8 @@ export class UpgradedServices {
     upgradedServices['PredictionResultObjectFactory'] =
         new PredictionResultObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
+    upgradedServices['StateImprovementSuggestionService'] =
+      new StateImprovementSuggestionService();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
