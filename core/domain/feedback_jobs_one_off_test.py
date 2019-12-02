@@ -131,15 +131,13 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
         self._check_model_validity(user_id2, thread_id2, user_feedback_model2)
 
 
-class FeedbackThreadMessageCacheOneOffJobTest(test_utils.GenericTestBase):
+class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
     """Tests for GeneralFeedbackThreadUser migration."""
 
-    ONE_OFF_JOB_CLASS = (
-        feedback_jobs_one_off.FeedbackThreadMessageCacheOneOffJob)
+    ONE_OFF_JOB_CLASS = feedback_jobs_one_off.FeedbackThreadCacheOneOffJob
 
     def setUp(self):
-        super(FeedbackThreadMessageCacheOneOffJobTest, self).setUp()
-
+        super(FeedbackThreadCacheOneOffJobTest, self).setUp()
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 

@@ -48,7 +48,7 @@ class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(values))
 
 
-class FeedbackThreadMessageCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job to populate message data cache of threads."""
 
     @classmethod
