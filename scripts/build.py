@@ -29,6 +29,7 @@ import subprocess
 import threading
 
 import python_utils
+from scripts import common
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -240,7 +241,7 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
     python_utils.PRINT('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        NODE_FILE, UGLIFY_FILE, source_path,
+        common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     subprocess.check_call(cmd, shell=True)
 

@@ -35,18 +35,12 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
-NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
+NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
-YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-v1.17.3')
+YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
-
-# Add path for node which is required by the node_modules.
-os.environ['PATH'] = (
-    '%s%sbin%s' % (NODE_PATH, os.sep, os.pathsep) +
-    '%s%s' % (NODE_PATH, os.pathsep) +
-    '%s%sbin%s' % (YARN_PATH, os.sep, os.pathsep) + os.environ['PATH'])
 
 
 def is_windows_os():
@@ -68,6 +62,15 @@ def is_x64_architecture():
     """Check if the architecture is on X64."""
     return ARCHITECTURE == 'x86_64'
 
+
+NODE_BIN_PATH = os.path.join(
+    NODE_PATH, '' if is_windows_os() else 'bin', 'node')
+
+# Add path for node which is required by the node_modules.
+os.environ['PATH'] = (
+    os.path.dirname(NODE_BIN_PATH) + os.pathsep +
+    os.path.join(YARN_PATH, 'bin') + os.pathsep +
+    os.environ['PATH'])
 
 def run_cmd(cmd_tokens):
     """Runs the command and returns the output.
