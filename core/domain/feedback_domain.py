@@ -45,11 +45,11 @@ class FeedbackThread(python_utils.OBJECT):
         updated_status: str. The change in status since the last message, if
             any.
         last_message_text: str. The text of the last message in the thread.
-        last_message_author_id: str. The author id of the last message in the
+        last_message_author: str. The author id of the last message in the
             thread.
         second_last_message_text: str. The text of the second-to-last message in
             the thread.
-        second_last_message_author_id: str. The author id of the second-to-last
+        second_last_message_author: str. The author id of the second-to-last
             message in the thread.
     """
 
@@ -57,8 +57,8 @@ class FeedbackThread(python_utils.OBJECT):
             self, thread_id, entity_type, entity_id, state_name,
             original_author_id, status, subject, summary, has_suggestion,
             message_count, created_on, last_updated, updated_status,
-            last_message_text, last_message_author_id, second_last_message_text,
-            second_last_message_author_id):
+            last_message_text, last_message_author, second_last_message_text,
+            second_last_message_author):
         """Initializes a FeedbackThread object."""
 
         self.id = thread_id
@@ -76,9 +76,9 @@ class FeedbackThread(python_utils.OBJECT):
         self.last_updated = last_updated
         self.updated_status = updated_status
         self.last_message_text = last_message_text
-        self.last_message_author_id = last_message_author_id
+        self.last_message_author = last_message_author
         self.second_last_message_text = second_last_message_text
-        self.second_last_message_author_id = second_last_message_author_id
+        self.second_last_message_author = second_last_message_author
 
     def to_dict(self):
         """Returns a dict representation of this FeedbackThread object.
@@ -98,13 +98,9 @@ class FeedbackThread(python_utils.OBJECT):
             'message_count': self.message_count,
             'updated_status': self.updated_status,
             'last_message_text': self.last_message_text,
-            'last_message_author': (
-                user_services.get_username(self.last_message_author_id)
-                if self.last_message_author_id else None),
+            'last_message_author': self.last_message_author,
             'second_last_message_text': self.second_last_message_text,
-            'second_last_message_author': (
-                user_services.get_username(self.second_last_message_author_id)
-                if self.second_last_message_author_id else None),
+            'second_last_message_author': self.second_last_message_author,
         }
 
 

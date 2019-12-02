@@ -18,6 +18,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import feedback_services
+from core.domain import user_services
 from core.platform import models
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -93,9 +94,10 @@ def _cache_last_message(thread, last_message):
     if thread.last_message_text != last_message_text:
         thread.last_message_text = last_message_text
         cache_updated = True
-    last_message_author_id = last_message and last_message.author_id
-    if thread.last_message_author_id != last_message_author_id:
-        thread.last_message_author_id = last_message_author_id
+    last_message_author = (
+        last_message and user_services.get_username(last_message.author_id))
+    if thread.last_message_author != last_message_author:
+        thread.last_message_author = last_message_author
         cache_updated = True
     return cache_updated
 
@@ -116,10 +118,11 @@ def _cache_second_last_message(thread, second_last_message):
     if thread.second_last_message_text != second_last_message_text:
         thread.second_last_message_text = second_last_message_text
         cache_updated = True
-    second_last_message_author_id = (
-        second_last_message and second_last_message.author_id)
-    if thread.second_last_message_author_id != second_last_message_author_id:
-        thread.second_last_message_author_id = second_last_message_author_id
+    second_last_message_author = (
+        second_last_message and
+        user_services.get_username(second_last_message.author_id))
+    if thread.second_last_message_author != second_last_message_author:
+        thread.second_last_message_author = second_last_message_author
         cache_updated = True
     return cache_updated
 

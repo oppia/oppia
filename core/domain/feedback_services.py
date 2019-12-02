@@ -169,9 +169,10 @@ def create_message(
 
     # Update the message data cache of the thread.
     thread.second_last_message_text = thread.last_message_text
-    thread.second_last_message_author_id = thread.last_message_author_id
+    thread.second_last_message_author = thread.last_message_author
     thread.last_message_text = message.text
-    thread.last_message_author_id = message.author_id
+    thread.last_message_author = (
+        author_id and user_services.get_username(author_id))
     if thread.message_count is not None:
         thread.message_count += 1
     else:
@@ -412,9 +413,8 @@ def _get_thread_from_model(thread_model):
         thread_model.subject, thread_model.summary, thread_model.has_suggestion,
         message_count, thread_model.created_on, thread_model.last_updated,
         thread_model.updated_status, thread_model.last_message_text,
-        thread_model.last_message_author_id,
-        thread_model.second_last_message_text,
-        thread_model.second_last_message_author_id)
+        thread_model.last_message_author, thread_model.second_last_message_text,
+        thread_model.second_last_message_author)
 
 
 def get_full_message_id(thread_id, message_id):

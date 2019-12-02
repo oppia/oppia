@@ -58,7 +58,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
             expected_thread_dict['summary'], False, 5, fake_date, fake_date,
-            None, 'last message', self.viewer_id, 'second last', self.viewer_id)
+            None, 'last message', self.VIEWER_USERNAME, 'second last',
+            self.VIEWER_USERNAME)
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict())
 

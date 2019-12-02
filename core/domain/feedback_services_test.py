@@ -38,6 +38,14 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 class FeedbackServicesUnitTests(test_utils.GenericTestBase):
     """Test functions in feedback_services."""
 
+    USER_EMAIL = 'user@example.com'
+    USER_USERNAME = 'user'
+
+    def setUp(self):
+        super(FeedbackServicesUnitTests, self).setUp()
+        self.signup(self.USER_EMAIL, self.USER_USERNAME)
+        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
+
     def test_feedback_ids(self):
         """Test various conventions for thread and message ids."""
         exp_id = '0'
@@ -75,7 +83,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackMessageModel.EntityNotFoundError
             ):
             feedback_services.create_message(
-                'invalid_thread_id', 'user_id', None, None, 'Hello')
+                'invalid_thread_id', self.user_id, None, None, 'Hello')
 
     def test_create_message_with_no_message_count(self):
         exp_id = '0'
@@ -92,7 +100,7 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(recent_message.text, 'some text')
 
         feedback_services.create_message(
-            thread_id, 'user_id', None, None, 'Hello')
+            thread_id, self.user_id, None, None, 'Hello')
         recent_message = (
             feedback_models.GeneralFeedbackMessageModel
             .get_most_recent_message(thread_id))
@@ -309,8 +317,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_1 = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
             u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            5, fake_date, fake_date, None, 'last message', self.viewer_id,
-            'second last', self.viewer_id)
+            5, fake_date, fake_date, None, 'last message', self.VIEWER_USERNAME,
+            'second last', self.VIEWER_USERNAME)
 
         last_two_message_ids = (
             feedback_services.get_last_two_message_ids(thread_1))
@@ -323,8 +331,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread_1 = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID_1,
             u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            1, fake_date, fake_date, None, 'last message', self.viewer_id, None,
-            None)
+            1, fake_date, fake_date, None, 'last message', self.VIEWER_USERNAME,
+            None, None)
 
         last_two_message_ids = (
             feedback_services.get_last_two_message_ids(thread_1))
