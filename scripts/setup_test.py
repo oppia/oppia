@@ -81,6 +81,9 @@ class SetupTests(test_utils.GenericTestBase):
         self.download_swap = self.swap(
             setup, 'download_and_install_package',
             mock_download_and_install_package)
+        self.download_node_on_windows_swap = self.swap(
+            setup, 'download_and_install_node_on_windows',
+            mock_download_and_install_package)
         self.exists_swap = self.swap(os.path, 'exists', mock_exists)
         self.chown_swap = self.swap(
             common, 'recursive_chown', mock_recursive_chown)
@@ -213,38 +216,6 @@ class SetupTests(test_utils.GenericTestBase):
                 setup.download_and_install_package('url', 'filename')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
-    def test_download_and_install_package_on_windows_for_zip_file(self):
-        check_function_calls = {
-            'url_retrieve_is_called': False,
-            'check_call': False,
-            'remove_is_called': False
-        }
-        expected_check_function_calls = {
-            'url_retrieve_is_called': True,
-            'remove_is_called': True,
-            'check_call': True
-        }
-        # pylint: disable=unused-argument
-        def mock_url_retrieve(unused_url, filename):
-            check_function_calls['url_retrieve_is_called'] = True
-
-        def mock_remove(unused_path):
-            check_function_calls['remove_is_called'] = True
-
-        def mock_check_call(commands):
-            check_function_calls['check_call'] = True
-
-        url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', mock_url_retrieve)
-        remove_swap = self.swap(os, 'remove', mock_remove)
-        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-
-        with url_retrieve_swap, os_name_swap, check_call_swap:
-            with remove_swap:
-                setup.download_and_install_package('url', 'filename.zip')
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-
     def test_invalid_dir(self):
         def mock_getcwd():
             return 'invalid'
@@ -357,7 +328,8 @@ class SetupTests(test_utils.GenericTestBase):
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.delete_swap:
                 with self.isfile_swap, architecture_swap:
-                    setup.main(args=[])
+                    with self.download_node_on_windows_swap:
+                        setup.main(args=[])
         check_function_calls = self.check_function_calls.copy()
         del check_function_calls['recursive_chown_is_called']
         del check_function_calls['recursive_chmod_is_called']
@@ -380,7 +352,8 @@ class SetupTests(test_utils.GenericTestBase):
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.delete_swap:
                 with self.isfile_swap, architecture_swap:
-                    setup.main(args=[])
+                    with self.download_node_on_windows_swap:
+                        setup.main(args=[])
         check_function_calls = self.check_function_calls.copy()
         del check_function_calls['recursive_chown_is_called']
         del check_function_calls['recursive_chmod_is_called']
@@ -392,6 +365,32 @@ class SetupTests(test_utils.GenericTestBase):
                 '-win-x64.zip',
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v1.17.3/yarn-v1.17.3.tar.gz'])
+
+    def test_download_and_install_node_on_windows(self):
+        check_function_calls = {
+            'url_retrieve_called': False,
+            'check_call_called': False
+        }
+        url_to_retrieve = 'link'
+        outfile_name = 'file'
+        def mock_url_retrieve(link, filename):
+            self.assertEqual(url_to_retrieve, link)
+            self.assertEqual(filename, outfile_name)
+            check_function_calls['url_retrieve_called'] = True
+
+        def mock_check_call(commands):
+            self.assertEqual(
+                commands, [
+                    'powershell.exe', '-c', 'expand-archive',
+                    outfile_name, '-DestinationPath',
+                    common.OPPIA_TOOLS_DIR])
+            check_function_calls['check_call_called'] = True
+        popen_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        with popen_swap, retrieve_swap:
+            setup.download_and_install_node_on_windows(
+                url_to_retrieve, outfile_name)
 
     def test_chrome_bin_setup_with_travis_var_set(self):
         def mock_get(unused_var):
@@ -437,6 +436,20 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(
             os.environ['CHROME_BIN'],
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
+
+    def test_chrome_bin_setup_with_windows_chrome(self):
+        def mock_isfile(path):
+            return (
+                path == ('c:\\Program Files (x86)\\Google\\Chrome\\' +
+                         'Application\\Chrome.exe'))
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        with self.test_py_swap, self.create_swap, self.uname_swap:
+            with self.exists_swap, self.chown_swap, self.chmod_swap:
+                with self.get_swap, isfile_swap:
+                    setup.main(args=[])
+        self.assertEqual(
+            os.environ['CHROME_BIN'],
+            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
 
     def test_chrome_bin_setup_with_chrome_exe_mnt_files(self):
         def mock_isfile(path):
