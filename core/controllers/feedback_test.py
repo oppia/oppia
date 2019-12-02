@@ -39,8 +39,8 @@ import python_utils
 
 EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
-    'thread_id', 'subject', 'last_updated', 'updated_status', 'message_count',
-    'updated_status', 'last_message_text', 'last_message_author']
+    'thread_id', 'subject', 'last_updated', 'message_count', 'updated_status',
+    'last_message_text', 'last_message_author']
 EXPECTED_MESSAGE_KEYS = [
     'author_username', 'created_on', 'entity_type', 'message_id', 'entity_id',
     'text', 'updated_status', 'updated_subject', 'received_via_email']
