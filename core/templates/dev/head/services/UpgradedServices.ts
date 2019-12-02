@@ -30,6 +30,8 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
+import { BrowserCheckerService } from
+  'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ChangesInHumanReadableFormService } from
@@ -164,6 +166,7 @@ export class UpgradedServices {
     upgradedServices['BackgroundMaskService'] = new BackgroundMaskService();
     upgradedServices['baseInteractionValidationService'] =
       new baseInteractionValidationService();
+    upgradedServices['BrowserCheckerService'] = new BrowserCheckerService();
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
