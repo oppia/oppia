@@ -282,13 +282,6 @@ def start_python_script(scriptname):
     return task.returncode
 
 
-def start_npm_audit():
-    """Starts the npm audit checks and returns the returncode of the task."""
-    task = subprocess.Popen([YARN_CMD, 'audit'])
-    task.communicate()
-    return task.returncode
-
-
 def has_uncommitted_files():
     """Returns true if the repo contains modified files that are uncommitted.
     Ignores untracked files.
@@ -345,22 +338,6 @@ def does_diff_include_js_or_ts_files(files_to_lint):
     return False
 
 
-def does_diff_include_package_json(files_to_lint):
-    """Returns true if diff includes package.json or yarn.lock.
-
-    Args:
-        files_to_lint: list(str). List of files to be linted.
-
-    Returns:
-        bool. Whether the diff contains changes in package.json or
-            yarn.lock.
-    """
-    for filename in files_to_lint:
-        if filename == 'package.json' or filename == 'yarn.lock':
-            return True
-    return False
-
-
 def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
@@ -394,13 +371,6 @@ def main(args=None):
                 if lint_status != 0:
                     python_utils.PRINT(
                         'Push failed, please correct the linting issues above.')
-                    sys.exit(1)
-            if does_diff_include_package_json(files_to_lint):
-                npm_audit_status = start_npm_audit()
-                if npm_audit_status != 0:
-                    python_utils.PRINT(
-                        'Push failed, please correct the npm audit issues '
-                        'above.')
                     sys.exit(1)
             frontend_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
