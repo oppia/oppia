@@ -98,8 +98,7 @@ SUBPROCESS_ENV = {
 COVERAGE_DIR = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools', 'coverage-4.5.4')
 
-COVERAGE_PATH = os.path.join(
-    COVERAGE_DIR, 'coverage')
+COVERAGE_PATH = os.path.join(COVERAGE_DIR, 'coverage')
 
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
