@@ -16,19 +16,28 @@
  * @fileoverview Service for tracking the sequence of learner actions.
  */
 
-angular.module('oppia').factory('DebugInfoTrackerService', [
-  function() {
-    var _sequenceOfActions = [];
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-    return {
-      reset: function() {
-        _sequenceOfActions = [];
-      },
-      addAction: function(action) {
-        _sequenceOfActions.push(action);
-      },
-      getSequenceOfActions: function() {
-        return _sequenceOfActions;
-      }
-    };
-  }]);
+@Injectable({
+  providedIn: 'root'
+})
+export class DebugInfoTrackerService {
+  _sequenceOfActions: Array<any> = [];
+
+  reset(): void {
+    this._sequenceOfActions = [];
+  }
+
+  addAction(action): void {
+    this._sequenceOfActions.push(action);
+  }
+
+  getSequenceOfActions(): Array<any> {
+    return this._sequenceOfActions;
+  }
+}
+
+angular.module('oppia').factory(
+  'DebugInfoTrackerService',
+  downgradeInjectable(DebugInfoTrackerService));
