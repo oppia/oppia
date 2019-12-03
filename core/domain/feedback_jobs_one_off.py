@@ -64,7 +64,8 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             feedback_models.GeneralFeedbackMessageModel.get_multi(
                 feedback_services.get_last_two_message_ids(thread)))
         cache_updated = any([
-            _cache_last_message(thread, last_message),
+            _cache_last_message_text(thread, last_message),
+            _cache_last_message_author(thread, last_message),
             _cache_last_message_updated_status(
                 thread, last_message, second_last_message),
         ])
@@ -78,9 +79,8 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, sum(int(s) for s in value_strs))
 
 
-def _cache_last_message(thread, last_message):
-    """Ensures the given thread's cache for the last message has its values set
-    to the provided message.
+def _cache_last_message_text(thread, last_message):
+    """Ensures the given thread's cache for the last message's text is correct.
 
     Args:
         thread: feedback_models.GeneralFeedbackThreadModel.
@@ -89,17 +89,30 @@ def _cache_last_message(thread, last_message):
     Returns:
         bool. Whether the cache was actually updated.
     """
-    cache_updated = False
     last_message_text = last_message and last_message.text
     if thread.last_message_text != last_message_text:
         thread.last_message_text = last_message_text
-        cache_updated = True
+        return True
+    return False
+
+
+def _cache_last_message_author(thread, last_message):
+    """Ensures the given thread's cache for the last message's author is
+    correct.
+
+    Args:
+        thread: feedback_models.GeneralFeedbackThreadModel.
+        last_message: feedback_models.GeneralFeedbackMessageModel.
+
+    Returns:
+        bool. Whether the cache was actually updated.
+    """
     last_message_author = (
         last_message and user_services.get_username(last_message.author_id))
     if thread.last_message_author != last_message_author:
         thread.last_message_author = last_message_author
-        cache_updated = True
-    return cache_updated
+        return True
+    return False
 
 
 def _cache_last_message_updated_status(
