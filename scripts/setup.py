@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import subprocess
 import sys
 import tarfile
 
@@ -130,12 +131,12 @@ def main(args=None):
             if os_info[4] == 'x86_64':
                 node_file_name = 'node-v10.15.3-darwin-x64'
             else:
-                node_file_name = 'node-v10.15.3-darwin-x86'
+                node_file_name = 'node-v10.15.3'
         elif os_info[0] == 'Linux':
             if os_info[4] == 'x86_64':
                 node_file_name = 'node-v10.15.3-linux-x64'
             else:
-                node_file_name = 'node-v10.15.3-linux-x86'
+                node_file_name = 'node-v10.15.3'
 
         download_and_install_package(
             'https://nodejs.org/dist/v10.15.3/%s.tar.gz' % node_file_name,
@@ -143,6 +144,11 @@ def main(args=None):
         os.rename(
             os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
             common.NODE_PATH)
+
+        if node_file_name == 'node-v10.15.3':
+            with common.CD(common.NODE_PATH):
+                subprocess.check_call(['./configure'])
+                subprocess.check_call(['make'])
 
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
