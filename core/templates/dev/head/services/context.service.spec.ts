@@ -134,6 +134,29 @@ describe('Context service', () => {
     });
   });
 
+  describe('behavior in question editor modal', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+    });
+
+    it('should correctly retrieve the values in topic editor', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
+
+      expect(ecs.getEntityType()).toBe('question');
+      expect(ecs.getEntityId()).toBe('questionId');
+    });
+
+    it('should correctly retrieve the values in skill editor', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/skill_edtior/123');
+      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
+
+      expect(ecs.getEntityType()).toBe('question');
+      expect(ecs.getEntityId()).toBe('questionId');
+    });
+  });
+
   describe('behavior in the subtopic viewer view', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
