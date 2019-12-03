@@ -347,18 +347,17 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_exists(unused_path):
             return False
         # pylint: disable=unused-argument
-        def url_retrieve_mock(url, filename):
+        def mock_url_retrieve(url, filename):
             self.urls.append(url)
         # pylint: enable=unused-argument
-        def check_call_mock(commands):
-            check_call_mock.commands = commands
-
+        def mock_check_call(commands):
+            mock_check_call.commands = commands
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
         architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', url_retrieve_mock)
-        check_call_swap = self.swap(subprocess, 'check_call', check_call_mock)
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.delete_swap:
@@ -371,7 +370,7 @@ class SetupTests(test_utils.GenericTestBase):
         for _, item in check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
-            check_call_mock.commands,
+            mock_check_call.commands,
             ['powershell.exe', '-c', 'expand-archive',
              'node-download', '-DestinationPath',
              common.OPPIA_TOOLS_DIR])
@@ -387,19 +386,19 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_exists(unused_path):
             return False
         # pylint: disable=unused-argument
-        def url_retrieve_mock(url, filename):
+        def mock_url_retrieve(url, filename):
             self.urls.append(url)
 
         # pylint: enable=unused-argument
-        def check_call_mock(commands):
-            check_call_mock.commands = commands
+        def mock_check_call(commands):
+            mock_check_call.commands = commands
 
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
         architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86_64')
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
-            python_utils, 'url_retrieve', url_retrieve_mock)
-        check_call_swap = self.swap(subprocess, 'check_call', check_call_mock)
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.delete_swap:
@@ -412,7 +411,7 @@ class SetupTests(test_utils.GenericTestBase):
         for _, item in check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
-            check_call_mock.commands,
+            mock_check_call.commands,
             ['powershell.exe', '-c', 'expand-archive',
              'node-download', '-DestinationPath',
              common.OPPIA_TOOLS_DIR])
