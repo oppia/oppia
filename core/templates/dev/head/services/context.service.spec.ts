@@ -134,7 +134,7 @@ describe('Context service', () => {
     });
   });
 
-  describe('behavior in question editor modal', () => {
+  fdescribe('behavior in question editor modal', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
@@ -149,7 +149,7 @@ describe('Context service', () => {
     });
 
     it('should correctly retrieve the values in skill editor', () => {
-      spyOn(urlService, 'getPathname').and.returnValue('/skill_edtior/123');
+      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
       spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
 
       expect(ecs.getEntityType()).toBe('question');
