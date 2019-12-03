@@ -47,7 +47,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'message_count': 1,
             'subject': u'a subject',
             'last_updated': utils.get_time_in_millisecs(fake_date),
-            'updated_status': None,
+            'last_message_updated_status': None,
             'last_message_text': 'last message',
             'last_message_author': self.VIEWER_USERNAME,
         }

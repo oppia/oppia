@@ -65,7 +65,8 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 feedback_services.get_last_two_message_ids(thread)))
         cache_updated = any([
             _cache_last_message(thread, last_message),
-            _cache_updated_status(thread, last_message, second_last_message),
+            _cache_last_message_updated_status(
+                thread, last_message, second_last_message),
         ])
         if cache_updated:
             thread.put()
@@ -101,7 +102,8 @@ def _cache_last_message(thread, last_message):
     return cache_updated
 
 
-def _cache_updated_status(thread, last_message, second_last_message):
+def _cache_last_message_updated_status(
+        thread, last_message, second_last_message):
     """Ensures the given thread's cache for the change-in-status is based upon
     the actual difference between the last and second-to-last messages.
 
@@ -115,10 +117,10 @@ def _cache_updated_status(thread, last_message, second_last_message):
     """
     if (last_message and last_message.updated_status and second_last_message and
             last_message.updated_status != second_last_message.updated_status):
-        updated_status = last_message.updated_status
+        last_message_updated_status = last_message.updated_status
     else:
-        updated_status = None
-    if thread.updated_status != updated_status:
-        thread.updated_status = updated_status
+        last_message_updated_status = None
+    if thread.last_message_updated_status != last_message_updated_status:
+        thread.last_message_updated_status = last_message_updated_status
         return True
     return False

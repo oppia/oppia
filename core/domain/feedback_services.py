@@ -85,7 +85,6 @@ def _create_models_for_thread_and_first_message(
     # when a new thread is created. If this is changed, changes need to be
     # made there as well.
     thread.status = feedback_models.STATUS_CHOICES_OPEN
-    thread.updated_status = None
     thread.subject = subject
     thread.has_suggestion = has_suggestion
     thread.message_count = 0
@@ -182,11 +181,11 @@ def create_message(
     # last_updated time of the thread reflects the last time a message was
     # added to it.
     old_status = thread.status
-    thread.updated_status = None
+    thread.last_message_updated_status = None
     if message_id != 0 and (updated_status or updated_subject):
         if updated_status and updated_status != thread.status:
             thread.status = updated_status
-            thread.updated_status = updated_status
+            thread.last_message_updated_status = updated_status
         if updated_subject and updated_subject != thread.subject:
             thread.subject = updated_subject
     new_status = thread.status
@@ -410,8 +409,8 @@ def _get_thread_from_model(thread_model):
         thread_model.original_author_id, thread_model.status,
         thread_model.subject, thread_model.summary, thread_model.has_suggestion,
         message_count, thread_model.created_on, thread_model.last_updated,
-        thread_model.updated_status, thread_model.last_message_text,
-        thread_model.last_message_author)
+        thread_model.last_message_updated_status,
+        thread_model.last_message_text, thread_model.last_message_author)
 
 
 def get_full_message_id(thread_id, message_id):
