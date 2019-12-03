@@ -62,7 +62,7 @@ angular.module('oppia').directive('oppiaNoninteractiveConceptcard', [
                 }
               ]
             });
-          }
+          };
         }]
     };
   }

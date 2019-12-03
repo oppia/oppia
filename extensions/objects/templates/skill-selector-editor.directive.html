@@ -5,10 +5,10 @@
   </md-card>
   <div style="max-height: 50vh; overflow-y: auto;">
     <div class="list-group-item"
-       ng-repeat="skill in $ctrl.skills | filter:skillFilterText"
-       ng-click="$ctrl.selectSkill(skill.id, skill.description)"
-       ng-class="{'list-group-item-success': (skill.id === $ctrl.value.id)}"
-       style="color: black;">
+         ng-repeat="skill in $ctrl.skills | filter:skillFilterText"
+         ng-click="$ctrl.selectSkill(skill.id, skill.description)"
+         ng-class="{'list-group-item-success': (skill.id === $ctrl.value.id)}"
+         style="color: black;">
       <label class="list-group-item-heading"><[skill.description]></label>
       <div ng-if="skill.id === $ctrl.value.id" style="color: black;">
         <strong> Explanation </strong>
