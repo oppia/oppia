@@ -134,7 +134,7 @@ describe('Context service', () => {
     });
   });
 
-  fdescribe('behavior in question editor modal', () => {
+  describe('behavior in question editor modal', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
