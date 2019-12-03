@@ -37,12 +37,8 @@ angular.module('oppia').factory('SubtopicViewerBackendApiService', [
 
       $http.get(subtopicDataUrl).then(function(response) {
         subtopicDataDict = angular.copy(response.data);
-        subtopicDataObject = subtopicDataDict.map(
-          function(subtopicDataDict) {
-            return SubtopicDataObjectFactory.createFromBackendDict(
-              subtopicDataDict
-            );
-          }
+        subtopicDataObject = SubtopicDataObjectFactory.createFromBackendDict(
+          subtopicDataDict
         );
         if (successCallback) {
           successCallback(subtopicDataObject);
