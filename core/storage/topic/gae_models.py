@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -472,8 +473,10 @@ class TopicRightsModel(base_models.VersionedModel):
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in manager_ids."""
+        user_ids = [user_id for user_id in self.manager_ids
+                    if user_id != feconf.SYSTEM_COMMITTER_ID]
         user_settings_models = user_models.UserSettingsModel.get_multi(
-            self.manager_ids, include_deleted=True)
+            user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
 
     def _trusted_commit(

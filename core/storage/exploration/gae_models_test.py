@@ -302,6 +302,9 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         )
         self.assertTrue(model.verify_model_user_ids_exist())
 
+        model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+
         model.owner_ids = [self.USER_ID_1, 'user_non_id']
         self.assertFalse(model.verify_model_user_ids_exist())
 
@@ -874,6 +877,9 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             viewer_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
             contributor_ids=[self.USER_ID_1_NEW, self.USER_ID_2_NEW],
         )
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [self.USER_ID_1_NEW, 'user_non_id']

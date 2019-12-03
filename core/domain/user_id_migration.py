@@ -20,6 +20,7 @@ import inspect
 
 from core import jobs
 from core.platform import models
+import feconf
 
 (
     base_models, collection_models,
@@ -370,6 +371,8 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             True if UserSettingsModel with id equal to user_id exists, False
             otherwise.
         """
+        if user_id == feconf.SYSTEM_COMMITTER_ID:
+            return True
         return user_models.UserSettingsModel.get_by_id(user_id) is not None
 
     @staticmethod
@@ -385,8 +388,11 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             True if UserSettingsModel with id as user_id in model exists, False
             otherwise.
         """
-        return (user_id in model_id and
-                user_models.UserSettingsModel.get_by_id(user_id) is not None)
+        if user_id not in model_id:
+            return False
+        if user_id == feconf.SYSTEM_COMMITTER_ID:
+            return True
+        return user_models.UserSettingsModel.get_by_id(user_id) is not None
 
     @staticmethod
     def _check_one_field_exists(model):
@@ -400,15 +406,19 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             False otherwise.
         """
         model_class = model.__class__
-        verification_field = model_class.get_user_id_migration_field()
         model_values = model.to_dict()
-        return user_models.UserSettingsModel.get_by_id(
-            model_values[verification_field._name]) is not None  # pylint: disable=protected-access
+        user_id = model_values[model_class.get_user_id_migration_field()._name]  # pylint: disable=protected-access
+        if user_id == feconf.SYSTEM_COMMITTER_ID:
+            return True
+        return user_models.UserSettingsModel.get_by_id(user_id) is not None
 
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
-        return models.Registry.get_all_storage_model_classes()
+        return [model_class for model_class in
+                models.Registry.get_all_storage_model_classes()
+                if model_class.get_user_id_migration_policy() !=
+                base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE]
 
     @staticmethod
     def map(model):
@@ -418,33 +428,35 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
                 base_models.USER_ID_MIGRATION_POLICY.COPY):
             if (ModelsUserIdsHaveUserSettingsVerificationJob
                     ._does_user_settings_model_exits(model.id)):
-                yield ('SUCCESS', model_class.__name__)
+                yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
-                yield ('FAILURE', model_class.__name__)
+                yield ('FAILURE - %s' % model_class.__name__, model.id)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD):
             if (ModelsUserIdsHaveUserSettingsVerificationJob
                     ._check_id_and_user_id_exist(model.id, model.user_id)):
-                yield ('SUCCESS', model_class.__name__)
+                yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
-                yield ('FAILURE', model_class.__name__)
+                yield ('FAILURE - %s' % model_class.__name__, model.id)
 
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
             if (ModelsUserIdsHaveUserSettingsVerificationJob
                     ._check_one_field_exists(model)):
-                yield ('SUCCESS', model_class.__name__)
+                yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
-                yield ('FAILURE', model_class.__name__)
+                yield ('FAILURE - %s' % model_class.__name__, model.id)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.CUSTOM):
             if model.verify_model_user_ids_exist():
-                yield ('SUCCESS', model_class.__name__)
+                yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
-                yield ('FAILURE', model_class.__name__)
-        yield ('SUCCESS', model_class.__name__)
+                yield ('FAILURE - %s' % model_class.__name__, model.id)
 
     @staticmethod
     def reduce(key, status):
         """Implements the reduce function for this job."""
-        yield (key, status)
+        if key.startswith('SUCCESS'):
+            yield (key, len(status))
+        else:
+            yield (key, status)

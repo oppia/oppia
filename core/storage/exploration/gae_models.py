@@ -300,9 +300,12 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
         editor_ids, voice_artist_ids and viewer_ids.
         """
+        user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
+                    self.viewer_ids)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id != feconf.SYSTEM_COMMITTER_ID]
         user_settings_models = user_models.UserSettingsModel.get_multi(
-            self.owner_ids + self.editor_ids + self.voice_artist_ids +
-            self.viewer_ids, include_deleted=True)
+            user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
 
     def save(self, committer_id, commit_message, commit_cmds):
@@ -737,7 +740,10 @@ class ExpSummaryModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
         editor_ids, voice_artist_ids, viewer_ids and contributor_ids.
         """
+        user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
+                    self.viewer_ids + self.contributor_ids)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id != feconf.SYSTEM_COMMITTER_ID]
         user_settings_models = user_models.UserSettingsModel.get_multi(
-            self.owner_ids + self.editor_ids + self.voice_artist_ids +
-            self.viewer_ids + self.contributor_ids, include_deleted=True)
+            user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)

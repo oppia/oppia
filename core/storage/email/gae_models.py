@@ -284,8 +284,11 @@ class SentEmailModel(base_models.BaseModel):
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for recipient_id and sender_id."""
+        user_ids = [self.recipient_id, self.sender_id]
+        user_ids = [user_id for user_id in user_ids
+                    if user_id != feconf.SYSTEM_COMMITTER_ID]
         user_settings_models = user_models.UserSettingsModel.get_multi(
-            [self.recipient_id, self.sender_id], include_deleted=True)
+            user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
 
 

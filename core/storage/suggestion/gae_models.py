@@ -366,8 +366,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for author_id and
         final_reviewer_id.
         """
+        user_ids = [self.author_id, self.final_reviewer_id]
+        user_ids = [user_id for user_id in user_ids
+                    if user_id != feconf.SYSTEM_COMMITTER_ID]
         user_settings_models = user_models.UserSettingsModel.get_multi(
-            [self.author_id, self.final_reviewer_id], include_deleted=True)
+            user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
 
 
@@ -510,6 +513,9 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for author_id and
         final_reviewer_id.
         """
+        user_ids = [self.author_id, self.final_reviewer_id]
+        user_ids = [user_id for user_id in user_ids
+                    if user_id != feconf.SYSTEM_COMMITTER_ID]
         user_settings_models = user_models.UserSettingsModel.get_multi(
-            [self.author_id, self.final_reviewer_id], include_deleted=True)
+            user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)

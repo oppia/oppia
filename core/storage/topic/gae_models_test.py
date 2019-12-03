@@ -394,6 +394,9 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             manager_ids=[self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_NEW])
         self.assertTrue(model.verify_model_user_ids_exist())
 
+        model.author_id = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+
         model.manager_ids = [self.MANAGER_1_ID_NEW, 'user_non_id']
         self.assertFalse(model.verify_model_user_ids_exist())
 

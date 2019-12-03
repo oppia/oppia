@@ -367,7 +367,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
                 feedback_models.GeneralFeedbackThreadUserModel
                 .get_user_id_migration_field()),
             python_utils.UNICODE(
-                feedback_models.GeneralFeedbackThreadUserModel.creator_id))
+                feedback_models.GeneralFeedbackThreadUserModel.user_id))
 
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(

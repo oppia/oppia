@@ -819,11 +819,43 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
         ).put()
 
     def test_one_user_one_model_full_id(self):
-        original_model = user_models.CompletedActivitiesModel(
+        user_models.CompletedActivitiesModel(
             id=self.USER_1_GAE_ID,
             exploration_ids=['1', '2'],
-            collection_ids=['1', '2'])
-        original_model.put()
+            collection_ids=['1', '2']).put()
+        user_models.ExpUserLastPlaythroughModel(
+            id='%s.%s' % (self.USER_2_GAE_ID, 'exp_id'),
+            user_id=self.USER_2_GAE_ID,
+            exploration_id='exp_id',
+            last_played_exp_version=2,
+            last_played_state_name='start').put()
+        user_models.UserContributionScoringModel(
+            id='%s.%s' % ('category', self.USER_2_GAE_ID),
+            user_id=self.USER_2_USER_ID,
+            score_category='category',
+            score=1.5,
+            has_email_been_sent=False).put()
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='instance_id',
+            committer_id=self.USER_2_GAE_ID,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]).put()
 
         output = self._run_one_off_job()
-        self.assertEqual(output, '')
+        self.assertIn(
+            ['FAILURE - CompletedActivitiesModel', [self.USER_1_GAE_ID]],
+            output)
+        self.assertIn(
+            ['FAILURE - ExpUserLastPlaythroughModel',
+             ['%s.%s' % (self.USER_2_GAE_ID, 'exp_id')]],
+            output)
+        self.assertIn(
+            ['FAILURE - UserContributionScoringModel',
+             ['%s.%s' % ('category', self.USER_2_GAE_ID)]],
+            output)
+        self.assertIn(
+            ['FAILURE - ExplorationSnapshotMetadataModel', ['instance_id']],
+            output)
+        self.assertIn(
+            ['SUCCESS - UserSettingsModel', 3], output)
