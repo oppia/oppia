@@ -91,7 +91,8 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.original_author_id == user_id).get() is not None
+        return cls.query(cls.original_author_id == user_id).get(
+            keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -240,7 +241,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.author_id == user_id).get() is not None
+        return cls.query(cls.author_id == user_id).get(
+            keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -467,7 +469,7 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():

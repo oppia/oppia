@@ -50,6 +50,10 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         """
         old_model = model_class.get_by_id(old_user_id)
         if not old_model:
+            # Some models are defined only for some users (for example
+            # UserSubscribersModel, is only defined for users who actually have
+            # at least one subscriber) that is why we are okay with the fact
+            # that model is None.
             return
         model_values = old_model.to_dict()
         model_values['id'] = new_user_id
@@ -83,7 +87,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             new_models.append(model_class(**model_values))
 
         def _replace_models():
-            """Replace old models with a new ones."""
+            """Replace old models with new ones."""
             model_class.put_multi(new_models, update_last_updated_time=False)
             model_class.delete_multi(old_models)
 
@@ -144,9 +148,9 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         yield ('SUCCESS', (old_user_id, new_user_id))
 
     @staticmethod
-    def reduce(key, old_new_user_id_tuple):
+    def reduce(key, old_new_user_id_tuples):
         """Implements the reduce function for this job."""
-        yield (key, old_new_user_id_tuple)
+        yield (key, old_new_user_id_tuples)
 
 
 class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
@@ -318,7 +322,8 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
         gae_id = user_model.gae_id
         if (len(user_model.id) != 32 or
                 not all(c.islower() for c in user_model.id)):
-            yield ('FAILURE - WRONG ID FORMAT', (gae_id, ''))
+            yield ('FAILURE - WRONG ID FORMAT', (gae_id, user_model.id))
+        success = True
         for model_class in models.Registry.get_all_storage_model_classes():
             base_classes = [
                 base.__name__ for base in inspect.getmro(model_class)]
@@ -336,8 +341,10 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
             if model_class.has_reference_to_user_id(gae_id):
                 yield ('FAILURE - HAS REFERENCE TO GAE ID',
                        (gae_id, model_class.__name__))
+                success = False
 
-        yield ('SUCCESS', (gae_id, ''))
+        if success:
+            yield ('SUCCESS', (gae_id, user_model.id))
 
     @staticmethod
     def reduce(key, status):
@@ -347,52 +354,52 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
 
 class ModelsUserIdsHaveUserSettingsVerificationJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for going through all the models that contain user IDs, this
+    """One-off job for going through all the models that contain user IDs. This
     job checks that all the user IDs used in the model have their corresponding
     UserSettingsModel defined.
     """
 
     @staticmethod
-    def _check_id_exists(model):
-        """Check if UserSettingsModel exists for the model id.
+    def _does_user_settings_model_exits(user_id):
+        """Check if UserSettingsModel exists for the user_id.
 
         Args:
-            model: instance. Model being checked.
+            user_id: str. User ID that should have its UserSettingsModel.
 
         Returns:
-            True if UserSettingsModel with id as id in model exists, False
+            True if UserSettingsModel with id equal to user_id exists, False
             otherwise.
         """
-        return user_models.UserSettingsModel.get_by_id(model.id) is not None
+        return user_models.UserSettingsModel.get_by_id(user_id) is not None
 
     @staticmethod
-    def _check_id_and_user_id_exist(model):
+    def _check_id_and_user_id_exist(model_id, user_id):
         """Check if UserSettingsModel exists for user_id and model id contains
         user_id.
 
         Args:
-            model: instance. Model being checked.
+            model_id: str. ID of the model that should contain the user_id.
+            user_id: str. User ID that should have its UserSettingsModel.
 
         Returns:
             True if UserSettingsModel with id as user_id in model exists, False
             otherwise.
         """
-        return (
-            model.user_id == model.id.split('.')[0] and
-            user_models.UserSettingsModel.get_by_id(model.user_id) is not None)
+        return (user_id in model_id and
+                user_models.UserSettingsModel.get_by_id(user_id) is not None)
 
     @staticmethod
-    def _check_one_field_exists(model, model_class):
+    def _check_one_field_exists(model):
         """Check if UserSettingsModel exists for one field.
 
         Args:
             model: instance. Model being checked.
-            model_class: class. The class of the model being checked.
 
         Returns:
             True if UserSettingsModel with id as user ID field in model exists,
             False otherwise.
         """
+        model_class = model.__class__
         verification_field = model_class.get_user_id_migration_field()
         model_values = model.to_dict()
         return user_models.UserSettingsModel.get_by_id(
@@ -410,14 +417,14 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
         if (model_class.get_user_id_migration_policy() ==
                 base_models.USER_ID_MIGRATION_POLICY.COPY):
             if (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_id_exists(model)):
+                    ._does_user_settings_model_exits(model.id)):
                 yield ('SUCCESS', model_class.__name__)
             else:
                 yield ('FAILURE', model_class.__name__)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD):
             if (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_id_and_user_id_exist(model)):
+                    ._check_id_and_user_id_exist(model.id, model.user_id)):
                 yield ('SUCCESS', model_class.__name__)
             else:
                 yield ('FAILURE', model_class.__name__)
@@ -425,7 +432,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
             if (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_one_field_exists(model, model_class)):
+                    ._check_one_field_exists(model)):
                 yield ('SUCCESS', model_class.__name__)
             else:
                 yield ('FAILURE', model_class.__name__)
@@ -435,6 +442,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
                 yield ('SUCCESS', model_class.__name__)
             else:
                 yield ('FAILURE', model_class.__name__)
+        yield ('SUCCESS', model_class.__name__)
 
     @staticmethod
     def reduce(key, status):

@@ -556,9 +556,14 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assert_model_fields_equal(
-            question_models.QuestionSummaryModel.get_user_id_migration_field(),
-            question_models.QuestionSummaryModel.creator_id)
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                question_models.QuestionSummaryModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(
+                question_models.QuestionSummaryModel.creator_id))
 
     def test_get_by_creator_id(self):
         question_summary_model_1 = question_models.QuestionSummaryModel(
@@ -646,6 +651,11 @@ class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assert_model_fields_equal(
-            question_models.QuestionRightsModel.get_user_id_migration_field(),
-            question_models.QuestionRightsModel.creator_id)
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                question_models.QuestionRightsModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(
+                question_models.QuestionRightsModel.creator_id))

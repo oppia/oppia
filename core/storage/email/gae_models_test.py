@@ -24,6 +24,7 @@ import types
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -318,10 +319,12 @@ class BulkEmailModelUnitTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        """Return field that contains user ID."""
-        self.assert_model_fields_equal(
-            email_models.BulkEmailModel.get_user_id_migration_field(),
-            email_models.BulkEmailModel.sender_id)
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                email_models.BulkEmailModel.get_user_id_migration_field()),
+            python_utils.UNICODE(email_models.BulkEmailModel.sender_id))
 
 
 class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):

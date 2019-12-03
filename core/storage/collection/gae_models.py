@@ -226,7 +226,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 cls.editor_ids == user_id,
                 cls.voice_artist_ids == user_id,
                 cls.viewer_ids == user_id
-            )).get() is not None
+            )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @staticmethod
@@ -537,7 +537,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             cls.owner_ids == user_id,
             cls.editor_ids == user_id,
             cls.viewer_ids == user_id,
-            cls.contributor_ids == user_id)).get() is not None
+            cls.contributor_ids == user_id)).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():

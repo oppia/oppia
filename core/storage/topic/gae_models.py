@@ -428,7 +428,8 @@ class TopicRightsModel(base_models.VersionedModel):
                 reconstituted_model = cls(**snapshot_content_model.content)
                 if user_id in reconstituted_model.manager_ids:
                     return True
-        return (cls.query(cls.manager_ids == user_id).get() is not None or
+        return (cls.query(cls.manager_ids == user_id).get(
+            keys_only=True) is not None or
                 cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @staticmethod

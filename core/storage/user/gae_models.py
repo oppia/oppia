@@ -406,7 +406,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -998,7 +998,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -1152,7 +1152,7 @@ class CollectionProgressModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -1313,7 +1313,7 @@ class StoryProgressModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -1500,7 +1500,8 @@ class UserQueryModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.query(cls.submitter_id == user_id).get() is not None
+        return cls.query(cls.submitter_id == user_id).get(
+            keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -1610,7 +1611,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -1693,7 +1694,7 @@ class UserContributionScoringModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -1823,10 +1824,3 @@ class UserContributionScoringModel(base_models.BaseModel):
         else:
             model.score += increment_by
             model.put()
-
-    def verify_model_user_ids_exist(self):
-        """Check if UserSettingsModel exists for user_id and model id contains
-        user_id.
-        """
-        return (self.user_id == self.id.split('.')[1] and
-                UserSettingsModel.get_by_id(self.user_id) is not None)

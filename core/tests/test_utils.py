@@ -555,13 +555,6 @@ tags: []
         with self.assertRaisesRegexp(utils.ValidationError, error_substring):
             item.validate()
 
-    def assert_model_fields_equal(self, first, second):
-        """Assert that two method fields (not the values of the fields)
-         are the same.
-         """
-        self.assertEqual(
-            python_utils.UNICODE(first), python_utils.UNICODE(second))
-
     def signup_superadmin_user(self):
         """Signs up a superadmin user. Should be called at the end of
         setUp().

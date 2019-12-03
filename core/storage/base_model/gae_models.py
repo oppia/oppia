@@ -49,8 +49,9 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
 # Enums are evaluated as classes in Python and they should use PascalCase,
 # but using UPPER_CASE seems more appropriate here.
 # COPY - User ID is used as model ID thus the model needs to be recreated.
-# COPY_AND_UPDATE_ONE_FIELD - User id is used as first part of the model ID thus
-#                             the model needs to be recreated.
+# COPY_AND_UPDATE_ONE_FIELD - User ID is used as some part of the model ID and
+#                             also in user_id field thus the model needs to be
+#                             recreated and the field changed.
 # ONE_FIELD - One field in the model contains user ID thus the value in that
 #             field needs to be changed.
 # CUSTOM - Multiple fields in the model contain user ID, values in all these
@@ -390,7 +391,7 @@ class BaseCommitLogEntryModel(BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -1018,7 +1019,8 @@ class BaseSnapshotMetadataModel(BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.committer_id == user_id).get() is not None
+        return cls.query(cls.committer_id == user_id).get(
+            keys_only=True) is not None
 
     def get_unversioned_instance_id(self):
         """Gets the instance id from the snapshot id.

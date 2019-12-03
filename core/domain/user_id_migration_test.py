@@ -27,18 +27,20 @@ from core.tests import test_utils
 import feconf
 
 (
-    base_models, collection_models,
-    exp_models, feedback_models, question_models,
-    skill_models, topic_models, user_models) = models.Registry.import_models(
-        [models.NAMES.base_model, models.NAMES.collection,
-         models.NAMES.exploration, models.NAMES.feedback, models.NAMES.question,
-         models.NAMES.skill, models.NAMES.topic, models.NAMES.user])
+    activity_models, base_models,
+    collection_models, exp_models,
+    feedback_models, question_models, skill_models,
+    topic_models, user_models) = models.Registry.import_models(
+        [models.NAMES.activity, models.NAMES.base_model,
+         models.NAMES.collection, models.NAMES.exploration,
+         models.NAMES.feedback, models.NAMES.question, models.NAMES.skill,
+         models.NAMES.topic, models.NAMES.user])
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
 
 class UserIdMigrationJobTests(test_utils.GenericTestBase):
-    """Tests for user id migration job."""
+    """Tests for UserIdMigrationJobTests."""
     EXP_ID_1 = 'exp_id_1'
     EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
@@ -418,7 +420,7 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
 
 
 class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
-    """Tests for snapshot user id migration job."""
+    """Tests for SnapshotsUserIdMigrationJobTests."""
     SNAPSHOT_ID = '2'
     USER_1_USER_ID = 'user_id_1'
     USER_1_GAE_ID = 'gae_id_1'
@@ -437,13 +439,18 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         stringified_output = (
             user_id_migration.SnapshotsUserIdMigrationJob.get_output(job_id))
-        eval_output = [
-            ast.literal_eval(stringified_item) for
-            stringified_item in stringified_output]
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
         return eval_output
 
     def setUp(self):
-        super(SnapshotsUserIdMigrationJobTests, self).setUp()
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to signup the superadmin user.
+        with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
+            super(SnapshotsUserIdMigrationJobTests, self).setUp()
         user_models.UserSettingsModel(
             id=self.USER_1_USER_ID,
             gae_id=self.USER_1_GAE_ID,
@@ -626,3 +633,197 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             [self.USER_1_USER_ID, self.USER_2_USER_ID],
             migrated_rights_model.manager_ids)
+
+
+class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
+    """Tests for GaeIdNotInModelsVerificationJob."""
+    USER_1_USER_ID = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    USER_1_GAE_ID = 'gae_id_1'
+    USER_2_USER_ID = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+    USER_2_GAE_ID = 'gae_id_2'
+    USER_3_USER_ID = 'cccccccccccccccccccccccccccccccc'
+    USER_3_GAE_ID = 'gae_id_3'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_id_migration.GaeIdNotInModelsVerificationJob.create_new()
+        user_id_migration.GaeIdNotInModelsVerificationJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration.GaeIdNotInModelsVerificationJob.get_output(
+                job_id))
+        eval_output = []
+        for stringified_item in stringified_output:
+            item = ast.literal_eval(stringified_item)
+            item[1] = [ast.literal_eval(ids) for ids in item[1]]
+            eval_output.append(item)
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to signup the superadmin user.
+        with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
+            super(GaeIdNotInModelsVerificationJobTests, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_1_USER_ID,
+            gae_id=self.USER_1_GAE_ID,
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_2_USER_ID,
+            gae_id=self.USER_2_GAE_ID,
+            email='some.different@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_3_USER_ID,
+            gae_id=self.USER_3_GAE_ID,
+            email='some.different@email.cz',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+
+    def test_wrong_user_ids(self):
+        user_models.UserSettingsModel(
+            id='aa',
+            gae_id=self.USER_1_GAE_ID,
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id='AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            gae_id=self.USER_2_GAE_ID,
+            email='some.different@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+
+        output = self._run_one_off_job()
+        output = [
+            key[1] for key in output if key[0] == 'FAILURE - WRONG ID FORMAT'
+        ][0]
+        self.assertEqual(len(output), 2)
+        self.assertIn(('gae_id_1', 'aa'), output)
+        self.assertIn(('gae_id_2', 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'), output)
+
+    def test_failure(self):
+        user_models.CompletedActivitiesModel(
+            id=self.USER_1_GAE_ID,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2']
+        ).put()
+        user_models.CompletedActivitiesModel(
+            id=self.USER_2_GAE_ID,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2']
+        ).put()
+        user_models.ExpUserLastPlaythroughModel(
+            id='%s.%s' % (self.USER_3_GAE_ID, 'exp_id'),
+            user_id=self.USER_3_GAE_ID,
+            exploration_id='exp_id',
+            last_played_exp_version=2,
+            last_played_state_name='start'
+        ).put()
+
+        original_rights_model = skill_models.SkillRightsModel(
+            id='1', creator_id=self.USER_1_GAE_ID)
+        original_rights_snapshot_model = (
+            skill_models.SkillRightsSnapshotContentModel(
+                id='1', content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        # Model with DELETION_POLICY equal to NOT_APPLICABLE.
+        activity_models.ActivityReferencesModel(id='some_id').put()
+
+        output = self._run_one_off_job()
+        self.assertNotIn('SUCCESS', [key[0] for key in output])
+        output = [
+            key[1] for key in output
+            if key[0] == 'FAILURE - HAS REFERENCE TO GAE ID'][0]
+        self.assertEqual(len(output), 4)
+        self.assertIn((self.USER_1_GAE_ID, 'SkillRightsModel'), output)
+        self.assertIn((self.USER_1_GAE_ID, 'CompletedActivitiesModel'), output)
+        self.assertIn((self.USER_2_GAE_ID, 'CompletedActivitiesModel'), output)
+        self.assertIn(
+            (self.USER_3_GAE_ID, 'ExpUserLastPlaythroughModel'), output)
+
+    def test_success(self):
+        output = self._run_one_off_job()
+        output = [key[1] for key in output if key[0] == 'SUCCESS'][0]
+
+        self.assertEqual(len(output), 3)
+        self.assertIn((self.USER_1_GAE_ID, self.USER_1_USER_ID), output)
+        self.assertIn((self.USER_2_GAE_ID, self.USER_2_USER_ID), output)
+        self.assertIn((self.USER_3_GAE_ID, self.USER_3_USER_ID), output)
+
+
+class ModelsUserIdsHaveUserSettingsVerificationJobTests(
+        test_utils.GenericTestBase):
+    """Tests for ModelsUserIdsHaveUserSettingsVerificationJob."""
+    USER_1_USER_ID = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    USER_1_GAE_ID = 'gae_id_1'
+    USER_2_USER_ID = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+    USER_2_GAE_ID = 'gae_id_2'
+    USER_3_USER_ID = 'cccccccccccccccccccccccccccccccc'
+    USER_3_GAE_ID = 'gae_id_3'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_id_migration.ModelsUserIdsHaveUserSettingsVerificationJob
+            .create_new())
+        (user_id_migration.ModelsUserIdsHaveUserSettingsVerificationJob
+         .enqueue(job_id))
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration.ModelsUserIdsHaveUserSettingsVerificationJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to signup the superadmin user.
+        with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
+            super(
+                ModelsUserIdsHaveUserSettingsVerificationJobTests, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_1_USER_ID,
+            gae_id=self.USER_1_GAE_ID,
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_2_USER_ID,
+            gae_id=self.USER_2_GAE_ID,
+            email='some.different@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_3_USER_ID,
+            gae_id=self.USER_3_GAE_ID,
+            email='some.different@email.cz',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+
+    def test_one_user_one_model_full_id(self):
+        original_model = user_models.CompletedActivitiesModel(
+            id=self.USER_1_GAE_ID,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2'])
+        original_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, '')

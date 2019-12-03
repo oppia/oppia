@@ -62,7 +62,7 @@ class RoleQueryAuditModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():

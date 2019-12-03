@@ -95,7 +95,7 @@ class SentEmailModel(base_models.BaseModel):
         return cls.query(ndb.OR(
             cls.recipient_id == user_id,
             cls.sender_id == user_id,
-        )).get() is not None
+        )).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -337,7 +337,8 @@ class BulkEmailModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.sender_id == user_id).get() is not None
+        return cls.query(cls.sender_id == user_id).get(
+            keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -405,7 +406,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():

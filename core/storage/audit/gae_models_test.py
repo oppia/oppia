@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (audit_models, base_models) = models.Registry.import_models(
     [models.NAMES.audit, models.NAMES.base_model])
@@ -68,9 +69,12 @@ class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assert_model_fields_equal(
-            audit_models.RoleQueryAuditModel.get_user_id_migration_field(),
-            audit_models.RoleQueryAuditModel.user_id)
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                audit_models.RoleQueryAuditModel.get_user_id_migration_field()),
+            python_utils.UNICODE(audit_models.RoleQueryAuditModel.user_id))
 
     def test_get_model(self):
         audit_model = audit_models.RoleQueryAuditModel.get(self.ID)

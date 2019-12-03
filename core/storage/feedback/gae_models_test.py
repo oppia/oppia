@@ -24,6 +24,7 @@ from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (base_models, feedback_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.feedback])
@@ -84,10 +85,14 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assert_model_fields_equal(
-            feedback_models.GeneralFeedbackThreadModel
-            .get_user_id_migration_field(),
-            feedback_models.GeneralFeedbackThreadModel.original_author_id)
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                feedback_models.GeneralFeedbackThreadModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(
+                feedback_models.GeneralFeedbackThreadModel.original_author_id))
 
     def test_raise_exception_by_mocking_collision(self):
         feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
@@ -173,10 +178,14 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assert_model_fields_equal(
-            feedback_models.GeneralFeedbackMessageModel
-            .get_user_id_migration_field(),
-            feedback_models.GeneralFeedbackMessageModel.author_id)
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                feedback_models.GeneralFeedbackMessageModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(
+                feedback_models.GeneralFeedbackMessageModel.author_id))
 
     def test_raise_exception_by_mocking_collision(self):
         with self.assertRaisesRegexp(
@@ -351,10 +360,14 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assert_model_fields_equal(
-            feedback_models.GeneralFeedbackThreadUserModel
-            .get_user_id_migration_field(),
-            feedback_models.GeneralFeedbackThreadUserModel.user_id)
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                feedback_models.GeneralFeedbackThreadUserModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(
+                feedback_models.GeneralFeedbackThreadUserModel.creator_id))
 
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(

@@ -156,7 +156,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         return cls.query(
             ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
-        ).get() is not None
+        ).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -418,7 +418,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """
         return cls.query(
             ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
-        ).get() is not None
+        ).get(keys_only=True) is not None
 
     @staticmethod
     def get_user_id_migration_policy():

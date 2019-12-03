@@ -22,6 +22,7 @@ from constants import constants
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 (base_models, skill_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.skill])
@@ -85,7 +86,7 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillSummaryModel.has_reference_to_user_id('any_id'))
 
     def test_get_user_id_migration_policy(self):
-        self.assert_model_fields_equal(
+        self.assertEqual(
             skill_models.SkillSummaryModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
@@ -180,9 +181,12 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
             base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
 
     def test_get_user_id_migration_field(self):
-        self.assert_model_fields_equal(
-            skill_models.SkillRightsModel.get_user_id_migration_field(),
-            skill_models.SkillRightsModel.creator_id)
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                skill_models.SkillRightsModel.get_user_id_migration_field()),
+            python_utils.UNICODE(skill_models.SkillRightsModel.creator_id))
 
     def test_get_unpublished_by_creator_id(self):
         results = (
