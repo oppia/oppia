@@ -34,7 +34,8 @@ export class CsrfTokenService {
     if (this.tokenPromise !== null) {
       throw new Error('Token request has already been made');
     }
-
+    // TODO(#8035): Remove the use of $.ajax and hence the ts-ignore
+    // in csrf-token.service.spec.ts once all the services are migrated
     // We use jQuery here instead of Angular's $http, since the latter creates
     // a circular dependency.
     this.tokenPromise = $.ajax({
