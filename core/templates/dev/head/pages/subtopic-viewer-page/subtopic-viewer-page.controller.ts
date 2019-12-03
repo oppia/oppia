@@ -63,11 +63,11 @@ angular.module('oppia').directive('subtopicViewerPage', [
           $rootScope.loadingMessage = 'Loading';
           SubtopicViewerBackendApiService.fetchSubtopicData(
             ctrl.topicName, ctrl.subtopicId).then(
-            function(subtopicDataDict) {
+            function(subtopicDataObject) {
               ctrl.pageContents =
                 SubtitledHtmlObjectFactory.createFromBackendDict(
-                  subtopicDataDict.page_contents.subtitled_html);
-              ctrl.subtopicTitle = subtopicDataDict.subtopic_title;
+                  subtopicDataObject.getPageContents().subtitled_html);
+              ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
               PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
               $rootScope.loadingMessage = '';
             },

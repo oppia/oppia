@@ -21,6 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
+require('domain/subtopic_viewer/SubtopicDataObjectFactory.ts');
 
 describe('Subtopic viewer backend API service', function() {
   var SubtopicViewerBackendApiService = null;
@@ -29,6 +30,8 @@ describe('Subtopic viewer backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
   var UndoRedoService = null;
+  var sampleDataResultsObjects = null;
+  var SubtopicDataObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -44,12 +47,17 @@ describe('Subtopic viewer backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    SubtopicDataObjectFactory = $injector.get('SubtopicDataObjectFactory');
 
     // Sample subtopic page contents object returnable from the backend
     sampleDataResults = {
       subtopic_title: 'Subtopic Title',
       page_contents: {}
     };
+
+    sampleDataResultsObjects = SubtopicDataObjectFactory.createFromBackendDict(
+      sampleDataResults
+    );
   }));
 
   afterEach(function() {
@@ -68,7 +76,7 @@ describe('Subtopic viewer backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResultsObjects);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
