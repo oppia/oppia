@@ -134,6 +134,7 @@
 /core/templates/dev/head/components/state-editor/ @aks681
 /core/templates/dev/head/services/compute-graph.service.ts @aks681
 /core/templates/dev/head/services/context.service*.ts @aks681
+/core/templates/dev/head/services/debug-info-tracker.service*.ts @aks681
 /core/templates/dev/head/services/editability.service*.ts @aks681
 /core/templates/dev/head/services/exploration-features*.ts @aks681
 /core/templates/dev/head/services/exploration-html-formatter.service*.ts @aks681
@@ -355,6 +356,7 @@
 /core/templates/dev/head/app.constants.ajs.ts @ankita240796
 /core/templates/dev/head/combined-tests.spec.ts @ankita240796
 /core/templates/dev/head/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @Jamesjay4199
+/core/templates/dev/head/pages/interaction-specs.constants.ts @bansalnitish
 /core/templates/dev/head/I18nFooter.ts @nithusha21
 /core/templates/dev/head/i18n-footer.directive.html @nithusha21
 /core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @YashJipkate
@@ -455,6 +457,7 @@
 /gulpfile.js @jamesjay4199 @vojtechjelinek
 /jinja_utils*.py @jamesjay4199 @vojtechjelinek
 /webpack.common.config.ts @jamesjay4199 @vojtechjelinek
+/webpack.common.macros.ts @jamesjay4199 @vojtechjelinek
 /webpack.dev.config.ts @jamesjay4199 @vojtechjelinek
 /webpack.prod.config.ts @jamesjay4199 @vojtechjelinek
 

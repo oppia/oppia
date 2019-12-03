@@ -2915,9 +2915,9 @@ class OtherLintChecksManager(LintChecksManager):
         methods = [self._check_import_order]
         super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
 
-    def _check_docstrings_and_comments(self):
-        """Run checks relates to docstring and comments."""
-        methods = [self._check_docstrings, self._check_comments]
+    def _check_docstring(self):
+        """Run checks related to docstring."""
+        methods = [self._check_docstrings]
         super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
 
     def _check_docstrings(self):
@@ -3078,87 +3078,6 @@ class OtherLintChecksManager(LintChecksManager):
         self.process_manager['docstrings'] = summary_messages
         _STDOUT_LIST.append(stdout)
 
-    def _check_comments(self):
-        """This function ensures that comments follow correct style."""
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting comment checks')
-            python_utils.PRINT('----------------------------------------')
-        summary_messages = []
-        files_to_check = [
-            filepath for filepath in self.py_filepaths if not
-            any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)]
-        message = 'There should be a period at the end of the comment.'
-        failed = False
-        space_regex = re.compile(r'^#[^\s].*$')
-        capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
-        stdout = python_utils.string_io()
-        with _redirect_stdout(stdout):
-            for filepath in files_to_check:
-                file_content = FILE_CACHE.readlines(filepath)
-                file_length = len(file_content)
-                for line_num in python_utils.RANGE(file_length):
-                    line = file_content[line_num].strip()
-                    next_line = ''
-                    previous_line = ''
-                    if line_num + 1 < file_length:
-                        next_line = file_content[line_num + 1].strip()
-                    if line_num > 0:
-                        previous_line = file_content[line_num - 1].strip()
-
-                    if line.startswith('#') and not next_line.startswith('#'):
-                        # Check that the comment ends with the proper
-                        # punctuation.
-                        last_char_is_invalid = line[-1] not in (
-                            ALLOWED_TERMINATING_PUNCTUATIONS)
-                        no_word_is_present_in_excluded_phrases = not any(
-                            word in line for word in EXCLUDED_PHRASES)
-                        if last_char_is_invalid and (
-                                no_word_is_present_in_excluded_phrases):
-                            failed = True
-                            python_utils.PRINT('%s --> Line %s: %s' % (
-                                filepath, line_num + 1, message))
-                            python_utils.PRINT('')
-
-                    # Check that comment starts with a space and is not a
-                    # shebang expression at the start of a bash script which
-                    # loses funtion when a space is added.
-                    if space_regex.match(line) and not line.startswith('#!'):
-                        message = (
-                            'There should be a space at the beginning '
-                            'of the comment.')
-                        failed = True
-                        python_utils.PRINT('%s --> Line %s: %s' % (
-                            filepath, line_num + 1, message))
-                        python_utils.PRINT('')
-
-                    # Check that comment starts with a capital letter.
-                    if not previous_line.startswith('#') and (
-                            capital_regex.match(line)):
-                        message = (
-                            'There should be a capital letter'
-                            ' to begin the content of the comment.')
-                        failed = True
-                        python_utils.PRINT('%s --> Line %s: %s' % (
-                            filepath, line_num + 1, message))
-                        python_utils.PRINT('')
-
-            python_utils.PRINT('')
-            if failed:
-                summary_message = (
-                    '%s   Comments check failed, fix files that have bad '
-                    'comment formating.' % _MESSAGE_TYPE_FAILED)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-        self.process_manager['comments'] = summary_messages
-        _STDOUT_LIST.append(stdout)
-
-
     def _check_html_tags_and_attributes(self, debug=False):
         """This function checks the indentation of lines in HTML files."""
 
@@ -3278,9 +3197,8 @@ class OtherLintChecksManager(LintChecksManager):
         # division_operator_messages = self._check_division_operator()
         # import_order_messages = self._check_import_order()
         self._check_import()
-        self._check_docstrings_and_comments()
+        self._check_docstring()
         docstring_messages = self.process_manager['docstrings']
-        comment_messages = self.process_manager['comments']
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
         html_tag_and_attribute_messages = (
@@ -3290,8 +3208,8 @@ class OtherLintChecksManager(LintChecksManager):
 
         all_messages = (
             import_order_messages + common_messages +
-            docstring_messages + comment_messages +
-            html_tag_and_attribute_messages + html_linter_messages)
+            docstring_messages + html_tag_and_attribute_messages +
+            html_linter_messages)
         return all_messages
 
 
