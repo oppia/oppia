@@ -202,7 +202,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(thread.last_message_text, 'first text')
 
     def test_update_to_text_cache_for_stale_cache_with_2_messages(self):
@@ -216,7 +216,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(thread.last_message_text, 'second text')
 
     def test_update_to_author_cache_for_stale_cache_with_1_message(self):
@@ -228,7 +228,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(thread.last_message_author, self.EDITOR_USERNAME)
 
     def test_update_to_author_cache_for_stale_cache_with_2_messages(self):
@@ -242,7 +242,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(thread.last_message_author, self.EDITOR_USERNAME)
 
     def test_update_to_author_cache_for_stale_cache_with_1_anon_message(self):
@@ -254,7 +254,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(thread.last_message_author)
 
     def test_update_to_author_cache_for_stale_cache_with_2_anon_messages(self):
@@ -268,7 +268,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(thread.last_message_author)
 
     def test_update_to_status_cache_for_stale_cache_with_status_change(self):
@@ -283,7 +283,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(
             thread.last_message_updated_status,
             feedback_models.STATUS_CHOICES_IGNORED)
@@ -299,7 +299,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(thread.last_message_updated_status)
 
     def test_update_to_all_caches_for_stale_cache_with_0_messages(self):
@@ -321,7 +321,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(thread.last_message_text)
         self.assertIsNone(thread.last_message_author)
         self.assertIsNone(thread.last_message_updated_status)
@@ -333,7 +333,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(thread.last_message_text, 'first text')
         self.assertEqual(thread.last_message_author, self.EDITOR_USERNAME)
 
@@ -346,7 +346,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(thread.last_message_text, 'second text')
         self.assertEqual(thread.last_message_author, self.EDITOR_USERNAME)
 
@@ -359,7 +359,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(thread.last_message_updated_status)
 
     def test_no_update_to_status_cache_of_fresh_cache_with_status_change(self):
@@ -371,7 +371,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         self.assertEqual(self._run_one_off_job(), [])
 
-        thread = feedback_services.get_thread(thread_id)
+        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(
             thread.last_message_updated_status,
             feedback_models.STATUS_CHOICES_IGNORED)
