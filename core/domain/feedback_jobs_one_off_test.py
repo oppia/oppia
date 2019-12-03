@@ -156,6 +156,41 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         outputs = [ast.literal_eval(s) for s in output_strs]
         return [(key, int(value)) for key, value in outputs]
 
+    def test_sample_usage(self):
+        fresh_thread_ids = (
+            [feedback_services.create_thread(
+                'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
+             feedback_services.create_thread(
+                'exploration', 'exp_id', self.editor_id, 'subject', 'message')])
+        stale_thread_ids = (
+            [feedback_services.create_thread(
+                'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
+             feedback_services.create_thread(
+                'exploration', 'exp_id', self.editor_id, 'subject', 'message')])
+        for thread_id in stale_thread_ids:
+            thread = (
+                feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+            # Forcibly clear the cache, it should get populated by the job.
+            thread.last_message_text = None
+            thread.last_message_author = None
+            thread.last_message_updated_status = (
+                feedback_models.STATUS_CHOICES_OPEN)
+            thread.put()
+
+        # The two stale threads should be updated by the job.
+        self.assertEqual(self._run_one_off_job(), [('Updated', 2)])
+
+        for thread_id in stale_thread_ids:
+            thread = (
+                feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
+            # The cache should now be fresh.
+            self.assertEqual(thread.last_message_text, 'message')
+            self.assertEqual(thread.last_message_author, self.EDITOR_USERNAME)
+            self.assertIsNone(thread.last_message_updated_status)
+
+        # Now that all caches are fresh, the job should not perform any updates.
+        self.assertEqual(self._run_one_off_job(), [])
+
     def test_update_to_text_cache_for_stale_cache_with_1_message(self):
         thread_id = feedback_services.create_thread(
             'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
