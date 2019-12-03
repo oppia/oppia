@@ -70,10 +70,11 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
 
 
 def tweak_yarn_executable():
-    """When run yarn on Windows, the file `yarn` will be excecuted (
-    even then command specified is `yarn.cmd`). While this file is a bash
-    script, so it can not be executed. To avoid the issue, we can rename
-    this file to `yarn.sh`.
+    """When yarn is run on Windows, the file yarn will be executed by default.
+    However, this file is a bash script, and can't be executed directly on
+    Windows. So, to prevent Windows automatically executing it by default
+    (while preserving the behavior on other systems), we rename it to yarn.sh
+    here.
     """
     origin_file = os.path.join(common.YARN_PATH, 'bin', 'yarn')
     if os.path.isfile(origin_file):
