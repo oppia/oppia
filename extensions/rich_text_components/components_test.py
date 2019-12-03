@@ -117,17 +117,17 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
     def test_concept_card_validation(self):
         """Tests concept card component validation."""
         valid_items = [{
-            'skill-summary-with-value':
+            'skill_summary-with-value':
                 '{\'id\': \'skill_id\', \'description\': '
                 '\'skill_description\'}',
         }]
         invalid_items = [{
-            'skill-summary-with-value': 'javascript:alert(5);',
+            'skill_summary-with-value': 'javascript:alert(5);',
             'text-with-value': 'Hello'
         }]
 
         self.check_validation(
-            components.ConceptCard, valid_items, invalid_items)
+            components.Conceptcard, valid_items, invalid_items)
 
     def test_math_validation(self):
         """Tests collapsible component validation."""

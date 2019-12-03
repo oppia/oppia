@@ -20,7 +20,7 @@ require('components/concept-card/concept-card.directive.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaNoninteractiveConceptCard', [
+angular.module('oppia').directive('oppiaNoninteractiveConceptcard', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
@@ -28,8 +28,8 @@ angular.module('oppia').directive('oppiaNoninteractiveConceptCard', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/ConceptCard/directives/' +
-        'concept-card.directive.html'),
+        '/rich_text_components/Conceptcard/directives/' +
+        'conceptcard.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$uibModal',

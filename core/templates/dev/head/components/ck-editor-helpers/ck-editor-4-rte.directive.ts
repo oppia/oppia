@@ -36,7 +36,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
-        var isLessonRelatedContext = (
+        var contextIsLessonRelated = (
           ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
         var canUseFs = (
@@ -50,7 +50,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||
             (!canUseFs && componentDefn.requiresFs) ||
-            (!isLessonRelatedContext && componentDefn.isLessonRelated))) {
+            (!contextIsLessonRelated && componentDefn.isLessonRelated))) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }

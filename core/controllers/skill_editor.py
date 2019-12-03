@@ -195,22 +195,40 @@ class SkillDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, action, comma_separated_skill_ids):
+    def get(self, comma_separated_skill_ids):
         """Populates the data on skill pages of the skill ids."""
 
-        if action == 'fetch_all':
-            skill_ids = (
-                topic_services.get_all_skill_ids_assigned_to_some_topic())
-        elif action == 'fetch_multi':
-            skill_ids = comma_separated_skill_ids.split(',')
-        else:
-            raise self.InvalidInputException
+        skill_ids = comma_separated_skill_ids.split(',')
 
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
         except Exception as e:
             raise self.PageNotFoundException('Invalid skill id.')
+        try:
+            skills = skill_services.get_multi_skills(skill_ids)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        skill_dicts = [skill.to_dict() for skill in skills]
+        self.values.update({
+            'skills': skill_dicts
+        })
+
+        self.render_json(self.values)
+
+
+class FetchSkillsHandler(base.BaseHandler):
+    """A handler for accessing all skills data."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Returns all skill IDs linked to some topic."""
+
+        skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
+
         try:
             skills = skill_services.get_multi_skills(skill_ids)
         except Exception as e:

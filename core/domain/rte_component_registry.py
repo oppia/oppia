@@ -93,8 +93,9 @@ class Registry(python_utils.OBJECT):
             for name, obj in inspect.getmembers(module):
                 if inspect.isclass(obj) and name == component_name:
                     component_types_to_component_classes[
-                        'oppia-noninteractive-%s' % component_name.lower()] = (
-                            obj)
+                        'oppia-noninteractive-%s' %
+                        utils.camelcase_to_hyphenated(component_name).lower()
+                    ] = obj
 
         return component_types_to_component_classes
 

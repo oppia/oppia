@@ -248,7 +248,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def setUp(self):
         super(SkillDataHandlerTest, self).setUp()
-        self.url = '%s/fetch_multi/%s,%s' % (
+        self.url = '%s/%s,%s' % (
             feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
         self.put_payload = {
             'version': 1,
@@ -269,11 +269,28 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.assertEqual(self.skill_id_2, json_response['skills'][1]['id'])
         self.logout()
 
-    def test_skill_data_handler_get_all_skills_linked_to_some_topic(self):
+    def test_skill_data_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
-        # Check that admins can access all linked skills data at the same time.
-        json_response = self.get_json(
-            '%s/fetch_all/%s' % (feconf.SKILL_DATA_URL_PREFIX, None))
+        # Check GET returns 404 when cannot get skill by id.
+        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.get_json(self.url, expected_status_int=404)
+        self.url = '%s/1,%s' % (
+            feconf.SKILL_DATA_URL_PREFIX, self.skill_id_2)
+        self.get_json(self.url, expected_status_int=404)
+        self.logout()
+
+
+class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for FetchSkillsHandler."""
+
+    def setUp(self):
+        super(FetchSkillsHandlerTest, self).setUp()
+        self.url = feconf.FETCH_SKILLS_URL_PREFIX
+
+    def test_skill_data_handler_get_multiple_skills(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check that admins can access two skills data at the same time.
+        json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
         self.assertEqual(len(json_response['skills']), 1)
         self.logout()

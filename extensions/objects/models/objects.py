@@ -335,16 +335,13 @@ class SanitizedUrl(BaseObject):
     }
 
 
-class ConceptCard(BaseObject):
-    """Concept Card class."""
+class SkillSelector(BaseObject):
+    """Skill selector class."""
 
     description = 'The skill summary for the concept card.'
 
     SCHEMA = {
         'type': 'unicode',
-        'validators': [{
-            'id': 'is_nonempty'
-        }],
         'ui_config': {
             'placeholder': 'Search for skill'
         }

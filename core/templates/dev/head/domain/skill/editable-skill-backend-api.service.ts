@@ -51,7 +51,6 @@ angular.module('oppia').factory('EditableSkillBackendApiService', [
     var _fetchMultiSkills = function(skillIds, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
         SKILL_DATA_URL_TEMPLATE, {
-          action: 'fetch_multi',
           comma_separated_skill_ids: skillIds.join(',')
         });
 

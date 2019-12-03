@@ -47,7 +47,7 @@ class BaseRteComponent(python_utils.OBJECT):
         'ListOfTabs': objects.ListOfTabs,
         'int': objects.Int,
         'bool': objects.Boolean,
-        'SkillSelector': objects.ConceptCard
+        'SkillSelector': objects.SkillSelector
     }
 
     @classmethod
@@ -122,8 +122,8 @@ class Link(BaseRteComponent):
     """Class for Link component."""
 
 
-class ConceptCard(BaseRteComponent):
-    """Class for Concept Card component."""
+class Conceptcard(BaseRteComponent):
+    """Class for Conceptcard component."""
 
 
 class Math(BaseRteComponent):

@@ -227,7 +227,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_vals = [3.0, {'a': 1}, [1, 2, 1], None]
 
         self.check_normalization(
-            objects.ConceptCard, mappings, invalid_vals)
+            objects.SkillSelector, mappings, invalid_vals)
 
     def test_sanitized_url_validation(self):
         mappings = [

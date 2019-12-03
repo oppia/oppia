@@ -31,8 +31,8 @@ angular.module('oppia').directive('skillSelectorEditor', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/skill-selector-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$http', 'SKILL_DATA_URL_TEMPLATE',
-        function($http, SKILL_DATA_URL_TEMPLATE) {
+      controller: ['$http', 'FETCH_SKILLS_URL_TEMPLATE',
+        function($http, FETCH_SKILLS_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.skills = [];
 
@@ -42,15 +42,7 @@ angular.module('oppia').directive('skillSelectorEditor', [
               description: skillDescription
             };
           };
-          var skillDataUrl = UrlInterpolationService.interpolateUrl(
-            SKILL_DATA_URL_TEMPLATE, {
-              action: 'fetch_all',
-              // When action is fetch_all, the second parameter is ignored, so
-              // a placeholder value is passed so that the correct handler is
-              // called.
-              comma_separated_skill_ids: 'None'
-            });
-          $http.get(skillDataUrl).then(function(response) {
+          $http.get(FETCH_SKILLS_URL_TEMPLATE).then(function(response) {
             ctrl.skills = angular.copy(response.data.skills);
           });
         }

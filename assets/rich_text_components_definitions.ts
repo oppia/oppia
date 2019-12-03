@@ -112,20 +112,20 @@ export = {
       "default_value": ""
     }]
   },
-  "ConceptCard": {
-    "backend_id": "concept-card",
+  "Conceptcard": {
+    "backend_id": "conceptcard",
     "category": "Basic Input",
     "description": "A link to the concept card of the linked skill.",
-    "frontend_id": "concept-card",
+    "frontend_id": "conceptcard",
     "tooltip": "Insert Concept Card Link",
-    "icon_data_url": "/rich_text_components/ConceptCard/Concept_Card.png",
+    "icon_data_url": "/rich_text_components/Conceptcard/Conceptcard.png",
     "is_complex": false,
     "requires_fs": false,
     "is_lesson_related": true,
     "is_block_element": false,
     "customization_arg_specs": [{
-      "name": "skill-summary",
-      "description": "",
+      "name": "skill_summary",
+      "description": "Click on skill to view concept card.",
       "schema": {
         "type": "custom",
         "obj_type": "SkillSelector"
