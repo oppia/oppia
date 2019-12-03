@@ -132,7 +132,7 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
 
 
 class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
-    """Tests for GeneralFeedbackThreadUser migration."""
+    """Tests for FeedbackThread cache population."""
 
     ONE_OFF_JOB_CLASS = feedback_jobs_one_off.FeedbackThreadCacheOneOffJob
 
