@@ -17,33 +17,32 @@
  * subtopic data domain objects.
  */
 
-angular.module('oppia').factory('SubtopicDataObjectFactory', [function() {
-    var SubtopicData = function(
-        subtopic_title, page_contents) {
-      this._subtopic_title = subtopic_title;
-      this._page_contents = page_contents;
-    };
-  
-    // Instance methods
-  
-    SubtopicData.prototype.getSubtopicTitle = function() {
-      return this._subtopic_title;
-    };
-  
-    SubtopicData.prototype.getPageContents = function() {
-      return this._page_contents;
-    };
-  
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicData['createFromBackendDict'] = function(subtopicDataBackendDict) {
+angular.module('oppia').factory('SubtopicDataObjectFactory', [function () {
+  var SubtopicData = function (
+    subtopic_title, page_contents) {
+    this._subtopic_title = subtopic_title;
+    this._page_contents = page_contents;
+  };
+
+  // Instance methods
+
+  SubtopicData.prototype.getSubtopicTitle = function () {
+    return this._subtopic_title;
+  };
+
+  SubtopicData.prototype.getPageContents = function () {
+    return this._page_contents;
+  };
+
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  SubtopicData['createFromBackendDict'] = function (subtopicDataBackendDict) {
     /* eslint-enable dot-notation */
-      return new SubtopicData(
-        subtopicDataBackendDict.subtopic_title,
-        subtopicDataBackendDict.page_contents,
-      );
-    };
-  
-    return SubtopicData;
-  }]);
-  
+    return new SubtopicData(
+      subtopicDataBackendDict.subtopic_title,
+      subtopicDataBackendDict.page_contents,
+    );
+  };
+
+  return SubtopicData;
+}]);

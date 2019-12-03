@@ -21,10 +21,10 @@ require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ajs.ts');
 require('domain/subtopic_viewer/SubtopicDataObjectFactory.ts');
 
 angular.module('oppia').factory('SubtopicViewerBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'SubtopicDataObjectFactory',
+  '$http', '$q', 'SubtopicDataObjectFactory', 'UrlInterpolationService',
   'SUBTOPIC_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, SubtopicDataObjectFactory,
-    SUBTOPIC_DATA_URL_TEMPLATE) {
+  function($http, $q, SubtopicDataObjectFactory, UrlInterpolationService,
+      SUBTOPIC_DATA_URL_TEMPLATE) {
     var subtopicDataDict = null;
     var subtopicDataObject = null;
     var _fetchSubtopicData = function(
