@@ -108,7 +108,8 @@ def _cache_last_message_author(thread, last_message):
         bool. Whether the cache was actually updated.
     """
     last_message_author = (
-        last_message and user_services.get_username(last_message.author_id))
+        last_message and last_message.author_id and
+        user_services.get_username(last_message.author_id))
     if thread.last_message_author != last_message_author:
         thread.last_message_author = last_message_author
         return True
