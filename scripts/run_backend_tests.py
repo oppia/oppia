@@ -91,10 +91,12 @@ DIRS_TO_ADD_TO_SYS_PATH = [
 
 # Explicitly pass all current environment variables into subprocess.
 # Otherwise, there will be dll error for running coverage. (For Windows)
+# pylint: disable=unicode-builtin
 SUBPROCESS_ENV = {
     k.encode('utf-8'): v.encode('utf-8') if isinstance(v, unicode) else v
     for k, v in os.environ.items()
 }
+# pylint: enable=unicode-builtin
 
 COVERAGE_DIR = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools', 'coverage-4.5.4')
