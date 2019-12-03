@@ -12,6 +12,9 @@ workflows:
       - frontend_tests:
           requires:
             - setup
+      - frontend_test_coverage:
+          requires:
+            - setup
       - backend_tests:
           requires:
             - setup
@@ -112,6 +115,21 @@ jobs:
             sudo pip install codecov
             codecov --file ../karma_coverage_reports/lcov.info -F frontend
           when: on_success
+
+  frontend_test_coverage:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - run:
+          <<: *install_dependencies
+      - run: date +%F > date
+      - restore_cache:
+          <<: *restore_cache
+      - run:
+          name: Check frontend test coverage
+          command: |
+            python -m scripts.check_frontend_test_coverage
+
 
   backend_tests:
     <<: *job_defaults
