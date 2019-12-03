@@ -24,6 +24,7 @@ from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import user_services
+from core.domain import state_domain
 from core.platform import models
 import feconf
 import python_utils
