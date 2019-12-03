@@ -72,8 +72,8 @@ angular.module('oppia').constant(
   TopicDomainConstants.TOPIC_PROPERTY_ABBREVIATED_NAME);
 
 angular.module('oppia').constant(
-  'TOPIC_PROPERTY_THUMBNAIL',
-  TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL);
+  'TOPIC_PROPERTY_THUMBNAIL_FILENAME',
+  TopicDomainConstants.TOPIC_PROPERTY_THUMBNAIL_FILENAME);
 
 angular.module('oppia').constant(
   'TOPIC_PROPERTY_DESCRIPTION',

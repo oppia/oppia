@@ -44,7 +44,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
 
     var ASSET_TYPE_AUDIO = 'audio';
     var ASSET_TYPE_IMAGE = 'image';
-    var ASSET_TYPE_THUMBNAIL = 'thumbnails';
+    var ASSET_TYPE_THUMBNAIL = 'thumbnail';
 
     var GCS_PREFIX = ('https://storage.googleapis.com/' +
       GCS_RESOURCE_BUCKET_NAME);
@@ -56,7 +56,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       '/<entity_type>/<entity_id>/assets/image/<filename>');
     var THUMBNAIL_DOWNLOAD_URL_TEMPLATE = (
       (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
-      '/<entity_type>/<entity_id>/assets/thumbnails/<filename>');
+      '/<entity_type>/<entity_id>/assets/thumbnail/<filename>');
 
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
@@ -291,7 +291,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
         return _getDownloadUrl(
           entityType, entityId, filename, ASSET_TYPE_IMAGE);
       },
-      getTopicThumbnailForPreview: function(entityType, entityId, filename) {
+      getTopicThumbnailUrlForPreview: function(entityType, entityId, filename) {
         return _getDownloadUrl(
           entityType, entityId, filename, ASSET_TYPE_THUMBNAIL);
       }

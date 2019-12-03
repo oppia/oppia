@@ -126,14 +126,14 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopicWithTitle = function(title, shortName) {
+  this.createTopicWithTitle = function(title, abbreviatedName) {
     waitFor.elementToBeClickable(
       createTopicButton,
       'Create Topic button takes too long to be clickable');
     createTopicButton.click();
 
     topicNameField.sendKeys(title);
-    abbreviatedTopicNameField.sendKeys(shortName);
+    abbreviatedTopicNameField.sendKeys(abbreviatedName);
     confirmTopicCreationButton.click();
     waitFor.pageToFullyLoad();
   };

@@ -435,10 +435,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_abbreviated_name('name')
         self.assertEqual(self.topic.abbreviated_name, 'name')
 
-    def test_update_thumbnail(self):
-        self.assertEqual(self.topic.thumbnail, None)
-        self.topic.update_thumbnail('img.png')
-        self.assertEqual(self.topic.thumbnail, 'img.png')
+    def test_update_thumbnail_filename(self):
+        self.assertEqual(self.topic.thumbnail_filename, None)
+        self.topic.update_thumbnail_filename('img.png')
+        self.assertEqual(self.topic.thumbnail_filename, 'img.png')
 
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):

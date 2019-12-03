@@ -54,7 +54,7 @@ describe('Topic object factory', function() {
     var sampleTopicBackendObject = {
       id: 'sample_topic_id',
       name: 'Topic name',
-      thumbnail: 'img.png',
+      thumbnail_filename: 'img.png',
       description: 'Topic description',
       version: 1,
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
@@ -95,7 +95,7 @@ describe('Topic object factory', function() {
 
   it('should validate the topic', function() {
     _sampleTopic.setName('');
-    _sampleTopic.setThumbnail(null);
+    _sampleTopic.setThumbnailFilename(null);
     _sampleTopic.addCanonicalStory('story_2');
     _sampleTopic.getSubtopics()[0].addSkill('skill_1');
 

@@ -67,6 +67,9 @@ angular.module('oppia').factory('TopicCreationService', [
           if (topic.topicName === '') {
             throw Error('Topic name cannot be empty');
           }
+          if (topic.abbreviatedTopicName === '') {
+            throw Error('Abbreviated name cannot be empty');
+          }
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
 

@@ -44,11 +44,11 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         }
       },
 
-      getTrustedResourceUrlForThumbnail: function(
+      getTrustedResourceUrlForThumbnailFilename: function(
           imageFileName, entityType, entityId) {
         var encodedFilepath = window.encodeURIComponent(imageFileName);
         return $sce.trustAsResourceUrl(
-          AssetsBackendApiService.getTopicThumbnailForPreview(
+          AssetsBackendApiService.getTopicThumbnailUrlForPreview(
             entityType, entityId, encodedFilepath));
       }
     };

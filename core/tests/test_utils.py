@@ -1410,8 +1410,9 @@ tags: []
             }])
 
     def save_new_topic(
-            self, topic_id, owner_id, name, abbreviated_name, thumbnail,
-            description, canonical_story_ids, additional_story_ids,
+            self, topic_id, owner_id, name, abbreviated_name,
+            thumbnail_filename, description,
+            canonical_story_ids, additional_story_ids,
             uncategorized_skill_ids, subtopics, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
@@ -1421,7 +1422,7 @@ tags: []
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated name of the topic.
-            thumbnail: str|None. The thumbnail of the topic.
+            thumbnail_filename: str|None. The thumbnail filename of the topic.
             description: str. The desscription of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -1447,7 +1448,7 @@ tags: []
             for story_id in additional_story_ids
         ]
         topic = topic_domain.Topic(
-            topic_id, name, abbreviated_name, thumbnail,
+            topic_id, name, abbreviated_name, thumbnail_filename,
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,

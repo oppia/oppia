@@ -161,7 +161,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         id=topic.id,
         name=topic.name,
         abbreviated_name=topic.abbreviated_name,
-        thumbnail=topic.thumbnail,
+        thumbnail_filename=topic.thumbnail_filename,
         canonical_name=topic.canonical_name,
         description=topic.description,
         language_code=topic.language_code,
@@ -311,8 +311,8 @@ def apply_change_list(topic_id, change_list):
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
                 elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_THUMBNAIL):
-                    topic.update_thumbnail(change.new_value)
+                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
+                    topic.update_thumbnail_filename(change.new_value)
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 subtopic_page_id = (
@@ -421,7 +421,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.description = topic.description
     topic_model.name = topic.name
     topic_model.abbreviated_name = topic.abbreviated_name
-    topic_model.thumbnail = topic.thumbnail
+    topic_model.thumbnail_filename = topic.thumbnail_filename
     topic_model.canonical_story_references = [
         reference.to_dict() for reference in topic.canonical_story_references
     ]

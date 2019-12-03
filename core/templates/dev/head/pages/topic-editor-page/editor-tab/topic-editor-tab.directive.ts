@@ -60,15 +60,17 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
             var placeholderImageUrl = '/icons/story-image-icon.png';
-            if (!$scope.topic.getThumbnail()) {
+            if (!$scope.topic.getThumbnailFilename()) {
               $scope.editableThumbnailDataUrl = (
                 UrlInterpolationService.getStaticImageUrl(
                   placeholderImageUrl));
             } else {
               $scope.editableThumbnailDataUrl = (
-                ImageUploadHelperService.getTrustedResourceUrlForThumbnail(
-                  $scope.topic.getThumbnail(), ContextService.getEntityType(),
-                  ContextService.getEntityId()));
+                ImageUploadHelperService
+                  .getTrustedResourceUrlForThumbnailFilename(
+                    $scope.topic.getThumbnailFilename(),
+                    ContextService.getEntityType(),
+                    ContextService.getEntityId()));
             }
 
             $scope.editableDescriptionIsEmpty = (
@@ -83,7 +85,7 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
-          var saveTopicThumbnail = function(imageURI) {
+          var saveTopicThumbnailUrl = function(imageURI) {
             let resampledFile = null;
             resampledFile = (
               ImageUploadHelperService.convertImageDataToImageFile(
@@ -100,7 +102,7 @@ angular.module('oppia').directive('topicEditorTab', [
             form.append('image', resampledFile);
             form.append('payload', JSON.stringify({
               filename: tempImageName,
-              filename_prefix: 'thumbnails'
+              filename_prefix: 'thumbnail'
             }));
             var imageUploadUrlTemplate = '/createhandler/imageupload/' +
               '<entity_type>/<entity_id>';
@@ -125,9 +127,10 @@ angular.module('oppia').directive('topicEditorTab', [
                 dataType: 'text'
               }).done(function(data) {
                 $scope.editableThumbnailDataUrl = (
-                  ImageUploadHelperService.getTrustedResourceUrlForThumbnail(
-                    data.filename, ContextService.getEntityType(),
-                    ContextService.getEntityId()));
+                  ImageUploadHelperService
+                    .getTrustedResourceUrlForThumbnailFilename(
+                      data.filename, ContextService.getEntityType(),
+                      ContextService.getEntityId()));
               }).fail(function(data) {
                 // Remove the XSSI prefix.
                 var transformedData = data.responseText.substring(5);
@@ -195,8 +198,8 @@ angular.module('oppia').directive('topicEditorTab', [
               ]
             }).result.then(function(newThumbnailDataUrl) {
               $scope.editableThumbnailDataUrl = newThumbnailDataUrl;
-              $scope.updateTopicThumbnail(tempImageName);
-              saveTopicThumbnail(newThumbnailDataUrl);
+              $scope.updateTopicThumbnailFilename(tempImageName);
+              saveTopicThumbnailUrl(newThumbnailDataUrl);
             });
           };
 
@@ -243,12 +246,12 @@ angular.module('oppia').directive('topicEditorTab', [
               $scope.topic, newAbbreviatedName);
           };
 
-          $scope.updateTopicThumbnail = function(newThumbnailName) {
-            if (newThumbnailName === $scope.topic.getThumbnail()) {
+          $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {
+            if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
               return;
             }
-            TopicUpdateService.setThumbnail(
-              $scope.topic, newThumbnailName);
+            TopicUpdateService.setThumbnailFilename(
+              $scope.topic, newThumbnailFilename);
           };
 
           $scope.updateTopicDescription = function(newDescription) {

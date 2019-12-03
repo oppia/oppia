@@ -445,7 +445,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'new_value': 'short name'
         }), topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL,
+            'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
             'old_value': '',
             'new_value': 'thumbnail.png'
         })]
@@ -456,7 +456,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.description, 'New Description')
         self.assertEqual(topic.abbreviated_name, 'short name')
-        self.assertEqual(topic.thumbnail, 'thumbnail.png')
+        self.assertEqual(topic.thumbnail_filename, 'thumbnail.png')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic_summary.version, 3)
 

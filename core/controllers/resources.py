@@ -52,7 +52,7 @@ class AssetDevHandler(base.BaseHandler):
     image and audio files are served from GCS).
     """
 
-    _SUPPORTED_TYPES = ['image', 'audio', 'thumbnails']
+    _SUPPORTED_TYPES = ['image', 'audio', 'thumbnail']
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

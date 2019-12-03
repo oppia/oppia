@@ -30,7 +30,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
         id, name, abbreviatedName, description, languageCode,
         canonicalStoryReferences, additionalStoryReferences,
         uncategorizedSkillIds, nextSubtopicId, version, subtopics,
-        skillIdToDescriptionMap, thumbnail) {
+        skillIdToDescriptionMap, thumbnailFilename) {
       this._id = id;
       this._name = name;
       this._abbreviatedName = abbreviatedName;
@@ -46,7 +46,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
       this._nextSubtopicId = nextSubtopicId;
       this._version = version;
       this._subtopics = angular.copy(subtopics);
-      this._thumbnail = thumbnail;
+      this._thumbnailFilename = thumbnailFilename;
     };
 
     // Instance methods
@@ -71,12 +71,12 @@ angular.module('oppia').factory('TopicObjectFactory', [
       this._abbreviatedName = abbreviatedName;
     };
 
-    Topic.prototype.setThumbnail = function(thumbnail) {
-      this._thumbnail = thumbnail;
+    Topic.prototype.setThumbnailFilename = function(thumbnailFilename) {
+      this._thumbnailFilename = thumbnailFilename;
     };
 
-    Topic.prototype.getThumbnail = function() {
-      return this._thumbnail;
+    Topic.prototype.getThumbnailFilename = function() {
+      return this._thumbnailFilename;
     };
 
     Topic.prototype.getDescription = function() {
@@ -113,7 +113,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
         issues.push('Abbreviated name should not be empty');
       }
 
-      if (!this._thumbnail) {
+      if (!this._thumbnailFilename) {
         issues.push('Topic should have a thumbnail.');
       }
 
@@ -369,7 +369,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
       this._id = otherTopic.getId();
       this.setName(otherTopic.getName());
       this.setAbbreviatedName(otherTopic.getAbbreviatedName());
-      this.setThumbnail(otherTopic.getThumbnail());
+      this.setThumbnailFilename(otherTopic.getThumbnailFilename());
       this.setDescription(otherTopic.getDescription());
       this.setLanguageCode(otherTopic.getLanguageCode());
       this._version = otherTopic.getVersion();
@@ -418,7 +418,8 @@ angular.module('oppia').factory('TopicObjectFactory', [
         topicBackendDict.language_code, canonicalStoryReferences,
         additionalStoryReferences, topicBackendDict.uncategorized_skill_ids,
         topicBackendDict.next_subtopic_id, topicBackendDict.version,
-        subtopics, skillIdToDescriptionDict, topicBackendDict.thumbnail
+        subtopics, skillIdToDescriptionDict,
+        topicBackendDict.thumbnail_filename
       );
     };
 

@@ -42,7 +42,7 @@ ROLE_NONE = 'none'
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'
 TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name'
-TOPIC_PROPERTY_THUMBNAIL = 'thumbnail'
+TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
@@ -100,7 +100,7 @@ class TopicChange(change_domain.BaseChange):
         TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
         TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
         TOPIC_PROPERTY_LANGUAGE_CODE,
-        TOPIC_PROPERTY_THUMBNAIL)
+        TOPIC_PROPERTY_THUMBNAIL_FILENAME)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
@@ -375,7 +375,7 @@ class Topic(python_utils.OBJECT):
     """Domain object for an Oppia Topic."""
 
     def __init__(
-            self, topic_id, name, abbreviated_name, thumbnail,
+            self, topic_id, name, abbreviated_name, thumbnail_filename,
             description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids,
             subtopics, subtopic_schema_version,
@@ -388,7 +388,7 @@ class Topic(python_utils.OBJECT):
             topic_id: str. The unique ID of the topic.
             name: str. The name of the topic.
             abbreviated_name: str. The abbreviated topic name.
-            thumbnail: str|None. The thumbnail of the topic.
+            thumbnail_filename: str|None. The thumbnail filename of the topic.
             description: str. The description of the topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
@@ -416,7 +416,7 @@ class Topic(python_utils.OBJECT):
         self.id = topic_id
         self.name = name
         self.abbreviated_name = abbreviated_name
-        self.thumbnail = thumbnail
+        self.thumbnail_filename = thumbnail_filename
         self.canonical_name = name.lower()
         self.description = description
         self.canonical_story_references = canonical_story_references
@@ -466,7 +466,7 @@ class Topic(python_utils.OBJECT):
             'id': self.id,
             'name': self.name,
             'abbreviated_name': self.abbreviated_name,
-            'thumbnail': self.thumbnail,
+            'thumbnail_filename': self.thumbnail_filename,
             'description': self.description,
             'canonical_story_references': [
                 reference.to_dict()
@@ -711,11 +711,11 @@ class Topic(python_utils.OBJECT):
         """
         self.require_valid_name(self.name)
         self.require_valid_abbreviated_name(self.abbreviated_name)
-        if self.thumbnail is not None and not (
-                isinstance(self.thumbnail, python_utils.BASESTRING)):
+        if self.thumbnail_filename is not None and not (
+                isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
             raise utils.ValidationError(
-                'Expected thumbnail to be a string, received %s'
-                % self.thumbnail)
+                'Expected thumbnail filename to be a string, received %s'
+                % self.thumbnail_filename)
         if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
@@ -898,14 +898,14 @@ class Topic(python_utils.OBJECT):
         """
         self.abbreviated_name = new_abbreviated_name
 
-    def update_thumbnail(self, new_thumbnail):
-        """Updates the thumbnail of a topic object.
+    def update_thumbnail_filename(self, new_thumbnail_filename):
+        """Updates the thumbnail filename of a topic object.
 
         Args:
-            new_thumbnail: str|None. The updated thumbnail
+            new_thumbnail_filename: str|None. The updated thumbnail filename
             for the topic.
         """
-        self.thumbnail = new_thumbnail
+        self.thumbnail_filename = new_thumbnail_filename
 
     def update_description(self, new_description):
         """Updates the description of a topic object.
