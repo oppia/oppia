@@ -20,39 +20,32 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require(
-  'pages/exploration-editor-page/improvements-tab/services/' +
-  'improvements-display.service.ts');
+import { ExplorationEditorPageConstants } from
+  'pages/exploration-editor-page/exploration-editor-page.constants';
+/* eslint-disable max-len */
+import { ImprovementsDisplayService } from
+  'pages/exploration-editor-page/improvements-tab/services/improvements-display.service';
+/* eslint-enable max-len */
 
 describe('ImprovementsDisplayService', function() {
-  var $httpBackend = null;
-  var ImprovementsDisplayService = null;
+  var ids = null;
   var STATUS_COMPLIMENT = null;
   var STATUS_FIXED = null;
   var STATUS_IGNORED = null;
   var STATUS_NOT_ACTIONABLE = null;
   var STATUS_OPEN = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function(
-      _$httpBackend_, _ImprovementsDisplayService_,
-      _STATUS_COMPLIMENT_, _STATUS_FIXED_, _STATUS_IGNORED_,
-      _STATUS_NOT_ACTIONABLE_, _STATUS_OPEN_) {
-    $httpBackend = _$httpBackend_;
-    ImprovementsDisplayService = _ImprovementsDisplayService_;
-    STATUS_COMPLIMENT = _STATUS_COMPLIMENT_;
-    STATUS_FIXED = _STATUS_FIXED_;
-    STATUS_IGNORED = _STATUS_IGNORED_;
-    STATUS_NOT_ACTIONABLE = _STATUS_NOT_ACTIONABLE_;
-    STATUS_OPEN = _STATUS_OPEN_;
-  }));
+  beforeEach(() => {
+    ids = TestBed.get(ImprovementsDisplayService);
+    STATUS_COMPLIMENT = ExplorationEditorPageConstants.STATUS_COMPLIMENT;
+    STATUS_FIXED = ExplorationEditorPageConstants.STATUS_FIXED;
+    STATUS_IGNORED = ExplorationEditorPageConstants.STATUS_IGNORED;
+    STATUS_NOT_ACTIONABLE = (
+      ExplorationEditorPageConstants.STATUS_NOT_ACTIONABLE);
+    STATUS_OPEN = ExplorationEditorPageConstants.STATUS_OPEN;
+  });
 
   describe('STATUS_OPEN', function() {
     beforeEach(function() {
@@ -60,16 +53,16 @@ describe('ImprovementsDisplayService', function() {
     });
 
     it('is open', function() {
-      expect(ImprovementsDisplayService.isOpen(this.status)).toBe(true);
+      expect(ids.isOpen(this.status)).toBe(true);
     });
 
     it('uses info badge', function() {
-      expect(ImprovementsDisplayService.getStatusCssClass(this.status))
+      expect(ids.getStatusCssClass(this.status))
         .toEqual('badge badge-info');
     });
 
     it('has a nice name', function() {
-      expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
+      expect(ids.getHumanReadableStatus(this.status))
         .toEqual('Open');
     });
   });
@@ -80,16 +73,16 @@ describe('ImprovementsDisplayService', function() {
     });
 
     it('is not open', function() {
-      expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
+      expect(ids.isOpen(this.status)).toBe(false);
     });
 
     it('uses default badge', function() {
-      expect(ImprovementsDisplayService.getStatusCssClass(this.status))
+      expect(ids.getStatusCssClass(this.status))
         .toEqual('badge badge-default');
     });
 
     it('has a nice name', function() {
-      expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
+      expect(ids.getHumanReadableStatus(this.status))
         .toEqual('Fixed');
     });
   });
@@ -100,16 +93,16 @@ describe('ImprovementsDisplayService', function() {
     });
 
     it('is not open', function() {
-      expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
+      expect(ids.isOpen(this.status)).toBe(false);
     });
 
     it('uses default badge', function() {
-      expect(ImprovementsDisplayService.getStatusCssClass(this.status))
+      expect(ids.getStatusCssClass(this.status))
         .toEqual('badge badge-default');
     });
 
     it('has a nice name', function() {
-      expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
+      expect(ids.getHumanReadableStatus(this.status))
         .toEqual('Ignored');
     });
   });
@@ -120,16 +113,16 @@ describe('ImprovementsDisplayService', function() {
     });
 
     it('is not open', function() {
-      expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
+      expect(ids.isOpen(this.status)).toBe(false);
     });
 
     it('uses success badge', function() {
-      expect(ImprovementsDisplayService.getStatusCssClass(this.status))
+      expect(ids.getStatusCssClass(this.status))
         .toEqual('badge badge-success');
     });
 
     it('has a nice name', function() {
-      expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
+      expect(ids.getHumanReadableStatus(this.status))
         .toEqual('Compliment');
     });
   });
@@ -140,16 +133,16 @@ describe('ImprovementsDisplayService', function() {
     });
 
     it('is not open', function() {
-      expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
+      expect(ids.isOpen(this.status)).toBe(false);
     });
 
     it('uses default badge', function() {
-      expect(ImprovementsDisplayService.getStatusCssClass(this.status))
+      expect(ids.getStatusCssClass(this.status))
         .toEqual('badge badge-default');
     });
 
     it('has a nice name', function() {
-      expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
+      expect(ids.getHumanReadableStatus(this.status))
         .toEqual('Not Actionable');
     });
   });
@@ -160,16 +153,16 @@ describe('ImprovementsDisplayService', function() {
     });
 
     it('is not open', function() {
-      expect(ImprovementsDisplayService.isOpen(this.status)).toBe(false);
+      expect(ids.isOpen(this.status)).toBe(false);
     });
 
     it('uses default badge', function() {
-      expect(ImprovementsDisplayService.getStatusCssClass(this.status))
+      expect(ids.getStatusCssClass(this.status))
         .toEqual('badge badge-default');
     });
 
     it('has an empty name', function() {
-      expect(ImprovementsDisplayService.getHumanReadableStatus(this.status))
+      expect(ids.getHumanReadableStatus(this.status))
         .toEqual('');
     });
   });
