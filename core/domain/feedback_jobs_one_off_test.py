@@ -157,16 +157,18 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         return [(key, int(value)) for key, value in outputs]
 
     def test_sample_usage(self):
-        fresh_thread_ids = (
-            [feedback_services.create_thread(
+        fresh_thread_ids = [
+            feedback_services.create_thread(
                 'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
-             feedback_services.create_thread(
-                'exploration', 'exp_id', self.editor_id, 'subject', 'message')])
-        stale_thread_ids = (
-            [feedback_services.create_thread(
+            feedback_services.create_thread(
                 'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
-             feedback_services.create_thread(
-                'exploration', 'exp_id', self.editor_id, 'subject', 'message')])
+        ]
+        stale_thread_ids = [
+            feedback_services.create_thread(
+                'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
+            feedback_services.create_thread(
+                'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
+        ]
         for thread_id in stale_thread_ids:
             thread = (
                 feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
