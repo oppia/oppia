@@ -248,7 +248,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def setUp(self):
         super(SkillDataHandlerTest, self).setUp()
-        self.url = '%s/%s,%s' % (
+        self.url = '%s/fetch_multi/%s,%s' % (
             feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
         self.put_payload = {
             'version': 1,
@@ -267,6 +267,15 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
         self.assertEqual(self.skill_id_2, json_response['skills'][1]['id'])
+        self.logout()
+
+    def test_skill_data_handler_get_all_skills_linked_to_some_topic(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check that admins can access all linked skills data at the same time.
+        json_response = self.get_json(
+            '%s/fetch_all/%s' % (feconf.SKILL_DATA_URL_PREFIX, None))
+        self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
+        self.assertEqual(len(json_response['skills']), 1)
         self.logout()
 
     def test_skill_data_handler_get_fails(self):

@@ -43,7 +43,6 @@ angular.module('oppia').directive('conceptCard', [
           var currentConceptCard = null;
           var numberOfWorkedExamplesShown = 0;
           ctrl.loadingMessage = 'Loading';
-
           ConceptCardBackendApiService.loadConceptCards(
             ctrl.getSkillIds()
           ).then(function(conceptCardBackendDicts) {

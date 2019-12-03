@@ -26,6 +26,9 @@ require(
   'rich_text_components/Link/directives/' +
   'oppia-noninteractive-link.directive.ts');
 require(
+  'rich_text_components/ConceptCard/directives/' +
+  'oppia-noninteractive-concept-card.directive.ts');
+require(
   'rich_text_components/Math/directives/' +
   'oppia-noninteractive-math.directive.ts');
 require(

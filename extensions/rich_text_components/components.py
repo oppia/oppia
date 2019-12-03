@@ -46,7 +46,8 @@ class BaseRteComponent(python_utils.OBJECT):
         'MathLatexString': objects.MathLatexString,
         'ListOfTabs': objects.ListOfTabs,
         'int': objects.Int,
-        'bool': objects.Boolean
+        'bool': objects.Boolean,
+        'SkillSelector': objects.ConceptCard
     }
 
     @classmethod
@@ -119,6 +120,10 @@ class Image(BaseRteComponent):
 
 class Link(BaseRteComponent):
     """Class for Link component."""
+
+
+class ConceptCard(BaseRteComponent):
+    """Class for Concept Card component."""
 
 
 class Math(BaseRteComponent):

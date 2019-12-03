@@ -22,6 +22,7 @@ from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 import feconf
 import utils
@@ -194,10 +195,16 @@ class SkillDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, comma_separated_skill_ids):
+    def get(self, action, comma_separated_skill_ids):
         """Populates the data on skill pages of the skill ids."""
 
-        skill_ids = comma_separated_skill_ids.split(',')
+        if action == 'fetch_all':
+            skill_ids = (
+                topic_services.get_all_skill_ids_assigned_to_some_topic())
+        elif action == 'fetch_multi':
+            skill_ids = comma_separated_skill_ids.split(',')
+        else:
+            raise self.InvalidInputException
 
         try:
             for skill_id in skill_ids:
