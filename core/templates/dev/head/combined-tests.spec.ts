@@ -49,10 +49,10 @@ getTestBed().initTestEnvironment(
 // Then we find all the tests, as well as any controller, directive,
 // service/factory files.
 // All files from the services_sources folder are exempted, because they
-// shouldn't be tested(those files are just intended as data files for backend
+// shouldn't be tested (those files are just intended as data files for backend
 // tests).
-// Note that known failing files are exempted;
-// corresponding issue -> https://github.com/oppia/oppia/issues/6960).
+// Note that known failing files are exempted.
+// corresponding issue -> https://github.com/oppia/oppia/issues/6960.
 // TODO(YashJipkate): Fix the tests that broke down after introduction of
 // Webpack due to templateCache.
 /* eslint-disable max-len */
