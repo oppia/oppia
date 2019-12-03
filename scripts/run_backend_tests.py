@@ -504,18 +504,15 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.Popen(
-            ['python', '-m', 'coverage', 'combine'])
+        subprocess.check_call(['python', '-m', 'coverage', 'combine'])
         process = subprocess.Popen(
             ['python', '-m', 'coverage', 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
              % common.OPPIA_TOOLS_DIR, '--show-missing'],
             stdout=subprocess.PIPE)
 
-        report_stdout = process.stdout.read()
+        report_stdout, _ = process.communicate()
         python_utils.PRINT(report_stdout)
-        python_utils.PRINT(
-            'Files that are not listed have complete coverage.')
 
         python_utils.PRINT('Generating xml coverage report...')
         subprocess.check_call(['python', '-m', 'coverage', 'xml'])
