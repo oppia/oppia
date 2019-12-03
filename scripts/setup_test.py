@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import os
+import subprocess
 import sys
 import tarfile
 
@@ -34,6 +35,18 @@ from . import setup
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNTAR_PATH = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.tar.gz')
+
+
+class MockCD(python_utils.OBJECT):
+    """Mock for context manager for changing the current working directory."""
+    def __init__(self, unused_new_path):
+        pass
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, unused_arg1, unused_arg2, unused_arg3):
+        pass
 
 
 class SetupTests(test_utils.GenericTestBase):
@@ -90,6 +103,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         self.delete_swap = self.swap(clean, 'delete_file', mock_delete_file)
         self.get_swap = self.swap(os.environ, 'get', mock_get)
+        self.cd_swap = self.swap(common, 'CD', MockCD)
 
     def test_create_directory_tree_with_missing_dir(self):
         check_function_calls = {
@@ -284,21 +298,27 @@ class SetupTests(test_utils.GenericTestBase):
             return ['Darwin', 'info1', 'info2', 'info3', 'x86']
         def mock_exists(unused_path):
             return False
+        all_cmd_tokens = []
+        def mock_check_call(cmd_tokens):
+            all_cmd_tokens.extend(cmd_tokens)
         uname_swap = self.swap(os, 'uname', mock_uname)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.chown_swap:
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
+                    with self.cd_swap, check_call_swap:
+                        setup.main(args=[])
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
                 'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-darwin-x86.tar.gz',
+                '.tar.gz',
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v1.17.3/yarn-v1.17.3.tar.gz'])
+        self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
     def test_package_install_with_linux_x64(self):
         def mock_uname():
@@ -326,21 +346,27 @@ class SetupTests(test_utils.GenericTestBase):
             return ['Linux', 'info1', 'info2', 'info3', 'x86']
         def mock_exists(unused_path):
             return False
+        all_cmd_tokens = []
+        def mock_check_call(cmd_tokens):
+            all_cmd_tokens.extend(cmd_tokens)
         uname_swap = self.swap(os, 'uname', mock_uname)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
         with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.chown_swap:
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
+                    with self.cd_swap, check_call_swap:
+                        setup.main(args=[])
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
                 'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-linux-x86.tar.gz',
+                '.tar.gz',
                 'https://github.com/yarnpkg/yarn/releases/download/'
                 'v1.17.3/yarn-v1.17.3.tar.gz'])
+        self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
     def test_chrome_bin_setup_with_travis_var_set(self):
         def mock_get(unused_var):
