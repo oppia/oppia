@@ -39,6 +39,12 @@ export class UtilsService {
 
   isEquivalent(a: any, b: any): boolean {
     // Create arrays of property names.
+    if (typeof a !== typeof b) {
+      return false;
+    }
+    if (typeof a !== 'object') {
+      return a === b;
+    }
     var aProps = Object.getOwnPropertyNames(a);
     var bProps = Object.getOwnPropertyNames(b);
     if (aProps.length !== bProps.length) {
@@ -46,15 +52,7 @@ export class UtilsService {
     }
     for (var i = 0; i < aProps.length; i++) {
       var propName = aProps[i];
-      if (typeof a[propName] !== typeof b[propName]) {
-        return false;
-      } else if (
-        typeof a[propName] === 'object' && !this.isEquivalent(
-          a[propName], b[propName])) {
-        return false;
-      } else if (
-        typeof a[propName] !== 'object' && (
-          a[propName] !== b[propName])) {
+      if (!this.isEquivalent(a[propName], b[propName])) {
         return false;
       }
     }

@@ -31,8 +31,16 @@ export class StatePropertyService {
   // The name of the setter method in ExplorationStatesService for this
   // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
   setterMethodKey: string;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of displayed depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of displayed according to that.
   displayed: any;
   stateName: string;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of savedMemento depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of savedMemento according to that.
   savedMemento: any;
 
   constructor(private alertsService: AlertsService,

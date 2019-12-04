@@ -22,7 +22,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { UtilsService } from 'services/utils.service';
 import { AppConstants } from 'app.constants';
 
 @Injectable({
