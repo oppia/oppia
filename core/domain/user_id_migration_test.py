@@ -673,7 +673,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             **migrated_rights_snapshot_model.content)
         self.assertEqual(self.USER_1_USER_ID, migrated_rights_model.creator_id)
 
-    def test_migrate_question_rights_snapshot_model_wrong_id(self):
+    def test_migrate_skill_rights_snapshot_model_wrong_id(self):
         original_rights_model = skill_models.SkillRightsModel(
             id=self.SNAPSHOT_ID,
             creator_id=self.WRONG_GAE_ID)

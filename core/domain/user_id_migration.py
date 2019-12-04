@@ -34,6 +34,7 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 class MissingUserException(Exception):
+    """Exception for cases when the user doesn't exist."""
     pass
 
 
@@ -52,6 +53,9 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             model_class: class. The class of the migrated model.
             old_user_id: str. The old (GAE) ID of the user being migrated.
             new_user_id: str. The newly generated ID of the user being migrated.
+
+        Returns:
+            optional((str, (str, str)).
         """
         old_model = model_class.get_by_id(old_user_id)
         if not old_model:
@@ -136,8 +140,10 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 continue
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.COPY):
-                UserIdMigrationJob._copy_model_with_new_id(
+                output = UserIdMigrationJob._copy_model_with_new_id(
                     model_class, old_user_id, new_user_id)
+                if output:
+                    yield output
             elif (model_class.get_user_id_migration_policy() ==
                   base_models.USER_ID_MIGRATION_POLICY.
                   COPY_AND_UPDATE_ONE_FIELD):
@@ -165,6 +171,17 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _replace_gae_ids(gae_ids):
+        """Replace GAE IDs with user IDs in list.
+
+        Args:
+            gae_ids: list(str). GAE IDs which should be replaced.
+
+        Returns:
+            list(str). New user IDs.
+
+        Raises:
+            MissingUserException: UserSettingsModel with GAE ID doesn't exist.
+        """
         new_ids = []
         for gae_id in gae_ids:
             if gae_id == feconf.SYSTEM_COMMITTER_ID:
@@ -242,7 +259,7 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             **rights_snapshot_model.content)
         if reconstituted_rights_model.creator_id != feconf.SYSTEM_COMMITTER_ID:
             user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-                    reconstituted_rights_model.creator_id)
+                reconstituted_rights_model.creator_id)
             if not user_settings_model:
                 raise MissingUserException(
                     reconstituted_rights_model.creator_id)
