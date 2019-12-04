@@ -314,9 +314,9 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread.subject = 'Feedback'
         thread.has_suggestion = False
         thread.message_count = 0
-        thread.last_message_updated_status = feedback_models.STATUS_CHOICES_OPEN
         thread.last_message_text = 'non-existing message text'
         thread.last_message_author = self.EDITOR_USERNAME
+        thread.last_message_updated_status = feedback_models.STATUS_CHOICES_OPEN
         thread.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
