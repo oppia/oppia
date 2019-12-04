@@ -52,6 +52,14 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
     USER_D_EMAIL = 'd@example.com'
     USER_D_USERNAME = 'd'
 
+    def _get_migrated_model_ids(self, job_output):
+        """Get successfully migrated model IDs."""
+        for item in job_output:
+            if item[0] == 'SUCCESS':
+                migrated_model_ids = sorted(item[1], key=lambda item: item[0])
+                migrated_model_ids = [item[1] for item in migrated_model_ids]
+        return migrated_model_ids
+
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = user_id_migration.UserIdMigrationJob.create_new()
@@ -65,13 +73,9 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         eval_output = []
         for stringified_item in stringified_output:
             items = ast.literal_eval(stringified_item)
-            if items[0] == 'SUCCESS':
-                user_ids = [ast.literal_eval(item) for item in items[1]]
-                eval_output.append([items[0], user_ids])
-        migrated_model_ids = sorted(
-            [item for item in eval_output[0][1]], key=lambda item: item[0])
-        migrated_model_ids = [item[1] for item in migrated_model_ids]
-        return migrated_model_ids
+            user_ids = [ast.literal_eval(item) for item in items[1]]
+            eval_output.append([items[0], user_ids])
+        return eval_output
 
     def setUp(self):
         def empty(*_):
@@ -84,6 +88,11 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
 
+    def test_repeated_migration(self):
+        self._run_one_off_job()
+        output = self._run_one_off_job()
+        self.assertIn(['ALREADY DONE', [(self.user_a_id, '')]], output)
+
     def test_one_user_one_model_full_id(self):
         original_model = user_models.CompletedActivitiesModel(
             id=self.user_a_id,
@@ -91,7 +100,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             collection_ids=['1', '2'])
         original_model.put()
 
-        migrated_model_ids = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
         migrated_model = (
             user_models.CompletedActivitiesModel.get_by_id(
                 migrated_model_ids[0]))
@@ -133,7 +143,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.id)
 
-        migrated_model_ids = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
         for i, model_id in enumerate(migrated_model_ids):
             migrated_model = (
                 user_models.CompletedActivitiesModel.get_by_id(model_id))
@@ -166,7 +177,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             last_played_state_name='start')
         original_model.put()
 
-        migrated_model_ids = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
 
         migrated_model = (
             user_models.ExpUserLastPlaythroughModel.get_by_id(
@@ -201,7 +213,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         )
         original_model.put()
 
-        migrated_model_ids = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
 
         migrated_model = (
             user_models.UserContributionScoringModel.get_by_id(
@@ -253,7 +266,9 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.user_id)
 
-        migrated_model_ids = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
+
         for i, model_id in enumerate(migrated_model_ids):
             migrated_model = (
                 user_models.ExpUserLastPlaythroughModel.get_by_id(
@@ -313,7 +328,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.user_id)
 
-        migrated_model_ids = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
         for i, model_id in enumerate(migrated_model_ids):
             migrated_model = (
                 user_models.UserContributionScoringModel.get_by_id(
@@ -343,7 +359,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
             commit_cmds=[{'cmd': 'some_command'}])
         original_model.put()
 
-        migrated_model_ids = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
 
         migrated_model = (
             exp_models.ExplorationSnapshotMetadataModel.query(
@@ -395,7 +412,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         original_models[-1].put()
         original_models.sort(key=lambda model: model.committer_id)
 
-        migrated_model_ids = self._run_one_off_job()
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
         for i, model_id in enumerate(migrated_model_ids):
             migrated_model = (
                 exp_models.ExplorationSnapshotMetadataModel.query(
@@ -921,9 +939,19 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             id=self.USER_1_GAE_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']).put()
+        user_models.CompletedActivitiesModel(
+            id=feconf.SYSTEM_COMMITTER_ID,
+            exploration_ids=['1', '2'],
+            collection_ids=['1', '2']).put()
         user_models.ExpUserLastPlaythroughModel(
             id='%s.%s' % (self.USER_2_GAE_ID, 'exp_id'),
             user_id=self.USER_2_GAE_ID,
+            exploration_id='exp_id',
+            last_played_exp_version=2,
+            last_played_state_name='start').put()
+        user_models.ExpUserLastPlaythroughModel(
+            id='%s.%s' % (feconf.SYSTEM_COMMITTER_ID, 'exp_id'),
+            user_id=feconf.SYSTEM_COMMITTER_ID,
             exploration_id='exp_id',
             last_played_exp_version=2,
             last_played_state_name='start').put()
@@ -934,26 +962,55 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             score=1.5,
             has_email_been_sent=False).put()
         exp_models.ExplorationSnapshotMetadataModel(
-            id='instance_id',
+            id='exp_1_id',
             committer_id=self.USER_2_GAE_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]).put()
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='exp_2_id',
+            committer_id=feconf.SYSTEM_COMMITTER_ID,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]).put()
+        topic_models.TopicRightsModel.put_multi([
+            topic_models.TopicRightsModel(
+                id='topic_1_id',
+                manager_ids=[self.USER_1_GAE_ID])])
+        topic_models.TopicRightsModel.put_multi([
+            topic_models.TopicRightsModel(
+                id='topic_2_id',
+                manager_ids=[feconf.SYSTEM_COMMITTER_ID])])
 
         output = self._run_one_off_job()
         self.assertIn(
             ['FAILURE - CompletedActivitiesModel', [self.USER_1_GAE_ID]],
             output)
         self.assertIn(
+            ['SUCCESS - CompletedActivitiesModel', 1],
+            output)
+        self.assertIn(
             ['FAILURE - ExpUserLastPlaythroughModel',
              ['%s.%s' % (self.USER_2_GAE_ID, 'exp_id')]],
+            output)
+        self.assertIn(
+            ['SUCCESS - ExpUserLastPlaythroughModel', 1],
             output)
         self.assertIn(
             ['FAILURE - UserContributionScoringModel',
              ['%s.%s' % ('category', self.USER_2_GAE_ID)]],
             output)
         self.assertIn(
-            ['FAILURE - ExplorationSnapshotMetadataModel', ['instance_id']],
+            ['FAILURE - ExplorationSnapshotMetadataModel', ['exp_1_id']],
+            output)
+        self.assertIn(
+            ['SUCCESS - ExplorationSnapshotMetadataModel', 1],
+            output)
+        self.assertIn(
+            ['FAILURE - TopicRightsModel', ['topic_1_id']],
+            output)
+        self.assertIn(
+            ['SUCCESS - TopicRightsModel', 1],
             output)
         self.assertIn(
             ['SUCCESS - UserSettingsModel', 3], output)
