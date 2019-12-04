@@ -66,8 +66,6 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         cache_updated = any([
             _cache_last_message_text(thread, last_message),
             _cache_last_message_author(thread, last_message),
-            _cache_last_message_updated_status(
-                thread, last_message, second_last_message),
         ])
         if cache_updated:
             thread.put()
@@ -112,29 +110,5 @@ def _cache_last_message_author(thread, last_message):
         user_services.get_username(last_message.author_id))
     if thread.last_message_author != last_message_author:
         thread.last_message_author = last_message_author
-        return True
-    return False
-
-
-def _cache_last_message_updated_status(
-        thread, last_message, second_last_message):
-    """Ensures the given thread's cache for the change-in-status is based upon
-    the actual difference between the last and second-to-last messages.
-
-    Args:
-        thread: feedback_models.GeneralFeedbackThreadModel.
-        last_message: feedback_models.GeneralFeedbackMessageModel.
-        second_last_message: feedback_models.GeneralFeedbackMessageModel.
-
-    Returns:
-        bool. Whether the cache was actually updated.
-    """
-    if (last_message and last_message.updated_status and second_last_message and
-            last_message.updated_status != second_last_message.updated_status):
-        last_message_updated_status = last_message.updated_status
-    else:
-        last_message_updated_status = None
-    if thread.last_message_updated_status != last_message_updated_status:
-        thread.last_message_updated_status = last_message_updated_status
         return True
     return False

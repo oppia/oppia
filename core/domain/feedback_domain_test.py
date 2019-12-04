@@ -49,14 +49,13 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'last_updated': utils.get_time_in_millisecs(fake_date),
             'last_message_text': 'last message',
             'last_message_author': self.VIEWER_USERNAME,
-            'last_message_updated_status': None,
         }
         observed_thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
             expected_thread_dict['summary'], False, 1, fake_date, fake_date,
-            'last message', self.VIEWER_USERNAME, None)
+            'last message', self.VIEWER_USERNAME)
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict())
 

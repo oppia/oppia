@@ -80,9 +80,6 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     last_message_text = ndb.StringProperty(indexed=True, default=None)
     # Cached username of the author of the last message in the thread.
     last_message_author = ndb.StringProperty(indexed=True, default=None)
-    # The change in status since the last message, if any.
-    last_message_updated_status = (
-        ndb.StringProperty(choices=STATUS_CHOICES, indexed=True))
 
     @staticmethod
     def get_deletion_policy():
