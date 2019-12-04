@@ -42,8 +42,9 @@ angular.module('oppia').directive('oppiaNoninteractiveConcept', [
           ctrl.openConceptCard = function() {
             var skillId = skillSummary.id;
             var skillDescription = ctrl.skillDescription;
-            var removeCustomEntity = ContextService.removeCustomEntity;
-            ContextService.setCustomEntity(ENTITY_TYPE.SKILL, skillId);
+            var removeCustomEntityContext =
+              ContextService.removeCustomEntityContext;
+            ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/concept-card/concept-card-modal.template.html'
@@ -59,7 +60,7 @@ angular.module('oppia').directive('oppiaNoninteractiveConcept', [
                   $scope.isInTestMode = false;
 
                   $scope.closeModal = function() {
-                    removeCustomEntity();
+                    removeCustomEntityContext();
                     $uibModalInstance.dismiss('cancel');
                   };
                 }

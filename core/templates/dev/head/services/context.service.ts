@@ -17,13 +17,14 @@
  * context.
  */
 
+require('domain/utilities/EntityContextObjectFactory.ts');
 require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('ContextService', [
-  'UrlService', 'ENTITY_TYPE', 'EXPLORATION_EDITOR_TAB_CONTEXT',
-  'PAGE_CONTEXT', function(
-      UrlService, ENTITY_TYPE, EXPLORATION_EDITOR_TAB_CONTEXT,
-      PAGE_CONTEXT) {
+  'EntityContextObjectFactory', 'UrlService', 'ENTITY_TYPE',
+  'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT', function(
+      EntityContextObjectFactory, UrlService, ENTITY_TYPE,
+      EXPLORATION_EDITOR_TAB_CONTEXT, PAGE_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
     var questionId = null;
@@ -108,20 +109,17 @@ angular.module('oppia').factory('ContextService', [
       // This function is used in cases where the URL does not specify the
       // correct context for some case. eg: Viewing a skill's concept card on
       // any page via the RTE.
-      setCustomEntity: function(entityType, entityId) {
-        customEntity = {
-          entityId: entityId,
-          entityType: entityType
-        };
+      setCustomEntityContext: function(entityType, entityId) {
+        customEntity = EntityContextObjectFactory.create(entityId, entityType);
       },
 
-      removeCustomEntity: function() {
+      removeCustomEntityContext: function() {
         customEntity = null;
       },
 
       getEntityId: function() {
         if (customEntity !== null) {
-          return customEntity.entityId;
+          return customEntity.getId();
         }
         var pathnameArray = UrlService.getPathname().split('/');
         var hashValues = UrlService.getHash().split('#');
@@ -138,7 +136,7 @@ angular.module('oppia').factory('ContextService', [
 
       getEntityType: function() {
         if (customEntity !== null) {
-          return customEntity.entityType;
+          return customEntity.getType();
         }
         var pathnameArray = UrlService.getPathname().split('/');
         var hashValues = UrlService.getHash().split('#');

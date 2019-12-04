@@ -41,11 +41,12 @@ angular.module('oppia').directive('skillSelectorEditor', [
           var ctrl = this;
           ctrl.skills = [];
           if (ctrl.value) {
-            ContextService.setCustomEntity(ENTITY_TYPE.SKILL, ctrl.value.id);
+            ContextService.setCustomEntityContext(
+              ENTITY_TYPE.SKILL, ctrl.value.id);
           }
 
           ctrl.selectSkill = function(skillId, skillDescription) {
-            ContextService.setCustomEntity(ENTITY_TYPE.SKILL, skillId);
+            ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             ctrl.value = {
               id: skillId,
               description: skillDescription
@@ -55,7 +56,7 @@ angular.module('oppia').directive('skillSelectorEditor', [
             ctrl.skills = angular.copy(response.data.skills);
           });
           $scope.$on('$destroy', function() {
-            ContextService.removeCustomEntity();
+            ContextService.removeCustomEntityContext();
           });
         }
       ]
