@@ -40,6 +40,7 @@ import { ClassifierObjectFactory } from
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
+import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
@@ -193,6 +194,7 @@ export class UpgradedServices {
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
     upgradedServices['ComputeGraphService'] = new ComputeGraphService();
     upgradedServices['CountVectorizerService'] = new CountVectorizerService();
+    upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
