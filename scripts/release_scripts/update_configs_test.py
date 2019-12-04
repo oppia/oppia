@@ -26,11 +26,8 @@ import tempfile
 
 from core.tests import test_utils
 import python_utils
-
-import requests
-
-from . import common
-from . import update_configs
+from scripts import common
+from scripts.release_scripts import update_configs
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -76,10 +73,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         def mock_getpass(prompt):
             return 'test-token'
         # pylint: enable=unused-argument
-        def mock_get(unused_url):
-            res = requests.models.Response()
-            res.status_code = 200
-            return res
+        def mock_url_open(unused_url):
+            pass
 
         self.release_scripts_exist_swap = self.swap(
             common, 'ensure_release_scripts_folder_exists_and_is_up_to_date',
@@ -96,7 +91,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         self.feconf_swap = self.swap(
             update_configs, 'LOCAL_FECONF_PATH',
             MOCK_LOCAL_FECONF_PATH)
-        self.get_swap = self.swap(requests, 'get', mock_get)
+        self.url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
 
     def test_invalid_branch_name(self):
         def mock_get_current_branch_name():
@@ -104,29 +99,16 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         branch_name_swap = self.swap(
             common, 'get_current_branch_name', mock_get_current_branch_name)
         with branch_name_swap, self.assertRaises(AssertionError):
-            update_configs.main()
+            update_configs.main('test-token')
 
     def test_missing_terms_page(self):
-        terms_page_swap = self.swap(
-            update_configs, 'TERMS_PAGE_URL',
-            '%s-invalid' % update_configs.TERMS_PAGE_URL)
+        def mock_url_open(unused_url):
+            raise Exception('Not found.')
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         with self.branch_name_swap, self.release_scripts_exist_swap:
-            with terms_page_swap, self.assertRaisesRegexp(
+            with url_open_swap, self.assertRaisesRegexp(
                 Exception, 'Terms mainpage does not exist on Github.'):
-                update_configs.main()
-
-    def test_missing_personal_access_token(self):
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
-            return None
-        # pylint: enable=unused-argument
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
-        with getpass_swap, self.assertRaisesRegexp(
-            Exception, (
-                'No personal access token provided, please set up a '
-                'personal access token at https://github.com/settings/'
-                'tokens and re-run the script')):
-            update_configs.check_updates_to_terms_of_service()
+                update_configs.main('test-token')
 
     def test_invalid_user_input(self):
         print_msgs = []
@@ -142,7 +124,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
             with self.open_tab_swap, input_swap, print_swap:
-                update_configs.check_updates_to_terms_of_service()
+                update_configs.check_updates_to_terms_of_service('test-token')
         self.assertEqual(
             print_msgs, ['Invalid Input: invalid. Please enter yes or no.'])
 
@@ -178,7 +160,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs, 'LOCAL_FECONF_PATH', temp_feconf_path)
         with self.getpass_swap, self.get_org_swap, self.get_repo_swap:
             with self.open_tab_swap, input_swap, feconf_swap, get_commit_swap:
-                update_configs.check_updates_to_terms_of_service()
+                update_configs.check_updates_to_terms_of_service('test-token')
         with python_utils.open_file(temp_feconf_path, 'r') as f:
             self.assertEqual(f.read(), expected_feconf_text)
 
@@ -308,7 +290,7 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             'check_updates_to_terms_of_service_gets_called': True,
             'run_cmd_gets_called': True
         }
-        def mock_check_updates():
+        def mock_check_updates(unused_personal_access_token):
             check_function_calls[
                 'check_updates_to_terms_of_service_gets_called'] = True
             raise Exception('Testing')
@@ -319,23 +301,25 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             mock_check_updates)
         run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         with self.branch_name_swap, self.release_scripts_exist_swap:
-            with self.get_swap, check_updates_swap, run_cmd_swap:
+            with self.url_open_swap, check_updates_swap, run_cmd_swap:
                 with self.assertRaisesRegexp(Exception, 'Testing'):
-                    update_configs.main()
+                    update_configs.main('test-token')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls(self):
         check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': False,
             'add_mailgun_api_key_gets_called': False,
-            'apply_changes_based_on_config_gets_called': False
+            'apply_changes_based_on_config_gets_called': False,
+            'ask_user_to_confirm_gets_called': False
         }
         expected_check_function_calls = {
             'check_updates_to_terms_of_service_gets_called': True,
             'add_mailgun_api_key_gets_called': True,
-            'apply_changes_based_on_config_gets_called': True
+            'apply_changes_based_on_config_gets_called': True,
+            'ask_user_to_confirm_gets_called': True
         }
-        def mock_check_updates():
+        def mock_check_updates(unused_personal_access_token):
             check_function_calls[
                 'check_updates_to_terms_of_service_gets_called'] = True
         def mock_add_mailgun_api_key():
@@ -345,6 +329,8 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
                 unused_expected_config_line_regex):
             check_function_calls[
                 'apply_changes_based_on_config_gets_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] = True
 
         check_updates_swap = self.swap(
             update_configs, 'check_updates_to_terms_of_service',
@@ -353,8 +339,10 @@ class UpdateConfigsTests(test_utils.GenericTestBase):
             update_configs, 'add_mailgun_api_key', mock_add_mailgun_api_key)
         apply_changes_swap = self.swap(
             update_configs, 'apply_changes_based_on_config', mock_apply_changes)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         with self.branch_name_swap, self.release_scripts_exist_swap:
-            with self.get_swap, check_updates_swap, add_mailgun_api_key_swap:
-                with apply_changes_swap:
-                    update_configs.main()
+            with self.url_open_swap, check_updates_swap, ask_user_swap:
+                with add_mailgun_api_key_swap, apply_changes_swap:
+                    update_configs.main('test-token')
         self.assertEqual(check_function_calls, expected_check_function_calls)
