@@ -76,10 +76,10 @@ def tweak_yarn_executable():
     (while preserving the behavior on other systems), we rename it to yarn.sh
     here.
     """
-    origin_file = os.path.join(common.YARN_PATH, 'bin', 'yarn')
-    if os.path.isfile(origin_file):
-        renamed_file = os.path.join(common.YARN_PATH, 'bin', 'yarn.sh')
-        os.rename(origin_file, renamed_file)
+    origin_file_path = os.path.join(common.YARN_PATH, 'bin', 'yarn')
+    if os.path.isfile(origin_file_path):
+        renamed_file_path = os.path.join(common.YARN_PATH, 'bin', 'yarn.sh')
+        os.rename(origin_file_path, renamed_file_path)
 
 
 def get_yarn_command():
