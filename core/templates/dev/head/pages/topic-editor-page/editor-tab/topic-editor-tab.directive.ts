@@ -85,7 +85,7 @@ angular.module('oppia').directive('topicEditorTab', [
 
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
-          var saveTopicThumbnailUrl = function(imageURI) {
+          var saveTopicThumbnailImageData = function(imageURI) {
             let resampledFile = null;
             resampledFile = (
               ImageUploadHelperService.convertImageDataToImageFile(
@@ -199,7 +199,7 @@ angular.module('oppia').directive('topicEditorTab', [
             }).result.then(function(newThumbnailDataUrl) {
               $scope.editableThumbnailDataUrl = newThumbnailDataUrl;
               $scope.updateTopicThumbnailFilename(tempImageName);
-              saveTopicThumbnailUrl(newThumbnailDataUrl);
+              saveTopicThumbnailImageData(newThumbnailDataUrl);
             });
           };
 

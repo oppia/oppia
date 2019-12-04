@@ -56,7 +56,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'id': self.topic_id,
             'name': 'Name',
             'abbreviated_name': 'abbrev',
-            'thumbnail': None,
+            'thumbnail_filename': None,
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
             'additional_story_references': [],

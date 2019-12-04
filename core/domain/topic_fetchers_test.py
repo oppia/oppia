@@ -101,6 +101,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model = topic_models.TopicModel(
             id='topic_id',
             name='name',
+            abbreviated_name='abbrev',
             canonical_name='canonical_name',
             next_subtopic_id=1,
             language_code='en',
@@ -122,6 +123,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model = topic_models.TopicModel(
             id='topic_id_2',
             name='name 2',
+            abbreviated_name='abbrev',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',

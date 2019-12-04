@@ -62,6 +62,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         topic = topic_models.TopicModel(
             id=self.TOPIC_ID,
             name=self.TOPIC_NAME,
+            abbreviated_name='abbrev',
             canonical_name=self.TOPIC_CANONICAL_NAME,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(

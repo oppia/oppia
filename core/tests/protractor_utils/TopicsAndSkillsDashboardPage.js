@@ -126,7 +126,7 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopicWithTitle = function(title, abbreviatedName) {
+  this.createTopic = function(title, abbreviatedName) {
     waitFor.elementToBeClickable(
       createTopicButton,
       'Create Topic button takes too long to be clickable');
