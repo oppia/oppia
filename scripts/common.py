@@ -70,12 +70,9 @@ NODE_BIN_PATH = os.path.join(
     NODE_PATH, '' if is_windows_os() else 'bin', 'node')
 
 # Add path for node which is required by the node_modules.
-os.environ['PATH'] = os.pathsep.join(
-    [
-        os.path.dirname(NODE_BIN_PATH),
-        os.path.join(YARN_PATH, 'bin'),
-        os.environ['PATH']
-    ])
+os.environ['PATH'] = os.pathsep.join([
+    os.path.dirname(NODE_BIN_PATH), os.path.join(YARN_PATH, 'bin'),
+    os.environ['PATH']])
 
 
 def run_cmd(cmd_tokens):
