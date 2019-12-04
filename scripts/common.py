@@ -167,13 +167,37 @@ def verify_local_repo_is_clean():
 
 
 def get_current_branch_name():
-    """Get the current branch name."""
+    """Get the current branch name.
+
+    Returns:
+        str. The name of current branch.
+    """
     git_status_output = subprocess.check_output(
         ['git', 'status']).strip().split('\n')
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)
     return git_status_first_line[len(branch_message_prefix):]
+
+
+def get_current_release_version_number(release_branch_name):
+    """Gets the release version given a release branch name.
+
+    Args:
+        release_branch_name: str. The name of release branch.
+
+    Returns:
+        str. The version of release.
+    """
+    release_match = re.match(r'release-(\d+\.\d+\.\d+)$', release_branch_name)
+    hotfix_match = re.match(
+        r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$', release_branch_name)
+    if release_match:
+        return release_match.group(1)
+    elif hotfix_match:
+        return hotfix_match.group(1)
+    else:
+        raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
 def is_current_branch_a_release_branch():
