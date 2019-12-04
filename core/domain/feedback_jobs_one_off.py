@@ -60,9 +60,9 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(thread):
         """Implements the map function for this job."""
-        last_message, second_last_message = (
-            feedback_models.GeneralFeedbackMessageModel.get_multi(
-                feedback_services.get_last_two_message_ids(thread)))
+        last_message = feedback_models.GeneralFeedbackMessageModel.get_by_id(
+            feedback_services.get_full_message_id(
+                thread.id, thread.message_count - 1))
         cache_updated = any([
             _cache_last_message_text(thread, last_message),
             _cache_last_message_author(thread, last_message),
