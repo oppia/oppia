@@ -274,7 +274,7 @@ def _execute_tasks(tasks, batch_size=8):
             task.start()
             task.start_time = time.time()
 
-        time.sleep(5)
+        time.sleep(7)
         if remaining_tasks:
             log('----------------------------------------')
             log('Number of unstarted tasks: %s' % len(remaining_tasks))
