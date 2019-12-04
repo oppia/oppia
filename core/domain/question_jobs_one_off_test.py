@@ -19,7 +19,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import datetime
 
 from core.domain import question_jobs_one_off
 from core.domain import question_services
@@ -178,92 +177,3 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
                      [u'Question %s failed validation: linked_skill_ids is '
                       'either null or an empty list' % question_id]]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
-
-
-class QuestionSummaryModelIndexesOneOffJobTest(test_utils.GenericTestBase):
-    """Tests for QuestionSummaryModel migration."""
-
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
-        question_jobs_one_off.QuestionSummaryModelIndexesOneOffJob]
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            question_jobs_one_off.QuestionSummaryModelIndexesOneOffJob
-            .create_new())
-        question_jobs_one_off.QuestionSummaryModelIndexesOneOffJob.enqueue(
-            job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        stringified_output = (
-            question_jobs_one_off.QuestionSummaryModelIndexesOneOffJob
-            .get_output(job_id))
-
-        eval_output = [ast.literal_eval(stringified_item)
-                       for stringified_item in stringified_output]
-        output = [(eval_item[0], int(eval_item[1]))
-                  for eval_item in eval_output]
-        return output
-
-    def _check_model_validity(
-            self, instance_id, original_question_summary_model):
-        """Checks if the model was migrated correctly."""
-        migrated_question_summary_model = (
-            question_models.QuestionSummaryModel.get_by_id(instance_id))
-        self.assertEqual(
-            migrated_question_summary_model.creator_id,
-            original_question_summary_model.creator_id)
-        self.assertEqual(
-            migrated_question_summary_model.question_model_last_updated,
-            original_question_summary_model.question_model_last_updated)
-        self.assertEqual(
-            migrated_question_summary_model.question_model_created_on,
-            original_question_summary_model.question_model_created_on)
-        self.assertEqual(
-            migrated_question_summary_model.question_content,
-            original_question_summary_model.question_content)
-
-    def test_successful_migration(self):
-        instance_id = 'id_1'
-        question_summary_model = question_models.QuestionSummaryModel(
-            id=instance_id,
-            creator_id='user_id',
-            question_model_last_updated=datetime.datetime.utcnow(),
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_content='smth'
-        )
-        question_summary_model.put()
-
-        output = self._run_one_off_job()
-
-        self.assertEqual(output, [(u'SUCCESS', 1)])
-        self._check_model_validity(instance_id, question_summary_model)
-
-    def test_multiple_questions(self):
-        instance_id_1 = 'id_1'
-        question_summary_model_1 = question_models.QuestionSummaryModel(
-            id=instance_id_1,
-            creator_id='user_id_1',
-            question_model_last_updated=datetime.datetime.utcnow(),
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_content='smth1'
-        )
-        question_summary_model_1.put()
-
-        instance_id_2 = 'id_2'
-        question_summary_model_2 = question_models.QuestionSummaryModel(
-            id=instance_id_2,
-            creator_id='user_id_2',
-            question_model_last_updated=datetime.datetime.utcnow(),
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_content='smth2'
-        )
-        question_summary_model_2.put()
-
-        output = self._run_one_off_job()
-
-        self.assertEqual(output, [(u'SUCCESS', 2)])
-        self._check_model_validity(instance_id_1, question_summary_model_1)
-        self._check_model_validity(instance_id_2, question_summary_model_2)

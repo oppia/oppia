@@ -55,34 +55,3 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         pass
-
-
-class SnapshotMetadataModelsIndexesJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that re-puts all children of BaseSnapshotMetadataModel
-    (in order to, e.g., ensure that indexed fields are properly indexed).
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [collection_models.CollectionSnapshotMetadataModel,
-                collection_models.CollectionRightsSnapshotMetadataModel,
-                config_models.ConfigPropertySnapshotMetadataModel,
-                exp_models.ExplorationSnapshotMetadataModel,
-                exp_models.ExplorationRightsSnapshotMetadataModel,
-                question_models.QuestionSnapshotMetadataModel,
-                question_models.QuestionRightsSnapshotMetadataModel,
-                skill_models.SkillSnapshotMetadataModel,
-                skill_models.SkillRightsSnapshotMetadataModel,
-                story_models.StorySnapshotMetadataModel,
-                topic_models.TopicSnapshotMetadataModel,
-                topic_models.SubtopicPageSnapshotMetadataModel,
-                topic_models.TopicRightsSnapshotMetadataModel]
-
-    @staticmethod
-    def map(model_instance):
-        model_instance.put(update_last_updated_time=False)
-        yield ('SUCCESS', model_instance.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
