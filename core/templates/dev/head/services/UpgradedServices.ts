@@ -49,7 +49,7 @@ import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
 import { EntityContextObjectFactory } from
-   'domain/utilities/EntityContextObjectFactory';
+  'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationDraftObjectFactory } from
