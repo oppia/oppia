@@ -122,8 +122,8 @@ class Link(BaseRteComponent):
     """Class for Link component."""
 
 
-class Conceptcard(BaseRteComponent):
-    """Class for Conceptcard component."""
+class Concept(BaseRteComponent):
+    """Class for Concept component."""
 
 
 class Math(BaseRteComponent):

@@ -4,7 +4,7 @@
     <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
   </md-card>
   <div style="max-height: 50vh; overflow-y: auto;">
-    <div class="list-group-item"
+    <div class="list-group-item protractor-test-rte-skill-selector-item"
          ng-repeat="skill in $ctrl.skills | filter:skillFilterText"
          ng-click="$ctrl.selectSkill(skill.id, skill.description)"
          ng-class="{'list-group-item-success': (skill.id === $ctrl.value.id)}"

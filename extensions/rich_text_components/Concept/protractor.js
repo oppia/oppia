@@ -13,22 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for using the ConceptCard component during
+ * @fileoverview Utilities for using the Concept component during
  * end-to-end testing with Protractor.js
  */
 
 var objects = require('../../objects/protractor.js');
 
-var customizeComponent = function(modal, url) {
-  objects.SanitizedUrlEditor(
-    modal.element(by.tagName('sanitized-url-editor'))
-  ).setValue(url);
+var customizeComponent = function(modal, index) {
+  objects.SkillSelector(
+    modal.element(by.tagName('skill-selector-editor'))
+  ).setValue(index);
 };
 
-var expectComponentDetailsToMatch = function(elem, url) {
-  expect(elem.element(by.tagName('a')).getAttribute('href')).toBe(url);
-  expect(
-    elem.element(by.tagName('a')).getAttribute('target')).toBe('_blank');
+var expectComponentDetailsToMatch = function(elem, description) {
+  expect(elem.element(by.tagName('a'))).toBe('description');
 };
 
 exports.customizeComponent = customizeComponent;

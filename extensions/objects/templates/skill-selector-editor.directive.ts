@@ -18,6 +18,7 @@
 require(
   'components/skill-selector/skill-selector.directive.ts');
 require('domain/skill/skill-domain.constants.ajs.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').directive('skillSelectorEditor', [
   'UrlInterpolationService',
@@ -31,12 +32,20 @@ angular.module('oppia').directive('skillSelectorEditor', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/skill-selector-editor.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$http', 'FETCH_SKILLS_URL_TEMPLATE',
-        function($http, FETCH_SKILLS_URL_TEMPLATE) {
+      controller: [
+        '$http', '$scope', 'ContextService', 'ENTITY_TYPE',
+        'FETCH_SKILLS_URL_TEMPLATE',
+        function(
+            $http, $scope, ContextService, ENTITY_TYPE,
+            FETCH_SKILLS_URL_TEMPLATE) {
           var ctrl = this;
           ctrl.skills = [];
+          if (ctrl.value) {
+            ContextService.setCustomEntity(ENTITY_TYPE.SKILL, ctrl.value.id);
+          }
 
           ctrl.selectSkill = function(skillId, skillDescription) {
+            ContextService.setCustomEntity(ENTITY_TYPE.SKILL, skillId);
             ctrl.value = {
               id: skillId,
               description: skillDescription
@@ -44,6 +53,9 @@ angular.module('oppia').directive('skillSelectorEditor', [
           };
           $http.get(FETCH_SKILLS_URL_TEMPLATE).then(function(response) {
             ctrl.skills = angular.copy(response.data.skills);
+          });
+          $scope.$on('$destroy', function() {
+            ContextService.removeCustomEntity();
           });
         }
       ]

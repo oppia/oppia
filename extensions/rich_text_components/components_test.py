@@ -127,7 +127,7 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         }]
 
         self.check_validation(
-            components.Conceptcard, valid_items, invalid_items)
+            components.Concept, valid_items, invalid_items)
 
     def test_math_validation(self):
         """Tests collapsible component validation."""

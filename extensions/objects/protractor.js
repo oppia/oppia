@@ -177,6 +177,21 @@ var SanitizedUrlEditor = function(elem) {
   };
 };
 
+var SkillSelector = function(elem) {
+  return {
+    setValue: function(index) {
+      elem.element(by.css('protractor-test-rte-skill-selector-item')).click();
+    },
+    expectValueToBe: function(expectedValue) {
+      elem.element(by.tagName('input')).getAttribute('value').then(
+        function(value) {
+          expect(value).toEqual(expectedValue);
+        }
+      );
+    }
+  };
+};
+
 var UnicodeStringEditor = function(elem) {
   return {
     setValue: function(text) {

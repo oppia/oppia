@@ -112,13 +112,13 @@ export = {
       "default_value": ""
     }]
   },
-  "Conceptcard": {
-    "backend_id": "conceptcard",
+  "Concept": {
+    "backend_id": "concept",
     "category": "Basic Input",
     "description": "A link to the concept card of the linked skill.",
-    "frontend_id": "conceptcard",
+    "frontend_id": "concept",
     "tooltip": "Insert Concept Card Link",
-    "icon_data_url": "/rich_text_components/Conceptcard/Conceptcard.png",
+    "icon_data_url": "/rich_text_components/Concept/Concept.png",
     "is_complex": false,
     "requires_fs": false,
     "is_lesson_related": true,

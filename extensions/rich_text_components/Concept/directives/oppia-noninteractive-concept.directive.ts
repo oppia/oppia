@@ -18,9 +18,10 @@
 
 require('components/concept-card/concept-card.directive.ts');
 require('domain/utilities/url-interpolation.service.ts');
+require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaNoninteractiveConceptcard', [
+angular.module('oppia').directive('oppiaNoninteractiveConcept', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
@@ -28,12 +29,11 @@ angular.module('oppia').directive('oppiaNoninteractiveConceptcard', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Conceptcard/directives/' +
-        'conceptcard.directive.html'),
+        '/rich_text_components/Concept/directives/concept.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$uibModal',
-        function($attrs, $uibModal) {
+        '$attrs', '$uibModal', 'ContextService', 'ENTITY_TYPE',
+        function($attrs, $uibModal, ContextService, ENTITY_TYPE) {
           var ctrl = this;
           var skillSummary = HtmlEscaperService.escapedJsonToObj(
             $attrs.skillSummaryWithValue);
@@ -42,6 +42,8 @@ angular.module('oppia').directive('oppiaNoninteractiveConceptcard', [
           ctrl.openConceptCard = function() {
             var skillId = skillSummary.id;
             var skillDescription = ctrl.skillDescription;
+            var removeCustomEntity = ContextService.removeCustomEntity;
+            ContextService.setCustomEntity(ENTITY_TYPE.SKILL, skillId);
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/concept-card/concept-card-modal.template.html'
@@ -57,6 +59,7 @@ angular.module('oppia').directive('oppiaNoninteractiveConceptcard', [
                   $scope.isInTestMode = false;
 
                   $scope.closeModal = function() {
+                    removeCustomEntity();
                     $uibModalInstance.dismiss('cancel');
                   };
                 }

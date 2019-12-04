@@ -28,6 +28,7 @@ angular.module('oppia').factory('ContextService', [
     var explorationId = null;
     var questionId = null;
     var editorContext = null;
+    var customEntity = null;
 
     return {
       init: function(editorName) {
@@ -104,7 +105,24 @@ angular.module('oppia').factory('ContextService', [
           this.getPageContext() === PAGE_CONTEXT.EXPLORATION_PLAYER);
       },
 
+      // This function is used in cases where the URL does not specify the
+      // correct context for some case. eg: Viewing a skill's concept card on
+      // any page via the RTE.
+      setCustomEntity: function(entityType, entityId) {
+        customEntity = {
+          entityId: entityId,
+          entityType: entityType
+        };
+      },
+
+      removeCustomEntity: function() {
+        customEntity = null;
+      },
+
       getEntityId: function() {
+        if (customEntity !== null) {
+          return customEntity.entityId;
+        }
         var pathnameArray = UrlService.getPathname().split('/');
         var hashValues = UrlService.getHash().split('#');
         for (var i = 0; i < pathnameArray.length; i++) {
@@ -119,6 +137,9 @@ angular.module('oppia').factory('ContextService', [
       },
 
       getEntityType: function() {
+        if (customEntity !== null) {
+          return customEntity.entityType;
+        }
         var pathnameArray = UrlService.getPathname().split('/');
         var hashValues = UrlService.getHash().split('#');
         for (var i = 0; i < pathnameArray.length; i++) {
