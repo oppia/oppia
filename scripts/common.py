@@ -28,7 +28,7 @@ import python_utils
 import release_constants
 
 NODE_VERSION = '10.15.3'
-YARN_VERSION = 'v1.17.3'
+YARN_VERSION = '1.17.3'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -41,7 +41,7 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
-YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
+YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-v%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 

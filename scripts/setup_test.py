@@ -263,7 +263,7 @@ class SetupTests(test_utils.GenericTestBase):
                 'https://nodejs.org/dist/v%s/node-v%s-darwin-x64.tar.gz' % (
                     common.NODE_VERSION, common.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                '%s/yarn-%s.tar.gz' % (
+                'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_darwin_x86(self):
@@ -289,7 +289,7 @@ class SetupTests(test_utils.GenericTestBase):
                 'https://nodejs.org/dist/v%s/node-v%s.tar.gz' % (
                     common.NODE_VERSION, common.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                '%s/yarn-%s.tar.gz' % (
+                'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
         self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
@@ -313,7 +313,7 @@ class SetupTests(test_utils.GenericTestBase):
                     common.NODE_VERSION, common.NODE_VERSION) +
                 '-linux-x64.tar.gz',
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                '%s/yarn-%s.tar.gz' % (
+                'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_linux_x86(self):
@@ -339,7 +339,7 @@ class SetupTests(test_utils.GenericTestBase):
                 'https://nodejs.org/dist/v%s/node-v%s.tar.gz' % (
                     common.NODE_VERSION, common.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                '%s/yarn-%s.tar.gz' % (
+                'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
         self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
@@ -379,7 +379,7 @@ class SetupTests(test_utils.GenericTestBase):
                 'https://nodejs.org/dist/v%s/node-v%s-win-x86.zip' % (
                     common.NODE_VERSION, common.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                '%s/yarn-%s.tar.gz' % (
+                'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_windows_x64(self):
@@ -420,7 +420,7 @@ class SetupTests(test_utils.GenericTestBase):
                 'https://nodejs.org/dist/v%s/node-v%s-win-x64.zip' % (
                     common.NODE_VERSION, common.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                '%s/yarn-%s.tar.gz' % (
+                'v%s/yarn-v%s.tar.gz' % (
                     common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_chrome_bin_setup_with_travis_var_set(self):
