@@ -362,7 +362,12 @@ def main(args=None):
                 os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')):
             raise Exception('Coverage is not installed, please run the start '
                             'script.')
-        os.environ['PYTHONPATH'] = COVERAGE_DIR.encode(encoding='utf-8')
+
+        pythonpath = [COVERAGE_DIR]
+        if os.environ.get('PYTHONPATH'):
+            pythonpath.append(os.environ.get('PYTHONPATH'))
+
+        os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath)
 
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
