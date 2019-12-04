@@ -383,7 +383,7 @@ class BaseCommitLogEntryModel(BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether CollectionCommitLogEntryModel references user.
+        """Check whether BaseCommitLogEntryModel references user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.

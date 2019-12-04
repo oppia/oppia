@@ -33,6 +33,10 @@ datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
+class MissingUserException(Exception):
+    pass
+
+
 class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating new user ids for all the users and re-adding
     models that use the user id. This migration doesn't handle snapshot content
@@ -55,7 +59,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             # UserSubscribersModel, is only defined for users who actually have
             # at least one subscriber) that is why we are okay with the fact
             # that model is None.
-            return
+            return ('MISSING OLD MODEL', (old_user_id, new_user_id))
         model_values = old_model.to_dict()
         model_values['id'] = new_user_id
         new_model = model_class(**model_values)
@@ -111,7 +115,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             model_values = model.to_dict()
             model_values[migration_field._name] = new_user_id  # pylint: disable=protected-access
             model.populate(**model_values)
-            model.put(update_last_updated_time=False)
+            model_class.put_multi([model], update_last_updated_time=False)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -160,6 +164,20 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """
 
     @staticmethod
+    def _replace_gae_ids(gae_ids):
+        new_ids = []
+        for gae_id in gae_ids:
+            if gae_id == feconf.SYSTEM_COMMITTER_ID:
+                new_ids.append(feconf.SYSTEM_COMMITTER_ID)
+            else:
+                user_settings_model = (
+                    user_models.UserSettingsModel.get_by_gae_id(gae_id))
+                if not user_settings_model:
+                    raise MissingUserException(gae_id)
+                new_ids.append(user_settings_model.id)
+        return new_ids
+
+    @staticmethod
     def _migrate_collection(rights_snapshot_model):
         """Migrate CollectionRightsSnapshotContentModel to use the new user ID
         in the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
@@ -170,18 +188,18 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         """
         reconstituted_rights_model = collection_models.CollectionRightsModel(
             **rights_snapshot_model.content)
-        reconstituted_rights_model.owner_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.owner_ids]
-        reconstituted_rights_model.editor_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.editor_ids]
-        reconstituted_rights_model.voice_artist_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.voice_artist_ids]
-        reconstituted_rights_model.viewer_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.viewer_ids]
+        reconstituted_rights_model.owner_ids = (
+            SnapshotsUserIdMigrationJob._replace_gae_ids(
+                reconstituted_rights_model.owner_ids))
+        reconstituted_rights_model.editor_ids = (
+            SnapshotsUserIdMigrationJob._replace_gae_ids(
+                reconstituted_rights_model.editor_ids))
+        reconstituted_rights_model.voice_artist_ids = (
+            SnapshotsUserIdMigrationJob._replace_gae_ids(
+                reconstituted_rights_model.voice_artist_ids))
+        reconstituted_rights_model.viewer_ids = (
+            SnapshotsUserIdMigrationJob._replace_gae_ids(
+                reconstituted_rights_model.viewer_ids))
         rights_snapshot_model.content = reconstituted_rights_model.to_dict()
         rights_snapshot_model.put(update_last_updated_time=False)
 
@@ -196,18 +214,18 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         """
         reconstituted_rights_model = exp_models.ExplorationRightsModel(
             **rights_snapshot_model.content)
-        reconstituted_rights_model.owner_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.owner_ids]
-        reconstituted_rights_model.editor_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.editor_ids]
-        reconstituted_rights_model.voice_artist_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.voice_artist_ids]
-        reconstituted_rights_model.viewer_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.viewer_ids]
+        reconstituted_rights_model.owner_ids = (
+            SnapshotsUserIdMigrationJob._replace_gae_ids(
+                reconstituted_rights_model.owner_ids))
+        reconstituted_rights_model.editor_ids = (
+            SnapshotsUserIdMigrationJob._replace_gae_ids(
+                reconstituted_rights_model.editor_ids))
+        reconstituted_rights_model.voice_artist_ids = (
+            SnapshotsUserIdMigrationJob._replace_gae_ids(
+                reconstituted_rights_model.voice_artist_ids))
+        reconstituted_rights_model.viewer_ids = (
+            SnapshotsUserIdMigrationJob._replace_gae_ids(
+                reconstituted_rights_model.viewer_ids))
         rights_snapshot_model.content = reconstituted_rights_model.to_dict()
         rights_snapshot_model.put(update_last_updated_time=False)
 
@@ -222,11 +240,15 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         """
         reconstituted_rights_model = question_models.QuestionRightsModel(
             **rights_snapshot_model.content)
-        reconstituted_rights_model.creator_id = (
-            user_models.UserSettingsModel.get_by_gae_id(
-                reconstituted_rights_model.creator_id).id)
-        rights_snapshot_model.content = reconstituted_rights_model.to_dict()
-        rights_snapshot_model.put(update_last_updated_time=False)
+        if reconstituted_rights_model.creator_id != feconf.SYSTEM_COMMITTER_ID:
+            user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
+                    reconstituted_rights_model.creator_id)
+            if not user_settings_model:
+                raise MissingUserException(
+                    reconstituted_rights_model.creator_id)
+            reconstituted_rights_model.creator_id = user_settings_model.id
+            rights_snapshot_model.content = reconstituted_rights_model.to_dict()
+            rights_snapshot_model.put(update_last_updated_time=False)
 
     @staticmethod
     def _migrate_skill(rights_snapshot_model):
@@ -239,11 +261,15 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         """
         reconstituted_rights_model = skill_models.SkillRightsModel(
             **rights_snapshot_model.content)
-        reconstituted_rights_model.creator_id = (
-            user_models.UserSettingsModel.get_by_gae_id(
-                reconstituted_rights_model.creator_id).id)
-        rights_snapshot_model.content = reconstituted_rights_model.to_dict()
-        rights_snapshot_model.put(update_last_updated_time=False)
+        if reconstituted_rights_model.creator_id != feconf.SYSTEM_COMMITTER_ID:
+            user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
+                reconstituted_rights_model.creator_id)
+            if not user_settings_model:
+                raise MissingUserException(
+                    reconstituted_rights_model.creator_id)
+            reconstituted_rights_model.creator_id = user_settings_model.id
+            rights_snapshot_model.content = reconstituted_rights_model.to_dict()
+            rights_snapshot_model.put(update_last_updated_time=False)
 
     @staticmethod
     def _migrate_topic(rights_snapshot_model):
@@ -256,9 +282,9 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **rights_snapshot_model.content)
-        reconstituted_rights_model.manager_ids = [
-            user_models.UserSettingsModel.get_by_gae_id(gae_id).id
-            for gae_id in reconstituted_rights_model.manager_ids]
+        reconstituted_rights_model.manager_ids = (
+            SnapshotsUserIdMigrationJob._replace_gae_ids(
+                reconstituted_rights_model.manager_ids))
         rights_snapshot_model.content = reconstituted_rights_model.to_dict()
         rights_snapshot_model.put(update_last_updated_time=False)
 
@@ -274,35 +300,45 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(rights_snapshot_model):
         """Implements the map function for this job."""
-        if isinstance(
-                rights_snapshot_model,
-                collection_models.CollectionRightsSnapshotContentModel):
-            SnapshotsUserIdMigrationJob._migrate_collection(
-                rights_snapshot_model)
-        elif isinstance(
-                rights_snapshot_model,
-                exp_models.ExplorationRightsSnapshotContentModel):
-            SnapshotsUserIdMigrationJob._migrate_exploration(
-                rights_snapshot_model)
-        elif isinstance(
-                rights_snapshot_model,
-                question_models.QuestionRightsSnapshotContentModel):
-            SnapshotsUserIdMigrationJob._migrate_question(rights_snapshot_model)
-        elif isinstance(
-                rights_snapshot_model,
-                skill_models.SkillRightsSnapshotContentModel):
-            SnapshotsUserIdMigrationJob._migrate_skill(rights_snapshot_model)
-        elif isinstance(
-                rights_snapshot_model,
-                topic_models.TopicRightsSnapshotContentModel):
-            SnapshotsUserIdMigrationJob._migrate_topic(rights_snapshot_model)
         class_name = rights_snapshot_model.__class__.__name__
-        yield ('SUCCESS - %s' % class_name, rights_snapshot_model.id)
+        try:
+            if isinstance(
+                    rights_snapshot_model,
+                    collection_models.CollectionRightsSnapshotContentModel):
+                SnapshotsUserIdMigrationJob._migrate_collection(
+                    rights_snapshot_model)
+            elif isinstance(
+                    rights_snapshot_model,
+                    exp_models.ExplorationRightsSnapshotContentModel):
+                SnapshotsUserIdMigrationJob._migrate_exploration(
+                    rights_snapshot_model)
+            elif isinstance(
+                    rights_snapshot_model,
+                    question_models.QuestionRightsSnapshotContentModel):
+                SnapshotsUserIdMigrationJob._migrate_question(
+                    rights_snapshot_model)
+            elif isinstance(
+                    rights_snapshot_model,
+                    skill_models.SkillRightsSnapshotContentModel):
+                SnapshotsUserIdMigrationJob._migrate_skill(
+                    rights_snapshot_model)
+            elif isinstance(
+                    rights_snapshot_model,
+                    topic_models.TopicRightsSnapshotContentModel):
+                SnapshotsUserIdMigrationJob._migrate_topic(
+                    rights_snapshot_model)
+        except MissingUserException as e:
+            yield ('FAILURE - %s' % class_name, e)
+        else:
+            yield ('SUCCESS - %s' % class_name, rights_snapshot_model.id)
 
     @staticmethod
     def reduce(key, ids):
         """Implements the reduce function for this job."""
-        yield (key, len(ids))
+        if key.startswith('SUCCESS'):
+            yield (key, len(ids))
+        else:
+            yield (key, ids)
 
 
 class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):

@@ -428,6 +428,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
     USER_2_GAE_ID = 'gae_id_2'
     USER_3_USER_ID = 'user_id_3'
     USER_3_GAE_ID = 'gae_id_3'
+    WRONG_GAE_ID = 'wrong_id'
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -474,7 +475,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
         original_rights_model = collection_models.CollectionRightsModel(
             id=self.SNAPSHOT_ID,
             owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
-            editor_ids=[self.USER_1_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
             voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
             viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
             community_owned=False,
@@ -505,7 +506,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             [self.USER_1_USER_ID, self.USER_2_USER_ID],
             migrated_rights_model.owner_ids)
         self.assertEqual(
-            [self.USER_1_USER_ID],
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
             migrated_rights_model.editor_ids)
         self.assertEqual(
             [self.USER_1_USER_ID, self.USER_2_USER_ID],
@@ -514,11 +515,35 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             [self.USER_1_USER_ID, self.USER_3_USER_ID],
             migrated_rights_model.viewer_ids)
 
+    def test_migrate_collection_rights_snapshot_model_wrong_id(self):
+        original_rights_model = collection_models.CollectionRightsModel(
+            id=self.SNAPSHOT_ID,
+            owner_ids=[self.WRONG_GAE_ID],
+            editor_ids=[self.WRONG_GAE_ID],
+            voice_artist_ids=[self.WRONG_GAE_ID],
+            viewer_ids=[self.WRONG_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        original_rights_snapshot_model = (
+            collection_models.CollectionRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertIn(
+            ['FAILURE - CollectionRightsSnapshotContentModel',
+             [self.WRONG_GAE_ID]],
+            output)
+
     def test_migrate_exploration_rights_snapshot_model(self):
         original_rights_model = exp_models.ExplorationRightsModel(
             id=self.SNAPSHOT_ID,
             owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
-            editor_ids=[self.USER_1_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
             voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
             viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
             community_owned=False,
@@ -549,7 +574,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             [self.USER_1_USER_ID, self.USER_2_USER_ID],
             migrated_rights_model.owner_ids)
         self.assertEqual(
-            [self.USER_1_USER_ID],
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
             migrated_rights_model.editor_ids)
         self.assertEqual(
             [self.USER_1_USER_ID, self.USER_2_USER_ID],
@@ -557,6 +582,30 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             [self.USER_1_USER_ID, self.USER_3_USER_ID],
             migrated_rights_model.viewer_ids)
+
+    def test_migrate_exploration_rights_snapshot_model_wrong_id(self):
+        original_rights_model = exp_models.ExplorationRightsModel(
+            id=self.SNAPSHOT_ID,
+            owner_ids=[self.WRONG_GAE_ID],
+            editor_ids=[self.WRONG_GAE_ID],
+            voice_artist_ids=[self.WRONG_GAE_ID],
+            viewer_ids=[self.WRONG_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        original_rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertIn(
+            ['FAILURE - ExplorationRightsSnapshotContentModel',
+             [self.WRONG_GAE_ID]],
+            output)
 
     def test_migrate_question_rights_snapshot_model(self):
         original_rights_model = question_models.QuestionRightsModel(
@@ -583,6 +632,22 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             **migrated_rights_snapshot_model.content)
         self.assertEqual(self.USER_1_USER_ID, migrated_rights_model.creator_id)
 
+    def test_migrate_question_rights_snapshot_model_wrong_id(self):
+        original_rights_model = question_models.QuestionRightsModel(
+            id=self.SNAPSHOT_ID,
+            creator_id=self.WRONG_GAE_ID)
+        original_rights_snapshot_model = (
+            question_models.QuestionRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertIn(
+            ['FAILURE - QuestionRightsSnapshotContentModel',
+             [self.WRONG_GAE_ID]],
+            output)
+
     def test_migrate_skill_rights_snapshot_model(self):
         original_rights_model = skill_models.SkillRightsModel(
             id=self.SNAPSHOT_ID,
@@ -608,9 +673,26 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             **migrated_rights_snapshot_model.content)
         self.assertEqual(self.USER_1_USER_ID, migrated_rights_model.creator_id)
 
+    def test_migrate_question_rights_snapshot_model_wrong_id(self):
+        original_rights_model = skill_models.SkillRightsModel(
+            id=self.SNAPSHOT_ID,
+            creator_id=self.WRONG_GAE_ID)
+        original_rights_snapshot_model = (
+            skill_models.SkillRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertIn(
+            ['FAILURE - SkillRightsSnapshotContentModel',
+             [self.WRONG_GAE_ID]],
+            output)
+
     def test_migrate_topic_rights_snapshot_model(self):
         original_rights_model = topic_models.TopicRightsModel(
-            manager_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID])
+            manager_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID,
+                         feconf.SYSTEM_COMMITTER_ID])
         original_rights_snapshot_model = (
             topic_models.TopicRightsSnapshotContentModel(
                 id=self.SNAPSHOT_ID,
@@ -631,8 +713,24 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
         migrated_rights_model = topic_models.TopicRightsModel(
             **migrated_rights_snapshot_model.content)
         self.assertEqual(
-            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            [self.USER_1_USER_ID, self.USER_2_USER_ID,
+             feconf.SYSTEM_COMMITTER_ID],
             migrated_rights_model.manager_ids)
+
+    def test_migrate_topic_rights_snapshot_model_wrong_id(self):
+        original_rights_model = topic_models.TopicRightsModel(
+            manager_ids=[self.WRONG_GAE_ID])
+        original_rights_snapshot_model = (
+            topic_models.TopicRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertIn(
+            ['FAILURE - TopicRightsSnapshotContentModel',
+             [self.WRONG_GAE_ID]],
+            output)
 
 
 class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
