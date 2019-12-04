@@ -24,8 +24,7 @@ import sys
 
 import python_utils
 import release_constants
-
-from . import common
+from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -109,6 +108,6 @@ def main():
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when wrap_release.py is used as a script.
+# it will only be called when wrap_up_release.py is used as a script.
 if __name__ == '__main__': # pragma: no cover
     main()
