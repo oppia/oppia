@@ -175,9 +175,11 @@ def main(args=None):
             'visit https://yarnpkg.com/en/docs/usage.'])
 
         # NB: Update .yarnrc if the yarn version below is changed.
-        yarn_file_name = 'yarn-v%s.tar.gz' % common.YARN_VERSION
+        # TODO(#8125): Remove the `v` in the folder name, e.g., yarn-v1.17.3 ->
+        # yarn-1.17.3.
+        yarn_file_name = 'yarn-%s.tar.gz' % common.YARN_VERSION
         download_and_install_package(
-            'https://github.com/yarnpkg/yarn/releases/download/v%s/%s'
+            'https://github.com/yarnpkg/yarn/releases/download/%s/%s'
             % (common.YARN_VERSION, yarn_file_name), yarn_file_name)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
