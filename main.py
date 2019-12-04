@@ -117,13 +117,13 @@ def get_redirect_route(regex_route, handler, defaults=None):
     with parameters should be formulated without the trailing slash.
 
     Args:
-        regex_route: string:  A raw string representing a route.
-        handler: A callable to handle the route.
-        defaults: Default or keywords to be passed into a RedirectRoute
-            constructor.
+        regex_route: unicode. A raw string representing a route.
+        handler: BaseHandler. A callable to handle the route.
+        defaults: NoneType. Default or keywords to be passed into a
+            RedirectRoute constructor.
 
     Returns:
-        RedirectRoute: A RedirectRoute object for redirects.
+        RedirectRoute. A RedirectRoute object for redirects.
     """
     if defaults is None:
         defaults = {}
