@@ -64,10 +64,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_tweak_yarn_executable(self):
-        # pylint: disable=unused-argument
-        def mock_is_file(filename):
+        def mock_is_file(unused_filename):
             return True
-        # pylint: enable=unused-argument
+
         def mock_rename(origin_name, new_name):
             self.assertEqual(origin_name + '.sh', new_name)
             mock_rename.called = True
@@ -103,7 +102,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
     def test_pip_install_with_import_error_and_darwin_os(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
-
 
         import pip
         try:
@@ -350,16 +348,15 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             check_function_calls['install_skulpt_is_called'] = True
         def mock_check_call(unused_cmd_tokens):
             pass
-        # pylint: disable=unused-argument
-        def mock_main_for_install_third_party(args):
+        def mock_main_for_install_third_party(unused_args):
             check_function_calls['install_third_party_main_is_called'] = True
-        def mock_main_for_setup(args):
+        def mock_main_for_setup(unused_args):
             check_function_calls['setup_main_is_called'] = True
-        def mock_main_for_setup_gae(args):
+        def mock_main_for_setup_gae(unused_args):
             check_function_calls['setup_gae_main_is_called'] = True
-        def mock_main_for_pre_commit_hook(args):
+        def mock_main_for_pre_commit_hook(unused_args):
             check_function_calls['pre_commit_hook_main_is_called'] = True
-        def mock_main_for_pre_push_hook(args):
+        def mock_main_for_pre_push_hook(unused_args):
             check_function_calls['pre_push_hook_main_is_called'] = True
         # pylint: enable=unused-argument
         def mock_tweak_yarn_executable():

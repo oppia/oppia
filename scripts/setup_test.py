@@ -346,12 +346,13 @@ class SetupTests(test_utils.GenericTestBase):
     def test_package_install_with_windows_x86(self):
         def mock_exists(unused_path):
             return False
-        # pylint: disable=unused-argument
-        def mock_url_retrieve(url, filename):
+
+        def mock_url_retrieve(url, unused_filename):
             self.urls.append(url)
-        # pylint: enable=unused-argument
+
         def mock_check_call(commands):
             mock_check_call.commands = commands
+
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
         architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
         exists_swap = self.swap(os.path, 'exists', mock_exists)
@@ -385,11 +386,10 @@ class SetupTests(test_utils.GenericTestBase):
     def test_package_install_with_windows_x64(self):
         def mock_exists(unused_path):
             return False
-        # pylint: disable=unused-argument
-        def mock_url_retrieve(url, filename):
+
+        def mock_url_retrieve(url, unused_filename):
             self.urls.append(url)
 
-        # pylint: enable=unused-argument
         def mock_check_call(commands):
             mock_check_call.commands = commands
 
