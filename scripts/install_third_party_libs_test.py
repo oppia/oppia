@@ -348,15 +348,16 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             check_function_calls['install_skulpt_is_called'] = True
         def mock_check_call(unused_cmd_tokens):
             pass
-        def mock_main_for_install_third_party(unused_args):
+        # pylint: disable=unused-argument
+        def mock_main_for_install_third_party(args):
             check_function_calls['install_third_party_main_is_called'] = True
-        def mock_main_for_setup(unused_args):
+        def mock_main_for_setup(args):
             check_function_calls['setup_main_is_called'] = True
-        def mock_main_for_setup_gae(unused_args):
+        def mock_main_for_setup_gae(args):
             check_function_calls['setup_gae_main_is_called'] = True
-        def mock_main_for_pre_commit_hook(unused_args):
+        def mock_main_for_pre_commit_hook(args):
             check_function_calls['pre_commit_hook_main_is_called'] = True
-        def mock_main_for_pre_push_hook(unused_args):
+        def mock_main_for_pre_push_hook(args):
             check_function_calls['pre_push_hook_main_is_called'] = True
         # pylint: enable=unused-argument
         def mock_tweak_yarn_executable():
