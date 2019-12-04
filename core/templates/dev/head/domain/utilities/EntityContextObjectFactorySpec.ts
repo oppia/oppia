@@ -19,7 +19,7 @@
 import { EntityContextObjectFactory } from
   'domain/utilities/EntityContextObjectFactory';
 
-fdescribe('Entity context object factory', () => {
+describe('Entity context object factory', () => {
   describe('EntityContextObjectFactory', () => {
     let entityContextObjectFactory: EntityContextObjectFactory;
 
