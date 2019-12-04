@@ -16,9 +16,6 @@
 
 """Script that automatically makes updates to changelog and authors
 using release_summary.md.
-
-This script should only be run after release_info.py script is run
-successfully.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -33,8 +30,8 @@ import sys
 
 import python_utils
 import release_constants
-
-from . import common
+from scripts import common
+from scripts.release_scripts import generate_release_info
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -132,12 +129,12 @@ def check_ordering_of_sections(release_summary_lines):
                     section.strip(), next_section.strip()))
 
 
-def get_previous_release_version(branch_type, current_release_version):
+def get_previous_release_version(branch_type, current_release_version_number):
     """Finds previous version given the current version.
 
     Args:
         branch_type: str. The type of the branch: release or hotfix.
-        current_release_version: str. The current release version.
+        current_release_version_number: str. The current release version.
 
     Returns:
         str. The previous version.
@@ -149,23 +146,24 @@ def get_previous_release_version(branch_type, current_release_version):
     all_tags = subprocess.check_output(['git', 'tag'])[:-1].split('\n')
     # Tags are of format vX.Y.Z. So, the substring starting from index 1 is the
     # version.
-    if branch_type == release_constants.RELEASE_BRANCH_TYPE:
+    if branch_type == release_constants.BRANCH_TYPE_RELEASE:
         previous_release_version = all_tags[-1][1:]
-    elif branch_type == release_constants.HOTFIX_BRANCH_TYPE:
+    elif branch_type == release_constants.BRANCH_TYPE_HOTFIX:
         previous_release_version = all_tags[-2][1:]
     else:
         raise Exception('Invalid branch type: %s.' % branch_type)
-    assert previous_release_version != current_release_version
+    assert previous_release_version != current_release_version_number
     return previous_release_version
 
 
 def remove_repetition_from_changelog(
-        current_release_version, previous_release_version, changelog_lines):
+        current_release_version_number, previous_release_version,
+        changelog_lines):
     """Removes information about current version from changelog before
     generation of changelog again.
 
     Args:
-        current_release_version: str. The current release version.
+        current_release_version_number: str. The current release version.
         previous_release_version: str. The previous release version.
         changelog_lines: str. The lines of changelog file.
 
@@ -176,7 +174,7 @@ def remove_repetition_from_changelog(
     current_version_start = 0
     previous_version_start = 0
     for index, line in enumerate(changelog_lines):
-        if 'v%s' % current_release_version in line:
+        if 'v%s' % current_release_version_number in line:
             current_version_start = index
         if 'v%s' % previous_release_version in line:
             previous_version_start = index
@@ -185,42 +183,45 @@ def remove_repetition_from_changelog(
 
 
 def update_changelog(
-        branch_name, release_summary_lines, current_release_version):
+        branch_name, release_summary_lines, current_release_version_number):
     """Updates CHANGELOG file.
 
     Args:
         branch_name: str. The name of the current branch.
         release_summary_lines: list(str). List of lines in
             ../release_summary.md.
-        current_release_version: str. The version of current release.
+        current_release_version_number: str. The version of current release.
     """
     python_utils.PRINT('Updating Changelog...')
     start_index = release_summary_lines.index('### Changelog:\n') + 1
     end_index = release_summary_lines.index('### Commit History:\n')
     release_version_changelog = [
-        u'v%s (%s)\n' % (current_release_version, CURRENT_DATE),
+        u'v%s (%s)\n' % (current_release_version_number, CURRENT_DATE),
         u'------------------------\n'] + release_summary_lines[
             start_index:end_index]
     changelog_lines = []
     with python_utils.open_file(CHANGELOG_FILEPATH, 'r') as changelog_file:
         changelog_lines = changelog_file.readlines()
 
-    if release_constants.HOTFIX_BRANCH_TYPE in branch_name:
+    if release_constants.BRANCH_TYPE_HOTFIX in branch_name:
         previous_release_version = get_previous_release_version(
-            release_constants.HOTFIX_BRANCH_TYPE, current_release_version)
+            release_constants.BRANCH_TYPE_HOTFIX,
+            current_release_version_number)
         changelog_lines = remove_repetition_from_changelog(
-            current_release_version, previous_release_version, changelog_lines)
+            current_release_version_number, previous_release_version,
+            changelog_lines)
     else:
         previous_release_version = get_previous_release_version(
-            release_constants.RELEASE_BRANCH_TYPE, current_release_version)
+            release_constants.BRANCH_TYPE_RELEASE,
+            current_release_version_number)
         # Update only if changelog is generated before and contains info for
         # current version.
         if any(
                 line.startswith(
-                    'v%s' % current_release_version
+                    'v%s' % current_release_version_number
                     ) for line in changelog_lines):
             changelog_lines = remove_repetition_from_changelog(
-                current_release_version, previous_release_version,
+                current_release_version_number, previous_release_version,
                 changelog_lines)
 
     changelog_lines[2:2] = release_version_changelog
@@ -404,7 +405,9 @@ def remove_updates_and_delete_branch(repo_fork, target_branch):
             're-running the script' % target_branch)
 
 
-def create_branch(repo_fork, target_branch, github_username):
+def create_branch(
+        repo_fork, target_branch, github_username,
+        current_release_version_number):
     """Creates a new branch with updates to AUTHORS, CHANGELOG,
     CONTRIBUTORS and about-page.
 
@@ -413,6 +416,7 @@ def create_branch(repo_fork, target_branch, github_username):
             forked repo.
         target_branch: str. The name of the target branch.
         github_username: str. The github username of the user.
+        current_release_version_number: str. The version of current release.
     """
     python_utils.PRINT(
         'Creating new branch with updates to AUTHORS, CONTRIBUTORS, '
@@ -432,10 +436,15 @@ def create_branch(repo_fork, target_branch, github_username):
     common.run_cmd(GIT_CMD_CHECKOUT.split(' '))
     common.open_new_tab_in_browser_if_possible(
         'https://github.com/oppia/oppia/compare/develop...%s:%s?'
-        'expand=1' % (github_username, target_branch))
+        'expand=1&title=Update authors and changelog for v%s' % (
+            github_username, target_branch, current_release_version_number))
     python_utils.PRINT(
         'Pushed changes to Github. '
-        'Please create a pull request from the %s branch' % target_branch)
+        'Please create a pull request from the %s branch\n\n'
+        'Note: PR title should be exactly: '
+        '"Update authors and changelog for v%s" '
+        'otherwise deployment will fail.' % (
+            target_branch, current_release_version_number))
 
 
 def main():
@@ -445,36 +454,60 @@ def main():
         raise Exception(
             'This script should only be run from the latest release branch.')
 
-    if not os.path.exists(release_constants.RELEASE_SUMMARY_FILEPATH):
-        raise Exception(
-            'Release summary file %s is missing. Please run the '
-            'release_info.py script and re-run this script.' % (
-                release_constants.RELEASE_SUMMARY_FILEPATH))
-
     parsed_args = _PARSER.parse_args()
     if parsed_args.github_username is None:
         raise Exception(
             'No GitHub username provided. Please re-run the '
-            'script specifying a username using --username=<Your username>')
+            'script specifying a username using '
+            '--github_username=<Your username>')
     github_username = parsed_args.github_username
 
     personal_access_token = common.get_personal_access_token()
+
+    python_utils.PRINT('Generating release summary...')
+    generate_release_info.main(personal_access_token)
+
+    if not os.path.exists(release_constants.RELEASE_SUMMARY_FILEPATH):
+        raise Exception(
+            'Release summary file %s is missing. Please re-run '
+            'this script.' % release_constants.RELEASE_SUMMARY_FILEPATH)
+
     g = github.Github(personal_access_token)
     repo_fork = g.get_repo('%s/oppia' % github_username)
 
-    current_release_version = branch_name[len(
-        common.RELEASE_BRANCH_NAME_PREFIX):]
-    target_branch = 'update-changelog-for-releasev%s' % current_release_version
+    current_release_version_number = common.get_current_release_version_number(
+        branch_name)
+    target_branch = 'update-changelog-for-releasev%s' % (
+        current_release_version_number)
 
     remove_updates_and_delete_branch(repo_fork, target_branch)
 
-    message = (
-        'Please update %s to:\n- have a correct changelog for '
-        'updating the CHANGELOG file\n- have a correct list of new '
-        'authors and contributors to update AUTHORS, CONTRIBUTORS '
-        'and developer_names section in about-page.directive.html\n' % (
+    # Opens Credit Form.
+    python_utils.PRINT(
+        'Note: Make following changes directly to %s and make sure to '
+        'save the file after making these changes.' % (
             release_constants.RELEASE_SUMMARY_FILEPATH))
-    common.ask_user_to_confirm(message)
+
+    common.ask_user_to_confirm(
+        'Check emails and names for authors and contributors and '
+        'verify that the emails are '
+        'correct through welcome emails sent from welcome@oppia.org '
+        '(confirm with Sean in case of doubt).')
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.CREDITS_FORM_URL)
+    common.ask_user_to_confirm(
+        'Check the credits form and add any additional contributors '
+        'to the contributor list in release summary file.')
+    common.ask_user_to_confirm(
+        'Categorize the PR titles in the Uncategorized section of the '
+        'changelog, and arrange the changelog to have user-facing '
+        'categories on top.')
+    common.ask_user_to_confirm(
+        'Verify each item is in the correct section and remove '
+        'trivial changes like "Fix lint errors" from the changelog.')
+    common.ask_user_to_confirm(
+        'Ensure that all items in changelog start with a '
+        'verb in simple present tense.')
 
     release_summary_lines = []
     with python_utils.open_file(
@@ -485,7 +518,7 @@ def main():
     check_ordering_of_sections(release_summary_lines)
 
     update_changelog(
-        branch_name, release_summary_lines, current_release_version)
+        branch_name, release_summary_lines, current_release_version_number)
     update_authors(release_summary_lines)
     update_contributors(release_summary_lines)
     update_developer_names(release_summary_lines)
@@ -497,7 +530,9 @@ def main():
             ABOUT_PAGE_FILEPATH))
     common.ask_user_to_confirm(message)
 
-    create_branch(repo_fork, target_branch, github_username)
+    create_branch(
+        repo_fork, target_branch, github_username,
+        current_release_version_number)
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

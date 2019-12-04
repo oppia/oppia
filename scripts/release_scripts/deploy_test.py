@@ -26,16 +26,12 @@ import sys
 import tempfile
 
 from core.tests import test_utils
-
 import python_utils
-
-import requests
-
-from . import common
-from . import deploy
-from . import gcloud_adapter
-from . import install_third_party_libs
-from . import update_configs
+from scripts import common
+from scripts import install_third_party_libs
+from scripts.release_scripts import deploy
+from scripts.release_scripts import gcloud_adapter
+from scripts.release_scripts import update_configs
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -104,6 +100,8 @@ class DeployTests(test_utils.GenericTestBase):
         self.print_arr = []
         def mock_print(msg):
             self.print_arr.append(msg)
+        def mock_create_release_doc():
+            pass
 
         self.install_swap = self.swap(
             install_third_party_libs, 'main', mock_main)
@@ -137,6 +135,8 @@ class DeployTests(test_utils.GenericTestBase):
         self.get_remote_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.create_swap = self.swap(
+            deploy, 'create_release_doc', mock_create_release_doc)
 
     def test_invalid_app_name(self):
         args_swap = self.swap(
@@ -188,7 +188,7 @@ class DeployTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, args_swap, out_swap:
+                with self.run_swap, self.create_swap, args_swap, out_swap:
                     with self.assertRaisesRegexp(
                         Exception, 'Invalid last commit message: Invalid.'):
                         deploy.execute_deployment()
@@ -198,7 +198,7 @@ class DeployTests(test_utils.GenericTestBase):
             sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
         feconf_swap = self.swap(
             deploy, 'FECONF_PATH', MOCK_FECONF_FILEPATH)
-        def mock_main():
+        def mock_main(unused_personal_access_token):
             pass
         def mock_get_personal_access_token():
             return 'test'
@@ -237,14 +237,15 @@ class DeployTests(test_utils.GenericTestBase):
 
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
-                with self.run_swap, config_swap, get_token_swap, get_org_swap:
-                    with get_repo_swap, bug_check_swap, pr_check_swap, out_swap:
-                        with args_swap, feconf_swap, check_tests_swap:
-                            with self.assertRaisesRegexp(
-                                Exception,
-                                'The mailgun API key must be added before '
-                                'deployment.'):
-                                deploy.execute_deployment()
+                with self.run_swap, self.create_swap, config_swap:
+                    with get_token_swap, get_org_swap, get_repo_swap:
+                        with bug_check_swap, pr_check_swap, out_swap:
+                            with args_swap, feconf_swap, check_tests_swap:
+                                with self.assertRaisesRegexp(
+                                    Exception,
+                                    'The mailgun API key must be added before '
+                                    'deployment.'):
+                                    deploy.execute_deployment()
 
     def test_missing_third_party_dir(self):
         third_party_swap = self.swap(deploy, 'THIRD_PARTY_DIR', 'INVALID_DIR')
@@ -302,18 +303,21 @@ class DeployTests(test_utils.GenericTestBase):
         def mock_build_scripts():
             check_function_calls['build_scripts_gets_called'] = True
         def mock_deploy_application_and_write_log_entry(
-                unused_app_name, unused_version_to_deploy_to,
+                unused_app_name, version_to_deploy_to,
                 unused_current_git_revision):
-            check_function_calls[
-                'deploy_application_and_write_log_entry_gets_called'] = True
+            if version_to_deploy_to == '1-2-3':
+                check_function_calls[
+                    'deploy_application_and_write_log_entry_gets_called'] = True
         def mock_switch_version(
-                unused_app_name, unused_current_release_version):
-            check_function_calls['switch_version_gets_called'] = True
+                unused_app_name, current_release_version):
+            if current_release_version == '1-2-3':
+                check_function_calls['switch_version_gets_called'] = True
         def mock_flush_memcache(unused_app_name):
             check_function_calls['flush_memcache_gets_called'] = True
         def mock_check_breakage(
-                unused_app_name, unused_current_release_version):
-            check_function_calls['check_breakage_gets_called'] = True
+                unused_app_name, current_release_version):
+            if current_release_version == '1-2-3':
+                check_function_calls['check_breakage_gets_called'] = True
 
         cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
         preprocess_swap = self.swap(
@@ -334,6 +338,81 @@ class DeployTests(test_utils.GenericTestBase):
         with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
             with self.release_script_exist_swap, self.gcloud_available_swap:
                 with self.args_swap, self.exists_swap, self.check_output_swap:
+                    with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
+                        with cwd_swap, preprocess_swap, update_swap, build_swap:
+                            with deploy_swap, switch_swap, self.run_swap:
+                                with memcache_swap, check_breakage_swap:
+                                    deploy.execute_deployment()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_function_calls_with_custom_version(self):
+        check_function_calls = {
+            'preprocess_release_gets_called': False,
+            'update_and_check_indexes_gets_called': False,
+            'build_scripts_gets_called': False,
+            'deploy_application_and_write_log_entry_gets_called': False,
+            'switch_version_gets_called': False,
+            'flush_memcache_gets_called': False,
+            'check_breakage_gets_called': False
+        }
+        expected_check_function_calls = {
+            'preprocess_release_gets_called': True,
+            'update_and_check_indexes_gets_called': True,
+            'build_scripts_gets_called': True,
+            'deploy_application_and_write_log_entry_gets_called': True,
+            'switch_version_gets_called': True,
+            'flush_memcache_gets_called': True,
+            'check_breakage_gets_called': True
+        }
+        def mock_getcwd():
+            return 'deploy-oppiatestserver-release-1.2.3-%s' % (
+                deploy.CURRENT_DATETIME.strftime('%Y%m%d-%H%M%S'))
+        def mock_preprocess_release(unused_app_name, unused_deploy_data_path):
+            check_function_calls['preprocess_release_gets_called'] = True
+        def mock_update_and_check_indexes(unused_app_name):
+            check_function_calls['update_and_check_indexes_gets_called'] = True
+        def mock_build_scripts():
+            check_function_calls['build_scripts_gets_called'] = True
+        def mock_deploy_application_and_write_log_entry(
+                unused_app_name, version_to_deploy_to,
+                unused_current_git_revision):
+            if version_to_deploy_to == 'release-1-2-3-custom':
+                check_function_calls[
+                    'deploy_application_and_write_log_entry_gets_called'] = True
+        def mock_switch_version(
+                unused_app_name, current_release_version):
+            if current_release_version == 'release-1-2-3-custom':
+                check_function_calls['switch_version_gets_called'] = True
+        def mock_flush_memcache(unused_app_name):
+            check_function_calls['flush_memcache_gets_called'] = True
+        def mock_check_breakage(
+                unused_app_name, current_release_version):
+            if current_release_version == 'release-1-2-3-custom':
+                check_function_calls['check_breakage_gets_called'] = True
+
+        cwd_swap = self.swap(os, 'getcwd', mock_getcwd)
+        preprocess_swap = self.swap(
+            deploy, 'preprocess_release', mock_preprocess_release)
+        update_swap = self.swap(
+            deploy, 'update_and_check_indexes', mock_update_and_check_indexes)
+        build_swap = self.swap(deploy, 'build_scripts', mock_build_scripts)
+        deploy_swap = self.swap(
+            deploy, 'deploy_application_and_write_log_entry',
+            mock_deploy_application_and_write_log_entry)
+        switch_swap = self.swap(
+            deploy, 'switch_version', mock_switch_version)
+        memcache_swap = self.swap(
+            deploy, 'flush_memcache', mock_flush_memcache)
+        check_breakage_swap = self.swap(
+            deploy, 'check_breakage', mock_check_breakage)
+        args_swap = self.swap(
+            sys, 'argv', [
+                'deploy.py', '--app_name=oppiatestserver',
+                '--version=release-1.2.3-custom'])
+
+        with self.get_branch_swap, self.install_swap, self.cwd_check_swap:
+            with self.release_script_exist_swap, self.gcloud_available_swap:
+                with args_swap, self.exists_swap, self.check_output_swap:
                     with self.dir_exists_swap, self.copytree_swap, self.cd_swap:
                         with cwd_swap, preprocess_swap, update_swap, build_swap:
                             with deploy_swap, switch_swap, self.run_swap:
@@ -652,13 +731,9 @@ class DeployTests(test_utils.GenericTestBase):
     def test_check_travis_and_circleci_tests_with_local_travis_not_setup(self):
         def mock_check_output(unused_cmd_tokens):
             return 'sha'
-        def mock_get(url):
-            res = requests.models.Response()
+        def mock_url_open(url):
             if 'travis' in url:
-                res.status_code = 404
-            else:
-                res.status_code = 200
-            return res
+                raise Exception('Not found.')
         def mock_input():
             if 'username' in self.print_arr[-1]:
                 return 'username'
@@ -666,9 +741,9 @@ class DeployTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        get_swap = self.swap(requests, 'get', mock_get)
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.get_remote_alias_swap, self.open_tab_swap, get_swap:
+        with self.get_remote_alias_swap, self.open_tab_swap, url_open_swap:
             with self.print_swap, check_output_swap, input_swap:
                 deploy.check_travis_and_circleci_tests('test-branch')
         self.assertEqual(
@@ -680,13 +755,9 @@ class DeployTests(test_utils.GenericTestBase):
             self):
         def mock_check_output(unused_cmd_tokens):
             return 'sha'
-        def mock_get(url):
-            res = requests.models.Response()
+        def mock_url_open(url):
             if 'circleci' in url:
-                res.status_code = 404
-            else:
-                res.status_code = 200
-            return res
+                raise Exception('Not found.')
         def mock_input():
             if 'username' in self.print_arr[-1]:
                 return 'username'
@@ -694,9 +765,9 @@ class DeployTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        get_swap = self.swap(requests, 'get', mock_get)
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.get_remote_alias_swap, self.open_tab_swap, get_swap:
+        with self.get_remote_alias_swap, self.open_tab_swap, url_open_swap:
             with self.print_swap, check_output_swap, input_swap:
                 deploy.check_travis_and_circleci_tests('test-branch')
         self.assertEqual(
@@ -707,10 +778,8 @@ class DeployTests(test_utils.GenericTestBase):
     def test_check_travis_and_circleci_tests_with_travis_tests_failing(self):
         def mock_check_output(unused_cmd_tokens):
             return 'sha'
-        def mock_get(unused_url):
-            res = requests.models.Response()
-            res.status_code = 200
-            return res
+        def mock_url_open(unused_url):
+            pass
         def mock_input():
             if 'username' in self.print_arr[-1]:
                 return 'username'
@@ -720,9 +789,9 @@ class DeployTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        get_swap = self.swap(requests, 'get', mock_get)
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.get_remote_alias_swap, check_output_swap, get_swap:
+        with self.get_remote_alias_swap, check_output_swap, url_open_swap:
             with self.open_tab_swap, self.print_swap, input_swap:
                 with self.assertRaisesRegexp(
                     Exception, 'Please fix the travis tests before deploying.'):
@@ -734,10 +803,8 @@ class DeployTests(test_utils.GenericTestBase):
     def test_check_travis_and_circleci_tests_with_circleci_tests_failing(self):
         def mock_check_output(unused_cmd_tokens):
             return 'sha'
-        def mock_get(unused_url):
-            res = requests.models.Response()
-            res.status_code = 200
-            return res
+        def mock_url_open(unused_url):
+            pass
         def mock_input():
             if 'username' in self.print_arr[-1]:
                 return 'username'
@@ -747,9 +814,9 @@ class DeployTests(test_utils.GenericTestBase):
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
-        get_swap = self.swap(requests, 'get', mock_get)
+        url_open_swap = self.swap(python_utils, 'url_open', mock_url_open)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with self.get_remote_alias_swap, check_output_swap, get_swap:
+        with self.get_remote_alias_swap, check_output_swap, url_open_swap:
             with self.open_tab_swap, self.print_swap, input_swap:
                 with self.assertRaisesRegexp(
                     Exception,
@@ -759,3 +826,26 @@ class DeployTests(test_utils.GenericTestBase):
             self.urls_to_open, [
                 'https://travis-ci.org/username/oppia/branches',
                 'https://circleci.com/gh/username/workflows/oppia'])
+
+    def test_create_release_doc(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'ask_user_to_confirm_is_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'ask_user_to_confirm_is_called': True
+        }
+        def mock_open_tab(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_is_called'] = True
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
+            deploy.create_release_doc()
+        self.assertEqual(check_function_calls, expected_check_function_calls)

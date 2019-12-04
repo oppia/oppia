@@ -24,25 +24,24 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import argparse
 import os
 
-from . import common
-from . import gcloud_adapter
+from scripts import common
+from scripts.release_scripts import gcloud_adapter
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--app_name', help='name of the app whose indexes should be updated',
     type=str)
 
-PARSED_ARGS = _PARSER.parse_args()
-if PARSED_ARGS.app_name:
-    APP_NAME = PARSED_ARGS.app_name
-else:
-    raise Exception('No app name specified.')
-
 INDEX_YAML_PATH = os.path.join('.', 'index.yaml')
 
 
-def _update_indexes():
+def update_indexes():
     """Updates production indexes after doing the prerequisite checks."""
+    parsed_args = _PARSER.parse_args()
+    if parsed_args.app_name:
+        app_name = parsed_args.app_name
+    else:
+        raise Exception('No app name specified.')
 
     # Do prerequisite checks.
     common.require_cwd_to_be_oppia()
@@ -52,8 +51,10 @@ def _update_indexes():
             'Indexes should only be updated from a release branch.')
 
     # Update the indexes.
-    gcloud_adapter.update_indexes(INDEX_YAML_PATH, APP_NAME)
+    gcloud_adapter.update_indexes(INDEX_YAML_PATH, app_name)
 
 
-if __name__ == '__main__':
-    _update_indexes()
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when initial_release_prep.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
+    update_indexes()

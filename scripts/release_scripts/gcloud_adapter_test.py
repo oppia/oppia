@@ -23,8 +23,7 @@ import os
 import subprocess
 
 from core.tests import test_utils
-
-from . import gcloud_adapter
+from scripts.release_scripts import gcloud_adapter
 
 
 class GcloudAdapterTests(test_utils.GenericTestBase):

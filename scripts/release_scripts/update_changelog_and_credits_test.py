@@ -27,9 +27,9 @@ import sys
 from core.tests import test_utils
 import python_utils
 import release_constants
-
-from . import common
-from . import update_changelog_and_credits
+from scripts import common
+from scripts.release_scripts import generate_release_info
+from scripts.release_scripts import update_changelog_and_credits
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -99,6 +99,12 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         def mock_get_git_ref(unused_self, unused_ref):
             return github.GitRef.GitRef(
                 requester='', headers='', attributes={}, completed='')
+        def mock_main(unused_personal_access_token):
+            pass
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return 'test-token'
+        # pylint: enable=unused-argument
 
         self.mock_repo = github.Repository.Repository(
             requester='', headers='', attributes={}, completed='')
@@ -114,6 +120,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         self.run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
         self.get_git_ref_swap = self.swap(
             github.Repository.Repository, 'get_git_ref', mock_get_git_ref)
+        self.main_swap = self.swap(generate_release_info, 'main', mock_main)
+        self.getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
 
     def test_get_previous_release_version_without_hotfix(self):
         def mock_check_output(unused_cmd_tokens):
@@ -121,7 +129,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
-                    release_constants.RELEASE_BRANCH_TYPE, '2.0.8'), '2.0.7')
+                    release_constants.BRANCH_TYPE_RELEASE, '2.0.8'), '2.0.7')
 
     def test_get_previous_release_version_with_hotfix(self):
         def mock_check_output(unused_cmd_tokens):
@@ -129,7 +137,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'check_output', mock_check_output):
             self.assertEqual(
                 update_changelog_and_credits.get_previous_release_version(
-                    release_constants.HOTFIX_BRANCH_TYPE, '2.0.8'), '2.0.7')
+                    release_constants.BRANCH_TYPE_HOTFIX, '2.0.8'), '2.0.7')
 
     def test_get_previous_release_version_with_invalid_branch_type(self):
         def mock_check_output(unused_cmd_tokens):
@@ -362,16 +370,6 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'branch.')):
             update_changelog_and_credits.main()
 
-    def test_missing_release_summary_file(self):
-        release_summary_swap = self.swap(
-            release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
-        with self.branch_name_swap, release_summary_swap:
-            with self.assertRaisesRegexp(
-                Exception, (
-                    'Release summary file invalid.md is missing. Please run '
-                    'the release_info.py script and re-run this script.')):
-                update_changelog_and_credits.main()
-
     def test_missing_github_username(self):
         args_swap = self.swap(
             sys, 'argv', ['update_changelog_and_credits.py'])
@@ -379,7 +377,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(
                 Exception, (
                     'No GitHub username provided. Please re-run the script '
-                    'specifying a username using --username=<Your username>')):
+                    'specifying a username using --github_username='
+                    '<Your username>')):
                 update_changelog_and_credits.main()
 
     def test_missing_personal_access_token(self):
@@ -394,6 +393,16 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                     'No personal access token provided, please set up a '
                     'personal access token at https://github.com/settings/'
                     'tokens and re-run the script')):
+                update_changelog_and_credits.main()
+
+    def test_missing_release_summary_file(self):
+        release_summary_swap = self.swap(
+            release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
+        with self.main_swap, self.branch_name_swap, release_summary_swap:
+            with self.args_swap, self.getpass_swap, self.assertRaisesRegexp(
+                Exception, (
+                    'Release summary file invalid.md is missing. '
+                    'Please re-run this script.')):
                 update_changelog_and_credits.main()
 
     def test_create_branch(self):
@@ -453,7 +462,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
         with get_branch_swap, git_ref_swap, get_contents_swap, update_file_swap:
             with run_cmd_swap, open_tab_swap:
                 update_changelog_and_credits.create_branch(
-                    self.mock_repo, 'target_branch', 'username')
+                    self.mock_repo, 'target_branch', 'username', '1.2.3')
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls(self):
@@ -464,7 +473,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_contributors_gets_called': False,
             'update_developer_names_gets_called': False,
             'check_ordering_of_sections_gets_called': False,
-            'create_branch_gets_called': False
+            'create_branch_gets_called': False,
+            'open_new_tab_in_browser_if_possible_gets_called': False
         }
         expected_check_function_calls = {
             'remove_updates_and_delete_branch_gets_called': True,
@@ -473,7 +483,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'update_contributors_gets_called': True,
             'update_developer_names_gets_called': True,
             'check_ordering_of_sections_gets_called': True,
-            'create_branch_gets_called': True
+            'create_branch_gets_called': True,
+            'open_new_tab_in_browser_if_possible_gets_called': True
         }
         def mock_remove_updates_and_delete_branch(
                 unused_repo_fork, unused_target_branch):
@@ -481,7 +492,7 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 'remove_updates_and_delete_branch_gets_called'] = True
         def mock_update_changelog(
                 unused_branch_name, unused_release_summary_lines,
-                unused_current_release_version):
+                unused_current_release_version_number):
             check_function_calls['update_changelog_gets_called'] = True
         def mock_update_authors(unused_release_summary_lines):
             check_function_calls['update_authors_gets_called'] = True
@@ -493,16 +504,16 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             check_function_calls[
                 'check_ordering_of_sections_gets_called'] = True
         def mock_create_branch(
-                unused_repo_fork, unused_target_branch, unused_github_username):
+                unused_repo_fork, unused_target_branch, unused_github_username,
+                unused_current_release_version_number):
             check_function_calls['create_branch_gets_called'] = True
-        # pylint: disable=unused-argument
-        def mock_getpass(prompt):
-            return 'test-token'
-        # pylint: enable=unused-argument
         def mock_input():
             return 'y'
         def mock_get_repo(unused_self, unused_repo_name):
             return self.mock_repo
+        def mock_open_tab(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_gets_called'] = True
 
         remove_updates_swap = self.swap(
             update_changelog_and_credits, 'remove_updates_and_delete_branch',
@@ -524,15 +535,17 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             mock_check_ordering_of_sections)
         create_branch_swap = self.swap(
             update_changelog_and_credits, 'create_branch', mock_create_branch)
-        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
-            with input_swap, remove_updates_swap, update_authors_swap:
-                with update_changelog_swap, update_contributors_swap:
-                    with update_developer_names_swap, check_order_swap:
-                        with create_branch_swap, getpass_swap, get_repo_swap:
-                            update_changelog_and_credits.main()
+            with self.main_swap, self.getpass_swap, input_swap:
+                with remove_updates_swap, update_authors_swap, open_tab_swap:
+                    with update_changelog_swap, update_contributors_swap:
+                        with update_developer_names_swap, check_order_swap:
+                            with create_branch_swap, get_repo_swap:
+                                update_changelog_and_credits.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)

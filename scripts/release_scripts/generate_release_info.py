@@ -28,8 +28,7 @@ import sys
 
 import python_utils
 import release_constants
-
-from . import common
+from scripts import common
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
@@ -47,7 +46,7 @@ GIT_CMD_DIFF_NAMES_ONLY_FORMAT_STRING = 'git diff --name-only %s %s'
 GIT_CMD_SHOW_FORMAT_STRING = 'git show %s:feconf.py'
 ISSUE_URL_FORMAT_STRING = 'https://github.com/oppia/oppia/issues/%s'
 ISSUE_REGEX = re.compile(r'#(\d+)')
-PR_NUMBER_REGEX = re.compile(r'\(#(\d+)\)')
+PR_NUMBER_REGEX = re.compile(r'\(#(\d+)\)$')
 GROUP_SEP = '\x1D'
 VERSION_RE_FORMAT_STRING = r'%s\s*=\s*(\d+|\.)+'
 FECONF_VAR_NAMES = ['CURRENT_STATE_SCHEMA_VERSION',
@@ -68,7 +67,20 @@ def get_current_version_tag(repo):
     Returns:
         github.Tag.Tag: The most recent version tag.
     """
-    return repo.get_tags()[0]
+    # In case of hotfix, the first version tag will be the version of the
+    # release for which the hotfix branch is. So, if we require generation
+    # of release summary in case of hotfix, we need to get the second version
+    # tag. For example, if branch is release-1.2.3-hotfix-1, the first tag
+    # on github will be 1.2.3 but the correct tag of previous release will be
+    # 1.2.2 which is required for release summary generation.
+    if 'hotfix' in common.get_current_branch_name():
+        return repo.get_tags()[1]
+    # This is for the normal release without any hotfix. In this case, the
+    # first tag will be of current release serving on prod. For example, if we
+    # are deploying release-1.2.3, the first tag on github will be 1.2.2 which
+    # is required for release summary generation.
+    else:
+        return repo.get_tags()[0]
 
 
 def get_extra_commits_in_new_release(base_commit, repo):
@@ -108,7 +120,11 @@ def gather_logs(start, stop='HEAD'):
     """
     get_logs_cmd = GIT_CMD_GET_LOGS_FORMAT_STRING.format(
         GROUP_SEP, start, stop)
-    out = common.run_cmd(get_logs_cmd.split(' ')).split('\x00')
+    # The unicode conversion is required because there can be non-ascii
+    # characters in the logs and it can result in breaking the flow
+    # of release summary generation.
+    out = python_utils.UNICODE(
+        common.run_cmd(get_logs_cmd.split(' ')), 'utf-8').split('\x00')
     if len(out) == 1 and out[0] == '':
         return []
     else:
@@ -138,8 +154,9 @@ def extract_pr_numbers(logs):
     Returns:
         set(int): Set of PR numbers extracted from the log.
     """
-    pr_numbers = PR_NUMBER_REGEX.findall(
-        ' '.join([log.message for log in logs]))
+    pr_numbers = []
+    for log in logs:
+        pr_numbers.extend(PR_NUMBER_REGEX.findall(log.message.split('\n')[0]))
     # Delete duplicates.
     pr_numbers = list(set(pr_numbers))
     pr_numbers.sort(reverse=True)
@@ -256,7 +273,7 @@ def check_storage_models(current_release):
     """Check if files in core/storage have changed and returns them.
 
     Args:
-        current_release: The current release version
+        current_release: The current release version.
 
     Returns:
         list(str): The changed files (if any).
@@ -265,12 +282,16 @@ def check_storage_models(current_release):
     return [item for item in diff_list if item.startswith('core/storage')]
 
 
-def main():
-    """Collects necessary info and dumps it to disk."""
+def main(personal_access_token):
+    """Collects necessary info and dumps it to disk.
+
+    Args:
+        personal_access_token: str. The personal access token for the
+            GitHub id of user.
+    """
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'This script should only be run from the latest release branch.')
-    personal_access_token = common.get_personal_access_token()
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
@@ -381,9 +402,3 @@ def main():
 
     python_utils.PRINT('Done. Summary file generated in %s' % (
         release_constants.RELEASE_SUMMARY_FILEPATH))
-
-
-# The 'no coverage' pragma is used as this line is un-testable. This is because
-# it will only be called when release_info.py is used as a script.
-if __name__ == '__main__': # pragma: no cover
-    main()

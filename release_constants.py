@@ -39,5 +39,29 @@ RELEASE_SUMMARY_FILEPATH = os.path.join(
 
 REMOTE_URL = 'git@github.com:oppia/oppia.git'
 
-RELEASE_BRANCH_TYPE = 'release'
-HOTFIX_BRANCH_TYPE = 'hotfix'
+BRANCH_TYPE_RELEASE = 'release'
+BRANCH_TYPE_HOTFIX = 'hotfix'
+
+RELEASE_DRIVE_URL = (
+    'https://drive.google.com/drive/folders/0B9KSjiibL_WDNjJyYlEtbTNvY3c')
+RELEASE_NOTES_URL = (
+    'https://docs.google.com/document/d/'
+    '1pmcDNfM2KtmkZeYipuInC48RE5JfkSJWQYdIQAkD0hQ/edit#')
+
+REPEATABLE_JOBS_SPREADSHEETS_URL = (
+    'https://docs.google.com/spreadsheets/d/'
+    '1cSoVEwFyT-Q6d7yonbB0N-ElYGCFz5feMWXZXsv16_Y/edit#gid=1262496785')
+ONE_TIME_JOBS_SPREADSHEET_URL = (
+    'https://docs.google.com/spreadsheets/d/'
+    '1Wegd0rZhVOm3Q3VCIw0xMbLC7IWtRyrEahiPn61Fhoo/edit#gid=948463314')
+
+ISSUE_FILING_URL = 'https://github.com/oppia/oppia/milestone/39'
+CREDITS_FORM_URL = (
+    'https://docs.google.com/forms/d/'
+    '1yH6ZO2UiD_VspgKJR40byRSjUP1AaBF9ARSe814p8K0/edit#responses')
+RELEASE_NOTES_TEMPLATE_URL = (
+    'https://docs.google.com/document/d/'
+    '1VBa3pdRLnvobNlfmZB6-uRYJHBz_Gc-6eN_ilSoVlhE/edit#')
+RELEASE_NOTES_EXAMPLE_URL = (
+    'https://docs.google.com/document/d/'
+    '1OUwgMPNORABJAz7DS0iuDUr5A2FxcXg4Y5-qUEdgo-M/edit#heading=h.l3dbee3s55ti')

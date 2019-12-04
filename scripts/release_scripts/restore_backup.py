@@ -23,6 +23,10 @@ The name of the project should match the project name on App Engine.
 If the status of a backup restoration is to be checked, run the script as:
 
     python -m scripts.restore_backup --check_status
+
+If you want to cancel a backup restoration operation, run the script as:
+
+    python -m scripts.restore_backup --cancel_operation
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -30,11 +34,12 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
+import re
 import sys
 
 import python_utils
-
-from . import common
+import release_constants
+from scripts import common
 
 GCLOUD_PATH = os.path.join(
     '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',
@@ -51,6 +56,8 @@ LIST_OF_BUCKETS_URL = (
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--project_name', help='name of the project to set for backup', type=str)
+_PARSER.add_argument(
+    '--cancel_operation', action='store_true', default=False)
 _PARSER.add_argument(
     '--check_status', action='store_true', default=False)
 
@@ -73,8 +80,13 @@ def initiate_backup_restoration_process():
         '<date_time>.overall_export_metadata. \n'
         'For example, "20181122-090002.overall_export_metadata". '
         'This is the file you want to import.\n'
-        'Please copy and enter the name of this file\n')
+        'Please copy and enter the path of this file\n')
     export_metadata_filepath = python_utils.INPUT()
+    if not re.match(
+            r'^oppia-export-backups/(\d{8}-\d{6})/\1\.overall_export_metadata$',
+            export_metadata_filepath):
+        raise Exception('Invalid export metadata filepath: %s' % (
+            export_metadata_filepath))
     common.run_cmd([
         GCLOUD_PATH, 'datastore', 'import',
         'gs://%s' % export_metadata_filepath, '--async'])
@@ -86,6 +98,30 @@ def check_backup_restoration_status():
         common.run_cmd([GCLOUD_PATH, 'datastore', 'operations', 'list']))
 
 
+def cancel_operation():
+    """Cancels a datastore operation."""
+    python_utils.PRINT(
+        'Cancellation of operation may corrupt the datastore. '
+        'Refer: https://cloud.google.com/datastore/docs/'
+        'export-import-entities#cancel_an_operation\n'
+        'Do you want to continue?\n')
+    execute_cancellation = python_utils.INPUT().lower()
+    if execute_cancellation not in release_constants.AFFIRMATIVE_CONFIRMATIONS:
+        python_utils.PRINT('Aborting Cancellation.')
+        return
+
+    python_utils.PRINT('List of operations in progress:\n')
+    check_backup_restoration_status()
+    python_utils.PRINT(
+        'Enter the name of the operation to cancel from the above list. '
+        'The name of an operation is listed in the field called "name". '
+        'Check the example here: https://stackoverflow.com/a/53630367 for '
+        'details.\n')
+    operation_name = python_utils.INPUT()
+    common.run_cmd([
+        GCLOUD_PATH, 'datastore', 'operations', 'cancel', operation_name])
+
+
 def main(args=None):
     """Performs task to restore backup or check the status of
     backup restoration.
@@ -95,20 +131,23 @@ def main(args=None):
         raise Exception('Directory %s does not exist.' % GAE_DIR)
     sys.path.insert(0, GAE_DIR)
 
-    if not common.is_current_branch_a_release_branch():
-        raise Exception(
-            'This script should only be run from the latest release branch.')
-
     options = _PARSER.parse_args(args=args)
 
-    if options.check_status:
-        check_backup_restoration_status()
+    if options.check_status or options.cancel_operation:
+        if options.check_status:
+            check_backup_restoration_status()
+        if options.cancel_operation:
+            cancel_operation()
     else:
         if options.project_name is None:
             raise Exception(
                 'Please provide project name for backup restoration.')
         set_project(options.project_name)
         initiate_backup_restoration_process()
+        python_utils.PRINT(
+            'Backup restoration process initiated!\n'
+            'To check the status of the project please run: '
+            'python -m scripts.restore_backup --check_status')
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

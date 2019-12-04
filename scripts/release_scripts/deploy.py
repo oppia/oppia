@@ -49,13 +49,10 @@ import sys
 
 import python_utils
 import release_constants
-
-import requests
-
-from . import common
-from . import gcloud_adapter
-from . import install_third_party_libs
-from . import update_configs
+from scripts import common
+from scripts import install_third_party_libs
+from scripts.release_scripts import gcloud_adapter
+from scripts.release_scripts import update_configs
 # pylint: enable=wrong-import-order
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -319,10 +316,6 @@ def check_breakage(app_name, current_release_version):
     test_server_error_logs_url = (
         'https://console.cloud.google.com/logs/viewer?'
         'project=%s&key1=default&minLogLevel=500') % app_name
-    release_journal_url = (
-        'https://drive.google.com/drive/folders/'
-        '0B9KSjiibL_WDNjJyYlEtbTNvY3c')
-    issue_filing_url = 'https://github.com/oppia/oppia/milestone/39'
 
     currently_served_version = (
         gcloud_adapter.get_currently_served_version(app_name))
@@ -331,8 +324,10 @@ def check_breakage(app_name, current_release_version):
         major_breakage = check_errors_in_a_page(
             test_server_error_logs_url, 'Is anything major broken?')
         if major_breakage:
-            common.open_new_tab_in_browser_if_possible(release_journal_url)
-            common.open_new_tab_in_browser_if_possible(issue_filing_url)
+            common.open_new_tab_in_browser_if_possible(
+                release_constants.RELEASE_DRIVE_URL)
+            common.open_new_tab_in_browser_if_possible(
+                release_constants.ISSUE_FILING_URL)
             raise Exception(
                 'Please note the issue in the release journal for this month, '
                 'file a blocking bug and switch to the last known good '
@@ -367,17 +362,21 @@ def check_travis_and_circleci_tests(current_branch_name):
             'The latest commit on release branch locally does '
             'not match the latest commit on Oppia repo.')
 
-    python_utils.PRINT('Enter your GitHub username.\n')
+    python_utils.PRINT('\nEnter your GitHub username.\n')
     github_username = python_utils.INPUT().lower()
 
     travis_url = 'https://travis-ci.org/%s/oppia/branches' % github_username
     circleci_url = 'https://circleci.com/gh/%s/workflows/oppia' % (
         github_username)
 
-    if requests.get(travis_url).status_code != 200:
+    try:
+        python_utils.url_open(travis_url)
+    except Exception:
         travis_url = 'https://travis-ci.org/oppia/oppia/branches'
 
-    if requests.get(circleci_url).status_code != 200:
+    try:
+        python_utils.url_open(circleci_url)
+    except Exception:
         circleci_url = 'https://circleci.com/gh/oppia/workflows/oppia'
 
     common.open_new_tab_in_browser_if_possible(travis_url)
@@ -398,6 +397,22 @@ def check_travis_and_circleci_tests(current_branch_name):
             'Please fix the circleci tests before deploying.')
 
 
+def create_release_doc():
+    """Asks the co-ordinator to create a doc for the current release."""
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_DRIVE_URL)
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_NOTES_TEMPLATE_URL)
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_NOTES_EXAMPLE_URL)
+    common.ask_user_to_confirm(
+        'Please create a dedicated section for this release in the '
+        'release tracking document created by the QA Lead.\n'
+        'The three tabs in your browser point to: '
+        'Release drive url, template for the release notes, example of release '
+        'notes from previous release.')
+
+
 def execute_deployment():
     """Executes the deployment process after doing the prerequisite checks.
 
@@ -413,6 +428,7 @@ def execute_deployment():
         Exception: Invalid directory accessed during deployment.
     """
     parsed_args = _PARSER.parse_args()
+    custom_version = None
     if parsed_args.app_name:
         app_name = parsed_args.app_name
         if app_name not in [
@@ -442,8 +458,13 @@ def execute_deployment():
     if not common.is_current_branch_a_release_branch():
         raise Exception(
             'The deployment script must be run from a release branch.')
-    current_release_version = current_branch_name[len(
-        common.RELEASE_BRANCH_NAME_PREFIX):].replace(DOT_CHAR, HYPHEN_CHAR)
+    if custom_version is not None:
+        current_release_version = custom_version.replace(
+            DOT_CHAR, HYPHEN_CHAR)
+    else:
+        current_release_version = current_branch_name[
+            len(common.RELEASE_BRANCH_NAME_PREFIX):].replace(
+                DOT_CHAR, HYPHEN_CHAR)
 
     # This is required to compose the release_version_library_url
     # (defined in switch_version function) correctly.
@@ -456,12 +477,14 @@ def execute_deployment():
     gcloud_adapter.require_gcloud_to_be_available()
     try:
         if app_name == APP_NAME_OPPIASERVER:
-            release_version = current_branch_name[len(
-                common.RELEASE_BRANCH_NAME_PREFIX):]
+            create_release_doc()
+            release_version_number = common.get_current_release_version_number(
+                current_branch_name)
             last_commit_message = subprocess.check_output(
                 'git log -1 --pretty=%B'.split())
             if not last_commit_message.startswith(
-                    'Update authors and changelog for v%s' % release_version):
+                    'Update authors and changelog for v%s' % (
+                        release_version_number)):
                 raise Exception(
                     'Invalid last commit message: %s.' % last_commit_message)
 
@@ -472,7 +495,7 @@ def execute_deployment():
             repo = g.get_organization('oppia').get_repo('oppia')
             common.check_blocking_bug_issue_count(repo)
             common.check_prs_for_current_release_are_released(repo)
-            update_configs.main()
+            update_configs.main(personal_access_token)
             with python_utils.open_file(FECONF_PATH, 'r') as f:
                 feconf_contents = f.read()
                 if ('MAILGUN_API_KEY' not in feconf_contents or
@@ -513,9 +536,7 @@ def execute_deployment():
             update_and_check_indexes(app_name)
             build_scripts()
             deploy_application_and_write_log_entry(
-                app_name, (
-                    custom_version
-                    if custom_version else current_release_version),
+                app_name, current_release_version,
                 current_git_revision)
 
             python_utils.PRINT('Returning to oppia/ root directory.')
