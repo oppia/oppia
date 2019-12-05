@@ -119,7 +119,7 @@ export class FractionObjectFactory {
       } else {
         throw new Error(
           ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_FORMAT);
-      } 
+      }
     }
     var isNegative = false;
     var wholeNumber = 0;
