@@ -20,6 +20,7 @@ CHROME_DRIVER_VERSION = '2.41'
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
+PROTRACTOR_BIN_PATH = os.path.join(common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -41,7 +42,7 @@ _PARSER.add_argument(
     '--browserstack',
     help='Run the tests on browserstack using the'
          'protractor-browserstack.conf.js file.',
-    )
+    action='store_true')
 _PARSER.add_argument(
     '--skip-install',
     help='If true, skips installing dependencies. The default value is false.',
@@ -54,7 +55,7 @@ _PARSER.add_argument(
          ' (fit or fdescribe).',
     action='store_true')
 _PARSER.add_argument(
-    '--sharding-instances',
+    '--sharding-instances', type=str,
     help='Sets the number of parallel browsers to open while sharding.'
          'Sharding must be disabled (either by passing in false to --sharding'
          ' or 1 to --sharding-instances) if running any tests in isolation'
@@ -127,7 +128,9 @@ def run_webdriver_manager(commands, wait=True):
     web_driver_command.extend(commands)
     p = subprocess.Popen(web_driver_command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if wait:
-        p.communicate()
+        stdout, err = p.communicate()
+        print stdout
+        print err   
     else:
         SUBPROCESSES.append(p)
 
@@ -153,6 +156,7 @@ def build_js_files(dev_mode, run_on_browserstack):
     os.remove('%s.bak' % constant_file)
 
 def start_webdriver_manager():
+    os_name = platform.system()
     run_webdriver_manager(['update', '--versions.chrome', CHROME_DRIVER_VERSION])
     run_webdriver_manager(
         ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
@@ -160,9 +164,19 @@ def start_webdriver_manager():
     run_webdriver_manager(
         ['start', '2>%snull' % '$' if os_name == 'Windows' else ''], False)
 
+def run_e2e_tests(run_on_browserstack, sharding, shard_instances, suite, dev_mode):
+    if not run_on_browserstack:
+        config_file = os.path.join('core', 'tests', 'protractor.conf.js')
+    else:
+        config_file = os.path.join('core', 'tests', 'protractor-browserstack.conf.js')
+    if not sharding or shard_instances == "1":
+        subprocess.Popen([PROTRACTOR_BIN_PATH, config_file, '--suite', suite, '--params.devMode=%s' % dev_mode])
+    else:
+        subprocess.Popen([PROTRACTOR_BIN_PATH, config_file, '--capabilities.shardTestFiles=%s' % sharding,  '--capabilities.maxInstances=%s' % shard_instances, '--suite', suite,  '--params.devMode="%s"' % dev_mode])
+
 
 def main(args=None):
-    os_name = platform.system()
+    sys.path.insert(1, os.path.join(common.THIRD_PARTY_DIR, 'psutil-5.6.7'))
     parsed_args = _PARSER.parse_args(args=args)
     atexit.register(cleanup)
     check_running_instance(8181, 9001)
@@ -183,8 +197,9 @@ def main(args=None):
             app_yaml_filepath), shell=True)
     wait_for_port(WEB_DRIVER_PORT)
     wait_for_port(GOOGLE_APP_ENGINE_PORT)
-    
-
+    if os.path.isdir(os.path.join(os.pardir, 'protractor-screenshots')):
+        os.rmdir(os.path.join(os.pardir, 'protractor-screenshots'))
+    run_e2e_tests(run_on_browserstack, parsed_args.sharding, parsed_args.shard_instances, parsed_args.suite, parsed_args.dev_mode)
 
 if __name__ == '__main__':
     main()
