@@ -30,6 +30,13 @@ describe('Translation language service', function() {
     $provide.value('LanguageUtilService', {
       getAllVoiceoverLanguageCodes: function() {
         return ['en', 'hi'];
+      },
+      getAudioLanguageDescription: function(activeLanguageCode) {
+        var descriptions = {
+          en: 'English',
+          hi: 'Hindi'
+        };
+        return descriptions[activeLanguageCode];
       }
     });
   }));
@@ -53,11 +60,22 @@ describe('Translation language service', function() {
     });
 
     it('should not allow invalid state names to be set', function() {
-      tls.setActiveLanguageCode('eng');
+      expect(tls.setActiveLanguageCode('eng')).toBeNull();
       expect(tls.getActiveLanguageCode()).toBeNull();
 
-      tls.setActiveLanguageCode(null);
+      expect(tls.setActiveLanguageCode(null)).toBeNull();
       expect(tls.getActiveLanguageCode()).toBeNull();
+    });
+
+    it('should show the language description', function() {
+      tls.setActiveLanguageCode('en');
+      expect(tls.getActiveLanguageDescription()).toBe('English');
+    });
+
+    it('shouldn\'t show the language description of invalid state name',
+      function() {
+        tls.setActiveLanguageCode('eng');
+        expect(tls.getActiveLanguageDescription()).toBeNull();
     });
   });
 });
