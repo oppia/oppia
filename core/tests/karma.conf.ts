@@ -173,7 +173,8 @@ module.exports = function(config) {
             loader: 'underscore-template-loader'
           },
           {
-            test: /\.ts$/,
+            // Exclude all the spec files from the report.
+            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
             enforce: 'post',
             use: {
               loader: 'istanbul-instrumenter-loader',
