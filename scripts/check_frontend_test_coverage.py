@@ -24,6 +24,10 @@ import sys
 
 import python_utils
 
+LCOV_FILE_PATH = '../karma_coverage_reports/lcov.info'
+DEV_LCOV_FILE_PATH = './tmp/dev-lcov.info'
+PR_LCOV_FILE_PATH = './tmp/pr-lcov.info'
+
 
 def change_git_branch(branch):
     """Changes git branch.
@@ -31,28 +35,21 @@ def change_git_branch(branch):
     Args:
       branch: string. Name of the branch to be changed.
     """
-    task = subprocess.Popen(['git', 'checkout', branch])
-
-    task.communicate()
-    task.wait()
+    subprocess.check_call(['git', 'checkout', branch])
 
     if branch == 'develop':
         # This line is executed because CircleCI keeps the commits from PR
         # branch when changing branchs. Ref ->
         # (https://discuss.circleci.com/t/changing-git-branches-causes-
         # commits-from-one-branch-to-carry-over-to-the-next/13562)
-        reset = subprocess.Popen(['git', 'reset', '--hard', 'origin/develop'])
-
-        reset.communicate()
-        reset.wait()
+        subprocess.check_call([
+            'git', 'reset', '--hard', 'origin/develop'])
 
 
 def run_frontend_tests_script():
     """Run the frontend tests script using subprocess."""
-    task = subprocess.Popen(['python', '-m', 'scripts.run_frontend_tests'])
-
-    task.communicate()
-    task.wait()
+    subprocess.check_call([
+        'python', '-m', 'scripts.run_frontend_tests'])
 
 
 def create_tmp_folder():
@@ -68,17 +65,18 @@ def delete_tmp_folder():
 
 
 def filter_lines(line):
-    """Check if the line has file path or total lines or covered lines
-        of the test.
+    """Check if the line has file path (SF) or total lines (LF) or covered
+        lines (LH) of the test.
 
     Args:
         line: str. A line from lcov file.
 
     Returns:
-        True or false.
+        If the line has the file path or total lines or covered lines of the
+        test.
     """
-    return bool(line.find('SF') >= 0 or line.find('LH') >= 0 or
-                line.find('LF') >= 0)
+    return (line.find('SF') >= 0 or line.find('LH') >= 0
+            or line.find('LF') >= 0)
 
 
 def get_test_file_name(test_path):
@@ -90,6 +88,12 @@ def get_test_file_name(test_path):
     Returns:
         file_name(str). The file name.
     """
+    if not test_path:
+        sys.stderr.write(
+            'The test path is empty or null.'
+            'It\'s not possible to diff the test coverage correctly.')
+        sys.exit(1)
+
     return test_path[test_path.rindex('/') + 1:]
 
 
@@ -103,7 +107,7 @@ def get_lcov_file_tests(file_path):
       file_path: string. The path of lcov file.
 
     Returns:
-      An array with all tests filtered, including ony important data for the
+      An array with all tests filtered, including only important data for the
       diff.
     """
     with python_utils.open_file(file_path, 'r') as f:
@@ -126,64 +130,57 @@ def build_tests_fully_coverage_dict():
         tested file.
     """
     coverage_dict = {}
-    file_path = './tmp/dev-lcov.info'
-    file_exists = os.path.exists(file_path)
 
-    if file_exists is True:
-        tests = get_lcov_file_tests(file_path)
+    if os.path.exists(DEV_LCOV_FILE_PATH):
+        tests = get_lcov_file_tests(DEV_LCOV_FILE_PATH)
         for lines in tests:
-            lf = lines[1].split(':')[1]
-            lh = lines[2].split(':')[1]
+            total_lines = lines[1].split(':')[1]
+            covered_lines = lines[2].split(':')[1]
 
-            if lf == lh:
+            if total_lines == covered_lines:
                 test_name = get_test_file_name(lines[0])
                 coverage_dict[test_name] = [
-                    int(lf),
-                    int(lh)
+                    int(total_lines),
+                    int(covered_lines)
                 ]
 
         return coverage_dict
     else:
-        raise Exception('File at path {} doesn\'t exist'.format(file_path))
+        raise Exception(
+            'File at path {} doesn\'t exist'.format(DEV_LCOV_FILE_PATH))
 
 
 def lcov_files_diff():
     """Check if any 100% covered file had the coverage dropped."""
     fully_covered_tests = build_tests_fully_coverage_dict()
 
-    file_path = './tmp/pr-lcov.info'
-    file_exists = os.path.exists(file_path)
-
-    if file_exists is True:
-        tests = get_lcov_file_tests(file_path)
+    if os.path.exists(PR_LCOV_FILE_PATH):
+        tests = get_lcov_file_tests(PR_LCOV_FILE_PATH)
         for lines in tests:
             test_name = get_test_file_name(lines[0])
 
             if test_name in fully_covered_tests:
-                lf = lines[1].split(':')[1]
-                lh = lines[2].split(':')[1]
+                total_lines = lines[1].split(':')[1]
+                covered_lines = lines[2].split(':')[1]
 
                 test = fully_covered_tests[test_name]
-                lf_test = test[0]
+                total_lines_test = test[0]
 
-                if lf_test == int(lf) and int(lf) != int(lh):
+                if (total_lines_test == int(total_lines)
+                        and int(total_lines) != int(covered_lines)):
                     sys.stderr.write(
                         'The {} file is fully covered and it has '
                         'decreased after the changes \n'.format(test_name))
                     sys.exit(1)
-
     else:
-        raise Exception('File at path {} doesn\'t exist'.format(file_path))
+        raise Exception('File at path {} doesn\'t exist'.format(
+            PR_LCOV_FILE_PATH))
 
 
 def main():
     """The first function to be executated."""
     current_branch = subprocess.check_output([
-        'git',
-        'rev-parse',
-        '--abbrev-ref',
-        'HEAD'
-    ]).strip()
+        'git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
 
     if current_branch != 'develop' and current_branch != 'master':
         run_frontend_tests_script()
@@ -191,16 +188,16 @@ def main():
         create_tmp_folder()
 
         shutil.copyfile(
-            '../karma_coverage_reports/lcov.info',
-            './tmp/pr-lcov.info')
+            os.path.join(*LCOV_FILE_PATH.split('/')),
+            os.path.join(*PR_LCOV_FILE_PATH.split('/')))
 
         change_git_branch('develop')
 
         run_frontend_tests_script()
 
         shutil.copyfile(
-            '../karma_coverage_reports/lcov.info',
-            './tmp/dev-lcov.info')
+            os.path.join(*LCOV_FILE_PATH.split('/')),
+            os.path.join(*DEV_LCOV_FILE_PATH.split('/')))
 
         lcov_files_diff()
 
