@@ -111,9 +111,15 @@ export class FractionObjectFactory {
         ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_CHARS);
     }
     var FRACTION_REGEX = /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
+    var INTERMEDIATE_REGEX = /^\s*-?\s*$/;
     if (!FRACTION_REGEX.test(rawInput)) {
-      throw new Error(
-        ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_FORMAT);
+      if (INTERMEDIATE_REGEX.test(rawInput)) {
+        throw new Error(
+          ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INTERMEDIATE);
+      } else {
+        throw new Error(
+          ObjectsDomainConstants.FRACTION_PARSING_ERRORS.INVALID_FORMAT);
+      } 
     }
     var isNegative = false;
     var wholeNumber = 0;
