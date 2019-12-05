@@ -19,12 +19,16 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import contextlib
 import getpass
 import os
+import platform
 import re
 import socket
 import subprocess
 
 import python_utils
 import release_constants
+
+NODE_VERSION = '10.15.3'
+YARN_VERSION = 'v1.17.3'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -34,13 +38,41 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
-NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
+NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
-YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-v1.17.3')
+YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
+OS_NAME = platform.system()
+ARCHITECTURE = platform.machine()
+
+
+def is_windows_os():
+    """Check if the running system is Windows."""
+    return OS_NAME == 'Windows'
+
+
+def is_mac_os():
+    """Check if the running system is MacOS."""
+    return OS_NAME == 'Darwin'
+
+
+def is_linux_os():
+    """Check if the running system is Linux."""
+    return OS_NAME == 'Linux'
+
+
+def is_x64_architecture():
+    """Check if the architecture is on X64."""
+    return ARCHITECTURE == 'x86_64'
+
+
+NODE_BIN_PATH = os.path.join(
+    NODE_PATH, '' if is_windows_os() else 'bin', 'node')
+
 # Add path for node which is required by the node_modules.
-os.environ['PATH'] = (
-    '%s/bin:' % NODE_PATH + '%s/bin:' % YARN_PATH + os.environ['PATH'])
+os.environ['PATH'] = os.pathsep.join([
+    os.path.dirname(NODE_BIN_PATH), os.path.join(YARN_PATH, 'bin'),
+    os.environ['PATH']])
 
 
 def run_cmd(cmd_tokens):
