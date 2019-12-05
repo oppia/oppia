@@ -6,6 +6,7 @@ import platform
 import re
 import subprocess
 import sys
+import time
 
 import python_utils
 
@@ -16,6 +17,9 @@ from scripts import setup
 from scripts import setup_gae
 
 CHROME_DRIVER_VERSION = '2.41'
+
+WEB_DRIVER_PORT = 4444
+GOOGLE_APP_ENGINE_PORT = 9001
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -102,6 +106,10 @@ Please terminate it before running the end-to-end tests.
             """ % port)
             sys.exit(1)
 
+def wait_for_port(port):
+    while not common.is_port_open(port):
+        time.sleep(1)
+
 def tweak_constant_ts(constant_file, dev_mode):
     regex = re.compile('"DEV_MODE": .*')
     constants_env_variable = '"DEV_MODE": %s' % (
@@ -152,6 +160,7 @@ def start_webdriver_manager():
     run_webdriver_manager(
         ['start', '2>%snull' % '$' if os_name == 'Windows' else ''], False)
 
+
 def main(args=None):
     os_name = platform.system()
     parsed_args = _PARSER.parse_args(args=args)
@@ -165,6 +174,15 @@ def main(args=None):
 
     app_yaml_filepath = 'app%s.yaml' % '_dev' if dev_mode else ''
 
+    import dev_appserver
+    subprocess.Popen(
+        'python %s/dev_appserver.py  --host 0.0.0.0 --port %s '
+        '--clear_datastore=yes --dev_appserver_log_level=critical '
+        '--log_level=critical --skip_sdk_update_check=true %s' % (
+            common.GOOGLE_APP_ENGINE_HOME, GOOGLE_APP_ENGINE_PORT,
+            app_yaml_filepath), shell=True)
+    wait_for_port(WEB_DRIVER_PORT)
+    wait_for_port(GOOGLE_APP_ENGINE_PORT)
     
 
 
