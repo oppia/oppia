@@ -393,10 +393,10 @@ def kill_processes_based_on_regex(regex):
         regex: _sre.SRE_Pattern. Regex pattern for searching processes.
     """
     import psutil
-    pids = psutil.pids()
-    for pid in pids:
-        process = psutil.Process(pid)
-        if regex.match(process.name()):
+    for process in psutil.process_iter():
+        cmdline = ' '.join(process.cmdline())
+        if regex.match(cmdline) and process.is_running():
+            python_utils.PRINT("Killing %s ..." % cmdline)
             process.kill()
 
 

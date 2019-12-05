@@ -48,14 +48,14 @@ _PARSER.add_argument(
     help='If true, skips installing dependencies. The default value is false.',
     action='store_true')
 _PARSER.add_argument(
-    '--sharding',
+    '--sharding', default=True, type=bool,
     help='Disables/Enables parallelization of protractor tests.'
          'Sharding must be disabled (either by passing in false to --sharding'
          ' or 1 to --sharding-instances) if running any tests in isolation'
          ' (fit or fdescribe).',
-    action='store_true')
+    )
 _PARSER.add_argument(
-    '--sharding-instances', type=str,
+    '--sharding-instances', type=str, default='3',
     help='Sets the number of parallel browsers to open while sharding.'
          'Sharding must be disabled (either by passing in false to --sharding'
          ' or 1 to --sharding-instances) if running any tests in isolation'
@@ -67,7 +67,7 @@ _PARSER.add_argument(
     action='store_true')
 
 _PARSER.add_argument(
-    '--suite',
+    '--suite', default='full',
     help='Performs test for different suites, here suites are the'
          'name of the test files present in core/tests/protractor_desktop/ and'
          'core/test/protractor/ dirs. e.g. for the file'
@@ -87,9 +87,10 @@ of the failed tests in ../protractor-screenshots/"
 
 def cleanup():
     processes_to_kill = [
-        re.compile('[Dd]ev_appserver.py --host=0.0.0.0 --port=9001'),
+        re.compile(r'.*[Dd]ev_appserver\.py --host 0\.0\.0\.0 --port 9001.*'),
         re.compile(
-            r'node_modules(/|\\)webdriver-manager(/|\\)selenium')
+            r'node_modules(/|\\)webdriver-manager(/|\\)selenium'),
+        re.compile('.*chromedriver_%s.*' % CHROME_DRIVER_VERSION)
     ]
     for p in SUBPROCESSES:
         p.kill()
@@ -129,8 +130,8 @@ def run_webdriver_manager(commands, wait=True):
     p = subprocess.Popen(web_driver_command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if wait:
         stdout, err = p.communicate()
-        print stdout
-        print err   
+        python_utils.PRINT(stdout)
+        python_utils.PRINT(err)
     else:
         SUBPROCESSES.append(p)
 
@@ -164,16 +165,16 @@ def start_webdriver_manager():
     run_webdriver_manager(
         ['start', '2>%snull' % '$' if os_name == 'Windows' else ''], False)
 
-def run_e2e_tests(run_on_browserstack, sharding, shard_instances, suite, dev_mode):
+def run_e2e_tests(run_on_browserstack, sharding, sharding_instances, suite, dev_mode):
     if not run_on_browserstack:
         config_file = os.path.join('core', 'tests', 'protractor.conf.js')
     else:
         config_file = os.path.join('core', 'tests', 'protractor-browserstack.conf.js')
-    if not sharding or shard_instances == "1":
-        subprocess.Popen([PROTRACTOR_BIN_PATH, config_file, '--suite', suite, '--params.devMode=%s' % dev_mode])
+    if not sharding or sharding_instances == "1":
+        p = subprocess.Popen(['node', PROTRACTOR_BIN_PATH, config_file, '--suite', suite, '--params.devMode=%s' % dev_mode])
     else:
-        subprocess.Popen([PROTRACTOR_BIN_PATH, config_file, '--capabilities.shardTestFiles=%s' % sharding,  '--capabilities.maxInstances=%s' % shard_instances, '--suite', suite,  '--params.devMode="%s"' % dev_mode])
-
+        p = subprocess.Popen(['node', PROTRACTOR_BIN_PATH, config_file, '--capabilities.shardTestFiles=%s' % sharding,  '--capabilities.maxInstances=%s' % sharding_instances, '--suite', suite,  '--params.devMode="%s"' % dev_mode])
+    p.communicate()
 
 def main(args=None):
     sys.path.insert(1, os.path.join(common.THIRD_PARTY_DIR, 'psutil-5.6.7'))
@@ -199,7 +200,7 @@ def main(args=None):
     wait_for_port(GOOGLE_APP_ENGINE_PORT)
     if os.path.isdir(os.path.join(os.pardir, 'protractor-screenshots')):
         os.rmdir(os.path.join(os.pardir, 'protractor-screenshots'))
-    run_e2e_tests(run_on_browserstack, parsed_args.sharding, parsed_args.shard_instances, parsed_args.suite, parsed_args.dev_mode)
+    run_e2e_tests(run_on_browserstack, parsed_args.sharding, parsed_args.sharding_instances, parsed_args.suite, dev_mode)
 
 if __name__ == '__main__':
     main()
