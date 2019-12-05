@@ -253,7 +253,7 @@ def _check_all_tasks(tasks):
             log(task_details)
 
 
-def _execute_tasks(tasks, batch_size=8):
+def _execute_tasks(tasks, batch_size=7):
     """Starts all tasks and checks the results.
 
     Runs no more than 'batch_size' tasks at a time.
@@ -274,7 +274,7 @@ def _execute_tasks(tasks, batch_size=8):
             task.start()
             task.start_time = time.time()
 
-        time.sleep(7)
+        time.sleep(6)
         if remaining_tasks:
             log('----------------------------------------')
             log('Number of unstarted tasks: %s' % len(remaining_tasks))
