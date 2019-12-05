@@ -443,7 +443,7 @@ def are_datetimes_close(later_datetime, earlier_datetime):
         earlier_datetime: datetime. The earlier datetime.
 
     Returns:
-        bool. Returns true if difference between two datetimes is less than 
+        bool. Returns true if difference between two datetimes is less than
             feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise returns false.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
@@ -541,7 +541,7 @@ def require_valid_name(name, name_type, allow_empty=False):
 
     Raises:
         Exception: Raised when name isn't a string.
-        Exception: Raised when the length of the name_type isn't between 
+        Exception: Raised when the length of the name_type isn't between
             1 and 50.
         Exception: Raised when name starts or ends with whitespace.
         Exception: Raised when adjacent whitespace in name_type isn't collapsed.
@@ -678,7 +678,7 @@ def unescape_encoded_uri_component(escaped_string):
         escaped_string: str. String that is encoded with encodeURIComponent.
 
     Returns:
-        str. Returns decoded string that was initially encoded with 
+        str. Returns decoded string that was initially encoded with
             encodeURIComponent.
     """
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')
@@ -689,7 +689,7 @@ def get_asset_dir_prefix():
     It is used as a prefix in urls for images, css and script files.
 
     Returns:
-        str. Returns prefix '/build' if constants,DEV_MODE is false, otherwise 
+        str. Returns prefix '/build' if constants,DEV_MODE is false, otherwise
             returns null string.
     """
     asset_dir_prefix = ''
