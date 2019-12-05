@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TopicViewerBackendApiService.
+ * @fileoverview Unit tests for ClassroomBackendApiService.
  */
 
 require('domain/classroom/classroom-backend-api.service.ts');
