@@ -386,6 +386,20 @@ def check_prs_for_current_release_are_released(repo):
                 'released before release summary generation.')
 
 
+def kill_processes_based_on_regex(regex):
+    """Kill processes based on provided regex.
+
+    Args:
+        regex: _sre.SRE_Pattern. Regex pattern for searching processes.
+    """
+    import psutil
+    pids = psutil.pids()
+    for pid in pids:
+        process = psutil.Process(pid)
+        if regex.match(process.name()):
+            process.kill()
+
+
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 
