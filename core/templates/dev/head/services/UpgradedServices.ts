@@ -30,8 +30,6 @@ import { BackgroundMaskService } from
   'services/stateful/background-mask.service';
 import { baseInteractionValidationService } from
   'interactions/base-interaction-validation.service';
-import { BrowserCheckerService } from
-  'domain/utilities/browser-checker.service';
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { ChangesInHumanReadableFormService } from
@@ -46,7 +44,6 @@ import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
 import { DebouncerService } from 'services/debouncer.service';
-import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 import { DeviceInfoService } from 'services/contextual/device-info.service';
 import { DocumentAttributeCustomizationService } from
   'services/contextual/document-attribute-customization.service';
@@ -65,6 +62,7 @@ import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { FormatTimePipe } from 'filters/format-timer.pipe';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { GenerateContentIdService } from 'services/generate-content-id.service';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
@@ -180,7 +178,6 @@ export class UpgradedServices {
     upgradedServices['CsrfTokenService'] = new CsrfTokenService();
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
-    upgradedServices['DebugInfoTrackerService'] = new DebugInfoTrackerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
     upgradedServices['ExplorationDraftObjectFactory'] =
@@ -232,8 +229,6 @@ export class UpgradedServices {
     // Group 2: Services depending only on group 1.
     upgradedServices['AlertsService'] =
       new AlertsService(upgradedServices['LoggerService']);
-    upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
-      upgradedServices['WindowRef']);
     upgradedServices['ChangesInHumanReadableFormService'] =
       new ChangesInHumanReadableFormService(
         upgradedServices['UtilsService'], document);

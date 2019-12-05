@@ -16,30 +16,43 @@
  * @fileoverview Service Promo bar.
  */
 
-require('services/services.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('PromoBarService', [
-  '$http', '$q', 'ENABLE_PROMO_BAR',
-  function($http, $q, ENABLE_PROMO_BAR) {
-    return {
-      getPromoBarData: function() {
-        var promoBarData = {
-          promoBarEnabled: false,
-          promoBarMessage: ''
-        };
+import { ServicesConstants } from 'services/services.constants';
 
-        if (ENABLE_PROMO_BAR) {
-          return $http.get('/promo_bar_handler', {}).then(
-            function(response) {
-              promoBarData.promoBarEnabled = response.data.promo_bar_enabled;
-              promoBarData.promoBarMessage = response.data.promo_bar_message;
-              return promoBarData;
-            }
-          );
-        } else {
-          return $q.resolve(promoBarData);
-        }
-      }
+export interface IPromoBarData {
+  promoBarEnabled: boolean,
+  promoBarMessage: string,
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PromoBarService {
+  constructor(private httpClient: HttpClient) {}
+
+  getPromoBarData(): Promise<IPromoBarData> {
+    let promoBarData = {
+      promoBarEnabled: false,
+      promoBarMessage: ''
     };
+
+    if (ServicesConstants.ENABLE_PROMO_BAR) {
+      return this.httpClient.get('/promo_bar_handler').toPromise().then(
+        (response: any) => {
+          promoBarData.promoBarEnabled = response.data.promo_bar_enabled;
+          promoBarData.promoBarMessage = response.data.promo_bar_message;
+          return promoBarData;
+        }
+      );
+    } else {
+      return Promise.resolve(promoBarData);
+    }
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'PromoBarService',
+  downgradeInjectable(PromoBarService));
