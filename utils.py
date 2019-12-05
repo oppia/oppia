@@ -423,7 +423,7 @@ def get_current_time_in_millisecs():
 def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
- 
+
     Args:
         time_msec: float. Time in milliseconds since the Epoch.
 
@@ -497,7 +497,7 @@ def vfs_normpath(path):
 
     Args:
         path: str. Path that is to be normalized.
-  
+
     Returns:
         str. Returns path if it is not null else returns a dot string.
     """
@@ -541,7 +541,8 @@ def require_valid_name(name, name_type, allow_empty=False):
 
     Raises:
         Exception: Raised when name isn't a string.
-        Exception: Raised when the length of the name_type isn't between 1 and 50.
+        Exception: Raised when the length of the name_type isn't between 
+            1 and 50.
         Exception: Raised when name starts or ends with whitespace.
         Exception: Raised when adjacent whitespace in name_type isn't collapsed.
         Exception: Raised when invalid character is present in name.
@@ -677,7 +678,8 @@ def unescape_encoded_uri_component(escaped_string):
         escaped_string: str. String that is encoded with encodeURIComponent.
 
     Returns:
-        str. Returns decoded string that was initially encoded with encodeURIComponent.
+        str. Returns decoded string that was initially encoded with 
+            encodeURIComponent.
     """
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')
 
