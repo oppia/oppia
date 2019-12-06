@@ -42,7 +42,7 @@ ROLE_NONE = 'none'
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'
 TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name'
-TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail'
+TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
@@ -444,7 +444,7 @@ class Topic(python_utils.OBJECT):
         topic = cls(
             topic_dict['topic_id'], topic_dict['name'],
             topic_dict['abbreviated_name'],
-            topic_dict['thumbnail'],
+            topic_dict['thumbnail_filename'],
             topic_dict['description'],
             topic_dict['canonical_story_references'],
             topic_dict['additional_story_references'],
