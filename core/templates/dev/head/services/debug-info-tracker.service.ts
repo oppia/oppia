@@ -29,7 +29,7 @@ export class DebugInfoTrackerService {
     this._sequenceOfActions = [];
   }
 
-  addAction(action): void {
+  addAction(action: any): void {
     this._sequenceOfActions.push(action);
   }
 

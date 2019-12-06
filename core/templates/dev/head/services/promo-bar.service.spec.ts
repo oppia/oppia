@@ -16,43 +16,40 @@
  * @fileoverview Tests that the resource service is working as expected.
  */
 
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed } from '@angular/core/testing';
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
+import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
-import { PromoBarService } from 'services/promo-bar.service';
+require('App.ts');
+require('services/promo-bar.service.ts');
 
-describe('Promo bar Service', () => {
-  let promoBarService: PromoBarService = null;
-  let httpTestingController: HttpTestingController;
+describe('Promo bar Service', function() {
+  var PromoBarService, $httpBackend;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [PromoBarService]
-    });
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.inject(function($injector) {
+    PromoBarService = $injector.get('PromoBarService');
+    $httpBackend = $injector.get('$httpBackend');
+  }));
 
-    promoBarService = TestBed.get(PromoBarService);
-    httpTestingController = TestBed.get(HttpTestingController);
-  });
-
-  afterEach(() => {
-    httpTestingController.verify();
-  });
-
-
-  it('should return promo bar data', () => {
-    promoBarService.getPromoBarData().then(function(data) {
-      expect(data.promoBarEnabled).toBe(true);
-      expect(data.promoBarMessage).toBe('test message');
-    });
-
-    let requestUrl = '/promo_bar_handler';
-    const req = httpTestingController.expectOne(requestUrl);
-    expect(req.request.method).toBe('GET');
-    req.flush({
+  it('should return promo bar data', function() {
+    var requestUrl = '/promo_bar_handler';
+    $httpBackend.expect('GET', requestUrl).respond(200, {
       promo_bar_enabled: true,
       promo_bar_message: 'test message'
     });
+
+    PromoBarService.getPromoBarData().then(function(data) {
+      expect(data.promoBarEnabled).toBe(true);
+      expect(data.promoBarMessage).toBe('test message');
+    });
+    $httpBackend.flush();
   });
 });
