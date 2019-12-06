@@ -33,8 +33,7 @@ describe('Translation language service', function() {
       },
       getAudioLanguageDescription: function(activeLanguageCode) {
         var descriptions = {
-          en: 'English',
-          hi: 'Hindi'
+          en: 'English'
         };
         return descriptions[activeLanguageCode];
       }
@@ -60,10 +59,10 @@ describe('Translation language service', function() {
     });
 
     it('should not allow invalid state names to be set', function() {
-      expect(tls.setActiveLanguageCode('eng')).toBeNull();
+      tls.setActiveLanguageCode('eng');
       expect(tls.getActiveLanguageCode()).toBeNull();
 
-      expect(tls.setActiveLanguageCode(null)).toBeNull();
+      tls.setActiveLanguageCode(null);
       expect(tls.getActiveLanguageCode()).toBeNull();
     });
 

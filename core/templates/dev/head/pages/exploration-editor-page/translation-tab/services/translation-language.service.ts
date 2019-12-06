@@ -32,7 +32,7 @@ angular.module('oppia').factory('TranslationLanguageService', [
       setActiveLanguageCode: function(newActiveLanguageCode) {
         if (allAudioLanguageCodes.indexOf(newActiveLanguageCode) < 0) {
           $log.error('Invalid active language code: ' + newActiveLanguageCode);
-          return null;
+          return;
         }
         activeLanguageCode = newActiveLanguageCode;
         $rootScope.$broadcast('activeLanguageChanged');
