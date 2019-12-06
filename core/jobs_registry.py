@@ -55,11 +55,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
-<<<<<<< HEAD
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
-    feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob,
-=======
->>>>>>> upstream/develop
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
