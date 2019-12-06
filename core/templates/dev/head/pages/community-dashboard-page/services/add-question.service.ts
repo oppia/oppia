@@ -17,25 +17,25 @@
  */
 
 angular.module('oppia').factory('AddQuestionService', [
-    '$http', function($http) {
-      return {
-        addQuestion: function(question, associatedSkill) {
-          var url = '/suggestionhandler/';
-          var data = {
-            suggestion_type: 'add_question',
-            target_type: 'skill',
-            description: 'Add new question',
-            target_id: associatedSkill._id,
-            target_version_at_submission: associatedSkill._version,
-            assigned_reviewer_id: '',
-            final_reviewer_id: '',
-            change: {
-              cmd: 'create_new_fully_specified_question',
-              question_dict: question.toBackendDict(true),
-              skill_id: associatedSkill._id
-            }
-          };
-          $http.post(url, data);
-        }
-      };
-    }]);
+  '$http', function($http) {
+    return {
+      addQuestion: function(question, associatedSkill) {
+        var url = '/suggestionhandler/';
+        var data = {
+          suggestion_type: 'add_question',
+          target_type: 'skill',
+          description: 'Add new question',
+          target_id: associatedSkill._id,
+          target_version_at_submission: associatedSkill._version,
+          assigned_reviewer_id: '',
+          final_reviewer_id: '',
+          change: {
+            cmd: 'create_new_fully_specified_question',
+            question_dict: question.toBackendDict(true),
+            skill_id: associatedSkill._id
+          }
+        };
+        $http.post(url, data);
+      }
+    };
+  }]);

@@ -21,9 +21,9 @@ require('domain/state/StateObjectFactory.ts');
 
 angular.module('oppia').factory('QuestionObjectFactory', [
   'StateObjectFactory', 'CURRENT_STATE_SCHEMA_VERSION',
-  'DEFAULT_LANGUAGE_CODE','INTERACTION_SPECS',
+  'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
   function(StateObjectFactory, CURRENT_STATE_SCHEMA_VERSION,
-    DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
+      DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
     var Question = function(id, stateData, languageCode, version,
         linkedSkillIds) {
       this._id = id;

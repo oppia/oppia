@@ -86,7 +86,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
               text: 'Review Translations'
             }
-          ]
+          ];
           ctrl.activeContributionTab = '';
           ctrl.contributionTabs = [
             {
@@ -97,7 +97,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
               text: 'Translations'
             }
-          ]
+          ];
 
           var getQuestionContributionsSummary = function() {
             var questionContributionsSummaryList = [];
@@ -107,14 +107,14 @@ angular.module('oppia').directive('contributionsAndReview', [
               var change = suggestion.change;
               var requiredData = {
                 id: suggestion.suggestion_id,
-                heading: $filter('formatRtePreview')
-                  (change.question_dict.question_state_data.content.html),
+                heading: $filter('formatRtePreview')(
+                  change.question_dict.question_state_data.content.html),
                 subheading: (details.topic_name + ' / ' +
                   details.skill_description),
                 labelText: SUGGESTION_LABELS[suggestion.status].text,
                 labelColor: SUGGESTION_LABELS[suggestion.status].color,
                 actionButtonTitle: (
-                  ctrl.activeReviewTab == ctrl.SUGGESTION_TYPE_QUESTION ?
+                  ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION ?
                     'Review' :
                     'View'
                 )
@@ -138,7 +138,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                 labelText: SUGGESTION_LABELS[suggestion.status].text,
                 labelColor: SUGGESTION_LABELS[suggestion.status].color,
                 actionButtonTitle: (
-                  ctrl.activeContributionTab == ctrl.SUGGESTION_TYPE_TRANSLATE ?
+                  ctrl.activeContributionTab === ctrl.SUGGESTION_TYPE_TRANSLATE ?
                     'Review' :
                     'View'
                 )
@@ -167,7 +167,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             var suggestionId = suggestion.suggestion_id;
             var authorName = suggestion.author_name;
             var questionHeader = (contributionDetails.topic_name + ' / ' +
-              contributionDetails.skill_description)
+              contributionDetails.skill_description);
             var question = QuestionObjectFactory.createFromBackendDict(
               suggestion.change.question_dict);
             var contentHtml = question.getStateData().content.getHtml();
@@ -313,16 +313,15 @@ angular.module('oppia').directive('contributionsAndReview', [
             if (suggestion.suggestion_type ===
                 ctrl.SUGGESTION_TYPE_QUESTION) {
               var reviewable =
-                ctrl.activeReviewTab == ctrl.SUGGESTION_TYPE_QUESTION;
+                ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_QUESTION;
               var contributionDetails =
                 ctrl.contributions[suggestionId].details;
-              console.log(suggestion);
               _showQuestionSuggestionModal(
                 suggestion, contributionDetails, reviewable);
             }
             if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
               var reviewable =
-                ctrl.activeReviewTab == ctrl.SUGGESTION_TYPE_TRANSLATE;
+                ctrl.activeReviewTab === ctrl.SUGGESTION_TYPE_TRANSLATE;
               _showTranslationSuggestionModal(
                 suggestion.target_id, suggestion.suggestion_id,
                 suggestion.change.content_html,

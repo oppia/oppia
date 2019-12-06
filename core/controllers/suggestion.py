@@ -160,8 +160,8 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
-        # if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
-        #     raise self.PageNotFoundException
+        if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
+            raise self.PageNotFoundException
 
         if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_SKILL:
             raise self.InvalidInputException(
