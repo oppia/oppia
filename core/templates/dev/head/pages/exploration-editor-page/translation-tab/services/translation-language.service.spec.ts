@@ -76,6 +76,6 @@ describe('Translation language service', function() {
       function() {
         tls.setActiveLanguageCode('eng');
         expect(tls.getActiveLanguageDescription()).toBeNull();
-    });
+      });
   });
 });

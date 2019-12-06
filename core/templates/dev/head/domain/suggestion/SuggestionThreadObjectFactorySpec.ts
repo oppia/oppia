@@ -60,14 +60,14 @@ describe('Suggestion thread object factory', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
   });
-  
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-  
+
   beforeEach(angular.mock.inject(function($injector) {
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
@@ -77,7 +77,8 @@ describe('Suggestion thread object factory', function() {
   it('should create a new suggestion thread from a backend dict.', function() {
     // To not affect others 'it' block that uses suggestionBackendDict
     var testSuggestionBackendDict = Object.assign({}, suggestionBackendDict);
-    testSuggestionBackendDict.suggestion_type = 'edit_exploration_state_content';
+    testSuggestionBackendDict.suggestion_type =
+      'edit_exploration_state_content';
 
     var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
       suggestionThreadBackendDict, testSuggestionBackendDict);
@@ -117,22 +118,22 @@ describe('Suggestion thread object factory', function() {
     var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
       suggestionThreadBackendDict, suggestionBackendDict);
 
-      expect(suggestionThread.lastUpdated).toEqual(1000);
-      expect(suggestionThread.originalAuthorName).toEqual('author');
-      expect(suggestionThread.status).toEqual('accepted');
-      expect(suggestionThread.subject).toEqual('sample subject');
-      expect(suggestionThread.summary).toEqual('sample summary');
-      expect(suggestionThread.messageCount).toEqual(10);
-      expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
-  
-      var suggestion = suggestionThread.getSuggestion();
-      expect(suggestion).toBeUndefined();
-      suggestionThread.setSuggestionStatus();
-      expect(suggestionThread.isSuggestionHandled()).toEqual(null);
-      expect(suggestionThread.getSuggestionStatus()).toEqual(null);
-      expect(suggestionThread.getSuggestionStateName()).toEqual(null);
-      expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
-        null);
+    expect(suggestionThread.lastUpdated).toEqual(1000);
+    expect(suggestionThread.originalAuthorName).toEqual('author');
+    expect(suggestionThread.status).toEqual('accepted');
+    expect(suggestionThread.subject).toEqual('sample subject');
+    expect(suggestionThread.summary).toEqual('sample summary');
+    expect(suggestionThread.messageCount).toEqual(10);
+    expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
+
+    var suggestion = suggestionThread.getSuggestion();
+    expect(suggestion).toBeUndefined();
+    suggestionThread.setSuggestionStatus();
+    expect(suggestionThread.isSuggestionHandled()).toEqual(null);
+    expect(suggestionThread.getSuggestionStatus()).toEqual(null);
+    expect(suggestionThread.getSuggestionStateName()).toEqual(null);
+    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
+      null);
   });
 
   it('should handle message getter and setter.', function() {
@@ -141,10 +142,10 @@ describe('Suggestion thread object factory', function() {
 
     expect(suggestionThread.getMessages().length).toBe(0);
     var messages = [{
-        text: 'message1'
-      }, {
-        text: 'message2'
-      }];
+      text: 'message1'
+    }, {
+      text: 'message2'
+    }];
     suggestionThread.setMessages(messages);
     expect(suggestionThread.getMessages()).toEqual(messages);
   });
