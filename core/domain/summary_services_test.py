@@ -83,10 +83,11 @@ class ExplorationDisplayableSummariesTest(
 
         super(ExplorationDisplayableSummariesTest, self).setUp()
 
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         self.albert = user_services.UserActionsInfo(self.albert_id)
         self.bob = user_services.UserActionsInfo(self.bob_id)
@@ -128,11 +129,10 @@ class ExplorationDisplayableSummariesTest(
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
-
-        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
-        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
         self.signup(self.USER_C_EMAIL, self.USER_C_NAME)
         self.signup(self.USER_D_EMAIL, self.USER_D_NAME)
+        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
         user_services.update_profile_picture_data_url(
             self.user_c_id, self.USER_C_PROFILE_PICTURE)
 
@@ -331,10 +331,10 @@ class FeaturedExplorationDisplayableSummariesTest(
 
         super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(
@@ -435,14 +435,12 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CollectionLearnerDictTests, self).setUp()
 
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
-        user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.owner = user_services.UserActionsInfo(self.owner_id)
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
@@ -584,15 +582,16 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
 
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
         self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
@@ -742,10 +741,10 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         super(
             RecentlyPublishedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(
@@ -912,10 +911,10 @@ class CollectionNodeMetadataDictsTest(
     def setUp(self):
         super(CollectionNodeMetadataDictsTest, self).setUp()
 
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         self.albert = user_services.UserActionsInfo(self.albert_id)
         self.bob = user_services.UserActionsInfo(self.bob_id)

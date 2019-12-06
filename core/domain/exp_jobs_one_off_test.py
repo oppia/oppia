@@ -761,8 +761,8 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         super(ExplorationValidityJobManagerTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_validation_errors_are_not_raised_for_valid_exploration(self):
@@ -913,8 +913,8 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         super(ExplorationMigrationJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_exp(self):
@@ -1100,8 +1100,8 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
         super(InteractionAuditOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_exp_state_pairs_are_produced_for_all_interactions_in_single_exp(
@@ -1215,8 +1215,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         super(ItemSelectionInteractionOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
@@ -1405,8 +1405,8 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         super(ViewableExplorationsAuditJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_output_contains_only_viewable_private_explorations(self):
@@ -1518,8 +1518,8 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         super(HintsAuditOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_number_of_hints_tabulated_are_correct_in_single_exp(self):
@@ -1688,8 +1688,8 @@ class ExplorationContentValidationJobForCKEditorTests(
         super(ExplorationContentValidationJobForCKEditorTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_for_validation_job(self):
@@ -1912,8 +1912,8 @@ class InteractionCustomizationArgsValidationJobTests(
             InteractionCustomizationArgsValidationJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_for_customization_arg_validation_job(self):

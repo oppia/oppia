@@ -42,8 +42,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
     def setUp(self):
         super(TopicMigrationOneOffJobTests, self).setUp()
         # Setup user who will own the test topics.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_topic(self):

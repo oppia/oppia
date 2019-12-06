@@ -91,7 +91,7 @@ class UserSettings(python_utils.OBJECT):
     """
 
     def __init__(
-            self, user_id, email, role, username=None,
+            self, user_id, gae_id, email, role, username=None,
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
             last_started_state_translation_tutorial=None, last_logged_in=None,
             last_created_an_exploration=None, last_edited_an_exploration=None,
@@ -105,6 +105,7 @@ class UserSettings(python_utils.OBJECT):
 
         Args:
             user_id: str. The unique ID of the user.
+            gae_id: str. The ID of the user retrieved from GAE.
             email: str. The user email.
             role: str. Role of the user. This is used in conjunction with
                 PARENT_ROLES to determine which actions the user can perform.
@@ -139,7 +140,7 @@ class UserSettings(python_utils.OBJECT):
                 for audio translations preference.
         """
         self.user_id = user_id
-        self.gae_id = user_id
+        self.gae_id = gae_id
         self.email = email
         self.role = role
         self.username = username
@@ -181,10 +182,11 @@ class UserSettings(python_utils.OBJECT):
         if not self.user_id:
             raise utils.ValidationError('No user id specified.')
 
-        if not isinstance(self.gae_id, python_utils.BASESTRING):
+        if (self.gae_id is not None and
+                not isinstance(self.gae_id, python_utils.BASESTRING)):
             raise utils.ValidationError(
                 'Expected gae_id to be a string, received %s' %
-                self.user_id
+                self.gae_id
             )
 
         if not isinstance(self.email, python_utils.BASESTRING):
@@ -393,45 +395,18 @@ def get_users_settings(user_ids):
     """
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = []
-    for ind, model in enumerate(user_settings_models):
-        if user_ids[ind] == feconf.SYSTEM_COMMITTER_ID:
+    for i, model in enumerate(user_settings_models):
+        if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
             result.append(UserSettings(
-                feconf.SYSTEM_COMMITTER_ID,
+                user_id=feconf.SYSTEM_COMMITTER_ID,
+                gae_id=None,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
                 role=feconf.ROLE_ID_ADMIN,
                 username='admin',
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
-        elif model:
-            result.append(UserSettings(
-                model.id,
-                email=model.email,
-                role=model.role,
-                username=model.username,
-                last_agreed_to_terms=model.last_agreed_to_terms,
-                last_started_state_editor_tutorial=(
-                    model.last_started_state_editor_tutorial),
-                last_started_state_translation_tutorial=(
-                    model.last_started_state_translation_tutorial),
-                last_logged_in=model.last_logged_in,
-                last_edited_an_exploration=model.last_edited_an_exploration,
-                last_created_an_exploration=(
-                    model.last_created_an_exploration),
-                profile_picture_data_url=model.profile_picture_data_url,
-                default_dashboard=model.default_dashboard,
-                creator_dashboard_display_pref=(
-                    model.creator_dashboard_display_pref),
-                user_bio=model.user_bio,
-                subject_interests=model.subject_interests,
-                first_contribution_msec=model.first_contribution_msec,
-                preferred_language_codes=model.preferred_language_codes,
-                preferred_site_language_code=(
-                    model.preferred_site_language_code),
-                preferred_audio_language_code=(
-                    model.preferred_audio_language_code)
-            ))
         else:
-            result.append(None)
+            result.append(_transform_user_settings(model))
     return result
 
 
@@ -513,6 +488,30 @@ def get_user_settings(user_id, strict=False):
     user_settings = get_users_settings([user_id])[0]
     if strict and user_settings is None:
         logging.error('Could not find user with id %s' % user_id)
+        raise Exception('User not found.')
+    return user_settings
+
+
+def get_user_settings_by_gae_id(gae_id, strict=False):
+    """Return the user settings for a single user.
+
+    Args:
+        gae_id: str. The GAE user ID of the user.
+        strict: bool. Whether to fail noisily if no user with the given
+            id exists in the datastore. Defaults to False.
+
+    Returns:
+        UserSettings or None. If the given gae_id does not exist and strict
+        is False, returns None. Otherwise, returns the corresponding
+        UserSettings domain object.
+
+    Raises:
+        Exception: strict is True and given gae_id does not exist.
+    """
+    user_settings = _transform_user_settings(
+        user_models.UserSettingsModel.get_by_gae_id(gae_id))
+    if strict and user_settings is None:
+        logging.error('Could not find user with id %s' % gae_id)
         raise Exception('User not found.')
     return user_settings
 
@@ -648,6 +647,52 @@ def _save_user_settings(user_settings):
     ).put()
 
 
+def _transform_user_settings(user_settings_model):
+    """Transform user settings storage model to domain object.
+
+    Args:
+        user_settings_model: UserSettingsModel.
+
+    Returns:
+         UserSettings. Domain object for user settings.
+    """
+    if user_settings_model:
+        return UserSettings(
+            user_id=user_settings_model.id,
+            gae_id=user_settings_model.gae_id,
+            email=user_settings_model.email,
+            role=user_settings_model.role,
+            username=user_settings_model.username,
+            last_agreed_to_terms=user_settings_model.last_agreed_to_terms,
+            last_started_state_editor_tutorial=(
+                user_settings_model.last_started_state_editor_tutorial),
+            last_started_state_translation_tutorial=(
+                user_settings_model.last_started_state_translation_tutorial),
+            last_logged_in=user_settings_model.last_logged_in,
+            last_edited_an_exploration=(
+                user_settings_model.last_edited_an_exploration),
+            last_created_an_exploration=(
+                user_settings_model.last_created_an_exploration),
+            profile_picture_data_url=(
+                user_settings_model.profile_picture_data_url),
+            default_dashboard=user_settings_model.default_dashboard,
+            creator_dashboard_display_pref=(
+                user_settings_model.creator_dashboard_display_pref),
+            user_bio=user_settings_model.user_bio,
+            subject_interests=user_settings_model.subject_interests,
+            first_contribution_msec=(
+                user_settings_model.first_contribution_msec),
+            preferred_language_codes=(
+                user_settings_model.preferred_language_codes),
+            preferred_site_language_code=(
+                user_settings_model.preferred_site_language_code),
+            preferred_audio_language_code=(
+                user_settings_model.preferred_audio_language_code)
+        )
+    else:
+        return None
+
+
 def is_user_registered(user_id):
     """Checks if a user is registered with the given user_id.
 
@@ -694,25 +739,27 @@ def has_fully_registered(user_id):
         feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC)
 
 
-def create_new_user(user_id, email):
+def create_new_user(gae_id, email):
     """Creates a new user.
 
     Args:
-        user_id: str. The unique ID of the user.
+        gae_id: str. The unique GAE user ID of the user.
         email: str. The user email.
 
     Returns:
         UserSettings. The newly-created user settings domain object.
 
     Raises:
-        Exception: If a user with the given user_id already exists.
+        Exception: If a user with the given gae_id already exists.
     """
-    user_settings = get_user_settings(user_id, strict=False)
+    user_settings = get_user_settings(gae_id, strict=False)
     if user_settings is not None:
-        raise Exception('User %s already exists.' % user_id)
+        raise Exception('User %s already exists.' % gae_id)
 
+    # TODO(#7848): Generate user_id together with the migration.
+    user_id = gae_id
     user_settings = UserSettings(
-        user_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
+        user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
     _save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
