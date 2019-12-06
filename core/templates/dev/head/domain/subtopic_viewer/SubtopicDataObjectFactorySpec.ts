@@ -19,12 +19,15 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { SubtopicPageContentsObjectFactory } from '../topic/SubtopicPageContentsObjectFactory';
 // ^^^ This block is to be removed.
 
 require('domain/subtopic_viewer/SubtopicDataObjectFactory.ts');
+require('domain/topic/SubtopicPageContentsObjectFactory');
 
 describe('Subtopic data object factory', function() {
   var SubtopicDataObjectFactory = null;
+  var SubtopicPageContentsObjectFactory = null;
   var _sampleSubtopicData = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -37,10 +40,28 @@ describe('Subtopic data object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     SubtopicDataObjectFactory = $injector.get('SubtopicDataObjectFactory');
+    SubtopicPageContentsObjectFactory = $injector.get(
+      'SubtopicPageContentsObjectFactory');
 
     var sampleSubtopicDataBackendDict = {
       subtopic_title: 'sample_title',
-      page_contents: {}
+      page_contents: {
+        subtitled_html: {
+          html: 'test content',
+          content_id: 'content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {
+              en: {
+                filename: 'test.mp3',
+                file_size_bytes: 100,
+                needs_update: false
+              }
+            }
+          }
+        }
+      }
     };
     _sampleSubtopicData = SubtopicDataObjectFactory.createFromBackendDict(
       sampleSubtopicDataBackendDict);
@@ -48,6 +69,7 @@ describe('Subtopic data object factory', function() {
 
   it('should be able to get all the values', function() {
     expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
-    expect(_sampleSubtopicData.getPageContents()).toEqual({});
+    expect(_sampleSubtopicData.getPageContents()).toEqual(
+      SubtopicPageContentsObjectFactory.createFromBackendDict({}));
   });
 });

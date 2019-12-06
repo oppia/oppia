@@ -17,6 +17,9 @@
  * subtopic data domain objects.
  */
 
+import { SubtopicPageContentsObjectFactory } from
+'domain/topic/SubtopicPageContentsObjectFactory';
+
 angular.module('oppia').factory('SubtopicDataObjectFactory', [function() {
   var SubtopicData = function(
       subtopicTitle, pageContents) {
@@ -40,7 +43,9 @@ angular.module('oppia').factory('SubtopicDataObjectFactory', [function() {
     /* eslint-enable dot-notation */
     return new SubtopicData(
       subtopicDataBackendDict.subtopic_title,
-      subtopicDataBackendDict.page_contents,
+      this.SubtopicPageContentsObjectFactory.createFromBackendDict(
+        subtopicDataBackendDict.page_contents
+      )
     );
   };
 
