@@ -39,8 +39,8 @@ describe('Subtopic data object factory', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     SubtopicDataObjectFactory = $injector.get('SubtopicDataObjectFactory');
-    SubtopicPageContentsObjectFactory = $injector.get(
-      'SubtopicPageContentsObjectFactory');
+    // SubtopicPageContentsObjectFactory = $injector.get(
+    //   'SubtopicPageContentsObjectFactory');
 
     var sampleSubtopicDataBackendDict = {
       subtopic_title: 'sample_title',

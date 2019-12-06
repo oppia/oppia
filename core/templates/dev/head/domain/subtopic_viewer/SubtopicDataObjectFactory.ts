@@ -26,8 +26,9 @@ angular.module('oppia').factory('SubtopicDataObjectFactory',
           subtopicTitle, pageContents) {
         this._subtopic_title = subtopicTitle;
         console.error("Hi I'm Error");
-        this._page_contents = SubtopicPageContentsObjectFactory.
-          createFromBackendDict(pageContents);
+        // this._page_contents = SubtopicPageContentsObjectFactory.
+        //   createFromBackendDict(pageContents);
+        this.page_contents = pageContents;
       };
 
       // Instance methods
