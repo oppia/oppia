@@ -21,6 +21,11 @@ CHROME_DRIVER_VERSION = '2.41'
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
 PROTRACTOR_BIN_PATH = os.path.join(common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
+GECKO_PROVIDER_FILE_PATH = os.path.join(common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider', 'geckodriver.js')
+CHROME_PROVIDER_FILE_PATH = os.path.join(common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider', 'chromedriver.js')
+CHROME_PROVIDER_BAK_FILE_PATH = os.path.join(common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider', 'chromedriver.js.bak')
+GECKO_PROVIDER_BAK_FILE_PATH = os.path.join(common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider', 'geckodriver.js.bak')
+
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -123,9 +128,9 @@ def tweak_constant_ts(constant_file, dev_mode):
         python_utils.PRINT('%s' % line)
 
 def run_webdriver_manager(commands, wait=True):
-    webdriver_bin = os.path.join(
-        common.CURR_DIR, 'node_modules', '.bin', 'webdriver-manager')
-    web_driver_command = ['node', webdriver_bin]
+    webdriver_bin_path = os.path.join(
+        common.CURR_DIR, 'node_modules', 'webdriver-manager', 'bin', 'webdriver-manager')
+    web_driver_command = [common.NODE_BIN_PATH, webdriver_bin_path]
     web_driver_command.extend(commands)
     p = subprocess.Popen(web_driver_command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if wait:
@@ -150,20 +155,67 @@ def build_js_files(dev_mode, run_on_browserstack):
         webpack_bin = os.path.join(
             common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
         common.run_cmd(
-            ['node', webpack_bin, '--config', 'webpack.dev.config.ts'])
+            [common.NODE_BIN_PATH, webpack_bin, '--config', 'webpack.dev.config.ts'])
     if run_on_browserstack:
         python_utils.PRINT(' Running the tests on browsertack...')
     build.main(args=['--prod_env'] if not dev_mode else [])
     os.remove('%s.bak' % constant_file)
 
+
+def tweak_webdriver_manager():
+    """webdriver-manager (version 13.0.0) uses `os.arch()` to determine the
+    architecture of the operation system, however, this function can only be
+    used to determine the architecture of the machine that compiled `node`
+    (great job!). In the case of Windows, we are using the portable version, 
+    which was compiled on `ia32` machine so that is the value returned by this
+    `os.arch` function. While clearly the author of webdriver-manager never 
+    considered windows would run on this architecture, so its own help function
+    will return null for this. This is causing the application has no idea 
+    about where to download the correct version. So we need to change the 
+    lines in webdriver-manager to explicitly tell the architecture. 
+    
+    https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L16
+    https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/geckodriver.ts#L21
+    https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L167
+    https://github.com/nodejs/node/issues/17036
+    """
+    regex = re.compile(r'this\.osArch = os\.arch\(\);')
+    for line in fileinput.input(files=[CHROME_PROVIDER_FILE_PATH], inplace=True, backup='.bak'):
+        line = line.replace('\n', '')
+        # 'x64' and 'x32' share the same driver file.
+        line = regex.sub('this.osArch = "x64";', line) 
+        
+        python_utils.PRINT(line)
+
+    for line in fileinput.input(files=[GECKO_PROVIDER_FILE_PATH], inplace=True, backup='.bak'):
+        line = line.replace('\n', '')
+        # 'x64' and 'x32' share the same driver file.
+        line = regex.sub('this.osArch = "x64";', line)
+        python_utils.PRINT(line)
+
+
+def undo_webdriver_tweak():
+    if os.path.isfile(CHROME_PROVIDER_BAK_FILE_PATH):
+        os.remove(CHROME_PROVIDER_FILE_PATH)
+        os.rename(CHROME_PROVIDER_BAK_FILE_PATH, CHROME_PROVIDER_FILE_PATH)
+    if os.path.isfile(GECKO_PROVIDER_BAK_FILE_PATH):
+        os.remove(GECKO_PROVIDER_FILE_PATH)
+        os.rename(GECKO_PROVIDER_BAK_FILE_PATH, GECKO_PROVIDER_FILE_PATH)
+
+
 def start_webdriver_manager():
-    os_name = platform.system()
+    if common.is_windows_os():
+        tweak_webdriver_manager()
+
     run_webdriver_manager(['update', '--versions.chrome', CHROME_DRIVER_VERSION])
     run_webdriver_manager(
         ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
         '--detach', '--quiet'])
     run_webdriver_manager(
-        ['start', '2>%snull' % '$' if os_name == 'Windows' else ''], False)
+        ['start', '2>%snull' % '$' if common.is_windows_os() else ''], False)
+    
+    if common.is_windows_os():
+        undo_webdriver_tweak()
 
 def run_e2e_tests(run_on_browserstack, sharding, sharding_instances, suite, dev_mode):
     if not run_on_browserstack:
@@ -171,13 +223,15 @@ def run_e2e_tests(run_on_browserstack, sharding, sharding_instances, suite, dev_
     else:
         config_file = os.path.join('core', 'tests', 'protractor-browserstack.conf.js')
     if not sharding or sharding_instances == "1":
-        p = subprocess.Popen(['node', PROTRACTOR_BIN_PATH, config_file, '--suite', suite, '--params.devMode=%s' % dev_mode])
+        p = subprocess.Popen([common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file, '--suite', suite, '--params.devMode=%s' % dev_mode])
     else:
-        p = subprocess.Popen(['node', PROTRACTOR_BIN_PATH, config_file, '--capabilities.shardTestFiles=%s' % sharding,  '--capabilities.maxInstances=%s' % sharding_instances, '--suite', suite,  '--params.devMode="%s"' % dev_mode])
+        p = subprocess.Popen([common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file, '--capabilities.shardTestFiles=%s' % sharding,  '--capabilities.maxInstances=%s' % sharding_instances, '--suite', suite,  '--params.devMode="%s"' % dev_mode])
     p.communicate()
 
+
+
 def main(args=None):
-    sys.path.insert(1, os.path.join(common.THIRD_PARTY_DIR, 'psutil-5.6.7'))
+    sys.path.insert(1, os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-5.6.7'))
     parsed_args = _PARSER.parse_args(args=args)
     atexit.register(cleanup)
     check_running_instance(8181, 9001)
