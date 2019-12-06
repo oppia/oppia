@@ -28,13 +28,13 @@ TOOLS_DIR = os.path.join('..', 'oppia_tools')
 # Download and install pyyaml.
 if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
     subprocess.check_call([
-        'pip', 'install', 'pyyaml==5.1.2', '--target',
+        'pip2', 'install', 'pyyaml==5.1.2', '--target',
         os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
 # Download and install future.
 if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
     subprocess.check_call([
-        'pip', 'install', 'future==0.17.1', '--target',
+        'pip2', 'install', 'future==0.17.1', '--target',
         os.path.join('third_party', 'future-0.17.1')])
 
 # pylint: disable=wrong-import-position
@@ -100,7 +100,7 @@ def pip_install(package, version, install_path):
     try:
         python_utils.PRINT('Checking if pip is installed on the local machine')
         # Importing pip just to check if its installed.
-        import pip  #pylint: disable=unused-variable
+        import pip2  #pylint: disable=unused-variable
     except ImportError:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
@@ -123,7 +123,7 @@ def pip_install(package, version, install_path):
         raise Exception
 
     subprocess.check_call([
-        'pip', 'install', '%s==%s' % (package, version), '--target',
+        'pip2', 'install', '%s==%s' % (package, version), '--target',
         install_path])
 
 
