@@ -40,6 +40,7 @@ import { ClassifierObjectFactory } from
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from 'interactions/CodeRepl/code-repl-prediction.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ContextService } from 'services/context.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
 import { DateTimeFormatService } from 'services/date-time-format.service';
@@ -78,6 +79,7 @@ import { LearnerAnswerDetailsObjectFactory } from
   'domain/statistics/LearnerAnswerDetailsObjectFactory';
 import { LearnerAnswerInfoObjectFactory } from
   'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
@@ -117,6 +119,8 @@ import { StateClassifierMappingService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StopwatchObjectFactory } from
+  'domain/utilities/StopwatchObjectFactory';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { SubtitledHtmlObjectFactory } from
@@ -125,6 +129,8 @@ import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { TextInputPredictionService } from
+  'interactions/TextInput/text-input-prediction.service';
 import { TextInputRulesService } from
   'interactions/TextInput/directives/text-input-rules.service';
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
@@ -207,6 +213,7 @@ export class UpgradedServices {
         new PredictionResultObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
+    upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
@@ -239,6 +246,8 @@ export class UpgradedServices {
       new HintObjectFactory(upgradedServices['SubtitledHtmlObjectFactory']);
     upgradedServices['HtmlEscaperService'] =
       new HtmlEscaperService(upgradedServices['LoggerService']);
+    upgradedServices['LocalStorageService'] = new LocalStorageService(
+      upgradedServices['ExplorationDraftObjectFactory']);
     upgradedServices['MetaTagCustomizationService'] =
       new MetaTagCustomizationService(upgradedServices['WindowRef']);
     upgradedServices['NumberWithUnitsObjectFactory'] =
@@ -312,6 +321,8 @@ export class UpgradedServices {
         upgradedServices['PythonProgramTokenizer'],
         upgradedServices['SVMPredictionService'],
         upgradedServices['WinnowingPreprocessingService']);
+    upgradedServices['ContextService'] = new ContextService(
+      upgradedServices['UrlService']);
 
     // Group 4: Services depending on groups 1,2 and 3.
     upgradedServices['ExplorationHtmlFormatterService'] =
