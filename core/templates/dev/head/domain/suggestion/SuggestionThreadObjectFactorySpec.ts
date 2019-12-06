@@ -42,7 +42,6 @@ describe('Suggestion thread object factory', function() {
   beforeEach(angular.mock.inject(function($injector) {
     SuggestionThreadObjectFactory = $injector.get(
       'SuggestionThreadObjectFactory');
-    suggestionObjectFactory = $injector.get('SuggestionObjectFactory');
   }));
 
   beforeEach(function() {
