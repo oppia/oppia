@@ -426,11 +426,13 @@ def kill_processes_based_on_regex(regex):
     """
     import psutil
     for process in psutil.process_iter():
-        cmdline = ' '.join(process.cmdline())
-        if regex.match(cmdline) and process.is_running():
-            python_utils.PRINT("Killing %s ..." % cmdline)
-            process.kill()
-
+        try:
+            cmdline = ' '.join(process.cmdline())
+            if regex.match(cmdline) and process.is_running():
+                python_utils.PRINT("Killing %s ..." % cmdline)
+                process.kill()
+        except psutil.AccessDenied:
+            continue
 
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
