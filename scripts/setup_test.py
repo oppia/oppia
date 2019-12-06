@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import collections
 import os
+import subprocess
 import sys
 import tarfile
 
@@ -34,6 +35,18 @@ from . import setup
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNTAR_PATH = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.tar.gz')
+
+
+class MockCD(python_utils.OBJECT):
+    """Mock for context manager for changing the current working directory."""
+    def __init__(self, unused_new_path):
+        pass
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, unused_arg1, unused_arg2, unused_arg3):
+        pass
 
 
 class SetupTests(test_utils.GenericTestBase):
@@ -90,6 +103,7 @@ class SetupTests(test_utils.GenericTestBase):
         self.isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
         self.delete_swap = self.swap(clean, 'delete_file', mock_delete_file)
         self.get_swap = self.swap(os.environ, 'get', mock_get)
+        self.cd_swap = self.swap(common, 'CD', MockCD)
 
     def test_create_directory_tree_with_missing_dir(self):
         check_function_calls = {
@@ -147,17 +161,16 @@ class SetupTests(test_utils.GenericTestBase):
         print_arr = []
         def mock_print(msg_list):
             print_arr.extend(msg_list)
-        def mock_uname():
-            return ['Windows']
         print_swap = self.swap(
             common, 'print_each_string_after_two_new_lines', mock_print)
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
         version_info = collections.namedtuple(
             'version_info', ['major', 'minor'])
         version_swap = self.swap(
             sys, 'version_info', version_info(major=3, minor=4))
-        with print_swap, uname_swap, version_swap, self.assertRaises(Exception):
-            setup.test_python_version()
+        with print_swap, os_name_swap, version_swap:
+            with self.assertRaises(Exception):
+                setup.test_python_version()
         self.assertEqual(
             print_arr, [
                 'It looks like you are using Windows. If you have Python '
@@ -231,116 +244,184 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertTrue(
             self.check_function_calls['test_python_version_is_called'])
 
-    def test_invalid_os(self):
-        print_arr = []
-        def mock_print(msg_list):
-            print_arr.extend(msg_list)
-        def mock_uname():
-            return ['Windows']
-        print_swap = self.swap(
-            common, 'print_each_string_after_two_new_lines', mock_print)
-        uname_swap = self.swap(os, 'uname', mock_uname)
-
-        with self.test_py_swap, self.create_swap, print_swap, uname_swap:
-            with self.assertRaises(Exception):
-                setup.main(args=[])
-        self.assertEqual(
-            print_arr, [
-                'WARNING: Unsupported OS for installation of node.js.',
-                'If you are running this script on Windows, see the '
-                'instructions',
-                'here regarding installation of node.js:',
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-                'Windows%29',
-                'STATUS: Installation completed except for node.js. Exiting.'])
-        self.assertTrue(
-            self.check_function_calls['test_python_version_is_called'])
-        self.assertTrue(
-            self.check_function_calls['create_directory_is_called'])
-
     def test_package_install_with_darwin_x64(self):
-        def mock_uname():
-            return ['Darwin', 'info1', 'info2', 'info3', 'x86_64']
         def mock_exists(unused_path):
             return False
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86_64')
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
+        with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.chown_swap:
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
+                    with architecture_swap:
+                        setup.main(args=[])
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-darwin-x64.tar.gz',
+                'https://nodejs.org/dist/v%s/node-v%s-darwin-x64.tar.gz' % (
+                    common.NODE_VERSION, common.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (
+                    common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_darwin_x86(self):
-        def mock_uname():
-            return ['Darwin', 'info1', 'info2', 'info3', 'x86']
         def mock_exists(unused_path):
             return False
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
+        all_cmd_tokens = []
+        def mock_check_call(cmd_tokens):
+            all_cmd_tokens.extend(cmd_tokens)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
-        with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
+        with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.chown_swap:
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
+                    with architecture_swap, self.cd_swap, check_call_swap:
+                        setup.main(args=[])
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-darwin-x86.tar.gz',
+                'https://nodejs.org/dist/v%s/node-v%s.tar.gz' % (
+                    common.NODE_VERSION, common.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (
+                    common.YARN_VERSION, common.YARN_VERSION)])
+        self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
 
     def test_package_install_with_linux_x64(self):
-        def mock_uname():
-            return ['Linux', 'info1', 'info2', 'info3', 'x86_64']
         def mock_exists(unused_path):
             return False
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86_64')
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
-        with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
+        with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.chown_swap:
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
+                    with architecture_swap:
+                        setup.main(args=[])
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
+                'https://nodejs.org/dist/v%s/node-v%s' % (
+                    common.NODE_VERSION, common.NODE_VERSION) +
                 '-linux-x64.tar.gz',
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (
+                    common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_package_install_with_linux_x86(self):
-        def mock_uname():
-            return ['Linux', 'info1', 'info2', 'info3', 'x86']
         def mock_exists(unused_path):
             return False
-        uname_swap = self.swap(os, 'uname', mock_uname)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
+        all_cmd_tokens = []
+        def mock_check_call(cmd_tokens):
+            all_cmd_tokens.extend(cmd_tokens)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
 
-        with self.test_py_swap, self.create_swap, uname_swap, exists_swap:
+        with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
             with self.download_swap, self.rename_swap, self.chown_swap:
                 with self.chmod_swap, self.delete_swap, self.isfile_swap:
-                    setup.main(args=[])
+                    with architecture_swap, self.cd_swap, check_call_swap:
+                        setup.main(args=[])
         for _, item in self.check_function_calls.items():
             self.assertTrue(item)
         self.assertEqual(
             self.urls, [
-                'https://nodejs.org/dist/v10.15.3/node-v10.15.3'
-                '-linux-x86.tar.gz',
+                'https://nodejs.org/dist/v%s/node-v%s.tar.gz' % (
+                    common.NODE_VERSION, common.NODE_VERSION),
                 'https://github.com/yarnpkg/yarn/releases/download/'
-                'v1.17.3/yarn-v1.17.3.tar.gz'])
+                '%s/yarn-%s.tar.gz' % (
+                    common.YARN_VERSION, common.YARN_VERSION)])
+        self.assertEqual(all_cmd_tokens, ['./configure', 'make'])
+
+    def test_package_install_with_windows_x86(self):
+        def mock_exists(unused_path):
+            return False
+
+        def mock_url_retrieve(url, unused_filename):
+            self.urls.append(url)
+
+        def mock_check_call(commands):
+            mock_check_call.commands = commands
+
+        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+
+        with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
+            with self.download_swap, self.rename_swap, self.delete_swap:
+                with self.isfile_swap, architecture_swap, check_call_swap:
+                    with url_retrieve_swap:
+                        setup.main(args=[])
+        check_function_calls = self.check_function_calls.copy()
+        del check_function_calls['recursive_chown_is_called']
+        del check_function_calls['recursive_chmod_is_called']
+        for _, item in check_function_calls.items():
+            self.assertTrue(item)
+        self.assertEqual(
+            mock_check_call.commands,
+            ['powershell.exe', '-c', 'expand-archive',
+             'node-download', '-DestinationPath',
+             common.OPPIA_TOOLS_DIR])
+        self.assertEqual(
+            self.urls, [
+                'https://nodejs.org/dist/v%s/node-v%s-win-x86.zip' % (
+                    common.NODE_VERSION, common.NODE_VERSION),
+                'https://github.com/yarnpkg/yarn/releases/download/'
+                '%s/yarn-%s.tar.gz' % (
+                    common.YARN_VERSION, common.YARN_VERSION)])
+
+    def test_package_install_with_windows_x64(self):
+        def mock_exists(unused_path):
+            return False
+
+        def mock_url_retrieve(url, unused_filename):
+            self.urls.append(url)
+
+        def mock_check_call(commands):
+            mock_check_call.commands = commands
+
+        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86_64')
+        exists_swap = self.swap(os.path, 'exists', mock_exists)
+        url_retrieve_swap = self.swap(
+            python_utils, 'url_retrieve', mock_url_retrieve)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+
+        with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
+            with self.download_swap, self.rename_swap, self.delete_swap:
+                with self.isfile_swap, architecture_swap, check_call_swap:
+                    with url_retrieve_swap:
+                        setup.main(args=[])
+        check_function_calls = self.check_function_calls.copy()
+        del check_function_calls['recursive_chown_is_called']
+        del check_function_calls['recursive_chmod_is_called']
+        for _, item in check_function_calls.items():
+            self.assertTrue(item)
+        self.assertEqual(
+            mock_check_call.commands,
+            ['powershell.exe', '-c', 'expand-archive',
+             'node-download', '-DestinationPath',
+             common.OPPIA_TOOLS_DIR])
+        self.assertEqual(
+            self.urls, [
+                'https://nodejs.org/dist/v%s/node-v%s-win-x64.zip' % (
+                    common.NODE_VERSION, common.NODE_VERSION),
+                'https://github.com/yarnpkg/yarn/releases/download/'
+                '%s/yarn-%s.tar.gz' % (
+                    common.YARN_VERSION, common.YARN_VERSION)])
 
     def test_chrome_bin_setup_with_travis_var_set(self):
         def mock_get(unused_var):
@@ -386,6 +467,20 @@ class SetupTests(test_utils.GenericTestBase):
         self.assertEqual(
             os.environ['CHROME_BIN'],
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
+
+    def test_chrome_bin_setup_with_windows_chrome(self):
+        def mock_isfile(path):
+            return (
+                path == ('c:\\Program Files (x86)\\Google\\Chrome\\' +
+                         'Application\\Chrome.exe'))
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        with self.test_py_swap, self.create_swap, self.uname_swap:
+            with self.exists_swap, self.chown_swap, self.chmod_swap:
+                with self.get_swap, isfile_swap:
+                    setup.main(args=[])
+        self.assertEqual(
+            os.environ['CHROME_BIN'],
+            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
 
     def test_chrome_bin_setup_with_chrome_exe_mnt_files(self):
         def mock_isfile(path):
