@@ -278,6 +278,10 @@ export = {
     "description": "English",
     "relatedLanguages": ["en"]
   }, {
+    "id": "ak",
+    "description": "Akan",
+    "relatedLanguages": ["ak"]
+  }, {
     "id": "ar",
     "description": "Arabic",
     "relatedLanguages": ["ar"]
@@ -337,6 +341,10 @@ export = {
     "id": "el",
     "description": "Greek",
     "relatedLanguages": ["el"]
+  }, {
+    "id": "gaa",
+    "description": "Ga",
+    "relatedLanguages": ["gaa"]
   }, {
     "id": "he",
     "description": "Hebrew",
