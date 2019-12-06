@@ -17,10 +17,10 @@
  * subtopic data domain objects.
  */
 
-import { SubtopicPageContentsObjectFactory } from
-'domain/topic/SubtopicPageContentsObjectFactory';
+require('domain/topic/SubtopicPageContentsObjectFactory.ts');
 
-angular.module('oppia').factory('SubtopicDataObjectFactory', [function() {
+angular.module('oppia').factory('SubtopicDataObjectFactory',
+['SubtopicPageContentsObjectFactory', function(SubtopicPageContentsObjectFactory) {
   var SubtopicData = function(
       subtopicTitle, pageContents) {
     this._subtopic_title = subtopicTitle;
