@@ -23,7 +23,6 @@ import { SubtopicPageContentsObjectFactory } from '../topic/SubtopicPageContents
 // ^^^ This block is to be removed.
 
 require('domain/subtopic_viewer/SubtopicDataObjectFactory.ts');
-require('domain/topic/SubtopicPageContentsObjectFactory');
 
 describe('Subtopic data object factory', function() {
   var SubtopicDataObjectFactory = null;
@@ -70,6 +69,22 @@ describe('Subtopic data object factory', function() {
   it('should be able to get all the values', function() {
     expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
     expect(_sampleSubtopicData.getPageContents()).toEqual(
-      SubtopicPageContentsObjectFactory.createFromBackendDict({}));
+      SubtopicPageContentsObjectFactory.createFromBackendDict({
+        subtitled_html: {
+          html: 'test content',
+          content_id: 'content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {
+              en: {
+                filename: 'test.mp3',
+                file_size_bytes: 100,
+                needs_update: false
+              }
+            }
+          }
+        }
+      }));
   });
 });
