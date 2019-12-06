@@ -44,20 +44,21 @@ export class MessengerService {
   ];
 
   MESSAGE_VALIDATORS = {
-    heightChange: (payload) => {
+    // TODO(#7165): Replace any with exact type.
+    heightChange: (payload: any): boolean => {
       return this.isPositiveInteger(payload.height) &&
           this.isBoolean(payload.scroll);
     },
-    explorationLoaded: function() {
+    explorationLoaded: (): boolean => {
       return true;
     },
-    stateTransition: function(payload) {
+    stateTransition: (payload: any): boolean => {
       return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
     },
-    explorationReset: function(payload) {
+    explorationReset: (payload: any): boolean => {
       return Boolean(payload.stateName);
     },
-    explorationCompleted: function() {
+    explorationCompleted: function(): boolean {
       return true;
     }
   };

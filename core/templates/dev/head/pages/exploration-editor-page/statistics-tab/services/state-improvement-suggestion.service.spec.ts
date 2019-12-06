@@ -304,8 +304,8 @@ describe('StateImprovementSuggestionService', () => {
         },
       }
     };
-
-    var _createState = (destStateName) => {
+    // TODO(#7165): Replace any with exact type.
+    var _createState = (destStateName: any): any => {
       // Only a partial state definition is needed for these tests.
       if (destStateName) {
         return {
@@ -322,22 +322,25 @@ describe('StateImprovementSuggestionService', () => {
         };
       }
     };
-
-    var _createDefaultStateStats = () => {
+    // TODO(#7165): Replace any with exact type.
+    var _createDefaultStateStats = (): any => {
       return {
         total_entry_count: 0,
         no_submitted_answer_count: 0
       };
     };
-
-    var _enterStateWithoutAnswer = (stateStats) => {
+    // TODO(#7165): Replace any with exact type.
+    var _enterStateWithoutAnswer = (stateStats: any): void => {
       stateStats.total_entry_count++;
     };
-    var _answerIncorrectly = (stateStats) => {
+    // TODO(#7165): Replace any with exact type.
+    var _answerIncorrectly = (stateStats: any): void => {
       stateStats.total_entry_count++;
       stateStats.no_submitted_answer_count++;
     };
-    var _answerDefaultOutcome = (stateStats) => {
+
+    // TODO(#7165): Replace any with exact type.
+    var _answerDefaultOutcome = (stateStats: any): void => {
       stateStats.total_entry_count++;
     };
 

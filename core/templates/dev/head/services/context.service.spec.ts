@@ -31,6 +31,7 @@ describe('Context service', () => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/explore/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
     });
 
     it('should correctly set editor context to exploration editor', () => {
@@ -55,8 +56,9 @@ describe('Context service', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
-      spyOn(urlService, 'getPathname').and
-        .returnValue('/embed/exploration/123');
+      spyOn(urlService, 'getPathname').and.returnValue(
+        '/embed/exploration/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
     });
 
     it('should correctly set editor context to exploration editor', () => {
@@ -106,36 +108,12 @@ describe('Context service', () => {
     });
   });
 
-  describe('behavior in the question editor view', () => {
-    beforeEach(() => {
-      ecs = TestBed.get(ContextService);
-      urlService = TestBed.get(UrlService);
-      spyOn(urlService, 'getPathname').and.returnValue('/question_editor/123');
-    });
-
-    it('should correctly set editor context to question editor', () => {
-      ecs.init('question_editor');
-      expect(ecs.getEditorContext()).toBe('question_editor');
-    });
-
-    it('should correctly retrieve the question id', () => {
-      expect(ecs.getQuestionId()).toBe('123');
-    });
-
-    it('should correctly retrieve the page context', () => {
-      expect(ecs.getPageContext()).toBe('question_editor');
-    });
-
-    it('should correctly tell the question editor context', () => {
-      expect(ecs.isInQuestionContext()).toBe(true);
-    });
-  });
-
   describe('behavior in the topic editor view', () => {
     beforeEach(() => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
     });
 
     it('should correctly set editor context to topic editor', () => {
@@ -153,6 +131,29 @@ describe('Context service', () => {
 
     it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('topic_editor');
+    });
+  });
+
+  describe('behavior in question editor modal', () => {
+    beforeEach(() => {
+      ecs = TestBed.get(ContextService);
+      urlService = TestBed.get(UrlService);
+    });
+
+    it('should correctly retrieve the values in topic editor', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/topic_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
+
+      expect(ecs.getEntityType()).toBe('question');
+      expect(ecs.getEntityId()).toBe('questionId');
+    });
+
+    it('should correctly retrieve the values in skill editor', () => {
+      spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('#/questions#questionId');
+
+      expect(ecs.getEntityType()).toBe('question');
+      expect(ecs.getEntityId()).toBe('questionId');
     });
   });
 
@@ -202,6 +203,7 @@ describe('Context service', () => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/skill_editor/123');
+      spyOn(urlService, 'getHash').and.returnValue('');
     });
 
     it('should correctly set editor context to skill editor', () => {
@@ -227,17 +229,13 @@ describe('Context service', () => {
       ecs = TestBed.get(ContextService);
       urlService = TestBed.get(UrlService);
       spyOn(urlService, 'getPathname').and.returnValue('/about');
+      spyOn(urlService, 'getHash').and.returnValue('');
     });
 
     it('should throw an error when trying to retrieve the exploration id',
       () => {
         expect(ecs.getExplorationId).toThrow();
       }
-    );
-
-    it('should throw an error when trying to retrieve the question id', () => {
-      expect(ecs.getQuestionId).toThrow();
-    }
     );
 
     it('should retrieve other as page context', () => {
