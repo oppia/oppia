@@ -160,8 +160,8 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
-        if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
-            raise self.PageNotFoundException
+        # if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
+        #     raise self.PageNotFoundException
 
         if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_SKILL:
             raise self.InvalidInputException(
@@ -181,8 +181,7 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
                 # The skill_id is passed only at the time of accepting the
                 # suggestion.
-                skill_id = self.payload.get('skill_id')
-                suggestion.change.skill_id = skill_id
+                suggestion.change.skill_id = target_id
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))

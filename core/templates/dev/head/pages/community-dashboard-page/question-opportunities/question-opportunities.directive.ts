@@ -99,35 +99,12 @@ angular.module('oppia').directive('questionOpportunities', [
             }
           };
 
-          ctrl.getSkill = function(skillId, successCallback) {
-            var skill = {};
-            EditableSkillBackendApiService.fetchSkill(skillId)
-              .then(function(backendSkillObject) {
-                skill = SkillObjectFactory.createFromBackendDict(
-                  backendSkillObject.skill);
-                successCallback(skill);
-              }, function(error) {
-                AlertsService.addWarning();
-              });
-            return skill;
-          };
-
           ctrl.onClickButton = function(skillId) {
             var question =
               QuestionObjectFactory.createDefaultQuestion([skillId]);
             var questionId = question.getId();
             var questionStateData = question.getStateData();
-            var misconceptionsBySkill = {};
-            var associatedSkill = ctrl.getSkill(
-              skillId,
-              function(skill) {
-                misconceptionsBySkill[skill._id] =
-                skill._misconceptions.map(
-                  function(misconceptionsBackendDict) {
-                    return MisconceptionObjectFactory
-                      .createFromBackendDict(misconceptionsBackendDict);
-                  });
-              });
+
             QuestionUndoRedoService.clearChanges();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -144,8 +121,21 @@ angular.module('oppia').directive('questionOpportunities', [
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.questionId = questionId;
-                  $scope.associatedSkill = associatedSkill;
-                  $scope.misconceptionsBySkill = misconceptionsBySkill;
+                  EditableSkillBackendApiService.fetchSkill(skillId)
+                    .then(function(backendSkillObject) {
+                      $scope.associatedSkill =
+                        SkillObjectFactory.createFromBackendDict(
+                          backendSkillObject.skill);
+                      $scope.misconceptionsBySkill = {};
+                      $scope.misconceptionsBySkill[$scope.associatedSkill._id] =
+                        $scope.associatedSkill._misconceptions.map(
+                          function(misconceptionsBackendDict) {
+                            return MisconceptionObjectFactory
+                              .createFromBackendDict(misconceptionsBackendDict);
+                          });
+                    }, function(error) {
+                      AlertsService.addWarning();
+                    });
                   $scope.removeErrors = function() {
                     $scope.validationError = null;
                   };
@@ -165,7 +155,7 @@ angular.module('oppia').directive('questionOpportunities', [
                       return;
                     }
                     AddQuestionService.addQuestion(
-                      $scope.question, $scope.associatedSkillDict);
+                      $scope.question, $scope.associatedSkill);
                     $uibModalInstance.close();
                   };
                   // Checking if Question contains all requirements to enable

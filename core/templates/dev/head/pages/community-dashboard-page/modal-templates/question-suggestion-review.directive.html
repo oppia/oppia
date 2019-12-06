@@ -1,15 +1,20 @@
 <div class="modal-header">
-  <h3>Review question</h3>
+  <div>
+    <h3><[questionHeader]></h3>
+    <h4 class="author-header">Submitted by <[authorName]></h4>
+  </div>
 </div>
 
 <div class="modal-body">
   <section class="oppia-suggestion-review-container">
-    <div class="oppia-suggestion-review-panel-container" style="float: left;">
-      <strong>Question content:</strong>
-      <div class="oppia-suggestion-review-panel">
-        <angular-html-bind html-data="contentHtml">
-        </angular-html-bind>
-      </div>
+    <div class="oppia-question-suggestion">
+      <question-editor question-id="questionId"
+            misconceptions-by-skill="misconceptionsBySkill"
+            question-state-data="questionStateData"
+            question="question"
+            can-edit-question="canEditQuestion"
+            question-changed="questionChanged">
+      </question-editor>
     </div>
   </section>
   <div ng-show="reviewable" class="oppia-suggestion-review-message">
@@ -33,6 +38,13 @@
 </div>
 
 <style>
+  .author-header {
+    margin-top: -12px;
+  }
+  .oppia-question-suggestion {
+    height: 100%;
+    overflow: scroll;
+  }
   .oppia-suggestion-review-message {
     margin-left: 10px;
     margin-top: 20px;

@@ -19,13 +19,18 @@
 require('base-components/base-content.directive.ts');
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/question-directives/question-editor/' +
+  'question-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
+require('domain/question/QuestionObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 require(
   'pages/community-dashboard-page/login-required-message/' +
   'login-required-message.directive.ts');
+
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-and-review.services.ts');
@@ -43,9 +48,11 @@ angular.module('oppia').directive('contributionsAndReview', [
         'contributions-and-review.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$uibModal', 'ContributionAndReviewService', 'UserService',
+        '$filter', '$uibModal', 'ContributionAndReviewService',
+        'QuestionObjectFactory', 'UserService',
         function(
-            $filter, $uibModal, ContributionAndReviewService, UserService) {
+            $filter, $uibModal, ContributionAndReviewService,
+            QuestionObjectFactory, UserService) {
           var SUGGESTION_LABELS = {
             review: {
               text: 'Awaiting review',
@@ -67,9 +74,30 @@ angular.module('oppia').directive('contributionsAndReview', [
           ctrl.contributions = {};
           ctrl.contributionSummaries = [];
           ctrl.contributionsDataLoading = true;
-          ctrl.reviewTabActive = false;
           ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
           ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
+          ctrl.activeReviewTab = '';
+          ctrl.reviewTabs = [
+            {
+              suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+              text: 'Review Questions'
+            },
+            {
+              suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+              text: 'Review Translations'
+            }
+          ]
+          ctrl.activeContributionTab = '';
+          ctrl.contributionTabs = [
+            {
+              suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+              text: 'Questions'
+            },
+            {
+              suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+              text: 'Translations'
+            }
+          ]
 
           var getQuestionContributionsSummary = function() {
             var questionContributionsSummaryList = [];
@@ -79,12 +107,17 @@ angular.module('oppia').directive('contributionsAndReview', [
               var change = suggestion.change;
               var requiredData = {
                 id: suggestion.suggestion_id,
-                heading: $filter('formatRtePreview')(change.question_html),
+                heading: $filter('formatRtePreview')
+                  (change.question_dict.question_state_data.content.html),
                 subheading: (details.topic_name + ' / ' +
                   details.skill_description),
                 labelText: SUGGESTION_LABELS[suggestion.status].text,
                 labelColor: SUGGESTION_LABELS[suggestion.status].color,
-                actionButtonTitle: (ctrl.reviewTabActive ? 'Review' : 'View')
+                actionButtonTitle: (
+                  ctrl.activeReviewTab == ctrl.SUGGESTION_TYPE_QUESTION ?
+                    'Review' :
+                    'View'
+                )
               };
               questionContributionsSummaryList.push(requiredData);
             });
@@ -104,7 +137,11 @@ angular.module('oppia').directive('contributionsAndReview', [
                   ' / ' + details.chapter_title),
                 labelText: SUGGESTION_LABELS[suggestion.status].text,
                 labelColor: SUGGESTION_LABELS[suggestion.status].color,
-                actionButtonTitle: (ctrl.reviewTabActive ? 'Review' : 'View')
+                actionButtonTitle: (
+                  ctrl.activeContributionTab == ctrl.SUGGESTION_TYPE_TRANSLATE ?
+                    'Review' :
+                    'View'
+                )
               };
               translationContributionsSummaryList.push(requiredData);
             });
@@ -122,18 +159,35 @@ angular.module('oppia').directive('contributionsAndReview', [
           };
 
           var _showQuestionSuggestionModal = function(
-              targetId, suggestionId, contentHtml, reviewable) {
+              suggestion, contributionDetails, reviewable) {
             var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/community-dashboard-page/modal-templates/' +
               'question-suggestion-review.directive.html');
+            var targetId = suggestion.target_id;
+            var suggestionId = suggestion.suggestion_id;
+            var authorName = suggestion.author_name;
+            var questionHeader = (contributionDetails.topic_name + ' / ' +
+              contributionDetails.skill_description)
+            var question = QuestionObjectFactory.createFromBackendDict(
+              suggestion.change.question_dict);
+            var contentHtml = question.getStateData().content.getHtml();
 
             $uibModal.open({
               templateUrl: _templateUrl,
               backdrop: true,
               size: 'lg',
               resolve: {
+                authorName: function() {
+                  return authorName;
+                },
                 contentHtml: function() {
                   return contentHtml;
+                },
+                question: function() {
+                  return question;
+                },
+                questionHeader: function() {
+                  return questionHeader;
                 },
                 reviewable: function() {
                   return reviewable;
@@ -141,13 +195,24 @@ angular.module('oppia').directive('contributionsAndReview', [
               },
               controller: [
                 '$scope', '$uibModalInstance', 'SuggestionModalService',
-                'reviewable', 'contentHtml',
+                'question', 'reviewable',
                 function($scope, $uibModalInstance, SuggestionModalService,
-                    reviewable, contentHtml) {
+                    question, reviewable) {
+                  $scope.authorName = authorName;
                   $scope.contentHtml = contentHtml;
                   $scope.reviewable = reviewable;
                   $scope.commitMessage = '';
                   $scope.reviewMessage = '';
+                  $scope.question = question;
+                  $scope.questionHeader = questionHeader;
+                  $scope.questionStateData = question.getStateData();
+                  $scope.questionId = question.getId();
+                  $scope.canEditQuestion = false;
+                  $scope.misconceptionsBySkill = [];
+
+                  $scope.questionChanged = function() {
+                    $scope.validationError = null;
+                  };
 
                   $scope.accept = function() {
                     SuggestionModalService.acceptSuggestion(
@@ -167,6 +232,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                         reviewMessage: $scope.reviewMessage
                       });
                   };
+
                   $scope.cancel = function() {
                     SuggestionModalService.cancelSuggestion($uibModalInstance);
                   };
@@ -244,73 +310,78 @@ angular.module('oppia').directive('contributionsAndReview', [
 
           ctrl.onClickViewSuggestion = function(suggestionId) {
             var suggestion = ctrl.contributions[suggestionId].suggestion;
+            if (suggestion.suggestion_type ===
+                ctrl.SUGGESTION_TYPE_QUESTION) {
+              var reviewable =
+                ctrl.activeReviewTab == ctrl.SUGGESTION_TYPE_QUESTION;
+              var contributionDetails =
+                ctrl.contributions[suggestionId].details;
+              console.log(suggestion);
+              _showQuestionSuggestionModal(
+                suggestion, contributionDetails, reviewable);
+            }
             if (suggestion.suggestion_type === ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              var reviewable =
+                ctrl.activeReviewTab == ctrl.SUGGESTION_TYPE_TRANSLATE;
               _showTranslationSuggestionModal(
                 suggestion.target_id, suggestion.suggestion_id,
                 suggestion.change.content_html,
-                suggestion.change.translation_html, ctrl.reviewTabActive);
-            }
-            if (suggestion.suggestion_type ===
-                ctrl.SUGGESTION_TYPE_ADD_QUESTION) {
-              _showQuestionSuggestionModal(
-                suggestion.target_id, suggestion.suggestion_id,
-                suggestion.change.question_dict.question_state_data.content
-                  .html, ctrl.reviewTabActive);
+                suggestion.change.translation_html, reviewable);
             }
           };
 
           ctrl.switchToContributionsTab = function(suggestionType) {
-            if (ctrl.reviewTabActive) {
-              ctrl.reviewTabActive = false;
-              ctrl.contributionsDataLoading = true;
-              ctrl.contributionSummaries = [];
-              if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
-                ContributionAndReviewService.getUserCreatedQuestionSuggestions(
+            ctrl.activeReviewTab = '';
+            ctrl.contributionsDataLoading = true;
+            ctrl.contributionSummaries = [];
+            if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
+              ContributionAndReviewService.getUserCreatedQuestionSuggestions(
+                function(suggestionIdToSuggestions) {
+                  ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_QUESTION;
+                  ctrl.contributions = suggestionIdToSuggestions;
+                  ctrl.contributionSummaries = (
+                    getQuestionContributionsSummary());
+                  ctrl.contributionsDataLoading = false;
+                });
+            }
+            if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              ContributionAndReviewService
+                .getUserCreatedTranslationSuggestions(
                   function(suggestionIdToSuggestions) {
+                    ctrl.activeContributionTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
                     ctrl.contributions = suggestionIdToSuggestions;
                     ctrl.contributionSummaries = (
-                      getQuestionContributionsSummary());
+                      getTranslationContributionsSummary());
                     ctrl.contributionsDataLoading = false;
                   });
-              }
-              if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
-                ContributionAndReviewService
-                  .getUserCreatedTranslationSuggestions(
-                    function(suggestionIdToSuggestions) {
-                      ctrl.contributions = suggestionIdToSuggestions;
-                      ctrl.contributionSummaries = (
-                        getTranslationContributionsSummary());
-                      ctrl.contributionsDataLoading = false;
-                    });
-              }
             }
           };
 
           ctrl.switchToReviewTab = function(suggestionType) {
-            if (!ctrl.reviewTabActive) {
-              ctrl.reviewTabActive = true;
-              ctrl.contributionsDataLoading = true;
-              ctrl.contributionSummaries = [];
+            ctrl.activeContributionTab = '';
+            ctrl.contributionsDataLoading = true;
+            ctrl.contributionSummaries = [];
 
-              if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
-                ContributionAndReviewService.getReviewableQuestionSuggestions(
+            if (suggestionType === ctrl.SUGGESTION_TYPE_QUESTION) {
+              ContributionAndReviewService.getReviewableQuestionSuggestions(
+                function(suggestionIdToSuggestions) {
+                  ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_QUESTION;
+                  ctrl.contributions = suggestionIdToSuggestions;
+                  ctrl.contributionSummaries = (
+                    getQuestionContributionsSummary());
+                  ctrl.contributionsDataLoading = false;
+                });
+            }
+            if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
+              ContributionAndReviewService
+                .getReviewableTranslationSuggestions(
                   function(suggestionIdToSuggestions) {
+                    ctrl.activeReviewTab = ctrl.SUGGESTION_TYPE_TRANSLATE;
                     ctrl.contributions = suggestionIdToSuggestions;
                     ctrl.contributionSummaries = (
-                      getQuestionContributionsSummary());
+                      getTranslationContributionsSummary());
                     ctrl.contributionsDataLoading = false;
                   });
-              }
-              if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
-                ContributionAndReviewService
-                  .getReviewableTranslationSuggestions(
-                    function(suggestionIdToSuggestions) {
-                      ctrl.contributions = suggestionIdToSuggestions;
-                      ctrl.contributionSummaries = (
-                        getTranslationContributionsSummary());
-                      ctrl.contributionsDataLoading = false;
-                    });
-              }
             }
           };
 
@@ -319,10 +390,8 @@ angular.module('oppia').directive('contributionsAndReview', [
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
             ctrl.userDetailsLoading = false;
             if (ctrl.isAdmin) {
-              ctrl.reviewTabActive = false;
               ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
             } else if (ctrl.userIsLoggedIn) {
-              ctrl.reviewTabActive = true;
               ctrl.switchToContributionsTab(ctrl.SUGGESTION_TYPE_QUESTION);
             }
           });

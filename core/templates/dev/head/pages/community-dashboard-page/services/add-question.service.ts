@@ -25,14 +25,14 @@ angular.module('oppia').factory('AddQuestionService', [
             suggestion_type: 'add_question',
             target_type: 'skill',
             description: 'Add new question',
-            target_id: associatedSkill.id,
-            target_version_at_submission: associatedSkill.version,
-            assigned_reviewer_id: null,
-            final_reviewer_id: null,
+            target_id: associatedSkill._id,
+            target_version_at_submission: associatedSkill._version,
+            assigned_reviewer_id: '',
+            final_reviewer_id: '',
             change: {
               cmd: 'create_new_fully_specified_question',
               question_dict: question.toBackendDict(true),
-              skill_id: associatedSkill.id
+              skill_id: associatedSkill._id
             }
           };
           $http.post(url, data);

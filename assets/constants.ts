@@ -46,6 +46,12 @@ export = {
   // The default language code for an exploration.
   "DEFAULT_LANGUAGE_CODE": "en",
 
+  // The current version of the exploration states blob schema. If any backward-
+  // incompatible changes are made to the states blob schema in the data store,
+  // this version number must be changed and the exploration migration job
+  // executed.
+  "CURRENT_STATE_SCHEMA_VERSION": 30,
+
   // List of supported default categories. For now, each category has a specific
   // color associated with it. Each category also has a thumbnail icon whose
   // filename is '{{CategoryName}}.svg'.
@@ -632,6 +638,9 @@ export = {
   // The bucket name is set to None-resources to enable it to be used
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
+
+  // Used to disable account removal until it is fully implemented.
+  "ENABLE_ACCOUNT_DELETION": false,
 
   "DEV_MODE": true
 };

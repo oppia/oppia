@@ -130,9 +130,9 @@ class BaseChange(python_utils.OBJECT):
                     cmd['required_attribute_names'] + cmd[
                         'optional_attribute_names'])
                 break
-
         for attribute_name in cmd_attribute_names:
             setattr(self, attribute_name, change_dict.get(attribute_name))
+
 
     def validate_dict(self, change_dict):
         """Checks that the command in change dict is valid for the domain

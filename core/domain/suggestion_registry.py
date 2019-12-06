@@ -560,7 +560,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
-
         if self.change.skill_id is None:
             raise utils.ValidationError('Expected change to contain skill_id')
         question_dict = self.change.question_dict

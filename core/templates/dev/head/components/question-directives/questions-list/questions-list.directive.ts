@@ -324,7 +324,6 @@ angular.module('oppia').directive('questionsList', [
               skillIds).then(
               function(skillDicts) {
                 skillDicts.forEach(function(skillDict) {
-                  console.log(skillDict);
                   ctrl.misconceptionsBySkill[skillDict.id] =
                     skillDict.misconceptions.map(
                       function(misconceptionsBackendDict) {
