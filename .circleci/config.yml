@@ -130,7 +130,6 @@ jobs:
           command: |
             python -m scripts.check_frontend_test_coverage
 
-
   backend_tests:
     <<: *job_defaults
     steps:

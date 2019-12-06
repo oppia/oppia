@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Check for any decreasement of 100% covered files in the frontend"""
+"""Check for decrease in coverage from 100% of frontend files."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -72,8 +72,8 @@ def filter_lines(line):
         line: str. A line from lcov file.
 
     Returns:
-        If the line has the file path or total lines or covered lines of the
-        test.
+        Boolean. If the line has the file path or total lines or covered lines
+        of the test.
     """
     return (line.find('SF') >= 0 or line.find('LH') >= 0
             or line.find('LF') >= 0)
@@ -86,7 +86,7 @@ def get_test_file_name(test_path):
         test_path: string. The file's absolute path.
 
     Returns:
-        file_name(str). The file name.
+        String. The file path.
     """
     if not test_path:
         sys.stderr.write(
@@ -107,8 +107,8 @@ def get_lcov_file_tests(file_path):
       file_path: string. The path of lcov file.
 
     Returns:
-      An array with all tests filtered, including only important data for the
-      diff.
+      String array. An array with all tests filtered, including only important
+      data for the diff.
     """
     with python_utils.open_file(file_path, 'r') as f:
         tests_array = f.read().split('end_of_record')
@@ -126,8 +126,11 @@ def build_tests_fully_coverage_dict():
     """Build a dict with only fully covered files from develop branch.
 
     Returns:
-        A dict containing file path, total lines and covered lines of each
-        tested file.
+        Dictionary. A dict containing file path, total lines and covered lines
+        of each tested file.
+
+    Raises:
+      Exception: If DEV_LCOV_FILE_PATH doesn't exist.
     """
     coverage_dict = {}
 
@@ -151,7 +154,11 @@ def build_tests_fully_coverage_dict():
 
 
 def lcov_files_diff():
-    """Check if any 100% covered file had the coverage dropped."""
+    """Check if any 100% covered file had the coverage dropped.
+
+    Raises:
+      Exception: If PR_LCOV_FILE_PATH doesn't exist.
+    """
     fully_covered_tests = build_tests_fully_coverage_dict()
 
     if os.path.exists(PR_LCOV_FILE_PATH):
