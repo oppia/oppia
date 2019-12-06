@@ -23,7 +23,7 @@ angular.module('oppia').factory('SubtopicDataObjectFactory',
   ['SubtopicPageContentsObjectFactory',
     function(SubtopicPageContentsObjectFactory) {
       var SubtopicData = function(
-        subtopicTitle, pageContents) {
+          subtopicTitle, pageContents) {
         this._subtopic_title = subtopicTitle;
         this._page_contents = pageContents;
       };
@@ -40,7 +40,8 @@ angular.module('oppia').factory('SubtopicDataObjectFactory',
 
       // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
       /* eslint-disable dot-notation */
-      SubtopicData['createFromBackendDict'] = function(subtopicDataBackendDict) {
+      SubtopicData['createFromBackendDict'] = function(
+          subtopicDataBackendDict) {
         /* eslint-enable dot-notation */
         return new SubtopicData(
           subtopicDataBackendDict.subtopic_title,
