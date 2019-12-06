@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('domain/subtopic_viewer/SubtopicDataObjectFactory.ts');
-require('domain/topic/SubtopicPageContentsObjectFactory.ts')
+require('domain/topic/SubtopicPageContentsObjectFactory.ts');
 
 describe('Subtopic data object factory', function() {
   var SubtopicDataObjectFactory = null;

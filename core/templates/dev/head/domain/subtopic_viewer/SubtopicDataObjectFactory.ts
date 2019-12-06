@@ -20,34 +20,34 @@
 require('domain/topic/SubtopicPageContentsObjectFactory.ts');
 
 angular.module('oppia').factory('SubtopicDataObjectFactory',
-['SubtopicPageContentsObjectFactory', function(SubtopicPageContentsObjectFactory) {
-  var SubtopicData = function(
+  ['SubtopicPageContentsObjectFactory', function(SubtopicPageContentsObjectFactory) {
+    var SubtopicData = function (
       subtopicTitle, pageContents) {
-    this._subtopic_title = subtopicTitle;
-    this._page_contents = pageContents;
-  };
+      this._subtopic_title = subtopicTitle;
+      this._page_contents = pageContents;
+    };
 
-  // Instance methods
+    // Instance methods
 
-  SubtopicData.prototype.getSubtopicTitle = function() {
-    return this._subtopic_title;
-  };
+    SubtopicData.prototype.getSubtopicTitle = function() {
+      return this._subtopic_title;
+    };
 
-  SubtopicData.prototype.getPageContents = function() {
-    return this._page_contents;
-  };
+    SubtopicData.prototype.getPageContents = function() {
+      return this._page_contents;
+    };
 
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  SubtopicData['createFromBackendDict'] = function(subtopicDataBackendDict) {
-    /* eslint-enable dot-notation */
-    return new SubtopicData(
-      subtopicDataBackendDict.subtopic_title,
-      SubtopicPageContentsObjectFactory.createFromBackendDict(
-        subtopicDataBackendDict.page_contents
-      )
-    );
-  };
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    SubtopicData['createFromBackendDict'] = function(subtopicDataBackendDict) {
+      /* eslint-enable dot-notation */
+      return new SubtopicData(
+        subtopicDataBackendDict.subtopic_title,
+        SubtopicPageContentsObjectFactory.createFromBackendDict(
+          subtopicDataBackendDict.page_contents
+        )
+      );
+    };
 
-  return SubtopicData;
-}]);
+    return SubtopicData;
+  }]);
