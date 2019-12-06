@@ -25,37 +25,8 @@ require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 
 describe('Suggestion thread object factory', function() {
   var SuggestionThreadObjectFactory = null;
-  var suggestionThreadBackendDict = {
-    last_updated: 1000,
-    original_author_username: 'author',
-    status: 'accepted',
-    subject: 'sample subject',
-    summary: 'sample summary',
-    message_count: 10,
-    state_name: 'state 1',
-    thread_id: 'exploration.exp1.thread1'
-  };
-  var suggestionBackendDict = {
-    suggestion_id: 'exploration.exp1.thread1',
-    suggestion_type: '',
-    target_type: 'exploration',
-    target_id: 'exp1',
-    target_version_at_submission: 1,
-    status: 'accepted',
-    author_name: 'author',
-    change: {
-      cmd: 'edit_state_property',
-      property_name: 'content',
-      state_name: 'state_1',
-      new_value: {
-        html: 'new suggestion content'
-      },
-      old_value: {
-        html: 'old suggestion content'
-      }
-    },
-    last_updated: 1000
-  };
+  var suggestionThreadBackendDict;
+  var suggestionBackendDict;
 
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -74,14 +45,46 @@ describe('Suggestion thread object factory', function() {
     suggestionObjectFactory = $injector.get('SuggestionObjectFactory');
   }));
 
-  it('should create a new suggestion thread from a backend dict.', function() {
-    // To not affect others 'it' block that uses suggestionBackendDict
-    var testSuggestionBackendDict = Object.assign({}, suggestionBackendDict);
-    testSuggestionBackendDict.suggestion_type =
-      'edit_exploration_state_content';
+  beforeEach(function() {
+    suggestionThreadBackendDict = {
+      last_updated: 1000,
+      original_author_username: 'author',
+      status: 'accepted',
+      subject: 'sample subject',
+      summary: 'sample summary',
+      message_count: 10,
+      state_name: 'state 1',
+      thread_id: 'exploration.exp1.thread1'
+    };
+    suggestionBackendDict = {
+      suggestion_id: 'exploration.exp1.thread1',
+      suggestion_type: '',
+      target_type: 'exploration',
+      target_id: 'exp1',
+      target_version_at_submission: 1,
+      status: 'accepted',
+      author_name: 'author',
+      change: {
+        cmd: 'edit_state_property',
+        property_name: 'content',
+        state_name: 'state_1',
+        new_value: {
+          html: 'new suggestion content'
+        },
+        old_value: {
+          html: 'old suggestion content'
+        }
+      },
+      last_updated: 1000
+    };
+  });
 
-    var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
-      suggestionThreadBackendDict, testSuggestionBackendDict);
+  it('should create a new suggestion thread from a backend dict.', function() {
+    suggestionBackendDict.suggestion_type = 'edit_exploration_state_content';
+
+    var suggestionThread = (
+      SuggestionThreadObjectFactory.createFromBackendDicts(
+        suggestionThreadBackendDict, suggestionBackendDict));
 
     expect(suggestionThread.lastUpdated).toEqual(1000);
     expect(suggestionThread.originalAuthorName).toEqual('author');
