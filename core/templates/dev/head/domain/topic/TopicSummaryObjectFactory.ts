@@ -20,15 +20,6 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export interface ITopicSummary {
-  _id: string;
-  _name: string;
-  _canonicalStoryCount: number;
-  _subtopicCount: number;
-  _totalSkillCount: number;
-  _uncategorizedSkillCount: number;
-}
-
 class TopicSummary {
   _id: string;
   _name: string;
@@ -81,7 +72,7 @@ export class TopicSummaryObjectFactory {
   // 'any' because 'topicSummaryBackendDict' is a dict with  underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  createFromBackendDict(topicSummaryBackendDict: any): ITopicSummary {
+  createFromBackendDict(topicSummaryBackendDict: any): TopicSummary {
     return new TopicSummary(
       topicSummaryBackendDict.id,
       topicSummaryBackendDict.name,
