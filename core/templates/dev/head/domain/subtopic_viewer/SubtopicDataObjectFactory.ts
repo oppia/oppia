@@ -43,7 +43,7 @@ angular.module('oppia').factory('SubtopicDataObjectFactory',
     /* eslint-enable dot-notation */
     return new SubtopicData(
       subtopicDataBackendDict.subtopic_title,
-      this.SubtopicPageContentsObjectFactory.createFromBackendDict(
+      SubtopicPageContentsObjectFactory.createFromBackendDict(
         subtopicDataBackendDict.page_contents
       )
     );
