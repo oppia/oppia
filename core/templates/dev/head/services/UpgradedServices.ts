@@ -38,6 +38,7 @@ import { ChangesInHumanReadableFormService } from
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
+import { CodeReplPredictionService } from 'interactions/CodeRepl/code-repl-prediction.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -101,6 +102,7 @@ import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
+import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -128,6 +130,8 @@ import { TextInputRulesService } from
 import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { TextInputValidationService } from
   'interactions/TextInput/directives/text-input-validation.service';
+import { TextInputPredictionService } from
+  'interactions/TextInput/text-input-prediction.service';
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -143,12 +147,11 @@ import { VoiceoverObjectFactory } from
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
+import { WinnowingPreprocessingService } from 'classifiers/winnowing-preprocessing.service';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { TextInputPredictionService } from
-  'interactions/TextInput/text-input-prediction.service';
 
 @Injectable({
   providedIn: 'root'
@@ -217,6 +220,8 @@ export class UpgradedServices {
     upgradedServices['VoiceoverObjectFactory'] = new VoiceoverObjectFactory();
     upgradedServices['WindowDimensionsService'] = new WindowDimensionsService();
     upgradedServices['WindowRef'] = new WindowRef();
+    upgradedServices['WinnowingPreprocessingService'] =
+      new WinnowingPreprocessingService();
     upgradedServices['WrittenTranslationObjectFactory'] =
       new WrittenTranslationObjectFactory();
 
@@ -276,6 +281,8 @@ export class UpgradedServices {
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
+    upgradedServices['PythonProgramTokenizer'] =
+      new PythonProgramTokenizer(upgradedServices['LoggerService'])
 
     // Group 3: Services depending only on groups 1-2.
     upgradedServices['AnswerGroupObjectFactory'] =
@@ -299,6 +306,12 @@ export class UpgradedServices {
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
+    upgradedServices['CodeReplPredictionService'] =
+      new CodeReplPredictionService(
+        upgradedServices['CountVectorizerService'],
+        upgradedServices['PythonProgramTokenizer'],
+        upgradedServices['SVMPredictionService'],
+        upgradedServices['WinnowingPreprocessingService']);
 
     // Group 4: Services depending on groups 1,2 and 3.
     upgradedServices['ExplorationHtmlFormatterService'] =

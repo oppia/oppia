@@ -16,34 +16,26 @@
  * @fileoverview Unit tests python program tokenizer.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+import { LoggerService } from 'services/contextual/logger.service';
 
-describe('Python program tokenizer', function() {
+describe('Python program tokenizer', () => {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
 
-  describe('Test python program tokenizer', function() {
-    var tokenizer;
-    beforeEach(angular.mock.inject(function($injector) {
-      tokenizer = $injector.get('PythonProgramTokenizer');
-    }));
+  describe('Test python program tokenizer', () => {
+    let tokenizer: PythonProgramTokenizer;
+    beforeEach(() => {
+      tokenizer = new PythonProgramTokenizer(new LoggerService());
+    });
 
-    it('should generate correct tokens for a program', function() {
-      var program = (
+    it('should generate correct tokens for a program', () => {
+      const program = (
         '# In Python, the code\n#\n#     for letter in [\'a\', \'b\']:\n#    ' +
         '     print letter\n#\n# prints:\n#\n#     a\n#     b\ns = 0;\nfor ' +
         'num in range(1000):\n  if num%7 == 0 or num%5 == 0:\n\ts +=x\n' +
         'print s');
 
-      var expectedTokens = [
+      const expectedTokens = [
         ['COMMENT', '# In Python, the code'], ['NL', ''], ['COMMENT', '#'],
         ['NL', ''], ['COMMENT', '#     for letter in [\'a\', \'b\']:'],
         ['NL', ''], ['COMMENT', '#         print letter'], ['NL', ''],
@@ -58,7 +50,7 @@ describe('Python program tokenizer', function() {
         ['NUMBER', '0'], ['OP', ':'], ['NAME', 's'], ['OP', '+='],
         ['NAME', 'x'], ['NAME', 'print'], ['NAME', 's'], ['ENDMARKER', '']];
 
-      var tokens = tokenizer.generateTokens(program.split('\n'));
+      const tokens = tokenizer.generateTokens(program.split('\n'));
       expect(tokens.length).toEqual(expectedTokens.length);
       expect(tokens).toEqual(expectedTokens);
     });
