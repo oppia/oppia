@@ -38,7 +38,7 @@ describe('Subtopic data object factory', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-  })); 
+  }));
 
   beforeEach(angular.mock.inject(function($injector) {
     SubtopicDataObjectFactory = $injector.get('SubtopicDataObjectFactory');

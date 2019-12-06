@@ -28,38 +28,38 @@ import { VoiceoverObjectFactory } from
 
 angular.module('oppia').factory('SubtopicDataObjectFactory',
   [function() {
-      var SubtopicData = function(
-          subtopicTitle, pageContents) {
-        var subtopicPageContentsObjectFactory = 
-          new SubtopicPageContentsObjectFactory(
-            new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
-            new SubtitledHtmlObjectFactory());
+    var SubtopicData = function(
+      subtopicTitle, pageContents) {
+      var subtopicPageContentsObjectFactory =
+        new SubtopicPageContentsObjectFactory(
+          new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
+          new SubtitledHtmlObjectFactory());
 
-        this._subtopic_title = subtopicTitle;
-        this._page_contents = subtopicPageContentsObjectFactory.
-          createFromBackendDict(pageContents);
-      };
+      this._subtopic_title = subtopicTitle;
+      this._page_contents = subtopicPageContentsObjectFactory.
+        createFromBackendDict(pageContents);
+    };
 
-      // Instance methods
+    // Instance methods
 
-      SubtopicData.prototype.getSubtopicTitle = function() {
-        return this._subtopic_title;
-      };
+    SubtopicData.prototype.getSubtopicTitle = function() {
+      return this._subtopic_title;
+    };
 
-      SubtopicData.prototype.getPageContents = function() {
-        return this._page_contents;
-      };
+    SubtopicData.prototype.getPageContents = function() {
+      return this._page_contents;
+    };
 
-      // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-      /* eslint-disable dot-notation */
-      SubtopicData['createFromBackendDict'] = function(
-          subtopicDataBackendDict) {
-        /* eslint-enable dot-notation */
-        return new SubtopicData(
-          subtopicDataBackendDict.subtopic_title,
-          subtopicDataBackendDict.page_contents
-        );
-      };
+    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    SubtopicData['createFromBackendDict'] = function(
+      subtopicDataBackendDict) {
+      /* eslint-enable dot-notation */
+      return new SubtopicData(
+        subtopicDataBackendDict.subtopic_title,
+        subtopicDataBackendDict.page_contents
+      );
+    };
 
-      return SubtopicData;
-    }]);
+    return SubtopicData;
+  }]);
