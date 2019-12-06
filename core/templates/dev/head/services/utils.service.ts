@@ -38,13 +38,16 @@ export class UtilsService {
   }
 
   isEquivalent(a: any, b: any): boolean {
-    // Create arrays of property names.
+    if (a === null || b === null) {
+      return a === b;
+    }
     if (typeof a !== typeof b) {
       return false;
     }
     if (typeof a !== 'object') {
       return a === b;
     }
+    // Create arrays of property names.
     var aProps = Object.getOwnPropertyNames(a);
     var bProps = Object.getOwnPropertyNames(b);
     if (aProps.length !== bProps.length) {
