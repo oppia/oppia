@@ -29,7 +29,7 @@ import { VoiceoverObjectFactory } from
 angular.module('oppia').factory('SubtopicDataObjectFactory',
   [function() {
     var SubtopicData = function(
-      subtopicTitle, pageContents) {
+        subtopicTitle, pageContents) {
       var subtopicPageContentsObjectFactory =
         new SubtopicPageContentsObjectFactory(
           new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
@@ -53,7 +53,7 @@ angular.module('oppia').factory('SubtopicDataObjectFactory',
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
     SubtopicData['createFromBackendDict'] = function(
-      subtopicDataBackendDict) {
+        subtopicDataBackendDict) {
       /* eslint-enable dot-notation */
       return new SubtopicData(
         subtopicDataBackendDict.subtopic_title,
