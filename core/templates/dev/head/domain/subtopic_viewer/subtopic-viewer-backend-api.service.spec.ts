@@ -52,7 +52,23 @@ describe('Subtopic viewer backend API service', function() {
     // Sample subtopic page contents object returnable from the backend
     sampleDataResults = {
       subtopic_title: 'Subtopic Title',
-      page_contents: {}
+      page_contents: {
+        subtitled_html: {
+          html: 'test content',
+          content_id: 'content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {
+              en: {
+                filename: 'test.mp3',
+                file_size_bytes: 100,
+                needs_update: false
+              }
+            }
+          }
+        }
+      }
     };
 
     sampleDataResultsObjects = SubtopicDataObjectFactory.createFromBackendDict(

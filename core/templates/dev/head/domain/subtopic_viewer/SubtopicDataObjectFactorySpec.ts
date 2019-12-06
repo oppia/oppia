@@ -19,15 +19,18 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
+
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory';
 
 require('domain/subtopic_viewer/SubtopicDataObjectFactory.ts');
-require('domain/topic/SubtopicPageContentsObjectFactory.ts');
 
 describe('Subtopic data object factory', function() {
   var SubtopicDataObjectFactory = null;
-  var SubtopicPageContentsObjectFactory = null;
   var _sampleSubtopicData = null;
+  let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
+    null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -35,16 +38,37 @@ describe('Subtopic data object factory', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-  }));
+  })); 
 
   beforeEach(angular.mock.inject(function($injector) {
     SubtopicDataObjectFactory = $injector.get('SubtopicDataObjectFactory');
-    // SubtopicPageContentsObjectFactory = $injector.get(
-    //   'SubtopicPageContentsObjectFactory');
+
+    TestBed.configureTestingModule({
+      providers: [SubtopicPageContentsObjectFactory]
+    });
+
+    subtopicPageContentsObjectFactory = TestBed.get(
+      SubtopicPageContentsObjectFactory);
 
     var sampleSubtopicDataBackendDict = {
       subtopic_title: 'sample_title',
-      page_contents: {}
+      page_contents: {
+        subtitled_html: {
+          html: 'test content',
+          content_id: 'content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {
+              en: {
+                filename: 'test.mp3',
+                file_size_bytes: 100,
+                needs_update: false
+              }
+            }
+          }
+        }
+      }
     };
     _sampleSubtopicData = SubtopicDataObjectFactory.createFromBackendDict(
       sampleSubtopicDataBackendDict);
@@ -53,7 +77,23 @@ describe('Subtopic data object factory', function() {
   it('should be able to get all the values', function() {
     expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
     expect(_sampleSubtopicData.getPageContents()).toEqual(
-      SubtopicPageContentsObjectFactory.createFromBackendDict({})
+      subtopicPageContentsObjectFactory.createFromBackendDict({
+        subtitled_html: {
+          html: 'test content',
+          content_id: 'content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {
+              en: {
+                filename: 'test.mp3',
+                file_size_bytes: 100,
+                needs_update: false
+              }
+            }
+          }
+        }
+      })
     );
   });
 });

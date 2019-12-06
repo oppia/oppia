@@ -17,18 +17,27 @@
  * subtopic data domain objects.
  */
 
-require('domain/topic/SubtopicPageContentsObjectFactory.ts');
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
 
 angular.module('oppia').factory('SubtopicDataObjectFactory',
-  ['SubtopicPageContentsObjectFactory',
-    function(SubtopicPageContentsObjectFactory) {
+  [function() {
       var SubtopicData = function(
           subtopicTitle, pageContents) {
+        var subtopicPageContentsObjectFactory = 
+          new SubtopicPageContentsObjectFactory(
+            new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
+            new SubtitledHtmlObjectFactory());
+
         this._subtopic_title = subtopicTitle;
-        console.error("Hi I'm Error");
-        // this._page_contents = SubtopicPageContentsObjectFactory.
-        //   createFromBackendDict(pageContents);
-        this.page_contents = pageContents;
+        this._page_contents = subtopicPageContentsObjectFactory.
+          createFromBackendDict(pageContents);
       };
 
       // Instance methods
