@@ -44,23 +44,7 @@ describe('Subtopic data object factory', function() {
 
     var sampleSubtopicDataBackendDict = {
       subtopic_title: 'sample_title',
-      page_contents: {
-        subtitled_html: {
-          html: 'test content',
-          content_id: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'test.mp3',
-                file_size_bytes: 100,
-                needs_update: false
-              }
-            }
-          }
-        }
-      }
+      page_contents: {}
     };
     _sampleSubtopicData = SubtopicDataObjectFactory.createFromBackendDict(
       sampleSubtopicDataBackendDict);
@@ -69,22 +53,7 @@ describe('Subtopic data object factory', function() {
   it('should be able to get all the values', function() {
     expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
     expect(_sampleSubtopicData.getPageContents()).toEqual(
-      SubtopicPageContentsObjectFactory.createFromBackendDict({
-        subtitled_html: {
-          html: 'test content',
-          content_id: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'test.mp3',
-                file_size_bytes: 100,
-                needs_update: false
-              }
-            }
-          }
-        }
-      }));
+      SubtopicPageContentsObjectFactory.createFromBackendDict({})
+    );
   });
 });

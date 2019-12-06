@@ -25,7 +25,9 @@ angular.module('oppia').factory('SubtopicDataObjectFactory',
       var SubtopicData = function(
           subtopicTitle, pageContents) {
         this._subtopic_title = subtopicTitle;
-        this._page_contents = pageContents;
+        console.error("Hi I'm Error");
+        this._page_contents = SubtopicPageContentsObjectFactory.
+          createFromBackendDict(pageContents);
       };
 
       // Instance methods
@@ -45,9 +47,7 @@ angular.module('oppia').factory('SubtopicDataObjectFactory',
         /* eslint-enable dot-notation */
         return new SubtopicData(
           subtopicDataBackendDict.subtopic_title,
-          SubtopicPageContentsObjectFactory.createFromBackendDict(
-            subtopicDataBackendDict.page_contents
-          )
+          subtopicDataBackendDict.page_contents
         );
       };
 
