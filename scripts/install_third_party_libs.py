@@ -23,19 +23,6 @@ import os
 import shutil
 import subprocess
 
-# pylint: disable=wrong-import-position
-# pylint: disable=wrong-import-order
-import python_utils  # isort:skip
-
-from . import common  # isort:skip
-from . import install_third_party  # isort:skip
-from . import pre_commit_hook  # isort:skip
-from . import pre_push_hook  # isort:skip
-from . import setup  # isort:skip
-from . import setup_gae  # isort:skip
-# pylint: enable=wrong-import-order
-# pylint: enable=wrong-import-position
-
 # Checking for pip version
 pip2_check_required = False
 pip_name = 'pip'
@@ -51,25 +38,7 @@ if pip2_check_required:
         import pip2 #pylint: disable=unused-variable
         pip_name = 'pip2'
     except ImportError:
-        common.print_each_string_after_two_new_lines([
-            'Pip2 is required to install Oppia dependencies, but pip2 wasn\'t '
-            'found on your local machine.',
-            'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
-            'page:'])
-
-        os_info = os.uname()
-        if os_info[0] == 'Darwin':
-            python_utils.PRINT(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
-                'OS%29')
-        elif os_info[0] == 'Linux':
-            python_utils.PRINT(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
-                '%29')
-        else:
-            python_utils.PRINT(
-                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
-                'Windows%29')
+        print('Pip2 is required to install Oppia dependencies, but pip2 wasn\'t found on your local machine.')
         raise Exception
 
 # These libraries need to be installed before running or importing any script.
@@ -85,6 +54,19 @@ if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
     subprocess.check_call([
         pip_name, 'install', 'future==0.17.1', '--target',
         os.path.join('third_party', 'future-0.17.1')])
+
+# pylint: disable=wrong-import-position
+# pylint: disable=wrong-import-order
+import python_utils  # isort:skip
+
+from . import common  # isort:skip
+from . import install_third_party  # isort:skip
+from . import pre_commit_hook  # isort:skip
+from . import pre_push_hook  # isort:skip
+from . import setup  # isort:skip
+from . import setup_gae  # isort:skip
+# pylint: enable=wrong-import-order
+# pylint: enable=wrong-import-position
 
 _PARSER = argparse.ArgumentParser(description="""
 Installation script for Oppia third-party libraries.
