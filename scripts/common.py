@@ -424,11 +424,15 @@ def normalize_windows_style_path(file_path):
     """
     return file_path.replace('\\', '/')
 
+
+# pylint: disable=anomalous-backslash-in-string
 def normalize_windows_style_path_for_regex(file_path):
     """Windows style file path contains a lot of `\` and this symbol should
     be escaped in Regex.
     """
     return file_path.replace('\\', '\\\\')
+# pylint: enable=anomalous-backslash-in-string
+
 
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
