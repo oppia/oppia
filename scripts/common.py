@@ -418,22 +418,6 @@ def check_prs_for_current_release_are_released(repo):
                 'released before release summary generation.')
 
 
-def normalize_windows_style_path(file_path):
-    """Occassionally the Windows style file path just does not work, so we
-    may want to convert it to Unix style.
-    """
-    return file_path.replace('\\', '/')
-
-
-# pylint: disable=anomalous-backslash-in-string
-def normalize_windows_style_path_for_regex(file_path):
-    """Windows style file path contains a lot of `\` and this symbol should
-    be escaped in Regex.
-    """
-    return file_path.replace('\\', '\\\\')
-# pylint: enable=anomalous-backslash-in-string
-
-
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 

@@ -23,6 +23,7 @@ import collections
 import json
 import os
 import random
+import re
 import subprocess
 import tempfile
 import threading
@@ -93,8 +94,7 @@ class BuildTests(test_utils.GenericTestBase):
         non_existent_filepaths = [INVALID_INPUT_FILEPATH]
         # Exception will be raised at first file determined to be non-existent.
         error_message = ('File %s does not exist.') % non_existent_filepaths[0]
-        error_message = common.normalize_windows_style_path_for_regex(
-            error_message)
+        error_message = re.escape(error_message)
         with self.assertRaisesRegexp(
             OSError, error_message):
             build._ensure_files_exist(non_existent_filepaths)
@@ -247,8 +247,7 @@ class BuildTests(test_utils.GenericTestBase):
         BASE_HTML_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_DEV_DIR, 'base.html')
         BASE_JS_RELATIVE_PATH = os.path.join('pages', 'Base.js')
-        BASE_JS_RELATIVE_PATH_IN_HTML = common.normalize_windows_style_path(
-            BASE_JS_RELATIVE_PATH)
+        BASE_JS_RELATIVE_PATH_IN_HTML = os.path.normpath(BASE_JS_RELATIVE_PATH)
         BASE_JS_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
 
@@ -759,8 +758,7 @@ class BuildTests(test_utils.GenericTestBase):
                          'directory in %s: %s' % (
                              MOCK_COMPILED_JS_DIR, build.TSCONFIG_FILEPATH,
                              out_dir))
-        error_message = common.normalize_windows_style_path_for_regex(
-            error_message)
+        error_message = re.escape(error_message)
         with self.assertRaisesRegexp(
             Exception,
             error_message), self.swap(

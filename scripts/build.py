@@ -214,10 +214,8 @@ def _minify(source_path, target_path):
     # https://circleci.com/blog/how-to-handle-java-oom-errors/
     # Use relative path to avoid java command line parameter parse error on
     # Windows.
-    target_path = common.normalize_windows_style_path(
-        os.path.relpath(target_path))
-    source_path = common.normalize_windows_style_path(
-        os.path.relpath(source_path))
+    target_path = os.path.normpath(os.path.relpath(target_path))
+    source_path = os.path.normpath(os.path.relpath(source_path))
     cmd = 'java -Xmx24m -jar %s -o %s %s' % (
         YUICOMPRESSOR_DIR, target_path, source_path)
     subprocess.check_call(cmd, shell=True)
@@ -422,12 +420,10 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         # This is because html paths are used by backend and we work with
         # paths without hash part in backend.
         if not filepath.endswith('.html'):
-            filepath = common.normalize_windows_style_path(filepath)
+            filepath = os.path.normpath(filepath)
             filepath_with_hash = _insert_hash(filepath, file_hash)
             content = content.replace(
-                '%s%s' % (
-                    common.normalize_windows_style_path(TEMPLATES_DEV_DIR),
-                    filepath),
+                '%s/%s' % (os.path.normpath(TEMPLATES_DEV_DIR), filepath),
                 '%s%s' % (
                     TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
                     filepath_with_hash))
