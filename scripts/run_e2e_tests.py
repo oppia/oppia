@@ -2,7 +2,6 @@ import argparse
 import atexit
 import fileinput
 import os
-import platform
 import re
 import subprocess
 import sys
@@ -20,11 +19,20 @@ CHROME_DRIVER_VERSION = '2.41'
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
-PROTRACTOR_BIN_PATH = os.path.join(common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
-GECKO_PROVIDER_FILE_PATH = os.path.join(common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider', 'geckodriver.js')
-CHROME_PROVIDER_FILE_PATH = os.path.join(common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider', 'chromedriver.js')
-CHROME_PROVIDER_BAK_FILE_PATH = os.path.join(common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider', 'chromedriver.js.bak')
-GECKO_PROVIDER_BAK_FILE_PATH = os.path.join(common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider', 'geckodriver.js.bak')
+PROTRACTOR_BIN_PATH = os.path.join(
+    common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
+GECKO_PROVIDER_FILE_PATH = os.path.join(
+    common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider',
+    'geckodriver.js')
+CHROME_PROVIDER_FILE_PATH = os.path.join(
+    common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider',
+    'chromedriver.js')
+CHROME_PROVIDER_BAK_FILE_PATH = os.path.join(
+    common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider',
+    'chromedriver.js.bak')
+GECKO_PROVIDER_BAK_FILE_PATH = os.path.join(
+    common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider',
+    'geckodriver.js.bak')
 
 
 _PARSER = argparse.ArgumentParser(description="""
@@ -122,17 +130,19 @@ def tweak_constant_ts(constant_file, dev_mode):
     constants_env_variable = '"DEV_MODE": %s' % (
         'true' if dev_mode else 'false')
     for line in fileinput.input(
-           files=[constant_file], inplace=True, backup='.bak'):
-        line = line.replace("\n", "")
+            files=[constant_file], inplace=True, backup='.bak'):
+        line = line.replace('\n', '')
         line = regex.sub(constants_env_variable, line)
         python_utils.PRINT('%s' % line)
 
 def run_webdriver_manager(commands, wait=True):
     webdriver_bin_path = os.path.join(
-        common.CURR_DIR, 'node_modules', 'webdriver-manager', 'bin', 'webdriver-manager')
+        common.CURR_DIR, 'node_modules', 'webdriver-manager', 'bin',
+        'webdriver-manager')
     web_driver_command = [common.NODE_BIN_PATH, webdriver_bin_path]
     web_driver_command.extend(commands)
-    p = subprocess.Popen(web_driver_command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    p = subprocess.Popen(
+        web_driver_command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     if wait:
         stdout, err = p.communicate()
         python_utils.PRINT(stdout)
@@ -155,7 +165,8 @@ def build_js_files(dev_mode, run_on_browserstack):
         webpack_bin = os.path.join(
             common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
         common.run_cmd(
-            [common.NODE_BIN_PATH, webpack_bin, '--config', 'webpack.dev.config.ts'])
+            [common.NODE_BIN_PATH, webpack_bin, '--config',
+             'webpack.dev.config.ts'])
     if run_on_browserstack:
         python_utils.PRINT(' Running the tests on browsertack...')
     build.main(args=['--prod_env'] if not dev_mode else [])
@@ -166,31 +177,32 @@ def tweak_webdriver_manager():
     """webdriver-manager (version 13.0.0) uses `os.arch()` to determine the
     architecture of the operation system, however, this function can only be
     used to determine the architecture of the machine that compiled `node`
-    (great job!). In the case of Windows, we are using the portable version, 
+    (great job!). In the case of Windows, we are using the portable version,
     which was compiled on `ia32` machine so that is the value returned by this
-    `os.arch` function. While clearly the author of webdriver-manager never 
+    `os.arch` function. While clearly the author of webdriver-manager never
     considered windows would run on this architecture, so its own help function
-    will return null for this. This is causing the application has no idea 
-    about where to download the correct version. So we need to change the 
-    lines in webdriver-manager to explicitly tell the architecture. 
-    
+    will return null for this. This is causing the application has no idea
+    about where to download the correct version. So we need to change the
+    lines in webdriver-manager to explicitly tell the architecture.
+
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L16
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/geckodriver.ts#L21
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L167
     https://github.com/nodejs/node/issues/17036
     """
     regex = re.compile(r'this\.osArch = os\.arch\(\);')
-    for line in fileinput.input(files=[CHROME_PROVIDER_FILE_PATH], inplace=True, backup='.bak'):
+    arch = 'x64' if common.is_x64_architecture() else 'x86'
+    for line in fileinput.input(
+            files=[CHROME_PROVIDER_FILE_PATH], inplace=True, backup='.bak'):
         line = line.replace('\n', '')
-        # 'x64' and 'x32' share the same driver file.
-        line = regex.sub('this.osArch = "x64";', line) 
-        
+        line = regex.sub('this.osArch = "%s";' % arch, line)
+
         python_utils.PRINT(line)
 
-    for line in fileinput.input(files=[GECKO_PROVIDER_FILE_PATH], inplace=True, backup='.bak'):
+    for line in fileinput.input(
+            files=[GECKO_PROVIDER_FILE_PATH], inplace=True, backup='.bak'):
         line = line.replace('\n', '')
-        # 'x64' and 'x32' share the same driver file.
-        line = regex.sub('this.osArch = "x64";', line)
+        line = regex.sub('this.osArch = "%s";' % arch, line)
         python_utils.PRINT(line)
 
 
@@ -207,27 +219,34 @@ def start_webdriver_manager():
     if common.is_windows_os():
         tweak_webdriver_manager()
 
-    run_webdriver_manager(['update', '--versions.chrome', CHROME_DRIVER_VERSION])
+    run_webdriver_manager(
+        ['update', '--versions.chrome', CHROME_DRIVER_VERSION])
     run_webdriver_manager(
         ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
-        '--detach', '--quiet'])
-    run_webdriver_manager(
-        ['start', '2>%snull' % '$' if common.is_windows_os() else ''], False)
-    
+         '--detach', '--quiet'])
+    run_webdriver_manager(['start'], wait=False)
+
     if common.is_windows_os():
         undo_webdriver_tweak()
 
-def run_e2e_tests(run_on_browserstack, sharding, sharding_instances, suite, dev_mode):
+def run_e2e_tests(
+        run_on_browserstack, sharding, sharding_instances, suite, dev_mode):
     if not run_on_browserstack:
         config_file = os.path.join('core', 'tests', 'protractor.conf.js')
     else:
-        config_file = os.path.join('core', 'tests', 'protractor-browserstack.conf.js')
-    if not sharding or sharding_instances == "1":
-        p = subprocess.Popen([common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file, '--suite', suite, '--params.devMode=%s' % dev_mode])
+        config_file = os.path.join(
+            'core', 'tests', 'protractor-browserstack.conf.js')
+    if not sharding or sharding_instances == '1':
+        p = subprocess.Popen(
+            [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file, '--suite',
+             suite, '--params.devMode=%s' % dev_mode])
     else:
-        p = subprocess.Popen([common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file, '--capabilities.shardTestFiles=%s' % sharding,  '--capabilities.maxInstances=%s' % sharding_instances, '--suite', suite,  '--params.devMode="%s"' % dev_mode])
+        p = subprocess.Popen(
+            [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file,
+             '--capabilities.shardTestFiles=%s' % sharding,
+             '--capabilities.maxInstances=%s' % sharding_instances,
+             '--suite', suite, '--params.devMode="%s"' % dev_mode])
     p.communicate()
-
 
 
 def main(args=None):
@@ -243,7 +262,6 @@ def main(args=None):
 
     app_yaml_filepath = 'app%s.yaml' % '_dev' if dev_mode else ''
 
-    import dev_appserver
     subprocess.Popen(
         'python %s/dev_appserver.py  --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
@@ -254,7 +272,9 @@ def main(args=None):
     wait_for_port(GOOGLE_APP_ENGINE_PORT)
     if os.path.isdir(os.path.join(os.pardir, 'protractor-screenshots')):
         os.rmdir(os.path.join(os.pardir, 'protractor-screenshots'))
-    run_e2e_tests(run_on_browserstack, parsed_args.sharding, parsed_args.sharding_instances, parsed_args.suite, dev_mode)
+    run_e2e_tests(
+        run_on_browserstack, parsed_args.sharding,
+        parsed_args.sharding_instances, parsed_args.suite, dev_mode)
 
 if __name__ == '__main__':
     main()
