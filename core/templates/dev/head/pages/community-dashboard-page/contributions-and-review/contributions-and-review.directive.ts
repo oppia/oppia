@@ -139,9 +139,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                 labelColor: SUGGESTION_LABELS[suggestion.status].color,
                 actionButtonTitle: (
                   ctrl.activeContributionTab === ctrl.SUGGESTION_TYPE_TRANSLATE
-                    ?
-                    'Review' :
-                    'View'
+                    ? 'Review'
+                    : 'View'
                 )
               };
               translationContributionsSummaryList.push(requiredData);
