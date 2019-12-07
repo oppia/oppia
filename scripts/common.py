@@ -418,6 +418,13 @@ def check_prs_for_current_release_are_released(repo):
                 'released before release summary generation.')
 
 
+def convert_windows_style_path_to_unix_style(file_path):
+    """Occassionally the Windows style file path just does not work, so we
+    may want to convert it to Unix style.
+    """
+    return file_path.replace('\\', '/')
+
+
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 
