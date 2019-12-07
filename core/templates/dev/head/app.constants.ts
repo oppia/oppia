@@ -151,8 +151,11 @@ export class AppConstants {
     TOPIC: 'topic',
     SKILL: 'skill',
     STORY: 'story',
-    SUBTOPIC: 'subtopic'
+    SUBTOPIC: 'subtopic',
+    QUESTION: 'question'
   };
+
+  public static MISCONCEPTION_NAME_CHAR_LIMIT = 100;
 }
 
 const constants = require('constants.ts');

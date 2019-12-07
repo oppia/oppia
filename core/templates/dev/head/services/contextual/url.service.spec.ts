@@ -1,0 +1,302 @@
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Unit tests for UrlService.
+ */
+
+import { TestBed } from '@angular/core/testing';
+
+import { UrlService } from 'services/contextual/url.service';
+
+describe('Url Service', () => {
+  let urlService: UrlService;
+  let sampleHash = 'sampleHash';
+  let pathname = '/embed';
+  let mockLocation = null;
+  let origin = 'http://sample.com';
+
+  beforeEach(() => {
+    mockLocation = {
+      href: origin + pathname,
+      origin: origin,
+      pathname: pathname,
+      hash: sampleHash,
+      search: ''
+    };
+
+    urlService = TestBed.get(UrlService);
+    spyOn(urlService, 'getCurrentLocation').and.returnValue(mockLocation);
+  });
+
+  it('should return correct query value list for each query field', () => {
+    expect(urlService.getQueryFieldValuesAsList('field1')).toEqual([]);
+
+    mockLocation.search = '?field1=value1&' +
+      'field2=value2&field1=value3&field1=value4&field2=value5&' +
+      'field1=value6&field1=value%3F%3D%20%266';
+    let expectedList1 = ['value1', 'value3', 'value4', 'value6', 'value?= &6'];
+    let expectedList2 = ['value2', 'value5'];
+    expect(
+      urlService.getQueryFieldValuesAsList('field1')).toEqual(expectedList1);
+    expect(
+      urlService.getQueryFieldValuesAsList('field2')).toEqual(expectedList2);
+  });
+
+  it('should correctly decode special characters in query value in url',
+    () => {
+      let expectedObject = {
+        field1: '?value=1',
+        field2: '?value&1'
+      };
+      mockLocation.search = '?field1=%3Fvalue%3D1&field2=%3Fvalue%261';
+      expect(urlService.getUrlParams()).toEqual(expectedObject);
+    });
+
+  it('should correctly encode and add query field and value to url',
+    () => {
+      let queryValue = '&value=1?';
+      let queryField = 'field 1';
+      let baseUrl = '/sample';
+      let expectedUrl1 = baseUrl + '?field%201=%26value%3D1%3F';
+      expect(
+        urlService.addField(baseUrl, queryField, queryValue)).toBe(
+        expectedUrl1);
+
+      baseUrl = '/sample?field=value';
+      let expectedUrl2 = baseUrl + '&field%201=%26value%3D1%3F';
+      expect(
+        urlService.addField(baseUrl, queryField, queryValue)).toBe(
+        expectedUrl2);
+    });
+
+  it('should correctly return true if embed present in pathname', () => {
+    expect(urlService.isIframed()).toBe(true);
+  });
+
+  it('should correctly return false if embed not in pathname', () => {
+    mockLocation.pathname = '/sample.com';
+    expect(urlService.isIframed()).toBe(false);
+  });
+
+  it('should correctly return hash value of window.location', () => {
+    expect(urlService.getHash()).toBe(sampleHash);
+  });
+
+  it('should correctly return the origin of window.location', () => {
+    expect(urlService.getOrigin()).toBe('http://sample.com');
+  });
+
+  it('should correctly retrieve topic id from url', () => {
+    mockLocation.pathname = '/topic_editor/abcdefgijklm';
+    expect(
+      urlService.getTopicIdFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/topic_editor/abcdefgij';
+    expect(function() {
+      urlService.getTopicIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/topiceditor/abcdefgijklm';
+    expect(function() {
+      urlService.getTopicIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/topic_editor';
+    expect(function() {
+      urlService.getTopicIdFromUrl();
+    }).toThrow();
+  });
+
+  it('should correctly retrieve topic name from url', () => {
+    mockLocation.pathname = '/topic/abcdefgijklm';
+    expect(
+      urlService.getTopicNameFromLearnerUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/topic/topic%20name';
+    expect(
+      urlService.getTopicNameFromLearnerUrl()
+    ).toBe('topic name');
+    mockLocation.pathname = '/practice_session/topic%20name';
+    expect(
+      urlService.getTopicNameFromLearnerUrl()
+    ).toBe('topic name');
+    mockLocation.pathname = '/topc/abcdefgijklm';
+    expect(function() {
+      urlService.getTopicNameFromLearnerUrl();
+    }).toThrowError('Invalid URL for topic');
+  });
+
+  it('should correctly retrieve classroom name from url', () => {
+    mockLocation.pathname = '/classroom/abcdefgijklm';
+    expect(
+      urlService.getClassroomNameFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/classroom/class%20name';
+    expect(
+      urlService.getClassroomNameFromUrl()
+    ).toBe('class name');
+    mockLocation.pathname = '/invalid/abcdefgijklm';
+    expect(function() {
+      urlService.getClassroomNameFromUrl();
+    }).toThrowError('Invalid URL for classroom');
+  });
+
+  it('should correctly retrieve subtopic id from url', () => {
+    mockLocation.pathname = '/subtopic/abcdefgijklm/1';
+    expect(
+      urlService.getSubtopicIdFromUrl()
+    ).toBe('1');
+    mockLocation.pathname = '/subtopic/topic%20name/20';
+    expect(
+      urlService.getSubtopicIdFromUrl()
+    ).toBe('20');
+    mockLocation.pathname = '/subtopic/abcdefgijklm';
+    expect(function() {
+      urlService.getSubtopicIdFromUrl();
+    }).toThrowError('Invalid URL for subtopic');
+    mockLocation.pathname = '/topic/abcdefgijklm/1';
+    expect(function() {
+      urlService.getSubtopicIdFromUrl();
+    }).toThrowError('Invalid URL for subtopic');
+  });
+
+  it('should correctly retrieve story id from url', () => {
+    mockLocation.pathname = '/story_editor/abcdefgijklm';
+    expect(
+      urlService.getStoryIdFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/story_editor/abcdefgij';
+    expect(function() {
+      urlService.getStoryIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/storyeditor/abcdefgijklm';
+    expect(function() {
+      urlService.getStoryIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story_editor';
+    expect(function() {
+      urlService.getStoryIdFromUrl();
+    }).toThrow();
+  });
+
+  it('should correctly retrieve story id from story viewer url', () => {
+    mockLocation.pathname = '/story_viewer/abcdefgijklm';
+    expect(function() {
+      urlService.getStoryIdFromViewerUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story/abcdefg';
+    expect(function() {
+      urlService.getStoryIdFromViewerUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story/abcdefgijklm';
+    expect(
+      urlService.getStoryIdFromViewerUrl()
+    ).toEqual('abcdefgijklm');
+  });
+
+  it('should correctly retrieve skill id from url', () => {
+    mockLocation.pathname = '/skill_editor/abcdefghijkl';
+    expect(
+      urlService.getSkillIdFromUrl()
+    ).toBe('abcdefghijkl');
+    mockLocation.pathname = '/skill_editor/abcdefghijk';
+    expect(function() {
+      urlService.getSkillIdFromUrl();
+    }).toThrow();
+  });
+
+  it('should correctly retrieve story id from url in player', () => {
+    mockLocation.search = '?story_id=mnopqrstuvwx';
+    expect(
+      urlService.getStoryIdInPlayer()
+    ).toBe('mnopqrstuvwx');
+    mockLocation.search = '?story=mnopqrstuvwx';
+    expect(
+      urlService.getStoryIdInPlayer()
+    ).toBe(null);
+  });
+
+  it('should correctly retrieve collection id from url in exploration player',
+    function() {
+      mockLocation.search = '?collection_id=abcdefghijkl';
+      expect(
+        urlService.getCollectionIdFromExplorationUrl()
+      ).toBe('abcdefghijkl');
+
+      mockLocation.search = '?collection=abcdefghijkl';
+      expect(
+        urlService.getCollectionIdFromExplorationUrl()
+      ).toBe(null);
+
+      mockLocation.search = '?collection_id=abcdefghijkl&parent=mnopqrst';
+      expect(
+        urlService.getCollectionIdFromExplorationUrl()
+      ).toBe(null);
+    }
+  );
+
+  it('should correctly retrieve exploration version from the url', () => {
+    mockLocation.search = '?v=1';
+    expect(urlService.getExplorationVersionFromUrl()).toBe(1);
+
+    mockLocation.search = '?someparam=otherval&v=2';
+    expect(urlService.getExplorationVersionFromUrl()).toBe(2);
+
+    mockLocation.search = '?v=3#version=0.0.9';
+    expect(urlService.getExplorationVersionFromUrl()).toBe(3);
+
+    mockLocation.search = '?another=1';
+    expect(urlService.getExplorationVersionFromUrl()).toBe(null);
+  });
+
+  it('should correctly retrieve username from url', () => {
+    mockLocation.pathname = '/profile/abcdefgijklm';
+    expect(urlService.getUsernameFromProfileUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/wrong_url/abcdefgijklm';
+    expect(function() {
+      urlService.getUsernameFromProfileUrl();
+    }).toThrowError('Invalid profile URL');
+  });
+
+  it('should correctly retrieve collection id from url', () => {
+    mockLocation.pathname = '/collection/abcdefgijklm';
+    expect(urlService.getCollectionIdFromUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/wrong_url/abcdefgijklm';
+    expect(function() {
+      urlService.getCollectionIdFromUrl();
+    }).toThrowError('Invalid collection URL');
+  });
+
+  it('should correctly retrieve collection id from editor url', () => {
+    mockLocation.pathname = '/collection_editor/create/abcdefgijklm';
+    expect(urlService.getCollectionIdFromEditorUrl()).toBe('abcdefgijklm');
+
+    mockLocation.pathname = '/collection_editor/abcdefgijklm';
+    expect(function() {
+      urlService.getCollectionIdFromEditorUrl();
+    }).toThrowError('Invalid collection editor URL');
+
+    mockLocation.pathname = '/collection_editor/wrong/abcdefgijklm';
+    expect(function() {
+      urlService.getCollectionIdFromEditorUrl();
+    }).toThrowError('Invalid collection editor URL');
+  });
+});

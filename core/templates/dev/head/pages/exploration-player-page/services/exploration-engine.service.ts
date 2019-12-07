@@ -16,13 +16,13 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
-require('domain/collection/GuestCollectionProgressService.ts');
-require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/collection/guest-collection-progress.service.ts');
+require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/ExplorationObjectFactory.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
@@ -37,14 +37,14 @@ require('pages/exploration-player-page/services/player-transcript.service.ts');
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/ExplorationFeaturesBackendApiService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/UserService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/exploration-features-backend-api.service.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/user.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
 

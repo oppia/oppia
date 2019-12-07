@@ -639,7 +639,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
         """Checks whether a class and corresponding  init() method are
         documented. If both of them are documented, it adds an error message.
 
-
         Args:
             class_doc: Docstring. Pylint docstring class instance representing
                 a class's docstring.
@@ -658,6 +657,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     def _handle_no_raise_doc(self, excs, node):
         """Checks whether the raised exception in a function has been
         documented, add a message otherwise.
+
         Args:
             excs: list(str). A list of exception types.
             node: astroid.scoped_nodes.Function. Node to access module content.
@@ -961,6 +961,309 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
                 self.add_message('single-space-after-yield', line=line_num + 1)
 
 
+class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
+    """Checks if there are excessive newlines between method definitions."""
+    __implements__ = interfaces.IRawChecker
+
+    name = 'excessive-new-lines'
+    priority = -1
+    msgs = {
+        'C0011': (
+            'Excessive new lines between function definations.',
+            'excessive-new-lines',
+            'Remove extra newlines.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that method definitions are not seperated
+        by more than two blank lines.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        blank_line_counter = 0
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            if file_content[line_num] == b'\n':
+                blank_line_counter += 1
+            else:
+                blank_line_counter = 0
+
+            if line_num + 1 < file_length and blank_line_counter > 2:
+                line = file_content[line_num + 1].strip()
+                if line.startswith(b'def') or line.startswith(b'@'):
+                    self.add_message('excessive-new-lines', line=line_num + 1)
+
+
+class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
+    """Checker for single space above args in python doc string."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'single-space-above-args-raises-returns'
+    priority = -1
+    msgs = {
+        'C0012': (
+            'Files must have a single newline above args in doc string.',
+            'single-space-above-args',
+            'Please enter a single newline above args in doc string.'
+        ),
+        'C0013': (
+            'Files must have a single newline above returns in doc string.',
+            'single-space-above-returns',
+            'Please enter a single newline above returns in doc string.'
+        ),
+        'C0014': (
+            'Files must have a single newline above raises in doc string.',
+            'single-space-above-raises',
+            'Please enter a single newline above raises in doc string.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that there is a single newline above args,
+        raises, returns in python doc string.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        blank_line_counter = 0
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            if file_content[line_num] == b'\n':
+                blank_line_counter += 1
+            else:
+                blank_line_counter = 0
+
+            if (line_num + 1 < file_length and (
+                    blank_line_counter == 0 or blank_line_counter > 1)):
+                line = file_content[line_num + 1].strip()
+                if line == b'Args:':
+                    self.add_message(
+                        'single-space-above-args', line=line_num + 1)
+                elif line == b'Returns:':
+                    self.add_message(
+                        'single-space-above-returns', line=line_num + 1)
+                elif line == b'Raises:':
+                    self.add_message(
+                        'single-space-above-raises', line=line_num + 1)
+
+
+class DivisionOperatorChecker(checkers.BaseChecker):
+    """Checks if division operator is used."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'division-operator-used'
+    priority = -1
+    msgs = {
+        'C0015': (
+            'Division Operator is used.',
+            'division-operator-used',
+            'Please use python_utils.divide() instead of the "/" operator'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that the division operator('/') is not
+        used and python_utils.divide() is used instead.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        string_indicator = b'\''
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single line comment, ignore it.
+            if line.startswith(b'#'):
+                continue
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            # Ignore anything inside a string.
+            if line.count(string_indicator) >= 2:
+                continue
+
+            if re.search(br'[^/]/[^/]', line):
+                self.add_message(
+                    'division-operator-used', line=line_num + 1)
+
+
+class SingleLineCommentChecker(checkers.BaseChecker):
+    """Checks if comments follow correct style."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'incorrectly_styled_comment'
+    priority = -1
+    msgs = {
+        'C0016': (
+            'Invalid punctuation is used.',
+            'invalid-punctuation-used',
+            'Please use valid punctuation.'
+        ),
+        'C0017': (
+            'No space is used at beginning of comment.',
+            'no-space-at-beginning',
+            'Please use single space at the beginning of comment.'
+        ),
+        'C0018': (
+            'No capital letter is used at the beginning of comment.',
+            'no-capital-letter-at-beginning',
+            'Please use capital letter to begin the content of comment.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that comments follow correct style.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        allowed_terminating_punctuations = ['.', '?', '}', ']', ')']
+        excluded_phrases = [
+            'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+        data_types = ['int', 'str', 'float', 'bool']
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multiline comment.
+            if in_multi_line_comment:
+                continue
+
+            next_line = ''
+            previous_line = ''
+            if line_num + 1 < file_length:
+                next_line = file_content[line_num + 1].strip()
+            if line_num > 0:
+                previous_line = file_content[line_num - 1].strip()
+
+            if line.startswith(b'#'):
+                # Check if comment contains any excluded phrase.
+                word_is_present_in_excluded_phrases = any(
+                    word in line for word in excluded_phrases)
+
+                # Check if variable name is used.
+                underscore_is_present = any('_' in word for word in line)
+
+                if word_is_present_in_excluded_phrases or underscore_is_present:
+                    continue
+
+            if line.startswith(b'#') and not next_line.startswith(b'#'):
+                # Check that the comment ends with the proper
+                # punctuation.
+                last_char_is_invalid = line[-1] not in (
+                    allowed_terminating_punctuations)
+                if last_char_is_invalid:
+                    self.add_message(
+                        'invalid-punctuation-used', line=line_num + 1)
+
+            # Check that comment starts with a space and is not a
+            # shebang expression at the start of a bash script which
+            # loses function when a space is added.
+            if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
+                self.add_message(
+                    'no-space-at-beginning', line=line_num + 1)
+
+            # Check if comment contains version info or data type.
+            if not previous_line.startswith(b'#'):
+                data_type_is_present = any(word in line for word in data_types)
+                if data_type_is_present or re.search(br'^# v[0-9]+ .*$', line):
+                    continue
+
+            # Check that comment starts with a capital letter.
+            if not previous_line.startswith(b'#') and (
+                    re.search(br'^# [a-z][A-Za-z]*.*$', line)):
+                self.add_message(
+                    'no-capital-letter-at-beginning', line=line_num + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -976,3 +1279,7 @@ def register(linter):
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
     linter.register_checker(SingleSpaceAfterYieldChecker(linter))
+    linter.register_checker(ExcessiveEmptyLinesChecker(linter))
+    linter.register_checker(SingleNewlineAboveArgsChecker(linter))
+    linter.register_checker(DivisionOperatorChecker(linter))
+    linter.register_checker(SingleLineCommentChecker(linter))

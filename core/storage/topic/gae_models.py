@@ -80,6 +80,18 @@ class TopicModel(base_models.VersionedModel):
         """Topic should be kept if it is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether TopicModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -151,6 +163,13 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the topic being edited.
     topic_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Topic commit log is deleted only if the correspondingm topic is not
+        public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def _get_instance_id(cls, topic_id, version):
         """This function returns the generated id for the get_commit function
@@ -212,6 +231,19 @@ class TopicSummaryModel(base_models.BaseModel):
         """Topic summary should be kept if associated topic is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether TopicSummaryModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -247,6 +279,18 @@ class SubtopicPageModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Subtopic should be kept if associated topic is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SubtopicPageModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -295,6 +339,13 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the subtopic page being edited.
     subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Subtopic page commit log is deleted only if the corresponding
+        topic is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def _get_instance_id(cls, subtopic_page_id, version):
         """This function returns the generated id for the get_commit function
@@ -341,6 +392,29 @@ class TopicRightsModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Topic rights should be kept if associated topic is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether TopicRightsModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        more_results = True
+        cursor = None
+        while more_results:
+            snapshot_content_models, cursor, more_results = (
+                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
+                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
+            for snapshot_content_model in snapshot_content_models:
+                reconstituted_model = cls(**snapshot_content_model.content)
+                if user_id in reconstituted_model.manager_ids:
+                    return True
+        return (cls.query(cls.manager_ids == user_id).get() is not None or
+                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @classmethod
     def get_by_user(cls, user_id):

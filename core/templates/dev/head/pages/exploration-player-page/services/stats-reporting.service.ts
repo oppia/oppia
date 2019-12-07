@@ -17,13 +17,13 @@
  */
 
 require('domain/utilities/StopwatchObjectFactory.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
-require('services/ContextService.ts');
-require('services/MessengerService.ts');
-require('services/PlaythroughService.ts');
-require('services/SiteAnalyticsService.ts');
+require('services/context.service.ts');
+require('services/messenger.service.ts');
+require('services/playthrough.service.ts');
+require('services/site-analytics.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

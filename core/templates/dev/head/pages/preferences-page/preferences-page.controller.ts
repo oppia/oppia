@@ -25,11 +25,11 @@ require(
   'background-banner.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
-require('services/UserService.ts');
-require('services/UtilsService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
+require('services/user.service.ts');
+require('services/utils.service.ts');
 
 angular.module('oppia').directive('preferencesPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -50,13 +50,15 @@ angular.module('oppia').directive('preferencesPage', [
         '$window', '$uibModal', 'AlertsService', 'LanguageUtilService',
         'UrlInterpolationService', 'UserService', 'UtilsService',
         'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
-        'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
+        'ENABLE_ACCOUNT_DELETION', 'SUPPORTED_AUDIO_LANGUAGES',
+        'SUPPORTED_SITE_LANGUAGES',
         function(
             $http, $q, $rootScope, $scope, $timeout, $translate,
             $window, $uibModal, AlertsService, LanguageUtilService,
             UrlInterpolationService, UserService, UtilsService,
             DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
-            SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
+            ENABLE_ACCOUNT_DELETION, SUPPORTED_AUDIO_LANGUAGES,
+            SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
           var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
           ctrl.profilePictureDataUrl = '';
@@ -98,7 +100,11 @@ angular.module('oppia').directive('preferencesPage', [
             $rootScope.loadingMessage = '';
           });
 
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+
+          ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
 
           var _saveDataItem = function(updateType, data) {
             $http.put(_PREFERENCES_DATA_URL, {

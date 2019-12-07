@@ -16,12 +16,12 @@
  * @fileoverview Summary tile for collections.
  */
 
-require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
+require('domain/learner_dashboard/learner-dashboard-icons.directive.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/DateTimeFormatService.ts');
-require('services/UserService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/date-time-format.service.ts');
+require('services/user.service.ts');
 
 require('components/summary-tile/collection-summary-tile.constants.ajs.ts');
 
@@ -85,8 +85,8 @@ angular.module('oppia').directive('collectionSummaryTile', [
               ctrl.getThumbnailIconUrl());
           };
 
-          ctrl.getStaticImageUrl = function(url) {
-            return UrlInterpolationService.getStaticImageUrl(url);
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
 
           ctrl.setHoverState = function(hoverState) {

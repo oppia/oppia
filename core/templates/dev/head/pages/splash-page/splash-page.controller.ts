@@ -18,63 +18,62 @@
 
 require('base-components/base-content.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/UserService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/site-analytics.service.ts');
+require('services/user.service.ts');
 
-angular.module('oppia').directive('splashPage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/splash-page/splash-page.directive.html'),
-      controllerAs: '$ctrl',
-      controller: [
-        '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
-        'UrlInterpolationService', 'UserService',
-        function($rootScope, $timeout, $window, SiteAnalyticsService,
-            UrlInterpolationService, UserService) {
-          var ctrl = this;
-          ctrl.userIsLoggedIn = null;
-          $rootScope.loadingMessage = 'Loading';
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-            $rootScope.loadingMessage = '';
-          });
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-          ctrl.getStaticSubjectImageUrl = function(subjectName) {
-            return UrlInterpolationService.getStaticImageUrl('/subjects/' +
-              subjectName + '.svg');
-          };
+angular.module('oppia').directive('splashPage', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    template: require('!html-loader!./splash-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
+      'UrlInterpolationService', 'UserService',
+      function($rootScope, $timeout, $window, SiteAnalyticsService,
+          UrlInterpolationService, UserService) {
+        var ctrl = this;
+        ctrl.userIsLoggedIn = null;
+        $rootScope.loadingMessage = 'Loading';
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+          $rootScope.loadingMessage = '';
+        });
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
+        ctrl.getStaticSubjectImageUrl = function(subjectName) {
+          return UrlInterpolationService.getStaticImageUrl('/subjects/' +
+            subjectName + '.svg');
+        };
 
-          ctrl.onRedirectToLogin = function(destinationUrl) {
-            SiteAnalyticsService.registerStartLoginEvent(
-              'splashPageCreateExplorationButton');
-            $timeout(function() {
-              $window.location = destinationUrl;
-            }, 150);
-            return false;
-          };
+        ctrl.onRedirectToLogin = function(destinationUrl) {
+          SiteAnalyticsService.registerStartLoginEvent(
+            'splashPageCreateExplorationButton');
+          $timeout(function() {
+            $window.location = destinationUrl;
+          }, 150);
+          return false;
+        };
 
-          ctrl.onClickBrowseLibraryButton = function() {
-            SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-            $timeout(function() {
-              $window.location = '/library';
-            }, 150);
-            return false;
-          };
+        ctrl.onClickBrowseLibraryButton = function() {
+          SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+          $timeout(function() {
+            $window.location = '/library';
+          }, 150);
+          return false;
+        };
 
-          ctrl.onClickCreateExplorationButton = function() {
-            SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
-            $timeout(function() {
-              $window.location = '/creator_dashboard?mode=create';
-            }, 150);
-            return false;
-          };
-        }
-      ]
-    };
-  }]);
+        ctrl.onClickCreateExplorationButton = function() {
+          SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
+          $timeout(function() {
+            $window.location = '/creator_dashboard?mode=create';
+          }, 150);
+          return false;
+        };
+      }
+    ]
+  };
+}]);

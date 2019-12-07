@@ -20,9 +20,9 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/HtmlEscaperService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/html-escaper.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaResponseCodeRepl', [
   'HtmlEscaperService', 'UrlInterpolationService',

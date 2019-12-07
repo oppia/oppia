@@ -1,14 +1,26 @@
 <md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown && !activeQuestion">
   <div class="questions">
-    <h3 class="form-heading"> Questions included in this topic </h3>
+    <h3 class="form-heading"> Questions included in this topic linked to selected skill </h3>
+    <select class="form-control protractor-test-select-skill-dropdown"
+            ng-model="selectedSkillId"
+            ng-if="allSkillSummaries.length > 0"
+            ng-change="reinitializeQuestionsList(selectedSkillId)"
+            ng-options="summary.getId() as summary.getDescription() for summary in allSkillSummaries"
+            style="width: 300px; margin-bottom: 10px;">
+      <option value="" hidden selected> Select Skill </option>
+    </select>
     <questions-list skill-descriptions-are-shown="true"
                     select-skill-modal-is-shown="true"
                     skill-ids="topic.getSkillIds()"
+                    selected-skill-id="selectedSkillId"
                     get-question-summaries-async="getQuestionSummariesAsync"
                     is-last-question-batch="isLastQuestionBatch"
                     all-skill-summaries="allSkillSummaries"
                     can-edit-question="canEditQuestion"
-                    question-suggestion-threads="questionSuggestionThreads">
+                    skill-id-to-rubrics-object="skillIdToRubricsObject"
+                    question-suggestion-threads="questionSuggestionThreads"
+                    fetch-from-backend="true"
+                    get-grouped-skill-summaries="getGroupedSkillSummaries">
     </questions-list>
   </div>
 </md-card>

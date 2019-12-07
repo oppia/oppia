@@ -18,8 +18,8 @@
 
 require('components/summary-tile/story-summary-tile.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -37,6 +37,7 @@ angular.module('oppia').directive('storiesList', [
           $scope.leftmostCardIndices = 0;
           var MAX_NUM_TILES_PER_ROW = 4;
           $scope.tileDisplayCount = 0;
+          $scope.canonicalStories = $scope.getCanonicalStories();
 
           var initCarousels = function() {
             $scope.canonicalStories = $scope.getCanonicalStories();

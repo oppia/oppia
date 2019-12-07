@@ -16,8 +16,8 @@
  * @fileoverview Directive for uploading images.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/IdGenerationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/id-generation.service.ts');
 
 angular.module('oppia').directive('imageUploader', [
   'IdGenerationService', 'UrlInterpolationService',
@@ -46,15 +46,15 @@ angular.module('oppia').directive('imageUploader', [
           }
 
           if (!file.type.match('image.jpeg') &&
-              !file.type.match('image.gif') &&
-              !file.type.match('image.jpg') &&
-              !file.type.match('image.png')) {
+            !file.type.match('image.gif') &&
+            !file.type.match('image.jpg') &&
+            !file.type.match('image.png')) {
             return 'This image format is not supported.';
           }
 
           if ((file.type.match(/jp(e?)g$/) && !file.name.match(/\.jp(e?)g$/)) ||
-              (file.type.match(/gif$/) && !file.name.match(/\.gif$/)) ||
-              (file.type.match(/png$/) && !file.name.match(/\.png$/))) {
+            (file.type.match(/gif$/) && !file.name.match(/\.gif$/)) ||
+            (file.type.match(/png$/) && !file.name.match(/\.png$/))) {
             return 'This image format does not match the filename extension.';
           }
 
@@ -62,7 +62,7 @@ angular.module('oppia').directive('imageUploader', [
           if (file.size > ONE_MB_IN_BYTES) {
             var currentSize = (file.size / ONE_MB_IN_BYTES).toFixed(1) + ' MB';
             return 'The maximum allowed file size is 1 MB' +
-                   ' (' + currentSize + ' given).';
+              ' (' + currentSize + ' given).';
           }
 
           return null;

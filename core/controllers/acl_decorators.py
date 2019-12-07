@@ -1984,55 +1984,6 @@ def can_create_skill(handler):
     return test_can_create_skill
 
 
-def can_publish_skill(handler):
-    """Decorator to check whether the user can publish a skill.
-
-    Args:
-        handler: function. The function to be decorated.
-
-    Returns:
-        function. The newly decorated function that now also
-            checks whether the user has permission to publish
-            a skill.
-    """
-    def test_can_publish_skill(self, skill_id, **kwargs):
-        """Tests whether the user can publish a given skill by checking
-        if the user is logged in and using can_user_publish_skill.
-
-        Args:
-            skill_id: str. The skill ID.
-            **kwargs: *. Keyword arguments.
-
-        Returns:
-            *. The return value of the desired function.
-
-        Raises:
-            NotLoggedInException: The user is not logged in.
-            PageNotFoundException: The given page cannot be found.
-            UnauthorizedUserException: The given user does not have
-                credentials to publish the given skill.
-        """
-        if not self.user_id:
-            raise base.UserFacingExceptions.NotLoggedInException
-
-        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
-        if skill_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if role_services.ACTION_PUBLISH_OWNED_SKILL not in self.user.actions:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this skill.')
-        elif skill_rights.is_creator(self.user.user_id):
-            return handler(self, skill_id, **kwargs)
-        else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit this skill.')
-
-    test_can_publish_skill.__wrapped__ = True
-
-    return test_can_publish_skill
-
-
 def can_delete_story(handler):
     """Decorator to check whether the user can delete a story in a given
     topic.
@@ -2379,8 +2330,12 @@ def can_access_topic_viewer_page(handler):
         topic_id = topic.id
         topic_rights = topic_services.get_topic_rights(
             topic_id, strict=False)
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
 
-        if topic_rights.topic_is_published:
+        if (
+                topic_rights.topic_is_published or
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                user_actions_info.actions):
             return handler(self, topic_name, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -2421,6 +2376,7 @@ def can_access_story_viewer_page(handler):
         story_is_published = False
         topic_is_published = False
         topic_id = story.corresponding_topic_id
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
         if topic_id:
             topic = topic_fetchers.get_topic_by_id(topic_id)
             topic_rights = topic_services.get_topic_rights(topic_id)
@@ -2430,7 +2386,10 @@ def can_access_story_viewer_page(handler):
                 if reference.story_id == story_id:
                     story_is_published = reference.story_is_published
 
-        if story_is_published and topic_is_published:
+        if (
+                (story_is_published and topic_is_published) or
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                user_actions_info.actions):
             return handler(self, story_id, **kwargs)
         else:
             raise self.PageNotFoundException
@@ -2468,8 +2427,13 @@ def can_access_subtopic_viewer_page(handler):
         if topic is None:
             raise self.PageNotFoundException
 
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
         topic_rights = topic_services.get_topic_rights(topic.id)
-        if topic_rights is None or not topic_rights.topic_is_published:
+
+        if (
+                (topic_rights is None or not topic_rights.topic_is_published)
+                and role_services.ACTION_VISIT_ANY_TOPIC_EDITOR not in
+                user_actions_info.actions):
             raise self.PageNotFoundException
 
         subtopic_is_present = any(

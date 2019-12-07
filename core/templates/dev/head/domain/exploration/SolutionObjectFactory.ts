@@ -17,108 +17,152 @@
  * domain objects.
  */
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/objects/FractionObjectFactory.ts');
-require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/HtmlEscaperService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('SolutionObjectFactory', [
-  '$filter', 'ExplorationHtmlFormatterService', 'FractionObjectFactory',
-  'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
-  'SubtitledHtmlObjectFactory',
-  function($filter, ExplorationHtmlFormatterService, FractionObjectFactory,
-      HtmlEscaperService, NumberWithUnitsObjectFactory,
-      SubtitledHtmlObjectFactory) {
-    var Solution = function(answerIsExclusive, correctAnswer, explanation) {
-      this.answerIsExclusive = answerIsExclusive;
-      this.correctAnswer = correctAnswer;
-      this.explanation = explanation;
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { ExplorationHtmlFormatterService } from
+  'services/exploration-html-formatter.service';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HtmlEscaperService } from 'services/html-escaper.service';
+import { LoggerService } from 'services/contextual/logger.service';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
+import { SubtitledHtml, SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory.ts';
+
+export interface ExplanationBackendDict {
+  /* eslint-disable camelcase */
+  content_id: string;
+  /* eslint-enable camelcase */
+  html: string;
+}
+
+export interface SolutionBackendDict {
+  /* eslint-disable camelcase */
+  answer_is_exclusive: boolean;
+  correct_answer: string;
+  /* eslint-enable camelcase */
+  explanation: ExplanationBackendDict;
+}
+
+export class Solution {
+  ehfs: ExplorationHtmlFormatterService;
+  shof: SubtitledHtmlObjectFactory;
+  answerIsExclusive: boolean;
+  correctAnswer: any;
+  explanation: SubtitledHtml;
+  constructor(
+      ehfs: ExplorationHtmlFormatterService,
+      shof: SubtitledHtmlObjectFactory,
+      answerisexclusive: boolean, correctanswer: any,
+      explanation: SubtitledHtml) {
+    this.ehfs = ehfs;
+    this.shof = shof;
+    this.answerIsExclusive = answerisexclusive;
+    this.correctAnswer = correctanswer;
+    this.explanation = explanation;
+  }
+
+  toBackendDict(): SolutionBackendDict {
+    return {
+      answer_is_exclusive: this.answerIsExclusive,
+      correct_answer: this.correctAnswer,
+      explanation: this.explanation.toBackendDict()
     };
+  }
 
-    Solution.prototype.toBackendDict = function() {
-      return {
-        answer_is_exclusive: this.answerIsExclusive,
-        correct_answer: this.correctAnswer,
-        explanation: this.explanation.toBackendDict()
-      };
-    };
+  getSummary(interactionId: string): string {
+    var solutionType = (
+      this.answerIsExclusive ? 'The only' : 'One');
+    var correctAnswer = null;
+    if (interactionId === 'GraphInput') {
+      correctAnswer = '[Graph]';
+    } else if (interactionId === 'MathExpressionInput') {
+      correctAnswer = this.correctAnswer.latex;
+    } else if (interactionId === 'CodeRepl' ||
+      interactionId === 'PencilCodeEditor') {
+      correctAnswer = this.correctAnswer.code;
+    } else if (interactionId === 'MusicNotesInput') {
+      correctAnswer = '[Music Notes]';
+    } else if (interactionId === 'LogicProof') {
+      correctAnswer = this.correctAnswer.correct;
+    } else if (interactionId === 'FractionInput') {
+      correctAnswer = (new FractionObjectFactory()).fromDict(
+        this.correctAnswer).toString();
+    } else if (interactionId === 'NumberWithUnits') {
+      correctAnswer = (new NumberWithUnitsObjectFactory(
+        new UnitsObjectFactory(), new FractionObjectFactory())).fromDict(
+        this.correctAnswer).toString();
+    } else {
+      correctAnswer = (
+        (new HtmlEscaperService(new LoggerService())).objToEscapedJson(
+          this.correctAnswer));
+    }
+    var explanation = (
+      (new ConvertToPlainTextPipe()).transform(this.explanation.getHtml()));
+    return (
+      solutionType + ' solution is "' + correctAnswer +
+      '". ' + explanation + '.');
+  }
 
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Solution['createFromBackendDict'] = function(solutionBackendDict) {
-    /* eslint-enable dot-notation */
-      return new Solution(
-        solutionBackendDict.answer_is_exclusive,
-        solutionBackendDict.correct_answer,
-        SubtitledHtmlObjectFactory.createFromBackendDict(
-          solutionBackendDict.explanation));
-    };
+  setCorrectAnswer(correctAnswer: any): void {
+    this.correctAnswer = correctAnswer;
+  }
 
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Solution['createNew'] = function(
-    /* eslint-enable dot-notation */
-        answerIsExclusive, correctAnswer, explanationHtml, explanationId) {
-      return new Solution(
-        answerIsExclusive,
-        correctAnswer,
-        SubtitledHtmlObjectFactory.createDefault(explanationHtml,
-          explanationId));
-    };
+  setExplanation(explanation: SubtitledHtml): void {
+    this.explanation = explanation;
+  }
+  // TODO(#7165): Replace any with correct type.
+  getOppiaShortAnswerResponseHtml(interaction: any) {
+    return {
+      prefix: (this.answerIsExclusive ? 'The only' : 'One'),
+      answer: this.ehfs.getShortAnswerHtml(
+        this.correctAnswer, interaction.id, interaction.customizationArgs)};
+  }
 
-    Solution.prototype.getSummary = function(interactionId) {
-      var solutionType = (
-        this.answerIsExclusive ? 'The only' : 'One');
-      var correctAnswer = null;
-      if (interactionId === 'GraphInput') {
-        correctAnswer = '[Graph]';
-      } else if (interactionId === 'MathExpressionInput') {
-        correctAnswer = this.correctAnswer.latex;
-      } else if (interactionId === 'CodeRepl' ||
-        interactionId === 'PencilCodeEditor') {
-        correctAnswer = this.correctAnswer.code;
-      } else if (interactionId === 'MusicNotesInput') {
-        correctAnswer = '[Music Notes]';
-      } else if (interactionId === 'LogicProof') {
-        correctAnswer = this.correctAnswer.correct;
-      } else if (interactionId === 'FractionInput') {
-        correctAnswer = FractionObjectFactory.fromDict(
-          this.correctAnswer).toString();
-      } else if (interactionId === 'NumberWithUnits') {
-        correctAnswer = NumberWithUnitsObjectFactory.fromDict(
-          this.correctAnswer).toString();
-      } else {
-        correctAnswer = (
-          HtmlEscaperService.objToEscapedJson(this.correctAnswer));
-      }
-      var explanation = (
-        $filter('convertToPlainText')(this.explanation.getHtml()));
-      return (
-        solutionType + ' solution is "' + correctAnswer +
-        '". ' + explanation + '.');
-    };
+  getOppiaSolutionExplanationResponseHtml(): string {
+    return this.explanation.getHtml();
+  }
+}
 
-    Solution.prototype.setCorrectAnswer = function(correctAnswer) {
-      this.correctAnswer = correctAnswer;
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class SolutionObjectFactory {
+  constructor(
+    private shof: SubtitledHtmlObjectFactory,
+    private ehfs: ExplorationHtmlFormatterService) {}
+  createFromBackendDict(solutionBackendDict: SolutionBackendDict): Solution {
+  /* eslint-enable dot-notation */
+    return new Solution(
+      this.ehfs,
+      this.shof,
+      solutionBackendDict.answer_is_exclusive,
+      solutionBackendDict.correct_answer,
+      this.shof.createFromBackendDict(
+        solutionBackendDict.explanation));
+  }
 
-    Solution.prototype.setExplanation = function(explanation) {
-      this.explanation = explanation;
-    };
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  createNew(
+  /* eslint-enable dot-notation */
+      answerIsExclusive: boolean, correctAnswer: any, explanationHtml: string,
+      explanationId: string): Solution {
+    return new Solution(
+      this.ehfs,
+      this.shof,
+      answerIsExclusive,
+      correctAnswer,
+      this.shof.createDefault(
+        explanationHtml, explanationId));
+  }
+}
 
-    Solution.prototype.getOppiaShortAnswerResponseHtml = function(interaction) {
-      return {
-        prefix: (this.answerIsExclusive ? 'The only' : 'One'),
-        answer: ExplorationHtmlFormatterService.getShortAnswerHtml(
-          this.correctAnswer, interaction.id, interaction.customizationArgs)};
-    };
 
-    Solution.prototype.getOppiaSolutionExplanationResponseHtml =
-      function() {
-        return this.explanation.getHtml();
-      };
-
-    return Solution;
-  }]);
+angular.module('oppia').factory(
+  'SolutionObjectFactory',
+  downgradeInjectable(SolutionObjectFactory));

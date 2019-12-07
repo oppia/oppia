@@ -21,8 +21,8 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/SiteAnalyticsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').directive('teachPage', [
   'UrlInterpolationService', function(
@@ -80,7 +80,9 @@ angular.module('oppia').directive('teachPage', [
             activateTab(tabName);
           };
 
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           ctrl.onApplyToTeachWithOppia = function() {
             SiteAnalyticsService.registerApplyToTeachWithOppiaEvent();

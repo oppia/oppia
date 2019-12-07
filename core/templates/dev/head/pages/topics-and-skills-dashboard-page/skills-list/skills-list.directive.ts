@@ -17,16 +17,15 @@
  */
 
 require(
-  'pages/topics-and-skills-dashboard-page/skill-selector/' +
-  'skill-selector.directive.ts');
+  'components/skill-selector/skill-selector.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'topic-selector.directive.ts');
 
-require('domain/skill/EditableSkillBackendApiService.ts');
-require('domain/topic/EditableTopicBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
+require('domain/topic/editable-topic-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
@@ -166,15 +165,14 @@ angular.module('oppia').directive('skillsList', [
             var skillSummaries = $scope.getMergeableSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard-page/templates/' +
-                'merge-skill-modal.template.html'),
+                '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = '';
-                  $scope.done = function() {
+                  $scope.save = function() {
                     $uibModalInstance.close(
                       {skill: skill,
                         supersedingSkillId: $scope.selectedSkillId

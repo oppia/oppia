@@ -22,15 +22,18 @@
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/ContextService.ts');
+require('services/context.service.ts');
 require('pages/exploration-player-page/services/' +
   'player-position.service.ts');
 require('pages/exploration-player-page/services/' +
   'player-transcript.service.ts');
+require('services/debug-info-tracker.service.ts');
 
 angular.module('oppia').factory('CurrentInteractionService', [
-  'ContextService', 'PlayerPositionService', 'PlayerTranscriptService',
-  function(ContextService, PlayerPositionService, PlayerTranscriptService) {
+  'ContextService', 'DebugInfoTrackerService', 'PlayerPositionService',
+  'PlayerTranscriptService',
+  function(ContextService, DebugInfoTrackerService, PlayerPositionService,
+      PlayerTranscriptService) {
     var _submitAnswerFn = null;
     var _onSubmitFn = null;
     var _validityCheckFn = null;
@@ -89,9 +92,15 @@ angular.module('oppia').factory('CurrentInteractionService', [
         if (_submitAnswerFn === null) {
           var index = PlayerPositionService.getDisplayedCardIndex();
           var displayedCard = PlayerTranscriptService.getCard(index);
+          var sequenceOfInteractions = (
+            JSON.stringify(DebugInfoTrackerService.getSequenceOfActions()));
           var additionalInfo = ('\nUndefined submit answer debug logs:' +
             '\nInteraction ID: ' + displayedCard.getInteractionId() +
-            '\nExploration ID: ' + ContextService.getExplorationId());
+            '\nExploration ID: ' + ContextService.getExplorationId() +
+            '\nState Name: ' + displayedCard.getStateName() +
+            '\nContext: ' + ContextService.getPageContext() +
+            '\nSequence of steps: ' + sequenceOfInteractions +
+            '\nErrored at index: ' + index);
           throw Error('The current interaction did not ' +
                       'register a _submitAnswerFn.' + additionalInfo);
         } else {

@@ -17,9 +17,9 @@
  */
 
 require('components/button-directives/exploration-embed-button.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/HtmlEscaperService.ts');
-require('services/SiteAnalyticsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/html-escaper.service.ts');
+require('services/site-analytics.service.ts');
 
 angular.module('oppia').directive('sharingLinks', [
   'UrlInterpolationService', function(UrlInterpolationService) {

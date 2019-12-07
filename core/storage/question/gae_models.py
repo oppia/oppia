@@ -70,6 +70,18 @@ class QuestionModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether QuestionModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question of the form
         {{random_hash_of_12_chars}}
@@ -189,6 +201,19 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         anonymized and are not deleted whe user is deleted.
         """
         return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether QuestionSkillLinkModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
 
     @classmethod
     def get_model_id(cls, question_id, skill_id):
@@ -508,6 +533,13 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the question being edited.
     question_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Question commit log is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def _get_instance_id(cls, question_id, question_version):
         """Returns ID of the question commit log entry model.
@@ -537,7 +569,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     The key of each instance is the question id.
     """
     # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(required=True)
+    creator_id = ndb.StringProperty(required=True, indexed=True)
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
@@ -559,14 +591,28 @@ class QuestionSummaryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def get_by_creator_id(cls, creator_id):
-        """Gets QuestionSummaryModel by creator_id.
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether any existing QuestionSummaryModel refers to the given
+        user_id.
 
         Args:
-            creator_id: str. The user ID of the creator of the question.
+            user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            QuestionSummaryModel. The summary model of the question.
+            bool. Whether any models refer to the given user_id.
+        """
+        return cls.query(cls.creator_id == user_id).get() is not None
+
+    @classmethod
+    def get_by_creator_id(cls, creator_id):
+        """Get QuestionSummaryModels created by the given user.
+
+        Args:
+            creator_id: str. The user ID of the creator of the questions.
+
+        Returns:
+            list(QuestionSummaryModel). The list of summary models of the
+            questions.
         """
         return QuestionSummaryModel.query().filter(
             cls.creator_id == creator_id).fetch()
@@ -602,3 +648,27 @@ class QuestionRightsModel(base_models.VersionedModel):
         anonymized.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether QuestionRightsModel or its snapshots references the
+        given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        more_results = True
+        cursor = None
+        while more_results:
+            snapshot_content_models, cursor, more_results = (
+                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
+                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
+            for snapshot_content_model in snapshot_content_models:
+                reconstituted_model = cls(**snapshot_content_model.content)
+                if user_id == reconstituted_model.creator_id:
+                    return True
+        return (cls.query(cls.creator_id == user_id).get() is not None or
+                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))

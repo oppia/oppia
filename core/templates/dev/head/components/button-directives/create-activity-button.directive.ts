@@ -18,10 +18,10 @@
 
 require('components/entity-creation-services/collection-creation.service.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
-require('domain/utilities/BrowserCheckerService.ts');
-require('services/contextual/UrlService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/UserService.ts');
+require('domain/utilities/browser-checker.service.ts');
+require('services/contextual/url.service.ts');
+require('services/site-analytics.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -29,8 +29,8 @@ angular.module('oppia').directive('createActivityButton', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/button-directives/create-activity-button.directive.html'),
+      template: require(
+        '!html-loader!./create-activity-button.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$timeout', '$window', '$uibModal',

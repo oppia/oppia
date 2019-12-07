@@ -16,8 +16,8 @@
  * @fileoverview Directive for the misconception editor.
  */
 
-require('domain/skill/SkillUpdateService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/skill/skill-update.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 angular.module('oppia').directive('misconceptionEditor', [
@@ -34,8 +34,12 @@ angular.module('oppia').directive('misconceptionEditor', [
         'misconception-editor.directive.html'),
       controller: [
         '$scope', 'SkillUpdateService', 'SkillEditorStateService',
-        function($scope, SkillUpdateService, SkillEditorStateService) {
+        'MISCONCEPTION_NAME_CHAR_LIMIT',
+        function(
+            $scope, SkillUpdateService, SkillEditorStateService,
+            MISCONCEPTION_NAME_CHAR_LIMIT) {
           $scope.skill = SkillEditorStateService.getSkill();
+          $scope.MISCONCEPTION_NAME_CHAR_LIMIT = MISCONCEPTION_NAME_CHAR_LIMIT;
 
           var nameMemento = null;
           var notesMemento = null;
@@ -48,7 +52,8 @@ angular.module('oppia').directive('misconceptionEditor', [
           $scope.container = {
             misconceptionName: $scope.misconception.getName(),
             misconceptionNotes: $scope.misconception.getNotes(),
-            misconceptionFeedback: $scope.misconception.getFeedback()
+            misconceptionFeedback: $scope.misconception.getFeedback(),
+            misconceptionMustBeAddressed: $scope.misconception.isMandatory()
           };
 
           $scope.NOTES_FORM_SCHEMA = {
@@ -117,6 +122,14 @@ angular.module('oppia').directive('misconceptionEditor', [
                 $scope.container.misconceptionNotes);
               notesMemento = null;
             }
+          };
+
+          $scope.updateMustBeAddressed = function() {
+            SkillUpdateService.updateMisconceptionMustBeAddressed(
+              $scope.skill,
+              $scope.misconception.getId(),
+              !$scope.container.misconceptionMustBeAddressed,
+              $scope.container.misconceptionMustBeAddressed);
           };
 
           $scope.saveFeedback = function() {

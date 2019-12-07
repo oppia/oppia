@@ -16,7 +16,7 @@
  * @fileoverview Controller for the navbar breadcrumb of the skill editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 angular.module('oppia').directive('skillEditorNavbarBreadcrumb', [
@@ -32,8 +32,8 @@ angular.module('oppia').directive('skillEditorNavbarBreadcrumb', [
         function($scope, SkillEditorStateService) {
           var skill = SkillEditorStateService.getSkill();
           $scope.getTruncatedDescription = function() {
-            var truncatedDescription = skill.getDescription().substr(0, 40);
-            if (skill.getDescription().length > 40) {
+            var truncatedDescription = skill.getDescription().substr(0, 35);
+            if (skill.getDescription().length > 35) {
               truncatedDescription += '...';
             }
             return truncatedDescription;

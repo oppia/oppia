@@ -18,14 +18,14 @@
 
 require('filters/string-utility-filters/truncate.filter.ts');
 
-require('domain/utilities/LanguageUtilService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/ConstructTranslationIdsService.ts');
-require('services/DebouncerService.ts');
-require('services/HtmlEscaperService.ts');
-require('services/NavigationService.ts');
-require('services/SearchService.ts');
-require('services/contextual/UrlService.ts');
+require('domain/utilities/language-util.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/construct-translation-ids.service.ts');
+require('services/debouncer.service.ts');
+require('services/html-escaper.service.ts');
+require('services/navigation.service.ts');
+require('services/search.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('searchBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -88,7 +88,7 @@ angular.module('oppia').directive('searchBar', [
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             ctrl.activeMenuName = NavigationService.activeMenuName;
           };
-          ctrl.ALL_LANGUAGE_CODES = (
+          ctrl.SUPPORTED_CONTENT_LANGUAGES = (
             LanguageUtilService.getLanguageIdsAndTexts());
 
           ctrl.searchQuery = '';
@@ -104,7 +104,7 @@ angular.module('oppia').directive('searchBar', [
             languageCodes: {
               description: '',
               itemsName: 'languages',
-              masterList: ctrl.ALL_LANGUAGE_CODES,
+              masterList: ctrl.SUPPORTED_CONTENT_LANGUAGES,
               numSelections: 0,
               selections: {},
               summary: ''

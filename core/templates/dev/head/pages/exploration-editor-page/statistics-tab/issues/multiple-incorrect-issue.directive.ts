@@ -16,9 +16,9 @@
  * @fileoverview Directive for visualizing multiple incorrect issue.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
-require('services/PlaythroughIssuesService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
+require('services/playthrough-issues.service.ts');
 
 angular.module('oppia').directive('multipleIncorrectIssue', [
   'UrlInterpolationService', function(UrlInterpolationService) {

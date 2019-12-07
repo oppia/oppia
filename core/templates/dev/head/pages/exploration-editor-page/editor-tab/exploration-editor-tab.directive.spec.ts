@@ -31,10 +31,10 @@ import { ClassifierObjectFactory } from
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
+  'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementsService } from 'services/ImprovementsService';
+import { ImprovementsService } from 'services/improvements.service';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
 import { ParamChangeObjectFactory } from
@@ -142,7 +142,7 @@ describe('Exploration editor tab controller', function() {
     }));
     beforeEach(angular.mock.module('oppia', function($provide) {
       var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
       }
     }));

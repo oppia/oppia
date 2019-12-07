@@ -53,6 +53,7 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 import feconf
 import python_utils
@@ -164,7 +165,7 @@ class BaseModelValidator(python_utils.OBJECT):
             unused_item: ndb.Model. Entity to validate.
 
         Returns:
-            *: A domain object to validate.
+            *. A domain object to validate.
         """
         return None
 
@@ -201,6 +202,9 @@ class BaseModelValidator(python_utils.OBJECT):
             dict(str, (ndb.Model, list(str)). A dictionary whose keys are
             field names of the model to validate, and whose values are tuples
             that consist of the external model class and list of keys to fetch.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError
 
@@ -280,6 +284,9 @@ class BaseModelValidator(python_utils.OBJECT):
 
         Each validation function should accept only a single arg, which is the
         model instance to validate.
+
+        Returns:
+            list(function). The list of custom validation functions to run.
         """
         return []
 
@@ -313,11 +320,14 @@ class BaseSummaryModelValidator(BaseModelValidator):
         This should be implemented by subclasses.
 
         Returns:
-            tuple(str, list(tuple), dict): A tuple with first element as
+            tuple(str, list(tuple), dict). A tuple with first element as
                 external model name, second element as a tuple of
                 cls.external_instance_details and the third element
                 as a properties dict with key as property name in summary
                 model and value as property name in external model.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError
 
@@ -475,8 +485,11 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             unused_item: ndb.Model. Entity to validate.
 
         Returns:
-            change_domain.BaseChange: A domain object class for the
+            change_domain.BaseChange. A domain object class for the
                 changes made by commit commands of the model.
+
+        Raises:
+            NotImplementedError. This function has not yet been implemented.
         """
         raise NotImplementedError
 
@@ -656,7 +669,7 @@ class BaseUserModelValidator(BaseModelValidator):
             unused_item: ndb.Model. BaseUserModel to validate.
 
         Returns:
-            list(tuple(str, str, list, str, list):
+            list(tuple(str, str, list, str, list).
                 A list of tuple which consists of External model name,
                 property name in model, list of property value in model,
                 property name in external model, list of property value
@@ -3390,30 +3403,34 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
             cls._validate_final_reveiwer_id]
 
 
-class ReviewerRotationTrackingModelValidator(BaseModelValidator):
-    """Class for validating ReviewerRotationTrackingModels."""
+class GeneralVoiceoverApplicationModelValidator(BaseModelValidator):
+    """Class for validating GeneralVoiceoverApplicationModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        # Valid id: same as score category.
-        regex_string = '^(%s)$' % ('|').join(ALLOWED_SCORE_CATEGORIES)
-        return regex_string
+    def _get_model_domain_object_instance(cls, item):
+        """Returns a domain object instance created from the model.
+
+        Args:
+            item: GeneralVoiceoverApplicationModel. Entity to validate.
+
+        Returns:
+            *. A domain object to validate.
+        """
+        return voiceover_services.get_voiceover_application_by_id(item.id)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        question_ids = []
-        split_id = item.id.split(suggestion_models.SCORE_CATEGORY_DELIMITER)
-        if len(split_id) == 2 and (
-                split_id[0] == suggestion_models.SCORE_TYPE_QUESTION):
-            question_ids = [split_id[1]]
-        return {
-            'user_ids': (
-                user_models.UserSettingsModel,
-                [item.current_position_in_rotation]),
-            'question_ids': (
-                question_models.QuestionModel,
-                question_ids)
+        external_instance_details = {
+            'author_ids': (user_models.UserSettingsModel, [item.author_id]),
         }
+        if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
+            external_instance_details['%s_ids' % item.target_type] = (
+                TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
+                [item.target_id])
+        if item.final_reviewer_id is not None:
+            external_instance_details['final_reviewer_ids'] = (
+                user_models.UserSettingsModel, [item.final_reviewer_id])
+        return external_instance_details
 
 
 class TopicModelValidator(BaseModelValidator):
@@ -5158,8 +5175,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
         StoryCommitLogEntryModelValidator),
     story_models.StorySummaryModel: StorySummaryModelValidator,
     suggestion_models.GeneralSuggestionModel: GeneralSuggestionModelValidator,
-    suggestion_models.ReviewerRotationTrackingModel: (
-        ReviewerRotationTrackingModelValidator),
+    suggestion_models.GeneralVoiceoverApplicationModel: (
+        GeneralVoiceoverApplicationModelValidator),
     topic_models.TopicModel: TopicModelValidator,
     topic_models.TopicSnapshotMetadataModel: (
         TopicSnapshotMetadataModelValidator),
@@ -5798,12 +5815,13 @@ class GeneralSuggestionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [suggestion_models.GeneralSuggestionModel]
 
 
-class ReviewerRotationTrackingModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates ReviewerRotationTrackingModel."""
+class GeneralVoiceoverApplicationModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralVoiceoverApplicationModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [suggestion_models.ReviewerRotationTrackingModel]
+        return [suggestion_models.GeneralVoiceoverApplicationModel]
 
 
 class TopicModelAuditOneOffJob(ProdValidationAuditOneOffJob):

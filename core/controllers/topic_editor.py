@@ -18,6 +18,8 @@ are created.
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import logging
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -163,14 +165,44 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        skill_ids = topic.get_all_skill_ids()
+        skill_id_to_description_dict, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                topic.get_all_skill_ids()))
 
-        skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
+        topics = topic_fetchers.get_all_topics()
+        grouped_skill_summary_dicts = {}
+        skill_id_to_rubrics_dict = {}
+
+        for topic_object in topics:
+            skill_id_to_rubrics_dict_local, deleted_skill_ids = (
+                skill_services.get_rubrics_of_skills(
+                    topic_object.get_all_skill_ids())
+            )
+
+            skill_id_to_rubrics_dict.update(skill_id_to_rubrics_dict_local)
+
+            if deleted_skill_ids:
+                deleted_skills_string = ', '.join(deleted_skill_ids)
+                logging.error(
+                    'The deleted skills: %s are still present in topic with '
+                    'id %s' % (deleted_skills_string, topic_id)
+                )
+                if feconf.CAN_SEND_EMAILS:
+                    email_manager.send_mail_to_admin(
+                        'Deleted skills present in topic',
+                        'The deleted skills: %s are still present in '
+                        'topic with id %s' % (deleted_skills_string, topic_id))
+            skill_summaries = skill_services.get_multi_skill_summaries(
+                topic_object.get_all_skill_ids())
+            skill_summary_dicts = [
+                summary.to_dict() for summary in skill_summaries]
+            grouped_skill_summary_dicts[topic_object.name] = skill_summary_dicts
 
         self.values.update({
             'topic_dict': topic.to_dict(),
-            'skill_id_to_description_dict': skill_id_to_description_dict
+            'grouped_skill_summary_dicts': grouped_skill_summary_dicts,
+            'skill_id_to_description_dict': skill_id_to_description_dict,
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
 
         self.render_json(self.values)
@@ -210,14 +242,31 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        skill_ids = topic.get_all_skill_ids()
 
-        skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
+        skill_id_to_description_dict, deleted_skill_ids = (
+            skill_services.get_descriptions_of_skills(
+                topic.get_all_skill_ids()))
+
+        skill_id_to_rubrics_dict, deleted_skill_ids = (
+            skill_services.get_rubrics_of_skills(topic.get_all_skill_ids())
+        )
+
+        if deleted_skill_ids:
+            deleted_skills_string = ', '.join(deleted_skill_ids)
+            logging.error(
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic_id)
+            )
+            if feconf.CAN_SEND_EMAILS:
+                email_manager.send_mail_to_admin(
+                    'Deleted skills present in topic',
+                    'The deleted skills: %s are still present in topic with '
+                    'id %s' % (deleted_skills_string, topic_id))
 
         self.values.update({
             'topic_dict': topic.to_dict(),
-            'skill_id_to_description_dict': skill_id_to_description_dict
+            'skill_id_to_description_dict': skill_id_to_description_dict,
+            'skill_id_to_rubrics_dict': skill_id_to_rubrics_dict
         })
 
         self.render_json(self.values)

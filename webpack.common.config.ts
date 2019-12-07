@@ -20,6 +20,8 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
+const macros = require('./webpack.common.macros.ts');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -68,6 +70,9 @@ module.exports = {
     community_dashboard:
       commonPrefix + '/pages/community-dashboard-page/' +
       'community-dashboard-page.scripts.ts',
+    delete_account:
+      commonPrefix + '/pages/delete-account-page/' +
+        'delete-account-page.scripts.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.scripts.ts',
     email_dashboard:
       commonPrefix +
@@ -235,6 +240,16 @@ module.exports = {
       template:
         commonPrefix + '/pages/community-dashboard-page/' +
         'community-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['delete_account'],
+      filename: 'delete-account-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/delete-account-page/' +
+          'delete-account-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -617,7 +632,15 @@ module.exports = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true
-    })
+    }),
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        macros: {
+          load: macros.load,
+          loadExtensions: macros.loadExtensions
+        },
+      },
+    }),
   ],
   module: {
     rules: [{

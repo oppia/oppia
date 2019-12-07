@@ -16,11 +16,11 @@
  * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/stateful/focus-manager.service.ts');
 
 // TODO(bhenning): After the navbar is moved to a directive, this directive
 // should be updated to say 'Loading...' if the collection editor's controller

@@ -30,6 +30,7 @@ SKILL_PROPERTY_DESCRIPTION = 'description'
 SKILL_PROPERTY_LANGUAGE_CODE = 'language_code'
 SKILL_PROPERTY_SUPERSEDING_SKILL_ID = 'superseding_skill_id'
 SKILL_PROPERTY_ALL_QUESTIONS_MERGED = 'all_questions_merged'
+SKILL_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 
 SKILL_CONTENTS_PROPERTY_EXPLANATION = 'explanation'
 SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES = 'worked_examples'
@@ -37,6 +38,7 @@ SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES = 'worked_examples'
 SKILL_MISCONCEPTIONS_PROPERTY_NAME = 'name'
 SKILL_MISCONCEPTIONS_PROPERTY_NOTES = 'notes'
 SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK = 'feedback'
+SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED = 'must_be_addressed'
 
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -49,6 +51,9 @@ CMD_UPDATE_RUBRICS = 'update_rubrics'
 
 CMD_ADD_SKILL_MISCONCEPTION = 'add_skill_misconception'
 CMD_DELETE_SKILL_MISCONCEPTION = 'delete_skill_misconception'
+
+CMD_ADD_PREREQUISITE_SKILL = 'add_prerequisite_skill'
+CMD_DELETE_PREREQUISITE_SKILL = 'delete_prerequisite_skill'
 
 CMD_CREATE_NEW = 'create_new'
 CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION = (
@@ -85,7 +90,8 @@ class SkillChange(change_domain.BaseChange):
     SKILL_PROPERTIES = (
         SKILL_PROPERTY_DESCRIPTION, SKILL_PROPERTY_LANGUAGE_CODE,
         SKILL_PROPERTY_SUPERSEDING_SKILL_ID,
-        SKILL_PROPERTY_ALL_QUESTIONS_MERGED)
+        SKILL_PROPERTY_ALL_QUESTIONS_MERGED,
+        SKILL_PROPERTY_PREREQUISITE_SKILL_IDS)
 
     # The allowed list of skill contents properties which can be used in
     # update_skill_contents_property command.
@@ -98,7 +104,8 @@ class SkillChange(change_domain.BaseChange):
     SKILL_MISCONCEPTIONS_PROPERTIES = (
         SKILL_MISCONCEPTIONS_PROPERTY_NAME,
         SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
-        SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK
+        SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
+        SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED
     )
 
     ALLOWED_COMMANDS = [{
@@ -112,6 +119,14 @@ class SkillChange(change_domain.BaseChange):
     }, {
         'name': CMD_DELETE_SKILL_MISCONCEPTION,
         'required_attribute_names': ['misconception_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_PREREQUISITE_SKILL,
+        'required_attribute_names': ['skill_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_PREREQUISITE_SKILL,
+        'required_attribute_names': ['skill_id'],
         'optional_attribute_names': []
     }, {
         'name': CMD_UPDATE_RUBRICS,
@@ -152,7 +167,7 @@ class Misconception(python_utils.OBJECT):
     """Domain object describing a skill misconception."""
 
     def __init__(
-            self, misconception_id, name, notes, feedback):
+            self, misconception_id, name, notes, feedback, must_be_addressed):
         """Initializes a Misconception domain object.
 
         Args:
@@ -164,11 +179,14 @@ class Misconception(python_utils.OBJECT):
             feedback: str. This can auto-populate the feedback field
                 when an answer group has been tagged with a misconception. This
                 should be an html string.
+            must_be_addressed: bool. Whether the misconception should
+                necessarily be addressed in all questions linked to the skill.
         """
         self.id = misconception_id
         self.name = name
         self.notes = html_cleaner.clean(notes)
         self.feedback = html_cleaner.clean(feedback)
+        self.must_be_addressed = must_be_addressed
 
     def to_dict(self):
         """Returns a dict representing this Misconception domain object.
@@ -180,7 +198,8 @@ class Misconception(python_utils.OBJECT):
             'id': self.id,
             'name': self.name,
             'notes': self.notes,
-            'feedback': self.feedback
+            'feedback': self.feedback,
+            'must_be_addressed': self.must_be_addressed
         }
 
     @classmethod
@@ -196,7 +215,8 @@ class Misconception(python_utils.OBJECT):
         """
         misconception = cls(
             misconception_dict['id'], misconception_dict['name'],
-            misconception_dict['notes'], misconception_dict['feedback'])
+            misconception_dict['notes'], misconception_dict['feedback'],
+            misconception_dict['must_be_addressed'])
 
         return misconception
 
@@ -234,6 +254,11 @@ class Misconception(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
                 self.notes)
+
+        if not isinstance(self.must_be_addressed, bool):
+            raise utils.ValidationError(
+                'Expected must_be_addressed to be a bool, received %s' %
+                self.must_be_addressed)
 
         if not isinstance(self.feedback, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -299,9 +324,6 @@ class Rubric(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected explanation to be a string, received %s' %
                 self.explanation)
-
-        if self.explanation == '' or self.explanation == '<p></p>':
-            raise utils.ValidationError('Explanation should be non empty')
 
 
 class SkillContents(python_utils.OBJECT):
@@ -410,7 +432,8 @@ class Skill(python_utils.OBJECT):
             skill_contents, misconceptions_schema_version,
             rubric_schema_version, skill_contents_schema_version,
             language_code, version, next_misconception_id, superseding_skill_id,
-            all_questions_merged, created_on=None, last_updated=None):
+            all_questions_merged, prerequisite_skill_ids,
+            created_on=None, last_updated=None):
         """Constructs a Skill domain object.
 
         Args:
@@ -439,6 +462,8 @@ class Skill(python_utils.OBJECT):
                 another one.
             all_questions_merged: bool. Flag that indicates if all
                 questions are moved from this skill to the superseding skill.
+            prerequisite_skill_ids: list(str). The prerequisite skill IDs for
+                the skill.
             created_on: datetime.datetime. Date and time when the skill is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -459,6 +484,7 @@ class Skill(python_utils.OBJECT):
         self.next_misconception_id = next_misconception_id
         self.superseding_skill_id = superseding_skill_id
         self.all_questions_merged = all_questions_merged
+        self.prerequisite_skill_ids = prerequisite_skill_ids
 
     @classmethod
     def require_valid_skill_id(cls, skill_id):
@@ -585,6 +611,17 @@ class Skill(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected misconceptions to be a list, '
                 'received %s' % self.misconceptions)
+
+        if not isinstance(self.prerequisite_skill_ids, list):
+            raise utils.ValidationError(
+                'Expected prerequisite_skill_ids to be a list, '
+                'received %s' % self.prerequisite_skill_ids)
+
+        for skill_id in self.prerequisite_skill_ids:
+            if not isinstance(skill_id, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each skill ID to be a string, '
+                    'received %s' % skill_id)
         misconception_id_list = []
         for misconception in self.misconceptions:
             if not isinstance(misconception, Misconception):
@@ -633,7 +670,8 @@ class Skill(python_utils.OBJECT):
             'version': self.version,
             'next_misconception_id': self.next_misconception_id,
             'superseding_skill_id': self.superseding_skill_id,
-            'all_questions_merged': self.all_questions_merged
+            'all_questions_merged': self.all_questions_merged,
+            'prerequisite_skill_ids': self.prerequisite_skill_ids
         }
 
     @classmethod
@@ -669,7 +707,7 @@ class Skill(python_utils.OBJECT):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False)
+            constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False, [])
 
     @classmethod
     def update_skill_contents_from_model(
@@ -722,6 +760,20 @@ class Skill(python_utils.OBJECT):
             updated_misconceptions.append(conversion_fn(misconception))
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
+
+    @classmethod
+    def _convert_misconception_v1_dict_to_v2_dict(cls, misconception_dict):
+        """Converts v1 misconception schema to the v2 schema. In the v2 schema,
+        the field must_be_addressed has been added.
+
+        Args:
+            misconception_dict: dict. The v1 misconception dict.
+
+        Returns:
+            dict. The converted misconception_dict.
+        """
+        misconception_dict['must_be_addressed'] = True
+        return misconception_dict
 
     @classmethod
     def update_rubrics_from_model(cls, versioned_rubrics, current_version):
@@ -800,17 +852,17 @@ class Skill(python_utils.OBJECT):
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
     def update_worked_examples(self, worked_examples):
-        """Updates the worked examples list of the skill.
+        """Updates the worked examples list of the skill by performing a copy
+        of the provided list.
 
         Args:
-            worked_examples: list(dict). The new worked examples of the skill.
+            worked_examples: list(SubtitledHtml). The new worked examples of
+                the skill.
         """
         old_content_ids = [worked_example.content_id for worked_example in (
             self.skill_contents.worked_examples)]
 
-        self.skill_contents.worked_examples = [
-            state_domain.SubtitledHtml.from_dict(worked_example)
-            for worked_example in worked_examples]
+        self.skill_contents.worked_examples = list(worked_examples)
 
         new_content_ids = [worked_example.content_id for worked_example in (
             self.skill_contents.worked_examples)]
@@ -868,10 +920,53 @@ class Skill(python_utils.OBJECT):
             misconception_dict['id'],
             misconception_dict['name'],
             misconception_dict['notes'],
-            misconception_dict['feedback'])
+            misconception_dict['feedback'],
+            misconception_dict['must_be_addressed'])
         self.misconceptions.append(misconception)
         self.next_misconception_id = self.get_incremented_misconception_id(
             misconception_dict['id'])
+
+    def _find_prerequisite_skill_id_index(self, skill_id_to_find):
+        """Returns the index of the skill_id in the prerequisite_skill_ids
+        array.
+
+        Args:
+            skill_id_to_find: str. The skill ID to search for.
+
+        Returns:
+            int|None. The index of the skill_id, if it exists or None.
+        """
+        for ind, skill_id in enumerate(self.prerequisite_skill_ids):
+            if skill_id == skill_id_to_find:
+                return ind
+        return None
+
+    def add_prerequisite_skill(self, skill_id):
+        """Adds a prerequisite skill to the skill.
+
+        Args:
+            skill_id: str. The skill ID to add.
+
+        Raises:
+            ValueError: The skill is already a prerequisite skill.
+        """
+        if self._find_prerequisite_skill_id_index(skill_id) is not None:
+            raise ValueError('The skill is already a prerequisite skill.')
+        self.prerequisite_skill_ids.append(skill_id)
+
+    def delete_prerequisite_skill(self, skill_id):
+        """Removes a prerequisite skill from the skill.
+
+        Args:
+            skill_id: str. The skill ID to remove.
+
+        Raises:
+            ValueError: The skill to remove is not a prerequisite skill.
+        """
+        index = self._find_prerequisite_skill_id_index(skill_id)
+        if index is None:
+            raise ValueError('The skill to remove is not a prerequisite skill.')
+        del self.prerequisite_skill_ids[index]
 
     def update_rubric(self, difficulty, explanation):
         """Adds or updates the rubric of the given difficulty.
@@ -929,6 +1024,28 @@ class Skill(python_utils.OBJECT):
             raise ValueError(
                 'There is no misconception with the given id.')
         self.misconceptions[index].name = name
+
+    def update_misconception_must_be_addressed(
+            self, misconception_id, must_be_addressed):
+        """Updates the must_be_addressed value of the misconception with the
+        given id.
+
+        Args:
+            misconception_id: int. The id of the misconception to be edited.
+            must_be_addressed: bool. The new must_be_addressed value for the
+                misconception.
+
+        Raises:
+            ValueError: There is no misconception with the given id.
+            ValueError: must_be_addressed should be bool.
+        """
+        if not isinstance(must_be_addressed, bool):
+            raise ValueError('must_be_addressed should be a bool value.')
+        index = self._find_misconception_index(misconception_id)
+        if index is None:
+            raise ValueError(
+                'There is no misconception with the given id.')
+        self.misconceptions[index].must_be_addressed = must_be_addressed
 
     def update_misconception_notes(self, misconception_id, notes):
         """Updates the notes of the misconception with the given id.

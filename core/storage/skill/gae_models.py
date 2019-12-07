@@ -65,6 +65,8 @@ class SkillModel(base_models.VersionedModel):
         required=True, indexed=True)
     # A dict representing the skill contents.
     skill_contents = ndb.JsonProperty(indexed=False)
+    # The prerequisite skills for the skill.
+    prerequisite_skill_ids = ndb.StringProperty(repeated=True, indexed=False)
     # The id to be used by the next misconception added.
     next_misconception_id = ndb.IntegerProperty(required=True, indexed=False)
     # The id that the skill is merged into, in case the skill has been
@@ -80,6 +82,18 @@ class SkillModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Skill should be kept if it is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SkillModel snapshots references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
     @classmethod
     def get_merged_skills(cls):
@@ -148,6 +162,13 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the skill being edited.
     skill_id = ndb.StringProperty(indexed=True, required=True)
 
+    @staticmethod
+    def get_deletion_policy():
+        """Skill commit log is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
     @classmethod
     def _get_instance_id(cls, skill_id, version):
         """This function returns the generated id for the get_commit function
@@ -199,6 +220,19 @@ class SkillSummaryModel(base_models.BaseModel):
         """Skill summary should be kept if associated skill is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @classmethod
+    def has_reference_to_user_id(cls, unused_user_id):
+        """Check whether SkillSummaryModel references the given user.
+
+        Args:
+            unused_user_id: str. The (unused) ID of the user whose data should
+            be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return False
+
 
 class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill rights snapshot."""
@@ -229,6 +263,30 @@ class SkillRightsModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Skill rights should be kept if associated skill is published."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether SkillRightsModel or its snapshots references the given
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        more_results = True
+        cursor = None
+        while more_results:
+            snapshot_content_models, cursor, more_results = (
+                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
+                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
+            for snapshot_content_model in snapshot_content_models:
+                reconstituted_model = cls(**snapshot_content_model.content)
+                if user_id == reconstituted_model.creator_id:
+                    return True
+        return (cls.query(cls.creator_id == user_id).get() is not None or
+                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

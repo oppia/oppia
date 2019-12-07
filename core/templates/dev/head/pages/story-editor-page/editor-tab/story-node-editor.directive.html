@@ -8,7 +8,7 @@
       <em>Please use at most 20 characters for the story title.</em>
     </span>
   </div>
-  <div>
+  <div class="protractor-test-add-chapter-outline">
     <label for="storyNodeOutline" class="form-heading"> Chapter Outline </label> <br>
     Outline Finalized
     <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
@@ -18,7 +18,7 @@
                          local-value="editableOutline">
     </schema-based-editor>
     <button type="button"
-            class="btn btn-success save-button"
+            class="btn btn-success save-button protractor-test-node-outline-save-button"
             ng-disabled="!isOutlineModified(editableOutline)"
             ng-click="updateOutline(editableOutline)">
       Save
@@ -26,65 +26,83 @@
   </div>
   <label style="padding-top: 2em;" class="form-heading"> Exploration ID </label>
   <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
-    <input type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
-    <button type="submit" class="btn btn-success btn-sm" ng-disabled="!canSaveExpId || (explorationId === currentExplorationId)">Save</button>
+    <input class="protractor-test-exploration-id-input" type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
+    <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!canSaveExpId || (explorationId === currentExplorationId)">Save</button>
   </form>
   <label style="padding-top: 2em;" class="form-heading"> Prerequisite Skill IDs </label>
-  <form class="form-horizontal" role="form" ng-submit="addPrerequisiteSkillId(prerequisiteSkillId)">
-    <input type="text" ng-model="prerequisiteSkillId" style="margin-bottom: 1em;">
-    <button type="submit" class="btn btn-success btn-sm">Add</button>
-    <md-card class="destination-node-id"
-             ng-repeat="skillId in getPrerequisiteSkillIds()">
-      <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillId]></a>
-      <span style="float: right;" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
-        <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
-      </span>
+  <div class="oppia-placeholder">
+    The skill should be one of the skills that are linked to this topic.
+  </div>
+  <div>
+    <md-card class="destination-node-id" ng-repeat="skillId in getPrerequisiteSkillIds()">
+      <div class="skill-description-card protractor-test-prerequisite-skill-description-card">
+        <span class="protractor-test-remove-prerequisite-skill" style="float: right;" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
+          <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+        </span>
+        <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
+      </div>
     </md-card>
-  </form>
+    <button class="btn btn-success btn-sm protractor-test-add-prerequisite-skill" ng-click="addPrerequisiteSkillId()">Add Prerequisite Skill</button>
+  </div>
   <label style="padding-top: 2em;" class="form-heading"> Acquired Skill IDs </label>
-  <form class="form-horizontal" role="form" ng-submit="addAcquiredSkillId(acquiredSkillId)">
-    <input type="text" ng-model="acquiredSkillId" style="margin-bottom: 1em;">
-    <button type="submit" class="btn btn-success btn-sm">Add</button>
-    <md-card class="destination-node-id"
-             ng-repeat="skillId in getAcquiredSkillIds()">
-      <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillId]></a>
-      <span style="float: right;" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
-        <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
-      </span>
+  <div class="oppia-placeholder">
+    The skill should be one of the skills that are linked to this topic.
+  </div>
+  <div>
+    <md-card class="destination-node-id" ng-repeat="skillId in getAcquiredSkillIds()">
+      <div class="skill-description-card protractor-test-acquired-skill-description-card">
+        <span class="protractor-test-remove-acquired-skill" style="float: right;" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
+          <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+        </span>
+        <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillIdToSummaryMap[skillId]]></a>
+      </div>
     </md-card>
-  </form>
+    <button class="btn btn-success btn-sm protractor-test-add-acquired-skill" ng-click="addAcquiredSkillId()">Add Acquired Skill</button>
+  </div>
   <div class="node-field">
-    <label class="form-heading"> Next Chapters </label>
-    <div ng-if="getDestinationNodeIds().length === 0">
-      This chapter doesn't lead to any other chapters yet.
+    <div ng-if="getDestinationNodeIds().length > 0">
+      <label class="form-heading"> Next Chapter </label>
+      <md-card class="destination-node-id"
+               ng-repeat="nodeId in getDestinationNodeIds()"
+               ng-click="viewNodeEditor(nodeId)">
+        <div class="repeating-card-wrapper protractor-test-next-chapter-card">
+          <[nodeIdToTitleMap[nodeId]]>
+          <span class="protractor-test-remove-destination-button" style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
+            <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+          </span>
+        </div>
+      </md-card>
     </div>
-    <md-card class="destination-node-id"
-             ng-repeat="nodeId in getDestinationNodeIds()"
-             ng-click="viewNodeEditor(nodeId)">
-      <[nodeIdToTitleMap[nodeId]]>
-      <span style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
-        <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
-      </span>
-    </md-card>
-    <div style="margin-top: 1em;">
-      <label> Add a destination chapter </label>
+    <div style="margin-top: 1em;" ng-if="getDestinationNodeIds().length === 0">
+      <label> Select destination chapter </label>
+      <div>
+        <select class="form-control protractor-test-destination-select"
+                ng-model="newNodeId"
+                ng-if="availableNodes.length > 0"
+                ng-options="node.id as node.text for node in availableNodes"
+                style="width: 300px; margin-bottom: 10px;"
+                ng-click="addDestinationNode(newNodeId)">
+          <option value="">Pick an already existing chapter</option>
+        </select>
+        <button class="btn btn-success protractor-test-add-destination-chapter-button"
+                ng-click="addNewDestinationNode()"> Add a new Destination Chapter
+        </button>
+      </div>
     </div>
-    <span>
-      <select class="form-control"
-              ng-model="newNodeId"
-              ng-options="node.id as node.text for node in availableNodes"
-              style="width: 300px; margin-bottom: 10px;"
-              ng-click="addDestinationNode(newNodeId)">
-        <option value="">Pick an already existing chapter</option>
-      </select>
-      <button class="btn btn-success protractor-test-add-destination-chapter-button"
-              ng-click="addNewDestinationNode()"> Add a new Destination Chapter
-      </button>
-    </span>
   </div>
 </div>
 
 <style>
+  story-editor .repeating-card-wrapper {
+      height: 2.5em;
+      padding-top: 0.5em;
+      padding-left: 0.5em;
+  }
+
+  story-editor .oppia-placeholder {
+    margin-bottom: 1vh;
+  }
+
   story-editor .story-node-title {
     margin-bottom: 3%;
   }
@@ -92,6 +110,11 @@
   story-editor .node-field {
     margin-top: 3%;
     height: auto;
+  }
+  story-editor .skill-description-card {
+    height: 2.5em;
+    padding-left: 10px;
+    padding-top: 10px;
   }
   story-editor .node-field label {
     margin-bottom: 3%;

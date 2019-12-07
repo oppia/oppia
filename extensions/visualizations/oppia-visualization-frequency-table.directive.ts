@@ -16,8 +16,8 @@
  * @fileoverview Directive for the "frequency table" visualization.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/HtmlEscaperService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/html-escaper.service.ts');
 
 // Each visualization receives three variables: 'data', 'options', and
 // 'isAddressed'. The exact format for each of these is specific to the

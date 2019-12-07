@@ -27,7 +27,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('pages/exploration-editor-page/services/' +
   'learner-answer-details-data.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Learner answer details service', function() {
   var expId = '12345';
@@ -51,7 +51,7 @@ describe('Learner answer details service', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

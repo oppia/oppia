@@ -34,7 +34,7 @@
       <div class="form-group row">
         <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_BIO"></label>
         <div class="col-lg-10 col-md-10 col-sm-10">
-          <textarea class="protractor-test-user-bio" ng-model="$ctrl.userBio" ng-blur="$ctrl.saveUserBio($ctrl.userBio)" rows="5" maxlength="2000"></textarea>
+          <textarea class="oppia-bio-border protractor-test-user-bio" ng-model="$ctrl.userBio" ng-blur="$ctrl.saveUserBio($ctrl.userBio)" rows="5" maxlength="2000"></textarea>
           <span class="form-text" style="font-size: smaller" translate="I18N_PREFERENCES_BIO_EXPLAIN_TEXT"></span>
         </div>
       </div>
@@ -214,6 +214,20 @@
       </div>
     </div>
 
+    <hr ng-if="$ctrl.userCanDeleteAccount">
+
+    <div ng-if="$ctrl.userCanDeleteAccount" role="form" class="form-group row">
+      <label class="col-lg-2 col-md-2 col-sm-2">Delete Account</label>
+      <div class="col-lg-10 col-md-10 col-sm-10">
+        <a href="/remove-account">
+          <button type="button" class="btn btn-danger" title="Delete account">
+            Delete account
+          </button>
+        </a>
+        <span class="form-text" style="font-size: smaller">This will take you to a page where you can delete your Oppia account.</span>
+      </div>
+    </div>
+
   </md-card>
 </div>
 <style>
@@ -237,5 +251,10 @@
     font-size: 1.2em;
     position: relative;
     text-align: center;
+  }
+
+  .oppia-bio-border {
+    border-width: 0.01em;
+    border-color: rgb(156,156,156);
   }
 </style>

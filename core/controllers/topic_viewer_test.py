@@ -87,12 +87,17 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
                 '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
 
 
-    def test_no_user_can_access_unpublished_topic_viewer_page(self):
+    def test_accessibility_of_unpublished_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
                 '%s/%s' % (
                     feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
                 expected_status_int=404)
+            self.login(self.ADMIN_EMAIL)
+            self.get_html_response(
+                '%s/%s' % (
+                    feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'))
+            self.logout()
 
 
     def test_get_fails_when_new_structures_not_enabled(self):
@@ -134,34 +139,49 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
             self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_get_with_user_logged_in(self):
+        skill_services.delete_skill(self.admin_id, self.skill_id_1)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.login(self.NEW_USER_EMAIL)
-            json_response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
-            expected_dict = {
-                'topic_name': 'public_topic_name',
-                'topic_id': self.topic_id,
-                'canonical_story_dicts': [{
-                    'id': self.story.id,
-                    'title': self.story.title,
-                    'description': self.story.description
-                }],
-                'additional_story_dicts': [],
-                'uncategorized_skill_ids': [self.skill_id_1],
-                'subtopics': [{
-                    u'skill_ids': [self.skill_id_2],
-                    u'id': 1,
-                    u'title': u'subtopic_name'}],
-                'degrees_of_mastery': {
-                    self.skill_id_1: 0.3,
-                    self.skill_id_2: 0.5
-                },
-                'skill_descriptions': {
-                    self.skill_id_1: 'Skill Description 1',
-                    self.skill_id_2: 'Skill Description 2'
+            with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+                messages = self.mail_stub.get_sent_messages(
+                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                self.assertEqual(len(messages), 0)
+                json_response = self.get_json(
+                    '%s/%s' % (feconf.TOPIC_DATA_HANDLER, 'public_topic_name'))
+                messages = self.mail_stub.get_sent_messages(
+                    to=feconf.ADMIN_EMAIL_ADDRESS)
+                expected_email_html_body = (
+                    'The deleted skills: %s are still'
+                    ' present in topic with id %s' % (
+                        self.skill_id_1, self.topic_id))
+                self.assertEqual(len(messages), 1)
+                self.assertIn(
+                    expected_email_html_body,
+                    messages[0].html.decode())
+                expected_dict = {
+                    'topic_name': 'public_topic_name',
+                    'topic_id': self.topic_id,
+                    'canonical_story_dicts': [{
+                        'id': self.story.id,
+                        'title': self.story.title,
+                        'description': self.story.description
+                    }],
+                    'additional_story_dicts': [],
+                    'uncategorized_skill_ids': [self.skill_id_1],
+                    'subtopics': [{
+                        u'skill_ids': [self.skill_id_2],
+                        u'id': 1,
+                        u'title': u'subtopic_name'}],
+                    'degrees_of_mastery': {
+                        self.skill_id_1: 0.3,
+                        self.skill_id_2: 0.5
+                    },
+                    'skill_descriptions': {
+                        self.skill_id_1: None,
+                        self.skill_id_2: 'Skill Description 2'
+                    }
                 }
-            }
-            self.assertDictContainsSubset(expected_dict, json_response)
+                self.assertDictContainsSubset(expected_dict, json_response)
 
             self.logout()
 

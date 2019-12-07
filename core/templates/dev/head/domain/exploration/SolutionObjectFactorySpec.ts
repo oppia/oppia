@@ -16,37 +16,23 @@
  * @fileoverview Unit tests for the Solution object factory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// SolutionObjectFactory.ts is upgraded to Angular 8.
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/exploration/SolutionObjectFactory.ts');
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { SolutionObjectFactory } from
+  'domain/exploration/SolutionObjectFactory';
 
-describe('Solution object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-
-  describe('SolutionObjectFactory', function() {
-    var scope, sof, solution;
-    beforeEach(angular.mock.inject(function($injector, $rootScope) {
-      scope = $rootScope.$new();
-      sof = $injector.get('SolutionObjectFactory');
+describe('Solution object factory', () => {
+  describe('SolutionObjectFactory', () => {
+    var sof, solution;
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
+      });
+      sof = TestBed.get(SolutionObjectFactory);
       solution = sof.createFromBackendDict({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',
@@ -55,10 +41,10 @@ describe('Solution object factory', function() {
           html: 'This is the explanation to the answer'
         }
       });
-    }));
+    });
 
 
-    it('should create a new solution', function() {
+    it('should create a new solution', () => {
       expect(solution.toBackendDict()).toEqual({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',
@@ -69,7 +55,7 @@ describe('Solution object factory', function() {
       });
     });
 
-    it('should create summary correctly', function() {
+    it('should create summary correctly', () => {
       expect(solution.getSummary('TextInput')).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');

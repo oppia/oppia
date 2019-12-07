@@ -29,6 +29,7 @@ import subprocess
 import threading
 
 import python_utils
+from scripts import common
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -50,11 +51,6 @@ THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join('css', 'third_party.css')
 MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
     'css', 'third_party.min.css')
 
-FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
-# /webfonts is needed for font-awesome-5, due to changes
-# in its directory structure hence, FAM-5 now doesn't use /fonts
-# but /fonts is needed by BootStrap and will be removed later
-# if /fonts is not used by any other library.
 WEBFONTS_RELATIVE_DIRECTORY_PATH = os.path.join('webfonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
@@ -84,8 +80,6 @@ REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-NODE_FILE = os.path.join(
-    PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
@@ -117,7 +111,6 @@ JS_FILEPATHS_NOT_TO_BUILD = (
 # need cache invalidation.
 FILEPATHS_NOT_TO_RENAME = (
     '*.py',
-    'third_party/generated/fonts/*',
     'third_party/generated/js/third_party.min.js.map',
     'third_party/generated/webfonts/*',
     '*.bundle.js',
@@ -246,7 +239,7 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
     python_utils.PRINT('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        NODE_FILE, UGLIFY_FILE, source_path,
+        common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     subprocess.check_call(cmd, shell=True)
 
@@ -588,8 +581,6 @@ def build_third_party_libs(third_party_directory_path):
         third_party_directory_path, THIRD_PARTY_JS_RELATIVE_FILEPATH)
     THIRD_PARTY_CSS_FILEPATH = os.path.join(
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
-    FONTS_DIR = os.path.join(
-        third_party_directory_path, FONTS_RELATIVE_DIRECTORY_PATH)
     WEBFONTS_DIR = os.path.join(
         third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH)
 
@@ -603,11 +594,6 @@ def build_third_party_libs(third_party_directory_path):
     with python_utils.open_file(
         THIRD_PARTY_CSS_FILEPATH, 'w+') as third_party_css_file:
         _join_files(dependency_filepaths['css'], third_party_css_file)
-
-    ensure_directory_exists(FONTS_DIR)
-    _execute_tasks(
-        _generate_copy_tasks_for_fonts(
-            dependency_filepaths['fonts'], FONTS_DIR))
 
     ensure_directory_exists(WEBFONTS_DIR)
     _execute_tasks(
@@ -1334,17 +1320,12 @@ def compile_typescript_files_continuously(project_dir):
         project_dir: str. The project directory which contains the ts files
             to be compiled.
     """
-    kill_cmd = (
-        'kill `ps aux | grep "node_modules/typescript/bin/tsc --project . '
-        '--watch" | awk \'{print $2}\'`'
-    )
-    subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files in watch mode...')
     cmd = [
-        './node_modules/typescript/bin/tsc', '--project', project_dir,
-        '--watch']
+        common.NODE_BIN_PATH, './node_modules/typescript/bin/tsc', '--project',
+        project_dir, '--watch']
 
     with python_utils.open_file('tsc_output_log.txt', 'w') as out:
         subprocess.Popen(cmd, stdout=out)

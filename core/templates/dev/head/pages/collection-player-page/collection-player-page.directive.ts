@@ -26,13 +26,13 @@ require('components/summary-tile/exploration-summary-tile.directive.ts');
 
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionPlaythroughObjectFactory.ts');
-require('domain/collection/GuestCollectionProgressService.ts');
-require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
-require('services/PageTitleService.ts');
-require('services/UserService.ts');
-require('services/contextual/UrlService.ts');
+require('domain/collection/guest-collection-progress.service.ts');
+require('domain/collection/read-only-collection-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
+require('services/page-title.service.ts');
+require('services/user.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').animation(
   '.oppia-collection-animate-slide', function() {
@@ -75,7 +75,9 @@ angular.module('oppia').directive('collectionPlayerPage', [
           ctrl.collectionPlaythrough = null;
           ctrl.collectionId = UrlService.getCollectionIdFromUrl();
           ctrl.explorationCardIsShown = false;
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           // The pathIconParameters is an array containing the co-ordinates,
           // background color and icon url for the icons generated on the path.
           ctrl.pathIconParameters = [];

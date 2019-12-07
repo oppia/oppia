@@ -13,17 +13,19 @@
     background-color: #fff;
     color: #00376d;
   }
+  admin-navbar .oppia-navbar-admin {
+    top: 0;
+  }
 </style>
-<nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection" role="navigation">
+<nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-admin" role="navigation">
   <div class="navbar-container" style="background-color: #00376d">
     <div class="navbar-header protractor-test-navbar-header float-left">
-      <a class="oppia-navbar-brand-name oppia-transition-200" href="/library">
+      <a class="oppia-navbar-brand-name oppia-transition-200 float-left" href="/library">
         <img ng-src="<[$ctrl.logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
       </a>
       <ul class="nav navbar-nav oppia-navbar-breadcrumb">
         <li>
-          <span class="oppia-navbar-breadcrumb-separator"></span>
-          Admin
+          <span class="oppia-navbar-breadcrumb-separator"></span>Admin
         </li>
       </ul>
     </div>

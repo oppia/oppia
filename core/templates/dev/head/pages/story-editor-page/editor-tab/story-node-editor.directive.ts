@@ -15,11 +15,13 @@
 /**
  * @fileoverview Controller for the story node editor.
  */
+require(
+  'components/skill-selector/skill-selector.directive.ts');
 
-require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/story/StoryUpdateService.ts');
+require('domain/editor/undo_redo/undo-redo.service.ts');
+require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -51,6 +53,11 @@ angular.module('oppia').directive('storyNodeEditor', [
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
+            var linearNodesList =
+              $scope.story.getStoryContents().getLinearNodesList();
+            var linearNodeIds = linearNodesList.map(function(node) {
+              return node.getId();
+            });
             for (var i = 0; i < $scope.storyNodeIds.length; i++) {
               if ($scope.storyNodeIds[i] === $scope.getId()) {
                 continue;
@@ -60,10 +67,12 @@ angular.module('oppia').directive('storyNodeEditor', [
                   $scope.storyNodeIds[i]) !== -1) {
                 continue;
               }
-              $scope.availableNodes.push({
-                id: $scope.storyNodeIds[i],
-                text: $scope.nodeIdToTitleMap[$scope.storyNodeIds[i]]
-              });
+              if (linearNodeIds.indexOf($scope.storyNodeIds[i]) === -1) {
+                $scope.availableNodes.push({
+                  id: $scope.storyNodeIds[i],
+                  text: $scope.nodeIdToTitleMap[$scope.storyNodeIds[i]]
+                });
+              }
             }
           };
           var _init = function() {
@@ -73,6 +82,12 @@ angular.module('oppia').directive('storyNodeEditor', [
               $scope.story.getStoryContents().getNodeIdsToTitleMap(
                 $scope.storyNodeIds);
             _recalculateAvailableNodes();
+            $scope.skillIdToSummaryMap = {};
+            var skillSummaries = StoryEditorStateService.getSkillSummaries();
+            for (var idx in skillSummaries) {
+              $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
+                skillSummaries[idx].description;
+            }
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
             $scope.oldOutline = $scope.getOutline();
@@ -124,37 +139,77 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.currentExplorationId = explorationId;
           };
 
-          $scope.addPrerequisiteSkillId = function(skillId) {
-            if (!skillId) {
-              return;
-            }
-            try {
-              StoryUpdateService.addPrerequisiteSkillIdToNode(
-                $scope.story, $scope.getId(), skillId);
-            } catch (err) {
-              AlertsService.addWarning(
-                'Given skill is already a prerequisite skill');
-            }
-            $scope.prerequisiteSkillId = null;
-          };
-
           $scope.removePrerequisiteSkillId = function(skillId) {
             StoryUpdateService.removePrerequisiteSkillIdFromNode(
               $scope.story, $scope.getId(), skillId);
           };
 
-          $scope.addAcquiredSkillId = function(skillId) {
-            if (!skillId) {
-              return;
-            }
-            try {
-              StoryUpdateService.addAcquiredSkillIdToNode(
-                $scope.story, $scope.getId(), skillId);
-            } catch (err) {
-              AlertsService.addWarning(
-                'Given skill is already an acquired skill');
-            }
-            $scope.acquiredSkillId = null;
+          $scope.addPrerequisiteSkillId = function() {
+            var skillSummaries =
+              StoryEditorStateService.getSkillSummaries();
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/skill-selector/select-skill-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.skillSummaries = skillSummaries;
+                  $scope.selectedSkillId = null;
+                  $scope.countOfSkillsToPrioritize = 0;
+                  $scope.save = function() {
+                    $uibModalInstance.close($scope.selectedSkillId);
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(skillId) {
+              try {
+                StoryUpdateService.addPrerequisiteSkillIdToNode(
+                  $scope.story, $scope.getId(), skillId);
+              } catch (err) {
+                AlertsService.addInfoMessage(
+                  'Given skill is already a prerequisite skill', 5000);
+              }
+            });
+          };
+
+          $scope.addAcquiredSkillId = function() {
+            var skillSummaries =
+              StoryEditorStateService.getSkillSummaries();
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/skill-selector/select-skill-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.skillSummaries = skillSummaries;
+                  $scope.selectedSkillId = null;
+                  $scope.countOfSkillsToPrioritize = 0;
+                  $scope.save = function() {
+                    $uibModalInstance.close($scope.selectedSkillId);
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(skillId) {
+              try {
+                StoryUpdateService.addAcquiredSkillIdToNode(
+                  $scope.story, $scope.getId(), skillId);
+              } catch (err) {
+                AlertsService.addInfoMessage(
+                  'Given skill is already an acquired skill', 5000);
+              }
+            });
           };
 
           $scope.removeAcquiredSkillId = function(skillId) {
@@ -213,6 +268,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 $scope.story, $scope.getId(), nextNodeId);
               _init();
               _recalculateAvailableNodes();
+              $rootScope.$broadcast(
+                'storyGraphUpdated', $scope.story.getStoryContents());
             });
           };
 
@@ -224,6 +281,13 @@ angular.module('oppia').directive('storyNodeEditor', [
               AlertsService.addInfoMessage(
                 'A chapter cannot lead to itself.', 3000);
               return;
+            }
+            var nodes = $scope.story.getStoryContents().getNodes();
+            for (var i = 0; i < nodes.length; i++) {
+              if (nodes[i].getDestinationNodeIds().indexOf(nodeId) !== -1) {
+                StoryUpdateService.removeDestinationNodeIdFromNode(
+                  $scope.story, nodes[i].getId(), nodeId);
+              }
             }
             try {
               StoryUpdateService.addDestinationNodeIdToNode(
@@ -270,6 +334,7 @@ angular.module('oppia').directive('storyNodeEditor', [
 
           $scope.$on(EVENT_STORY_INITIALIZED, _init);
           $scope.$on(EVENT_STORY_REINITIALIZED, _init);
+          $scope.$on('recalculateAvailableNodes', _recalculateAvailableNodes);
 
           _init();
         }
