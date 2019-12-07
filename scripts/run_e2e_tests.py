@@ -59,6 +59,7 @@ WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
     'webdriver-manager')
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
+PATTERN_FOR_REPLACE_WEBDRIVER_CODE =  r'this\.osArch = os\.arch\(\);'
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -178,7 +179,7 @@ def wait_for_port(port):
         sys.exit(1)
 
 
-def tweak_constant_ts(constant_file, dev_mode):
+def tweak_constant_file(constant_file, dev_mode):
     """Change constant file based on the running mode. Only the `DEV_MODE` line
     should be changed.
 
@@ -209,7 +210,6 @@ def run_webdriver_manager(parameters):
     python_utils.PRINT(common.run_cmd(web_driver_command))
 
 
-
 def setup_and_install_dependencies():
     """Run the setup and installation scripts."""
     install_third_party_libs.main(args=[])
@@ -217,25 +217,21 @@ def setup_and_install_dependencies():
     setup_gae.main(args=[])
 
 
-def build_js_files(dev_mode, run_on_browserstack):
+def build_js_files(dev_mode):
     """Build the javascript files.
 
     Args:
         dev_mode: boolean. Represents whether run the related commands in dev
             mode.
-        run_on_browserstack: boolean. Represents whether the tests should run
-            on browserstack.
     """
-    tweak_constant_ts(CONSTANT_FILE_PATH, dev_mode)
+    tweak_constant_file(CONSTANT_FILE_PATH, dev_mode)
     if not dev_mode:
         python_utils.PRINT('  Generating files for production mode...')
     else:
         common.run_cmd(
             [common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
              'webpack.dev.config.ts'])
-    if run_on_browserstack:
-        python_utils.PRINT('Running the tests on browsertack...')
-    build.main(args=['--prod_env'] if not dev_mode else [])
+    build.main(args=(['--prod_env'] if not dev_mode else []))
     os.remove('%s.bak' % CONSTANT_FILE_PATH)
 
 
@@ -256,21 +252,11 @@ def tweak_webdriver_manager():
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L167
     https://github.com/nodejs/node/issues/17036
     """
-    regex = re.compile(r'this\.osArch = os\.arch\(\);')
+    regex_pattern = PATTERN_FOR_REPLACE_WEBDRIVER_CODE
     arch = 'x64' if common.is_x64_architecture() else 'x86'
-    for line in fileinput.input(
-            files=[CHROME_PROVIDER_FILE_PATH], inplace=True, backup='.bak'):
-        line = line.replace('\n', '')
-        line = regex.sub('this.osArch = "%s";' % arch, line)
-
-        python_utils.PRINT(line)
-
-    for line in fileinput.input(
-            files=[GECKO_PROVIDER_FILE_PATH], inplace=True, backup='.bak'):
-        line = line.replace('\n', '')
-        line = regex.sub('this.osArch = "%s";' % arch, line)
-        python_utils.PRINT(line)
-
+    replace = 'this.osArch = "%s";' % arch
+    common.inplace_replace_file(CHROME_PROVIDER_FILE_PATH, regex_pattern, replace)
+    common.inplace_replace_file(GECKO_PROVIDER_FILE_PATH, regex_pattern, replace)
 
 def undo_webdriver_tweak():
     """Undo the tweak on webdriver manager's source code."""
@@ -314,19 +300,19 @@ def run_e2e_tests(
     if not run_on_browserstack:
         config_file = os.path.join('core', 'tests', 'protractor.conf.js')
     else:
+        python_utils.PRINT('Running the tests on browsertack...')
         config_file = os.path.join(
             'core', 'tests', 'protractor-browserstack.conf.js')
     if not sharding or sharding_instances == '1':
-        p = subprocess.Popen(
+        common.run_cmd(
             [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file, '--suite',
              suite, '--params.devMode=%s' % dev_mode])
     else:
-        p = subprocess.Popen(
+        common.run_cmd(
             [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file,
              '--capabilities.shardTestFiles=%s' % sharding,
              '--capabilities.maxInstances=%s' % sharding_instances,
              '--suite', suite, '--params.devMode="%s"' % dev_mode])
-    p.communicate()
 
 
 def start_google_engine(dev_mode):
@@ -361,15 +347,14 @@ def main(args=None):
 
     dev_mode = not parsed_args.prod_env
     run_on_browserstack = parsed_args.browserstack
-    build_js_files(dev_mode, run_on_browserstack)
+    build_js_files(dev_mode)
     start_webdriver_manager()
 
     start_google_engine(dev_mode)
 
     wait_for_port(WEB_DRIVER_PORT)
     wait_for_port(GOOGLE_APP_ENGINE_PORT)
-    if os.path.isdir(os.path.join(os.pardir, 'protractor-screenshots')):
-        os.rmdir(os.path.join(os.pardir, 'protractor-screenshots'))
+    check_screenshot()
     run_e2e_tests(
         run_on_browserstack, parsed_args.sharding,
         parsed_args.sharding_instances, parsed_args.suite, dev_mode)
