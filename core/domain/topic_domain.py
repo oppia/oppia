@@ -431,31 +431,6 @@ class Topic(python_utils.OBJECT):
         self.version = version
         self.story_reference_schema_version = story_reference_schema_version
 
-    @classmethod
-    def from_dict(cls, topic_dict):
-        """Returns a Topic domain object from a dict.
-
-        Args:
-            topic_dict: dict. The dict representation of Topic object.
-
-        Returns:
-            Topic. The corresponding Topic domain object.
-        """
-        topic = cls(
-            topic_dict['topic_id'], topic_dict['name'],
-            topic_dict['abbreviated_name'],
-            topic_dict['thumbnail_filename'],
-            topic_dict['description'],
-            topic_dict['canonical_story_references'],
-            topic_dict['additional_story_references'],
-            topic_dict['uncategorized_skill_ids'],
-            topic_dict['subtopics'], topic_dict['subtopic_schema_version'],
-            topic_dict['next_subtopic_id'], topic_dict['language_code'],
-            topic_dict['version'],
-            topic_dict['story_reference_schema_version'],
-            topic_dict['created_on'], topic_dict['last_updated'])
-        return topic
-
     def to_dict(self):
         """Returns a dict representing this Topic domain object.
 

@@ -109,7 +109,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
         issues.push('Topic name should not be empty.');
       }
 
-      if (this._abbreviatedName === '') {
+      if (!this._abbreviatedName) {
         issues.push('Abbreviated name should not be empty');
       }
 
