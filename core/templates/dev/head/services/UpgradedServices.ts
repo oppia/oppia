@@ -114,13 +114,37 @@ import { SolutionValidityService } from
   'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { StateContentService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-content.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
-import { StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
+import { StateHintsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-hints.service';
+import { StateInteractionIdService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-interaction-id.service';
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { StatePropertyService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-property.service';
+import { StateRecordedVoiceoversService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service';
+import { StateSolicitAnswerDetailsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solicit-answer-details.service';
+import { StateSolutionService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-solution.service';
+import { StateWrittenTranslationsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-written-translations.service';
+import { StopwatchObjectFactory } from
+  'domain/utilities/StopwatchObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
@@ -302,6 +326,26 @@ export class UpgradedServices {
         upgradedServices['NormalizeWhitespacePipe'],
         upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
         upgradedServices['CodeNormalizerService']);
+    upgradedServices['StateContentService'] = new StateContentService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateHintsService'] = new StateHintsService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateInteractionIdService'] =
+      new StateInteractionIdService(
+        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StatePropertyService'] = new StatePropertyService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateRecordedVoiceoversService'] =
+      new StateRecordedVoiceoversService(
+        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateSolicitAnswerDetailsService'] =
+      new StateSolicitAnswerDetailsService(
+        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateSolutionService'] = new StateSolutionService(
+      upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateWrittenTranslationsService'] =
+      new StateWrittenTranslationsService(
+        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
