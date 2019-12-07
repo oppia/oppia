@@ -51,6 +51,9 @@ GECKO_PROVIDER_BAK_FILE_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider',
     'geckodriver.js.bak')
 
+PSUTIL_DIR = os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-5.6.7')
+CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
+
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -176,12 +179,11 @@ def tweak_constant_ts(constant_file, dev_mode):
         python_utils.PRINT('%s' % line)
 
 
-def run_webdriver_manager(commands, wait=True):
+def run_webdriver_manager(commands):
     """Run commands of webdriver manager.
 
     Args:
         commands: list[str]. A list of parameters to pass to webdriver manager.
-        wait: boolean. Represents whether the program should be waited.
     """
     webdriver_bin_path = os.path.join(
         common.CURR_DIR, 'node_modules', 'webdriver-manager', 'bin',
@@ -190,12 +192,9 @@ def run_webdriver_manager(commands, wait=True):
     web_driver_command.extend(commands)
     p = subprocess.Popen(
         web_driver_command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    if wait:
-        stdout, err = p.communicate()
-        python_utils.PRINT(stdout)
-        python_utils.PRINT(err)
-    else:
-        SUBPROCESSES.append(p)
+    stdout, err = p.communicate()
+    python_utils.PRINT(stdout)
+    python_utils.PRINT(err)
 
 
 def setup_and_install_dependencies():
@@ -214,8 +213,7 @@ def build_js_files(dev_mode, run_on_browserstack):
         run_on_browserstack: boolean. Represents whether the tests should run
             on browserstack.
     """
-    constant_file = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
-    tweak_constant_ts(constant_file, dev_mode)
+    tweak_constant_ts(CONSTANT_FILE_PATH, dev_mode)
     if not dev_mode:
         python_utils.PRINT('  Generating files for production mode...')
     else:
@@ -227,7 +225,7 @@ def build_js_files(dev_mode, run_on_browserstack):
     if run_on_browserstack:
         python_utils.PRINT(' Running the tests on browsertack...')
     build.main(args=['--prod_env'] if not dev_mode else [])
-    os.remove('%s.bak' % constant_file)
+    os.remove('%s.bak' % CONSTANT_FILE_PATH)
 
 
 def tweak_webdriver_manager():
@@ -283,7 +281,6 @@ def start_webdriver_manager():
     run_webdriver_manager(
         ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
          '--detach', '--quiet'])
-    run_webdriver_manager(['start'], wait=False)
 
     if common.is_windows_os():
         undo_webdriver_tweak()
@@ -321,19 +318,14 @@ def run_e2e_tests(
     p.communicate()
 
 
-def main(args=None):
-    """Run the scripts to start end-to-end tests."""
-    sys.path.insert(1, os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-5.6.7'))
-    parsed_args = _PARSER.parse_args(args=args)
-    atexit.register(cleanup)
-    check_running_instance(8181, 9001)
-    setup_and_install_dependencies()
-    dev_mode = not parsed_args.prod_env
-    run_on_browserstack = parsed_args.browserstack
-    build_js_files(dev_mode, run_on_browserstack)
-    start_webdriver_manager()
+def start_google_engine(dev_mode):
+    """Start the google engine server.
 
-    app_yaml_filepath = 'app%s.yaml' % '_dev' if dev_mode else ''
+    Args:
+        dev_mode: boolean. Represents whether run the related commands in dev
+            mode.
+    """
+    app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode else '')
 
     subprocess.Popen(
         'python %s/dev_appserver.py  --host 0.0.0.0 --port %s '
@@ -341,6 +333,26 @@ def main(args=None):
         '--log_level=critical --skip_sdk_update_check=true %s' % (
             common.GOOGLE_APP_ENGINE_HOME, GOOGLE_APP_ENGINE_PORT,
             app_yaml_filepath), shell=True)
+
+
+def main(args=None):
+    """Run the scripts to start end-to-end tests."""
+
+    parsed_args = _PARSER.parse_args(args=args)
+
+    check_running_instance(8181, 9001)
+    setup_and_install_dependencies()
+
+    sys.path.insert(1, PSUTIL_DIR)
+    atexit.register(cleanup)
+
+    dev_mode = not parsed_args.prod_env
+    run_on_browserstack = parsed_args.browserstack
+    build_js_files(dev_mode, run_on_browserstack)
+    start_webdriver_manager()
+
+    start_google_engine(dev_mode)
+
     wait_for_port(WEB_DRIVER_PORT)
     wait_for_port(GOOGLE_APP_ENGINE_PORT)
     if os.path.isdir(os.path.join(os.pardir, 'protractor-screenshots')):
