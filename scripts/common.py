@@ -63,7 +63,7 @@ def is_linux_os():
 
 def is_x64_architecture():
     """Check if the architecture is on X64."""
-    return ARCHITECTURE == 'x86_64'
+    return ARCHITECTURE.endswith('64')
 
 
 NODE_BIN_PATH = os.path.join(
