@@ -56,9 +56,8 @@ angular.module('oppia').directive('solutionEditor', [
         onOpenSolutionEditor: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/solution-editor/' +
-        'solution-editor.directive.html'),
+      template: require(
+        '!html-loader!./solution-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'StateSolutionService',

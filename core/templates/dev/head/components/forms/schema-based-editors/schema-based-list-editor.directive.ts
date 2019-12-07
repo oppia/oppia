@@ -50,9 +50,8 @@ angular.module('oppia').directive('schemaBasedListEditor', [
         validators: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-list-editor.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-list-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {

@@ -27,8 +27,8 @@ angular.module('oppia').directive('circularImage', [
         src: '&',
         link: '&?'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile-link-directives/circular-image.directive.html'),
+      template: require(
+        '!html-loader!./circular-image.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

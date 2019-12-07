@@ -25,8 +25,8 @@ angular.module('oppia').directive('scoreRing', [
         getScore: '&score',
         testIsPassed: '&testIsPassed'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/score-ring/score-ring.directive.html'),
+      template: require(
+        '!html-loader!./score-ring.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', '$timeout', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
         function($scope, $timeout, $window, COLORS_FOR_PASS_FAIL_MODE) {

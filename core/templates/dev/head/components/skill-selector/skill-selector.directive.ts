@@ -30,8 +30,8 @@ angular.module('oppia').directive('selectSkill', [
         selectedSkillId: '=',
         getCountOfSkillsToPrioritize: '&countOfSkillsToPrioritize'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/skill-selector/skill-selector.directive.html'),
+      template: require(
+        '!html-loader!./skill-selector.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope',
         function(

@@ -44,9 +44,8 @@ angular.module('oppia').directive('select2Dropdown', [
         placeholder: '@',
         width: '@'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/custom-forms-directives/' +
-        'select2-dropdown.directive.html'),
+      template: require(
+        '!html-loader!./select2-dropdown.directive.html'),
       controller: ['$scope', '$element', function($scope, $element) {
         $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
 

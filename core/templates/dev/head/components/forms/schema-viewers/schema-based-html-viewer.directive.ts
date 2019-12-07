@@ -24,9 +24,8 @@ angular.module('oppia').directive('schemaBasedHtmlViewer', [
       scope: {
         localValue: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-html-viewer.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-html-viewer.directive.html'),
       restrict: 'E'
     };
   }]);

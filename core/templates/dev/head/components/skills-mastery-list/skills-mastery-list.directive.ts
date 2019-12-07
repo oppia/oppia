@@ -30,8 +30,8 @@ angular.module('oppia').directive('skillsMasteryList', [
         getDegreesOfMastery: '&degreesOfMastery',
         getSkillDescriptions: '&skillDescriptions'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/skills-mastery-list/skills-mastery-list.directive.html'),
+      template: require(
+        '!html-loader!./skills-mastery-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$uibModal', 'UserService',

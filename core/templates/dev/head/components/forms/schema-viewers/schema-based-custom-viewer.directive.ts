@@ -31,9 +31,8 @@ angular.module('oppia').directive('schemaBasedCustomViewer', [
         // The class of the object being edited.
         objType: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-custom-viewer.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-custom-viewer.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };

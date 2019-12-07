@@ -29,9 +29,8 @@ angular.module('oppia').directive('schemaBasedExpressionEditor', [
         outputType: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-expression-editor.directive.html'
+      template: require(
+        '!html-loader!./schema-based-expression-editor.directive.html'
       ),
       restrict: 'E'
     };

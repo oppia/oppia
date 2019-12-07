@@ -27,9 +27,8 @@ angular.module('oppia').directive('profileLinkImage', [
       bindToController: {
         username: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile-link-directives/' +
-        'profile-link-image.directive.html'),
+      template: require(
+        '!html-loader!./profile-link-image.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http',

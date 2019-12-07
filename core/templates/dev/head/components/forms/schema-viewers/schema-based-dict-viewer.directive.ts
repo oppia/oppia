@@ -34,9 +34,8 @@ angular.module('oppia').directive('schemaBasedDictViewer', [
         // properties and the corresponding schemas.
         propertySchemas: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-dict-viewer.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-dict-viewer.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {

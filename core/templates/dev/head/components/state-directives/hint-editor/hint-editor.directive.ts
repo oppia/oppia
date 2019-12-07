@@ -37,8 +37,8 @@ angular.module('oppia').directive('hintEditor', [
         getOnSaveFn: '&onSave',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/hint-editor/hint-editor.directive.html'),
+      template: require(
+        '!html-loader!./hint-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditabilityService', 'StateHintsService',

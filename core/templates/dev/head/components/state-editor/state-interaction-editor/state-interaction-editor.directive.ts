@@ -67,9 +67,8 @@ angular.module('oppia').directive('stateInteractionEditor', [
         onSaveStateContent: '=',
         recomputeGraph: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-interaction-editor/' +
-        'state-interaction-editor.directive.html'),
+      template: require(
+        '!html-loader!./state-interaction-editor.directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
         'AlertsService', 'HtmlEscaperService', 'StateEditorService',

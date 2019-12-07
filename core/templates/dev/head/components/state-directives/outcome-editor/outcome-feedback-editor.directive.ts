@@ -28,9 +28,8 @@ angular.module('oppia').directive('outcomeFeedbackEditor', [
       bindToController: {
         outcome: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/outcome-editor/' +
-        'outcome-feedback-editor.directive.html'),
+      template: require(
+        '!html-loader!./outcome-feedback-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

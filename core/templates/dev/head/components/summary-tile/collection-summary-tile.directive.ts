@@ -46,8 +46,8 @@ angular.module('oppia').directive('collectionSummaryTile', [
         isContainerNarrow: '&containerIsNarrow',
         isOwnedByCurrentUser: '&activityIsOwnedByCurrentUser',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/collection-summary-tile.directive.html'),
+      template: require(
+        '!html-loader!./collection-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'DateTimeFormatService', 'UserService',

@@ -59,9 +59,8 @@ angular.module('oppia').directive('answerGroupEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '=',
         suppressWarnings: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/answer-group-editor/' +
-        'answer-group-editor.directive.html'),
+      template: require(
+        '!html-loader!./answer-group-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',

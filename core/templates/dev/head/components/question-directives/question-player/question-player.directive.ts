@@ -121,9 +121,8 @@ angular.module('oppia').directive('questionPlayer', [
       bindToController: {
         getQuestionPlayerConfig: '&playerConfig',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-directives/question-player/' +
-        'question-player.directive.html'),
+      template: require(
+        '!html-loader!./question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',

@@ -35,9 +35,8 @@ angular.module('oppia').directive('schemaBasedCustomEditor', [
         // The class of the object being edited.
         objType: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-custom-editor.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-custom-editor.directive.html'),
       controllerAs: '$ctrl',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: [function() {}]

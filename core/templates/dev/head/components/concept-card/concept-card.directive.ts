@@ -29,8 +29,8 @@ angular.module('oppia').directive('conceptCard', [
         getSkillIds: '&skillIds',
         index: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/concept-card/concept-card.template.html'),
+      template: require(
+        '!html-loader!./concept-card.template.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$rootScope',

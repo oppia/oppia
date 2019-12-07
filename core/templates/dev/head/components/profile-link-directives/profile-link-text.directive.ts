@@ -27,9 +27,8 @@ angular.module('oppia').directive('profileLinkText', [
       bindToController: {
         username: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile-link-directives/' +
-        'profile-link-text.directive.html'),
+      template: require(
+        '!html-loader!./profile-link-text.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

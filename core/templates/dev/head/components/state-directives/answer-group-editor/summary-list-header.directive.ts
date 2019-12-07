@@ -33,9 +33,8 @@ angular.module('oppia').directive('summaryListHeader', [
         isDeleteAvailable: '&isDeleteAvailable',
         getNumItems: '&numItems',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/answer-group-editor/' +
-        'summary-list-header.directive.html'),
+      template: require(
+        '!html-loader!./summary-list-header.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {

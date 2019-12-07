@@ -40,9 +40,8 @@ angular.module('oppia').directive('reviewMaterialEditor', [
         getBindableDict: '&bindableDict',
         onSaveExplanation: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/review-material-editor/' +
-        'review-material-editor.directive.html'),
+      template: require(
+        '!html-loader!./review-material-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['SubtitledHtmlObjectFactory', 'COMPONENT_NAME_EXPLANATION',
         function(

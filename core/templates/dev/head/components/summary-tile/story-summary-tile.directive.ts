@@ -28,8 +28,8 @@ angular.module('oppia').directive('storySummaryTile', [
         getStoryTitle: '&title',
         getStoryDescription: '&description',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/story-summary-tile.directive.html'),
+      template: require(
+        '!html-loader!./story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: ['STORY_VIEWER_URL_TEMPLATE',
         function(STORY_VIEWER_URL_TEMPLATE) {

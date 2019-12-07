@@ -47,9 +47,8 @@ angular.module('oppia').directive('outcomeEditor', [
         addState: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/outcome-editor/' +
-        'outcome-editor.directive.html'),
+      template: require(
+        '!html-loader!./outcome-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'StateEditorService', 'StateInteractionIdService',

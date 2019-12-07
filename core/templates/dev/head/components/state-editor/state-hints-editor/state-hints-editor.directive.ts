@@ -49,9 +49,8 @@ angular.module('oppia').directive('stateHintsEditor', [
         onSaveSolution: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-hints-editor/' +
-        'state-hints-editor.directive.html'),
+      template: require(
+        '!html-loader!./state-hints-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',

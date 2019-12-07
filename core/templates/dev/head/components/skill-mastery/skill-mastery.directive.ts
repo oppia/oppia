@@ -28,8 +28,8 @@ angular.module('oppia').directive('skillMasteryViewer', [
         skillId: '=',
         masteryChange: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/skill-mastery/skill-mastery.directive.html'),
+      template: require(
+        '!html-loader!./skill-mastery.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'SkillMasteryBackendApiService',

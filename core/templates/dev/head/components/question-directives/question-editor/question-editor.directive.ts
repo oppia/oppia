@@ -53,9 +53,8 @@ angular.module('oppia').directive('questionEditor', [
         questionStateData: '=',
         questionChanged: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-directives/question-editor/' +
-        'question-editor.directive.html'),
+      template: require(
+        '!html-loader!./question-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal',

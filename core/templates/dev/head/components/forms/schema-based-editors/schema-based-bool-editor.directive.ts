@@ -29,9 +29,8 @@ angular.module('oppia').directive('schemaBasedBoolEditor', [
         isDisabled: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/' +
-        'schema-based-editors/schema-based-bool-editor.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-bool-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {}]
     };

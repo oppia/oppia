@@ -33,9 +33,8 @@ angular.module('oppia').directive('schemaBasedListViewer', [
         // Read-only property. The schema definition for each item in the list.
         itemSchema: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-list-viewer.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-list-viewer.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };

@@ -33,9 +33,8 @@ angular.module('oppia').directive('sharingLinks', [
         getExplorationId: '&explorationId',
         getCollectionId: '&collectionId'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'sharing-links.directive.html'),
+      template: require(
+        '!html-loader!./sharing-links.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$window', 'HtmlEscaperService',

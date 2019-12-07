@@ -24,9 +24,8 @@ angular.module('oppia').directive('loadingDots', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'loading-dots.directive.html'),
+      template: require(
+        '!html-loader!./loading-dots.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {}]
     };

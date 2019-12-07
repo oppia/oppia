@@ -43,8 +43,8 @@ angular.module('oppia').directive('rubricsEditor', [
         getRubrics: '&rubrics',
         onSaveRubric: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/rubrics-editor/rubrics-editor.directive.html'),
+      template: require(
+        '!html-loader!./rubrics-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope',

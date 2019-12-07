@@ -51,8 +51,8 @@ angular.module('oppia').directive('ruleEditor', [
         onSaveRule: '&',
         rule: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/rule-editor/rule-editor.directive.html'),
+      template: require(
+        '!html-loader!./rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$timeout', 'StateEditorService',

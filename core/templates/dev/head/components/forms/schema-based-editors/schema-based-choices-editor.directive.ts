@@ -37,9 +37,8 @@ angular.module('oppia').directive('schemaBasedChoicesEditor', [
         schema: '&',
         isDisabled: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-choices-editor.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-choices-editor.directive.html'),
       controllerAs: '$ctrl',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {

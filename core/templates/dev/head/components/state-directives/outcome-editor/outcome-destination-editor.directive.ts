@@ -37,9 +37,8 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
         outcome: '=',
         addState: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/outcome-editor/' +
-        'outcome-destination-editor.directive.html'),
+      template: require(
+        '!html-loader!./outcome-destination-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',

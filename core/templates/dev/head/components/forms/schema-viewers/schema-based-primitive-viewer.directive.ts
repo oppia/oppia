@@ -24,9 +24,8 @@ angular.module('oppia').directive('schemaBasedPrimitiveViewer', [
       scope: {
         localValue: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-primitive-viewer.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-primitive-viewer.directive.html'),
       restrict: 'E',
       controller: ['$scope', function($scope) {
         $scope.isExpression = function(value) {

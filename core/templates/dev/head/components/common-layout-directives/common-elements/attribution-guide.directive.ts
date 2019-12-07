@@ -25,9 +25,8 @@ angular.module('oppia').directive('attributionGuide', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'attribution-guide.directive.html'),
+      template: require(
+        '!html-loader!./attribution-guide.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'BrowserCheckerService', 'UrlService', function(

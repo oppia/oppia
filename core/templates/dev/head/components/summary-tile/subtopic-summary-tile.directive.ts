@@ -29,8 +29,8 @@ angular.module('oppia').directive('subtopicSummaryTile', [
         getSubtopicTitle: '&subtopicTitle',
         getTopicName: '&topicName'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary-tile/subtopic-summary-tile.directive.html'),
+      template: require(
+        '!html-loader!./subtopic-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: ['SUBTOPIC_VIEWER_URL_TEMPLATE',
         function(SUBTOPIC_VIEWER_URL_TEMPLATE) {

@@ -61,9 +61,8 @@ angular.module('oppia').directive('questionsList', [
         getSelectedSkillId: '&selectedSkillId',
         getGroupedSkillSummaries: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-directives/questions-list/' +
-        'questions-list.directive.html'),
+      template: require(
+        '!html-loader!./questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',

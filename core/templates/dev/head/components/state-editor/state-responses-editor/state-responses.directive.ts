@@ -89,9 +89,8 @@ angular.module('oppia').directive('stateResponses', [
         refreshWarnings: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-responses-editor/' +
-        'state-responses.directive.html'),
+      template: require(
+        '!html-loader!./state-responses.directive.html'),
       controller: [
         '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService',

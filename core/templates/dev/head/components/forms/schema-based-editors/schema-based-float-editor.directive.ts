@@ -38,9 +38,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
         onInputBlur: '=',
         onInputFocus: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-float-editor.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$timeout', 'FocusManagerService',

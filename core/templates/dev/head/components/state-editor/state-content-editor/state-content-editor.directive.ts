@@ -44,9 +44,8 @@ angular.module('oppia').directive('stateContentEditor', [
         onSaveStateContent: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-content-editor/' +
-        'state-content-editor.directive.html'),
+      template: require(
+        '!html-loader!./state-content-editor.directive.html'),
       controller: [
         '$scope', 'EditabilityService', 'EditorFirstTimeEventsService',
         'StateContentService', 'StateEditorService',

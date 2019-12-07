@@ -42,9 +42,8 @@ angular.module('oppia').directive('responseHeader', [
         showWarning: '&showWarning',
         navigateToState: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/response-header/' +
-        'response-header.directive.html'),
+      template: require(
+        '!html-loader!./response-header.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'EditabilityService', 'StateEditorService',

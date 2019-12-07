@@ -25,9 +25,8 @@ angular.module('oppia').directive('schemaBasedUnicodeViewer', [
       scope: {
         localValue: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/' +
-        'schema-based-unicode-viewer.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-unicode-viewer.directive.html'),
       restrict: 'E',
       controller: [
         '$scope', '$filter', '$sce',

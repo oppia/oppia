@@ -32,9 +32,8 @@ angular.module('oppia').directive('schemaBasedHtmlEditor', [
         labelForFocusTarget: '&',
         uiConfig: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-html-editor.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-html-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {}]
     };

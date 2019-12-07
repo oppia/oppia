@@ -40,8 +40,8 @@ angular.module('oppia').directive('schemaBasedViewer', [
         schema: '&',
         localValue: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-viewers/schema-based-viewer.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-viewer.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {}]
     };

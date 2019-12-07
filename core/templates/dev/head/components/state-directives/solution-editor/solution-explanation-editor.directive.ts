@@ -32,9 +32,8 @@ angular.module('oppia').directive('solutionExplanationEditor', [
         onSaveSolution: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/solution-editor/' +
-        'solution-explanation-editor.directive.html'),
+      template: require(
+        '!html-loader!./solution-explanation-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditabilityService', 'StateSolutionService',

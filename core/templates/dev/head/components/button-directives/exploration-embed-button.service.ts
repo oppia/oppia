@@ -26,9 +26,8 @@ angular.module('oppia').factory('ExplorationEmbedButtonService', [
       showModal: function(explorationId) {
         $uibModal.open({
           backdrop: true,
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/button-directives/' +
-            'exploration-embed-button.directive.html'),
+          template: require(
+            '!html-loader!./exploration-embed-button.directive.html'),
           resolve: {
             explorationId: function() {
               return explorationId;

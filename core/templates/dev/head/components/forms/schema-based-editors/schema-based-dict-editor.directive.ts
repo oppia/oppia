@@ -38,9 +38,8 @@ angular.module('oppia').directive('schemaBasedDictEditor', [
         propertySchemas: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-dict-editor.directive.html'),
+      template: require(
+        '!html-loader!./schema-based-dict-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: [

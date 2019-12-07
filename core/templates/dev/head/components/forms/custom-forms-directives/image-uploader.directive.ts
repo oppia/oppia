@@ -30,9 +30,8 @@ angular.module('oppia').directive('imageUploader', [
         errorMessage: '@',
         width: '@'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/custom-forms-directives/' +
-        'image-uploader.directive.html'),
+      template: require(
+        '!html-loader!./image-uploader.directive.html'),
       link: function(scope: ICustomScope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();
