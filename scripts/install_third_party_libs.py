@@ -23,20 +23,6 @@ import os
 import shutil
 import subprocess
 
-# These libraries need to be installed before running or importing any script.
-TOOLS_DIR = os.path.join('..', 'oppia_tools')
-# Download and install pyyaml.
-if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
-    subprocess.check_call([
-        'pip', 'install', 'pyyaml==5.1.2', '--target',
-        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
-
-# Download and install future.
-if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
-    subprocess.check_call([
-        'pip', 'install', 'future==0.17.1', '--target',
-        os.path.join('third_party', 'future-0.17.1')])
-
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
 import python_utils  # isort:skip
@@ -49,6 +35,56 @@ from . import setup  # isort:skip
 from . import setup_gae  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
+
+# Checking for pip version
+pip2_check_required = False
+pip_name = 'pip'
+try:
+    import pip  #pylint: disable=unused-variable
+    if 'python2' not in pip.__file__.lower():
+        pip2_check_required = True
+except ImportError:
+    pip2_check_required = True
+
+if pip2_check_required:
+    try:
+        import pip2 #pylint: disable=unused-variable
+        pip_name = 'pip2'
+    except ImportError:
+        common.print_each_string_after_two_new_lines([
+            'Pip2 is required to install Oppia dependencies, but pip2 wasn\'t '
+            'found on your local machine.',
+            'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
+            'page:'])
+
+        os_info = os.uname()
+        if os_info[0] == 'Darwin':
+            python_utils.PRINT(
+                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
+                'OS%29')
+        elif os_info[0] == 'Linux':
+            python_utils.PRINT(
+                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
+                '%29')
+        else:
+            python_utils.PRINT(
+                'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28'
+                'Windows%29')
+        raise Exception
+
+# These libraries need to be installed before running or importing any script.
+TOOLS_DIR = os.path.join('..', 'oppia_tools')
+# Download and install pyyaml.
+if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
+    subprocess.check_call([
+        pip_name, 'install', 'pyyaml==5.1.2', '--target',
+        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
+
+# Download and install future.
+if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
+    subprocess.check_call([
+        pip_name, 'install', 'future==0.17.1', '--target',
+        os.path.join('third_party', 'future-0.17.1')])
 
 _PARSER = argparse.ArgumentParser(description="""
 Installation script for Oppia third-party libraries.
@@ -100,7 +136,10 @@ def pip_install(package, version, install_path):
     try:
         python_utils.PRINT('Checking if pip is installed on the local machine')
         # Importing pip just to check if its installed.
-        import pip  #pylint: disable=unused-variable
+        if pip_name == 'pip':
+            import pip  #pylint: disable=unused-variable
+        else:
+            import pip2 #pylint: disable=unused-variable
     except ImportError:
         common.print_each_string_after_two_new_lines([
             'Pip is required to install Oppia dependencies, but pip wasn\'t '
@@ -123,7 +162,7 @@ def pip_install(package, version, install_path):
         raise Exception
 
     subprocess.check_call([
-        'pip', 'install', '%s==%s' % (package, version), '--target',
+        pip_name, 'install', '%s==%s' % (package, version), '--target',
         install_path])
 
 
