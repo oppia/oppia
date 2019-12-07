@@ -230,6 +230,10 @@
     "wrap-iife": [
       "error",
       "any"
+    ],
+    "object-curly-spacing": [
+      "error",
+      "always"
     ]
   }
 }
