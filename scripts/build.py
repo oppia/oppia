@@ -612,8 +612,8 @@ def build_using_webpack():
 
     python_utils.PRINT('Building webpack')
 
-    cmd = '%s --config %s' % (
-        WEBPACK_FILE, WEBPACK_PROD_CONFIG)
+    cmd = '%s %s --config %s' % (
+        common.NODE_BIN_PATH, WEBPACK_FILE, WEBPACK_PROD_CONFIG)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -1308,7 +1308,9 @@ def compile_typescript_files(project_dir):
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files...')
-    cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
+    cmd = [
+        common.NODE_BIN_PATH, './node_modules/typescript/bin/tsc', '--project',
+        project_dir]
     subprocess.check_call(cmd)
 
 

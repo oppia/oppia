@@ -983,10 +983,12 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_build_using_webpack_command(self):
         def mock_check_call(cmd, **unused_kwargs):
+            expected_command = '%s %s --config %s' % (
+                common.NODE_BIN_PATH, build.WEBPACK_FILE,
+                build.WEBPACK_PROD_CONFIG
+            )
             self.assertEqual(
-                cmd,
-                '%s --config %s'
-                % (build.WEBPACK_FILE, build.WEBPACK_PROD_CONFIG))
+                cmd, expected_command)
 
         with self.swap(subprocess, 'check_call', mock_check_call):
             build.build_using_webpack()
