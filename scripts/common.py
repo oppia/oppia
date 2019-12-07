@@ -18,6 +18,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
 import getpass
+import fileinput
 import os
 import platform
 import re
@@ -440,6 +441,15 @@ def convert_windows_style_path_to_unix_style(file_path):
     may want to convert it to Unix style.
     """
     return file_path.replace('\\', '/')
+
+
+def inplace_replace_file(filename, regex_pattern, replace):
+    regex = re.compile(regex_pattern)
+    for line in fileinput.input(
+            files=[filename], inplace=True, backup='.bak'):
+        line = line.replace('\n', '')
+        line = regex.sub(replace, line)
+        python_utils.PRINT(line)
 
 
 class CD(python_utils.OBJECT):
