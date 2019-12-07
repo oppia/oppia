@@ -1,3 +1,20 @@
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the 'License');
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an 'AS-IS' BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Python execution for running e2e tests."""
+
+
 import argparse
 import atexit
 import fileinput
@@ -89,7 +106,9 @@ _PARSER.add_argument(
 
 SUBPROCESSES = []
 
+
 def check_screenshot():
+    """Check if screenshot directory exists, if so, delete it."""
     if not os.path.isdir(os.path.join('..', 'protractor-screenshots')):
         return
     python_utils.PRINT("""
@@ -98,11 +117,11 @@ core/tests/protractor.conf.js, you can view screenshots
 of the failed tests in ../protractor-screenshots/"
 """)
 
+
 def cleanup():
+    """Kill the running subprocesses and server fired in this program."""
     processes_to_kill = [
         re.compile(r'.*[Dd]ev_appserver\.py --host 0\.0\.0\.0 --port 9001.*'),
-        re.compile(
-            r'node_modules(/|\\)webdriver-manager(/|\\)selenium'),
         re.compile('.*chromedriver_%s.*' % CHROME_DRIVER_VERSION)
     ]
     for p in SUBPROCESSES:
@@ -111,7 +130,13 @@ def cleanup():
     for p in processes_to_kill:
         common.kill_processes_based_on_regex(p)
 
+
 def check_running_instance(*ports):
+    """Check if exists running oppia instance.
+
+    Args:
+        ports: list[int]. A list of ports that oppia instances may be running.
+    """
     for port in ports:
         if common.is_port_open(port):
             python_utils.PRINT("""
@@ -121,11 +146,26 @@ Please terminate it before running the end-to-end tests.
             """ % port)
             sys.exit(1)
 
+
 def wait_for_port(port):
+    """Wait until the port is open.
+
+    Args:
+        port: int. The port number to wait.
+    """
     while not common.is_port_open(port):
         time.sleep(1)
 
+
 def tweak_constant_ts(constant_file, dev_mode):
+    """Change constant file based on the running mode. Only the `DEV_MODE` line
+    should be changed.
+
+    Args:
+        constant_file: str. File path to the constant file.
+        dev_mode: boolean. Represents whether the program is running on dev
+            mode.
+    """
     regex = re.compile('"DEV_MODE": .*')
     constants_env_variable = '"DEV_MODE": %s' % (
         'true' if dev_mode else 'false')
@@ -135,7 +175,14 @@ def tweak_constant_ts(constant_file, dev_mode):
         line = regex.sub(constants_env_variable, line)
         python_utils.PRINT('%s' % line)
 
+
 def run_webdriver_manager(commands, wait=True):
+    """Run commands of webdriver manager.
+
+    Args:
+        commands: list[str]. A list of parameters to pass to webdriver manager.
+        wait: boolean. Represents whether the program should be waited.
+    """
     webdriver_bin_path = os.path.join(
         common.CURR_DIR, 'node_modules', 'webdriver-manager', 'bin',
         'webdriver-manager')
@@ -152,11 +199,21 @@ def run_webdriver_manager(commands, wait=True):
 
 
 def setup_and_install_dependencies():
+    """Run the setup and installation scripts."""
     install_third_party_libs.main(args=[])
     setup.main(args=[])
     setup_gae.main(args=[])
 
+
 def build_js_files(dev_mode, run_on_browserstack):
+    """Build the javascript files.
+
+    Args:
+        dev_mode: boolean. Represents whether run the related commands in dev
+            mode.
+        run_on_browserstack: boolean. Represents whether the tests should run
+            on browserstack.
+    """
     constant_file = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
     tweak_constant_ts(constant_file, dev_mode)
     if not dev_mode:
@@ -207,6 +264,7 @@ def tweak_webdriver_manager():
 
 
 def undo_webdriver_tweak():
+    """Undo the tweak on webdriver manager's source code."""
     if os.path.isfile(CHROME_PROVIDER_BAK_FILE_PATH):
         os.remove(CHROME_PROVIDER_FILE_PATH)
         os.rename(CHROME_PROVIDER_BAK_FILE_PATH, CHROME_PROVIDER_FILE_PATH)
@@ -216,6 +274,7 @@ def undo_webdriver_tweak():
 
 
 def start_webdriver_manager():
+    """Update and start webdriver manager"""
     if common.is_windows_os():
         tweak_webdriver_manager()
 
@@ -229,8 +288,21 @@ def start_webdriver_manager():
     if common.is_windows_os():
         undo_webdriver_tweak()
 
+
 def run_e2e_tests(
         run_on_browserstack, sharding, sharding_instances, suite, dev_mode):
+    """Start the end-2-end tests.
+
+    Args:
+        run_on_browserstack: boolean. Represents whether the tests should run
+            on browserstack.
+        sharding: boolean. Disables/Enables parallelization of protractor tests.
+        sharding_instances: str. Sets the number of parallel browsers to open
+            while sharding.
+        suite: str. Performs test for different suites.
+        dev_mode: boolean. Represents whether run the related commands in dev
+            mode.
+    """
     if not run_on_browserstack:
         config_file = os.path.join('core', 'tests', 'protractor.conf.js')
     else:
@@ -250,6 +322,7 @@ def run_e2e_tests(
 
 
 def main(args=None):
+    """Run the scripts to start end-to-end tests."""
     sys.path.insert(1, os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-5.6.7'))
     parsed_args = _PARSER.parse_args(args=args)
     atexit.register(cleanup)
@@ -275,6 +348,7 @@ def main(args=None):
     run_e2e_tests(
         run_on_browserstack, parsed_args.sharding,
         parsed_args.sharding_instances, parsed_args.suite, dev_mode)
+
 
 if __name__ == '__main__':
     main()
