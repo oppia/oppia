@@ -77,11 +77,16 @@ HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
-YUICOMPRESSOR_DIR = os.path.join(
-    '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
+
+# This path is only used for java command line. But the Windows style path
+# is causing syntax error. Since Unix style path can also work, we are
+# safe to just use this style.
+YUICOMPRESSOR_DIR = '/'.join([
+    os.pardir, 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar'])
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
+TSC_BIN_FILE = os.path.join('node_modules', 'typescript', 'bin', 'tsc')
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
@@ -99,9 +104,15 @@ GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 # errors due to missing variables. So, the files should be built only from
 # one location instead of both the locations.
 JS_FILEPATHS_NOT_TO_BUILD = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/expression-parser.service.js')
+    os.path.join(
+        'extensions', 'interactions', 'LogicProof', 'static', 'js',
+        'generatedDefaultData.js'),
+    os.path.join(
+        'extensions', 'interactions', 'LogicProof', 'static', 'js',
+        'generatedParser.js'),
+    os.path.join(
+        'core', 'templates', 'dev', 'head', 'expressions',
+        'expression-parser.service.js'))
 
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -201,6 +212,12 @@ def _minify(source_path, target_path):
     # experiments, 18m seems to work, but 12m is too small and results in an
     # out-of-memory error.
     # https://circleci.com/blog/how-to-handle-java-oom-errors/
+    # Use relative path to avoid java command line parameter parse error on
+    # Windows.
+    target_path = common.convert_windows_style_path_to_unix_style(
+        os.path.relpath(target_path))
+    source_path = common.convert_windows_style_path_to_unix_style(
+        os.path.relpath(source_path))
     cmd = 'java -Xmx24m -jar %s -o %s %s' % (
         YUICOMPRESSOR_DIR, target_path, source_path)
     subprocess.check_call(cmd, shell=True)
@@ -405,9 +422,11 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         # This is because html paths are used by backend and we work with
         # paths without hash part in backend.
         if not filepath.endswith('.html'):
+            filepath = common.convert_windows_style_path_to_unix_style(filepath)
             filepath_with_hash = _insert_hash(filepath, file_hash)
             content = content.replace(
-                '%s%s' % (TEMPLATES_DEV_DIR, filepath),
+                '%s%s' % (common.convert_windows_style_path_to_unix_style(
+                    TEMPLATES_DEV_DIR), filepath),
                 '%s%s' % (
                     TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
                     filepath_with_hash))
@@ -612,8 +631,8 @@ def build_using_webpack():
 
     python_utils.PRINT('Building webpack')
 
-    cmd = '%s --config %s' % (
-        WEBPACK_FILE, WEBPACK_PROD_CONFIG)
+    cmd = '%s %s --config %s' % (
+        common.NODE_BIN_PATH, WEBPACK_FILE, WEBPACK_PROD_CONFIG)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -1308,7 +1327,9 @@ def compile_typescript_files(project_dir):
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files...')
-    cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
+    cmd = [
+        common.NODE_BIN_PATH, TSC_BIN_FILE, '--project',
+        project_dir]
     subprocess.check_call(cmd)
 
 
