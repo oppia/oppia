@@ -53,7 +53,12 @@ GECKO_PROVIDER_BAK_FILE_PATH = os.path.join(
 
 PSUTIL_DIR = os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-5.6.7')
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
-
+WAIT_PORT_TIMEOUT = 1000
+WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
+    common.CURR_DIR, 'node_modules', 'webdriver-manager', 'bin',
+    'webdriver-manager')
+WEBPACK_BIN_PATH = os.path.join(
+    common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -112,14 +117,15 @@ SUBPROCESSES = []
 
 def check_screenshot():
     """Check if screenshot directory exists, if so, delete it."""
-    if not os.path.isdir(os.path.join('..', 'protractor-screenshots')):
+    screeenshots_dir = os.path.join(os.pardir, 'protractor-screenshots')
+    if not os.path.isdir(screeenshots_dir):
         return
     python_utils.PRINT("""
 Note: If ADD_SCREENSHOT_REPORTER is set to true in
 core/tests/protractor.conf.js, you can view screenshots
-of the failed tests in ../protractor-screenshots/"
+of the failed tests in ../protractor-screenshots/
 """)
-
+    os.rmdir(screeenshots_dir)
 
 def cleanup():
     """Kill the running subprocesses and server fired in this program."""
@@ -139,7 +145,11 @@ def check_running_instance(*ports):
 
     Args:
         ports: list[int]. A list of ports that oppia instances may be running.
+
+    Return:
+        boolean represents whether the ports are open.
     """
+    running = False
     for port in ports:
         if common.is_port_open(port):
             python_utils.PRINT("""
@@ -147,7 +157,9 @@ There is already a server running on localhost:%s.
 Please terminate it before running the end-to-end tests.
     Exiting.
             """ % port)
-            sys.exit(1)
+            running = True
+            break
+    return running
 
 
 def wait_for_port(port):
@@ -156,8 +168,14 @@ def wait_for_port(port):
     Args:
         port: int. The port number to wait.
     """
-    while not common.is_port_open(port):
+    current_time = 0
+    while not common.is_port_open(port) and current_time < WAIT_PORT_TIMEOUT:
         time.sleep(1)
+        current_time += 1
+    if current_time == WAIT_PORT_TIMEOUT and not common.is_port_open(port):
+        python_utils.PRINT(
+            'Failed to start server on port %s, exiting ...' % port)
+        sys.exit(1)
 
 
 def tweak_constant_ts(constant_file, dev_mode):
@@ -176,25 +194,20 @@ def tweak_constant_ts(constant_file, dev_mode):
             files=[constant_file], inplace=True, backup='.bak'):
         line = line.replace('\n', '')
         line = regex.sub(constants_env_variable, line)
-        python_utils.PRINT('%s' % line)
+        python_utils.PRINT(line)
 
 
-def run_webdriver_manager(commands):
+def run_webdriver_manager(parameters):
     """Run commands of webdriver manager.
 
     Args:
-        commands: list[str]. A list of parameters to pass to webdriver manager.
+        parameters: list[str]. A list of parameters to pass to webdriver
+            manager.
     """
-    webdriver_bin_path = os.path.join(
-        common.CURR_DIR, 'node_modules', 'webdriver-manager', 'bin',
-        'webdriver-manager')
-    web_driver_command = [common.NODE_BIN_PATH, webdriver_bin_path]
-    web_driver_command.extend(commands)
-    p = subprocess.Popen(
-        web_driver_command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    stdout, err = p.communicate()
-    python_utils.PRINT(stdout)
-    python_utils.PRINT(err)
+    web_driver_command = [common.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
+    web_driver_command.extend(parameters)
+    python_utils.PRINT(common.run_cmd(web_driver_command))
+
 
 
 def setup_and_install_dependencies():
@@ -217,13 +230,11 @@ def build_js_files(dev_mode, run_on_browserstack):
     if not dev_mode:
         python_utils.PRINT('  Generating files for production mode...')
     else:
-        webpack_bin = os.path.join(
-            common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
         common.run_cmd(
-            [common.NODE_BIN_PATH, webpack_bin, '--config',
+            [common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
              'webpack.dev.config.ts'])
     if run_on_browserstack:
-        python_utils.PRINT(' Running the tests on browsertack...')
+        python_utils.PRINT('Running the tests on browsertack...')
     build.main(args=['--prod_env'] if not dev_mode else [])
     os.remove('%s.bak' % CONSTANT_FILE_PATH)
 
@@ -340,7 +351,9 @@ def main(args=None):
 
     parsed_args = _PARSER.parse_args(args=args)
 
-    check_running_instance(8181, 9001)
+    other_instance_running = check_running_instance(8181, 9001)
+    if other_instance_running:
+        sys.exit(1)
     setup_and_install_dependencies()
 
     sys.path.insert(1, PSUTIL_DIR)
