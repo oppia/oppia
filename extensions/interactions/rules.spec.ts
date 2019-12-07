@@ -48,6 +48,7 @@ import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
+import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
@@ -75,19 +76,21 @@ describe('Rule spec services', function() {
       'InteractiveMapRulesService', new InteractiveMapRulesService());
     $provide.value('LogicProofRulesService', new LogicProofRulesService());
     $provide.value(
-      'MusicNotesInputRulesService', new MusicNotesInputRulesService());
+      'MusicNotesInputRulesService', new MusicNotesInputRulesService(
+        new UtilsService()));
     $provide.value(
       'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
     $provide.value(
       'NumberWithUnitsRulesService', new NumberWithUnitsRulesService(
         new NumberWithUnitsObjectFactory(
-          new UnitsObjectFactory(), new FractionObjectFactory())));
+          new UnitsObjectFactory(), new FractionObjectFactory(),
+        ), new UtilsService()));
     $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(
-        new FractionObjectFactory()));
+        new FractionObjectFactory(), new UtilsService()));
     $provide.value(
       'GraphInputRulesService', new GraphInputRulesService(
-        new GraphUtilsService()));
+        new GraphUtilsService(), new UtilsService()));
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The

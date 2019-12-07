@@ -21,12 +21,14 @@ import { Injectable } from '@angular/core';
 
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
+import { UtilsService } from 'services/utils.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GraphInputRulesService {
-  constructor(private gus: GraphUtilsService) {}
+  constructor(private gus: GraphUtilsService,
+    private utilsService: UtilsService) {}
   /**
    * @param {object} graph - A graph object.
    * @return {boolean} Whether the graph is strongly connected.
@@ -170,7 +172,7 @@ export class GraphInputRulesService {
       });
     }).sort();
 
-    if (!angular.equals(degrees1, degrees2)) {
+    if (!this.utilsService.isEquivalent(degrees1, degrees2)) {
       return false;
     }
 

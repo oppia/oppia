@@ -20,6 +20,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { UtilsService } from 'services/utils.service';
 
 export interface FractionAnswer {
   isNegative: boolean;
@@ -32,23 +33,8 @@ export interface FractionAnswer {
   providedIn: 'root'
 })
 export class FractionInputRulesService {
-  constructor(private fractionObjectFactory: FractionObjectFactory) {}
-
-  private isEquivalent(a: any, b: any): boolean {
-    // Create arrays of property names
-    var aProps = Object.getOwnPropertyNames(a);
-    var bProps = Object.getOwnPropertyNames(b);
-    if (aProps.length !== bProps.length) {
-      return false;
-    }
-    for (var i = 0; i < aProps.length; i++) {
-      var propName = aProps[i];
-      if (a[propName] !== b[propName]) {
-        return false;
-      }
-    }
-    return true;
-  }
+  constructor(private fractionObjectFactory: FractionObjectFactory,
+    private utilsService: UtilsService) {}
 
   toFloat(fractionDict: FractionAnswer) {
     return this.fractionObjectFactory.fromDict(fractionDict).toFloat();
@@ -62,12 +48,12 @@ export class FractionInputRulesService {
     var simplestForm =
       this.fractionObjectFactory.fromDict(inputs.f).convertToSimplestForm();
     return this.toFloat(answer) === this.toFloat(inputs.f) &&
-      this.isEquivalent(answer, simplestForm);
+      this.utilsService.isEquivalent(answer, simplestForm);
   }
   IsExactlyEqualTo(
       answer: FractionAnswer, inputs: {f: FractionAnswer}): boolean {
     // Only returns true if both answers are structurally equal.
-    return this.isEquivalent(answer, inputs.f);
+    return this.utilsService.isEquivalent(answer, inputs.f);
   }
   IsLessThan(
       answer: FractionAnswer, inputs: {f: FractionAnswer}): boolean {

@@ -19,6 +19,8 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import cloneDeep from 'lodash/cloneDeep';
+
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
@@ -71,14 +73,14 @@ export class Interaction {
   }
   // TODO(#7165): Replace any with exact type.
   copy(otherInteraction: any): void {
-    this.answerGroups = angular.copy(otherInteraction.answerGroups);
+    this.answerGroups = cloneDeep(otherInteraction.answerGroups);
     this.confirmedUnclassifiedAnswers =
-      angular.copy(otherInteraction.confirmedUnclassifiedAnswers);
-    this.customizationArgs = angular.copy(otherInteraction.customizationArgs);
-    this.defaultOutcome = angular.copy(otherInteraction.defaultOutcome);
-    this.hints = angular.copy(otherInteraction.hints);
-    this.id = angular.copy(otherInteraction.id);
-    this.solution = angular.copy(otherInteraction.solution);
+      cloneDeep(otherInteraction.confirmedUnclassifiedAnswers);
+    this.customizationArgs = cloneDeep(otherInteraction.customizationArgs);
+    this.defaultOutcome = cloneDeep(otherInteraction.defaultOutcome);
+    this.hints = cloneDeep(otherInteraction.hints);
+    this.id = cloneDeep(otherInteraction.id);
+    this.solution = cloneDeep(otherInteraction.solution);
   }
   // TODO(#7165): Replace any with exact type.
   toBackendDict(): any {

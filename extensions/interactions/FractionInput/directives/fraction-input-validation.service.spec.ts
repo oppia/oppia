@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for fraction input validation service.
  */
+import cloneDeep from 'lodash/cloneDeep';
 
 import { AppConstants } from 'app.constants';
 import { AnswerGroupObjectFactory } from
@@ -280,7 +281,7 @@ describe('FractionInputValidationService', () => {
   });
 
   it('should catch redundant rules in separate answer groups', () => {
-    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [greaterThanMinusOneRule];
     answerGroups[1].rules = [equalsOneRule];
     var warnings = validatorService.getAllWarnings(
@@ -437,7 +438,7 @@ describe('FractionInputValidationService', () => {
   it('should allow equivalent fractions with if not requireSimplestForm ' +
     'and rules are IsExactlyEqualTo', () => {
     customizationArgs.requireSimplestForm = false;
-    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [equalsOneRule];
     answerGroups[1].rules = [exactlyEqualToOneAndNotInSimplestFormRule];
     var warnings = validatorService.getAllWarnings(
@@ -449,7 +450,7 @@ describe('FractionInputValidationService', () => {
   it('should allow if numerator and denominator should equal the same value ' +
     'and are set in different rules', () => {
     customizationArgs.requireSimplestForm = false;
-    answerGroups[1] = angular.copy(answerGroups[0]);
+    answerGroups[1] = cloneDeep(answerGroups[0]);
     answerGroups[0].rules = [numeratorEqualsFiveRule];
     answerGroups[1].rules = [denominatorEqualsFiveRule];
     var warnings = validatorService.getAllWarnings(
@@ -502,7 +503,7 @@ describe('FractionInputValidationService', () => {
         goodDefaultOutcome);
       expect(warnings).toEqual([]);
 
-      answerGroups[1] = angular.copy(answerGroups[0]);
+      answerGroups[1] = cloneDeep(answerGroups[0]);
       answerGroups[0].rules = [denominatorEqualsFiveRule];
       answerGroups[1].rules = [HasFractionalPartExactlyEqualToTwoFifthsRule];
       var warnings = validatorService.getAllWarnings(

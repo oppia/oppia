@@ -18,11 +18,12 @@
 
 import { MusicNotesInputRulesService } from
   'interactions/MusicNotesInput/directives/music-notes-input-rules.service';
+import { UtilsService } from 'services/utils.service';
 
 describe('Music Notes Input rules service', () => {
   let mnirs: MusicNotesInputRulesService = null;
   beforeEach(() => {
-    mnirs = new MusicNotesInputRulesService();
+    mnirs = new MusicNotesInputRulesService(new UtilsService());
   });
 
   it('should have a correct \'equals\' rule', () => {

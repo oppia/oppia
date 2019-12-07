@@ -15,11 +15,25 @@
 /**
  * @fileoverview A data service that stores the written translations.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StateWrittenTranslationsService', [
-  'StatePropertyService', function(StatePropertyService) {
-    var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveWrittenTranslations';
-    return child;
+import { AlertsService } from 'services/alerts.service';
+import { StatePropertyService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-property.service';
+import { UtilsService } from 'services/utils.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StateWrittenTranslationsService extends StatePropertyService {
+  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+    super(alertsService, utilsService);
+    this.setterMethodKey = 'saveWrittenTranslations';
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'StateWrittenTranslationsService', downgradeInjectable(
+    StateWrittenTranslationsService));
