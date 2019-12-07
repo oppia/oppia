@@ -178,6 +178,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import {SuggestionThreadObjectFactory} from '../domain/suggestion/SuggestionThreadObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -289,6 +290,9 @@ export class UpgradedServices {
       new SidebarStatusService(upgradedServices['WindowDimensionsService']);
     upgradedServices['SiteAnalyticsService'] =
       new SiteAnalyticsService(upgradedServices['WindowRef']);
+    upgradedServices['SuggestionThreadObjectFactory'] =
+        new SuggestionThreadObjectFactory(
+          upgradedServices['SuggestionObjectFactory']);
     upgradedServices['SVMPredictionService'] =
       new SVMPredictionService(
         upgradedServices['PredictionResultObjectFactory']);

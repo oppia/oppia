@@ -14,75 +14,92 @@
 
 /**
  * @fileoverview Factory for creating new frontend instances of suggestion
-   thread domain objects.
+ thread domain objects.
  */
 
-require('domain/suggestion/SuggestionObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('SuggestionThreadObjectFactory', [
-  'SuggestionObjectFactory', function(SuggestionObjectFactory) {
-    var SuggestionThread = function(
-        status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-        threadId, suggestion) {
-      this.status = status;
-      this.subject = subject;
-      this.summary = summary;
-      this.originalAuthorName = originalAuthorName;
-      this.lastUpdated = lastUpdated;
-      this.messageCount = messageCount;
-      this.threadId = threadId;
-      this.suggestion = suggestion;
-      this.messages = [];
-    };
+import { Suggestion, SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
 
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SuggestionThread['createFromBackendDicts'] = function(
-    /* eslint-enable dot-notation */
-        suggestionThreadBackendDict, suggestionBackendDict) {
-      var suggestion;
-      if (suggestionBackendDict.suggestion_type ===
-          'edit_exploration_state_content') {
-        suggestion = SuggestionObjectFactory.createFromBackendDict(
-          suggestionBackendDict);
-      }
-      return new SuggestionThread(
-        suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
-        suggestionThreadBackendDict.summary,
-        suggestionThreadBackendDict.original_author_username,
-        suggestionThreadBackendDict.last_updated,
-        suggestionThreadBackendDict.message_count,
-        suggestionThreadBackendDict.thread_id, suggestion);
-    };
-
-    SuggestionThread.prototype.setMessages = function(messages) {
-      this.messages = messages;
-    };
-
-    SuggestionThread.prototype.isSuggestionHandled = function() {
-      return this.suggestion.status !== 'review';
-    };
-
-    SuggestionThread.prototype.getSuggestionStateName = function() {
-      return this.suggestion.stateName;
-    };
-
-    SuggestionThread.prototype.getSuggestionStatus = function() {
-      return this.suggestion.status;
-    };
-
-    SuggestionThread.prototype.getReplacementHtmlFromSuggestion = function() {
-      return this.suggestion.newValue.html;
-    };
-
-    SuggestionThread.prototype.isSuggestionThread = function() {
-      return true;
-    };
-
-    SuggestionThread.prototype.getSuggestion = function() {
-      return this.suggestion;
-    };
-
-    return SuggestionThread;
+class SuggestionThread {
+  status;
+  subject;
+  summary;
+  originalAuthorName;
+  lastUpdated;
+  messageCount;
+  threadId;
+  suggestion;
+  messages;
+  constructor(
+      status, subject, summary, originalAuthorName, lastUpdated, messageCount,
+      threadId, suggestion) {
+    this.status = status;
+    this.subject = subject;
+    this.summary = summary;
+    this.originalAuthorName = originalAuthorName;
+    this.lastUpdated = lastUpdated;
+    this.messageCount = messageCount;
+    this.threadId = threadId;
+    this.suggestion = suggestion;
+    this.messages = [];
   }
-]);
+
+  setMessages(messages: Array<{text: string}>): void {
+    this.messages = messages;
+  }
+
+  isSuggestionHandled(): boolean {
+    return this.suggestion.status !== 'review';
+  }
+
+  getSuggestionStateName(): string {
+    return this.suggestion.stateName;
+  }
+
+  getSuggestionStatus(): string {
+    return this.suggestion.status;
+  }
+
+  getReplacementHtmlFromSuggestion(): string {
+    return this.suggestion.newValue.html;
+  }
+
+  isSuggestionThread(): boolean {
+    return true;
+  }
+
+  getSuggestion(): Suggestion {
+    return this.suggestion;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SuggestionThreadObjectFactory {
+  constructor(private suggestionObjectFactory: SuggestionObjectFactory) {}
+  createFromBackendDicts(
+      suggestionThreadBackendDict: any,
+      suggestionBackendDict: any): SuggestionThread {
+    let suggestion;
+    if (suggestionBackendDict.suggestion_type ===
+        'edit_exploration_state_content') {
+      suggestion = this.suggestionObjectFactory.createFromBackendDict(
+        suggestionBackendDict);
+    }
+    return new SuggestionThread(
+      suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
+      suggestionThreadBackendDict.summary,
+      suggestionThreadBackendDict.original_author_username,
+      suggestionThreadBackendDict.last_updated,
+      suggestionThreadBackendDict.message_count,
+      suggestionThreadBackendDict.thread_id, suggestion);
+  }
+}
+
+angular.module('oppia').factory(
+  'SuggestionThreadObjectFactory',
+  downgradeInjectable(SuggestionThreadObjectFactory));
