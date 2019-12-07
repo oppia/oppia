@@ -82,10 +82,11 @@ REMOVE_WS = re.compile(r'\s{2,}').sub
 # is causing syntax error. Since Unix style path can also work, we are
 # safe to just use this style.
 YUICOMPRESSOR_DIR = '/'.join([
-    '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar'])
+    os.pardir, 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar'])
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
+TSC_BIN_FILE = os.path.join('node_modules', 'typescript', 'bin', 'tsc')
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
@@ -1328,7 +1329,7 @@ def compile_typescript_files(project_dir):
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files...')
     cmd = [
-        common.NODE_BIN_PATH, './node_modules/typescript/bin/tsc', '--project',
+        common.NODE_BIN_PATH, TSC_BIN_FILE, '--project',
         project_dir]
     subprocess.check_call(cmd)
 
