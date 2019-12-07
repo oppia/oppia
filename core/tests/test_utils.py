@@ -1832,6 +1832,35 @@ tags: []
             setattr(obj, attr, original)
 
     @contextlib.contextmanager
+    def swap_with_checks(
+            self, obj, attr, newvalue, expected_args=None, expected_kwargs=None,
+            called=True):
+        original = getattr(obj, attr)
+        newvalue.called = False
+        to_store = newvalue
+        if expected_args is not None or expected_kwargs is not None:
+            def wrapper(*args, **kwargs):
+                if expected_args is not None:
+                    self.assertEqual(list(args), expected_args)
+                if expected_kwargs is not None:
+                    self.assertEqual(kwargs, expected_kwargs)
+                return newvalue(*args, **kwargs)
+            to_store = wrapper
+        setattr(obj, attr, to_store)
+        error_occurred = False
+        try:
+            yield
+        except Exception as e :
+            error_occurred = True
+            raise e
+        finally:
+            setattr(obj, attr, original)
+            if not error_occurred:
+                self.assertEqual(newvalue.called, called)
+
+
+
+    @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
         """Log in with the given email under the context of a 'with' statement.
 
