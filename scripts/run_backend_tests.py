@@ -225,6 +225,27 @@ class TestingTaskSpec(python_utils.OBJECT):
         return run_shell_cmd(exc_list)
 
 
+def _check_all_tasks(tasks):
+    """Checks the results of all tasks."""
+    running_tasks_data = []
+
+    for task in tasks:
+        if task.isAlive():
+            running_tasks_data.append('  %s (started %s)' % (
+                task.name,
+                time.strftime('%H:%M:%S', time.localtime(task.start_time))
+            ))
+
+        if task.exception:
+            ALL_ERRORS.append(task.exception)
+
+    if running_tasks_data:
+        log('----------------------------------------')
+        log('Tasks still running:')
+        for task_details in running_tasks_data:
+            log(task_details)
+
+
 def _execute_tasks(tasks, semaphore):
     """Starts all tasks and checks the results.
     Runs no more than the allowable limit defined in the semaphore.
@@ -250,35 +271,6 @@ def _execute_tasks(tasks, semaphore):
         task.join()
 
     _check_all_tasks(currently_running_tasks)
-
-
-def _execute_tasks(tasks, batch_size=24):
-    """Starts all tasks and checks the results.
-
-    Runs no more than 'batch_size' tasks at a time.
-    """
-    remaining_tasks = [] + tasks
-    currently_running_tasks = set([])
-
-    while remaining_tasks or currently_running_tasks:
-        if currently_running_tasks:
-            for task in list(currently_running_tasks):
-                task.join(1)
-                if not task.isAlive():
-                    currently_running_tasks.remove(task)
-
-        while remaining_tasks and len(currently_running_tasks) < batch_size:
-            task = remaining_tasks.pop()
-            currently_running_tasks.add(task)
-            task.start()
-            task.start_time = time.time()
-
-        time.sleep(5)
-        if remaining_tasks:
-            log('----------------------------------------')
-            log('Number of unstarted tasks: %s' % len(remaining_tasks))
-        _check_all_tasks(tasks)
-        log('----------------------------------------')
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -488,16 +480,16 @@ def main(args=None):
     python_utils.PRINT('')
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
-    else:
-        python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
-            total_count, '' if total_count == 1 else 's',
-            len(tasks), '' if len(tasks) == 1 else 'es'))
 
-        if total_errors or total_failures:
-            python_utils.PRINT(
-                '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
-        else:
-            python_utils.PRINT('All tests passed.')
+    python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
+        total_count, '' if total_count == 1 else 's',
+        len(tasks), '' if len(tasks) == 1 else 'es'))
+
+    if total_errors or total_failures:
+        python_utils.PRINT(
+            '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
+    else:
+        python_utils.PRINT('All tests passed.')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
