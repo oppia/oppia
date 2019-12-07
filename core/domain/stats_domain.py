@@ -544,41 +544,20 @@ class Playthrough(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, playthrough_dict):
-        """Returns a Playthrough object from a dict.
+    def from_dict(cls, playthrough_data):
+        """Checks whether the playthrough dict has the correct keys and then
+        returns a domain object instance.
 
         Args:
-            playthrough_dict: dict. A dict mapping of all fields of Playthrough
+            playthrough_data: dict. A dict mapping of all fields of Playthrough
                 object.
 
         Returns:
             Playthrough. The corresponding Playthrough domain object.
         """
-        actions = [
-            LearnerAction.from_dict(action_dict)
-            for action_dict in playthrough_dict['actions']]
-        return cls(
-            playthrough_dict['exp_id'],
-            playthrough_dict['exp_version'],
-            playthrough_dict['issue_type'],
-            playthrough_dict['issue_customization_args'],
-            actions)
-
-    @classmethod
-    def from_backend_dict(cls, playthrough_data):
-        """Checks whether the playthrough dict has the correct keys and then
-        returns a domain object instance.
-
-        Args:
-            playthrough_data: dict. Dict representing a playthrough.
-
-        Returns:
-            Playthrough. A playthrough domain object.
-        """
         playthrough_properties = [
             'exp_id', 'exp_version', 'issue_type',
             'issue_customization_args', 'actions']
-
         for playthrough_property in playthrough_properties:
             if playthrough_property not in playthrough_data:
                 raise utils.ValidationError(
@@ -686,50 +665,35 @@ class ExplorationIssue(python_utils.OBJECT):
         }
 
     @classmethod
-    def from_dict(cls, issue_dict):
-        """Returns an ExplorationIssue object from a dict.
-
-        Args:
-            issue_dict: dict. A dict mapping of all fields of ExplorationIssue
-                object.
-
-        Returns:
-            ExplorationIssue. The corresponding ExplorationIssue domain object.
-        """
-        return cls(
-            issue_dict['issue_type'],
-            issue_dict['issue_customization_args'],
-            issue_dict['playthrough_ids'],
-            issue_dict['schema_version'],
-            issue_dict['is_valid'])
-
-    @classmethod
-    def from_backend_dict(cls, exp_issue_dict):
+    def from_dict(cls, exp_issue_dict):
         """Checks whether the exploration issue dict has the correct keys and
         then returns a domain object instance.
 
         Args:
-            exp_issue_dict: dict. Dict representing an exploration issue.
+            exp_issue_dict: dict. A dict mapping of all fields of
+                ExplorationIssue object.
 
         Returns:
-            ExplorationIssue. The exploration issue domain object.
+            ExplorationIssue. The corresponding ExplorationIssue domain object.
         """
         exp_issue_properties = [
             'issue_type', 'schema_version', 'issue_customization_args',
             'playthrough_ids', 'is_valid']
-
         for exp_issue_property in exp_issue_properties:
             if exp_issue_property not in exp_issue_dict:
                 raise utils.ValidationError(
-                    '%s not in exploration issue dict.' % (exp_issue_property))
+                    '%s not in exploration issue dict.' % (
+                        exp_issue_property))
 
-        dummy_exp_issue = cls(
+        exp_issue = cls(
             exp_issue_dict['issue_type'],
-            exp_issue_dict['issue_customization_args'], [],
-            exp_issue_dict['schema_version'], exp_issue_dict['is_valid'])
+            exp_issue_dict['issue_customization_args'],
+            exp_issue_dict['playthrough_ids'],
+            exp_issue_dict['schema_version'],
+            exp_issue_dict['is_valid'])
 
-        dummy_exp_issue.validate()
-        return dummy_exp_issue
+        exp_issue.validate()
+        return exp_issue
 
     @classmethod
     def update_exp_issue_from_model(cls, issue_dict):
