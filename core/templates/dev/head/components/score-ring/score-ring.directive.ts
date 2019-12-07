@@ -17,7 +17,7 @@
  */
 
 angular.module('oppia').directive('scoreRing', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},

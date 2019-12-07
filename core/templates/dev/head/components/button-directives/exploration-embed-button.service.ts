@@ -16,12 +16,11 @@
  * @fileoverview Service for the 'embed exploration' modal.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('ExplorationEmbedButtonService', [
-  '$uibModal', 'SiteAnalyticsService', 'UrlInterpolationService',
-  function($uibModal, SiteAnalyticsService, UrlInterpolationService) {
+  '$uibModal', 'SiteAnalyticsService',
+  function($uibModal, SiteAnalyticsService) {
     return {
       showModal: function(explorationId) {
         $uibModal.open({

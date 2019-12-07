@@ -32,7 +32,7 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').directive('hintAndSolutionButtons', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},

@@ -19,7 +19,6 @@
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
@@ -32,7 +31,7 @@ require('objects/objectComponentsRequires.ts');
 require('directives/angular-html-bind.directive.ts');
 
 angular.module('oppia').directive('reviewMaterialEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},

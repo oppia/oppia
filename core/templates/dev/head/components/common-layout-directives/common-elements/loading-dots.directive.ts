@@ -16,10 +16,8 @@
  * @fileoverview Directive for displaying animated loading dots.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').directive('loadingDots', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},

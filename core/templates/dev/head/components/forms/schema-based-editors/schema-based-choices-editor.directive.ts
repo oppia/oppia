@@ -16,15 +16,12 @@
  * @fileoverview Directive for a schema-based editor for multiple choice.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedChoicesEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'UrlInterpolationService',
   function(
-      NestedDirectivesRecursionTimeoutPreventionService,
-      UrlInterpolationService) {
+      NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       restrict: 'E',
       scope: {},

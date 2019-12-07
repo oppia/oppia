@@ -20,7 +20,6 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(
@@ -29,7 +28,7 @@ require(
 require('services/editability.service.ts');
 
 angular.module('oppia').directive('stateContentEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       link: function(scope, element) {

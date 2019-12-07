@@ -50,7 +50,7 @@ require('services/exploration-html-formatter.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('stateInteractionEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       link: function(scope, element) {

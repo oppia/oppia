@@ -16,10 +16,8 @@
  * @fileoverview Directive for displaying summary rating information.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').directive('ratingDisplay', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       // This will display a star-rating based on the given data. The attributes
       // passed in are as follows:

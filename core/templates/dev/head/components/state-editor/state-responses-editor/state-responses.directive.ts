@@ -76,7 +76,7 @@ require('services/generate-content-id.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('stateResponses', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {

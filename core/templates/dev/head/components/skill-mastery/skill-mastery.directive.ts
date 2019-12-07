@@ -20,7 +20,7 @@ require('components/skills-mastery-list/skills-mastery-list.constants.ajs.ts');
 require('domain/skill/skill-mastery-backend-api.service.ts');
 
 angular.module('oppia').directive('skillMasteryViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},

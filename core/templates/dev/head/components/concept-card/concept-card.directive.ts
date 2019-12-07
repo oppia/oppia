@@ -21,7 +21,7 @@ require('domain/skill/ConceptCardObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');
 
 angular.module('oppia').directive('conceptCard', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},

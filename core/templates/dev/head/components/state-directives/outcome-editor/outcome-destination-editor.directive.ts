@@ -28,7 +28,7 @@ require('services/user.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('outcomeDestinationEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},

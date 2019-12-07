@@ -20,8 +20,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/id-generation.service.ts');
 
 angular.module('oppia').directive('audioFileUploader', [
-  'IdGenerationService', 'UrlInterpolationService',
-  function(IdGenerationService, UrlInterpolationService) {
+  'IdGenerationService',
+  function(IdGenerationService) {
     return {
       restrict: 'E',
       scope: {

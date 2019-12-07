@@ -16,10 +16,8 @@
  * @fileoverview Directive for a schema-based viewer for primitive types.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').directive('schemaBasedPrimitiveViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       scope: {
         localValue: '='

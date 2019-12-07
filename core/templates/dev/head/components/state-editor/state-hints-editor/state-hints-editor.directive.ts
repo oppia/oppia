@@ -41,7 +41,7 @@ require('services/editability.service.ts');
 require('services/generate-content-id.service.ts');
 
 angular.module('oppia').directive('stateHintsEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {

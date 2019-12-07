@@ -20,14 +20,13 @@ require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/editability.service.ts');
 
 angular.module('oppia').directive('hintEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},

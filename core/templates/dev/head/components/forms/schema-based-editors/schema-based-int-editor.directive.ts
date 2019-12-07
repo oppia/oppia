@@ -19,10 +19,8 @@
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').directive('schemaBasedIntEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
