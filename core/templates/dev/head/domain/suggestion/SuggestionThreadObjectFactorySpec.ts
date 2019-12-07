@@ -16,39 +16,25 @@
  * @fileoverview Unit tests for SuggestionThreadObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// SuggestionThreadObjectFactory.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { SuggestionThreadObjectFactory } from
+  'domain/suggestion/SuggestionThreadObjectFactory';
 
-require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 
-describe('Suggestion thread object factory', function() {
-  beforeEach(function() {
-    angular.mock.module('oppia');
+describe('Suggestion thread object factory', () => {
+  let suggestionThreadObjectFactory: SuggestionThreadObjectFactory = null;
+  let suggestionObjectFactory: SuggestionObjectFactory = null;
+
+  beforeEach(() => {
+    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
+    suggestionObjectFactory = TestBed.get(SuggestionObjectFactory);
   });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  var SuggestionThreadObjectFactory = null;
-  var suggestionObjectFactory = null;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    SuggestionThreadObjectFactory = $injector.get(
-      'SuggestionThreadObjectFactory');
-    suggestionObjectFactory = $injector.get('SuggestionObjectFactory');
-  }));
-
-  it('should create a new suggestion thread from a backend dict.', function() {
-    var suggestionThreadBackendDict = {
+  it('should create a new suggestion thread from a backend dict.', () => {
+    let suggestionThreadBackendDict = {
       last_updated: 1000,
       original_author_username: 'author',
       status: 'accepted',
@@ -59,7 +45,7 @@ describe('Suggestion thread object factory', function() {
       thread_id: 'exploration.exp1.thread1'
     };
 
-    var suggestionBackendDict = {
+    let suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
       suggestion_type: 'edit_exploration_state_content',
       target_type: 'exploration',
@@ -80,7 +66,7 @@ describe('Suggestion thread object factory', function() {
       },
       last_updated: 1000
     };
-    var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
+    let suggestionThread = suggestionThreadObjectFactory.createFromBackendDicts(
       suggestionThreadBackendDict, suggestionBackendDict);
     expect(suggestionThread.status).toEqual('accepted');
     expect(suggestionThread.subject).toEqual('sample subject');
@@ -113,7 +99,7 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
       'new suggestion content');
 
-    var messages = [{
+    let messages = [{
       text: 'message1'
     }, {
       text: 'message2'
