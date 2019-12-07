@@ -38,7 +38,6 @@ if pip2_check_required:
         import pip2 #pylint: disable=unused-variable
         pip_name = 'pip2'
     except ImportError:
-        print('Pip2 is required to install Oppia dependencies, but pip2 wasn\'t found on your local machine.')
         raise Exception
 
 # These libraries need to be installed before running or importing any script.
