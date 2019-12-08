@@ -348,10 +348,8 @@ def main(args=None):
             % common.OPPIA_TOOLS_DIR)
         if not os.path.exists(
                 os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')):
-            python_utils.PRINT('Installing coverage')
-            install_third_party_libs.pip_install(
-                'coverage', '4.5.4',
-                os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4'))
+            raise Exception('Coverage is not installed, please run the start '
+                            'script.')
 
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
