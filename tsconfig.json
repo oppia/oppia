@@ -30,9 +30,7 @@
     "core/templates/dev/head/expressions/expression-parser.service.js",
     "core/tests/karma-globals.ts"
   ],
-  "include_explanation": "The files in extensions/ckeditor_plugins are yet to be integrated into webpack (#6732).",
   "include": [
-    "extensions/ckeditor_plugins",
     "typings"
   ]
 }
