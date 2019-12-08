@@ -182,16 +182,21 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         Raises:
             MissingUserException: UserSettingsModel with GAE ID doesn't exist.
         """
-        new_ids = []
-        for gae_id in gae_ids:
-            if gae_id == feconf.SYSTEM_COMMITTER_ID:
-                new_ids.append(feconf.SYSTEM_COMMITTER_ID)
-            else:
-                user_settings_model = (
-                    user_models.UserSettingsModel.get_by_gae_id(gae_id))
-                if not user_settings_model:
+        non_admin_gae_ids = [
+            gae_id for gae_id in gae_ids
+            if gae_id != feconf.SYSTEM_COMMITTER_ID]
+        user_setting_models = user_models.UserSettingsModel.query(
+            user_models.UserSettingsModel.gae_id.IN(non_admin_gae_ids)).fetch()
+        if len(user_setting_models) != len(non_admin_gae_ids):
+            found_gae_ids = [model.gae_id for model in user_setting_models]
+            for gae_id in non_admin_gae_ids:
+                if gae_id not in found_gae_ids:
                     raise MissingUserException(gae_id)
-                new_ids.append(user_settings_model.id)
+
+        new_ids = [model.id for model in user_setting_models]
+        new_ids.extend(
+            [gae_id for gae_id in gae_ids
+             if gae_id == feconf.SYSTEM_COMMITTER_ID])
         return new_ids
 
     @staticmethod
@@ -374,7 +379,7 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(user_model):
         """Implements the map function for this job."""
         gae_id = user_model.gae_id
-        if (len(user_model.id) != 32 or
+        if (len(user_model.id) != user_models.USER_ID_LENGTH or
                 not all(c.islower() for c in user_model.id)):
             yield ('FAILURE - WRONG ID FORMAT', (gae_id, user_model.id))
         success = True
@@ -414,7 +419,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
     """
 
     @staticmethod
-    def _does_user_settings_model_exits(user_id):
+    def _does_user_settings_model_exist(user_id):
         """Check if UserSettingsModel exists for the user_id.
 
         Args:
@@ -452,7 +457,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
         """Check if UserSettingsModel exists for one field.
 
         Args:
-            model: instance. Model being checked.
+            model: BaseModel. Model being checked.
 
         Returns:
             True if UserSettingsModel with id as user ID field in model exists,
@@ -480,7 +485,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
         if (model_class.get_user_id_migration_policy() ==
                 base_models.USER_ID_MIGRATION_POLICY.COPY):
             if (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._does_user_settings_model_exits(model.id)):
+                    ._does_user_settings_model_exist(model.id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
