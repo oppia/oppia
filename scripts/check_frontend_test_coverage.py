@@ -134,23 +134,23 @@ def build_tests_fully_coverage_dict():
     """
     coverage_dict = {}
 
-    if os.path.exists(DEV_LCOV_FILE_PATH):
-        tests = get_lcov_file_tests(DEV_LCOV_FILE_PATH)
-        for lines in tests:
-            total_lines = lines[1].split(':')[1]
-            covered_lines = lines[2].split(':')[1]
-
-            if total_lines == covered_lines:
-                test_name = get_test_file_name(lines[0])
-                coverage_dict[test_name] = [
-                    int(total_lines),
-                    int(covered_lines)
-                ]
-
-        return coverage_dict
-    else:
+    if not os.path.exists(DEV_LCOV_FILE_PATH):
         raise Exception(
             'File at path {} doesn\'t exist'.format(DEV_LCOV_FILE_PATH))
+
+    tests = get_lcov_file_tests(DEV_LCOV_FILE_PATH)
+    for lines in tests:
+        total_lines = lines[1].split(':')[1]
+        covered_lines = lines[2].split(':')[1]
+
+        if total_lines == covered_lines:
+            test_name = get_test_file_name(lines[0])
+            coverage_dict[test_name] = [
+                int(total_lines),
+                int(covered_lines)
+            ]
+
+    return coverage_dict        
 
 
 def lcov_files_diff():
@@ -161,27 +161,27 @@ def lcov_files_diff():
     """
     fully_covered_tests = build_tests_fully_coverage_dict()
 
-    if os.path.exists(PR_LCOV_FILE_PATH):
-        tests = get_lcov_file_tests(PR_LCOV_FILE_PATH)
-        for lines in tests:
-            test_name = get_test_file_name(lines[0])
-
-            if test_name in fully_covered_tests:
-                total_lines = lines[1].split(':')[1]
-                covered_lines = lines[2].split(':')[1]
-
-                test = fully_covered_tests[test_name]
-                total_lines_test = test[0]
-
-                if (total_lines_test == int(total_lines)
-                        and int(total_lines) != int(covered_lines)):
-                    sys.stderr.write(
-                        'The {} file is fully covered and it has '
-                        'decreased after the changes \n'.format(test_name))
-                    sys.exit(1)
-    else:
+    if not os.path.exists(PR_LCOV_FILE_PATH):
         raise Exception('File at path {} doesn\'t exist'.format(
             PR_LCOV_FILE_PATH))
+
+    tests = get_lcov_file_tests(PR_LCOV_FILE_PATH)
+    for lines in tests:
+        test_name = get_test_file_name(lines[0])
+
+        if test_name in fully_covered_tests:
+            total_lines = lines[1].split(':')[1]
+            covered_lines = lines[2].split(':')[1]
+
+            test = fully_covered_tests[test_name]
+            total_lines_test = test[0]
+
+            if (total_lines_test == int(total_lines)
+                    and int(total_lines) != int(covered_lines)):
+                sys.stderr.write(
+                    'The {} file is fully covered and it has '
+                    'decreased after the changes \n'.format(test_name))
+                sys.exit(1)
 
 
 def main():
