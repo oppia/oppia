@@ -110,7 +110,7 @@ angular.module('oppia').factory('TopicObjectFactory', [
       }
 
       if (!this._abbreviatedName) {
-        issues.push('Abbreviated name should not be empty');
+        issues.push('Abbreviated name should not be empty.');
       }
 
       if (!this._thumbnailFilename) {
