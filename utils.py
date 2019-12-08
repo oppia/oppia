@@ -259,7 +259,7 @@ def convert_png_binary_to_data_url(content):
         content: str. PNG binary file content.
 
     Returns:
-        *. Data url created from the binary content of the PNG.
+        str. Data url created from the binary content of the PNG.
 
     Raises:
         Exception: If the given binary string is not of a PNG image.
@@ -278,7 +278,7 @@ def convert_png_to_data_url(filepath):
         filepath: str. A full path to the file.
 
     Returns:
-        *. Data url created from the filepath of the PNG.
+        str. Data url created from the filepath of the PNG.
     """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
     return convert_png_binary_to_data_url(file_contents)
@@ -405,7 +405,7 @@ def get_time_in_millisecs(datetime_obj):
         datetime_obj: datetime. An object of type datetime.datetime.
 
     Returns:
-        float. This returns the time in the milliseconds since the Epoch.
+        float. The time in milliseconds since the Epoch.
     """
     seconds = time.mktime(datetime_obj.utctimetuple()) * 1000
     return seconds + python_utils.divide(datetime_obj.microsecond, 1000.0)
@@ -415,7 +415,7 @@ def get_current_time_in_millisecs():
     """Returns time in milliseconds since the Epoch.
 
     Returns:
-        float. This returns the time in the milliseconds since the Epoch.
+        float. The time in the milliseconds since the Epoch.
     """
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
@@ -428,7 +428,7 @@ def get_human_readable_time_string(time_msec):
         time_msec: float. Time in milliseconds since the Epoch.
 
     Returns:
-        str. Returns a string representing the time.
+        str. A string representing the time.
     """
     return time.strftime(
         '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
@@ -443,8 +443,8 @@ def are_datetimes_close(later_datetime, earlier_datetime):
         earlier_datetime: datetime. The earlier datetime.
 
     Returns:
-        bool. Returns true if difference between two datetimes is less than
-            feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise returns false.
+        bool. True if difference between two datetimes is less than
+            feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise false.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
@@ -476,10 +476,10 @@ def vfs_construct_path(base_path, *path_components):
 
     Args:
         base_path: str. The initial path upon which components would be added.
-        path_components: *. Components that would be added to the path.
+        path_components: list(str). Components that would be added to the path.
 
     Returns:
-        str. Returns the path that is obtained after adding the components.
+        str. The path that is obtained after adding the components.
     """
     path = base_path
     for component in path_components:
@@ -499,7 +499,7 @@ def vfs_normpath(path):
         path: str. Path that is to be normalized.
 
     Returns:
-        str. Returns path if it is not null else returns a dot string.
+        str. Path if it is not null else a dot string.
     """
     # Preserve unicode (if path is unicode).
     slash, dot = (u'/', u'.') if isinstance(path, python_utils.UNICODE) else (
@@ -540,12 +540,12 @@ def require_valid_name(name, name_type, allow_empty=False):
         allow_empty: bool. If True, empty strings are allowed.
 
     Raises:
-        Exception: Raised when name isn't a string.
-        Exception: Raised when the length of the name_type isn't between
+        Exception: Name isn't a string.
+        Exception: The length of the name_type isn't between
             1 and 50.
-        Exception: Raised when name starts or ends with whitespace.
-        Exception: Raised when adjacent whitespace in name_type isn't collapsed.
-        Exception: Raised when invalid character is present in name.
+        Exception: Name starts or ends with whitespace.
+        Exception: Adjacent whitespace in name_type isn't collapsed.
+        Exception: Invalid character is present in name.
     """
     if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError('%s must be a string.' % name)
@@ -678,7 +678,7 @@ def unescape_encoded_uri_component(escaped_string):
         escaped_string: str. String that is encoded with encodeURIComponent.
 
     Returns:
-        str. Returns decoded string that was initially encoded with
+        str. Decoded string that was initially encoded with
             encodeURIComponent.
     """
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')
@@ -689,8 +689,8 @@ def get_asset_dir_prefix():
     It is used as a prefix in urls for images, css and script files.
 
     Returns:
-        str. Returns prefix '/build' if constants,DEV_MODE is false, otherwise
-            returns null string.
+        str. Prefix '/build' if constants,DEV_MODE is false, otherwise
+            null string.
     """
     asset_dir_prefix = ''
     if not constants.DEV_MODE:
