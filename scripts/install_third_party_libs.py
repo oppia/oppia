@@ -23,10 +23,6 @@ import os
 import shutil
 import subprocess
 
-# Checking for pip version
-# If default pip is pip2, continue
-# Else, check for different versions of pip2 explicitly
-
 EXPLICIT_CHECK_REQUIRED = False
 PIP_NAME = 'pip'
 try:
