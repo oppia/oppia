@@ -29,6 +29,7 @@ import release_constants
 
 NODE_VERSION = '10.15.3'
 YARN_VERSION = 'v1.17.3'
+COVERAGE_VERSION = '4.5.4'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())

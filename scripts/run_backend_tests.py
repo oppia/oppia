@@ -89,18 +89,9 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
-# Explicitly pass all current environment variables into subprocess.
-# Otherwise, there will be dll error for running coverage. (For Windows)
-# pylint: disable=unicode-builtin
-SUBPROCESS_ENV = {
-    k.encode('utf-8'): v.encode('utf-8') if isinstance(v, unicode) else v
-    for k, v in os.environ.items()
-}
-# pylint: enable=unicode-builtin
-
 COVERAGE_DIR = os.path.join(
-    os.getcwd(), os.pardir, 'oppia_tools', 'coverage-4.5.4')
-COVERAGE_PATH = os.path.join(COVERAGE_DIR, 'coverage')
+    os.getcwd(), os.pardir, 'oppia_tools',
+    'coverage-%s' % common.COVERAGE_VERSION)
 
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
@@ -361,7 +352,9 @@ def main(args=None):
             'Checking whether coverage is installed in %s'
             % common.OPPIA_TOOLS_DIR)
         if not os.path.exists(
-                os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')):
+                os.path.join(
+                    common.OPPIA_TOOLS_DIR,
+                    'coverage-%s' % common.COVERAGE_VERSION)):
             raise Exception('Coverage is not installed, please run the start '
                             'script.')
 
