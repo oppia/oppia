@@ -23,18 +23,40 @@ import os
 import shutil
 import subprocess
 
+# Checking for pip version
+# If default pip is pip2, continue
+# Else, first check for pip2.7 and then for pip2
+pip2_check_required = False
+pip_name = 'pip'
+try:
+    if 'python2' not in subprocess.check_output(['pip', '--version']).lower():
+        pip2_check_required = True
+except OSError:
+    pip2_check_required = True
+
+if pip2_check_required:
+    try:
+        subprocess.check_call(['pip2.7', '--version'])
+        pip_name = 'pip2.7'
+    except OSError:
+        try:
+            subprocess.check_call(['pip2', '--version'])
+            pip_name = 'pip2'
+        except OSError:
+            raise Exception
+
 # These libraries need to be installed before running or importing any script.
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 # Download and install pyyaml.
 if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
     subprocess.check_call([
-        'pip', 'install', 'pyyaml==5.1.2', '--target',
+        pip_name, 'install', 'pyyaml==5.1.2', '--target',
         os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
 # Download and install future.
 if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
     subprocess.check_call([
-        'pip', 'install', 'future==0.17.1', '--target',
+        pip_name, 'install', 'future==0.17.1', '--target',
         os.path.join('third_party', 'future-0.17.1')])
 
 # pylint: disable=wrong-import-position
@@ -123,7 +145,7 @@ def pip_install(package, version, install_path):
         raise Exception
 
     subprocess.check_call([
-        'pip', 'install', '%s==%s' % (package, version), '--target',
+        pip_name, 'install', '%s==%s' % (package, version), '--target',
         install_path])
 
 
