@@ -17,12 +17,26 @@
  * args for theinteraction. This is a dict mapping customization arg names
  * to dicts of the form {value: customization_arg_value}.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
+import { AlertsService } from 'services/alerts.service';
+import { StatePropertyService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-property.service';
+import { UtilsService } from 'services/utils.service';
+
+@Injectable({
+  providedIn: 'root'
+})
 // TODO(sll): Add validation.
-angular.module('oppia').factory('StateCustomizationArgsService', [
-  'StatePropertyService', function(StatePropertyService) {
-    var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveInteractionCustomizationArgs';
-    return child;
+export class StateCustomizationArgsService extends StatePropertyService {
+  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+    super(alertsService, utilsService);
+    this.setterMethodKey = 'saveInteractionCustomizationArgs';
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'StateCustomizationArgsService', downgradeInjectable(
+    StateCustomizationArgsService));
