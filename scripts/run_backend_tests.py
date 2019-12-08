@@ -57,7 +57,6 @@ import time
 import python_utils
 
 from . import common
-from . import install_third_party_libs
 from . import setup
 from . import setup_gae
 
