@@ -90,8 +90,19 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
-COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage')
+# Explicitly pass all current environment variables into subprocess.
+# Otherwise, there will be dll error for running coverage. (For Windows)
+# pylint: disable=unicode-builtin
+SUBPROCESS_ENV = {
+    k.encode('utf-8'): v.encode('utf-8') if isinstance(v, unicode) else v
+    for k, v in os.environ.items()
+}
+# pylint: enable=unicode-builtin
+
+COVERAGE_DIR = os.path.join(
+    os.getcwd(), os.pardir, 'oppia_tools', 'coverage-4.5.4')
+COVERAGE_PATH = os.path.join(COVERAGE_DIR, 'coverage')
+
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -214,7 +225,7 @@ class TestingTaskSpec(python_utils.OBJECT):
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
+                'python', '-m', 'coverage', 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
         else:
             exc_list = ['python', TEST_RUNNER_PATH, test_target_flag]
@@ -337,7 +348,11 @@ def main(args=None):
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
-        sys.path.insert(0, directory)
+
+        # The directories should only be inserted starting at index 1. See
+        # https://stackoverflow.com/a/10095099 and
+        # https://stackoverflow.com/q/10095037 for more details.
+        sys.path.insert(1, directory)
 
     import dev_appserver
     dev_appserver.fix_sys_path()
@@ -350,6 +365,12 @@ def main(args=None):
                 os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')):
             raise Exception('Coverage is not installed, please run the start '
                             'script.')
+
+        pythonpath = [COVERAGE_DIR]
+        if os.environ.get('PYTHONPATH'):
+            pythonpath.append(os.environ.get('PYTHONPATH'))
+
+        os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath)
 
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
@@ -491,14 +512,23 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call(['python', COVERAGE_PATH, 'combine'])
-        subprocess.check_call([
-            'python', COVERAGE_PATH, 'report',
-            '--omit="%s*","third_party/*","/usr/share/*"'
-            % common.OPPIA_TOOLS_DIR, '--show-missing'])
+        subprocess.check_call(['python', '-m', 'coverage', 'combine'])
+        process = subprocess.Popen(
+            ['python', '-m', 'coverage', 'report',
+             '--omit="%s*","third_party/*","/usr/share/*"'
+             % common.OPPIA_TOOLS_DIR, '--show-missing'],
+            stdout=subprocess.PIPE)
+
+        report_stdout, _ = process.communicate()
+        python_utils.PRINT(report_stdout)
 
         python_utils.PRINT('Generating xml coverage report...')
-        subprocess.check_call(['python', COVERAGE_PATH, 'xml'])
+        subprocess.check_call(['python', '-m', 'coverage', 'xml'])
+
+        coverage_result = re.search(
+            r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
+        if coverage_result.group('total') != '100':
+            raise Exception('Backend test coverage is not 100%')
 
     python_utils.PRINT('')
     python_utils.PRINT('Done!')
