@@ -2,6 +2,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import atexit
 import fileinput
 import os
 import sys
@@ -35,13 +36,13 @@ class RunE2ETestsTests(test_utils.TestBase):
             self.print_arr.append(msg)
 
         def mock_run_cmd(unused_commands):
-            mock_run_cmd.called = True
+            pass
 
         def mock_build_main(args):
-            mock_build_main.called = True
+            pass
 
         def mock_remove(unused_path):
-            mock_remove.called = True
+            pass
 
 
         self.mock_run_cmd = mock_run_cmd
@@ -51,13 +52,16 @@ class RunE2ETestsTests(test_utils.TestBase):
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
         self.mock_node_bin_path = 'node'
-        self.node_bin_path_swap = self.swap(common, 'NODE_BIN_PATH', self.mock_node_bin_path)
+        self.node_bin_path_swap = self.swap(
+            common, 'NODE_BIN_PATH', self.mock_node_bin_path)
 
         self.mock_webpack_bin_path = 'webpack'
-        self.webpack_bin_path_swap = self.swap(run_e2e_tests, 'WEBPACK_BIN_PATH', self.mock_webpack_bin_path)
+        self.webpack_bin_path_swap = self.swap(
+            run_e2e_tests, 'WEBPACK_BIN_PATH', self.mock_webpack_bin_path)
 
         self.mock_constant_file_path = 'constant.ts'
-        self.constant_file_path_swap = self.swap(run_e2e_tests, 'CONSTANT_FILE_PATH', self.mock_constant_file_path)
+        self.constant_file_path_swap = self.swap(
+            run_e2e_tests, 'CONSTANT_FILE_PATH', self.mock_constant_file_path)
 
     def test_check_screenhost_when_not_exist(self):
         def mock_isdir(path):
@@ -336,7 +340,7 @@ of the failed tests in ../protractor-screenshots/
     def test_build_js_files_in_dev_mode(self):
 
         def mock_tweak_constant_file(unused_filename, unused_dev_mode):
-            mock_tweak_constant_file.called = True
+            pass
 
         expected_commands = [
             self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
@@ -345,15 +349,15 @@ of the failed tests in ../protractor-screenshots/
 
         tweak_constant_file_swap = self.swap_with_checks(
             run_e2e_tests, 'tweak_constant_file', mock_tweak_constant_file,
-            expected_args=[self.mock_constant_file_path, True])
+            expected_args=(self.mock_constant_file_path, True))
         run_cmd_swap = self.swap_with_checks(
             common, 'run_cmd', self.mock_run_cmd,
-            expected_args=[expected_commands])
+            expected_args=(expected_commands,))
         build_main_swap = self.swap_with_checks(
             build, 'main', self.mock_build_main, expected_kwargs={'args': []})
         remove_swap = self.swap_with_checks(
             os, 'remove', self.mock_remove,
-            expected_args=['%s.bak' % self.mock_constant_file_path])
+            expected_args=('%s.bak' % self.mock_constant_file_path,))
         with self.print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with tweak_constant_file_swap, run_cmd_swap, build_main_swap:
@@ -363,11 +367,11 @@ of the failed tests in ../protractor-screenshots/
     def test_build_js_files_in_prod_mode(self):
 
         def mock_tweak_constant_file(unused_filename, unused_dev_mode):
-            mock_tweak_constant_file.called = True
+            pass
 
         tweak_constant_file_swap = self.swap_with_checks(
             run_e2e_tests, 'tweak_constant_file', mock_tweak_constant_file,
-            expected_args=[self.mock_constant_file_path, False])
+            expected_args=(self.mock_constant_file_path, False))
 
         run_cmd_swap = self.swap_with_checks(
             common, 'run_cmd', self.mock_run_cmd, called=False)
@@ -378,7 +382,7 @@ of the failed tests in ../protractor-screenshots/
 
         remove_swap = self.swap_with_checks(
             os, 'remove', self.mock_remove,
-            expected_args=['%s.bak' % self.mock_constant_file_path])
+            expected_args=('%s.bak' % self.mock_constant_file_path,))
 
         with self.print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
@@ -395,7 +399,6 @@ of the failed tests in ../protractor-screenshots/
         inplace_replace_swap = self.swap(
             common, 'inplace_replace_file', mock_inplace_replace)
         def mock_is_x64():
-            mock_is_x64.called = True
             return True
         mock_regex = 'regex_pattern'
         architecture_swap = self.swap_with_checks(
@@ -421,7 +424,6 @@ of the failed tests in ../protractor-screenshots/
         inplace_replace_swap = self.swap(
             common, 'inplace_replace_file', mock_inplace_replace)
         def mock_is_x64():
-            mock_is_x64.called = True
             return False
         mock_regex = 'regex_pattern'
         architecture_swap = self.swap_with_checks(
@@ -437,3 +439,274 @@ of the failed tests in ../protractor-screenshots/
             [run_e2e_tests.GECKO_PROVIDER_FILE_PATH, mock_regex,
              expected_replace]], replace_args)
         self.assertEqual(mock_inplace_replace.called, 2)
+
+    def test_undo_webdriver_tweak(self):
+        files_to_check = [
+            run_e2e_tests.CHROME_PROVIDER_BAK_FILE_PATH,
+            run_e2e_tests.GECKO_PROVIDER_BAK_FILE_PATH]
+
+        files_to_remove = [
+            run_e2e_tests.CHROME_PROVIDER_FILE_PATH,
+            run_e2e_tests.GECKO_PROVIDER_FILE_PATH
+        ]
+        files_to_rename = files_to_check[:]
+
+        def mock_isfile(path):
+            self.assertIn(path, files_to_check)
+            files_to_check.remove(path)
+            return True
+
+        def mock_rename(origin, new):
+            self.assertIn(origin, files_to_rename)
+            self.assertEqual(origin, '%s.bak' % new)
+            files_to_rename.remove(origin)
+
+        def mock_remove(path):
+            self.assertIn(path, files_to_remove)
+            files_to_remove.remove(path)
+
+        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
+        rename_swap = self.swap(os, 'rename', mock_rename)
+        remove_swap = self.swap(os, 'remove', mock_remove)
+        with isfile_swap, rename_swap, remove_swap:
+            run_e2e_tests.undo_webdriver_tweak()
+        self.assertEqual(files_to_check, [])
+        self.assertEqual(files_to_remove, [])
+        self.assertEqual(files_to_rename, [])
+
+    def test_start_webdriver_manager_on_windows(self):
+        def mock_tweak_webdriver():
+            return
+
+        def mock_undo_tweak():
+            return
+
+        def mock_run_webdriver_manager(unused_commands):
+            return
+
+        def mock_is_windows():
+            return True
+        tweak_swap = self.swap_with_checks(
+            run_e2e_tests, 'tweak_webdriver_manager', mock_tweak_webdriver)
+        undo_swap = self.swap_with_checks(
+            run_e2e_tests, 'undo_webdriver_tweak', mock_undo_tweak)
+
+        expected_commands = [
+            (['update', '--versions.chrome',
+              run_e2e_tests.CHROME_DRIVER_VERSION],),
+            (['start', '--versions.chrome',
+              run_e2e_tests.CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
+        ]
+
+        run_swap = self.swap_with_checks(
+            run_e2e_tests, 'run_webdriver_manager', mock_run_webdriver_manager,
+            expected_args=expected_commands, called_times=2)
+
+        is_windows_swap = self.swap_with_checks(
+            common, 'is_windows_os', mock_is_windows)
+        with tweak_swap, undo_swap, run_swap, is_windows_swap:
+            run_e2e_tests.start_webdriver_manager()
+        self.assertEqual(expected_commands, [])
+
+    def test_start_webdriver_manager_on_machine_other_than_windows(self):
+        def mock_tweak_webdriver():
+            return
+
+        def mock_undo_tweak():
+            return
+
+        def mock_run_webdriver_manager(unused_commands):
+            return
+
+        def mock_is_windows():
+            return False
+        tweak_swap = self.swap_with_checks(
+            run_e2e_tests, 'tweak_webdriver_manager', mock_tweak_webdriver,
+            called=False)
+        undo_swap = self.swap_with_checks(
+            run_e2e_tests, 'undo_webdriver_tweak', mock_undo_tweak,
+            called=False)
+
+        expected_commands = [
+            (['update', '--versions.chrome',
+              run_e2e_tests.CHROME_DRIVER_VERSION],),
+            (['start', '--versions.chrome',
+              run_e2e_tests.CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
+        ]
+
+        run_swap = self.swap_with_checks(
+            run_e2e_tests, 'run_webdriver_manager', mock_run_webdriver_manager,
+            expected_args=expected_commands, called_times=2)
+
+        is_windows_swap = self.swap_with_checks(
+            common, 'is_windows_os', mock_is_windows)
+        with tweak_swap, undo_swap, run_swap, is_windows_swap:
+            run_e2e_tests.start_webdriver_manager()
+        self.assertEqual(expected_commands, [])
+
+    def test_get_parameter_for_config_file_with_browserstack(self):
+        result = run_e2e_tests.get_parameter_for_config_file(True)
+        self.assertEqual(run_e2e_tests.BROWSER_STACK_CONFIG_FILE, result)
+
+    def test_get_parameter_for_config_file_without_browserstack(self):
+        result = run_e2e_tests.get_parameter_for_config_file(False)
+        self.assertEqual(run_e2e_tests.PROTRACTOR_CONFIG_FILE, result)
+
+    def test_get_parameter_for_one_sharding_instance(self):
+        result = run_e2e_tests.get_parameter_for_sharding(True, '1')
+        self.assertEqual([], result)
+
+    def test_get_parameter_for_three_sharding_instances(self):
+        result = run_e2e_tests.get_parameter_for_sharding(True, '3')
+        self.assertEqual(
+            ['--capabilities.shardTestFiles=True',
+             '--capabilities.maxInstances=3'], result)
+
+    def test_get_parameter_for_dev_mode(self):
+        result = run_e2e_tests.get_parameter_for_dev_mode(True)
+        self.assertEqual(result, '--params.devMode=True')
+
+    def test_get_parameter_for_prod_mode(self):
+        result = run_e2e_tests.get_parameter_for_dev_mode(False)
+        self.assertEqual(result, '--params.devMode=False')
+
+    def test_get_parameter_for_suite(self):
+        result = run_e2e_tests.get_parameter_for_suite('Full')
+        self.assertEqual(result, ['--suite', 'Full'])
+
+    def test_get_e2e_test_parameters(self):
+        result = run_e2e_tests.get_e2e_test_parameters(
+            True, True, 3, 'Full', False)
+        self.assertEqual(result, [
+            run_e2e_tests.BROWSER_STACK_CONFIG_FILE,
+            '--capabilities.shardTestFiles=True',
+            '--capabilities.maxInstances=3',
+            '--suite', 'Full', '--params.devMode=False'
+        ])
+
+    def test_start_google_engine_in_dev_mode(self):
+        def mock_popen(args, shell):
+            return
+        expected_command = (
+            'python %s/dev_appserver.py  --host 0.0.0.0 --port %s '
+            '--clear_datastore=yes --dev_appserver_log_level=critical '
+            '--log_level=critical --skip_sdk_update_check=true %s' % (
+                common.GOOGLE_APP_ENGINE_HOME,
+                run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
+                'app_dev.yaml'))
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen, expected_args=(expected_command,),
+            expected_kwargs={'shell': True})
+        with popen_swap:
+            run_e2e_tests.start_google_engine(True)
+
+    def test_start_google_engine_in_prod_mode(self):
+        def mock_popen(args, shell):
+            return
+        expected_command = (
+            'python %s/dev_appserver.py  --host 0.0.0.0 --port %s '
+            '--clear_datastore=yes --dev_appserver_log_level=critical '
+            '--log_level=critical --skip_sdk_update_check=true %s' % (
+                common.GOOGLE_APP_ENGINE_HOME,
+                run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
+                'app.yaml'))
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen, expected_args=(expected_command,),
+            expected_kwargs={'shell': True})
+        with popen_swap:
+            run_e2e_tests.start_google_engine(False)
+
+    def test_start_tests_when_other_instances_not_stopped(self):
+        def mock_exit(unused_exit_code):
+            raise Exception('sys.exit(1)')
+        def mock_check_running_instance(*args):
+            return True
+
+        check_swap = self.swap_with_checks(
+            run_e2e_tests, 'check_running_instance',
+            mock_check_running_instance,
+            expected_args=(8181, 9001))
+        exit_swap = self.swap(sys, 'exit', mock_exit)
+        with check_swap, exit_swap:
+            with self.assertRaisesRegexp(Exception, r'sys\.exit\(1\)'):
+                run_e2e_tests.main(args=[])
+
+    def test_start_tests_when_no_other_instance_running(self):
+
+        def mock_check_running_instance(*unused_args):
+            return False
+
+        def mock_setup_and_install_dependencies():
+            return
+
+        def mock_register(unused_func):
+            return
+
+        def mock_cleanup():
+            return
+
+        def mock_build_js_files(unused_arg):
+            return
+
+        def mock_start_webdriver_manager():
+            return
+
+        def mock_start_google_engine(unused_arg):
+            return
+
+        def mock_wait_for_port(unused_port):
+            return
+
+        def mock_check_screenshot():
+            return
+
+        def mock_get_e2e_test_parameters(
+                unused_browser_stack, unused_sharding,
+                unused_sharding_instances,unused_suite, unused_dev_mode):
+            return ['commands']
+
+        def mock_run_cmd(unused_commands):
+            return
+
+        check_swap = self.swap_with_checks(
+            run_e2e_tests, 'check_running_instance',
+            mock_check_running_instance,
+            expected_args=(8181, 9001))
+
+        setup_and_install_swap = self.swap_with_checks(
+            run_e2e_tests, 'setup_and_install_dependencies',
+            mock_setup_and_install_dependencies)
+
+        register_swap = self.swap_with_checks(
+            atexit, 'register', mock_register, expected_args=(mock_cleanup,))
+
+        cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
+        build_swap = self.swap_with_checks(
+            run_e2e_tests, 'build_js_files', mock_build_js_files,
+            expected_args=(True,))
+        start_webdriver_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_webdriver_manager',
+            mock_start_webdriver_manager)
+        start_google_engine_swap = self.swap_with_checks(
+            run_e2e_tests, 'start_google_engine', mock_start_google_engine,
+            expected_args=(True,))
+        wait_swap = self.swap_with_checks(
+            run_e2e_tests, 'wait_for_port', mock_wait_for_port,
+            expected_args=[
+                (run_e2e_tests.WEB_DRIVER_PORT,),
+                (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)], called_times=2)
+        check_screenshot_swap = self.swap_with_checks(
+            run_e2e_tests, 'check_screenshot', mock_check_screenshot)
+        get_parameters_swap = self.swap_with_checks(
+            run_e2e_tests, 'get_e2e_test_parameters',
+            mock_get_e2e_test_parameters, expected_args=(
+                False, True, '3', 'full', True))
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd, expected_args=([
+                common.NODE_BIN_PATH, run_e2e_tests.PROTRACTOR_BIN_PATH,
+                'commands'],))
+        with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
+            with build_swap, start_webdriver_swap, start_google_engine_swap:
+                with wait_swap, check_screenshot_swap, get_parameters_swap:
+                    with run_cmd_swap:
+                        run_e2e_tests.main(args=[])

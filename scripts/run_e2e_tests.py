@@ -36,6 +36,7 @@ CHROME_DRIVER_VERSION = '2.41'
 
 WEB_DRIVER_PORT = 4444
 GOOGLE_APP_ENGINE_PORT = 9001
+OPPIA_SERVER_PORT = 8181
 PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
 GECKO_PROVIDER_FILE_PATH = os.path.join(
@@ -59,7 +60,10 @@ WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
     'webdriver-manager')
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
-PATTERN_FOR_REPLACE_WEBDRIVER_CODE =  r'this\.osArch = os\.arch\(\);'
+PATTERN_FOR_REPLACE_WEBDRIVER_CODE = r'this\.osArch = os\.arch\(\);'
+PROTRACTOR_CONFIG_FILE = os.path.join('core', 'tests', 'protractor.conf.js')
+BROWSER_STACK_CONFIG_FILE = os.path.join(
+    'core', 'tests', 'protractor-browserstack.conf.js')
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -255,8 +259,11 @@ def tweak_webdriver_manager():
     regex_pattern = PATTERN_FOR_REPLACE_WEBDRIVER_CODE
     arch = 'x64' if common.is_x64_architecture() else 'x86'
     replace = 'this.osArch = "%s";' % arch
-    common.inplace_replace_file(CHROME_PROVIDER_FILE_PATH, regex_pattern, replace)
-    common.inplace_replace_file(GECKO_PROVIDER_FILE_PATH, regex_pattern, replace)
+    common.inplace_replace_file(
+        CHROME_PROVIDER_FILE_PATH, regex_pattern, replace)
+    common.inplace_replace_file(
+        GECKO_PROVIDER_FILE_PATH, regex_pattern, replace)
+
 
 def undo_webdriver_tweak():
     """Undo the tweak on webdriver manager's source code."""
@@ -283,9 +290,31 @@ def start_webdriver_manager():
         undo_webdriver_tweak()
 
 
-def run_e2e_tests(
+def get_parameter_for_config_file(run_on_browserstack):
+    if not run_on_browserstack:
+        return PROTRACTOR_CONFIG_FILE
+    else:
+        python_utils.PRINT('Running the tests on browsertack...')
+        return BROWSER_STACK_CONFIG_FILE
+
+def get_parameter_for_sharding(sharding, sharding_instances):
+    if not sharding or sharding_instances == '1':
+        return []
+    else:
+        return ['--capabilities.shardTestFiles=%s' % sharding,
+                '--capabilities.maxInstances=%s' % sharding_instances]
+
+
+def get_parameter_for_dev_mode(dev_mode):
+    return '--params.devMode=%s' % dev_mode
+
+
+def get_parameter_for_suite(suite):
+    return ['--suite', suite]
+
+def get_e2e_test_parameters(
         run_on_browserstack, sharding, sharding_instances, suite, dev_mode):
-    """Start the end-2-end tests.
+    """Return parameters for the end-2-end tests.
 
     Args:
         run_on_browserstack: boolean. Represents whether the tests should run
@@ -296,23 +325,21 @@ def run_e2e_tests(
         suite: str. Performs test for different suites.
         dev_mode: boolean. Represents whether run the related commands in dev
             mode.
+    Returns:
+        list[str] Parameters for running the tests.
     """
-    if not run_on_browserstack:
-        config_file = os.path.join('core', 'tests', 'protractor.conf.js')
-    else:
-        python_utils.PRINT('Running the tests on browsertack...')
-        config_file = os.path.join(
-            'core', 'tests', 'protractor-browserstack.conf.js')
-    if not sharding or sharding_instances == '1':
-        common.run_cmd(
-            [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file, '--suite',
-             suite, '--params.devMode=%s' % dev_mode])
-    else:
-        common.run_cmd(
-            [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH, config_file,
-             '--capabilities.shardTestFiles=%s' % sharding,
-             '--capabilities.maxInstances=%s' % sharding_instances,
-             '--suite', suite, '--params.devMode="%s"' % dev_mode])
+    config_file = get_parameter_for_config_file(run_on_browserstack)
+    sharding_parameters = get_parameter_for_sharding(
+        sharding, sharding_instances)
+    dev_mode_parameters = get_parameter_for_dev_mode(dev_mode)
+    suite_parameter = get_parameter_for_suite(suite)
+
+    commands = [config_file]
+    commands.extend(sharding_parameters)
+    commands.extend(suite_parameter)
+    commands.append(dev_mode_parameters)
+
+    return commands
 
 
 def start_google_engine(dev_mode):
@@ -336,8 +363,9 @@ def main(args=None):
     """Run the scripts to start end-to-end tests."""
 
     parsed_args = _PARSER.parse_args(args=args)
+    other_instance_running = check_running_instance(
+        OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT)
 
-    other_instance_running = check_running_instance(8181, 9001)
     if other_instance_running:
         sys.exit(1)
     setup_and_install_dependencies()
@@ -355,9 +383,13 @@ def main(args=None):
     wait_for_port(WEB_DRIVER_PORT)
     wait_for_port(GOOGLE_APP_ENGINE_PORT)
     check_screenshot()
-    run_e2e_tests(
+    commands = [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH]
+    commands.extend(get_e2e_test_parameters(
         run_on_browserstack, parsed_args.sharding,
-        parsed_args.sharding_instances, parsed_args.suite, dev_mode)
+        parsed_args.sharding_instances, parsed_args.suite, dev_mode))
+
+    result = common.run_cmd(commands)
+    python_utils.PRINT(result)
 
 
 if __name__ == '__main__':
