@@ -100,6 +100,7 @@ ALL_ERRORS = []
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
+MAX_CONCURRENT_RUNS = 24
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -249,6 +250,11 @@ def _check_all_tasks(tasks):
 def _execute_tasks(tasks, semaphore):
     """Starts all tasks and checks the results.
     Runs no more than the allowable limit defined in the semaphore.
+
+    Args:
+        tasks: list(TestingTaskSpec). The tasks to run.
+        semaphore: threading.Semaphore. The object that controls how many tasks
+            can run at any time.
     """
     remaining_tasks = [] + tasks
     currently_running_tasks = []
@@ -384,7 +390,7 @@ def main(args=None):
             include_load_tests=include_load_tests)
 
     # Prepare tasks.
-    concurrent_count = min(multiprocessing.cpu_count(), 24)
+    concurrent_count = min(multiprocessing.cpu_count(), MAX_CONCURRENT_RUNS)
     semaphore = threading.Semaphore(concurrent_count)
 
     task_to_taskspec = {}
