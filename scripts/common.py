@@ -24,12 +24,14 @@ import platform
 import re
 import socket
 import subprocess
+import sys
 
 import python_utils
 import release_constants
 
 NODE_VERSION = '10.15.3'
 YARN_VERSION = 'v1.17.3'
+PSUTIL_VERSION = '5.6.7'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
@@ -45,6 +47,7 @@ FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
+PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
 
 
 def is_windows_os():
@@ -419,18 +422,21 @@ def check_prs_for_current_release_are_released(repo):
                 'released before release summary generation.')
 
 
-def kill_processes_based_on_regex(regex):
+def kill_processes_based_on_regex(pattern):
     """Kill processes based on provided regex.
 
     Args:
-        regex: _sre.SRE_Pattern. Regex pattern for searching processes.
+        pattern: str. Pattern for searching processes.
     """
+    regex = re.compile(pattern)
+    if PSUTIL_DIR not in sys.path:
+        sys.path.insert(1, PSUTIL_DIR)
     import psutil
     for process in psutil.process_iter():
         try:
             cmdline = ' '.join(process.cmdline())
             if regex.match(cmdline) and process.is_running():
-                python_utils.PRINT("Killing %s ..." % cmdline)
+                python_utils.PRINT('Killing %s ...' % cmdline)
                 process.kill()
         except psutil.AccessDenied:
             continue

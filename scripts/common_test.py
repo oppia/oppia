@@ -19,9 +19,11 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
+import fileinput
 import getpass
 import http.server
 import os
+import psutil
 import shutil
 import socketserver
 import stat
@@ -42,6 +44,25 @@ sys.path.insert(0, _PY_GITHUB_PATH)
 # pylint: disable=wrong-import-position
 import github # isort:skip
 # pylint: enable=wrong-import-position
+
+
+class MockPsutilProcess(python_utils.OBJECT):
+    cmdlines = [
+        ['dev_appserver.py', '--host', '0.0.0.0', '--port', '9001'],
+        ['downloads']
+    ]
+
+    def __init__(self, index):
+        self.index = index
+
+    def cmdline(self):
+        pass
+
+    def kill(self):
+        pass
+
+    def is_running(self):
+        return True
 
 
 class CommonTests(test_utils.GenericTestBase):
@@ -556,3 +577,76 @@ class CommonTests(test_utils.GenericTestBase):
                     'generation.') % (
                         release_constants.LABEL_FOR_RELEASED_PRS)):
                 common.check_prs_for_current_release_are_released(mock_repo)
+
+    def test_kill_processes_based_on_regex(self):
+        killed = []
+
+        def mock_kill(p):
+            killed.append(MockPsutilProcess.cmdlines[p.index])
+
+        def mock_cmdlines(p):
+            return MockPsutilProcess.cmdlines[p.index]
+
+        def mock_process_iter():
+            return [MockPsutilProcess(0), MockPsutilProcess(1)]
+
+        process_iter_swap = self.swap_with_checks(
+            psutil, 'process_iter', mock_process_iter)
+        kill_swap = self.swap(MockPsutilProcess, 'kill', mock_kill)
+        cmdlines_swap = self.swap(MockPsutilProcess, 'cmdline', mock_cmdlines)
+        with process_iter_swap, kill_swap, cmdlines_swap:
+            common.kill_processes_based_on_regex(r'.*dev_appserver\.py')
+        self.assertEqual(killed, [MockPsutilProcess.cmdlines[0]])
+
+    def test_kill_processes_based_on_regex_when_access_denied(self):
+        killed = []
+
+        def mock_kill(p):
+            killed.append(MockPsutilProcess.cmdlines[p.index])
+
+        def mock_cmdlines(p):
+            if p.index == 0:
+                raise psutil.AccessDenied()
+            return MockPsutilProcess.cmdlines[p.index]
+
+        def mock_process_iter():
+            return [MockPsutilProcess(0), MockPsutilProcess(1)]
+
+        process_iter_swap = self.swap_with_checks(
+            psutil, 'process_iter', mock_process_iter)
+        kill_swap = self.swap(MockPsutilProcess, 'kill', mock_kill)
+        cmdlines_swap = self.swap(MockPsutilProcess, 'cmdline', mock_cmdlines)
+        with process_iter_swap, kill_swap, cmdlines_swap:
+            common.kill_processes_based_on_regex(r'.*dev_appserver\.py')
+        self.assertEqual(killed, [])
+
+    def test_inplace_replace_file(self):
+        constant_file = 'constant.js'
+        origin_lines = [
+            '"RANDMON1" : "randomValue1"\n',
+            '"312RANDOM" : "ValueRanDom2"\n',
+            '"DEV_MODE": false\n',
+            '"RAN213DOM" : "raNdoVaLue3"\n'
+        ]
+        expected_lines = [line.replace('\n', '') for line in origin_lines]
+        expected_lines[2] = '"DEV_MODE": true'
+        # pylint: disable=unused-argument
+        def mock_input(files, inplace, backup):
+            return origin_lines
+        # pylint: enable=unused-argument
+        def mock_print(unused_output):
+            return
+
+        input_swap = self.swap_with_checks(
+            fileinput, 'input', mock_input,
+            expected_kwargs={
+                'files': [constant_file],
+                'inplace': True,
+                'backup': '.bak'})
+
+        print_swap = self.swap_with_checks(
+            python_utils, 'PRINT', mock_print,
+            expected_args=[(line,) for line in expected_lines], called_times=4)
+        with print_swap, input_swap:
+            common.inplace_replace_file(
+                constant_file, '"DEV_MODE": .*', '"DEV_MODE": true')
