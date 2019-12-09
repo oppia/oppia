@@ -626,7 +626,8 @@ class CommonTests(test_utils.GenericTestBase):
             '"RANDMON1" : "randomValue1"\n',
             '"312RANDOM" : "ValueRanDom2"\n',
             '"DEV_MODE": false\n',
-            '"RAN213DOM" : "raNdoVaLue3"\n'
+            '"RAN213DOM" : "raNdoVaLue3"\n',
+            '"一些中文" : "한국어"\n'
         ]
         expected_lines = [line.replace('\n', '') for line in origin_lines]
         expected_lines[2] = '"DEV_MODE": true'
@@ -646,7 +647,7 @@ class CommonTests(test_utils.GenericTestBase):
 
         print_swap = self.swap_with_checks(
             python_utils, 'PRINT', mock_print,
-            expected_args=[(line,) for line in expected_lines], called_times=4)
+            expected_args=[(line,) for line in expected_lines], called_times=5)
         with print_swap, input_swap:
             common.inplace_replace_file(
                 constant_file, '"DEV_MODE": .*', '"DEV_MODE": true')

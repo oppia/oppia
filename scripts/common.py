@@ -453,7 +453,7 @@ def inplace_replace_file(filename, regex_pattern, replace):
     regex = re.compile(regex_pattern)
     for line in fileinput.input(
             files=[filename], inplace=True, backup='.bak'):
-        line = line.replace('\n', '')
+        line = line.rstrip()
         line = regex.sub(replace, line)
         python_utils.PRINT(line)
 
