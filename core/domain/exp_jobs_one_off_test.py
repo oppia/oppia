@@ -1269,7 +1269,9 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state1.update_interaction_customization_args(customization_args_dict1)
+        answer_group_list1 = [state_domain.AnswerGroup.from_dict(answer_group_obj) for answer_group_obj in answer_group_list1]
         state1.update_interaction_answer_groups(answer_group_list1)
+        #state1.update_interaction_answer_groups(answer_group_list1)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
@@ -1317,8 +1319,9 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state2.update_interaction_customization_args(customization_args_dict2)
+        answer_group_list2 = [state_domain.AnswerGroup.from_dict(answer_group_obj) for answer_group_obj in answer_group_list2]
         state2.update_interaction_answer_groups(answer_group_list2)
-
+        #state2.update_interaction_answer_groups(answer_group_list2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
@@ -1382,7 +1385,9 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         }]
 
         state1.update_interaction_customization_args(customization_args_dict)
+        answer_group_list = [state_domain.AnswerGroup.from_dict(answer_group_obj) for answer_group_obj in answer_group_list]
         state1.update_interaction_answer_groups(answer_group_list)
+        #state1.update_interaction_answer_groups(answer_group_list)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 

@@ -1633,8 +1633,8 @@ class State(python_utils.OBJECT):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
 
         Args:
-            answer_groups_list: list(dict). List of dicts that represent
-                AnswerGroup domain object.
+            answer_groups_list: list(AnswerGroup). List of AnswerGroup domain 
+                object.
         """
         if not isinstance(answer_groups_list, list):
             raise Exception(
@@ -1648,11 +1648,8 @@ class State(python_utils.OBJECT):
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
         for answer_group_dict in answer_groups_list:
+            answer_group_dict = answer_group_dict.to_dict()
             rule_specs_list = answer_group_dict['rule_specs']
-            if not isinstance(rule_specs_list, list):
-                raise Exception(
-                    'Expected answer group rule specs to be a list, '
-                    'received %s' % rule_specs_list)
 
             answer_group = AnswerGroup(
                 Outcome.from_dict(answer_group_dict['outcome']), [],
