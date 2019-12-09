@@ -17,7 +17,6 @@
  */
 
 require('domain/skill/concept-card-backend-api.service.ts');
-require('domain/skill/ConceptCardObjectFactory.ts');
 require('filters/format-rte-preview.filter.ts');
 
 angular.module('oppia').directive('conceptCard', [
@@ -34,10 +33,10 @@ angular.module('oppia').directive('conceptCard', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$rootScope',
-        'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+        'ConceptCardBackendApiService',
         function(
-            $scope, $filter, $rootScope,
-            ConceptCardBackendApiService, ConceptCardObjectFactory) {
+            $scope, $filter, $rootScope, ConceptCardBackendApiService
+          ) {
           var ctrl = this;
           ctrl.conceptCards = [];
           var currentConceptCard = null;
@@ -46,12 +45,8 @@ angular.module('oppia').directive('conceptCard', [
 
           ConceptCardBackendApiService.loadConceptCards(
             ctrl.getSkillIds()
-          ).then(function(conceptCardBackendDicts) {
-            conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
-              ctrl.conceptCards.push(
-                ConceptCardObjectFactory.createFromBackendDict(
-                  conceptCardBackendDict));
-            });
+          ).then(function(conceptCardObjects) {
+            ctrl.conceptCards = conceptCardObjects;
             ctrl.loadingMessage = '';
             currentConceptCard = ctrl.conceptCards[ctrl.index];
           });

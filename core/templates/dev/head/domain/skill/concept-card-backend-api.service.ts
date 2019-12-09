@@ -19,12 +19,16 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/skill/skill-domain.constants.ajs.ts');
+require('domain/skill/ConceptCardObjectFactory.ts');
 
 angular.module('oppia').factory('ConceptCardBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'CONCEPT_CARD_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, CONCEPT_CARD_DATA_URL_TEMPLATE) {
+  '$http', '$q', 'ConceptCardObjectFactory', 'UrlInterpolationService',
+  'CONCEPT_CARD_DATA_URL_TEMPLATE',
+  function($http, $q, ConceptCardObjectFactory, UrlInterpolationService,
+    CONCEPT_CARD_DATA_URL_TEMPLATE) {
     // Maps previously loaded concept cards to their IDs.
     var _conceptCardCache = [];
+    var conceptCardObject = null;
 
     var _fetchConceptCards = function(
         skillIds, successCallback, errorCallback) {
@@ -35,8 +39,11 @@ angular.module('oppia').factory('ConceptCardBackendApiService', [
 
       $http.get(conceptCardDataUrl).then(function(response) {
         var conceptCards = angular.copy(response.data.concept_card_dicts);
+        conceptCardObject = ConceptCardObjectFactory.createFromBackendDict(
+          conceptCards
+        );
         if (successCallback) {
-          successCallback(conceptCards);
+          successCallback(conceptCardObject);
         }
       }, function(errorResponse) {
         if (errorCallback) {
