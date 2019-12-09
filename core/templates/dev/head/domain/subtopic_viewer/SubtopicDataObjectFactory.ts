@@ -33,7 +33,8 @@ export class SubtopicData {
   subtopicTitle;
   pageContents;
 
-  constructor(private subtopicPageContentsObjectFactory:SubtopicPageContentsObjectFactory, subtopicTitle, pageContents) {
+  constructor(private subtopicPageContentsObjectFactory:
+    SubtopicPageContentsObjectFactory, subtopicTitle, pageContents) {
     this.subtopicTitle = subtopicTitle;
     this.pageContents = subtopicPageContentsObjectFactory.
       createFromBackendDict(pageContents);
