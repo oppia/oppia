@@ -26,7 +26,7 @@ angular.module('oppia').factory('ClassroomBackendApiService', [
   function($http, $q, TopicSummaryObjectFactory, UrlInterpolationService,
       CLASSROOOM_DATA_URL_TEMPLATE) {
     var topicSummaryDicts = null;
-    var topicSummaryObject = null;
+    var topicSummaryObjects = null;
     var _fetchClassroomData = function(
         classroomName, successCallback, errorCallback) {
       var classroomDataUrl = UrlInterpolationService.interpolateUrl(
@@ -36,13 +36,13 @@ angular.module('oppia').factory('ClassroomBackendApiService', [
 
       $http.get(classroomDataUrl).then(function(response) {
         topicSummaryDicts = angular.copy(response.data.topic_summary_dicts);
-        topicSummaryObject = topicSummaryDicts.map(
+        topicSummaryObjects = topicSummaryDicts.map(
           function(summaryDict) {
             return TopicSummaryObjectFactory.createFromBackendDict(summaryDict);
           }
         );
         if (successCallback) {
-          successCallback(topicSummaryObject);
+          successCallback(topicSummaryObjects);
         }
       }, function(errorResponse) {
         if (errorCallback) {
