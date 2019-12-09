@@ -23,16 +23,20 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationEditorPage =
     require('../protractor_utils/ExplorationEditorPage.js');
+var CreatorDashboardPage = 
+    require('../protractor_utils/CreatorDashboardPage.js');
 
 describe('Voiceover upload features', function() {
   var TEST_USERNAME = 'uploadUser';
   var TEST_EMAIL = TEST_USERNAME + '@example.com';
+  var creatorDashboardPage = null;
   var explorationEditorPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorTranslationTab = null;
   var explorationEditorSettingsTab = null;
 
   beforeAll(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorTranslationTab =
@@ -85,6 +89,54 @@ describe('Voiceover upload features', function() {
       '../data/cafe-over-five-minutes.mp3');
     explorationEditorTranslationTab.expectSaveUploadedAudioButtonToBeDisabled();
     explorationEditorTranslationTab.closeUploadAudioModal();
+  });
+
+  it('should upload recorded file', function() {
+    explorationEditorTranslationTab.deleteAudioRecord();
+    explorationEditorTranslationTab.confirmDeleteAudioRecord();
+    explorationEditorTranslationTab.addAudioRecord();
+    explorationEditorTranslationTab.stopAudioRecord();
+    explorationEditorTranslationTab.confirmAudioRecord();
+    explorationEditorTranslationTab.playAudioRecord();
+    browser.refresh();
+    explorationEditorTranslationTab.playAudioRecord();
+  });
+
+  it('should logout and login', function() {
+    users.logout();
+    users.login(TEST_EMAIL);
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration('Untitled');
+    explorationEditorMainTab.exitTutorial();
+  });
+
+  it('should play recorded file', function() {
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.playAudioRecord();
+  });
+
+  it('should upload audio file from path', function() {
+    explorationEditorTranslationTab.deleteAudioRecord();
+    explorationEditorTranslationTab.confirmDeleteAudioRecord();
+    explorationEditorTranslationTab.uploadAudioRecord(
+      '../../../data/explorations/audio_test/assets/audio/test_audio_1_en.mp3');
+    explorationEditorTranslationTab.saveUploadedAudio();
+    explorationEditorTranslationTab.playAudioRecord();
+    browser.refresh();
+    explorationEditorTranslationTab.playAudioRecord();
+  });
+
+  it('should logout and login', function() {
+    users.logout();
+    users.login(TEST_EMAIL);
+    creatorDashboardPage.get();
+    creatorDashboardPage.editExploration('Untitled');
+    explorationEditorMainTab.exitTutorial();
+  });
+
+  it('should play recorded file', function() {
+    explorationEditorPage.navigateToTranslationTab();
+    explorationEditorTranslationTab.playAudioRecord();
   });
 
   afterAll(function() {

@@ -33,7 +33,6 @@ describe('Exploration translation and voiceover tab', function() {
   var creatorDashboardPage = null;
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
-  var explorationPreviewTab = null;
   var explorationEditorSettingsTab = null;
   var explorationEditorTranslationTab = null;
   var YELLOW_STATE_PROGRESS_COLOR = 'rgb(233, 179, 48)';
@@ -293,52 +292,6 @@ describe('Exploration translation and voiceover tab', function() {
       'final card', GREEN_STATE_PROGRESS_COLOR);
     explorationEditorTranslationTab.expectNumericalStatusAccessibilityToMatch(
       '3 items translated out of 8 items');
-    users.logout();
-  });
-
-  it('should upload recorded file', function() {
-    users.login('voiceArtist@translationTab.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Test Exploration');
-    explorationEditorMainTab.exitTutorial();
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.addAudioRecord();
-    explorationEditorTranslationTab.stopAudioRecord();
-    explorationEditorTranslationTab.confirmAudioRecord();
-    explorationEditorTranslationTab.playAudioRecord();
-    browser.refresh();
-    explorationEditorTranslationTab.playAudioRecord();
-    users.logout();
-    users.login('voiceArtist@translationTab.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Test Exploration');
-    explorationEditorMainTab.exitTutorial();
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.playAudioRecord();
-    users.logout();
-  });
-
-  it('should upload audio file from path', function() {
-    users.login('voiceArtist@translationTab.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Test Exploration');
-    explorationEditorMainTab.exitTutorial();
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.deleteAudioRecord();
-    explorationEditorTranslationTab.confirmDeleteAudioRecord();
-    explorationEditorTranslationTab.uploadAudioRecord(
-      '../../../data/explorations/audio_test/assets/audio/test_audio_1_en.mp3');
-    explorationEditorTranslationTab.saveUploadedAudio();
-    explorationEditorTranslationTab.playAudioRecord();
-    browser.refresh();
-    explorationEditorTranslationTab.playAudioRecord();
-    users.logout();
-    users.login('voiceArtist@translationTab.com');
-    creatorDashboardPage.get();
-    creatorDashboardPage.editExploration('Test Exploration');
-    explorationEditorMainTab.exitTutorial();
-    explorationEditorPage.navigateToTranslationTab();
-    explorationEditorTranslationTab.playAudioRecord();
     users.logout();
   });
 
