@@ -225,10 +225,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_check_output(unused_version):
             return 'python2'
 
-        check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
-        
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
+
         with check_output_swap:
-            self.assertEqual(install_third_party_libs.EXPLICIT_CHECK_REQUIRED, False)
+            self.assertEqual(
+                install_third_party_libs.EXPLICIT_CHECK_REQUIRED, False)
             self.assertEqual(install_third_party_libs.PIP_NAME, 'pip')
 
     def test_check_pip_name_when_pip_two_is_not_default_pip(self):
@@ -237,11 +239,13 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_check_call(unused_version):
             pass
 
-        check_output_swap = self.swap(subprocess, 'check_output', mock_check_output)
+        check_output_swap = self.swap(
+            subprocess, 'check_output', mock_check_output)
         check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-        
+
         with check_output_swap, check_call_swap:
-            self.assertEqual(install_third_party_libs.EXPLICIT_CHECK_REQUIRED, True)
+            self.assertEqual(
+                install_third_party_libs.EXPLICIT_CHECK_REQUIRED, True)
             self.assertTrue('pip2' in install_third_party_libs.PIP_NAME)
 
     def test_function_calls(self):
