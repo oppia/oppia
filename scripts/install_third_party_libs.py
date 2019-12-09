@@ -122,6 +122,7 @@ def pip_install(package, version, install_path):
                 'Windows%29')
         raise Exception
 
+    # The following will ensure that Python and Pip versions are compatible.
     subprocess.check_call([
         'python', '-m', 'pip', 'install', '%s==%s' % (package, version),
         '--target', install_path])
