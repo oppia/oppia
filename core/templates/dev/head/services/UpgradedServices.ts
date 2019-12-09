@@ -38,7 +38,8 @@ import { ChangesInHumanReadableFormService } from
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
-import { CodeReplPredictionService } from 'interactions/CodeRepl/code-repl-prediction.service';
+import { CodeReplPredictionService } from
+  'interactions/CodeRepl/code-repl-prediction.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ContextService } from 'services/context.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -151,7 +152,8 @@ import { VoiceoverObjectFactory } from
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
-import { WinnowingPreprocessingService } from 'classifiers/winnowing-preprocessing.service';
+import { WinnowingPreprocessingService } from
+  'classifiers/winnowing-preprocessing.service';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
@@ -289,7 +291,7 @@ export class UpgradedServices {
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
     upgradedServices['PythonProgramTokenizer'] =
-      new PythonProgramTokenizer(upgradedServices['LoggerService'])
+      new PythonProgramTokenizer(upgradedServices['LoggerService']);
 
     // Group 3: Services depending only on groups 1-2.
     upgradedServices['AnswerGroupObjectFactory'] =

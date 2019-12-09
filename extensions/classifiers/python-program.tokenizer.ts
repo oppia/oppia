@@ -48,11 +48,11 @@ export class PythonProgramTokenizer {
 
   private regExMayBePresent(params) {
     return this.groupOfRegEx(params) + '?';
-  };
+  }
 
   private repeatedRegEx(params) {
     return this.groupOfRegEx(params) + '*';
-  };
+  }
 
   private whitespace = '[ \\f\\t]*';
   private comment = '#[^\\r\\n]*';
@@ -64,7 +64,8 @@ export class PythonProgramTokenizer {
   private octnumber = '(0[oO][0-7]+)|(0[0-7]*)[lL]?';
   private binnumber = '0[bB][01]+[lL]?';
   private decnumber = '[1-9]\\d*[lL]?';
-  private intnumber = this.groupOfRegEx(this.hexnumber, this.binnumber, this.octnumber, this.decnumber);
+  private intnumber = this.groupOfRegEx(
+    this.hexnumber, this.binnumber, this.octnumber, this.decnumber);
   private exponent = '[eE][-+]?\\d+';
   private pointfloat = this.groupOfRegEx(
     '\\d+\\.\\d*', '\\\\d+\\\\.\\\\d*') + this.regExMayBePresent(this.exponent);
@@ -72,7 +73,8 @@ export class PythonProgramTokenizer {
   private floatnumber = this.groupOfRegEx(this.pointfloat, this.expfloat);
   private imagnumber = this.groupOfRegEx(
     '\\d+[jJ]', this.floatnumber + '[jJ]');
-  private num = this.groupOfRegEx(this.imagnumber, this.floatnumber, this.intnumber);
+  private num = this.groupOfRegEx(
+    this.imagnumber, this.floatnumber, this.intnumber);
   // Tail end of ' string.
   private single = '[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'';
   // Tail end of " string.
@@ -97,7 +99,8 @@ export class PythonProgramTokenizer {
   private special = this.groupOfRegEx('\\r?\\n', '[:;.,\\`@]');
   private funny = this.groupOfRegEx(this.operator, this.bracket, this.special);
 
-  private plaintoken = this.groupOfRegEx(this.num, this.funny, this.str, name);
+  private plaintoken = this.groupOfRegEx(
+    this.num, this.funny, this.str, this.name);
   private token = this.ignore + this.plaintoken;
 
   // First (or only) line of ' or " string.
@@ -106,9 +109,10 @@ export class PythonProgramTokenizer {
     this.groupOfRegEx("'", '\\\\\\r?\\n'),
     '[uUbB]?[rR]?"[^\\n"\\\\]*(?:\\\\.[^\\n"\\\\]*)*' +
     this.groupOfRegEx('"', '\\\\\\r?\\n'));
-  private pseudoextras = this.groupOfRegEx('\\\\\\r?\\n|\\Z', this.comment, this.triple);
+  private pseudoextras = this.groupOfRegEx(
+    '\\\\\\r?\\n|\\Z', this.comment, this.triple);
   private pseudotoken = this.whitespace + this.groupOfRegEx(
-    this.pseudoextras, this.num, this.funny, this.contStr, name);
+    this.pseudoextras, this.num, this.funny, this.contStr, this.name);
 
   // Regular Expression object.
   private tokenprog = new RegExp(this.token);
@@ -184,7 +188,8 @@ export class PythonProgramTokenizer {
         if (endmatch && endmatch.index === 0) {
           this.token = endmatch[0];
           pos = pos + this.token.length;
-          tokenizedProgram.push([this.PythonProgramTokenType.STRING, this.token]);
+          tokenizedProgram.push(
+            [this.PythonProgramTokenType.STRING, this.token]);
           contstr = '';
           needcont = 0;
           contline = null;
@@ -239,7 +244,7 @@ export class PythonProgramTokenizer {
             const comment = this.PythonProgramTokenType.COMMENT;
             const nl = this.PythonProgramTokenType.NL;
             tokenizedProgram.push([
-              this.PythonProgramTokenType.line[pos] === '#' ? comment : nl,
+              line[pos] === '#' ? comment : nl,
               line.slice(pos)]);
           }
           continue;

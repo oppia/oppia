@@ -16,8 +16,6 @@
  * @fileoverview Unit tests code repl prediction service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// code-repl-prediction.service.ts is upgraded to Angular 8.
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { WinnowingPreprocessingService } from
@@ -26,21 +24,21 @@ import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { LoggerService } from 'services/contextual/logger.service';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
 describe('CodeRepl prediction service', () => {
-  beforeEach(angular.mock.module('oppia'));
-
   describe('CodeRepl prediction service test', () => {
     let service: CodeReplPredictionService, tokenizer: PythonProgramTokenizer;
     beforeEach(angular.mock.inject(() => {
-      service = new CodeReplPredictionService(
-        new CountVectorizerService(),
-        new PythonProgramTokenizer(new LoggerService()),
-        new SVMPredictionService(),
-        new WinnowingPreprocessingService()
-      );
-      tokenizer = new PythonProgramTokenizer(new LoggerService());
+      TestBed.configureTestingModule({
+        providers: [
+          CodeReplPredictionService, CountVectorizerService,
+          LoggerService, PythonProgramTokenizer, SVMPredictionService,
+          WinnowingPreprocessingService
+        ]
+      });
+      tokenizer = TestBed.get(PythonProgramTokenizer);
+      service = TestBed.get(CodeReplPredictionService);
     }));
 
     it('should calculate correct jaccard index', () => {

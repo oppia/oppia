@@ -17,15 +17,15 @@
  */
 
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
-import { LoggerService } from 'services/contextual/logger.service';
-
+import { TestBed } from '@angular/core/testing';
 describe('Python program tokenizer', () => {
-  beforeEach(angular.mock.module('oppia'));
-
   describe('Test python program tokenizer', () => {
-    let tokenizer: PythonProgramTokenizer;
+    let tokenizer: PythonProgramTokenizer = null;
     beforeEach(() => {
-      tokenizer = new PythonProgramTokenizer(new LoggerService());
+      TestBed.configureTestingModule({
+        providers: [PythonProgramTokenizer]
+      });
+      tokenizer = TestBed.get(PythonProgramTokenizer);
     });
 
     it('should generate correct tokens for a program', () => {

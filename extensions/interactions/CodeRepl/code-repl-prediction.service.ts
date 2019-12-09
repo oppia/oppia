@@ -57,8 +57,7 @@ export class CodeReplPredictionService {
     private countVectorizerService: CountVectorizerService,
     private pythonProgramTokenizer: PythonProgramTokenizer,
     private svmPredictionService: SVMPredictionService,
-    private winnowingPreprocessingService: WinnowingPreprocessingService,
-    ) {}
+    private winnowingPreprocessingService: WinnowingPreprocessingService) {}
 
   // The string with which all the variable and method names need to be
   // replaced.
@@ -132,7 +131,7 @@ export class CodeReplPredictionService {
   }
 
   calcJaccardIndex(
-    multisetA: Array<number>, multisetB: Array<number>): number {
+      multisetA: Array<number>, multisetB: Array<number>): number {
     // Calculate jaccard index between two multisets.
     multisetA.sort(function(x, y) {
       return x > y ? 1 : -1;
