@@ -29,9 +29,9 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { LoggerService } from 'services/contextual/logger.service';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants.ts';
+import { LoggerService } from 'services/contextual/logger.service';
 
 @Injectable({
   providedIn: 'root'
@@ -39,18 +39,17 @@ import { ClassifiersExtensionConstants } from
 export class PythonProgramTokenizer {
   private PythonProgramTokenType = (
     ClassifiersExtensionConstants.PythonProgramTokenType);
-  constructor(private loggerService: LoggerService) {
-  }
+  constructor(private loggerService: LoggerService) {}
 
-  private groupOfRegEx(...params) {
+  private groupOfRegEx(...params: (string | string[])[]): string {
     return '(' + Array.prototype.join.call(params, '|') + ')';
   }
 
-  private regExMayBePresent(params) {
+  private regExMayBePresent(params: string | string[]): string {
     return this.groupOfRegEx(params) + '?';
   }
 
-  private repeatedRegEx(params) {
+  private repeatedRegEx(params: string | string[]): string {
     return this.groupOfRegEx(params) + '*';
   }
 
@@ -177,7 +176,7 @@ export class PythonProgramTokenizer {
       let pos = 0;
       const max = line.length;
 
-      let endmatch;
+      let endmatch: { length: number; }[];
       if (contstr) {
         if (!line) {
           // Exception.

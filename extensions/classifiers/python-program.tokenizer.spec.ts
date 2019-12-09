@@ -16,14 +16,17 @@
  * @fileoverview Unit tests python program tokenizer.
  */
 
-import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { TestBed } from '@angular/core/testing';
+
+import { LoggerService } from 'services/contextual/logger.service';
+import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+
 describe('Python program tokenizer', () => {
   describe('Test python program tokenizer', () => {
     let tokenizer: PythonProgramTokenizer = null;
     beforeEach(() => {
       TestBed.configureTestingModule({
-        providers: [PythonProgramTokenizer]
+        providers: [LoggerService, PythonProgramTokenizer]
       });
       tokenizer = TestBed.get(PythonProgramTokenizer);
     });
