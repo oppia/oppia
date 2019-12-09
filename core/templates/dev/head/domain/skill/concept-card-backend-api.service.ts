@@ -25,7 +25,7 @@ angular.module('oppia').factory('ConceptCardBackendApiService', [
   '$http', '$q', 'ConceptCardObjectFactory', 'UrlInterpolationService',
   'CONCEPT_CARD_DATA_URL_TEMPLATE',
   function($http, $q, ConceptCardObjectFactory, UrlInterpolationService,
-    CONCEPT_CARD_DATA_URL_TEMPLATE) {
+      CONCEPT_CARD_DATA_URL_TEMPLATE) {
     // Maps previously loaded concept cards to their IDs.
     var _conceptCardCache = [];
     var conceptCardObject = null;
