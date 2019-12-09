@@ -124,6 +124,9 @@ export class AppConstants {
   public static ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS =
     'MultipleIncorrectSubmissions';
   public static ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS = 'CyclicStateTransitions';
+
+  public static UNRELATED_ACTIONS_PER_BLOCK_THRESHOLD = 4;
+
   public static SITE_NAME = 'Oppia.org';
 
   public static DEFAULT_PROFILE_IMAGE_PATH = '/avatar/user_blue_72px.png';
