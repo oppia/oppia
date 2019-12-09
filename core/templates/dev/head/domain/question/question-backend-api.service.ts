@@ -17,13 +17,17 @@
  */
 
 require('domain/question/question-domain.constants.ajs.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/question/QuestionSummaryObjectFactory.ts');
 
 angular.module('oppia').factory('QuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTIONS_LIST_URL_TEMPLATE',
-  'QUESTION_PLAYER_URL_TEMPLATE',
+  'QUESTION_PLAYER_URL_TEMPLATE', 'QuestionObjectFactory', 
+  'QuestionSummaryObjectFactory',
   function(
       $http, $q, UrlInterpolationService, QUESTIONS_LIST_URL_TEMPLATE,
-      QUESTION_PLAYER_URL_TEMPLATE) {
+      QUESTION_PLAYER_URL_TEMPLATE, QuestionObjectFactory,
+      QuestionSummaryObjectFactory) {
     var _fetchQuestions = function(
         skillIds, questionCount, questionsSortedByDifficulty,
         successCallback, errorCallback) {
@@ -39,8 +43,13 @@ angular.module('oppia').factory('QuestionBackendApiService', [
 
       $http.get(questionDataUrl).then(function(response) {
         var questionDicts = angular.copy(response.data.question_dicts);
+        var questionObject = questionDicts.map(
+          function(questionDicts) {
+            return QuestionObjectFactory.createFromBackendDict(questionDicts);
+          }
+        )
         if (successCallback) {
-          successCallback(questionDicts);
+          successCallback(questionObject);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -64,10 +73,17 @@ angular.module('oppia').factory('QuestionBackendApiService', [
       $http.get(questionsDataUrl).then(function(response) {
         var questionSummaries = angular.copy(
           response.data.question_summary_dicts);
+        var questionSummaryObject = questionSummaries.map(
+          function(questionSummaries) {
+            return QuestionSummaryObjectFactory.createFromBackendDict(
+              questionSummaries
+            );
+          }
+        )
         var nextCursor = response.data.next_start_cursor;
         if (successCallback) {
           successCallback({
-            questionSummaries: questionSummaries,
+            questionSummaries: questionSummaryObject,
             nextCursor: nextCursor
           });
         }
