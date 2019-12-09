@@ -4,6 +4,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import atexit
 import fileinput
+import functools
 import os
 import re
 import sys
@@ -45,12 +46,20 @@ class RunE2ETestsTests(test_utils.TestBase):
         def mock_remove(unused_path):
             pass
 
+        def mock_inplace_replace(
+                unused_filename, unused_pattern, unused_replace):
+            return
 
+        self.inplace_replace_swap = functools.partial(
+            self.swap_with_checks, common, 'inplace_replace_file',
+            mock_inplace_replace)
         self.mock_run_cmd = mock_run_cmd
         self.mock_build_main = mock_build_main
         self.mock_remove = mock_remove
         self.print_arr = []
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
+        self.partial_print_swap = functools.partial(
+            self.swap_with_checks, python_utils, 'PRINT', mock_print)
 
         self.mock_node_bin_path = 'node'
         self.node_bin_path_swap = self.swap(
@@ -65,39 +74,36 @@ class RunE2ETestsTests(test_utils.TestBase):
             run_e2e_tests, 'CONSTANT_FILE_PATH', self.mock_constant_file_path)
 
     def test_check_screenhost_when_not_exist(self):
-        def mock_isdir(path):
-            self.assertEqual(
-                path, os.path.join(os.pardir, 'protractor-screenshots'))
+        def mock_isdir(unused_path):
             return False
-        exist_swap = self.swap(os.path, 'isdir', mock_isdir)
-        with self.print_swap, exist_swap:
+
+        exist_swap = self.swap_with_checks(
+            os.path, 'isdir', mock_isdir,
+            expected_args=(os.path.join(os.pardir, 'protractor-screenshots'),))
+        print_swap = self.partial_print_swap(called=False)
+        with print_swap, exist_swap:
             run_e2e_tests.check_screenshot()
-        self.assertEqual(self.print_arr, [])
 
     def test_check_screenhost_when_exist(self):
         screenshot_dir = os.path.join(os.pardir, 'protractor-screenshots')
-        def mock_isdir(path):
-            self.assertEqual(path, screenshot_dir)
+        def mock_isdir(unused_path):
             return True
 
-        def mock_rmdir(path):
-            self.assertEqual(path, path)
-            mock_rmdir.called = True
+        def mock_rmdir(unused_path):
             return True
-        mock_rmdir.called = False
 
-        exist_swap = self.swap(os.path, 'isdir', mock_isdir)
-        rmdir_swap = self.swap(os, 'rmdir', mock_rmdir)
-        with self.print_swap, exist_swap, rmdir_swap:
-            run_e2e_tests.check_screenshot()
-
-        self.assertTrue(mock_rmdir.called)
-        expected = ["""
+        exist_swap = self.swap_with_checks(
+            os.path, 'isdir', mock_isdir, expected_args=(screenshot_dir,))
+        rmdir_swap = self.swap_with_checks(
+            os, 'rmdir', mock_rmdir, expected_args=(screenshot_dir,))
+        expected_output = """
 Note: If ADD_SCREENSHOT_REPORTER is set to true in
 core/tests/protractor.conf.js, you can view screenshots
 of the failed tests in ../protractor-screenshots/
-"""]
-        self.assertEqual(self.print_arr, expected)
+"""
+        print_swap = self.partial_print_swap(expected_args=(expected_output,))
+        with print_swap, exist_swap, rmdir_swap:
+            run_e2e_tests.check_screenshot()
 
     def test_cleanup_when_no_subprocess(self):
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
@@ -129,42 +135,40 @@ of the failed tests in ../protractor-screenshots/
         mock_processes = [MockProcessClass(), MockProcessClass()]
         subprocess_swap = self.swap(
             run_e2e_tests, 'SUBPROCESSES', mock_processes)
-        swap_kill_process = self.swap(
+        swap_kill_process = self.swap_with_checks(
             common, 'kill_processes_based_on_regex',
-            mock_kill_process_based_on_regex)
+            mock_kill_process_based_on_regex, called_times=len(mock_processes))
         with subprocess_swap, swap_kill_process:
             run_e2e_tests.cleanup()
-
-        self.assertEqual(MockProcessClass.kill_count, len(mock_processes))
 
     def test_check_running_instances_when_ports_closed(self):
         expected_ports = [1, 2, 3]
         def mock_is_port_open(port):
-            self.assertIn(port, expected_ports)
-            expected_ports.remove(port)
             return False
 
-        is_port_open_swap = self.swap(common, 'is_port_open', mock_is_port_open)
+        is_port_open_swap = self.swap_with_checks(
+            common, 'is_port_open', mock_is_port_open,
+            expected_args=[(port,) for port in expected_ports],
+            called_times=3)
         with is_port_open_swap:
             result = run_e2e_tests.check_running_instance(*expected_ports)
             self.assertFalse(result)
-        self.assertEqual(expected_ports, [])
 
     def test_check_running_instances_when_one_of_the_ports_is_open(self):
         running_port = 2
         expected_ports = [1, running_port, 3]
         def mock_is_port_open(port):
-            self.assertIn(port, expected_ports)
-            expected_ports.remove(port)
             if port == running_port:
                 return True
             return False
 
-        is_port_open_swap = self.swap(common, 'is_port_open', mock_is_port_open)
+        is_port_open_swap = self.swap_with_checks(
+            common, 'is_port_open', mock_is_port_open,
+            expected_args=[(1,), (2,)],
+            called_times=2)
         with is_port_open_swap:
             result = run_e2e_tests.check_running_instance(*expected_ports)
             self.assertTrue(result)
-        self.assertEqual(expected_ports, [3])
 
     def test_wait_for_port_when_port_successfully_opened(self):
         def mock_is_port_open(unused_port):
@@ -175,16 +179,15 @@ of the failed tests in ../protractor-screenshots/
         mock_is_port_open.wait_time = 0
 
         def mock_sleep(unused_time):
-            mock_sleep.sleep_time += 1
-        mock_sleep.sleep_time = 0
+            return
 
-        is_port_open_swap = self.swap(common, 'is_port_open', mock_is_port_open)
-        sleep_swap = self.swap(time, 'sleep', mock_sleep)
+        is_port_open_swap = self.swap_with_checks(
+            common, 'is_port_open', mock_is_port_open, called_times=11)
+        sleep_swap = self.swap_with_checks(
+            time, 'sleep', mock_sleep, called_times=10)
 
         with is_port_open_swap, sleep_swap:
             run_e2e_tests.wait_for_port(1)
-        self.assertEqual(mock_sleep.sleep_time, 10)
-        self.assertEqual(mock_is_port_open.wait_time, 11)
 
     def test_wait_for_port_when_port_failed_to_open(self):
         def mock_is_port_open(unused_port):
@@ -194,152 +197,72 @@ of the failed tests in ../protractor-screenshots/
             mock_sleep.sleep_time += 1
 
         def mock_exit(unused_exit_code):
-            mock_exit.called = True
+            return
 
-        mock_exit.called = False
         mock_sleep.sleep_time = 0
 
         is_port_open_swap = self.swap(common, 'is_port_open', mock_is_port_open)
-        sleep_swap = self.swap(time, 'sleep', mock_sleep)
-        exit_swap = self.swap(sys, 'exit', mock_exit)
+        sleep_swap = self.swap_with_checks(
+            time, 'sleep', mock_sleep,
+            called_times=run_e2e_tests.WAIT_PORT_TIMEOUT)
+        exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
             run_e2e_tests.wait_for_port(1)
-        self.assertEqual(mock_sleep.sleep_time, run_e2e_tests.WAIT_PORT_TIMEOUT)
-        self.assertTrue(mock_exit.called)
 
     def test_tweak_constant_file_in_dev_mode_without_change_file(self):
         constant_file = 'constant.js'
-        origin_lines = [
-            '"RANDMON1" : "randomValue1"',
-            '"312RANDOM" : "ValueRanDom2"',
-            '"DEV_MODE": true',
-            '"RAN213DOM" : "raNdoVaLue3"'
-        ]
-        expected_lines = origin_lines[:]
-        # pylint: disable=unused-argument
-        def mock_input(files, inplace, backup):
-            self.assertEqual(len(files), 1)
-            self.assertEqual(constant_file, files[0])
-            return origin_lines
-        # pylint: enable=unused-argument
-        input_swap = self.swap(fileinput, 'input', mock_input)
-        with self.print_swap, input_swap:
+        inplace_replace_swap = self.inplace_replace_swap(expected_args=(
+            constant_file, '"DEV_MODE": .*', '"DEV_MODE": true'
+        ))
+        with inplace_replace_swap:
             run_e2e_tests.tweak_constant_file(constant_file, True)
-        self.assertEqual(self.print_arr, expected_lines)
 
-    def test_tweak_constant_file_in_dev_mode_with_file_changed(self):
+    def test_tweak_constant_file_in_prod_mode(self):
         constant_file = 'constant.js'
-        origin_lines = [
-            '"RANDMON1" : "randomValue1"',
-            '"312RANDOM" : "ValueRanDom2"',
-            '"DEV_MODE": false',
-            '"RAN213DOM" : "raNdoVaLue3"'
-        ]
-        expected_lines = origin_lines[:]
-        expected_lines[2] = '"DEV_MODE": true'
-        # pylint: disable=unused-argument
-        def mock_input(files, inplace, backup):
-            self.assertEqual(len(files), 1)
-            self.assertEqual(constant_file, files[0])
-            return origin_lines
-        # pylint: enable=unused-argument
-        input_swap = self.swap(fileinput, 'input', mock_input)
-        with self.print_swap, input_swap:
-            run_e2e_tests.tweak_constant_file(constant_file, True)
-        self.assertEqual(self.print_arr, expected_lines)
-
-    def test_tweak_constant_file_not_in_dev_mode_without_change_file(self):
-        constant_file = 'constant.js'
-        origin_lines = [
-            '"RANDMON1" : "randomValue1"',
-            '"312RANDOM" : "ValueRanDom2"',
-            '"DEV_MODE": false',
-            '"RAN213DOM" : "raNdoVaLue3"'
-        ]
-        expected_lines = origin_lines[:]
-        # pylint: disable=unused-argument
-        def mock_input(files, inplace, backup):
-            self.assertEqual(len(files), 1)
-            self.assertEqual(constant_file, files[0])
-            return origin_lines
-        # pylint: enable=unused-argument
-        input_swap = self.swap(fileinput, 'input', mock_input)
-        with self.print_swap, input_swap:
+        inplace_replace_swap = self.inplace_replace_swap(expected_args=(
+            constant_file, '"DEV_MODE": .*', '"DEV_MODE": false'
+        ))
+        with inplace_replace_swap:
             run_e2e_tests.tweak_constant_file(constant_file, False)
-        self.assertEqual(self.print_arr, expected_lines)
-
-    def test_tweak_constant_file_not_in_dev_mode_with_file_changed(self):
-        constant_file = 'constant.js'
-        origin_lines = [
-            '"RANDMON1" : "randomValue1"',
-            '"312RANDOM" : "ValueRanDom2"',
-            '"DEV_MODE": true',
-            '"RAN213DOM" : "raNdoVaLue3"'
-        ]
-        expected_lines = origin_lines[:]
-        expected_lines[2] = '"DEV_MODE": false'
-        # pylint: disable=unused-argument
-        def mock_input(files, inplace, backup):
-            self.assertEqual(len(files), 1)
-            self.assertEqual(constant_file, files[0])
-            return origin_lines
-        # pylint: enable=unused-argument
-        input_swap = self.swap(fileinput, 'input', mock_input)
-        with self.print_swap, input_swap:
-            run_e2e_tests.tweak_constant_file(constant_file, False)
-        self.assertEqual(self.print_arr, expected_lines)
 
     def test_run_webdriver_manager(self):
         mock_webdriver_path = 'webdriver-manager'
         expected_commands = [
-            self.mock_node_bin_path, mock_webdriver_path, 'start', '--detach']
+            common.NODE_BIN_PATH, run_e2e_tests.WEBDRIVER_MANAGER_BIN_PATH,
+            'start', '--detach']
 
         stdout = 'stdout'
         def mock_run_cmd(commands):
-            self.assertEqual(commands, expected_commands)
-            mock_run_cmd.called = True
             return stdout
 
         mock_run_cmd.called = False
-        run_cmd_swap = self.swap(common, 'run_cmd', mock_run_cmd)
-        webdriver_path_swap = self.swap(
-            run_e2e_tests, 'WEBDRIVER_MANAGER_BIN_PATH', mock_webdriver_path)
-        with self.print_swap, run_cmd_swap, self.node_bin_path_swap, webdriver_path_swap:
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd, expected_args=(expected_commands,))
+        print_swap = self.partial_print_swap(expected_args=(stdout,))
+        with print_swap, run_cmd_swap:
             run_e2e_tests.run_webdriver_manager(['start', '--detach'])
-
-        self.assertTrue(mock_run_cmd.called)
-        self.assertEqual(self.print_arr, [stdout])
 
     def test_setup_and_install_dependencies(self):
         def mock_setup_main(args):
-            self.assertEqual(args, [])
-            mock_setup_main.called = True
+            return
 
         def mock_install_third_party_libs_main(args):
-            self.assertEqual(args, [])
-            mock_install_third_party_libs_main.called = True
+            return
 
         def mock_setup_gae_main(args):
-            self.assertEqual(args, [])
-            mock_setup_gae_main.called = True
+            return
 
-        mock_setup_gae_main.called = False
-        mock_setup_main.called = False
-        mock_install_third_party_libs_main.called = False
-
-        setup_swap = self.swap(setup, 'main', mock_setup_main)
-        setup_gae_swap = self.swap(setup_gae, 'main', mock_setup_gae_main)
-        install_swap = self.swap(
+        setup_swap = self.swap_with_checks(
+            setup, 'main', mock_setup_main, expected_kwargs={'args': []})
+        setup_gae_swap = self.swap_with_checks(
+            setup_gae, 'main', mock_setup_gae_main, expected_kwargs={'args': []}
+            )
+        install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
-            mock_install_third_party_libs_main)
+            mock_install_third_party_libs_main, expected_kwargs={'args': []})
 
         with setup_swap, setup_gae_swap, install_swap:
             run_e2e_tests.setup_and_install_dependencies()
-
-        self.assertTrue(all(
-            [mock_install_third_party_libs_main.called,
-             mock_setup_gae_main.called,
-             mock_setup_main.called]))
 
     def test_build_js_files_in_dev_mode(self):
 
@@ -362,7 +285,8 @@ of the failed tests in ../protractor-screenshots/
         remove_swap = self.swap_with_checks(
             os, 'remove', self.mock_remove,
             expected_args=('%s.bak' % self.mock_constant_file_path,))
-        with self.print_swap, self.constant_file_path_swap:
+        print_swap = self.partial_print_swap(called=False)
+        with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with tweak_constant_file_swap, run_cmd_swap, build_main_swap:
                     with remove_swap:
@@ -388,61 +312,59 @@ of the failed tests in ../protractor-screenshots/
             os, 'remove', self.mock_remove,
             expected_args=('%s.bak' % self.mock_constant_file_path,))
 
-        with self.print_swap, self.constant_file_path_swap:
+        with self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with tweak_constant_file_swap, run_cmd_swap, build_main_swap:
                     with remove_swap:
                         run_e2e_tests.build_js_files(False)
 
     def test_tweak_webdriver_manager_on_x64_machine(self):
-        replace_args = []
+        expected_replace = 'this.osArch = "x64";'
         def mock_inplace_replace(file, regex_pattern, replace):
-            replace_args.append([file, regex_pattern, replace])
-            mock_inplace_replace.called += 1
-        mock_inplace_replace.called = 0
-        inplace_replace_swap = self.swap(
-            common, 'inplace_replace_file', mock_inplace_replace)
+            return
+
+        inplace_replace_swap = self.swap_with_checks(
+            common, 'inplace_replace_file', mock_inplace_replace,
+            expected_args=[
+                (run_e2e_tests.CHROME_PROVIDER_FILE_PATH,
+                 run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
+                 expected_replace),
+                (run_e2e_tests.GECKO_PROVIDER_FILE_PATH,
+                 run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
+                 expected_replace)
+            ], called_times=2)
         def mock_is_x64():
             return True
-        mock_regex = 'regex_pattern'
+
         architecture_swap = self.swap_with_checks(
             common, 'is_x64_architecture', mock_is_x64)
-        regex_pattern_swap = self.swap(
-            run_e2e_tests, 'PATTERN_FOR_REPLACE_WEBDRIVER_CODE', mock_regex)
-        expected_replace = 'this.osArch = "x64";'
-        with inplace_replace_swap, architecture_swap, regex_pattern_swap:
+
+        with inplace_replace_swap, architecture_swap:
             run_e2e_tests.tweak_webdriver_manager()
-        self.assertEqual([
-            [run_e2e_tests.CHROME_PROVIDER_FILE_PATH, mock_regex,
-            expected_replace],
-            [run_e2e_tests.GECKO_PROVIDER_FILE_PATH, mock_regex,
-            expected_replace]], replace_args)
-        self.assertEqual(mock_inplace_replace.called, 2)
 
     def test_tweak_webdriver_manager_on_x86_machine(self):
-        replace_args = []
         def mock_inplace_replace(file, regex_pattern, replace):
-            replace_args.append([file, regex_pattern, replace])
-            mock_inplace_replace.called += 1
-        mock_inplace_replace.called = 0
-        inplace_replace_swap = self.swap(
-            common, 'inplace_replace_file', mock_inplace_replace)
+            return
+
+        expected_replace = 'this.osArch = "x86";'
+        inplace_replace_swap = self.swap_with_checks(
+            common, 'inplace_replace_file', mock_inplace_replace,
+            expected_args=[
+                (run_e2e_tests.CHROME_PROVIDER_FILE_PATH,
+                 run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
+                 expected_replace),
+                (run_e2e_tests.GECKO_PROVIDER_FILE_PATH,
+                 run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
+                 expected_replace)
+            ], called_times=2)
         def mock_is_x64():
             return False
-        mock_regex = 'regex_pattern'
+
         architecture_swap = self.swap_with_checks(
             common, 'is_x64_architecture', mock_is_x64)
-        regex_pattern_swap = self.swap(
-            run_e2e_tests, 'PATTERN_FOR_REPLACE_WEBDRIVER_CODE', mock_regex)
-        expected_replace = 'this.osArch = "x86";'
-        with inplace_replace_swap, architecture_swap, regex_pattern_swap:
+
+        with inplace_replace_swap, architecture_swap:
             run_e2e_tests.tweak_webdriver_manager()
-        self.assertEqual([
-            [run_e2e_tests.CHROME_PROVIDER_FILE_PATH, mock_regex,
-             expected_replace],
-            [run_e2e_tests.GECKO_PROVIDER_FILE_PATH, mock_regex,
-             expected_replace]], replace_args)
-        self.assertEqual(mock_inplace_replace.called, 2)
 
     def test_undo_webdriver_tweak(self):
         files_to_check = [
@@ -456,27 +378,28 @@ of the failed tests in ../protractor-screenshots/
         files_to_rename = files_to_check[:]
 
         def mock_isfile(path):
-            self.assertIn(path, files_to_check)
-            files_to_check.remove(path)
             return True
 
         def mock_rename(origin, new):
-            self.assertIn(origin, files_to_rename)
-            self.assertEqual(origin, '%s.bak' % new)
-            files_to_rename.remove(origin)
+            return
 
         def mock_remove(path):
-            self.assertIn(path, files_to_remove)
-            files_to_remove.remove(path)
+            return
 
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        rename_swap = self.swap(os, 'rename', mock_rename)
-        remove_swap = self.swap(os, 'remove', mock_remove)
+        isfile_swap = self.swap_with_checks(
+            os.path, 'isfile', mock_isfile, expected_args=[
+                (file,) for file in files_to_check
+            ], called_times=2)
+        rename_swap = self.swap_with_checks(
+            os, 'rename', mock_rename, expected_args=[
+                (file, file.replace('.bak', '')) for file in files_to_rename
+            ], called_times=2)
+        remove_swap = self.swap_with_checks(
+            os, 'remove', mock_remove, expected_args=[
+                (file,) for file in files_to_remove
+            ], called_times=2)
         with isfile_swap, rename_swap, remove_swap:
             run_e2e_tests.undo_webdriver_tweak()
-        self.assertEqual(files_to_check, [])
-        self.assertEqual(files_to_remove, [])
-        self.assertEqual(files_to_rename, [])
 
     def test_start_webdriver_manager_on_windows(self):
         def mock_tweak_webdriver():
@@ -510,7 +433,6 @@ of the failed tests in ../protractor-screenshots/
             common, 'is_windows_os', mock_is_windows)
         with tweak_swap, undo_swap, run_swap, is_windows_swap:
             run_e2e_tests.start_webdriver_manager()
-        self.assertEqual(expected_commands, [])
 
     def test_start_webdriver_manager_on_machine_other_than_windows(self):
         def mock_tweak_webdriver():
@@ -546,7 +468,6 @@ of the failed tests in ../protractor-screenshots/
             common, 'is_windows_os', mock_is_windows)
         with tweak_swap, undo_swap, run_swap, is_windows_swap:
             run_e2e_tests.start_webdriver_manager()
-        self.assertEqual(expected_commands, [])
 
     def test_get_parameter_for_config_file_with_browserstack(self):
         result = run_e2e_tests.get_parameter_for_config_file(True)
@@ -675,8 +596,6 @@ of the failed tests in ../protractor-screenshots/
             result = MockProcessClass()
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
             return result
-
-
 
         check_swap = self.swap_with_checks(
             run_e2e_tests, 'check_running_instance',

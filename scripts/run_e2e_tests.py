@@ -198,14 +198,11 @@ def tweak_constant_file(constant_file, dev_mode):
         dev_mode: boolean. Represents whether the program is running on dev
             mode.
     """
-    regex = re.compile('"DEV_MODE": .*')
-    constants_env_variable = '"DEV_MODE": %s' % (
+    pattern = '"DEV_MODE": .*'
+    replace = '"DEV_MODE": %s' % (
         'true' if dev_mode else 'false')
-    for line in fileinput.input(
-            files=[constant_file], inplace=True, backup='.bak'):
-        line = line.replace('\n', '')
-        line = regex.sub(constants_env_variable, line)
-        python_utils.PRINT(line)
+    regex = re.compile(pattern)
+    common.inplace_replace_file(constant_file, pattern, replace)
 
 
 def run_webdriver_manager(parameters):
