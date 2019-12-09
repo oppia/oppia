@@ -132,10 +132,10 @@ export class CodeReplPredictionService {
   calcJaccardIndex(
       multisetA: Array<number>, multisetB: Array<number>): number {
     // Calculate jaccard index between two multisets.
-    multisetA.sort(function(x, y) {
+    multisetA.sort((x, y) => {
       return x > y ? 1 : -1;
     });
-    multisetB.sort(function(x, y) {
+    multisetB.sort((x, y) => {
       return x > y ? 1 : -1;
     });
 
@@ -148,7 +148,7 @@ export class CodeReplPredictionService {
     let index = 0;
     const extraElements = [];
 
-    smallSet.forEach(function(elem) {
+    smallSet.forEach(elem => {
       while (index < unionSet.length && elem > unionSet[index]) {
         index += 1;
       }
@@ -166,7 +166,7 @@ export class CodeReplPredictionService {
 
     index = 0;
     const intersectionSet = [];
-    multisetA.forEach(function(elem) {
+    multisetA.forEach(elem => {
       while (index < multisetB.length && elem > multisetB[index]) {
         index += 1;
       }
@@ -185,11 +185,11 @@ export class CodeReplPredictionService {
     const multisetA = [];
     const multisetB = [];
 
-    fingerprintA.forEach(function(hash) {
+    fingerprintA.forEach(hash => {
       multisetA.push(hash[0]);
     });
 
-    fingerprintB.forEach(function(hash) {
+    fingerprintB.forEach(hash => {
       multisetB.push(hash[0]);
     });
 
@@ -209,7 +209,7 @@ export class CodeReplPredictionService {
 
     // Empty lines in between program causes parser to think that program
     // has ended which leads to generation of wrong set of tokens.
-    programLines = programLines.filter(function(line) {
+    programLines = programLines.filter(line => {
       return line.trim().length !== 0;
     });
 
@@ -232,7 +232,7 @@ export class CodeReplPredictionService {
     // Calculte similarity of the input program with every program in
     // classifier data for k nearest neighbor classification.
     const similarityList = [];
-    Object.keys(fingerprintData).forEach(function(index) {
+    Object.keys(fingerprintData).forEach(index => {
       const fingerprintA = fingerprintData[index].fingerprint;
       const similarity = this.getProgramSimilarity(
         fingerprintA, programFingerprint);
@@ -241,7 +241,7 @@ export class CodeReplPredictionService {
 
     // Sort the programs according to their similairy with the
     // input program.
-    similarityList.sort(function(x, y) {
+    similarityList.sort((x, y) => {
       return x[1] > y[1] ? -1 : 1;
     });
 
@@ -265,7 +265,7 @@ export class CodeReplPredictionService {
     const nearesNeighborsClasses = [];
 
     // Find classes of nearest neighbor programs.
-    nearestNeighborsIndexes.forEach(function(neighbor) {
+    nearestNeighborsIndexes.forEach(neighbor => {
       const index = neighbor[0];
       const outputClassPropertyName = 'class';
       const similarity = neighbor[1];
@@ -275,7 +275,7 @@ export class CodeReplPredictionService {
 
     // Count how many times a class appears in nearest neighbors.
     const classCount = {};
-    nearesNeighborsClasses.forEach(function(neighbor) {
+    nearesNeighborsClasses.forEach(neighbor => {
       const outputClass = neighbor[0];
       if (classCount.hasOwnProperty(outputClass)) {
         classCount[outputClass] += 1;
@@ -286,11 +286,11 @@ export class CodeReplPredictionService {
 
     // Find the winning class.
     const classCountArray = [];
-    Object.keys(classCount).forEach(function(k) {
+    Object.keys(classCount).forEach(k => {
       classCountArray.push([parseInt(k), classCount[k]]);
     });
 
-    classCountArray.sort(function(x, y) {
+    classCountArray.sort((x, y) => {
       return x[1] > y[1] ? -1 : 1;
     });
 
@@ -318,7 +318,7 @@ export class CodeReplPredictionService {
 
     // Empty lines in between program causes parser to think that program
     // has ended which leads to generation of wrong set of tokens.
-    programLines = programLines.filter(function(line) {
+    programLines = programLines.filter(line => {
       return line.trim().length !== 0;
     });
 
