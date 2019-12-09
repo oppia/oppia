@@ -46,7 +46,8 @@ class BaseRteComponent(python_utils.OBJECT):
         'MathLatexString': objects.MathLatexString,
         'ListOfTabs': objects.ListOfTabs,
         'int': objects.Int,
-        'bool': objects.Boolean
+        'bool': objects.Boolean,
+        'SkillSelector': objects.SkillSelector
     }
 
     @classmethod
@@ -102,6 +103,10 @@ class Collapsible(BaseRteComponent):
             name='oppia-noninteractive-tabs')
         if len(collapsible) or len(tabs):
             raise Exception('Nested tabs and collapsible')
+
+
+class Concept(BaseRteComponent):
+    """Class for Concept component."""
 
 
 class Image(BaseRteComponent):

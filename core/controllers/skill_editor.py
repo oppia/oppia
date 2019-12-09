@@ -22,6 +22,7 @@ from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_fetchers
+from core.domain import topic_services
 from core.domain import user_services
 import feconf
 import utils
@@ -204,6 +205,30 @@ class SkillDataHandler(base.BaseHandler):
                 skill_domain.Skill.require_valid_skill_id(skill_id)
         except Exception as e:
             raise self.PageNotFoundException('Invalid skill id.')
+        try:
+            skills = skill_services.get_multi_skills(skill_ids)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        skill_dicts = [skill.to_dict() for skill in skills]
+        self.values.update({
+            'skills': skill_dicts
+        })
+
+        self.render_json(self.values)
+
+
+class FetchSkillsHandler(base.BaseHandler):
+    """A handler for accessing all skills data."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        """Returns all skill IDs linked to some topic."""
+
+        skill_ids = topic_services.get_all_skill_ids_assigned_to_some_topic()
+
         try:
             skills = skill_services.get_multi_skills(skill_ids)
         except Exception as e:

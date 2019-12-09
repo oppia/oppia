@@ -274,4 +274,30 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check GET returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
+        self.url = '%s/1,%s' % (
+            feconf.SKILL_DATA_URL_PREFIX, self.skill_id_2)
+        self.get_json(self.url, expected_status_int=404)
+        self.logout()
+
+
+class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for FetchSkillsHandler."""
+
+    def setUp(self):
+        super(FetchSkillsHandlerTest, self).setUp()
+        self.url = feconf.FETCH_SKILLS_URL_PREFIX
+
+    def test_skill_data_handler_get_multiple_skills(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check that admins can access two skills data at the same time.
+        json_response = self.get_json(self.url)
+        self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
+        self.assertEqual(len(json_response['skills']), 1)
+        self.logout()
+
+    def test_skill_data_handler_get_fails(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check GET returns 404 when cannot get skill by id.
+        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.get_json(self.url, expected_status_int=404)
         self.logout()

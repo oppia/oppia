@@ -40,6 +40,7 @@ angular.module('oppia').factory('RteHelperService', [
         id: RTE_COMPONENT_SPECS[componentId].frontend_id,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
+        isLessonRelated: RTE_COMPONENT_SPECS[componentId].is_lesson_related,
         isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
         tooltip: RTE_COMPONENT_SPECS[componentId].tooltip
@@ -74,7 +75,7 @@ angular.module('oppia').factory('RteHelperService', [
         return angular.copy(_RICH_TEXT_COMPONENTS);
       },
       isInlineComponent: function(richTextComponent) {
-        var inlineComponents = ['link', 'math'];
+        var inlineComponents = ['link', 'math', 'concept-card'];
         return inlineComponents.indexOf(richTextComponent) !== -1;
       },
       // The refocusFn arg is a function that restores focus to the text editor
