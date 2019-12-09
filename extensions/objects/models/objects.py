@@ -335,6 +335,19 @@ class SanitizedUrl(BaseObject):
     }
 
 
+class SkillSelector(BaseObject):
+    """Skill selector class."""
+
+    description = 'The skill summary for the concept card.'
+
+    SCHEMA = {
+        'type': 'unicode',
+        'ui_config': {
+            'placeholder': 'Search for skill'
+        }
+    }
+
+
 class MusicPhrase(BaseObject):
     """List of Objects that represent a musical phrase."""
 
