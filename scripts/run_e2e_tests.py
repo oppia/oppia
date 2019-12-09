@@ -39,25 +39,29 @@ GOOGLE_APP_ENGINE_PORT = 9001
 OPPIA_SERVER_PORT = 8181
 PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
-GECKO_PROVIDER_FILE_PATH = os.path.join(
-    common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider',
-    'geckodriver.js')
-CHROME_PROVIDER_FILE_PATH = os.path.join(
-    common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider',
-    'chromedriver.js')
-CHROME_PROVIDER_BAK_FILE_PATH = os.path.join(
-    common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider',
-    'chromedriver.js.bak')
-GECKO_PROVIDER_BAK_FILE_PATH = os.path.join(
-    common.NODE_MODULES_PATH, 'webdriver-manager', 'dist', 'lib', 'provider',
-    'geckodriver.js.bak')
 
-PSUTIL_DIR = os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-5.6.7')
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 WAIT_PORT_TIMEOUT = 1000
+WEBDRIVER_HOME_PATH = os.path.join(
+    common.NODE_MODULES_PATH, 'webdriver-manager')
 WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
-    common.CURR_DIR, 'node_modules', 'webdriver-manager', 'bin',
-    'webdriver-manager')
+    WEBDRIVER_HOME_PATH, 'bin', 'webdriver-manager')
+
+WEBDRIVER_PROVIDER_PATH = os.path.join(
+    WEBDRIVER_HOME_PATH, 'dist', 'lib', 'provider')
+
+GECKO_PROVIDER_FILE_PATH = os.path.join(
+    WEBDRIVER_PROVIDER_PATH, 'geckodriver.js')
+
+CHROME_PROVIDER_FILE_PATH = os.path.join(
+    WEBDRIVER_PROVIDER_PATH, 'chromedriver.js')
+
+CHROME_PROVIDER_BAK_FILE_PATH = os.path.join(
+    WEBDRIVER_PROVIDER_PATH, 'chromedriver.js.bak')
+
+GECKO_PROVIDER_BAK_FILE_PATH = os.path.join(
+    WEBDRIVER_PROVIDER_PATH, 'geckodriver.js.bak')
+
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
 PATTERN_FOR_REPLACE_WEBDRIVER_CODE = r'this\.osArch = os\.arch\(\);'
@@ -134,9 +138,11 @@ of the failed tests in ../protractor-screenshots/
 
 def cleanup():
     """Kill the running subprocesses and server fired in this program."""
+    dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
+    webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
     processes_to_kill = [
-        re.compile(r'.*[Dd]ev_appserver\.py --host 0\.0\.0\.0 --port 9001.*'),
-        re.compile('.*chromedriver_%s.*' % CHROME_DRIVER_VERSION)
+        '.*%s.*' % re.escape(dev_appserver_path),
+        '.*%s.*' % re.escape(webdriver_download_path)
     ]
     for p in SUBPROCESSES:
         p.kill()
@@ -370,7 +376,7 @@ def main(args=None):
         sys.exit(1)
     setup_and_install_dependencies()
 
-    sys.path.insert(1, PSUTIL_DIR)
+
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
@@ -388,8 +394,8 @@ def main(args=None):
         run_on_browserstack, parsed_args.sharding,
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 
-    result = common.run_cmd(commands)
-    python_utils.PRINT(result)
+    p = subprocess.Popen(commands)
+    p.communicate()
 
 
 if __name__ == '__main__':

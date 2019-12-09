@@ -5,6 +5,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import atexit
 import fileinput
 import os
+import re
 import sys
 import subprocess
 import time
@@ -101,21 +102,24 @@ of the failed tests in ../protractor-screenshots/
     def test_cleanup_when_no_subprocess(self):
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
+
+        dev_appserver_path = '%s/dev_appserver.py' % (
+            common.GOOGLE_APP_ENGINE_HOME)
+        webdriver_download_path = '%s/downloads' % (
+            run_e2e_tests.WEBDRIVER_HOME_PATH)
         process_pattern = [
-            r'.*[Dd]ev_appserver\.py --host 0\.0\.0\.0 --port 9001.*',
-            '.*chromedriver_%s.*' % run_e2e_tests.CHROME_DRIVER_VERSION
+            ('.*%s.*' % re.escape(dev_appserver_path),),
+            ('.*%s.*' % re.escape(webdriver_download_path),)
         ]
+        def mock_kill_process_based_on_regex(unused_regex):
+            return
 
-        def mock_kill_process_based_on_regex(regex):
-            self.assertIn(regex.pattern, process_pattern)
-            process_pattern.remove(regex.pattern)
-
-        swap_kill_process = self.swap(
+        swap_kill_process = self.swap_with_checks(
             common, 'kill_processes_based_on_regex',
-            mock_kill_process_based_on_regex)
+            mock_kill_process_based_on_regex,
+            expected_args=process_pattern)
         with swap_kill_process, subprocess_swap:
             run_e2e_tests.cleanup()
-        self.assertEqual(process_pattern, [])
 
     def test_cleanup_when_subprocesses_exist(self):
 
@@ -662,11 +666,17 @@ of the failed tests in ../protractor-screenshots/
 
         def mock_get_e2e_test_parameters(
                 unused_browser_stack, unused_sharding,
-                unused_sharding_instances,unused_suite, unused_dev_mode):
+                unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
-        def mock_run_cmd(unused_commands):
-            return
+        def mock_popen(unused_commands):
+            def mock_communicate():
+                return
+            result = MockProcessClass()
+            result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
+            return result
+
+
 
         check_swap = self.swap_with_checks(
             run_e2e_tests, 'check_running_instance',
@@ -701,12 +711,12 @@ of the failed tests in ../protractor-screenshots/
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=(
                 False, True, '3', 'full', True))
-        run_cmd_swap = self.swap_with_checks(
-            common, 'run_cmd', mock_run_cmd, expected_args=([
+        popen_swap = self.swap_with_checks(
+            subprocess, 'Popen', mock_popen, expected_args=([
                 common.NODE_BIN_PATH, run_e2e_tests.PROTRACTOR_BIN_PATH,
                 'commands'],))
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap, start_google_engine_swap:
                 with wait_swap, check_screenshot_swap, get_parameters_swap:
-                    with run_cmd_swap:
+                    with popen_swap:
                         run_e2e_tests.main(args=[])
