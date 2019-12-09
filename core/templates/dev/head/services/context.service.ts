@@ -21,6 +21,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { AppConstants } from 'app.constants';
+import { EntityContextObjectFactory } from
+  'domain/utilities/EntityContextObjectFactory.ts';
 import { ServicesConstants } from 'services/services.constants';
 import { UrlService } from 'services/contextual/url.service';
 
@@ -28,12 +30,15 @@ import { UrlService } from 'services/contextual/url.service';
   providedIn: 'root'
 })
 export class ContextService {
-  constructor(private urlService: UrlService) {}
+  constructor(
+    private urlService: UrlService,
+    private entityContextObjectFactory: EntityContextObjectFactory) {}
 
   pageContext = null;
   explorationId = null;
   questionId = null;
   editorContext = null;
+  customEntityContext = null;
 
   init(editorName: string): void {
     this.editorContext = editorName;
@@ -111,7 +116,22 @@ export class ContextService {
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER);
   }
 
+  // This function is used in cases where the URL does not specify the
+  // correct context for some case. eg: Viewing a skill's concept card on
+  // any page via the RTE.
+  setCustomEntityContext(entityType: string, entityId: string): void {
+    this.customEntityContext = this.entityContextObjectFactory.create(
+      entityId, entityType);
+  }
+
+  removeCustomEntityContext(): void {
+    this.customEntityContext = null;
+  }
+
   getEntityId(): string {
+    if (this.customEntityContext !== null) {
+      return this.customEntityContext.getId();
+    }
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
     for (let i = 0; i < pathnameArray.length; i++) {
@@ -127,6 +147,9 @@ export class ContextService {
 
   // add constants for entity type
   getEntityType(): string {
+    if (this.customEntityContext !== null) {
+      return this.customEntityContext.getType();
+    }
     let pathnameArray = this.urlService.getPathname().split('/');
     let hashValues = this.urlService.getHash().split('#');
     for (let i = 0; i < pathnameArray.length; i++) {
