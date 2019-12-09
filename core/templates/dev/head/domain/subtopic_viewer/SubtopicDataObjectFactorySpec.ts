@@ -16,84 +16,73 @@
  * @fileoverview Tests for SubtopicDataObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
 import { TestBed } from '@angular/core/testing';
 
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
 
-require('domain/subtopic_viewer/SubtopicDataObjectFactory.ts');
+import { SubtopicDataObjectFactory } from
+  'domain/subtopic_viewer/SubtopicDataObjectFactory.ts';
 
-describe('Subtopic data object factory', function() {
-  var SubtopicDataObjectFactory = null;
-  var _sampleSubtopicData = null;
-  let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
-    null;
+describe('Subtopic data object factory', () => {
+  describe('subtopic data object factory', () => {
+    var _sampleSubtopicData = null;
+    let subtopicDataObjectFactory: SubtopicDataObjectFactory =
+      null;
+    let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
+      null;
+    
+    beforeEach(() => {
+      subtopicDataObjectFactory = TestBed.get(SubtopicDataObjectFactory);
+      subtopicPageContentsObjectFactory = TestBed.get(
+        SubtopicPageContentsObjectFactory);
+      
+      var sampleSubtopicDataBackendDict = {
+        subtopic_title: 'sample_title',
+        page_contents: {
+          subtitled_html: {
+            html: 'test content',
+            content_id: 'content'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  filename: 'test.mp3',
+                  file_size_bytes: 100,
+                  needs_update: false
+                }
+              }
+            }
+          }
+        }
+      };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    SubtopicDataObjectFactory = $injector.get('SubtopicDataObjectFactory');
-
-    TestBed.configureTestingModule({
-      providers: [SubtopicPageContentsObjectFactory]
+      _sampleSubtopicData = subtopicDataObjectFactory.createFromBackendDict(
+        sampleSubtopicDataBackendDict);
     });
 
-    subtopicPageContentsObjectFactory = TestBed.get(
-      SubtopicPageContentsObjectFactory);
-
-    var sampleSubtopicDataBackendDict = {
-      subtopic_title: 'sample_title',
-      page_contents: {
-        subtitled_html: {
-          html: 'test content',
-          content_id: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'test.mp3',
-                file_size_bytes: 100,
-                needs_update: false
+    it('should be able to get all the values', function() {
+      expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
+      expect(_sampleSubtopicData.getPageContents()).toEqual(
+        subtopicPageContentsObjectFactory.createFromBackendDict({
+          subtitled_html: {
+            html: 'test content',
+            content_id: 'content'
+          },
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  filename: 'test.mp3',
+                  file_size_bytes: 100,
+                  needs_update: false
+                }
               }
             }
           }
-        }
-      }
-    };
-    _sampleSubtopicData = SubtopicDataObjectFactory.createFromBackendDict(
-      sampleSubtopicDataBackendDict);
-  }));
-
-  it('should be able to get all the values', function() {
-    expect(_sampleSubtopicData.getSubtopicTitle()).toEqual('sample_title');
-    expect(_sampleSubtopicData.getPageContents()).toEqual(
-      subtopicPageContentsObjectFactory.createFromBackendDict({
-        subtitled_html: {
-          html: 'test content',
-          content_id: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'test.mp3',
-                file_size_bytes: 100,
-                needs_update: false
-              }
-            }
-          }
-        }
-      })
-    );
+        })
+      );
+    });
   });
 });

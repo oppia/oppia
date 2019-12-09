@@ -18,15 +18,18 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ajs.ts');
-require('domain/subtopic_viewer/SubtopicDataObjectFactory.ts');
+
+import { SubtopicDataObjectFactory } from
+  'domain/subtopic_viewer/SubtopicDataObjectFactory';
 
 angular.module('oppia').factory('SubtopicViewerBackendApiService', [
-  '$http', '$q', 'SubtopicDataObjectFactory', 'UrlInterpolationService',
+  '$http', '$q', 'UrlInterpolationService',
   'SUBTOPIC_DATA_URL_TEMPLATE',
-  function($http, $q, SubtopicDataObjectFactory, UrlInterpolationService,
+  function($http, $q, UrlInterpolationService,
       SUBTOPIC_DATA_URL_TEMPLATE) {
     var subtopicDataDict = null;
     var subtopicDataObject = null;
+    var subtopicDataObjectFactory = new SubtopicDataObjectFactory();
     var _fetchSubtopicData = function(
         topicName, subtopicId, successCallback, errorCallback) {
       var subtopicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -37,7 +40,7 @@ angular.module('oppia').factory('SubtopicViewerBackendApiService', [
 
       $http.get(subtopicDataUrl).then(function(response) {
         subtopicDataDict = angular.copy(response.data);
-        subtopicDataObject = SubtopicDataObjectFactory.createFromBackendDict(
+        subtopicDataObject = subtopicDataObjectFactory.createFromBackendDict(
           subtopicDataDict
         );
         if (successCallback) {

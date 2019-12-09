@@ -20,8 +20,11 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
-require('domain/subtopic_viewer/SubtopicDataObjectFactory.ts');
+
+import { SubtopicDataObjectFactory } from
+  'domain/subtopic_viewer/SubtopicDataObjectFactory.ts';
 
 describe('Subtopic viewer backend API service', function() {
   var SubtopicViewerBackendApiService = null;
@@ -31,7 +34,8 @@ describe('Subtopic viewer backend API service', function() {
   var $httpBackend = null;
   var UndoRedoService = null;
   var sampleDataResultsObjects = null;
-  var SubtopicDataObjectFactory = null;
+  let subtopicDataObjectFactory: SubtopicDataObjectFactory = 
+    null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -47,7 +51,8 @@ describe('Subtopic viewer backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
-    SubtopicDataObjectFactory = $injector.get('SubtopicDataObjectFactory');
+    subtopicDataObjectFactory = TestBed.get(
+      SubtopicDataObjectFactory);
 
     // Sample subtopic page contents object returnable from the backend
     sampleDataResults = {
@@ -71,7 +76,7 @@ describe('Subtopic viewer backend API service', function() {
       }
     };
 
-    sampleDataResultsObjects = SubtopicDataObjectFactory.createFromBackendDict(
+    sampleDataResultsObjects = subtopicDataObjectFactory.createFromBackendDict(
       sampleDataResults
     );
   }));

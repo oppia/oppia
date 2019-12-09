@@ -17,6 +17,9 @@
  * subtopic data domain objects.
  */
 
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicPageContentsObjectFactory } from
@@ -26,40 +29,41 @@ import { RecordedVoiceoversObjectFactory } from
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 
-angular.module('oppia').factory('SubtopicDataObjectFactory',
-  [function() {
-    var SubtopicData = function(
-        subtopicTitle, pageContents) {
-      var subtopicPageContentsObjectFactory =
-        new SubtopicPageContentsObjectFactory(
-          new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
-          new SubtitledHtmlObjectFactory());
+export class SubtopicData {
+  _subtopic_title;
+  _page_contents;
 
-      this._subtopic_title = subtopicTitle;
-      this._page_contents = subtopicPageContentsObjectFactory.
+  constructor(private subtopicPageContentsObjectFactory:SubtopicPageContentsObjectFactory, subtopicTitle, pageContents) {
+    this._subtopic_title = subtopicTitle;
+    this._page_contents = subtopicPageContentsObjectFactory.
         createFromBackendDict(pageContents);
-    };
+  }
 
-    // Instance methods
+  getSubtopicTitle() {
+    return this._subtopic_title;
+  }
 
-    SubtopicData.prototype.getSubtopicTitle = function() {
-      return this._subtopic_title;
-    };
+  getPageContents() {
+    return this._page_contents;
+  }
+}
 
-    SubtopicData.prototype.getPageContents = function() {
-      return this._page_contents;
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class SubtopicDataObjectFactory {
+  createFromBackendDict(subtopicDataBackendDict: any): SubtopicData {
+    return new SubtopicData(
+      new SubtopicPageContentsObjectFactory(
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
+        new SubtitledHtmlObjectFactory()
+      ),
+      subtopicDataBackendDict.subtopic_title,
+      subtopicDataBackendDict.page_contents
+    )
+  }
+}
 
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SubtopicData['createFromBackendDict'] = function(
-        subtopicDataBackendDict) {
-      /* eslint-enable dot-notation */
-      return new SubtopicData(
-        subtopicDataBackendDict.subtopic_title,
-        subtopicDataBackendDict.page_contents
-      );
-    };
-
-    return SubtopicData;
-  }]);
+angular.module('oppia').factory(
+  'SubtopicDataObjectFactory',
+  downgradeInjectable(SubtopicDataObjectFactory));
