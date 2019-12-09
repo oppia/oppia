@@ -92,6 +92,9 @@ DIRS_TO_ADD_TO_SYS_PATH = [
 COVERAGE_DIR = os.path.join(
     os.getcwd(), os.pardir, 'oppia_tools',
     'coverage-%s' % common.COVERAGE_VERSION)
+COVERAGE_MODULE_PATH = os.path.join(
+    os.getcwd(), os.pardir, 'oppia_tools',
+    'coverage-%s' % common.COVERAGE_VERSION, 'coverage')
 
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
@@ -215,7 +218,7 @@ class TestingTaskSpec(python_utils.OBJECT):
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                'python', '-m', 'coverage', 'run', '-p', TEST_RUNNER_PATH,
+                'python', COVERAGE_MODULE_PATH, 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
         else:
             exc_list = ['python', TEST_RUNNER_PATH, test_target_flag]
@@ -358,11 +361,11 @@ def main(args=None):
             raise Exception('Coverage is not installed, please run the start '
                             'script.')
 
-        pythonpath = [COVERAGE_DIR]
+        pythonpath_components = [COVERAGE_DIR]
         if os.environ.get('PYTHONPATH'):
-            pythonpath.append(os.environ.get('PYTHONPATH'))
+            pythonpath_components.append(os.environ.get('PYTHONPATH'))
 
-        os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath)
+        os.environ['PYTHONPATH'] = os.pathsep.join(pythonpath_components)
 
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
@@ -504,9 +507,9 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call(['python', '-m', 'coverage', 'combine'])
+        subprocess.check_call(['python', COVERAGE_MODULE_PATH, 'combine'])
         process = subprocess.Popen(
-            ['python', '-m', 'coverage', 'report',
+            ['python', COVERAGE_MODULE_PATH, 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
              % common.OPPIA_TOOLS_DIR, '--show-missing'],
             stdout=subprocess.PIPE)
@@ -515,7 +518,7 @@ def main(args=None):
         python_utils.PRINT(report_stdout)
 
         python_utils.PRINT('Generating xml coverage report...')
-        subprocess.check_call(['python', '-m', 'coverage', 'xml'])
+        subprocess.check_call(['python', COVERAGE_MODULE_PATH, 'xml'])
 
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
