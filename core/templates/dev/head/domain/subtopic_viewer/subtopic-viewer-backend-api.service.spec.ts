@@ -34,7 +34,7 @@ describe('Subtopic viewer backend API service', function() {
   var $httpBackend = null;
   var UndoRedoService = null;
   var sampleDataResultsObjects = null;
-  let subtopicDataObjectFactory: SubtopicDataObjectFactory = 
+  let subtopicDataObjectFactory: SubtopicDataObjectFactory =
     null;
 
   beforeEach(angular.mock.module('oppia'));

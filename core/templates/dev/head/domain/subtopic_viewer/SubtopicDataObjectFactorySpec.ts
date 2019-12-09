@@ -31,12 +31,12 @@ describe('Subtopic data object factory', () => {
       null;
     let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
       null;
-    
+
     beforeEach(() => {
       subtopicDataObjectFactory = TestBed.get(SubtopicDataObjectFactory);
       subtopicPageContentsObjectFactory = TestBed.get(
         SubtopicPageContentsObjectFactory);
-      
+
       var sampleSubtopicDataBackendDict = {
         subtopic_title: 'sample_title',
         page_contents: {

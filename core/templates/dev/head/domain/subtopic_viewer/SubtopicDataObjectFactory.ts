@@ -30,21 +30,21 @@ import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 
 export class SubtopicData {
-  _subtopic_title;
-  _page_contents;
+  subtopicTitle;
+  pageContents;
 
   constructor(private subtopicPageContentsObjectFactory:SubtopicPageContentsObjectFactory, subtopicTitle, pageContents) {
-    this._subtopic_title = subtopicTitle;
-    this._page_contents = subtopicPageContentsObjectFactory.
-        createFromBackendDict(pageContents);
+    this.subtopicTitle = subtopicTitle;
+    this.pageContents = subtopicPageContentsObjectFactory.
+      createFromBackendDict(pageContents);
   }
 
   getSubtopicTitle() {
-    return this._subtopic_title;
+    return this.subtopicTitle;
   }
 
   getPageContents() {
-    return this._page_contents;
+    return this.pageContents;
   }
 }
 
@@ -60,7 +60,7 @@ export class SubtopicDataObjectFactory {
       ),
       subtopicDataBackendDict.subtopic_title,
       subtopicDataBackendDict.page_contents
-    )
+    );
   }
 }
 
