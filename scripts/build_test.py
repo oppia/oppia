@@ -247,8 +247,8 @@ class BuildTests(test_utils.GenericTestBase):
         BASE_HTML_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_DEV_DIR, 'base.html')
         BASE_JS_RELATIVE_PATH = os.path.join('pages', 'Base.js')
-        BASE_JS_RELATIVE_PATH_IN_HTML = (
-            common.convert_windows_style_path_to_unix_style(
+        BASE_JS_FILE_URL = (
+            common.convert_filepath_to_url(
                 BASE_JS_RELATIVE_PATH))
         BASE_JS_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
@@ -276,7 +276,7 @@ class BuildTests(test_utils.GenericTestBase):
                 % BASE_HTML_SOURCE_PATH)
             # Look for templates/pages/Base.js in source_base_file_content.
             self.assertIn(
-                BASE_JS_RELATIVE_PATH_IN_HTML, source_base_file_content)
+                BASE_JS_FILE_URL, source_base_file_content)
 
         # Build base.html file.
         with python_utils.open_file(
@@ -293,7 +293,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Final filepath in base.html example:
         # /build/templates/head/pages/Base.081ce90f17ecdf07701d83cb860985c2.js.
         final_filename = build._insert_hash(
-            BASE_JS_RELATIVE_PATH_IN_HTML, file_hashes[BASE_JS_RELATIVE_PATH])
+            BASE_JS_FILE_URL, file_hashes[BASE_JS_RELATIVE_PATH])
         # Look for templates/pages/Base.081ce90f17ecdf07701d83cb860985c2.js in
         # minified_html_file_content.
         self.assertIn(final_filename, minified_html_file_content)
