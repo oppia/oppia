@@ -24,16 +24,16 @@ import sys
 
 import python_utils
 
-LCOV_FILE_PATH = '../karma_coverage_reports/lcov.info'
-DEV_LCOV_FILE_PATH = './tmp/dev-lcov.info'
-PR_LCOV_FILE_PATH = './tmp/pr-lcov.info'
+LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
+DEV_LCOV_FILE_PATH = os.path.join(os.curdir, 'tmp', 'dev-lcov.info')
+PR_LCOV_FILE_PATH = os.path.join(os.curdir, 'tmp', 'pr-lcov.info')
 
 
 def change_git_branch(branch):
     """Changes git branch.
 
     Args:
-      branch: string. Name of the branch to be changed.
+      branch: str. Name of the branch to be changed.
     """
     subprocess.check_call(['git', 'checkout', branch])
 
@@ -75,8 +75,7 @@ def filter_lines(line):
         Boolean. If the line has the file path or total lines or covered lines
         of the test.
     """
-    return (line.find('SF') >= 0 or line.find('LH') >= 0
-            or line.find('LF') >= 0)
+    return ('SF' in line or 'LH' in line or 'LF' in line)
 
 
 def get_test_file_name(test_path):
@@ -122,7 +121,7 @@ def get_lcov_file_tests(file_path):
         return tests_array_filtered
 
 
-def build_tests_fully_coverage_dict():
+def get_coverage_dict_for_fully_covered_tests():
     """Build a dict with only fully covered files from develop branch.
 
     Returns:
@@ -153,13 +152,13 @@ def build_tests_fully_coverage_dict():
     return coverage_dict        
 
 
-def lcov_files_diff():
+def check_coverage_reduction_of_fully_covered_file():
     """Check if any 100% covered file had the coverage dropped.
 
     Raises:
       Exception: If PR_LCOV_FILE_PATH doesn't exist.
     """
-    fully_covered_tests = build_tests_fully_coverage_dict()
+    fully_covered_tests = get_coverage_dict_for_fully_covered_tests()
 
     if not os.path.exists(PR_LCOV_FILE_PATH):
         raise Exception('File at path {} doesn\'t exist'.format(
@@ -173,11 +172,7 @@ def lcov_files_diff():
             total_lines = lines[1].split(':')[1]
             covered_lines = lines[2].split(':')[1]
 
-            test = fully_covered_tests[test_name]
-            total_lines_test = test[0]
-
-            if (total_lines_test == int(total_lines)
-                    and int(total_lines) != int(covered_lines)):
+            if (int(total_lines) != int(covered_lines)):
                 sys.stderr.write(
                     'The {} file is fully covered and it has '
                     'decreased after the changes \n'.format(test_name))
@@ -185,7 +180,13 @@ def lcov_files_diff():
 
 
 def main():
-    """The first function to be executated."""
+    """Runs all the steps for checking if there is any decrease of 100% covered
+      files. Only PR branches is going to be checked, develop branch doesn't
+      need this check because it has the right percentage to compare the
+      test coverage from new changes in the PRs. Master branch doesn't need the
+      check neither, because all changes in develop should already be checked
+      during the PR review.
+    """
     current_branch = subprocess.check_output([
         'git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
 
@@ -195,18 +196,18 @@ def main():
         create_tmp_folder()
 
         shutil.copyfile(
-            os.path.join(*LCOV_FILE_PATH.split('/')),
-            os.path.join(*PR_LCOV_FILE_PATH.split('/')))
+            LCOV_FILE_PATH,
+            PR_LCOV_FILE_PATH)
 
         change_git_branch('develop')
 
         run_frontend_tests_script()
 
         shutil.copyfile(
-            os.path.join(*LCOV_FILE_PATH.split('/')),
-            os.path.join(*DEV_LCOV_FILE_PATH.split('/')))
+            LCOV_FILE_PATH,
+            DEV_LCOV_FILE_PATH)
 
-        lcov_files_diff()
+        check_coverage_reduction_of_fully_covered_file()
 
         change_git_branch(current_branch)
 
