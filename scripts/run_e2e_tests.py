@@ -358,11 +358,11 @@ def start_google_engine(dev_mode):
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode else '')
 
     p = subprocess.Popen(
-        'python %s/dev_appserver.py  --host 0.0.0.0 --port %s '
+        '%s %s/dev_appserver.py  --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' % (
-            common.GOOGLE_APP_ENGINE_HOME, GOOGLE_APP_ENGINE_PORT,
-            app_yaml_filepath), shell=True)
+            common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
+            GOOGLE_APP_ENGINE_PORT, app_yaml_filepath), shell=True)
     SUBPROCESSES.append(p)
 
 

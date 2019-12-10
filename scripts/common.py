@@ -33,6 +33,8 @@ NODE_VERSION = '10.15.3'
 YARN_VERSION = 'v1.17.3'
 PSUTIL_VERSION = '5.6.7'
 
+CURRENT_PYTHON_BIN = sys.executable
+
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')

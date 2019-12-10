@@ -547,10 +547,10 @@ of the failed tests in ../protractor-screenshots/
         def mock_popen(args, shell):
             return
         expected_command = (
-            'python %s/dev_appserver.py  --host 0.0.0.0 --port %s '
+            '%s %s/dev_appserver.py  --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=critical '
             '--log_level=critical --skip_sdk_update_check=true %s' % (
-                common.GOOGLE_APP_ENGINE_HOME,
+                common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
                 run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
                 'app_dev.yaml'))
         popen_swap = self.swap_with_checks(
@@ -563,10 +563,10 @@ of the failed tests in ../protractor-screenshots/
         def mock_popen(args, shell):
             return
         expected_command = (
-            'python %s/dev_appserver.py  --host 0.0.0.0 --port %s '
+            '%s %s/dev_appserver.py  --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=critical '
             '--log_level=critical --skip_sdk_update_check=true %s' % (
-                common.GOOGLE_APP_ENGINE_HOME,
+                common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
                 run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
                 'app.yaml'))
         popen_swap = self.swap_with_checks(
