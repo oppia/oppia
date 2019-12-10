@@ -106,6 +106,9 @@ of the failed tests in ../protractor-screenshots/
             run_e2e_tests.check_screenshot()
 
     def test_cleanup_when_no_subprocess(self):
+        def mock_is_windows_os():
+            return False
+
         subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
 
 
@@ -124,7 +127,9 @@ of the failed tests in ../protractor-screenshots/
             common, 'kill_processes_based_on_regex',
             mock_kill_process_based_on_regex,
             expected_args=process_pattern)
-        with swap_kill_process, subprocess_swap:
+        swap_is_windows = self.swap_with_checks(
+            common, 'is_windows_os', mock_is_windows_os)
+        with swap_kill_process, subprocess_swap, swap_is_windows:
             run_e2e_tests.cleanup()
 
     def test_cleanup_when_subprocesses_exist(self):
@@ -139,6 +144,35 @@ of the failed tests in ../protractor-screenshots/
             common, 'kill_processes_based_on_regex',
             mock_kill_process_based_on_regex, called_times=len(mock_processes))
         with subprocess_swap, swap_kill_process:
+            run_e2e_tests.cleanup()
+
+    def test_cleanup_on_windows(self):
+        def mock_is_windows_os():
+            return True
+
+        subprocess_swap = self.swap(run_e2e_tests, 'SUBPROCESSES', [])
+
+        dev_appserver_path = '%s/dev_appserver.py' % (
+            common.GOOGLE_APP_ENGINE_HOME)
+        webdriver_download_path = '%s/downloads' % (
+            run_e2e_tests.WEBDRIVER_HOME_PATH)
+        process_pattern = [
+            ('.*%s.*' % re.escape(dev_appserver_path),),
+            ('.*%s.*' % re.escape(webdriver_download_path),)
+        ]
+        expected_pattern = process_pattern[:]
+        expected_pattern[1] = ('.*%s.*' % re.escape(
+            os.path.abspath(webdriver_download_path)),)
+        def mock_kill_process_based_on_regex(unused_regex):
+            return
+
+        swap_kill_process = self.swap_with_checks(
+            common, 'kill_processes_based_on_regex',
+            mock_kill_process_based_on_regex,
+            expected_args=expected_pattern)
+        swap_is_windows = self.swap_with_checks(
+            common, 'is_windows_os', mock_is_windows_os)
+        with swap_kill_process, subprocess_swap, swap_is_windows:
             run_e2e_tests.cleanup()
 
     def test_check_running_instances_when_ports_closed(self):
