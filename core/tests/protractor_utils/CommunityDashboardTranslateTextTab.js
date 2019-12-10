@@ -39,4 +39,4 @@ var CommunityDashboardTranslateTextTab = function() {
     expect(selectedLanguageElement.getText()).toMatch(language);
   };
 };
-exports.CommunityDashboardTranslateTextTab = ExplorationEditorTranslationTab;
+exports.CommunityDashboardTranslateTextTab = CommunityDashboardTranslateTextTab;
