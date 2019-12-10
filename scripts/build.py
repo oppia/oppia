@@ -93,15 +93,9 @@ JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
-# These files are present in both extensions and local_compiled_js/extensions.
-# They are required in local_compiled_js since they contain code used in
-# other ts files and excluding them from compilation will create compile
-# errors due to missing variables. So, the files should be built only from
-# one location instead of both the locations.
 JS_FILEPATHS_NOT_TO_BUILD = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/expression-parser.service.js')
+    'core/templates/dev/head/expressions/expression-parser.service.js',
+    'extensions/ckeditor_plugins/pre/plugin.js')
 
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -649,8 +643,8 @@ def should_file_be_built(filepath):
         bool. True if filepath should be built, else False.
     """
     if filepath.endswith('.js'):
-        return filepath not in JS_FILEPATHS_NOT_TO_BUILD and not any(
-            filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
+        return all(
+            not filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
         return False
     elif filepath.endswith('.ts'):
