@@ -1837,20 +1837,21 @@ tags: []
             called=True, called_times=None):
         original = getattr(obj, attr)
         newvalue.called_times = 0
+        msg = 'Failed in check attribute %s' % attr
         def wrapper(*args, **kwargs):
             if expected_args is not None:
                 if isinstance(expected_args, tuple):
-                    self.assertEqual(args, expected_args)
+                    self.assertEqual(args, expected_args, msg)
                 elif isinstance(expected_args, list):
-                    self.assertIn(args, expected_args)
+                    self.assertIn(args, expected_args, msg)
                     expected_args.remove(args)
                 else:
                     raise Exception()
             if expected_kwargs is not None:
                 if isinstance(expected_kwargs, dict):
-                    self.assertEqual(kwargs, expected_kwargs)
+                    self.assertEqual(kwargs, expected_kwargs, msg)
                 elif isinstance(expected_kwargs, list):
-                    self.assertIn(kwargs, expected_kwargs)
+                    self.assertIn(kwargs, expected_kwargs, msg)
                     expected_kwargs.remove(kwargs)
                 else:
                     raise Exception()
@@ -1867,9 +1868,9 @@ tags: []
         finally:
             setattr(obj, attr, original)
             if not error_occurred:
-                self.assertEqual(newvalue.called_times > 0, called)
+                self.assertEqual(newvalue.called_times > 0, called, msg)
                 if called_times is not None:
-                    self.assertEqual(called_times, newvalue.called_times)
+                    self.assertEqual(called_times, newvalue.called_times, msg)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
