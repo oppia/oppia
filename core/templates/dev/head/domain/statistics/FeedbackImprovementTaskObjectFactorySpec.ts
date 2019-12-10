@@ -18,63 +18,41 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // FeedbackImprovementTaskObjectFactory.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
-import { AnswerClassificationResultObjectFactory } from
-  'domain/classifier/AnswerClassificationResultObjectFactory';
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { ClassifierObjectFactory } from
-  'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/editability.service';
-import { ExplorationDraftObjectFactory } from
-  'domain/exploration/ExplorationDraftObjectFactory';
-import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+/* eslint-disable max-len */
+import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
+import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
+import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFactory';
+import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
+import { ExplorationDraftObjectFactory } from 'domain/exploration/ExplorationDraftObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementActionButtonObjectFactory } from
-  'domain/statistics/ImprovementActionButtonObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
+import { RecordedVoiceoversObjectFactory } from 'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-disable max-len */
-import { SolutionValidityService } from
-  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-import { StateClassifierMappingService } from
-  'pages/exploration-player-page/services/state-classifier-mapping.service';
-/* eslint-disable max-len */
-import { StateEditorService } from
-  'components/state-editor/state-editor-properties-services/state-editor.service';
 /* eslint-enable max-len */
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-/* eslint-enable max-len */
-import { SuggestionModalService } from 'services/suggestion-modal.service';
-/* eslint-disable max-len */
-import { ThreadStatusDisplayService } from
-  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { VoiceoverObjectFactory } from 'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 /* eslint-enable max-len */
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { ImprovementActionButtonObjectFactory } from 'domain/statistics/ImprovementActionButtonObjectFactory';
+import { LearnerAnswerDetailsObjectFactory } from 'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfoObjectFactory } from 'domain/statistics/LearnerAnswerInfoObjectFactory';
+import { SuggestionObjectFactory } from 'domain/suggestion/SuggestionObjectFactory';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { LearnerAnswerDetailsObjectFactory } from
-  'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfoObjectFactory } from
-  'domain/statistics/LearnerAnswerInfoObjectFactory';
+/* eslint-disable max-len */
+import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+/* eslint-disable max-len */
+import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
+import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { EditabilityService } from 'services/editability.service';
+/* eslint-enable max-len */
+import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -152,6 +130,26 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
       new LearnerAnswerDetailsObjectFactory());
     $provide.value(
       'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
+    $provide.value(
+      'ThreadDataService', {
+      data: {
+        feedbackThreads: [{
+          threadId: 'abc1'
+        }, {
+          threadId: 'def2'
+        }]
+      },
+      fetchThreads: function() {
+        return $q.all(function() {
+          return this.fetchMessages();
+        });
+      },
+      fetchMessages: function() {
+      },
+      getData: function() {
+        return this.data;
+      }
+    });
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -178,6 +176,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
       var mockThread = {threadId: 1};
       var task = FeedbackImprovementTaskObjectFactory.createNew(mockThread);
 
+      expect(task.isObsolete()).toBe(false);
       expect(task.getDirectiveData()).toBe(mockThread);
       expect(task.getDirectiveType()).toEqual(FEEDBACK_IMPROVEMENT_TASK_TYPE);
     });
@@ -185,12 +184,6 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
 
   describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
-      spyOn(ThreadDataService, 'fetchThreads').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'fetchMessages').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'getData').and.returnValue({
-        feedbackThreads: [{threadId: 'abc1'}, {threadId: 'def2'}]
-      });
-
       FeedbackImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
         expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
         expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
