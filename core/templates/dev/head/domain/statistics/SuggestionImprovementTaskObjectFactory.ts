@@ -44,7 +44,7 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
 
     /** @returns {string} - The actionable status of this task. */
     SuggestionImprovementTask.prototype.getStatus = function() {
-      return this._suggestionThread.status;
+      return this._suggestionThread ? this._suggestionThread.status : null;
     };
 
     /**
