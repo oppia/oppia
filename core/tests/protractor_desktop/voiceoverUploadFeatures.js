@@ -23,7 +23,7 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var ExplorationEditorPage =
     require('../protractor_utils/ExplorationEditorPage.js');
-var CreatorDashboardPage = 
+var CreatorDashboardPage =
     require('../protractor_utils/CreatorDashboardPage.js');
 
 describe('Voiceover upload features', function() {

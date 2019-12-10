@@ -283,7 +283,6 @@ describe('Exploration translation and voiceover tab', function() {
     explorationEditorTranslationTab.moveToState('final card');
     explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
       'Yeh aakhri panna hain.'));
-
     explorationEditorTranslationTab.expectCorrectStatusColor(
       'first', YELLOW_STATE_PROGRESS_COLOR);
     explorationEditorTranslationTab.expectCorrectStatusColor(
