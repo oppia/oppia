@@ -31,7 +31,6 @@ from core.domain import state_domain
 from core.tests import test_utils
 import feconf
 import utils
-from core.domain.state_domain import RuleSpec
 
 
 def mock_get_filename_with_dimensions(filename, unused_exp_id):
@@ -259,11 +258,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        
-        answer_group_list = [state_domain.AnswerGroup.from_dict(answer_group_obj) for answer_group_obj in answer_group_list]
+        answer_group_list = [state_domain.AnswerGroup.from_dict(
+            answer_group_obj) for answer_group_obj in answer_group_list]
         init_state.update_interaction_answer_groups(answer_group_list)
-        # init_state.update_interaction_answer_groups(
-        #     [answer_group_dict])
         hints_list = []
         hints_list.append({
             'hint_content': {
@@ -868,11 +865,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-
-        answer_group_list = [state_domain.AnswerGroup.from_dict(answer_group_obj) for answer_group_obj in answer_group_list]
-        exploration.init_state.update_interaction_answer_groups(answer_group_list)
-        # exploration.init_state.update_interaction_answer_groups(
-        #     [answer_group_dict])
+        answer_group_list = [state_domain.AnswerGroup.from_dict(
+            answer_group_obj) for answer_group_obj in answer_group_list]
+        exploration.init_state.update_interaction_answer_groups(
+            answer_group_list)
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'feedback_1',
@@ -1281,9 +1277,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-
-        answer_groups_list = [state_domain.AnswerGroup.from_dict(answer_group_obj) 
-                for answer_group_obj in answer_groups_list]
+        answer_groups_list = [state_domain.AnswerGroup.from_dict(
+            answer_group_obj) for answer_group_obj in answer_groups_list]
 
         with self.assertRaisesRegexp(
             Exception, 'Expected rule_inputs to be a dict'):
@@ -1313,9 +1308,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-
-        answer_groups_list = [state_domain.AnswerGroup.from_dict(answer_group_obj) 
-                for answer_group_obj in answer_groups_list]
+        answer_groups_list = [state_domain.AnswerGroup.from_dict(
+            answer_group_obj) for answer_group_obj in answer_groups_list]
 
         with self.assertRaisesRegexp(
             Exception,
@@ -1355,7 +1349,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'training_data': [],
             'tagged_skill_misconception_id': None
         }]
-        answer_groups = [state_domain.AnswerGroup.from_dict(answer_group_obj) for answer_group_obj in answer_groups]
+        answer_groups = [state_domain.AnswerGroup.from_dict(
+            answer_group_obj) for answer_group_obj in answer_groups]
         exploration.init_state.update_interaction_answer_groups(answer_groups)
 
         with logging_swap, self.assertRaises(KeyError):
