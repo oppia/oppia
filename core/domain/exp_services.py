@@ -363,8 +363,9 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected answer groups to be a list, '
                             'recieved %s' % change.new_value)
-                    new_value_list = [state_domain.AnswerGroup.from_dict(answer_group_obj) 
-                        for answer_group_obj in change.new_value]
+                    new_value_list = [
+                        state_domain.AnswerGroup.from_dict(answer_group_obj
+                        ) for answer_group_obj in change.new_value]
                     state.update_interaction_answer_groups(new_value_list)
                 elif (
                         change.property_name ==
