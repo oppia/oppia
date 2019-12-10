@@ -438,7 +438,7 @@ def kill_processes_based_on_regex(pattern):
             if regex.match(cmdline) and process.is_running():
                 python_utils.PRINT('Killing %s ...' % cmdline)
                 process.kill()
-        except psutil.AccessDenied:
+        except psutil.Error:
             continue
 
 
