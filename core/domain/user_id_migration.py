@@ -182,21 +182,17 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         Raises:
             MissingUserException: UserSettingsModel with GAE ID doesn't exist.
         """
-        non_admin_gae_ids = [
-            gae_id for gae_id in gae_ids
-            if gae_id != feconf.SYSTEM_COMMITTER_ID]
-        user_setting_models = user_models.UserSettingsModel.query(
-            user_models.UserSettingsModel.gae_id.IN(non_admin_gae_ids)).fetch()
-        if len(user_setting_models) != len(non_admin_gae_ids):
-            found_gae_ids = [model.gae_id for model in user_setting_models]
-            for gae_id in non_admin_gae_ids:
-                if gae_id not in found_gae_ids:
+        new_ids = []
+        for gae_id in gae_ids:
+            if gae_id == feconf.SYSTEM_COMMITTER_ID:
+                new_ids.append(feconf.SYSTEM_COMMITTER_ID)
+            else:
+                user_settings_model = (
+                    user_models.UserSettingsModel.get_by_gae_id(gae_id))
+                if not user_settings_model:
                     raise MissingUserException(gae_id)
+                new_ids.append(user_settings_model.id)
 
-        new_ids = [model.id for model in user_setting_models]
-        new_ids.extend(
-            [gae_id for gae_id in gae_ids
-             if gae_id == feconf.SYSTEM_COMMITTER_ID])
         return new_ids
 
     @staticmethod
@@ -420,7 +416,8 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
 
     @staticmethod
     def _does_user_settings_model_exist(user_id):
-        """Check if UserSettingsModel exists for the user_id.
+        """Check if UserSettingsModel exists for the user_id or that the user_id
+        is SYSTEM_COMMITTER_ID.
 
         Args:
             user_id: str. User ID that should have its UserSettingsModel.
@@ -436,15 +433,15 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
     @staticmethod
     def _check_id_and_user_id_exist(model_id, user_id):
         """Check if UserSettingsModel exists for user_id and model id contains
-        user_id.
+        user_id or that the user_id is SYSTEM_COMMITTER_ID.
 
         Args:
             model_id: str. ID of the model that should contain the user_id.
             user_id: str. User ID that should have its UserSettingsModel.
 
         Returns:
-            True if UserSettingsModel with id as user_id in model exists, False
-            otherwise.
+            True if UserSettingsModel with id as user_id in model exists or
+            user_id is SYSTEM_COMMITTER_ID, False otherwise.
         """
         if user_id not in model_id:
             return False
@@ -454,14 +451,15 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
 
     @staticmethod
     def _check_one_field_exists(model):
-        """Check if UserSettingsModel exists for one field.
+        """Check if UserSettingsModel exists for one field or that field is
+        SYSTEM_COMMITTER_ID.
 
         Args:
             model: BaseModel. Model being checked.
 
         Returns:
-            True if UserSettingsModel with id as user ID field in model exists,
-            False otherwise.
+            True if UserSettingsModel with id as user ID field in model exists
+            or user ID field is SYSTEM_COMMITTER_ID, False otherwise.
         """
         model_class = model.__class__
         model_values = model.to_dict()
