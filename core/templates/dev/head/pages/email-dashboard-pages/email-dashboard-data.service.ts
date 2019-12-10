@@ -16,120 +16,109 @@
  * @fileoverview Services for oppia email dashboard page.
  */
 
-import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class EmailDashboardDataService {
-  constructor(private httpClient: HttpClient) {}
-    QUERY_DATA_URL = '/emaildashboarddatahandler';
-    QUERY_STATUS_CHECK_URL = '/querystatuscheck';
+angular.module('oppia').factory('EmailDashboardDataService', [
+  '$http', '$q', function($http, $q) {
+    var QUERY_DATA_URL = '/emaildashboarddatahandler';
+    var QUERY_STATUS_CHECK_URL = '/querystatuscheck';
     // No. of query results to display on a single page.
-    QUERIES_PER_PAGE = 10;
+    var QUERIES_PER_PAGE = 10;
     // Store latest cursor value for fetching next query page.
-    latestCursor = null;
+    var latestCursor = null;
     // Array containing all fetched queries.
-    queries = [];
+    var queries = [];
     // Index of currently-shown page of query results.
-    currentPageIndex = -1;
+    var currentPageIndex = -1;
 
-    fetchQueriesPage(pageSize, cursor) {
-      return this.httpClient.get(this.QUERY_DATA_URL, {
+    var fetchQueriesPage = function(pageSize, cursor) {
+      return $http.get(QUERY_DATA_URL, {
         params: {
           num_queries_to_fetch: pageSize,
           cursor: cursor
         }
-      }).toPromise().then(function(response: any) {
+      }).then(function(response) {
         return response.data;
       });
-    }
+    };
 
+    return {
+      getQueries: function() {
+        return queries;
+      },
 
-    getQueries() {
-      return this.queries;
-    }
+      getCurrentPageIndex: function() {
+        return currentPageIndex;
+      },
 
-    getCurrentPageIndex() {
-      return this.currentPageIndex;
-    }
+      getLatestCursor: function() {
+        return latestCursor;
+      },
 
-    getLatestCursor() {
-      return this.latestCursor;
-    }
+      submitQuery: function(data) {
+        var startQueryIndex = currentPageIndex * QUERIES_PER_PAGE;
+        var endQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
 
-    submitQuery(data) {
-      let startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
-      let endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
-
-      return this.httpClient.post(this.QUERY_DATA_URL, {
-        data: data
-      }).toPromise().then((response: any) => {
-        let data = response.data;
-        let newQueries = [data.query];
-        this.queries = newQueries.concat(this.queries);
-        return this.queries.slice(startQueryIndex, endQueryIndex);
-      });
-    }
-
-    getNextQueries() {
-      let startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
-      let endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
-
-      if (this.queries.length >= endQueryIndex ||
-            (this.latestCursor === null && this.currentPageIndex !== -1)) {
-        this.currentPageIndex = this.currentPageIndex + 1;
-        return Promise.resolve((resolver) => {
-          resolver(this.queries.slice(startQueryIndex, endQueryIndex));
+        return $http.post(QUERY_DATA_URL, {
+          data: data
+        }).then(function(response) {
+          var data = response.data;
+          var newQueries = [data.query];
+          queries = newQueries.concat(queries);
+          return queries.slice(startQueryIndex, endQueryIndex);
         });
-      } else {
-        this.currentPageIndex = this.currentPageIndex + 1;
-        return this.fetchQueriesPage(this.QUERIES_PER_PAGE, this.latestCursor)
-          .then((data) => {
-            this.queries = this.queries.concat(data.recent_queries);
-            this.latestCursor = data.cursor;
-            return this.queries.slice(startQueryIndex, endQueryIndex);
+      },
+
+      getNextQueries: function() {
+        var startQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
+        var endQueryIndex = (currentPageIndex + 2) * QUERIES_PER_PAGE;
+
+        if (queries.length >= endQueryIndex ||
+            (latestCursor === null && currentPageIndex !== -1)) {
+          currentPageIndex = currentPageIndex + 1;
+          return $q(function(resolver) {
+            resolver(queries.slice(startQueryIndex, endQueryIndex));
           });
-      }
-    }
-
-    getPreviousQueries() {
-      let startQueryIndex = (this.currentPageIndex - 1) * this.QUERIES_PER_PAGE;
-      let endQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
-      this.currentPageIndex = this.currentPageIndex - 1;
-      return this.queries.slice(startQueryIndex, endQueryIndex);
-    }
-
-    isNextPageAvailable() {
-      let nextQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
-      return (this.queries.length > nextQueryIndex) || Boolean(
-        this.latestCursor);
-    }
-
-    isPreviousPageAvailable() {
-      return (this.currentPageIndex > 0);
-    }
-
-    fetchQuery(queryId) {
-      return this.httpClient.get(this.QUERY_STATUS_CHECK_URL, {
-        params: {
-          query_id: queryId
+        } else {
+          currentPageIndex = currentPageIndex + 1;
+          return fetchQueriesPage(QUERIES_PER_PAGE, latestCursor)
+            .then(function(data) {
+              queries = queries.concat(data.recent_queries);
+              latestCursor = data.cursor;
+              return queries.slice(startQueryIndex, endQueryIndex);
+            });
         }
-      }).toPromise().then((response: any) => {
-        let data = response.data;
-        this.queries.forEach(function(query, index, queries) {
-          if (query.id === queryId) {
-            queries[index] = data.query;
+      },
+
+      getPreviousQueries: function() {
+        var startQueryIndex = (currentPageIndex - 1) * QUERIES_PER_PAGE;
+        var endQueryIndex = currentPageIndex * QUERIES_PER_PAGE;
+        currentPageIndex = currentPageIndex - 1;
+        return queries.slice(startQueryIndex, endQueryIndex);
+      },
+
+      isNextPageAvailable: function() {
+        var nextQueryIndex = (currentPageIndex + 1) * QUERIES_PER_PAGE;
+        return (queries.length > nextQueryIndex) || Boolean(latestCursor);
+      },
+
+      isPreviousPageAvailable: function() {
+        return (currentPageIndex > 0);
+      },
+
+      fetchQuery: function(queryId) {
+        return $http.get(QUERY_STATUS_CHECK_URL, {
+          params: {
+            query_id: queryId
           }
+        }).then(function(response) {
+          var data = response.data;
+          queries.forEach(function(query, index, queries) {
+            if (query.id === queryId) {
+              queries[index] = data.query;
+            }
+          });
+          return data.query;
         });
-        return data.query;
-      });
-    }
-}
-
-
-angular.module('oppia').factory(
-  'EmailDashboardDataService',
-  downgradeInjectable(EmailDashboardDataService));
+      }
+    };
+  }
+]);
