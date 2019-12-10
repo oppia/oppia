@@ -218,7 +218,7 @@ describe('Question object factory', function() {
     expect(defaultOutcome.feedback.getHtml()).toEqual('Correct Answer');
   });
 
-  fit('should correctly get backend dict', function() {
+  it('should correctly get backend dict', function() {
     var newQuestionBackendDict = _sampleQuestion.toBackendDict(true);
     expect(newQuestionBackendDict.id).toEqual(null);
     expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
