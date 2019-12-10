@@ -304,11 +304,6 @@ class BuildTests(test_utils.GenericTestBase):
         """
         service_js_filepath = os.path.join(
             'local_compiled_js', 'core', 'pages', 'AudioService.js')
-        generated_parser_js_filepath = os.path.join(
-            'core', 'expressions', 'expression-parser.service.js')
-        compiled_generated_parser_js_filepath = os.path.join(
-            'local_compiled_js', 'core', 'expressions',
-            'expression-parser.service.js')
         service_ts_filepath = os.path.join('core', 'pages', 'AudioService.ts')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
         protractor_filepath = os.path.join('extensions', 'protractor.js')

@@ -152,17 +152,19 @@ _PARSER.add_argument(
 _PARSER.add_argument(
     '--enable_watcher', action='store_true', default=False)
 
-def convert_filepath_to_hashed_url(filepath, hash):
+
+def convert_filepath_to_hashed_url(filepath, hashes):
     """Convert the original filepath to url with hash inserted.
 
     Args:
         filepath: str. The original file path.
-        hash: str. The calculated hash for this file.
+        hashes: str. The calculated hash for this file.
 
     Returns:
         Generated url style path.
     """
-    return _insert_hash(common.convert_to_posixpath(filepath), hash)
+    return _insert_hash(common.convert_to_posixpath(filepath), hashes)
+
 
 def generate_app_yaml():
     """Generate app.yaml from app_dev.yaml."""
