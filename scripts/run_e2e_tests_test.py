@@ -50,14 +50,17 @@ class MockProcessClass(python_utils.OBJECT):
 class RunE2ETestsTests(test_utils.TestBase):
     def setUp(self):
         def mock_print(msg):
-            self.print_arr.append(msg)
+            return
 
         def mock_run_cmd(unused_commands):
             pass
-        # pylint: disable=unused-args
+        # pylint: disable=unused-argument
         def mock_build_main(args):
             pass
-        # pylint: enable=unused-modules
+
+        def mock_popen(args, shell):
+            return
+        # pylint: enable=unused-argument
 
         def mock_remove(unused_path):
             pass
@@ -66,15 +69,15 @@ class RunE2ETestsTests(test_utils.TestBase):
                 unused_filename, unused_pattern, unused_replace):
             return
 
+        self.popen_swap = functools.partial(
+            self.swap_with_checks, subprocess, 'Popen', mock_popen)
         self.inplace_replace_swap = functools.partial(
             self.swap_with_checks, common, 'inplace_replace_file',
             mock_inplace_replace)
         self.mock_run_cmd = mock_run_cmd
         self.mock_build_main = mock_build_main
         self.mock_remove = mock_remove
-        self.print_arr = []
-        self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        self.partial_print_swap = functools.partial(
+        self.print_swap = functools.partial(
             self.swap_with_checks, python_utils, 'PRINT', mock_print)
 
         self.mock_node_bin_path = 'node'
@@ -96,7 +99,7 @@ class RunE2ETestsTests(test_utils.TestBase):
         exist_swap = self.swap_with_checks(
             os.path, 'isdir', mock_isdir,
             expected_args=(os.path.join(os.pardir, 'protractor-screenshots'),))
-        print_swap = self.partial_print_swap(called=False)
+        print_swap = self.print_swap(called=False)
         with print_swap, exist_swap:
             run_e2e_tests.check_screenshot()
 
@@ -117,7 +120,7 @@ Note: If ADD_SCREENSHOT_REPORTER is set to true in
 core/tests/protractor.conf.js, you can view screenshots
 of the failed tests in ../protractor-screenshots/
 """
-        print_swap = self.partial_print_swap(expected_args=(expected_output,))
+        print_swap = self.print_swap(expected_args=(expected_output,))
         with print_swap, exist_swap, rmdir_swap:
             run_e2e_tests.check_screenshot()
 
@@ -193,7 +196,7 @@ of the failed tests in ../protractor-screenshots/
 
     def test_check_running_instances_when_ports_closed(self):
         expected_ports = [1, 2, 3]
-        def mock_is_port_open(port):
+        def mock_is_port_open(unused_port):
             return False
 
         is_port_open_swap = self.swap_with_checks(
@@ -276,23 +279,23 @@ of the failed tests in ../protractor-screenshots/
             run_e2e_tests.tweak_constant_file(constant_file, False)
 
     def test_run_webdriver_manager(self):
-        mock_webdriver_path = 'webdriver-manager'
         expected_commands = [
             common.NODE_BIN_PATH, run_e2e_tests.WEBDRIVER_MANAGER_BIN_PATH,
             'start', '--detach']
 
         stdout = 'stdout'
-        def mock_run_cmd(commands):
+        def mock_run_cmd(unused_commands):
             return stdout
 
         mock_run_cmd.called = False
         run_cmd_swap = self.swap_with_checks(
             common, 'run_cmd', mock_run_cmd, expected_args=(expected_commands,))
-        print_swap = self.partial_print_swap(expected_args=(stdout,))
+        print_swap = self.print_swap(expected_args=(stdout,))
         with print_swap, run_cmd_swap:
             run_e2e_tests.run_webdriver_manager(['start', '--detach'])
 
     def test_setup_and_install_dependencies(self):
+        # pylint: disable=unused-argument
         def mock_setup_main(args):
             return
 
@@ -301,6 +304,7 @@ of the failed tests in ../protractor-screenshots/
 
         def mock_setup_gae_main(args):
             return
+        # pylint: enable=unused-argument
 
         setup_swap = self.swap_with_checks(
             setup, 'main', mock_setup_main, expected_kwargs={'args': []})
@@ -335,7 +339,7 @@ of the failed tests in ../protractor-screenshots/
         remove_swap = self.swap_with_checks(
             os, 'remove', self.mock_remove,
             expected_args=('%s.bak' % self.mock_constant_file_path,))
-        print_swap = self.partial_print_swap(called=False)
+        print_swap = self.print_swap(called=False)
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with tweak_constant_file_swap, run_cmd_swap, build_main_swap:
@@ -370,7 +374,8 @@ of the failed tests in ../protractor-screenshots/
 
     def test_tweak_webdriver_manager_on_x64_machine(self):
         expected_replace = 'this.osArch = "x64";'
-        def mock_inplace_replace(file, regex_pattern, replace):
+        def mock_inplace_replace(
+                unused_filepath, unused_regex_pattern, unused_replace):
             return
 
         inplace_replace_swap = self.swap_with_checks(
@@ -395,7 +400,8 @@ of the failed tests in ../protractor-screenshots/
             run_e2e_tests.tweak_webdriver_manager()
 
     def test_tweak_webdriver_manager_on_x86_machine(self):
-        def mock_inplace_replace(file, regex_pattern, replace):
+        def mock_inplace_replace(
+                unused_filepath, unused_regex_pattern, unused_replace):
             return
 
         expected_replace = 'this.osArch = "x86";'
@@ -431,13 +437,13 @@ of the failed tests in ../protractor-screenshots/
         ]
         files_to_rename = files_to_check[:]
 
-        def mock_isfile(path):
+        def mock_isfile(unused_path):
             return True
 
-        def mock_rename(origin, new):
+        def mock_rename(unused_origin, unused_new):
             return
 
-        def mock_remove(path):
+        def mock_remove(unused_path):
             return
 
         isfile_swap = self.swap_with_checks(
@@ -556,16 +562,17 @@ of the failed tests in ../protractor-screenshots/
     def test_get_e2e_test_parameters(self):
         result = run_e2e_tests.get_e2e_test_parameters(
             True, True, 3, 'Full', False)
-        self.assertEqual(result, [
-            run_e2e_tests.BROWSER_STACK_CONFIG_FILE,
-            '--capabilities.shardTestFiles=True',
-            '--capabilities.maxInstances=3',
-            '--suite', 'Full', '--params.devMode=False'
-        ])
+        self.assertEqual(
+            result, [
+                run_e2e_tests.BROWSER_STACK_CONFIG_FILE,
+                '--capabilities.shardTestFiles=True',
+                '--capabilities.maxInstances=3',
+                '--suite', 'Full', '--params.devMode=False'
+            ]
+        )
 
     def test_start_google_engine_in_dev_mode(self):
-        def mock_popen(args, shell):
-            return
+
         expected_command = (
             '%s %s/dev_appserver.py  --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=critical '
@@ -573,15 +580,14 @@ of the failed tests in ../protractor-screenshots/
                 common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
                 run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
                 'app_dev.yaml'))
-        popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=(expected_command,),
+        popen_swap = self.popen_swap(
+            expected_args=(expected_command,),
             expected_kwargs={'shell': True})
         with popen_swap:
             run_e2e_tests.start_google_engine(True)
 
     def test_start_google_engine_in_prod_mode(self):
-        def mock_popen(args, shell):
-            return
+
         expected_command = (
             '%s %s/dev_appserver.py  --host 0.0.0.0 --port %s '
             '--clear_datastore=yes --dev_appserver_log_level=critical '
@@ -589,8 +595,8 @@ of the failed tests in ../protractor-screenshots/
                 common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,
                 run_e2e_tests.GOOGLE_APP_ENGINE_PORT,
                 'app.yaml'))
-        popen_swap = self.swap_with_checks(
-            subprocess, 'Popen', mock_popen, expected_args=(expected_command,),
+        popen_swap = self.popen_swap(
+            expected_args=(expected_command,),
             expected_kwargs={'shell': True})
         with popen_swap:
             run_e2e_tests.start_google_engine(False)
