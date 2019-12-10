@@ -167,7 +167,7 @@ def create_message(
     message.put()
 
     # Update the message data cache of the thread.
-    thread.last_message_text = message.text
+    thread.last_message_text = text
     thread.last_message_author_id = author_id
     if thread.message_count is not None:
         thread.message_count += 1

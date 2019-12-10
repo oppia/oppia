@@ -77,8 +77,9 @@ class FeedbackThread(python_utils.OBJECT):
         """
         return {
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'original_author_username': user_services.get_username(
-                self.original_author_id) if self.original_author_id else None,
+            'original_author_username': (
+                user_services.get_username(self.original_author_id)
+                if self.original_author_id else None),
             'state_name': self.state_name,
             'status': self.status,
             'subject': self.subject,
