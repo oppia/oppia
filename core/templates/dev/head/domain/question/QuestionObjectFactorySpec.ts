@@ -97,6 +97,7 @@ describe('Question object factory', function() {
 
   beforeEach(function() {
     angular.mock.module(function($provide) {
+      $provide.constant('CURRENT_STATE_SCHEMA_VERSION', 30);
       $provide.constant('INTERACTION_SPECS', {
         TextInput: {
           can_have_solution: true
@@ -217,8 +218,13 @@ describe('Question object factory', function() {
     expect(defaultOutcome.feedback.getHtml()).toEqual('Correct Answer');
   });
 
-  it('should correctly get backend dict', function() {
-    expect(_sampleQuestion.toBackendDict(true).id).toEqual(null);
+  fit('should correctly get backend dict', function() {
+    var newQuestionBackendDict = _sampleQuestion.toBackendDict(true);
+    expect(newQuestionBackendDict.id).toEqual(null);
+    expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
+    expect(newQuestionBackendDict.question_state_data_schema_version).toEqual(
+      30);
+    expect(newQuestionBackendDict.version).toEqual(1);
     expect(_sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 
