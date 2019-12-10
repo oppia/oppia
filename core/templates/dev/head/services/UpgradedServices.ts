@@ -50,6 +50,8 @@ import { DocumentAttributeCustomizationService } from
 import { EditabilityService } from 'services/editability.service';
 import { EditorFirstTimeEventsService } from
   'pages/exploration-editor-page/services/editor-first-time-events.service';
+import { EntityContextObjectFactory } from
+  'domain/utilities/EntityContextObjectFactory';
 import { ExplorationDiffService } from
   'pages/exploration-editor-page/services/exploration-diff.service';
 import { ExplorationDraftObjectFactory } from
@@ -204,6 +206,8 @@ export class UpgradedServices {
     upgradedServices['DateTimeFormatService'] = new DateTimeFormatService();
     upgradedServices['DebouncerService'] = new DebouncerService();
     upgradedServices['EditabilityService'] = new EditabilityService();
+    upgradedServices['EntityContextObjectFactory'] =
+      new EntityContextObjectFactory();
     upgradedServices['ExplorationDiffService'] = new ExplorationDiffService();
     upgradedServices['ExplorationDraftObjectFactory'] =
       new ExplorationDraftObjectFactory();
@@ -356,7 +360,8 @@ export class UpgradedServices {
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
     upgradedServices['ContextService'] = new ContextService(
-      upgradedServices['UrlService']);
+      upgradedServices['UrlService'],
+      upgradedServices['EntityContextObjectFactory']);
 
     // Group 4: Services depending on groups 1,2 and 3.
     upgradedServices['ExplorationHtmlFormatterService'] =
