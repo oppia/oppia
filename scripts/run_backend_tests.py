@@ -222,8 +222,8 @@ class TestingTaskSpec(python_utils.OBJECT):
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                sys.executable, COVERAGE_MODULE_PATH, 'run', '-p', TEST_RUNNER_PATH,
-                test_target_flag]
+                sys.executable, COVERAGE_MODULE_PATH, 'run', '-p',
+                TEST_RUNNER_PATH, test_target_flag]
         else:
             exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
