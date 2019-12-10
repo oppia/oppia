@@ -56,7 +56,7 @@ export class SubtopicDataObjectFactory {
     return new SubtopicData(
       subtopicDataBackendDict.subtopic_title,
       this.subtopicPageContentsObjectFactory.createFromBackendDict(
-        subtopicDataBackendDict.page_contents  
+        subtopicDataBackendDict.page_contents
       )
     );
   }
