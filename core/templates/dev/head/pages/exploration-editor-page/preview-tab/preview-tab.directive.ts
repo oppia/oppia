@@ -44,6 +44,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/context.service.ts');
+require('services/debug-info-tracker.service.ts');
 require('services/exploration-features.service.ts');
 
 angular.module('oppia').directive('previewTab', [
@@ -59,7 +60,7 @@ angular.module('oppia').directive('previewTab', [
       controllerAs: '$ctrl',
       controller: [
         '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
-        'EditableExplorationBackendApiService',
+        'DebugInfoTrackerService', 'EditableExplorationBackendApiService',
         'ExplorationDataService', 'ExplorationEngineService',
         'ExplorationFeaturesService', 'ExplorationInitStateNameService',
         'LearnerParamsService', 'NumberAttemptsService',
@@ -68,7 +69,7 @@ angular.module('oppia').directive('previewTab', [
         'UrlInterpolationService',
         function(
             $q, $scope, $timeout, $uibModal, ContextService,
-            EditableExplorationBackendApiService,
+            DebugInfoTrackerService, EditableExplorationBackendApiService,
             ExplorationDataService, ExplorationEngineService,
             ExplorationFeaturesService, ExplorationInitStateNameService,
             LearnerParamsService, NumberAttemptsService,
@@ -165,6 +166,9 @@ angular.module('oppia').directive('previewTab', [
           };
 
           ctrl.resetPreview = function() {
+            if (DebugInfoTrackerService.getSequenceOfActions()) {
+              DebugInfoTrackerService.addAction('Preview Reset');
+            }
             ctrl.previewWarning = '';
             ctrl.isExplorationPopulated = false;
             var initStateNameForPreview = (
