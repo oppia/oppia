@@ -218,10 +218,10 @@ class TestingTaskSpec(python_utils.OBJECT):
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                'python', COVERAGE_MODULE_PATH, 'run', '-p', TEST_RUNNER_PATH,
+                sys.executable, COVERAGE_MODULE_PATH, 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
         else:
-            exc_list = ['python', TEST_RUNNER_PATH, test_target_flag]
+            exc_list = [sys.executable, TEST_RUNNER_PATH, test_target_flag]
 
         return run_shell_cmd(exc_list)
 
@@ -507,9 +507,9 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call(['python', COVERAGE_MODULE_PATH, 'combine'])
+        subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'combine'])
         process = subprocess.Popen(
-            ['python', COVERAGE_MODULE_PATH, 'report',
+            [sys.executable, COVERAGE_MODULE_PATH, 'report',
              '--omit="%s*","third_party/*","/usr/share/*"'
              % common.OPPIA_TOOLS_DIR, '--show-missing'],
             stdout=subprocess.PIPE)
@@ -518,7 +518,7 @@ def main(args=None):
         python_utils.PRINT(report_stdout)
 
         python_utils.PRINT('Generating xml coverage report...')
-        subprocess.check_call(['python', COVERAGE_MODULE_PATH, 'xml'])
+        subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'xml'])
 
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)

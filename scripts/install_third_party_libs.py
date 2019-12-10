@@ -124,7 +124,7 @@ def pip_install(package, version, install_path):
 
     # The following will ensure that Python and Pip versions are compatible.
     subprocess.check_call([
-        'python', '-m', 'pip', 'install', '%s==%s' % (package, version),
+        sys.executable, '-m', 'pip', 'install', '%s==%s' % (package, version),
         '--target', install_path])
 
 
@@ -201,7 +201,7 @@ def install_skulpt(parsed_args):
 
             # NB: Check call cannot be used because the commands above make the
             # git tree for skulpt dirty.
-            subprocess.call(['python', skulpt_filepath, 'dist'])
+            subprocess.call([sys.executable, skulpt_filepath, 'dist'])
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
