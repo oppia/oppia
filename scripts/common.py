@@ -442,10 +442,12 @@ def kill_processes_based_on_regex(pattern):
             continue
 
 
-def convert_windows_style_path_to_unix_style(file_path):
+def convert_to_posixpath(file_path):
     """Occassionally the Windows style file path just does not work, so we
-    may want to convert it to Unix style.
+    may want to convert it to posix style.
     """
+    if not is_windows_os():
+        return file_path
     return file_path.replace('\\', '/')
 
 

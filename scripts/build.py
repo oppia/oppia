@@ -98,21 +98,12 @@ JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
-# These files are present in both extensions and local_compiled_js/extensions.
-# They are required in local_compiled_js since they contain code used in
-# other ts files and excluding them from compilation will create compile
-# errors due to missing variables. So, the files should be built only from
-# one location instead of both the locations.
 JS_FILEPATHS_NOT_TO_BUILD = (
     os.path.join(
-        'extensions', 'interactions', 'LogicProof', 'static', 'js',
-        'generatedDefaultData.js'),
-    os.path.join(
-        'extensions', 'interactions', 'LogicProof', 'static', 'js',
-        'generatedParser.js'),
-    os.path.join(
         'core', 'templates', 'dev', 'head', 'expressions',
-        'expression-parser.service.js'))
+        'expression-parser.service.js'),
+    os.path.join('extensions', 'ckeditor_plugins', 'pre', 'plugin.js')
+)
 
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -160,6 +151,19 @@ _PARSER.add_argument(
     dest='minify_third_party_libs_only')
 _PARSER.add_argument(
     '--enable_watcher', action='store_true', default=False)
+
+
+def convert_filepath_to_hashed_url(filepath, hashes):
+    """Convert the original filepath to url with hash inserted.
+
+    Args:
+        filepath: str. The original file path.
+        hashes: str. The calculated hash for this file.
+
+    Returns:
+        Generated url style path.
+    """
+    return _insert_hash(common.convert_to_posixpath(filepath), hashes)
 
 
 def generate_app_yaml():
@@ -214,9 +218,9 @@ def _minify(source_path, target_path):
     # https://circleci.com/blog/how-to-handle-java-oom-errors/
     # Use relative path to avoid java command line parameter parse error on
     # Windows.
-    target_path = common.convert_windows_style_path_to_unix_style(
+    target_path = common.convert_to_posixpath(
         os.path.relpath(target_path))
-    source_path = common.convert_windows_style_path_to_unix_style(
+    source_path = common.convert_to_posixpath(
         os.path.relpath(source_path))
     cmd = 'java -Xmx24m -jar %s -o %s %s' % (
         YUICOMPRESSOR_DIR, target_path, source_path)
@@ -422,11 +426,11 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         # This is because html paths are used by backend and we work with
         # paths without hash part in backend.
         if not filepath.endswith('.html'):
-            filepath = common.convert_windows_style_path_to_unix_style(filepath)
-            filepath_with_hash = _insert_hash(filepath, file_hash)
+            filepath_with_hash = convert_filepath_to_hashed_url(
+                filepath, file_hash)
             content = content.replace(
-                '%s%s' % (common.convert_windows_style_path_to_unix_style(
-                    TEMPLATES_DEV_DIR), filepath),
+                '%s%s' % (
+                    common.convert_to_posixpath(TEMPLATES_DEV_DIR), filepath),
                 '%s%s' % (
                     TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
                     filepath_with_hash))
@@ -668,8 +672,8 @@ def should_file_be_built(filepath):
         bool. True if filepath should be built, else False.
     """
     if filepath.endswith('.js'):
-        return filepath not in JS_FILEPATHS_NOT_TO_BUILD and not any(
-            filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
+        return all(
+            not filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
         return False
     elif filepath.endswith('.ts'):
@@ -709,7 +713,8 @@ def generate_copy_tasks_to_copy_from_source_to_target(
             if not any(
                     source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 target_path = source_path
-                relative_path = os.path.relpath(source_path, source)
+                relative_path = common.convert_to_posixpath(
+                    os.path.relpath(source_path, source))
                 if (hash_should_be_inserted(source + relative_path) and
                         relative_path in file_hashes):
                     relative_path = (
@@ -801,9 +806,10 @@ def get_file_hashes(directory_path):
             filepath = os.path.join(root, filename)
             if should_file_be_built(filepath) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                complete_filepath = os.path.join(root, filename)
-                relative_filepath = os.path.relpath(
-                    complete_filepath, directory_path)
+                complete_filepath = common.convert_to_posixpath(
+                    os.path.join(root, filename))
+                relative_filepath = common.convert_to_posixpath(os.path.relpath(
+                    complete_filepath, directory_path))
                 file_hashes[relative_filepath] = generate_md5_hash(
                     complete_filepath)
 
@@ -993,7 +999,8 @@ def generate_delete_tasks_to_remove_deleted_files(
             # Ignore files with certain extensions.
             if not any(
                     target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                relative_path = os.path.relpath(target_path, staging_directory)
+                relative_path = common.convert_to_posixpath(
+                    os.path.relpath(target_path, staging_directory))
                 # Remove file found in staging directory but not in source
                 # directory, i.e. file not listed in hash dict.
                 if relative_path not in source_dir_hashes:
@@ -1205,11 +1212,13 @@ def _verify_hashes(output_dirnames, file_hashes):
 
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH])
+        file_hashes[common.convert_to_posixpath(
+            MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH])
+        file_hashes[common.convert_to_posixpath(
+            MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH)])
 
     _ensure_files_exist([
         os.path.join(ASSETS_OUT_DIR, hash_final_filename),

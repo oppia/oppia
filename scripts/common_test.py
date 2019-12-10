@@ -651,3 +651,23 @@ class CommonTests(test_utils.GenericTestBase):
         with print_swap, input_swap:
             common.inplace_replace_file(
                 constant_file, '"DEV_MODE": .*', '"DEV_MODE": true')
+
+    def test_convert_to_posixpath_on_windows(self):
+        def mock_is_windows():
+            return True
+
+        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+        original_filepath = 'c:\\path\\to\\a\\file.js'
+        with is_windows_swap:
+            actual_file_path = common.convert_to_posixpath(original_filepath)
+        self.assertEqual(actual_file_path, 'c:/path/to/a/file.js')
+
+    def test_convert_to_posixpath_on_platform_other_than_windows(self):
+        def mock_is_windows():
+            return False
+
+        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+        original_filepath = 'c:\\path\\to\\a\\file.js'
+        with is_windows_swap:
+            actual_file_path = common.convert_to_posixpath(original_filepath)
+        self.assertEqual(actual_file_path, original_filepath)

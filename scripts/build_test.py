@@ -247,8 +247,8 @@ class BuildTests(test_utils.GenericTestBase):
         BASE_HTML_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_DEV_DIR, 'base.html')
         BASE_JS_RELATIVE_PATH = os.path.join('pages', 'Base.js')
-        BASE_JS_RELATIVE_PATH_IN_HTML = (
-            common.convert_windows_style_path_to_unix_style(
+        BASE_JS_FILE_URL = (
+            common.convert_to_posixpath(
                 BASE_JS_RELATIVE_PATH))
         BASE_JS_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
@@ -276,7 +276,7 @@ class BuildTests(test_utils.GenericTestBase):
                 % BASE_HTML_SOURCE_PATH)
             # Look for templates/pages/Base.js in source_base_file_content.
             self.assertIn(
-                BASE_JS_RELATIVE_PATH_IN_HTML, source_base_file_content)
+                BASE_JS_FILE_URL, source_base_file_content)
 
         # Build base.html file.
         with python_utils.open_file(
@@ -293,7 +293,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Final filepath in base.html example:
         # /build/templates/head/pages/Base.081ce90f17ecdf07701d83cb860985c2.js.
         final_filename = build._insert_hash(
-            BASE_JS_RELATIVE_PATH_IN_HTML, file_hashes[BASE_JS_RELATIVE_PATH])
+            BASE_JS_FILE_URL, file_hashes[BASE_JS_RELATIVE_PATH])
         # Look for templates/pages/Base.081ce90f17ecdf07701d83cb860985c2.js in
         # minified_html_file_content.
         self.assertIn(final_filename, minified_html_file_content)
@@ -304,11 +304,6 @@ class BuildTests(test_utils.GenericTestBase):
         """
         service_js_filepath = os.path.join(
             'local_compiled_js', 'core', 'pages', 'AudioService.js')
-        generated_parser_js_filepath = os.path.join(
-            'core', 'expressions', 'expression-parser.service.js')
-        compiled_generated_parser_js_filepath = os.path.join(
-            'local_compiled_js', 'core', 'expressions',
-            'expression-parser.service.js')
         service_ts_filepath = os.path.join('core', 'pages', 'AudioService.ts')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
         protractor_filepath = os.path.join('extensions', 'protractor.js')
@@ -335,16 +330,6 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)):
             self.assertFalse(build.should_file_be_built(service_js_filepath))
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
-
-        with self.swap(
-            build, 'JS_FILEPATHS_NOT_TO_BUILD', (
-                os.path.join(
-                    'core', 'expressions', 'expression-parser.service.js'))):
-            self.assertFalse(
-                build.should_file_be_built(generated_parser_js_filepath))
-            self.assertTrue(
-                build.should_file_be_built(
-                    compiled_generated_parser_js_filepath))
 
     def test_hash_should_be_inserted(self):
         """Test hash_should_be_inserted returns the correct boolean value
