@@ -26,13 +26,9 @@
   },
   "files_explanation": "These files are included separately since we still do not have webpack in extensions folder and these files are still included through scripts tags, so they need to be compiled separately.",
   "files": [
-    "core/templates/dev/head/mathjaxConfig.ts",
-    "core/templates/dev/head/expressions/expression-parser.service.js",
     "core/tests/karma-globals.ts"
   ],
-  "include_explanation": "The files in extensions/ckeditor_plugins are yet to be integrated into webpack (#6732).",
   "include": [
-    "extensions/ckeditor_plugins",
     "typings"
   ]
 }

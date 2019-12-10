@@ -328,15 +328,6 @@ class BuildTests(test_utils.GenericTestBase):
             self.assertFalse(build.should_file_be_built(service_js_filepath))
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
 
-        with self.swap(
-            build, 'JS_FILEPATHS_NOT_TO_BUILD', (
-                'core/expressions/expression-parser.service.js',)):
-            self.assertFalse(
-                build.should_file_be_built(generated_parser_js_filepath))
-            self.assertTrue(
-                build.should_file_be_built(
-                    compiled_generated_parser_js_filepath))
-
     def test_hash_should_be_inserted(self):
         """Test hash_should_be_inserted returns the correct boolean value
         for filepath that should be hashed.
