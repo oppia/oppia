@@ -41,7 +41,7 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     thread_model.id, thread_model.message_count - 1)))
         cache_updated = any([
             _cache_last_message_text(thread_model, last_message_model),
-            _cache_last_message_author(thread_model, last_message_model),
+            _cache_last_message_author_id(thread_model, last_message_model),
         ])
         if cache_updated:
             thread_model.put()
@@ -72,7 +72,7 @@ def _cache_last_message_text(thread_model, last_message_model):
     return False
 
 
-def _cache_last_message_author(thread_model, last_message_model):
+def _cache_last_message_author_id(thread_model, last_message_model):
     """Ensures the given thread's cache for the last message's author is
     correct.
 
@@ -85,10 +85,8 @@ def _cache_last_message_author(thread_model, last_message_model):
     Returns:
         bool. Whether the cache was actually updated.
     """
-    last_message_author = (
-        last_message_model and last_message_model.author_id and
-        user_services.get_username(last_message_model.author_id))
-    if thread_model.last_message_author != last_message_author:
-        thread_model.last_message_author = last_message_author
+    last_message_author_id = last_message_model and last_message_model.author_id
+    if thread_model.last_message_author_id != last_message_author_id:
+        thread_model.last_message_author_id = last_message_author_id
         return True
     return False

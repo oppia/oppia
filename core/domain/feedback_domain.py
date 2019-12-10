@@ -43,14 +43,14 @@ class FeedbackThread(python_utils.OBJECT):
         last_updated: datetime.datetime. The time when the feedback thread
             was last updated.
         last_message_text: str. The text of the last message in the thread.
-        last_message_author: str. The author of the last message in the thread.
+        last_message_author_id: str. The author of the last message in the thread.
     """
 
     def __init__(
             self, thread_id, entity_type, entity_id, state_name,
             original_author_id, status, subject, summary, has_suggestion,
             message_count, created_on, last_updated, last_message_text,
-            last_message_author):
+            last_message_author_id):
         """Initializes a FeedbackThread object."""
 
         self.id = thread_id
@@ -67,7 +67,7 @@ class FeedbackThread(python_utils.OBJECT):
         self.created_on = created_on
         self.last_updated = last_updated
         self.last_message_text = last_message_text
-        self.last_message_author = last_message_author
+        self.last_message_author_id = last_message_author_id
 
     def to_dict(self):
         """Returns a dict representation of this FeedbackThread object.
@@ -86,7 +86,9 @@ class FeedbackThread(python_utils.OBJECT):
             'thread_id': self.id,
             'message_count': self.message_count,
             'last_message_text': self.last_message_text,
-            'last_message_author': self.last_message_author,
+            'last_message_author': (
+                user_services.get_username(self.last_message_author_id)
+                if self.last_message_author_id else None),
         }
 
 
