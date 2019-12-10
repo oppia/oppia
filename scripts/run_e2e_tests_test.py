@@ -1,3 +1,18 @@
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Unit tests for scripts/run_e2e_tests.py."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -39,9 +54,10 @@ class RunE2ETestsTests(test_utils.TestBase):
 
         def mock_run_cmd(unused_commands):
             pass
-
+        # pylint: disable=unused-args
         def mock_build_main(args):
             pass
+        # pylint: enable=unused-modules
 
         def mock_remove(unused_path):
             pass
@@ -360,12 +376,14 @@ of the failed tests in ../protractor-screenshots/
         inplace_replace_swap = self.swap_with_checks(
             common, 'inplace_replace_file', mock_inplace_replace,
             expected_args=[
-                (run_e2e_tests.CHROME_PROVIDER_FILE_PATH,
-                 run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
-                 expected_replace),
-                (run_e2e_tests.GECKO_PROVIDER_FILE_PATH,
-                 run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
-                 expected_replace)
+                (
+                    run_e2e_tests.CHROME_PROVIDER_FILE_PATH,
+                    run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
+                    expected_replace),
+                (
+                    run_e2e_tests.GECKO_PROVIDER_FILE_PATH,
+                    run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
+                    expected_replace)
             ], called_times=2)
         def mock_is_x64():
             return True
@@ -384,12 +402,14 @@ of the failed tests in ../protractor-screenshots/
         inplace_replace_swap = self.swap_with_checks(
             common, 'inplace_replace_file', mock_inplace_replace,
             expected_args=[
-                (run_e2e_tests.CHROME_PROVIDER_FILE_PATH,
-                 run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
-                 expected_replace),
-                (run_e2e_tests.GECKO_PROVIDER_FILE_PATH,
-                 run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
-                 expected_replace)
+                (
+                    run_e2e_tests.CHROME_PROVIDER_FILE_PATH,
+                    run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
+                    expected_replace),
+                (
+                    run_e2e_tests.GECKO_PROVIDER_FILE_PATH,
+                    run_e2e_tests.PATTERN_FOR_REPLACE_WEBDRIVER_CODE,
+                    expected_replace)
             ], called_times=2)
         def mock_is_x64():
             return False
@@ -512,7 +532,7 @@ of the failed tests in ../protractor-screenshots/
         self.assertEqual(run_e2e_tests.PROTRACTOR_CONFIG_FILE, result)
 
     def test_get_parameter_for_one_sharding_instance(self):
-        result = run_e2e_tests.get_parameter_for_sharding(True, '1')
+        result = run_e2e_tests.get_parameter_for_sharding(True, 1)
         self.assertEqual([], result)
 
     def test_get_parameter_for_three_sharding_instances(self):
@@ -663,7 +683,7 @@ of the failed tests in ../protractor-screenshots/
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=(
-                False, True, '3', 'full', True))
+                False, True, 3, 'full', True))
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=([
                 common.NODE_BIN_PATH, run_e2e_tests.PROTRACTOR_BIN_PATH,

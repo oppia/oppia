@@ -47,6 +47,7 @@ import github # isort:skip
 
 
 class MockPsutilProcess(python_utils.OBJECT):
+    """A mock class for Process class in Psutil."""
     cmdlines = [
         ['dev_appserver.py', '--host', '0.0.0.0', '--port', '9001'],
         ['downloads']
@@ -56,12 +57,15 @@ class MockPsutilProcess(python_utils.OBJECT):
         self.index = index
 
     def cmdline(self):
+        """Return the command line of this process."""
         pass
 
     def kill(self):
+        """Kill the process."""
         pass
 
     def is_running(self):
+        """Check whether the function is running."""
         return True
 
 

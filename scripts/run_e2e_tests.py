@@ -17,7 +17,6 @@
 
 import argparse
 import atexit
-import fileinput
 import os
 import re
 import subprocess
@@ -102,7 +101,7 @@ _PARSER.add_argument(
          ' (fit or fdescribe).',
     )
 _PARSER.add_argument(
-    '--sharding-instances', type=str, default='3',
+    '--sharding-instances', type=int, default=3,
     help='Sets the number of parallel browsers to open while sharding.'
          'Sharding must be disabled (either by passing in false to --sharding'
          ' or 1 to --sharding-instances) if running any tests in isolation'
@@ -204,7 +203,6 @@ def tweak_constant_file(constant_file, dev_mode):
     pattern = '"DEV_MODE": .*'
     replace = '"DEV_MODE": %s' % (
         'true' if dev_mode else 'false')
-    regex = re.compile(pattern)
     common.inplace_replace_file(constant_file, pattern, replace)
 
 
@@ -297,6 +295,15 @@ def start_webdriver_manager():
 
 
 def get_parameter_for_config_file(run_on_browserstack):
+    """Return the parameter for the target configuration file based on whether
+    the test is running on browserstack.
+
+    Args:
+        run_on_browserstack: bool. Whether run the test on browserstack.
+
+    Returns:
+        A str represents the config file path.
+    """
     if not run_on_browserstack:
         return PROTRACTOR_CONFIG_FILE
     else:
@@ -304,7 +311,16 @@ def get_parameter_for_config_file(run_on_browserstack):
         return BROWSER_STACK_CONFIG_FILE
 
 def get_parameter_for_sharding(sharding, sharding_instances):
-    if not sharding or sharding_instances == '1':
+    """Return the parameter for sharding. Based on the sharding instances
+
+    Args:
+        sharding: bool. Whether run the test with sharding.
+        sharding_instances: int. How many sharding instances to be running.
+
+    Returns:
+        A list of parameters to represent the sharding configuration.
+    """
+    if not sharding or sharding_instances == 1:
         return []
     else:
         return ['--capabilities.shardTestFiles=%s' % sharding,
@@ -312,10 +328,27 @@ def get_parameter_for_sharding(sharding, sharding_instances):
 
 
 def get_parameter_for_dev_mode(dev_mode):
+    """Return parameter for whether the test should be running on dev_mode
+
+    Args:
+        dev_mode: bool. Whether the test is running on dev_mode.
+
+    Returns:
+        A string for the testing mode command line parameter.
+    """
     return '--params.devMode=%s' % dev_mode
 
 
 def get_parameter_for_suite(suite):
+    """Return parameter for which suite to be running on the tests.
+
+    Args:
+        suite: str. The suite name to be running on the tests. If the value is
+            `full`, all tests will run.
+
+    Returns:
+        A list of command line parameter for suite.
+    """
     return ['--suite', suite]
 
 def get_e2e_test_parameters(

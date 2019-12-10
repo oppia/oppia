@@ -454,6 +454,13 @@ def convert_to_posixpath(file_path):
 
 
 def inplace_replace_file(filename, regex_pattern, replace):
+    """Replace the file content inplace with regex pattern.
+
+    Args:
+        filename: str. The name of the file to be changed.
+        regex_pattern: str. The pattern to check.
+        replace: str. The content to be replaced.
+    """
     regex = re.compile(regex_pattern)
     for line in fileinput.input(
             files=[filename], inplace=True, backup='.bak'):
