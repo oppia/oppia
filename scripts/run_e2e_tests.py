@@ -14,6 +14,8 @@
 
 """Python execution for running e2e tests."""
 
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import atexit
@@ -24,7 +26,6 @@ import sys
 import time
 
 import python_utils
-
 from scripts import build
 from scripts import common
 from scripts import install_third_party_libs
@@ -134,6 +135,7 @@ core/tests/protractor.conf.js, you can view screenshots
 of the failed tests in ../protractor-screenshots/
 """)
     os.rmdir(screeenshots_dir)
+
 
 def cleanup():
     """Kill the running subprocesses and server fired in this program."""
@@ -280,7 +282,7 @@ def undo_webdriver_tweak():
 
 
 def start_webdriver_manager():
-    """Update and start webdriver manager"""
+    """Update and start webdriver manager."""
     if common.is_windows_os():
         tweak_webdriver_manager()
 
@@ -309,6 +311,7 @@ def get_parameter_for_config_file(run_on_browserstack):
     else:
         python_utils.PRINT('Running the tests on browsertack...')
         return BROWSER_STACK_CONFIG_FILE
+
 
 def get_parameter_for_sharding(sharding, sharding_instances):
     """Return the parameter for sharding. Based on the sharding instances
@@ -350,6 +353,7 @@ def get_parameter_for_suite(suite):
         A list of command line parameter for suite.
     """
     return ['--suite', suite]
+
 
 def get_e2e_test_parameters(
         run_on_browserstack, sharding, sharding_instances, suite, dev_mode):
@@ -432,5 +436,5 @@ def main(args=None):
     p.communicate()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

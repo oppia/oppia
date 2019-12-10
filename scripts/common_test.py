@@ -23,7 +23,6 @@ import fileinput
 import getpass
 import http.server
 import os
-import psutil
 import shutil
 import socketserver
 import stat
@@ -34,6 +33,8 @@ import tempfile
 from core.tests import test_utils
 import python_utils
 import release_constants
+
+import psutil
 
 from . import common
 

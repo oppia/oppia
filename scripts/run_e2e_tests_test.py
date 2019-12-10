@@ -18,17 +18,16 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import atexit
-import fileinput
 import functools
 import os
 import re
-import sys
 import subprocess
+import sys
 import time
 
 from core.tests import test_utils
-
 import python_utils
+
 from scripts import build
 from scripts import common
 from scripts import install_third_party_libs
@@ -42,14 +41,18 @@ class MockProcessClass(python_utils.OBJECT):
         pass
 
     kill_count = 0
+
     # pylint: disable=missing-docstring
     def kill(self):
         MockProcessClass.kill_count += 1
     # pylint: enable=missing-docstring
 
+
 class RunE2ETestsTests(test_utils.TestBase):
+    """Test the run_e2e_tests methods."""
+
     def setUp(self):
-        def mock_print(msg):
+        def mock_print(unused_msg):
             return
 
         def mock_run_cmd(unused_commands):
@@ -448,15 +451,16 @@ of the failed tests in ../protractor-screenshots/
 
         isfile_swap = self.swap_with_checks(
             os.path, 'isfile', mock_isfile, expected_args=[
-                (file,) for file in files_to_check
+                (filepath,) for filepath in files_to_check
             ], called_times=2)
         rename_swap = self.swap_with_checks(
             os, 'rename', mock_rename, expected_args=[
-                (file, file.replace('.bak', '')) for file in files_to_rename
+                (filepath, filepath.replace('.bak', '')) for
+                filepath in files_to_rename
             ], called_times=2)
         remove_swap = self.swap_with_checks(
             os, 'remove', mock_remove, expected_args=[
-                (file,) for file in files_to_remove
+                (filepath,) for filepath in files_to_remove
             ], called_times=2)
         with isfile_swap, rename_swap, remove_swap:
             run_e2e_tests.undo_webdriver_tweak()
@@ -604,7 +608,7 @@ of the failed tests in ../protractor-screenshots/
     def test_start_tests_when_other_instances_not_stopped(self):
         def mock_exit(unused_exit_code):
             raise Exception('sys.exit(1)')
-        def mock_check_running_instance(*args):
+        def mock_check_running_instance(*unused_args):
             return True
 
         check_swap = self.swap_with_checks(
