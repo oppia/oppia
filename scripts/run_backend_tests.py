@@ -47,6 +47,7 @@ import argparse
 import datetime
 import importlib
 import inspect
+import multiprocessing
 import os
 import re
 import subprocess
@@ -103,6 +104,7 @@ ALL_ERRORS = []
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
+MAX_CONCURRENT_RUNS = 24
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -178,13 +180,14 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, verbose, name=None):
+    def __init__(self, func, verbose, semaphore, name=None):
         super(TaskThread, self).__init__()
         self.func = func
         self.output = None
         self.exception = None
         self.verbose = verbose
         self.name = name
+        self.semaphore = semaphore
         self.finished = False
 
     def run(self):
@@ -196,13 +199,14 @@ class TaskThread(threading.Thread):
                 log('----------------------------------------')
             log('FINISHED %s: %.1f secs' %
                 (self.name, time.time() - self.start_time), show_time=True)
-            self.finished = True
         except Exception as e:
             self.exception = e
             if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
                     self.exception.args[0]):
                 log('ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
+        finally:
+            self.semaphore.release()
             self.finished = True
 
 
@@ -247,33 +251,36 @@ def _check_all_tasks(tasks):
             log(task_details)
 
 
-def _execute_tasks(tasks, batch_size=24):
+def _execute_tasks(tasks, semaphore):
     """Starts all tasks and checks the results.
+    Runs no more than the allowable limit defined in the semaphore.
 
-    Runs no more than 'batch_size' tasks at a time.
+    Args:
+        tasks: list(TestingTaskSpec). The tasks to run.
+        semaphore: threading.Semaphore. The object that controls how many tasks
+            can run at any time.
     """
     remaining_tasks = [] + tasks
-    currently_running_tasks = set([])
+    currently_running_tasks = []
 
-    while remaining_tasks or currently_running_tasks:
-        if currently_running_tasks:
-            for task in list(currently_running_tasks):
-                task.join(1)
-                if not task.isAlive():
-                    currently_running_tasks.remove(task)
+    while remaining_tasks:
+        task = remaining_tasks.pop()
+        semaphore.acquire()
+        task.start()
+        task.start_time = time.time()
+        currently_running_tasks.append(task)
 
-        while remaining_tasks and len(currently_running_tasks) < batch_size:
-            task = remaining_tasks.pop()
-            currently_running_tasks.add(task)
-            task.start()
-            task.start_time = time.time()
-
-        time.sleep(5)
-        if remaining_tasks:
-            log('----------------------------------------')
-            log('Number of unstarted tasks: %s' % len(remaining_tasks))
-        _check_all_tasks(tasks)
+        if len(remaining_tasks) % 5 == 0:
+            if remaining_tasks:
+                log('----------------------------------------')
+                log('Number of unstarted tasks: %s' % len(remaining_tasks))
+            _check_all_tasks(currently_running_tasks)
         log('----------------------------------------')
+
+    for task in currently_running_tasks:
+        task.join()
+
+    _check_all_tasks(currently_running_tasks)
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -397,18 +404,22 @@ def main(args=None):
             include_load_tests=include_load_tests)
 
     # Prepare tasks.
+    concurrent_count = min(multiprocessing.cpu_count(), MAX_CONCURRENT_RUNS)
+    semaphore = threading.Semaphore(concurrent_count)
+
     task_to_taskspec = {}
     tasks = []
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        task = TaskThread(test.run, parsed_args.verbose, name=test_target)
+        task = TaskThread(
+            test.run, parsed_args.verbose, semaphore, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 
     task_execution_failed = False
     try:
-        _execute_tasks(tasks)
+        _execute_tasks(tasks, semaphore)
     except Exception:
         task_execution_failed = True
 
@@ -489,16 +500,16 @@ def main(args=None):
     python_utils.PRINT('')
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
-    else:
-        python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
-            total_count, '' if total_count == 1 else 's',
-            len(tasks), '' if len(tasks) == 1 else 'es'))
 
-        if total_errors or total_failures:
-            python_utils.PRINT(
-                '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
-        else:
-            python_utils.PRINT('All tests passed.')
+    python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
+        total_count, '' if total_count == 1 else 's',
+        len(tasks), '' if len(tasks) == 1 else 'es'))
+
+    if total_errors or total_failures:
+        python_utils.PRINT(
+            '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
+    else:
+        python_utils.PRINT('All tests passed.')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
