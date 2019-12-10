@@ -22,7 +22,7 @@ import fileinput
 import os
 import shutil
 import subprocess
-import executable
+import sys
 
 # These libraries need to be installed before running or importing any script.
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
