@@ -24,6 +24,7 @@ export class SkillDomainConstants {
 
   public static SKILL_DATA_URL_TEMPLATE =
     '/skill_data_handler/<comma_separated_skill_ids>';
+  public static FETCH_SKILLS_URL_TEMPLATE = '/fetch_skills';
   public static SKILL_EDITOR_QUESTION_URL_TEMPLATE =
     '/skill_editor_question_handler/<skill_id>?cursor=<cursor>';
 
@@ -37,6 +38,8 @@ export class SkillDomainConstants {
   public static SKILL_MISCONCEPTIONS_PROPERTY_NAME = 'name';
   public static SKILL_MISCONCEPTIONS_PROPERTY_NOTES = 'notes';
   public static SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK = 'feedback';
+  public static SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED =
+    'must_be_addressed';
 
   public static CMD_UPDATE_SKILL_PROPERTY =
     'update_skill_property';
@@ -49,6 +52,11 @@ export class SkillDomainConstants {
     'add_skill_misconception';
   public static CMD_DELETE_SKILL_MISCONCEPTION =
     'delete_skill_misconception';
+
+  public static CMD_ADD_PREREQUISITE_SKILL =
+    'add_prerequisite_skill';
+  public static CMD_DELETE_PREREQUISITE_SKILL =
+    'delete_prerequisite_skill';
 
   public static CMD_UPDATE_RUBRICS = 'update_rubrics';
 }

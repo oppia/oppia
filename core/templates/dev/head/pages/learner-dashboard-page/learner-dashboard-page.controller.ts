@@ -29,17 +29,17 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('directives/angular-html-bind.directive.ts');
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
-require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
+require('domain/learner_dashboard/learner-dashboard-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
 require(
   'pages/learner-dashboard-page/suggestion-modal/' +
   'suggestion-modal-for-learner-dashboard.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/AlertsService.ts');
-require('services/DateTimeFormatService.ts');
-require('services/UserService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/alerts.service.ts');
+require('services/date-time-format.service.ts');
+require('services/user.service.ts');
 
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 
@@ -87,7 +87,9 @@ angular.module('oppia').directive('learnerDashboardPage', [
             LEARNER_DASHBOARD_SECTION_I18N_IDS);
           ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
             LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.PAGE_SIZE = 8;
           ctrl.Math = window.Math;
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {

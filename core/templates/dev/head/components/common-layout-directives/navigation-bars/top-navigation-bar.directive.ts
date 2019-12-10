@@ -18,14 +18,14 @@
  * the editor pages).
  */
 
-require('domain/sidebar/SidebarStatusService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/DebouncerService.ts');
-require('services/NavigationService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/UserService.ts');
-require('services/contextual/DeviceInfoService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('domain/sidebar/sidebar-status.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/debouncer.service.ts');
+require('services/navigation.service.ts');
+require('services/site-analytics.service.ts');
+require('services/user.service.ts');
+require('services/contextual/device-info.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -33,9 +33,8 @@ angular.module('oppia').directive('topNavigationBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/navigation-bars/' +
-        'top-navigation-bar.directive.html'),
+      template: require(
+        '!html-loader!./top-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
@@ -97,7 +96,9 @@ angular.module('oppia').directive('topNavigationBar', [
             'story_editor'];
           ctrl.currentUrl = window.location.pathname.split('/')[1];
           ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.logoutUrl = LOGOUT_URL;
           ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
           ctrl.standardNavIsShown = (
@@ -175,7 +176,7 @@ angular.module('oppia').directive('topNavigationBar', [
           angular.element(document).on('click', function(evt) {
             if (!angular.element(evt.target).closest('li').length) {
               ctrl.activeMenuName = '';
-              $scope.$apply();
+              $scope.$applyAsync();
             }
           });
 
@@ -275,7 +276,7 @@ angular.module('oppia').directive('topNavigationBar', [
                   // Force a digest cycle to hide element immediately.
                   // Otherwise it would be hidden after the next call.
                   // This is due to setTimeout use in debounce.
-                  $scope.$apply();
+                  $scope.$applyAsync();
                   $timeout(truncateNavbar, 50);
                   return;
                 }

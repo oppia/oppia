@@ -17,17 +17,17 @@
  */
 
 require('components/profile-link-directives/circular-image.directive.ts');
-require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
+require('domain/learner_dashboard/learner-dashboard-icons.directive.ts');
 require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
 require('components/ratings/rating-computation/rating-computation.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/DateTimeFormatService.ts');
-require('services/UserService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/date-time-format.service.ts');
+require('services/user.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('explorationSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {

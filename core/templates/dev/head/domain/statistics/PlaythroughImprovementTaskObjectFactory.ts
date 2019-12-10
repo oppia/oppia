@@ -18,20 +18,26 @@
 
 require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/statistics/statistics-domain.constants.ajs.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvement-modal.service.ts');
-require('services/PlaythroughIssuesService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-exploration-permissions.service.ts');
+require('services/exploration-features.service.ts');
+require('services/playthrough-issues.service.ts');
 
 angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
-  'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
-  'PlaythroughIssuesService', 'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE',
+  '$q', 'ExplorationFeaturesService', 'ImprovementActionButtonObjectFactory',
+  'ImprovementModalService', 'PlaythroughIssuesService',
+  'UserExplorationPermissionsService', 'PLAYTHROUGH_IMPROVEMENT_TASK_TYPE',
   'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
   function(
-      ImprovementActionButtonObjectFactory, ImprovementModalService,
-      PlaythroughIssuesService, PLAYTHROUGH_IMPROVEMENT_TASK_TYPE,
+      $q, ExplorationFeaturesService, ImprovementActionButtonObjectFactory,
+      ImprovementModalService, PlaythroughIssuesService,
+      UserExplorationPermissionsService, PLAYTHROUGH_IMPROVEMENT_TASK_TYPE,
       STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
     /**
      * @constructor
@@ -41,17 +47,7 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
       /** @type {string} */
       this._title = PlaythroughIssuesService.renderIssueStatement(issue);
       /** @type {ImprovementActionButton[]} */
-      this._actionButtons = [
-        ImprovementActionButtonObjectFactory.createNew(
-          'Mark as Resolved', 'btn-primary', () => {
-            ImprovementModalService.openConfirmationModal(
-              'Marking this action as resolved will discard the playthrough ' +
-              'forever. Are you sure you want to proceed?',
-              'Mark as Resolved', 'btn-danger')
-              .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
-              .then(() => this._isObsolete = true);
-          }),
-      ];
+      this._actionButtons = [];
       /** @type {boolean} */
       this._isObsolete = false;
       /** @type {Object} */
@@ -60,6 +56,22 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
         suggestions: PlaythroughIssuesService.renderIssueSuggestions(issue),
         playthroughIds: issue.playthroughIds,
       };
+
+      UserExplorationPermissionsService.getPermissionsAsync().then(perms => {
+        if (!perms.can_edit) {
+          return;
+        }
+        this._actionButtons.push(
+          ImprovementActionButtonObjectFactory.createNew(
+            'Mark as Resolved', 'btn-primary', () => {
+              ImprovementModalService.openConfirmationModal(
+                'Marking this action as resolved will discard the ' +
+                'playthrough forever. Are you sure you want to proceed?',
+                'Mark as Resolved', 'btn-danger')
+                .result.then(() => PlaythroughIssuesService.resolveIssue(issue))
+                .then(() => this._isObsolete = true);
+            }));
+      });
     };
 
     /** @returns {string} - The actionable status of this task. */
@@ -117,6 +129,11 @@ angular.module('oppia').factory('PlaythroughImprovementTaskObjectFactory', [
        *    playthrough issues associated to the current exploration.
        */
       fetchTasks: function() {
+        // TODO(#7816): Remove this branch once all explorations maintain an
+        // ExplorationIssuesModel.
+        if (!ExplorationFeaturesService.isPlaythroughRecordingEnabled()) {
+          return $q.resolve([]);
+        }
         return PlaythroughIssuesService.getIssues().then(function(issues) {
           return issues.map(function(issue) {
             return new PlaythroughImprovementTask(issue);

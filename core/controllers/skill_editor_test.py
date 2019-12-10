@@ -178,6 +178,8 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
         self.assertEqual(self.skill_id, json_response['skill']['id'])
+        self.assertEqual(
+            1, len(json_response['grouped_skill_summaries']['Name']))
         self.logout()
 
     def test_editable_skill_handler_get_fails(self):
@@ -210,6 +212,14 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             self.put_json(
                 self.url, self.put_payload, csrf_token=csrf_token,
                 expected_status_int=400)
+        self.put_payload['version'] = None
+        self.put_json(
+            self.url, self.put_payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.put_payload['version'] = -1
+        self.put_json(
+            self.url, self.put_payload, csrf_token=csrf_token,
+            expected_status_int=400)
         # Check PUT returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.put_json(
@@ -264,51 +274,30 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
         # Check GET returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
+        self.url = '%s/1,%s' % (
+            feconf.SKILL_DATA_URL_PREFIX, self.skill_id_2)
+        self.get_json(self.url, expected_status_int=404)
         self.logout()
 
 
-class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
-    """Tests for SkillPublishHandler."""
+class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for FetchSkillsHandler."""
 
     def setUp(self):
-        super(SkillPublishHandlerTest, self).setUp()
-        self.url = '%s/%s' % (feconf.SKILL_PUBLISH_URL_PREFIX, self.skill_id)
+        super(FetchSkillsHandlerTest, self).setUp()
+        self.url = feconf.FETCH_SKILLS_URL_PREFIX
 
-    def test_skill_publish_handler_succeeds(self):
+    def test_skill_data_handler_get_multiple_skills(self):
         self.login(self.ADMIN_EMAIL)
-        # Check that an admin can publish a skill.
-        csrf_token = self.get_new_csrf_token()
-        self.put_json(self.url, {'version': 1}, csrf_token=csrf_token)
+        # Check that admins can access two skills data at the same time.
+        json_response = self.get_json(self.url)
+        self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
+        self.assertEqual(len(json_response['skills']), 1)
         self.logout()
 
-    def test_skill_publish_handler_fails(self):
-
+    def test_skill_data_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        # Check that a skill cannot be published when the payload has no
-        # version.
-        self.put_json(
-            self.url, {}, csrf_token=csrf_token,
-            expected_status_int=400)
-        # Check that a skill cannot be published when the payload's version
-        # is different from the skill's version.
-        self.put_json(
-            self.url, {'version': -1}, csrf_token=csrf_token,
-            expected_status_int=400)
-        # Check that a non-existing skill cannot be published.
-        url = '%s/non-existing-id' % (feconf.SKILL_PUBLISH_URL_PREFIX)
-        self.put_json(
-            url, {'version': 1}, csrf_token=csrf_token, expected_status_int=404)
-
-        # Check that the status is 401 when call to publish_skill raises an
-        # exception.
-        skill_services_swap = self.swap(
-            skill_services, 'publish_skill',
-            self._mock_publish_skill_raise_exception)
-        with skill_services_swap:
-            csrf_token = self.get_new_csrf_token()
-            self.put_json(
-                self.url, {'version': 1}, csrf_token=csrf_token,
-                expected_status_int=401)
-
+        # Check GET returns 404 when cannot get skill by id.
+        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.get_json(self.url, expected_status_int=404)
         self.logout()

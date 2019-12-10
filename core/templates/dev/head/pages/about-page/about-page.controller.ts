@@ -20,7 +20,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('aboutPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -105,7 +105,9 @@ angular.module('oppia').directive('aboutPage', [
           ctrl.listOfNames = listOfNamesToThank
             .slice(0, listOfNamesToThank.length - 1).join(', ') +
             ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.aboutPageMascotImgUrl = UrlInterpolationService
             .getStaticImageUrl('/general/about_page_mascot.png');
         }

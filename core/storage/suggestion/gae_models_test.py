@@ -79,33 +79,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
             base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_has_reference_to_user_id_author(self):
+    def test_has_reference_to_user_id(self):
         self.assertTrue(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('author_1'))
+            .has_reference_to_user_id('author_1')
+        )
         self.assertTrue(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('author_2'))
+            .has_reference_to_user_id('author_2')
+        )
         self.assertTrue(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('author_3'))
+            .has_reference_to_user_id('author_3')
+        )
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_1')
+        )
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_2')
+        )
+        self.assertTrue(
+            suggestion_models.GeneralSuggestionModel
+            .has_reference_to_user_id('reviewer_3')
+        )
         self.assertFalse(
             suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('id_x'))
-
-    def test_has_reference_to_user_id_reviewer(self):
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('reviewer_1'))
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('reviewer_2'))
-        self.assertTrue(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('reviewer_3'))
-        self.assertFalse(
-            suggestion_models.GeneralSuggestionModel
-            .has_reference_to_user_id('id_x'))
+            .has_reference_to_user_id('id_x')
+        )
 
     def test_score_type_contains_delimiter(self):
         for score_type in suggestion_models.SCORE_TYPE_CHOICES:
@@ -445,43 +447,148 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_data, test_data)
 
 
-class ReviewerRotationTrackingModelTests(test_utils.GenericTestBase):
+class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
+    """Tests for the GeneralVoiceoverApplicationModel class."""
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            suggestion_models.ReviewerRotationTrackingModel
-            .get_deletion_policy(),
-            base_models.DELETION_POLICY.NOT_APPLICABLE)
+            suggestion_models.GeneralSuggestionModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
 
-    def test_create_and_update_model(self):
-        suggestion_models.ReviewerRotationTrackingModel.create(
-            'category1', 'user1')
-        instance = suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-            'category1')
-        self.assertEqual(instance.id, 'category1')
-        self.assertEqual(instance.current_position_in_rotation, 'user1')
-        (
-            suggestion_models.ReviewerRotationTrackingModel
-            .update_position_in_rotation('category1', 'user2'))
-        instance = suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-            'category1')
-        self.assertEqual(instance.id, 'category1')
-        self.assertEqual(instance.current_position_in_rotation, 'user2')
+    def test_has_reference_to_user_id_author(self):
+        self.assertFalse(
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .has_reference_to_user_id('author_1'))
 
-    def test_id_collision_create_failure(self):
-        suggestion_models.ReviewerRotationTrackingModel.create(
-            'category1', 'user1')
-        with self.assertRaisesRegexp(
-            Exception, 'There already exists an instance with the given id: '
-                       'category1'):
-            suggestion_models.ReviewerRotationTrackingModel.create(
-                'category1', 'user1')
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='author_1',
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
 
-    def test_update_without_create_should_create_instance(self):
-        (
-            suggestion_models.ReviewerRotationTrackingModel
-            .update_position_in_rotation('category1', 'user1'))
-        instance = suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-            'category1')
-        self.assertEqual(instance.id, 'category1')
-        self.assertEqual(instance.current_position_in_rotation, 'user1')
+        self.assertTrue(
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .has_reference_to_user_id('author_1'))
+        self.assertFalse(
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .has_reference_to_user_id('author_2'))
+
+    def test_get_user_voiceover_applications(self):
+        author_id = 'author'
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_user_voiceover_applications(author_id))
+        self.assertEqual(applicant_models, [])
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=author_id,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_user_voiceover_applications(author_id))
+        self.assertEqual(len(applicant_models), 1)
+        self.assertEqual(applicant_models[0].id, 'application_id')
+
+    def test_get_user_voiceover_applications_with_status(self):
+        author_id = 'author'
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_user_voiceover_applications(
+                author_id, status=suggestion_models.STATUS_IN_REVIEW))
+        self.assertEqual(applicant_models, [])
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=author_id,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_user_voiceover_applications(
+                author_id, status=suggestion_models.STATUS_IN_REVIEW))
+        self.assertEqual(len(applicant_models), 1)
+        self.assertEqual(applicant_models[0].id, 'application_id')
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_user_voiceover_applications(
+                author_id, status=suggestion_models.STATUS_REJECTED))
+        self.assertEqual(applicant_models, [])
+
+    def test_get_reviewable_voiceover_applications(self):
+        author_id = 'author'
+        reviewer_id = 'reviewer_id'
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_reviewable_voiceover_applications(reviewer_id))
+        self.assertEqual(applicant_models, [])
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_reviewable_voiceover_applications(author_id))
+        self.assertEqual(applicant_models, [])
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id=author_id,
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_reviewable_voiceover_applications(reviewer_id))
+        self.assertEqual(len(applicant_models), 1)
+        self.assertEqual(applicant_models[0].id, 'application_id')
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_reviewable_voiceover_applications(author_id))
+        self.assertEqual(applicant_models, [])
+
+    def test_get_voiceover_applications(self):
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='application_id',
+            target_type='exploration',
+            target_id='exp_id',
+            status=suggestion_models.STATUS_IN_REVIEW,
+            author_id='author_id',
+            final_reviewer_id=None,
+            language_code='en',
+            filename='application_audio.mp3',
+            content='<p>Some content</p>',
+            rejection_message=None).put()
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_voiceover_applications('exploration', 'exp_id', 'en'))
+        self.assertEqual(len(applicant_models), 1)
+        self.assertEqual(applicant_models[0].id, 'application_id')
+
+        applicant_models = (
+            suggestion_models.GeneralVoiceoverApplicationModel
+            .get_voiceover_applications('exploration', 'exp_id', 'hi'))
+        self.assertEqual(len(applicant_models), 0)

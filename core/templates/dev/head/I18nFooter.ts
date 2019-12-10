@@ -18,16 +18,15 @@
  * @author milagro.teruel@gmail.com (Milagro Teruel)
  */
 
-require('services/TranslationFileHashLoaderService.ts');
+require('services/translation-file-hash-loader.service.ts');
 
 angular.module('oppia').directive('i18nFooter', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/i18n-footer.directive.html'),
+      template: require('!html-loader!./i18n-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$timeout', '$translate', 'UserService',

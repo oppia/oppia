@@ -525,6 +525,24 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 
+class MergedQuestionSkillLinkDomainTest(test_utils.GenericTestBase):
+    """Test for Merged Question Skill Link Domain object."""
+
+    def test_to_dict(self):
+        """Test to verify to_dict method of the Merged Question Skill Link
+        Domain object.
+        """
+        expected_object_dict = {
+            'question_id': 'testquestion',
+            'skill_ids': ['testskill'],
+            'skill_descriptions': ['testskilldescription'],
+            'skill_difficulties': [0.5],
+        }
+        observed_object = question_domain.MergedQuestionSkillLink(
+            'testquestion', ['testskill'], ['testskilldescription'], [0.5])
+        self.assertEqual(expected_object_dict, observed_object.to_dict())
+
+
 class QuestionRightsDomainTest(test_utils.GenericTestBase):
     """Test for Question Rights Domain object."""
 

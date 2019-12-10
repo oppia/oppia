@@ -16,8 +16,8 @@
  * @fileoverview Directive for the item view of an opportunity.
  */
 
-require('services/SiteAnalyticsService.ts');
-require('services/UserService.ts');
+require('services/site-analytics.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').directive('loginRequiredMessage', [
   'UrlInterpolationService', function(

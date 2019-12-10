@@ -36,10 +36,6 @@ POST_COMMIT_STATUS_PRIVATE = 'private'
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# The path for generating release_summary.md file for the current release.
-RELEASE_SUMMARY_FILEPATH = os.path.join(
-    os.getcwd(), os.pardir, 'release_summary.md')
-
 # When DEV_MODE is true check that we are running in development environment.
 # The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
 # need for an explicit check.
@@ -134,6 +130,7 @@ ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
+ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -191,7 +188,7 @@ CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
 CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 
 # The current version of misconceptions dict in the skill schema.
-CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 2
 
 # The current version of rubric dict in the skill schema.
 CURRENT_RUBRIC_SCHEMA_VERSION = 1
@@ -357,7 +354,8 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# Committer id for system actions.
+# Committer id for system actions. The username for the system committer
+# (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
@@ -445,6 +443,7 @@ EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
 EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
+EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -656,6 +655,7 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
+FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
@@ -694,6 +694,7 @@ QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
 QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+DELETE_ACCOUNT_URL = '/delete-account'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -705,7 +706,6 @@ SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
 SKILL_MASTERY_DATA_URL = '/skill_mastery_handler/data'
-SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
 SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'

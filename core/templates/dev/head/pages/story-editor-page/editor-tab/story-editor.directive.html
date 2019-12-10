@@ -64,26 +64,49 @@
     </div>
     <div class="story-nodes-title">
       <label for="storyNodes" class="form-heading">Chapters</label>
-      <span ng-if="nodes.length > 0"> <i> (Click on check box to mark it as the first chapter.)</i> </span>
+      <div ng-if="nodes.length > 0">
+        Select Initial Chapter
+        <select class="form-control protractor-test-initial-chapter-select"
+                ng-model="initialNodeId"
+                ng-if="nodes.length > 0"
+                ng-options="node.getId() as node.getTitle() for node in nodes"
+                style="width: 300px; margin-bottom: 10px;"
+                ng-click="markAsInitialNode(initialNodeId)">
+        </select>
+      </div>
     </div>
-    <div class="story-node-editor" ng-if="nodes.length > 0">
+    <div class="story-node-editor" ng-if="linearNodesList.length > 0">
       <div class="story-nodes-container">
-        <div ng-repeat="node in nodes">
+        <div ng-repeat="node in linearNodesList">
           <md-card class="story-editor-node"
                    ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
                    ng-click="setNodeToEdit(node.getId())">
             <div class="story-editor-node-title">
               <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
             </div>
-            <span style="font-size: 0.8em; width: 15vw;" ng-if="disconnectedNodeIds.indexOf(node.getId()) !== -1">
-              <i>This chapter is not reachable from any other chapter</i>
-            </span>
-            <span class="story-editor-initial-node">
-              <span ng-click="markAsInitialNode(node.getId())" aria-hidden="true">
-                <i ng-if="!isInitialNode(node.getId())" class="material-icons md-18">check_box_outline_blank</i>
-                <i ng-if="isInitialNode(node.getId())" class="material-icons md-18">check_box</i>
+            <span class="story-editor-delete-node">
+              <span class="protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())" aria-hidden="true">
+                <i class="material-icons md-18">&#xE14C;</i>
               </span>
             </span>
+          </md-card>
+          <div ng-if="$index < linearNodesList.length - 1">
+            <i style="font-size: 1.5em;" class="material-icons"> arrow_downward </i>
+          </div>
+        </div>
+        <h3 class="protractor-test-disconnected-node-warning" ng-if="disconnectedNodes.length > 0">
+          The following chapters are disconnected from the graph
+        </h3>
+        <em ng-if="disconnectedNodes.length > 0">
+          (Please fix this before saving changes)
+        </em>
+        <div ng-repeat="node in disconnectedNodes" style="padding-top: 2vh;">
+          <md-card class="story-editor-node"
+                   ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
+                   ng-click="setNodeToEdit(node.getId())">
+            <div class="story-editor-node-title">
+              <span class="protractor-test-chapter-title"><[node.getTitle()]></span>
+            </div>
             <span class="story-editor-delete-node">
               <span class="protractor-test-delete-chapter-button" ng-click="deleteNode(node.getId())" aria-hidden="true">
                 <i class="material-icons md-18">&#xE14C;</i>
@@ -106,7 +129,7 @@
         </div>
       </div>
     </div>
-    <div ng-if="nodes.length === 0" style="text-align: center;">
+    <div ng-if="linearNodesList.length === 0" style="text-align: center;">
       <p class="no-chapters-message" style="padding-top: 6px;">
         This story has no chapters.
       </p>
@@ -178,7 +201,7 @@
     padding: 70px 20px;
     position: relative;
     text-align: center;
-    white-space: nowrap;
+    white-space: initial;
     width: 35%;
   }
 

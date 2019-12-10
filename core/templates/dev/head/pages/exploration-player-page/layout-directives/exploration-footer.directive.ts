@@ -19,11 +19,11 @@
 
 require('components/button-directives/hint-and-solution-buttons.directive.ts');
 
-require('domain/summary/ExplorationSummaryBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/ContextService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('domain/summary/exploration-summary-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/context.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('explorationFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -41,7 +41,9 @@ angular.module('oppia').directive('explorationFooter', [
             ExplorationSummaryBackendApiService, UrlService,
             WindowDimensionsService) {
           $scope.explorationId = ContextService.getExplorationId();
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           $scope.iframed = UrlService.isIframed();
 
           $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();

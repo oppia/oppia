@@ -25,11 +25,11 @@ require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('components/ratings/rating-computation/rating-computation.service.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-require('services/ContextService.ts');
-require('services/contextual/UrlService.ts');
-require('services/DateTimeFormatService.ts');
+require('domain/exploration/read-only-exploration-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/context.service.ts');
+require('services/contextual/url.service.ts');
+require('services/date-time-format.service.ts');
 
 angular.module('oppia').directive('learnerViewInfo', [
   'UrlInterpolationService', function(
@@ -154,10 +154,21 @@ angular.module('oppia').directive('learnerViewInfo', [
                   $scope.infoCardBackgroundCss = {
                     'background-color': expInfo.thumbnail_bg_color
                   };
+                  $scope.titleWrapper = function() {
+                    var titleHeight =
+                    document.querySelectorAll(
+                      '.oppia-info-card-logo-thumbnail')[0].clientWidth - 20;
+                    var titleCss = {
+                      'word-wrap': 'break-word',
+                      width: titleHeight.toString()
+                    };
+                    return titleCss;
+                  };
                   $scope.infoCardBackgroundImageUrl = expInfo
                     .thumbnail_icon_url;
-                  $scope.getStaticImageUrl = (
-                    UrlInterpolationService.getStaticImageUrl);
+                  $scope.getStaticImageUrl = function(imagePath) {
+                    return UrlInterpolationService.getStaticImageUrl(imagePath);
+                  };
                   $scope.lastUpdatedString = getLastUpdatedString(
                     expInfo.last_updated_msec);
                   $scope.numViews = expInfo.num_views;

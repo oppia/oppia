@@ -41,8 +41,8 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         super(QuestionMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test questions.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
         self.skill_id = 'skill_id'
         self.save_new_skill(self.skill_id, self.albert_id, 'Skill Description')
@@ -79,7 +79,8 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(question.question_state_data.to_dict(),
                          updated_question.question_state_data.to_dict())
 
-        output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))
         expected = [[u'question_migrated',
                      [u'1 questions successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -109,7 +110,8 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             question_services.get_question_by_id(self.QUESTION_ID)
 
-        output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))
         expected = [[u'question_deleted',
                      [u'Encountered 1 deleted questions.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -139,7 +141,8 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
             updated_question.question_state_data_schema_version,
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-        output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))
         expected = [[u'question_migrated',
                      [u'1 questions successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -168,8 +171,8 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         self.process_and_flush_pending_tasks()
 
-        output = question_jobs_one_off.QuestionMigrationOneOffJob.get_output(
-            job_id)
+        output = (
+            question_jobs_one_off.QuestionMigrationOneOffJob.get_output(job_id))
         expected = [[u'validation_error',
                      [u'Question %s failed validation: linked_skill_ids is '
                       'either null or an empty list' % question_id]]]

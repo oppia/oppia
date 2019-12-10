@@ -11,7 +11,7 @@
              alt="Save Story">
             &#xE161;
           </i>
-          <span class="oppia-save-publish-button-label float-left">Save Changes</span>
+          <span class="oppia-save-publish-button-label float-left" style="width: 80px;">Save Draft</span>
           <span class="d-none d-md-block float-left" style="opacity: 0.5;margin-left: 2px;"
                 ng-if="getChangeListLength() > 0">
             (<[getChangeListLength()]>)
@@ -36,7 +36,7 @@
             class="btn btn-secondary oppia-editor-publish-button protractor-test-publish-story-button"
             ng-click="publishStory()"
             ng-class="{'btn-success': !isStorySaveable()}"
-            ng-disabled="isStorySaveable() || getWarningsCount() > 0">
+            ng-disabled="isStorySaveable() || getWarningsCount() > 0 || validationIssues.length > 0">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
         &#xE2C3;
@@ -56,14 +56,14 @@
       <i class="material-icons">&#xE254;</i>
     </a>
     <div ng-show="getWarningsCount()"
-         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color">
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color protractor-test-warning-indicator">
       <span class="oppia-editor-warnings-count">
         <[getWarningsCount()]>
       </span>
     </div>
     <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
       <span class="oppia-editor-warnings-header">Warnings</span>
-      <li class="oppia-editor-warnings-text"
+      <li class="oppia-editor-warnings-text protractor-test-warnings-text"
           ng-repeat="issue in validationIssues track by $index">
         <hr class="oppia-editor-warnings-separator">
         <[issue]>
@@ -71,3 +71,9 @@
     </ul>
   </li>
 </ul>
+<style>
+  .oppia-editor-warnings-text {
+    width: 100%;
+    word-wrap: break-word;
+  }
+</style>

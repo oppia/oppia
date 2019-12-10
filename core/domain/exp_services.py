@@ -527,7 +527,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.commit(committer_id, commit_message, change_list_dict)
     exp_memcache_key = exp_fetchers.get_exploration_memcache_key(exploration.id)
     memcache_services.delete(exp_memcache_key)
-    index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
 
@@ -1047,6 +1046,12 @@ def save_exploration_summary(exp_summary):
     )
 
     exp_summary_model.put()
+
+    # The index should be updated after saving the exploration
+    # summary instead of after saving the exploration since the
+    # index contains documents computed on basis of exploration
+    # summary.
+    index_explorations_given_ids([exp_summary.id])
 
 
 def delete_exploration_summary(exploration_id):

@@ -19,10 +19,10 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import copy
 import logging
 
-from core.domain import email_manager
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -210,7 +210,8 @@ def get_skill_from_model(skill_model):
         skill_model.language_code,
         skill_model.version, skill_model.next_misconception_id,
         skill_model.superseding_skill_id, skill_model.all_questions_merged,
-        skill_model.created_on, skill_model.last_updated)
+        skill_model.prerequisite_skill_ids, skill_model.created_on,
+        skill_model.last_updated)
 
 
 def get_all_skill_summaries():
@@ -240,7 +241,8 @@ def get_multi_skill_summaries(skill_ids):
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
     skill_summaries = [
         get_skill_summary_from_model(skill_summary_model)
-        for skill_summary_model in skill_summaries_models]
+        for skill_summary_model in skill_summaries_models
+        if skill_summary_model is not None]
     return skill_summaries
 
 
@@ -263,6 +265,59 @@ def get_multi_skills(skill_ids):
         for skill_model in local_skill_models
         if skill_model is not None]
     return skills
+
+
+def get_rubrics_of_skills(skill_ids):
+    """Returns a list of rubrics corresponding to given skills.
+
+    Args:
+        skill_ids: list(str). The list of skill IDs.
+
+    Returns:
+        dict, list(str). The skill rubrics of skills keyed by their
+            corresponding ids and the list of deleted skill ids, if any.
+    """
+    backend_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    skill_id_to_rubrics_dict = {}
+
+    for skill_model in backend_skill_models:
+        if skill_model is not None:
+            skill_id_to_rubrics_dict[skill_model.id] = skill_model.rubrics
+
+    deleted_skill_ids = []
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_rubrics_dict:
+            skill_id_to_rubrics_dict[skill_id] = None
+            deleted_skill_ids.append(skill_id)
+
+    return skill_id_to_rubrics_dict, deleted_skill_ids
+
+
+def get_descriptions_of_skills(skill_ids):
+    """Returns a list of skill descriptions corresponding to the given skills.
+
+    Args:
+        skill_ids: list(str). The list of skill ids.
+
+    Returns:
+        dict, list(str). The skill descriptions of skills keyed by their
+            corresponding ids and the list of deleted skill ids, if any.
+    """
+    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
+    skill_id_to_description_dict = {}
+
+    for skill_summary_model in skill_summary_models:
+        if skill_summary_model is not None:
+            skill_id_to_description_dict[skill_summary_model.id] = (
+                skill_summary_model.description)
+
+    deleted_skill_ids = []
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_description_dict:
+            skill_id_to_description_dict[skill_id] = None
+            deleted_skill_ids.append(skill_id)
+
+    return skill_id_to_description_dict, deleted_skill_ids
 
 
 def get_skill_summary_from_model(skill_summary_model):
@@ -340,45 +395,6 @@ def get_skill_summary_by_id(skill_id, strict=True):
         return None
 
 
-def get_skill_descriptions_by_ids(topic_id, skill_ids):
-    """Returns a list of skill descriptions corresponding to given skill ids.
-
-    Args:
-        topic_id: str. The id of the topic that these skills are a part of.
-        skill_ids: list(str). The list of skill ids.
-
-    Returns:
-        dict. The skill descriptions of skills keyed by their corresponding ids.
-    """
-    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
-    skill_id_to_description_dict = {}
-
-    for skill_summary_model in skill_summary_models:
-        if skill_summary_model is not None:
-            skill_id_to_description_dict[skill_summary_model.id] = (
-                skill_summary_model.description)
-
-    deleted_skill_ids = []
-    for skill_id in skill_ids:
-        if skill_id not in skill_id_to_description_dict:
-            skill_id_to_description_dict[skill_id] = None
-            deleted_skill_ids.append(skill_id)
-
-    if deleted_skill_ids:
-        deleted_skills_string = ', '.join(deleted_skill_ids)
-        logging.error(
-            'The deleted skills: %s are still present in topic with id %s'
-            % (deleted_skills_string, topic_id)
-        )
-        if feconf.CAN_SEND_EMAILS:
-            email_manager.send_mail_to_admin(
-                'Deleted skills present in topic',
-                'The deleted skills: %s are still present in topic with id %s'
-                % (deleted_skills_string, topic_id))
-
-    return skill_id_to_description_dict
-
-
 def get_new_skill_id():
     """Returns a new skill id.
 
@@ -418,7 +434,8 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         rubric_schema_version=skill.rubric_schema_version,
         skill_contents_schema_version=skill.skill_contents_schema_version,
         superseding_skill_id=skill.superseding_skill_id,
-        all_questions_merged=skill.all_questions_merged
+        all_questions_merged=skill.all_questions_merged,
+        prerequisite_skill_ids=skill.prerequisite_skill_ids
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -486,11 +503,18 @@ def apply_change_list(skill_id, change_list, committer_id):
                     skill.update_explanation(change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    skill.update_worked_examples(change.new_value)
+                    worked_examples_list = [
+                        state_domain.SubtitledHtml.from_dict(worked_example)
+                        for worked_example in change.new_value]
+                    skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 skill.add_misconception(change.new_misconception_dict)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
+            elif change.cmd == skill_domain.CMD_ADD_PREREQUISITE_SKILL:
+                skill.add_prerequisite_skill(change.skill_id)
+            elif change.cmd == skill_domain.CMD_DELETE_PREREQUISITE_SKILL:
+                skill.delete_prerequisite_skill(change.skill_id)
             elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
                 skill.update_rubric(
                     change.difficulty, change.explanation)
@@ -507,6 +531,10 @@ def apply_change_list(skill_id, change_list, committer_id):
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
+                        change.misconception_id, change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
+                    skill.update_misconception_must_be_addressed(
                         change.misconception_id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
@@ -574,6 +602,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.language_code = skill.language_code
     skill_model.superseding_skill_id = skill.superseding_skill_id
     skill_model.all_questions_merged = skill.all_questions_merged
+    skill_model.prerequisite_skill_ids = skill.prerequisite_skill_ids
     skill_model.misconceptions_schema_version = (
         skill.misconceptions_schema_version)
     skill_model.rubric_schema_version = (

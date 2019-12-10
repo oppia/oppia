@@ -16,8 +16,8 @@
  * @fileoverview Directive for CK Editor.
  */
 
-require('services/ContextService.ts');
-require('services/RteHelperService.ts');
+require('services/context.service.ts');
+require('services/rte-helper.service.ts');
 
 angular.module('oppia').directive('ckEditor4Rte', [
   'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
@@ -36,16 +36,21 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
+        var contextIsLessonRelated = (
+          ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
+          ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
         var canUseFs = (
           ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
+
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||
-            (!canUseFs && componentDefn.requiresFs))) {
+            (!canUseFs && componentDefn.requiresFs) ||
+            (!contextIsLessonRelated && componentDefn.isLessonRelated))) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
@@ -92,7 +97,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
         // Add external plugins.
         CKEDITOR.plugins.addExternal(
           'sharedspace',
-          '/third_party/static/ckeditor-sharedspace-4.12.1/', 'plugin.js');
+          '/third_party/static/ckeditor-4.12.1/plugins/sharedspace/',
+          'plugin.js');
         // Pre plugin is not available for 4.12.1 version of CKEditor. This is
         // a self created plugin (other plugins are provided by CKEditor).
         CKEDITOR.plugins.addExternal(
@@ -115,7 +121,10 @@ angular.module('oppia').directive('ckEditor4Rte', [
           sharedSpaces: {
             top: <HTMLElement>el[0].children[0].children[0]
           },
-          skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck-1.0/',
+          skin: (
+            'bootstrapck,' +
+            '/third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/'
+          ),
           toolbar: [
             {
               name: 'basicstyles',

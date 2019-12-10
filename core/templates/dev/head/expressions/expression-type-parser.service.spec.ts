@@ -25,13 +25,13 @@ require('App.ts');
 require('expressions/expression-parser.service.js');
 require('expressions/expression-syntax-tree.service.ts');
 require('expressions/expression-type-parser.service.ts');
-require('services/UtilsService.ts');
+require('services/utils.service.ts');
 
 describe('Expression type parser service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

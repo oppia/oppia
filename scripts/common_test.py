@@ -19,6 +19,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
+import getpass
 import http.server
 import os
 import shutil
@@ -30,12 +31,22 @@ import tempfile
 
 from core.tests import test_utils
 import python_utils
+import release_constants
 
 from . import common
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PY_GITHUB_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7')
+sys.path.insert(0, _PY_GITHUB_PATH)
+
+# pylint: disable=wrong-import-position
+import github # isort:skip
+# pylint: enable=wrong-import-position
 
 
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
+
     def test_run_cmd(self):
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),
@@ -95,32 +106,48 @@ class CommonTests(test_utils.GenericTestBase):
     def test_open_new_tab_in_browser_if_possible_with_url_opening_correctly(
             self):
         check_function_calls = {
-            'input_gets_called': False
+            'input_gets_called': False,
+            'check_call_gets_called': False
+        }
+        expected_check_function_calls = {
+            'input_gets_called': False,
+            'check_call_gets_called': True
         }
         def mock_call(unused_cmd_tokens):
             return 0
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_gets_called'] = True
         def mock_input():
             check_function_calls['input_gets_called'] = True
         call_swap = self.swap(subprocess, 'call', mock_call)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with call_swap, input_swap:
+        with call_swap, check_call_swap, input_swap:
             common.open_new_tab_in_browser_if_possible('test-url')
-        self.assertEqual(check_function_calls, {'input_gets_called': False})
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_open_new_tab_in_browser_if_possible_with_url_not_opening_correctly(
             self):
         check_function_calls = {
-            'input_gets_called': False
+            'input_gets_called': False,
+            'check_call_gets_called': False
+        }
+        expected_check_function_calls = {
+            'input_gets_called': True,
+            'check_call_gets_called': False
         }
         def mock_call(unused_cmd_tokens):
             return 1
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_gets_called'] = True
         def mock_input():
             check_function_calls['input_gets_called'] = True
         call_swap = self.swap(subprocess, 'call', mock_call)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        with call_swap, input_swap:
+        with call_swap, check_call_swap, input_swap:
             common.open_new_tab_in_browser_if_possible('test-url')
-        self.assertEqual(check_function_calls, {'input_gets_called': True})
+        self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_get_remote_alias_with_correct_alias(self):
         def mock_check_output(unused_cmd_tokens):
@@ -162,9 +189,30 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
+    def test_get_current_release_version_number_with_non_hotfix_branch(self):
+        self.assertEqual(
+            common.get_current_release_version_number('release-1.2.3'), '1.2.3')
+
+    def test_get_current_release_version_number_with_hotfix_branch(self):
+        self.assertEqual(
+            common.get_current_release_version_number('release-1.2.3-hotfix-1'),
+            '1.2.3')
+
+    def test_get_current_release_version_number_with_invalid_branch(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid branch name: invalid-branch.'):
+            common.get_current_release_version_number('invalid-branch')
+
     def test_is_current_branch_a_release_branch_with_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return 'On branch release-1.2.3'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_release_branch(), True)
+
+    def test_is_current_branch_a_release_branch_with_hotfix_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch release-1.2.3-hotfix-1'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
@@ -232,7 +280,7 @@ class CommonTests(test_utils.GenericTestBase):
         # pylint: enable=unused-argument
         def mock_communicate(unused_self):
             return ('Output', 'You\'ve successfully authenticated!')
-        def mock_call(unused_cmd_tokens):
+        def mock_check_call(unused_cmd_tokens):
             pass
         def mock_verify_local_repo_is_clean():
             pass
@@ -245,8 +293,8 @@ class CommonTests(test_utils.GenericTestBase):
         popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         communicate_swap = self.swap(
             subprocess.Popen, 'communicate', mock_communicate)
-        call_swap = self.swap(
-            subprocess, 'call', mock_call)
+        check_call_swap = self.swap(
+            subprocess, 'check_call', mock_check_call)
         verify_local_repo_swap = self.swap(
             common, 'verify_local_repo_is_clean',
             mock_verify_local_repo_is_clean)
@@ -255,9 +303,9 @@ class CommonTests(test_utils.GenericTestBase):
             mock_verify_current_branch_name)
         get_remote_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
-        with isdir_swap, chdir_swap, popen_swap, communicate_swap, call_swap:
-            with verify_local_repo_swap, verify_current_branch_name_swap:
-                with get_remote_alias_swap:
+        with isdir_swap, chdir_swap, popen_swap, communicate_swap:
+            with check_call_swap, verify_local_repo_swap:
+                with verify_current_branch_name_swap, get_remote_alias_swap:
                     (
                         common
                         .ensure_release_scripts_folder_exists_and_is_up_to_date(
@@ -331,9 +379,9 @@ class CommonTests(test_utils.GenericTestBase):
 
     def test_install_npm_library(self):
 
-        def _mock_subprocess_call(unused_command):
-            """Mocks subprocess.call() to create a temporary file instead of the
-            actual npm library.
+        def _mock_subprocess_check_call(unused_command):
+            """Mocks subprocess.check_call() to create a temporary file instead
+            of the actual npm library.
             """
             temp_file = tempfile.NamedTemporaryFile()
             temp_file.name = 'temp_file'
@@ -345,5 +393,166 @@ class CommonTests(test_utils.GenericTestBase):
 
         self.assertFalse(os.path.exists('temp_file'))
 
-        with self.swap(subprocess, 'call', _mock_subprocess_call):
+        with self.swap(subprocess, 'check_call', _mock_subprocess_check_call):
             common.install_npm_library('library_name', 'version', 'path')
+
+    def test_ask_user_to_confirm(self):
+        def mock_input():
+            return 'Y'
+        with self.swap(python_utils, 'INPUT', mock_input):
+            common.ask_user_to_confirm('Testing')
+
+    def test_get_personal_access_token_with_valid_token(self):
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return 'token'
+        # pylint: enable=unused-argument
+        with self.swap(getpass, 'getpass', mock_getpass):
+            self.assertEqual(common.get_personal_access_token(), 'token')
+
+    def test_get_personal_access_token_with_token_as_none(self):
+        # pylint: disable=unused-argument
+        def mock_getpass(prompt):
+            return None
+        # pylint: enable=unused-argument
+        getpass_swap = self.swap(getpass, 'getpass', mock_getpass)
+        with getpass_swap, self.assertRaisesRegexp(
+            Exception,
+            'No personal access token provided, please set up a personal '
+            'access token at https://github.com/settings/tokens and re-run '
+            'the script'):
+            common.get_personal_access_token()
+
+    def test_closed_blocking_bugs_milestone_results_in_exception(self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        # pylint: disable=unused-argument
+        def mock_get_milestone(unused_self, number):
+            return github.Milestone.Milestone(
+                requester='', headers='',
+                attributes={'state': 'closed'}, completed='')
+        # pylint: enable=unused-argument
+        get_milestone_swap = self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone)
+        with get_milestone_swap, self.assertRaisesRegexp(
+            Exception, 'The blocking bug milestone is closed.'):
+            common.check_blocking_bug_issue_count(mock_repo)
+
+    def test_non_zero_blocking_bug_issue_count_results_in_exception(self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        def mock_open_tab(unused_url):
+            pass
+        # pylint: disable=unused-argument
+        def mock_get_milestone(unused_self, number):
+            return github.Milestone.Milestone(
+                requester='', headers='',
+                attributes={'open_issues': 10, 'state': 'open'}, completed='')
+        # pylint: enable=unused-argument
+        get_milestone_swap = self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone)
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        with get_milestone_swap, open_tab_swap, self.assertRaisesRegexp(
+            Exception, (
+                'There are 10 unresolved blocking bugs. Please '
+                'ensure that they are resolved before release '
+                'summary generation.')):
+            common.check_blocking_bug_issue_count(mock_repo)
+
+    def test_zero_blocking_bug_issue_count_results_in_no_exception(self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        # pylint: disable=unused-argument
+        def mock_get_milestone(unused_self, number):
+            return github.Milestone.Milestone(
+                requester='', headers='',
+                attributes={'open_issues': 0, 'state': 'open'}, completed='')
+        # pylint: enable=unused-argument
+        with self.swap(
+            github.Repository.Repository, 'get_milestone', mock_get_milestone):
+            common.check_blocking_bug_issue_count(mock_repo)
+
+    def test_check_prs_for_current_release_are_released_with_no_unreleased_prs(
+            self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        pull1 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR1', 'number': 1, 'labels': [
+                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
+        pull2 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR2', 'number': 2, 'labels': [
+                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
+        label = github.Label.Label(
+            requester='', headers='',
+            attributes={
+                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+            completed='')
+        # pylint: disable=unused-argument
+        def mock_get_issues(unused_self, state, labels):
+            return [pull1, pull2]
+        # pylint: enable=unused-argument
+        def mock_get_label(unused_self, unused_name):
+            return [label]
+
+        get_issues_swap = self.swap(
+            github.Repository.Repository, 'get_issues', mock_get_issues)
+        get_label_swap = self.swap(
+            github.Repository.Repository, 'get_label', mock_get_label)
+        with get_issues_swap, get_label_swap:
+            common.check_prs_for_current_release_are_released(mock_repo)
+
+    def test_check_prs_for_current_release_are_released_with_unreleased_prs(
+            self):
+        mock_repo = github.Repository.Repository(
+            requester='', headers='', attributes={}, completed='')
+        def mock_open_tab(unused_url):
+            pass
+        pull1 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR1', 'number': 1, 'labels': [
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
+        pull2 = github.PullRequest.PullRequest(
+            requester='', headers='',
+            attributes={
+                'title': 'PR2', 'number': 2, 'labels': [
+                    {'name': release_constants.LABEL_FOR_RELEASED_PRS},
+                    {'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS}]},
+            completed='')
+        label = github.Label.Label(
+            requester='', headers='',
+            attributes={
+                'name': release_constants.LABEL_FOR_CURRENT_RELEASE_PRS},
+            completed='')
+        # pylint: disable=unused-argument
+        def mock_get_issues(unused_self, state, labels):
+            return [pull1, pull2]
+        # pylint: enable=unused-argument
+        def mock_get_label(unused_self, unused_name):
+            return [label]
+
+        get_issues_swap = self.swap(
+            github.Repository.Repository, 'get_issues', mock_get_issues)
+        get_label_swap = self.swap(
+            github.Repository.Repository, 'get_label', mock_get_label)
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
+        with get_issues_swap, get_label_swap, open_tab_swap:
+            with self.assertRaisesRegexp(
+                Exception, (
+                    'There are PRs for current release which do not '
+                    'have a \'%s\' label. Please ensure that '
+                    'they are released before release summary '
+                    'generation.') % (
+                        release_constants.LABEL_FOR_RELEASED_PRS)):
+                common.check_prs_for_current_release_are_released(mock_repo)

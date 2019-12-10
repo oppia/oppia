@@ -100,9 +100,9 @@ handlers:
   upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
   secure: always
   expiration: "0"
-- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js))$
-  static_files: local_compiled_js/extensions/\1/\2
-  upload: local_compiled_js/extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js))$
+- url: /extensions/ckeditor_plugins/(.*\.(js))$
+  static_files: extensions/ckeditor_plugins/\1
+  upload: extensions/ckeditor_plugins/(.*\.(js))$
   secure: always
   expiration: "0"
 - url: /extensions/visualizations/(.*\.html)
@@ -137,7 +137,7 @@ handlers:
   login: admin
   script: main_mail.app
   secure: always
-  
+
 # STATIC PAGES.
 - url: /about
   static_files: webpack_bundles/about-page.mainpage.html
@@ -282,7 +282,87 @@ skip_files:
 - third_party/static/angular-audio-1.7.4
 - third_party/static/angular-scroll-1.0.0
 - third_party/static/angular-toastr-1.7.0
-- third_party/static/bower-material-0.6.0-rc1
+- third_party/static/bootstrap-4.3.1
+- third_party/static/bower-angular-translate-2.18.1
+- third_party/static/bower-angular-translate-interpolation-messageformat-2.18.1
+- third_party/static/bower-angular-translate-loader-partial-2.18.1
+- third_party/static/bower-angular-translate-loader-static-files-2.18.1
+- third_party/static/bower-angular-cookies-1.5.8
+- third_party/static/bower-angular-translate-storage-cookie-2.18.1,
+- third_party/static/bower-material-1.1.19
+# CKEditor-4.12.1 plugins in the download from the CKEditor website include
+# only a11yhelp, about, clipboard, colordialog, copyformatting, dialog, div,
+# find, flash, forms, iframe, image, link, liststyle, magicline, pagebreak,
+# pastefromword, preview, scayt, showblocks, smiley, specialchar, table,
+# tableselection, tabletools, templates, widget and wsc. Our code is also using
+# the sharedspace plugin. So, for now, we exclude all others, as well as flash,
+# a11yhelp, about, colordialog, iframe, and anything related to tables, which
+# we definitely don't use.
+- third_party/static/ckeditor-4.12.1/plugins/a11yhelp
+- third_party/static/ckeditor-4.12.1/plugins/about
+- third_party/static/ckeditor-4.12.1/plugins/adobeair
+- third_party/static/ckeditor-4.12.1/plugins/ajax
+- third_party/static/ckeditor-4.12.1/plugins/autocomplete
+- third_party/static/ckeditor-4.12.1/plugins/autoembed
+- third_party/static/ckeditor-4.12.1/plugins/autogrow
+- third_party/static/ckeditor-4.12.1/plugins/autolink
+- third_party/static/ckeditor-4.12.1/plugins/balloonpanel
+- third_party/static/ckeditor-4.12.1/plugins/balloontoolbar
+- third_party/static/ckeditor-4.12.1/plugins/bbcode
+- third_party/static/ckeditor-4.12.1/plugins/bidi
+- third_party/static/ckeditor-4.12.1/plugins/cloudservices
+- third_party/static/ckeditor-4.12.1/plugins/codesnippet
+- third_party/static/ckeditor-4.12.1/plugins/codesnippetgeshi
+- third_party/static/ckeditor-4.12.1/plugins/colorbutton
+- third_party/static/ckeditor-4.12.1/plugins/colordialog
+- third_party/static/ckeditor-4.12.1/plugins/devtools
+- third_party/static/ckeditor-4.12.1/plugins/dialogadvtab
+- third_party/static/ckeditor-4.12.1/plugins/divarea
+- third_party/static/ckeditor-4.12.1/plugins/docprops
+- third_party/static/ckeditor-4.12.1/plugins/easyimage
+- third_party/static/ckeditor-4.12.1/plugins/embed
+- third_party/static/ckeditor-4.12.1/plugins/embedbase
+- third_party/static/ckeditor-4.12.1/plugins/embedsemantic
+- third_party/static/ckeditor-4.12.1/plugins/emoji
+- third_party/static/ckeditor-4.12.1/plugins/flash
+- third_party/static/ckeditor-4.12.1/plugins/font
+- third_party/static/ckeditor-4.12.1/plugins/iframe
+- third_party/static/ckeditor-4.12.1/plugins/iframedialog
+- third_party/static/ckeditor-4.12.1/plugins/image2
+- third_party/static/ckeditor-4.12.1/plugins/imagebase
+- third_party/static/ckeditor-4.12.1/plugins/indentblock
+- third_party/static/ckeditor-4.12.1/plugins/justify
+- third_party/static/ckeditor-4.12.1/plugins/language
+- third_party/static/ckeditor-4.12.1/plugins/mathjax
+- third_party/static/ckeditor-4.12.1/plugins/mentions
+- third_party/static/ckeditor-4.12.1/plugins/newpage
+- third_party/static/ckeditor-4.12.1/plugins/panelbutton
+- third_party/static/ckeditor-4.12.1/plugins/placeholder
+- third_party/static/ckeditor-4.12.1/plugins/print
+- third_party/static/ckeditor-4.12.1/plugins/save
+- third_party/static/ckeditor-4.12.1/plugins/selectall
+- third_party/static/ckeditor-4.12.1/plugins/sourcedialog
+- third_party/static/ckeditor-4.12.1/plugins/stylesheetparser
+- third_party/static/ckeditor-4.12.1/plugins/table
+- third_party/static/ckeditor-4.12.1/plugins/tableresize
+- third_party/static/ckeditor-4.12.1/plugins/tableselection
+- third_party/static/ckeditor-4.12.1/plugins/tabletools
+- third_party/static/ckeditor-4.12.1/plugins/textmatch
+- third_party/static/ckeditor-4.12.1/plugins/textwatcher
+- third_party/static/ckeditor-4.12.1/plugins/uicolor
+- third_party/static/ckeditor-4.12.1/plugins/uploadfile
+- third_party/static/ckeditor-4.12.1/plugins/xml
+- third_party/static/ckeditor-4.12.1/samples
+- third_party/static/ckeditor-4.12.1/skins/kama
+- third_party/static/ckeditor-4.12.1/skins/moono
+- third_party/static/ckeditor-bootstrapck-1.0.0/core
+- third_party/static/ckeditor-bootstrapck-1.0.0/lang
+- third_party/static/ckeditor-bootstrapck-1.0.0/plugins
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck-dev
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/moono
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/ckbuilder.jar
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/sample
+- third_party/static/ckeditor-bootstrapck-1.0.0/skins/bootstrapck/scss
 - third_party/static/fontawesome-free-5.9.0-web
 - third_party/static/guppy-b5055b/site
 - third_party/static/guppy-b5055b/test
@@ -338,6 +418,4 @@ skip_files:
 - third_party/static/messageformat-2.0.5
 - third_party/static/ng-img-crop-0.3.2
 - third_party/static/nginfinitescroll-1.0.0
-- third_party/static/perfectscrollbar-0.6.16
-- third_party/static/rangy-1.3.0
-- third_party/static/widget
+- third_party/static/popperJs-1.15.0

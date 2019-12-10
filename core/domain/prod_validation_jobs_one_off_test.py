@@ -93,8 +93,13 @@ OriginalDatetimeType = datetime.datetime
 class PatchedDatetimeType(type):
     """Validates the datetime instances."""
     def __instancecheck__(cls, other):
-        """Validates whether the given instance is a datatime
-        instance.
+        """Validates whether the given instance is a datatime instance.
+
+        Args:
+            other: *. The instance to check.
+
+        Returns:
+            bool. Whether or not the instance is an OriginalDateTimeType.
         """
         return isinstance(other, OriginalDatetimeType)
 
@@ -103,13 +108,23 @@ class MockDatetime13Hours( # pylint: disable=inherit-non-class
         python_utils.with_metaclass(PatchedDatetimeType, datetime.datetime)):
     @classmethod
     def utcnow(cls):
-        """Returns the current date and time 13 hours behind UTC."""
+        """Returns the current date and time 13 hours behind UTC.
+
+        Returns:
+            datetime. A datetime that is 13 hours behind the current time.
+        """
         return CURRENT_DATETIME - datetime.timedelta(hours=13)
 
 
 def run_job_and_check_output(
         self, expected_output, sort=False, literal_eval=False):
-    """Helper function to run job and compare output."""
+    """Helper function to run job and compare output.
+
+    Args:
+        expected_output: list(*). The expected result of the job.
+        sort: bool. Whether to sort the outputs before comparison.
+        literal_eval: bool. Whether to use ast.literal_eval before comparison.
+    """
     job_id = self.job_class.create_new()
     self.assertEqual(
         self.count_jobs_in_taskqueue(
@@ -800,7 +815,7 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated CollectionModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -3330,7 +3345,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated ExplorationModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -6310,7 +6325,7 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated QuestionModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -7984,7 +7999,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8063,7 +8079,7 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated SkillModel\', 4]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -8209,7 +8225,8 @@ class SkillSnapshotMetadataModelValidatorTests(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8396,7 +8413,8 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8532,7 +8550,8 @@ class SkillRightsModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8678,7 +8697,8 @@ class SkillRightsSnapshotMetadataModelValidatorTests(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8843,7 +8863,8 @@ class SkillRightsSnapshotContentModelValidatorTests(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -8974,7 +8995,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -9231,7 +9253,8 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconception_dict = {
             'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>'}
+            'feedback': '<p>default_feedback</p>',
+            'must_be_addressed': True}
 
         for index, skill in enumerate(skills):
             skill.language_code = language_codes[index]
@@ -9314,9 +9337,9 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'check of SkillSummaryModel\', '
                 '[u"Entity id 0: Misconception count: 10 does not match '
                 'the number of misconceptions in skill model: '
-                '[{u\'notes\': u\'<p>notes</p>\', u\'feedback\': '
-                'u\'<p>default_feedback</p>\', u\'name\': u\'name\', '
-                'u\'id\': 0}]"]]'
+                '[{u\'id\': 0, u\'must_be_addressed\': True, '
+                'u\'notes\': u\'<p>notes</p>\', u\'name\': u\'name\', '
+                'u\'feedback\': u\'<p>default_feedback</p>\'}]"]]'
             ), u'[u\'fully-validated SkillSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -9477,7 +9500,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated StoryModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -10373,126 +10396,127 @@ class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
 
 
-class ReviewerRotationTrackingModelValidatorTests(test_utils.GenericTestBase):
-
+class GeneralVoiceoverApplicationModelValidatorTests(
+        test_utils.GenericTestBase):
     def setUp(self):
-        super(ReviewerRotationTrackingModelValidatorTests, self).setUp()
-
+        super(GeneralVoiceoverApplicationModelValidatorTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        self.signup(USER_EMAIL, USER_NAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
 
-        score_category = (
-            suggestion_models.SCORE_TYPE_CONTENT +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + 'Art')
-        suggestion_models.ReviewerRotationTrackingModel.create(
-            score_category, self.owner_id)
-        self.model_instance_0 = (
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                score_category))
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skill = skill_domain.Skill.create_default_skill(
-            '0', description='description0', rubrics=rubrics)
-        skill_services.save_new_skill(self.owner_id, skill)
-        question = question_domain.Question.create_default_question(
-            '0', skill_ids=['0'])
-        question.question_state_data = self._create_valid_question_data('Test')
-        question_services.create_new_question(
-            self.owner_id, question, 'test question')
-        score_category = (
-            suggestion_models.SCORE_TYPE_QUESTION +
-            suggestion_models.SCORE_CATEGORY_DELIMITER + '0')
-        suggestion_models.ReviewerRotationTrackingModel.create(
-            score_category, self.user_id)
-        self.model_instance_1 = (
-            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-                score_category))
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.owner_id, exp)
+
+        suggestion_models.GeneralVoiceoverApplicationModel(
+            id='valid_id',
+            target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
+            target_id='0',
+            status=suggestion_models.STATUS_ACCEPTED,
+            author_id=self.owner_id,
+            final_reviewer_id=self.admin_id,
+            language_code='en',
+            filename='audio.mp3',
+            content='<p>Text to voiceover</p>',
+            rejection_message=None).put()
+        self.model_instance = (
+            suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+                'valid_id'))
 
         self.job_class = (
             prod_validation_jobs_one_off
-            .ReviewerRotationTrackingModelAuditOneOffJob)
+            .GeneralVoiceoverApplicationModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
-            u'[u\'fully-validated ReviewerRotationTrackingModel\', 2]']
+            u'[u\'fully-validated GeneralVoiceoverApplicationModel\', 1]']
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of ReviewerRotationTrackingModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id,
-                    self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated
-                ),
-            u'[u\'fully-validated ReviewerRotationTrackingModel\', 1]']
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of GeneralVoiceoverApplicationModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id,
+                self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
-            'ReviewerRotationTrackingModel\', '
+            'GeneralVoiceoverApplicationModel\', '
             '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
         with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
             db.DateTimeProperty, 'data_type', MockDatetime13Hours):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_invalid_missing_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for user_ids field '
-                'check of ReviewerRotationTrackingModel\', '
-                '[u"Entity id %s: based on field user_ids having value '
-                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
-                'exist"]]') % (
-                    self.model_instance_0.id, self.owner_id, self.owner_id),
-            u'[u\'fully-validated ReviewerRotationTrackingModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_invalid_missing_question_model_failure(self):
-        question_models.QuestionModel.get_by_id('0').delete(
+    def test_missing_exploration_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('0').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for question_ids field '
-                'check of ReviewerRotationTrackingModel\', '
-                '[u"Entity id %s: based on field question_ids having value '
-                '0, expect model QuestionModel with id 0 but it doesn\'t '
-                'exist"]]') % self.model_instance_1.id,
-            u'[u\'fully-validated ReviewerRotationTrackingModel\', 1]']
+                u'[u\'failed validation check for exploration_ids field '
+                'check of GeneralVoiceoverApplicationModel\', '
+                '[u"Entity id %s: based on field exploration_ids having value '
+                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                'exist"]]') % self.model_instance.id]
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_id(self):
-        suggestion_models.ReviewerRotationTrackingModel.create(
-            'invalid', self.user_id)
+    def test_missing_author_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for model id check of '
-                'ReviewerRotationTrackingModel\', [u\'Entity id invalid: '
-                'Entity id does not match regex pattern\']]'
-            ), u'[u\'fully-validated ReviewerRotationTrackingModel\', 2]']
+                u'[u\'failed validation check for author_ids field '
+                'check of GeneralVoiceoverApplicationModel\', '
+                '[u"Entity id %s: based on field author_ids having value '
+                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
+                'exist"]]') % (
+                    self.model_instance.id, self.owner_id, self.owner_id)]
         run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_reviewer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final_reviewer_ids field '
+                'check of GeneralVoiceoverApplicationModel\', '
+                '[u"Entity id %s: based on field final_reviewer_ids having '
+                'value %s, expect model UserSettingsModel with id %s but it '
+                'doesn\'t exist"]]') % (
+                    self.model_instance.id, self.admin_id, self.admin_id)]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_object_validation_failure(self):
+        expected_output = [
+            u'[u\'failed validation check for domain object check of '
+            'GeneralVoiceoverApplicationModel\', '
+            '[u\'Entity id valid_id: Entity fails domain validation with '
+            'the error Invalid language_code: en\']]']
+        mock_supported_audio_languages = [{
+            'id': 'ar',
+            'description': 'Arabic',
+            'relatedLanguages': ['ar']
+            }]
+        with self.swap(
+            constants, 'SUPPORTED_AUDIO_LANGUAGES',
+            mock_supported_audio_languages):
+            run_job_and_check_output(self, expected_output, sort=True)
 
 
 class TopicModelValidatorTests(test_utils.GenericTestBase):
@@ -10625,7 +10649,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated TopicModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 
@@ -12318,7 +12342,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated SubtopicPageModel\', 2]']
         with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
+            constants, 'SUPPORTED_CONTENT_LANGUAGES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
 

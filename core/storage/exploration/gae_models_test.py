@@ -39,6 +39,18 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
             exploration_models.ExplorationModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
+    def test_has_reference_to_user_id(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'id', title='A Title',
+            category='A Category', objective='An Objective')
+        exp_services.save_new_exploration('committer_id', exploration)
+        self.assertTrue(
+            exploration_models.ExplorationModel
+            .has_reference_to_user_id('committer_id'))
+        self.assertFalse(
+            exploration_models.ExplorationModel
+            .has_reference_to_user_id('x_id'))
+
     def test_get_exploration_count(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             'id', title='A Title',
@@ -56,17 +68,15 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
 
 class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationRightsModel class."""
-    EXPLORATION_ID_1 = 1
-    EXPLORATION_ID_2 = 2
-    EXPLORATION_ID_3 = 3
+    EXPLORATION_ID_1 = '1'
+    EXPLORATION_ID_2 = '2'
+    EXPLORATION_ID_3 = '3'
+    EXPLORATION_ID_4 = '4'
     USER_ID_1 = 'id_1'  # Related to all three explorations
     USER_ID_2 = 'id_2'  # Related to a subset of the three explorations
     USER_ID_3 = 'id_3'  # Related to no explorations
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            exploration_models.ExplorationRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+    USER_ID_4 = 'id_4'  # Related to one collection and then removed from it
+    USER_ID_COMMITTER = 'id_5'  # User id used in commits
 
     def setUp(self):
         super(ExplorationRightsModelUnitTest, self).setUp()
@@ -81,7 +91,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new exploration right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         exploration_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_2,
@@ -94,7 +104,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new exploration right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
         exploration_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_3,
@@ -107,8 +117,61 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.0
         ).save(
-            'cid', 'Created new exploration right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
+        exploration_models.ExplorationRightsModel(
+            id=self.EXPLORATION_ID_4,
+            owner_ids=[self.USER_ID_4],
+            editor_ids=[self.USER_ID_4],
+            voice_artist_ids=[self.USER_ID_4],
+            viewer_ids=[self.USER_ID_4],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.4
+        ).save(
+            self.USER_ID_COMMITTER, 'Created new collection right',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exploration_models.ExplorationRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_1))
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_2))
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_4))
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_COMMITTER))
+            self.assertFalse(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_3))
+
+            # We remove the USER_ID_4 from the exploration to verify that the
+            # USER_ID_4 is still found in ExplorationRightsSnapshotContentModel.
+            exploration_model = (
+                exploration_models.ExplorationRightsModel.get_by_id(
+                    self.EXPLORATION_ID_4))
+            exploration_model.owner_ids = [self.USER_ID_1]
+            exploration_model.editor_ids = [self.USER_ID_1]
+            exploration_model.voice_artist_ids = [self.USER_ID_1]
+            exploration_model.viewer_ids = [self.USER_ID_1]
+            exploration_model.commit(
+                self.USER_ID_COMMITTER, 'Changed collection rights',
+                [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
+
+            self.assertTrue(
+                exploration_models.ExplorationRightsModel
+                .has_reference_to_user_id(self.USER_ID_4))
 
     def test_save(self):
         exploration_models.ExplorationRightsModel(
@@ -177,19 +240,52 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         }
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
+    def test_export_data_on_nonexistent_user(self):
+        """Test for empty lists when user has no exploration involvement."""
+        exploration_ids = (
+            exploration_models.ExplorationRightsModel.export_data(
+                'fake_user'))
+        expected_exploration_ids = {
+            'owned_exploration_ids': [],
+            'editable_exploration_ids': [],
+            'voiced_exploration_ids': [],
+            'viewable_exploration_ids': []
+        }
+        self.assertEqual(expected_exploration_ids, exploration_ids)
+
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationCommitLogEntryModel class."""
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exploration_models.ExplorationCommitLogEntryModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        commit = exploration_models.ExplorationCommitLogEntryModel.create(
+            'b', 0, 'committer_id', 'username', 'msg',
+            'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False)
+        commit.exploration_id = 'b'
+        commit.put()
+        self.assertTrue(
+            exploration_models.ExplorationCommitLogEntryModel
+            .has_reference_to_user_id('committer_id'))
+        self.assertFalse(
+            exploration_models.ExplorationCommitLogEntryModel
+            .has_reference_to_user_id('x_id'))
+
     def test_get_all_non_private_commits(self):
         private_commit = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'commiter_id', 'username', 'msg',
+                'a', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         public_commit = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'b', 1, 'commiter_id', 'username', 'msg',
+                'b', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         private_commit.exploration_id = 'a'
@@ -219,12 +315,12 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     def test_get_multi(self):
         commit1 = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 1, 'commiter_id', 'username', 'msg',
+                'a', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         commit2 = (
             exploration_models.ExplorationCommitLogEntryModel.create(
-                'a', 2, 'commiter_id', 'username', 'msg',
+                'a', 2, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
         commit1.exploration_id = 'a'
@@ -249,6 +345,35 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_models.ExpSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_has_reference_to_user_id(self):
+        exploration_models.ExpSummaryModel(
+            id='id0',
+            title='title',
+            category='category',
+            objective='objective',
+            language_code='language_code',
+            community_owned=False,
+            owner_ids=['owner_id'],
+            editor_ids=['editor_id'],
+            viewer_ids=['viewer_id'],
+            contributor_ids=['contributor_id'],
+        ).put()
+        self.assertTrue(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('owner_id'))
+        self.assertTrue(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('editor_id'))
+        self.assertTrue(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('viewer_id'))
+        self.assertTrue(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('contributor_id'))
+        self.assertFalse(
+            exploration_models.ExpSummaryModel
+            .has_reference_to_user_id('x_id'))
 
     def test_get_non_private(self):
         public_exploration_summary_model = (

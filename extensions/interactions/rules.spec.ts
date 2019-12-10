@@ -18,7 +18,7 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // all the rules are upgraded to Angular 8.
-import { CodeNormalizerService } from 'services/CodeNormalizerService';
+import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { GraphUtilsService } from
   'interactions/GraphInput/directives/graph-utils.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -40,10 +40,15 @@ import { MultipleChoiceInputRulesService } from
   'interactions/MultipleChoiceInput/directives/multiple-choice-input-rules.service';
 import { ItemSelectionInputRulesService } from
   'interactions/ItemSelectionInput/directives/item-selection-input-rules.service';
+import { NumberWithUnitsRulesService } from
+  'interactions/NumberWithUnits/directives/number-with-units-rules.service.ts';
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory.ts';
 import { FractionInputRulesService } from
   'interactions/FractionInput/directives/fraction-input-rules.service';
 import { GraphInputRulesService } from
   'interactions/GraphInput/directives/graph-input-rules.service';
+import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 /* eslint-enable max-len */
 // ^^^ This block is to be removed.
@@ -71,15 +76,21 @@ describe('Rule spec services', function() {
       'InteractiveMapRulesService', new InteractiveMapRulesService());
     $provide.value('LogicProofRulesService', new LogicProofRulesService());
     $provide.value(
-      'MusicNotesInputRulesService', new MusicNotesInputRulesService());
+      'MusicNotesInputRulesService', new MusicNotesInputRulesService(
+        new UtilsService()));
     $provide.value(
       'ItemSelectionInputRulesService', new ItemSelectionInputRulesService());
     $provide.value(
+      'NumberWithUnitsRulesService', new NumberWithUnitsRulesService(
+        new NumberWithUnitsObjectFactory(
+          new UnitsObjectFactory(), new FractionObjectFactory(),
+        ), new UtilsService()));
+    $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(
-        new FractionObjectFactory()));
+        new FractionObjectFactory(), new UtilsService()));
     $provide.value(
       'GraphInputRulesService', new GraphInputRulesService(
-        new GraphUtilsService()));
+        new GraphUtilsService(), new UtilsService()));
     // This service is not mocked by using its actual class instance since the
     // services are tested in an iterative way and this causes problems since
     // a class instance and a function cannot be tested in the same way. The
@@ -110,7 +121,7 @@ describe('Rule spec services', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

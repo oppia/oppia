@@ -20,7 +20,7 @@ require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
@@ -41,7 +41,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
 
       return $q.when(suggestionsPromise, function(res) {
         var suggestionIdToSuggestions = {};
-        var targetIdToDetails = res.data.target_ids_to_opportunity_dicts;
+        var targetIdToDetails = res.data.target_id_to_opportunity_dict;
         res.data.suggestions.forEach(function(suggestion) {
           suggestionIdToSuggestions[suggestion.suggestion_id] = {
             suggestion: suggestion,

@@ -18,8 +18,11 @@
 
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts.ts');
-require('domain/topic/EditableTopicBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'components/review-material-editor/review-material-editor.directive.ts');
+require('domain/skill/RubricObjectFactory.ts');
+require('domain/topic/editable-topic-backend-api.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
@@ -53,7 +56,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
             var rubrics = [];
             for (var idx in SKILL_DIFFICULTIES) {
               rubrics.push(
-                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], 'N/A')
+                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], '')
               );
             }
             $uibModal.open({
@@ -67,10 +70,14 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                   $scope.newSkillDescription = '';
                   $scope.rubrics = rubrics;
                   $scope.allRubricsAdded = true;
+                  $scope.bindableDict = {
+                    displayedConceptCardExplanation: ''
+                  };
+                  var newExplanationObject = null;
 
                   $scope.$watch('newSkillDescription', function() {
                     $scope.rubrics[1].setExplanation(
-                      $scope.newSkillDescription);
+                      '<p>' + $scope.newSkillDescription + '</p>');
                   });
 
                   var areAllRubricsPresent = function() {
@@ -83,6 +90,11 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                     $scope.allRubricsAdded = true;
                   };
 
+                  $scope.onSaveExplanation = function(explanationObject) {
+                    newExplanationObject = explanationObject.toBackendDict();
+                    $scope.bindableDict.displayedConceptCardExplanation =
+                      explanationObject.getHtml();
+                  };
 
                   $scope.onSaveRubric = function(difficulty, explanation) {
                     for (var idx in $scope.rubrics) {
@@ -96,7 +108,8 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                   $scope.createNewSkill = function() {
                     $uibModalInstance.close({
                       description: $scope.newSkillDescription,
-                      rubrics: $scope.rubrics
+                      rubrics: $scope.rubrics,
+                      explanation: newExplanationObject
                     });
                   };
 
@@ -107,7 +120,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
               ]
             }).result.then(function(result) {
               SkillCreationService.createNewSkill(
-                result.description, result.rubrics, []);
+                result.description, result.rubrics, result.explanation, []);
             });
           };
           $rootScope.$on(

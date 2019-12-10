@@ -17,7 +17,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
-import unittest
 
 from core.platform import models
 from core.tests import test_utils
@@ -49,11 +48,14 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     if 'Model' in all_base_classes:
                         yield clazz
 
-    # List of model classes that can't have Wipeout related class methods
+    # List of model classes that don't have Wipeout related class methods
     # defined because they're not used directly but only as a base classes for
     # the other models.
+    #
+    # BaseCommitLogEntryModel is not included in this list because we implement
+    # has_reference_to_user_id inside it, since the children models don't differ
+    # that much.
     BASE_CLASSES = (
-        'BaseCommitLogEntryModel',
         'BaseMapReduceBatchResultsModel',
         'BaseModel',
         'BaseSnapshotContentModel',
@@ -109,17 +111,22 @@ class StorageModelsTest(test_utils.GenericTestBase):
                 with self.assertRaises(NotImplementedError):
                     clazz.get_deletion_policy()
 
-    @unittest.skip(
-        'has_reference_to_user_id is not yet implemented on all models')
     def test_base_or_versioned_child_classes_have_has_reference_to_user_id(
             self):
         for clazz in self._get_base_or_versioned_model_child_classes():
-            try:
-                self.assertIsNotNone(clazz.has_reference_to_user_id('any_id'))
-            except NotImplementedError:
-                self.fail(
-                    msg='has_reference_to_user_id is not defined for %s' % (
-                        clazz.__name__))
+            if (clazz.get_deletion_policy() ==
+                    base_models.DELETION_POLICY.NOT_APPLICABLE):
+                with self.assertRaises(NotImplementedError):
+                    clazz.has_reference_to_user_id('any_id')
+            else:
+                try:
+                    self.assertIsNotNone(
+                        clazz.has_reference_to_user_id('any_id'))
+                except NotImplementedError:
+                    self.fail(
+                        msg='has_reference_to_user_id is not defined for %s' % (
+                            clazz.__name__))
+
 
     def test_base_models_do_not_have_method_has_reference_to_user_id(self):
         for clazz in self._get_model_classes():

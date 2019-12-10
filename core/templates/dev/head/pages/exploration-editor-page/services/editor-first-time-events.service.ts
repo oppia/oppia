@@ -18,14 +18,20 @@
  * is opened for the first time for an exploration.
  */
 
-require('services/SiteAnalyticsService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('EditorFirstTimeEventsService', [
-  'SiteAnalyticsService',
-  function(SiteAnalyticsService) {
-    var explorationId = null;
-    var shouldRegisterEvents = false;
-    var alreadyRegisteredEvents = {
+import { SiteAnalyticsService } from 'services/site-analytics.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EditorFirstTimeEventsService {
+  constructor(private siteAnalyticsService: SiteAnalyticsService) {}
+
+    explorationId = null;
+    shouldRegisterEvents = false;
+    alreadyRegisteredEvents = {
       EditorFirstEntryEvent: null,
       FirstOpenContentBoxEvent: null,
       FirstSaveContentEvent: null,
@@ -35,70 +41,87 @@ angular.module('oppia').factory('EditorFirstTimeEventsService', [
       FirstSaveRuleEvent: null,
       FirstCreateSecondStateEvent: null
     };
-    return {
-      initRegisterEvents: function(expId) {
-        shouldRegisterEvents = true;
-        explorationId = expId;
-      },
-      registerEditorFirstEntryEvent: function() {
-        if (shouldRegisterEvents &&
-            alreadyRegisteredEvents.EditorFirstEntryEvent === null) {
-          SiteAnalyticsService.registerEditorFirstEntryEvent(explorationId);
-          alreadyRegisteredEvents.EditorFirstEntryEvent = true;
-        }
-      },
-      registerFirstOpenContentBoxEvent: function() {
-        if (shouldRegisterEvents &&
-            alreadyRegisteredEvents.FirstOpenContentBoxEvent === null) {
-          SiteAnalyticsService.registerFirstOpenContentBoxEvent(explorationId);
-          alreadyRegisteredEvents.FirstOpenContentBoxEvent = true;
-        }
-      },
-      registerFirstSaveContentEvent: function() {
-        if (shouldRegisterEvents &&
-            alreadyRegisteredEvents.FirstSaveContentEvent === null) {
-          SiteAnalyticsService.registerFirstSaveContentEvent(explorationId);
-          alreadyRegisteredEvents.FirstSaveContentEvent = true;
-        }
-      },
-      registerFirstClickAddInteractionEvent: function() {
-        if (shouldRegisterEvents &&
-            alreadyRegisteredEvents.FirstClickAddInteractionEvent === null) {
-          SiteAnalyticsService.registerFirstClickAddInteractionEvent(
-            explorationId);
-          alreadyRegisteredEvents.FirstClickAddInteractionEvent = true;
-        }
-      },
-      registerFirstSelectInteractionTypeEvent: function() {
-        if (shouldRegisterEvents &&
-            alreadyRegisteredEvents.FirstSelectInteractionTypeEvent === null) {
-          SiteAnalyticsService.registerFirstSelectInteractionTypeEvent(
-            explorationId);
-          alreadyRegisteredEvents.FirstSelectInteractionTypeEvent = true;
-        }
-      },
-      registerFirstSaveInteractionEvent: function() {
-        if (shouldRegisterEvents &&
-            alreadyRegisteredEvents.FirstSaveInteractionEvent === null) {
-          SiteAnalyticsService.registerFirstSaveInteractionEvent(explorationId);
-          alreadyRegisteredEvents.FirstSaveInteractionEvent = true;
-        }
-      },
-      registerFirstSaveRuleEvent: function() {
-        if (shouldRegisterEvents &&
-            alreadyRegisteredEvents.FirstSaveRuleEvent === null) {
-          SiteAnalyticsService.registerFirstSaveRuleEvent(explorationId);
-          alreadyRegisteredEvents.FirstSaveRuleEvent = true;
-        }
-      },
-      registerFirstCreateSecondStateEvent: function() {
-        if (shouldRegisterEvents &&
-            alreadyRegisteredEvents.FirstCreateSecondStateEvent === null) {
-          SiteAnalyticsService.registerFirstCreateSecondStateEvent(
-            explorationId);
-          alreadyRegisteredEvents.FirstCreateSecondStateEvent = true;
-        }
+
+    initRegisterEvents(expId: string): void {
+      this.shouldRegisterEvents = true;
+      this.explorationId = expId;
+    }
+
+    registerEditorFirstEntryEvent(): void {
+      if (this.shouldRegisterEvents &&
+            this.alreadyRegisteredEvents.EditorFirstEntryEvent === null) {
+        this.siteAnalyticsService.registerEditorFirstEntryEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.EditorFirstEntryEvent = true;
       }
-    };
-  }
-]);
+    }
+
+    registerFirstOpenContentBoxEvent(): void {
+      if (this.shouldRegisterEvents &&
+            this.alreadyRegisteredEvents.FirstOpenContentBoxEvent === null) {
+        this.siteAnalyticsService.registerFirstOpenContentBoxEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstOpenContentBoxEvent = true;
+      }
+    }
+
+    registerFirstSaveContentEvent(): void {
+      if (this.shouldRegisterEvents &&
+            this.alreadyRegisteredEvents.FirstSaveContentEvent === null) {
+        this.siteAnalyticsService.registerFirstSaveContentEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstSaveContentEvent = true;
+      }
+    }
+
+    registerFirstClickAddInteractionEvent(): void {
+      if (this.shouldRegisterEvents &&
+            this.alreadyRegisteredEvents.FirstClickAddInteractionEvent ===
+          null) {
+        this.siteAnalyticsService.registerFirstClickAddInteractionEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstClickAddInteractionEvent = true;
+      }
+    }
+
+    registerFirstSelectInteractionTypeEvent(): void {
+      if (this.shouldRegisterEvents &&
+            this.alreadyRegisteredEvents.FirstSelectInteractionTypeEvent ===
+          null) {
+        this.siteAnalyticsService.registerFirstSelectInteractionTypeEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstSelectInteractionTypeEvent = true;
+      }
+    }
+
+    registerFirstSaveInteractionEvent(): void {
+      if (this.shouldRegisterEvents &&
+            this.alreadyRegisteredEvents.FirstSaveInteractionEvent === null) {
+        this.siteAnalyticsService.registerFirstSaveInteractionEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstSaveInteractionEvent = true;
+      }
+    }
+
+    registerFirstSaveRuleEvent(): void {
+      if (this.shouldRegisterEvents &&
+            this.alreadyRegisteredEvents.FirstSaveRuleEvent === null) {
+        this.siteAnalyticsService.registerFirstSaveRuleEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstSaveRuleEvent = true;
+      }
+    }
+
+    registerFirstCreateSecondStateEvent(): void {
+      if (this.shouldRegisterEvents &&
+            this.alreadyRegisteredEvents.FirstCreateSecondStateEvent === null) {
+        this.siteAnalyticsService.registerFirstCreateSecondStateEvent(
+          this.explorationId);
+        this.alreadyRegisteredEvents.FirstCreateSecondStateEvent = true;
+      }
+    }
+}
+
+angular.module('oppia').factory(
+  'EditorFirstTimeEventsService',
+  downgradeInjectable(EditorFirstTimeEventsService));

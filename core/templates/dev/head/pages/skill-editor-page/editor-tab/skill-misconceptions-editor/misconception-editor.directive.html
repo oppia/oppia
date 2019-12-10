@@ -31,9 +31,9 @@
     <div ng-if="isEditable() && nameEditorIsOpen">
       <div class="oppia-rule-details-header">
         <strong>Misconception Name</strong>
-        <input class="form-control" type="text" ng-model="container.misconceptionName" maxlength="30">
-        <span ng-if="container.misconceptionName.length === 30" class="form-text" style="color: red; font-size: smaller">
-          <em>Please use at most 30 characters.</em>
+        <input class="form-control" type="text" ng-model="container.misconceptionName" maxlength="<[MISCONCEPTION_NAME_CHAR_LIMIT]>">
+        <span ng-if="container.misconceptionName.length === MISCONCEPTION_NAME_CHAR_LIMIT" class="form-text" style="color: red; font-size: smaller">
+          <em>Please use at most <[MISCONCEPTION_NAME_CHAR_LIMIT]> characters.</em>
         </span>
       </div>
 
@@ -71,6 +71,11 @@
           </div>
 
           <strong>Notes for Creator</strong>
+          <div ng-if="!container.misconceptionNotes">
+            <span class="oppia-placeholder">
+              Click here to add additional notes for question creators to understand how handling this misconception is useful for the skill being tested.
+            </span>
+          </div>
           <div>
             <angular-html-bind html-data="container.misconceptionNotes"></angular-html-bind>
           </div>
@@ -95,7 +100,6 @@
           </button>
           <button type="button"
                   class="btn btn-success"
-                  ng-disabled="!container.misconceptionNotes"
                   ng-click="saveNotes()">
             Save
           </button>
@@ -150,5 +154,9 @@
         <div style="clear: both;"></div>
       </div>
     </div>
+  </div>
+  <div class="oppia-misconception-editor-section">
+    <strong>Should a response to this misconception be enforced on every question linked to this skill?</strong>
+    <input type="checkbox" ng-change="updateMustBeAddressed()" ng-model="container.misconceptionMustBeAddressed">
   </div>
 </div>

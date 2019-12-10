@@ -20,11 +20,11 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
+require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
-require('services/AssetsBackendApiService.ts');
-require('services/ContextService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/assets-backend-api.service.ts');
+require('services/context.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
   'AssetsBackendApiService', 'ContextService',
@@ -85,9 +85,18 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
           // preview mode. We don't have loading indicator or try again for
           // showing images in the exploration editor or in preview mode. So
           // we directly assign the url to the imageUrl.
-          ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-            ContextService.getEntityType(), ContextService.getEntityId(),
-            ctrl.filepath);
+          try {
+            ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+              ContextService.getEntityType(), ContextService.getEntityId(),
+              ctrl.filepath);
+          } catch (e) {
+            var additionalInfo = (
+              '\nEntity type: ' + ContextService.getEntityType() +
+              '\nEntity ID: ' + ContextService.getEntityId() +
+              '\nFilepath: ' + ctrl.filepath);
+            e.message += additionalInfo;
+            throw e;
+          }
         }
 
         ctrl.imageCaption = '';

@@ -16,50 +16,59 @@
  * @fileoverview Rules service for the interaction.
  */
 
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 // TODO(#7403): Convert this to partial imports.
 import math from 'mathjs';
 
-require('domain/objects/FractionObjectFactory.ts');
-require('domain/objects/NumberWithUnitsObjectFactory.ts');
+import { NumberWithUnitsObjectFactory } from
+  'domain/objects/NumberWithUnitsObjectFactory';
+import { UtilsService } from 'services/utils.service';
 
 // Rules service for number with units interaction.
-angular.module('oppia').factory('NumberWithUnitsRulesService', [
-  'NumberWithUnitsObjectFactory',
-  function(NumberWithUnitsObjectFactory) {
+@Injectable({
+  providedIn: 'root'
+})
+export class NumberWithUnitsRulesService {
+  constructor(private unitsObjectFactory: NumberWithUnitsObjectFactory,
+    private utilsService: UtilsService) {
     try {
-      NumberWithUnitsObjectFactory.createCurrencyUnits();
+      this.unitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}
-
-    return {
-      IsEqualTo: function(answer, inputs) {
-        // Returns true only if input is exactly equal to answer.
-        answer = NumberWithUnitsObjectFactory.fromDict(answer);
-        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
-
-        var answerString = answer.toMathjsCompatibleString();
-        var inputsString = inputs.toMathjsCompatibleString();
-
-        var answerList = NumberWithUnitsObjectFactory.fromRawInputString(
-          answerString).toDict();
-        var inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
-          inputsString).toDict();
-        return angular.equals(answerList, inputsList);
-      },
-      IsEquivalentTo: function(answer, inputs) {
-        answer = NumberWithUnitsObjectFactory.fromDict(answer);
-        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
-        if (answer.type === 'fraction') {
-          answer.type = 'real';
-          answer.real = answer.fraction.toFloat();
-        }
-        if (inputs.type === 'fraction') {
-          inputs.type = 'real';
-          inputs.real = inputs.fraction.toFloat();
-        }
-        var answerString = answer.toMathjsCompatibleString();
-        var inputsString = inputs.toMathjsCompatibleString();
-        return math.unit(answerString).equals(math.unit(inputsString));
-      }
-    };
   }
-]);
+  // TODO(#7165): Replace 'any' with the exact type.
+  IsEqualTo(answer: any, inputs: any): boolean {
+    // Returns true only if input is exactly equal to answer.
+    answer = this.unitsObjectFactory.fromDict(answer);
+    inputs = this.unitsObjectFactory.fromDict(inputs.f);
+
+    var answerString = answer.toMathjsCompatibleString();
+    var inputsString = inputs.toMathjsCompatibleString();
+
+    var answerList = this.unitsObjectFactory.fromRawInputString(
+      answerString).toDict();
+    var inputsList = this.unitsObjectFactory.fromRawInputString(
+      inputsString).toDict();
+    return this.utilsService.isEquivalent(answerList, inputsList);
+  }
+  // TODO(#7165): Replace 'any' with the exact type.
+  IsEquivalentTo(answer: any, inputs: any): boolean {
+    answer = this.unitsObjectFactory.fromDict(answer);
+    inputs = this.unitsObjectFactory.fromDict(inputs.f);
+    if (answer.type === 'fraction') {
+      answer.type = 'real';
+      answer.real = answer.fraction.toFloat();
+    }
+    if (inputs.type === 'fraction') {
+      inputs.type = 'real';
+      inputs.real = inputs.fraction.toFloat();
+    }
+    var answerString = answer.toMathjsCompatibleString();
+    var inputsString = inputs.toMathjsCompatibleString();
+    return math.unit(answerString).equals(math.unit(inputsString));
+  }
+}
+
+angular.module('oppia').factory(
+  'NumberWithUnitsRulesService', downgradeInjectable(
+    NumberWithUnitsRulesService));

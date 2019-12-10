@@ -42,29 +42,3 @@ class EmailHashRegenerationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, len(values))
-
-
-class GeneralFeedbackEmailReplyToIdOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for setting user_id and thread_id for all
-    GeneralFeedbackEmailReplyToIdOneOffJob.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [email_models.GeneralFeedbackEmailReplyToIdModel]
-
-    @staticmethod
-    def map(model_instance):
-        """Implements the map function for this job."""
-        user_id, thread_id = model_instance.id.split('.', 1)
-        if model_instance.user_id is None:
-            model_instance.user_id = user_id
-        if model_instance.thread_id is None:
-            model_instance.thread_id = thread_id
-        model_instance.put(update_last_updated_time=False)
-        yield ('SUCCESS', model_instance.id)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))

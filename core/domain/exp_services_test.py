@@ -76,28 +76,22 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         """Before each individual test, create a dummy exploration."""
         super(ExplorationServicesUnitTests, self).setUp()
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.voice_artist_id = self.get_user_id_from_email(
-            self.VOICE_ARTIST_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
-        user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.create_new_user(
-            self.voice_artist_id, self.VOICE_ARTIST_EMAIL)
-        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
-
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
         self.set_admins([self.ADMIN_USERNAME])
-        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.admin = user_services.UserActionsInfo(self.user_id_admin)
 
 
@@ -2954,10 +2948,10 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         """
         super(ExplorationCommitLogUnitTests, self).setUp()
 
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.albert = user_services.UserActionsInfo(self.albert_id)
         self.bob = user_services.UserActionsInfo(self.bob_id)
 
@@ -3065,6 +3059,59 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             exp_services.index_explorations_given_ids(all_exp_ids)
 
         self.assertEqual(add_docs_counter.times_called, 1)
+
+    def test_updated_exploration_is_added_correctly_to_index(self):
+        exp_id = 'id0'
+        exp_title = 'title 0'
+        exp_category = 'cat0'
+        actual_docs = []
+        initial_exp_doc = {
+            'category': 'cat0',
+            'id': 'id0',
+            'language_code': 'en',
+            'objective': 'An objective',
+            'rank': 20,
+            'tags': [],
+            'title': 'title 0'}
+        updated_exp_doc = {
+            'category': 'cat1',
+            'id': 'id0',
+            'language_code': 'en',
+            'objective': 'An objective',
+            'rank': 20,
+            'tags': [],
+            'title': 'title 0'
+        }
+
+        def mock_add_documents_to_index(docs, index):
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            actual_docs.extend(docs)
+
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
+        add_docs_swap = self.swap(
+            search_services,
+            'add_documents_to_index',
+            add_docs_counter)
+
+        with add_docs_swap:
+            self.save_new_valid_exploration(
+                exp_id, self.owner_id, title=exp_title, category=exp_category,
+                end_state_name='End')
+
+            rights_manager.publish_exploration(self.owner, exp_id)
+            self.assertEqual(actual_docs, [initial_exp_doc])
+            self.assertEqual(add_docs_counter.times_called, 2)
+
+            actual_docs = []
+            exp_services.update_exploration(
+                self.owner_id, exp_id, [
+                    exp_domain.ExplorationChange({
+                        'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                        'property_name': 'category',
+                        'new_value': 'cat1'})], 'update category')
+            self.assertEqual(actual_docs, [updated_exp_doc])
+            self.assertEqual(add_docs_counter.times_called, 3)
+
 
     def test_get_number_of_ratings(self):
         self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
@@ -3189,10 +3236,10 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         """Test that a user who only makes a revert on an exploration
         is not counted in the list of that exploration's contributors.
         """
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         # Have Albert create a new exploration.
         self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
@@ -3229,10 +3276,10 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.assertEqual(expected, contributors_summary)
 
     def test_contributors_summary(self):
-        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         # Have Albert create a new exploration. Version 1.
         self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
@@ -3311,10 +3358,10 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         """
         super(ExplorationSummaryGetTests, self).setUp()
 
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.albert = user_services.UserActionsInfo(self.albert_id)
         self.bob = user_services.UserActionsInfo(self.bob_id)
 
@@ -3523,8 +3570,8 @@ title: Old Title
         super(ExplorationConversionPipelineTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
 
         # Create exploration that uses a states schema version of 0 and ensure
         # it is properly converted.

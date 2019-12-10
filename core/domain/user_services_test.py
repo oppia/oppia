@@ -67,15 +67,17 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
 
     def test_set_and_get_username(self):
-        user_id = 'someUser'
+        gae_id = 'someUser'
         username = 'username'
         with self.assertRaisesRegexp(Exception, 'User not found.'):
-            user_services.set_username(user_id, username)
+            user_services.set_username(gae_id, username)
 
-        user_services.create_new_user(user_id, 'user@example.com')
+        user_settings = user_services.create_new_user(
+            gae_id, 'user@example.com')
 
-        user_services.set_username(user_id, username)
-        self.assertEqual(username, user_services.get_username(user_id))
+        user_services.set_username(user_settings.user_id, username)
+        self.assertEqual(
+            username, user_services.get_username(user_settings.user_id))
 
     def test_get_username_for_system_user(self):
         self.assertEqual(
@@ -86,55 +88,67 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_username(feconf.MIGRATION_BOT_USER_ID))
 
     def test_get_usernames(self):
-        user_ids = ['test1', feconf.SYSTEM_COMMITTER_ID, 'test2']
-        usernames = ['name1', feconf.SYSTEM_COMMITTER_ID, 'name2']
-        user_emails = [
-            'test1@email.com', feconf.SYSTEM_EMAIL_ADDRESS, 'test2@email.com']
+        gae_ids = ['test1', 'test2']
+        usernames = ['name1', 'name2']
+        user_emails = ['test1@email.com', 'test2@email.com']
 
-        for uid, email, name in python_utils.ZIP(
-                user_ids, user_emails, usernames):
-            if uid != feconf.SYSTEM_COMMITTER_ID:
-                user_services.create_new_user(uid, email)
-                user_services.set_username(uid, name)
+        user_ids = []
+        for gae_id, email, name in python_utils.ZIP(
+                gae_ids, user_emails, usernames):
+            user_id = user_services.create_new_user(gae_id, email).user_id
+            user_services.set_username(user_id, name)
+            user_ids.append(user_id)
+
         # Handle usernames that exists.
         self.assertEqual(usernames, user_services.get_usernames(user_ids))
-
-        # Return empty list when no user id passed.
-        self.assertEqual([], user_services.get_usernames([]))
 
         # Return None for usernames that don't exists.
         self.assertEqual(
             [None, 'name1'],
             user_services.get_usernames(['fakeUser', 'test1']))
 
+    def test_get_usernames_empty_list(self):
+        # Return empty list when no user id passed.
+        self.assertEqual([], user_services.get_usernames([]))
+
+    def test_get_usernames_system_admin(self):
+        # Check that system admin has correct username.
+        self.assertEqual(
+            [feconf.SYSTEM_COMMITTER_ID],
+            user_services.get_usernames([feconf.SYSTEM_COMMITTER_ID]))
+
     def test_get_username_for_nonexistent_user(self):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.get_username('fakeUser')
 
     def test_get_username_none(self):
-        user_services.create_new_user('fakeUser', 'user@example.com')
-        self.assertEqual(None, user_services.get_username('fakeUser'))
+        user_id = user_services.create_new_user(
+            'fakeUser', 'user@example.com').user_id
+        self.assertEqual(None, user_services.get_username(user_id))
 
     def test_is_username_taken_false(self):
         self.assertFalse(user_services.is_username_taken('fakeUsername'))
 
     def test_is_username_taken_true(self):
-        user_id = 'someUser'
+        gae_id = 'someUser'
         username = 'newUsername'
-        user_services.create_new_user(user_id, 'user@example.com')
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_is_username_taken_different_case(self):
-        user_id = 'someUser'
+        gae_id = 'someUser'
         username = 'camelCase'
-        user_services.create_new_user(user_id, 'user@example.com')
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
     def test_set_invalid_usernames(self):
-        user_id = 'someUser'
-        user_services.create_new_user(user_id, 'user@example.com')
+        gae_id = 'someUser'
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
         bad_usernames = [
             ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020',
             'AbcOppiaMigrationBotXyz', 'OppiaMigrATIONBOTXyz',
@@ -164,13 +178,14 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             self.assertEqual(user_settings.truncated_email, expected_email)
 
     def test_get_email_from_username(self):
-        user_id = 'someUser'
+        gae_id = 'someUser'
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.create_new_user(user_id, user_email)
-        user_services.set_username(user_id, username)
-        self.assertEqual(user_services.get_username(user_id), username)
+        user_settings = user_services.create_new_user(gae_id, user_email)
+        user_services.set_username(user_settings.user_id, username)
+        self.assertEqual(
+            user_services.get_username(user_settings.user_id), username)
 
         # Handle usernames that exist.
         self.assertEqual(
@@ -185,25 +200,63 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_services.get_email_from_username('fakeUsername'))
 
     def test_get_user_id_from_username(self):
-        user_id = 'someUser'
+        gae_id = 'someUser'
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.create_new_user(user_id, user_email)
-        user_services.set_username(user_id, username)
-        self.assertEqual(user_services.get_username(user_id), username)
+        user_settings = user_services.create_new_user(gae_id, user_email)
+        user_services.set_username(user_settings.user_id, username)
+        self.assertEqual(
+            user_services.get_username(user_settings.user_id), username)
 
         # Handle usernames that exist.
         self.assertEqual(
-            user_services.get_user_id_from_username(username), user_id)
+            user_services.get_user_id_from_username(username),
+            user_settings.user_id)
 
         # Handle usernames in the same equivalence class correctly.
         self.assertEqual(
-            user_services.get_user_id_from_username('USERNAME'), user_id)
+            user_services.get_user_id_from_username('USERNAME'),
+            user_settings.user_id)
 
         # Return None for usernames which don't exist.
         self.assertIsNone(
             user_services.get_user_id_from_username('fakeUsername'))
+
+    def test_get_user_settings_by_gae_id(self):
+        gae_id = 'gae_id'
+        user_models.UserSettingsModel(
+            id='user_id',
+            gae_id=gae_id,
+            email='user@example.com',
+            username='username',
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
+            gae_id)
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+        self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.email, user_settings.email)
+        self.assertEqual(user_settings_model.username, user_settings.username)
+        self.assertIsNone(user_services.get_user_settings_by_gae_id('id_x'))
+
+    def test_get_user_settings_by_gae_id_strict(self):
+        gae_id = 'gae_id'
+        user_models.UserSettingsModel(
+            id='user_id',
+            gae_id=gae_id,
+            email='user@example.com',
+            username='username',
+        ).put()
+        user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
+            gae_id)
+        user_settings = user_services.get_user_settings_by_gae_id(
+            gae_id, strict=True)
+        self.assertEqual(user_settings_model.id, user_settings.user_id)
+        self.assertEqual(user_settings_model.email, user_settings.email)
+        self.assertEqual(user_settings_model.username, user_settings.username)
+
+        with self.assertRaises(Exception):
+            user_services.get_user_settings_by_gae_id('id_x', strict=True)
 
     def test_fetch_gravatar_success(self):
         user_email = 'user@example.com'
@@ -274,11 +327,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)
 
     def test_set_and_get_user_email_preferences(self):
-        user_id = 'someUser'
+        gae_id = 'someUser'
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.create_new_user(user_id, user_email)
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
         # When UserEmailPreferencesModel is yet to be created,
@@ -321,12 +374,12 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(email_preferences.can_receive_subscription_email)
 
     def test_set_and_get_user_email_preferences_for_exploration(self):
-        user_id = 'someUser'
+        gae_id = 'someUser'
         exploration_id = 'someExploration'
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.create_new_user(user_id, user_email)
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
         # When ExplorationUserDataModel is yet to be created, the value
@@ -386,16 +439,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(email_preferences.mute_suggestion_notifications)
 
     def test_get_usernames_by_role(self):
-        user_ids = ['test1', 'test2', 'test3', 'test4']
+        gae_ids = ['test1', 'test2', 'test3', 'test4']
         usernames = ['name1', 'name2', 'name3', 'name4']
         user_emails = [
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
-        for uid, email, name in python_utils.ZIP(
-                user_ids, user_emails, usernames):
-            user_services.create_new_user(uid, email)
-            user_services.set_username(uid, name)
+        user_ids = []
+        for gae_id, email, name in python_utils.ZIP(
+                gae_ids, user_emails, usernames):
+            user_id = user_services.create_new_user(gae_id, email).user_id
+            user_ids.append(user_id)
+            user_services.set_username(user_id, name)
 
         user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
         user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
@@ -412,16 +467,18 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             set(['name3', 'name4']))
 
     def test_get_user_ids_by_role(self):
-        user_ids = ['test1', 'test2', 'test3', 'test4']
+        gae_ids = ['test1', 'test2', 'test3', 'test4']
         usernames = ['name1', 'name2', 'name3', 'name4']
         user_emails = [
             'test1@email.com', 'test2@email.com',
             'test3@email.com', 'test4@email.com']
 
+        user_ids = []
         for uid, email, name in python_utils.ZIP(
-                user_ids, user_emails, usernames):
-            user_services.create_new_user(uid, email)
-            user_services.set_username(uid, name)
+                gae_ids, user_emails, usernames):
+            user_id = user_services.create_new_user(uid, email).user_id
+            user_ids.append(user_id)
+            user_services.set_username(user_id, name)
 
         user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
         user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
@@ -430,19 +487,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             set(user_services.get_user_ids_by_role(feconf.ROLE_ID_MODERATOR)),
-            set(['test1', 'test2']))
+            set([user_ids[0], user_ids[1]]))
 
         self.assertEqual(
             set(user_services.get_user_ids_by_role(
                 feconf.ROLE_ID_BANNED_USER)),
-            set(['test3', 'test4']))
+            set([user_ids[2], user_ids[3]]))
 
     def test_update_user_creator_dashboard_display(self):
-        user_id = 'test_id'
+        gae_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
 
-        user_services.create_new_user(user_id, user_email)
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
         user_setting = user_services.get_user_settings(user_id)
@@ -458,11 +515,11 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
 
     def test_update_user_role(self):
-        user_id = 'test_id'
+        gae_id = 'test_id'
         username = 'testname'
         user_email = 'test@email.com'
 
-        user_services.create_new_user(user_id, user_email)
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
         user_services.set_username(user_id, username)
 
         self.assertEqual(user_services.get_user_role_from_id(user_id),
@@ -523,9 +580,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_record_user_started_state_translation_tutorial(self):
         # Testing of the user translation tutorial firsttime state storage.
-        user_id = 'someUser'
+        gae_id = 'someUser'
         username = 'username'
-        user_services.create_new_user(user_id, 'user@example.com')
+        user_id = user_services.create_new_user(
+            gae_id, 'user@example.com').user_id
         user_services.set_username(user_id, username)
         user_services.record_user_started_state_translation_tutorial(user_id)
         user_settings = user_services.get_user_settings(user_id)
@@ -903,11 +961,12 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(SubjectInterestsUnitTests, self).setUp()
-        self.user_id = 'someUser'
+        self.gae_id = 'someUser'
         self.username = 'username'
         self.user_email = 'user@example.com'
 
-        user_services.create_new_user(self.user_id, self.user_email)
+        self.user_id = user_services.create_new_user(
+            self.gae_id, self.user_email).user_id
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self):
@@ -957,6 +1016,7 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
     def setUp(self):
         """Create exploration with two versions."""
         super(LastLoginIntegrationTests, self).setUp()
+
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -964,18 +1024,24 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
         """Test the case of a user who existed in the system before the
         last-login check was introduced.
         """
-        # Set up a 'previous-generation' user.
-        user_settings = user_services.get_user_settings(self.viewer_id)
-        user_settings.last_logged_in = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
-
-        self.assertIsNone(
+        previous_last_logged_in_datetime = (
             user_services.get_user_settings(self.viewer_id).last_logged_in)
+        self.assertIsNotNone(previous_last_logged_in_datetime)
+
+        current_datetime = datetime.datetime.utcnow()
+        mocked_datetime_utcnow = current_datetime - datetime.timedelta(days=1)
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+            user_services.record_user_logged_in(self.viewer_id)
+
+        user_settings = user_services.get_user_settings(self.viewer_id)
+        last_logged_in = user_settings.last_logged_in
+
         # After logging in and requesting a URL, the last_logged_in property is
-        # set.
+        # changed.
         self.login(self.VIEWER_EMAIL)
         self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        self.assertIsNotNone(
+        self.assertLess(
+            last_logged_in,
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.logout()
 
@@ -986,36 +1052,10 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.assertIsNotNone(previous_last_logged_in_datetime)
 
-        original_datetime_type = datetime.datetime
         current_datetime = datetime.datetime.utcnow()
 
-        # Without explicitly defining the type of the patched datetimes, NDB
-        # validation checks for datetime.datetime instances fail.
-        class PatchedDatetimeType(type):
-            """Validates the datetime instances."""
-            def __instancecheck__(cls, other):
-                """Validates whether the given instance is a datatime
-                instance.
-                """
-                return isinstance(other, original_datetime_type)
-
-        class MockDatetime11Hours( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the current date and time 11 hours ahead of UTC."""
-                return current_datetime + datetime.timedelta(hours=11)
-
-        class MockDatetime13Hours( # pylint: disable=inherit-non-class
-                python_utils.with_metaclass(
-                    PatchedDatetimeType, datetime.datetime)):
-            @classmethod
-            def utcnow(cls):
-                """Returns the current date and time 13 hours ahead of UTC."""
-                return current_datetime + datetime.timedelta(hours=13)
-
-        with self.swap(datetime, 'datetime', MockDatetime11Hours):
+        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=11)
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
@@ -1023,7 +1063,8 @@ class LastLoginIntegrationTests(test_utils.GenericTestBase):
                 previous_last_logged_in_datetime)
             self.logout()
 
-        with self.swap(datetime, 'datetime', MockDatetime13Hours):
+        mocked_datetime_utcnow = current_datetime + datetime.timedelta(hours=13)
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
             self.login(self.VIEWER_EMAIL)
             self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertGreater(
@@ -1053,11 +1094,6 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         """Test the case of a user who are editing exploration for first time
         after the last edited time check was introduced.
         """
-        # Set up a 'previous-generation' user.
-        user_settings = user_services.get_user_settings(self.editor_id)
-        user_settings.last_edited_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
-
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNone(editor_settings.last_edited_an_exploration)
 
@@ -1081,10 +1117,11 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
         # Decrease last exploration edited time by 13 hours.
         user_settings = user_services.get_user_settings(self.editor_id)
-        user_settings.last_edited_an_exploration = (
+        mocked_datetime_utcnow = (
             user_settings.last_edited_an_exploration -
             datetime.timedelta(hours=13))
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+        with self.mock_datetime_utcnow(mocked_datetime_utcnow):
+            user_services.record_user_edited_an_exploration(self.editor_id)
 
         editor_settings = user_services.get_user_settings(self.editor_id)
         previous_last_edited_an_exploration = (
@@ -1123,11 +1160,6 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         """Test the case of a user who are creating exploration for first time
         after the last edited time check was introduced.
         """
-        # Set up a 'previous-generation' user.
-        user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = None
-        user_services._save_user_settings(user_settings)  # pylint: disable=protected-access
-
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNone(owner_settings.last_created_an_exploration)
 
@@ -1143,10 +1175,10 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
 
         # Decrease last exploration created time by 13 hours.
         user_settings = user_services.get_user_settings(self.owner_id)
-        user_settings.last_created_an_exploration = (
+        with self.mock_datetime_utcnow(
             user_settings.last_created_an_exploration -
-            datetime.timedelta(hours=13))
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+            datetime.timedelta(hours=13)):
+            user_services.record_user_created_an_exploration(self.owner_id)
 
         owner_settings = user_services.get_user_settings(self.owner_id)
         previous_last_created_an_exploration = (
@@ -1176,9 +1208,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.user_settings.validate()
         self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
 
-    def test_gae_user_id_is_user_id(self):
+    def test_gae_id_is_user_id(self):
         self.assertEqual(
-            self.user_settings.user_id, self.user_settings.gae_user_id
+            self.user_settings.user_id, self.user_settings.gae_id
         )
 
     def test_validate_non_str_user_id(self):
@@ -1188,10 +1220,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
         ):
             self.user_settings.validate()
 
-    def test_validate_non_str_gae_user_id(self):
-        self.user_settings.gae_user_id = 0
+    def test_validate_non_str_gae_id(self):
+        self.user_settings.gae_id = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected gae_user_id to be a string'
+            utils.ValidationError, 'Expected gae_id to be a string'
         ):
             self.user_settings.validate()
 

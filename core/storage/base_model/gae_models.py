@@ -45,6 +45,9 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
+# Constant used when retrieving big number of models.
+FETCH_BATCH_SIZE = 1000
+
 # Constants used for generating ids.
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
@@ -88,8 +91,8 @@ class BaseModel(ndb.Model):
         """
         raise NotImplementedError
 
-    @staticmethod
-    def has_reference_to_user_id(user_id):
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
         """This method should be implemented by subclasses.
 
         Args:
@@ -335,6 +338,18 @@ class BaseCommitLogEntryModel(BaseModel):
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = ndb.IntegerProperty()
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionCommitLogEntryModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def create(
@@ -922,7 +937,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     """
 
     # The id of the user who committed this revision.
-    committer_id = ndb.StringProperty(required=True)
+    committer_id = ndb.StringProperty(required=True, indexed=True)
     # The type of the commit associated with this snapshot.
     commit_type = ndb.StringProperty(
         required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
@@ -931,6 +946,18 @@ class BaseSnapshotMetadataModel(BaseModel):
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
+
+    @classmethod
+    def exists_for_user_id(cls, user_id):
+        """Check whether BaseSnapshotMetadataModel references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.committer_id == user_id).get() is not None
 
     def get_unversioned_instance_id(self):
         """Gets the instance id from the snapshot id.
