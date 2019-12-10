@@ -21,15 +21,27 @@ require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ajs.ts');
 
 import { SubtopicDataObjectFactory } from
   'domain/subtopic_viewer/SubtopicDataObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
 
 angular.module('oppia').factory('SubtopicViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'SUBTOPIC_DATA_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService,
       SUBTOPIC_DATA_URL_TEMPLATE) {
-    var subtopicDataDict = null;
     var subtopicDataObject = null;
-    var subtopicDataObjectFactory = new SubtopicDataObjectFactory();
+    var subtopicDataObjectFactory = new SubtopicDataObjectFactory(
+      new SubtopicPageContentsObjectFactory(
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
+        new SubtitledHtmlObjectFactory()
+      )
+    );
     var _fetchSubtopicData = function(
         topicName, subtopicId, successCallback, errorCallback) {
       var subtopicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -39,9 +51,8 @@ angular.module('oppia').factory('SubtopicViewerBackendApiService', [
         });
 
       $http.get(subtopicDataUrl).then(function(response) {
-        subtopicDataDict = angular.copy(response.data);
         subtopicDataObject = subtopicDataObjectFactory.createFromBackendDict(
-          subtopicDataDict
+          angular.copy(response.data)
         );
         if (successCallback) {
           successCallback(subtopicDataObject);

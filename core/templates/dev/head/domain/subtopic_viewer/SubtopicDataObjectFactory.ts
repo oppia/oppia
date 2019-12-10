@@ -20,24 +20,16 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
 
 export class SubtopicData {
   subtopicTitle;
   pageContents;
 
-  constructor(private subtopicPageContentsObjectFactory:
-    SubtopicPageContentsObjectFactory, subtopicTitle, pageContents) {
+  constructor(subtopicTitle, pageContents) {
     this.subtopicTitle = subtopicTitle;
-    this.pageContents = subtopicPageContentsObjectFactory.
-      createFromBackendDict(pageContents);
+    this.pageContents = pageContents;
   }
 
   getSubtopicTitle() {
@@ -53,14 +45,19 @@ export class SubtopicData {
   providedIn: 'root'
 })
 export class SubtopicDataObjectFactory {
+  constructor(
+    private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory
+  ) {}
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
   createFromBackendDict(subtopicDataBackendDict: any): SubtopicData {
     return new SubtopicData(
-      new SubtopicPageContentsObjectFactory(
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
-        new SubtitledHtmlObjectFactory()
-      ),
       subtopicDataBackendDict.subtopic_title,
-      subtopicDataBackendDict.page_contents
+      this.subtopicPageContentsObjectFactory.createFromBackendDict(
+        subtopicDataBackendDict.page_contents  
+      )
     );
   }
 }
