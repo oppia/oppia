@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 require("services/navigation-bars-backend-api.service.ts");
 
-describe('Review test backend API service', function () {
+describe('Navigation bars backend API service', function () {
   var NavigationBarsBackendApiService = null;
   var sampleDataResults = null;
   var $rootScope = null;
@@ -46,9 +46,8 @@ describe('Review test backend API service', function () {
     $httpBackend = $injector.get('$httpBackend');
 
     sampleDataResults = {
-      story_name: 'Story Name',
-      skill_descriptions: {}
-    };
+        num_unseen_notifications: 0
+    }
   }));
 
   afterEach(function () {
@@ -67,7 +66,7 @@ describe('Review test backend API service', function () {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining({data: sampleDataResults}));
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -85,7 +84,7 @@ describe('Review test backend API service', function () {
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error getting review test data.');
+      expect(failHandler).toHaveBeenCalledWith(jasmine.objectContaining({data: 'Error getting notifications.'}));
     }
   );
 });

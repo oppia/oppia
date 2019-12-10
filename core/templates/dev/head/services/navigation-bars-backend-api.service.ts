@@ -23,9 +23,8 @@ require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('NavigationBarsBackendApiService', [
   '$http', 'UrlInterpolationService', 'NOTIFICATIONS_HANDLER_URL', function ($http, UrlInterpolationService, NOTIFICATIONS_HANDLER_URL) {
-    var _fetchNotificationHandler = function (storyId) {
-      var notificationsHandlerUrl = UrlInterpolationService.interpolateUrl(NOTIFICATIONS_HANDLER_URL);
-      return $http.get(notificationsHandlerUrl);
+    var _fetchNotificationHandler = function () {
+      return $http.get(NOTIFICATIONS_HANDLER_URL);
     };
 
     return {
