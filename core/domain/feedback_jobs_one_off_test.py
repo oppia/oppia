@@ -28,9 +28,7 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 
 
 class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
-    """Tests for FeedbackThread cache population."""
-
-    ONE_OFF_JOB_CLASS = feedback_jobs_one_off.FeedbackThreadCacheOneOffJob
+    """Tests for one-off job to populate the caches of FeedbackThreads."""
 
     def setUp(self):
         super(FeedbackThreadCacheOneOffJobTest, self).setUp()
@@ -38,174 +36,215 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
     def _run_one_off_job(self):
-        """Runs the one-off job under test."""
-        job_id = self.ONE_OFF_JOB_CLASS.create_new()
-        self.ONE_OFF_JOB_CLASS.enqueue(job_id)
+        """Runs the one-off job under test and returns its output."""
+        job_id = (
+            feedback_jobs_one_off.FeedbackThreadCacheOneOffJob.create_new())
+        feedback_jobs_one_off.FeedbackThreadCacheOneOffJob.enqueue(job_id)
         self.assertEqual(
+            1,
             self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS))
         self.process_and_flush_pending_tasks()
         self.assertEqual(
+            0,
             self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-        output_strs = self.ONE_OFF_JOB_CLASS.get_output(job_id)
-        outputs = [ast.literal_eval(s) for s in output_strs]
-        return [(key, int(value)) for key, value in outputs]
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS))
+        job_output = (
+            feedback_jobs_one_off.FeedbackThreadCacheOneOffJob.get_output(
+                job_id))
+        job_output_pairs = [ast.literal_eval(o) for o in job_output]
+        return [(key, int(val)) for key, val in job_output_pairs]
 
-    def test_sample_usage(self):
-        fresh_thread_ids = [
-            feedback_services.create_thread(
-                'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
-            feedback_services.create_thread(
-                'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
-        ]
-        stale_thread_ids = [
-            feedback_services.create_thread(
-                'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
-            feedback_services.create_thread(
-                'exploration', 'exp_id', self.editor_id, 'subject', 'message'),
-        ]
-        for thread_id in stale_thread_ids:
-            thread = (
-                feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
-            # Forcibly clear the cache, it should get populated by the job.
-            thread.last_message_text = None
-            thread.last_message_author_id = None
-            thread.put()
+    def _create_thread(self, author_id, text):
+        """Helper wrapper for feedback_services.create_thread which only exposes
+        arguments relevant to the cache.
 
-        # The two stale threads should be updated by the job.
-        self.assertEqual(self._run_one_off_job(), [('Updated', 2)])
+        Args:
+            author_id: str|None. ID of the user which created this thread, or
+                None if the author was anonymous (not logged in).
+            text: str. Content of the first message in the thread (allowed to be
+                an empty string).
 
-        for thread_id in stale_thread_ids:
-            thread = (
-                feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
-            # The cache should now be fresh.
-            self.assertEqual(thread.last_message_text, 'message')
-            self.assertEqual(thread.last_message_author_id, self.editor_id)
+        Returns:
+            str. The ID of the newly created thread.
+        """
+        return feedback_services.create_thread(
+            'exploration', 'exp_id', author_id, 'subject', text)
 
-        # Now that all caches are fresh, the job should not perform any updates.
-        self.assertEqual(self._run_one_off_job(), [])
+    def _create_message(self, thread_id, author_id, text):
+        """Helper wrapper for feedback_services.create_message which only
+        exposes arguments relevant to the cache.
 
-    def test_update_to_text_cache_for_stale_cache_with_1_message(self):
-        thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        thread.last_message_text = None
-        thread.put()
+        Args:
+            thread_id: str. ID of the thread to which this message should be
+                appened to.
+            author_id: str|None. ID of the user which created this message, or
+                None if the author was anonymous (not logged in).
+            text: str. Content of the first message in the thread (allowed to be
+                an empty string).
+        """
+        feedback_services.create_message(thread_id, author_id, None, None, text)
+
+    def test_cache_update_to_thread_with_1_message(self):
+        thread_id = self._create_thread(self.editor_id, 'first text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_text = None
+        model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        self.assertEqual(thread.last_message_text, 'first text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_text, 'first text')
 
-    def test_update_to_text_cache_for_stale_cache_with_2_messages(self):
-        thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
-        feedback_services.create_message(
-            thread_id, self.editor_id, None, None, 'second text')
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        thread.last_message_text = None
-        thread.put()
+    def test_cache_update_to_thread_with_2_messages(self):
+        thread_id = self._create_thread(self.editor_id, 'first text')
+        self._create_message(thread_id, self.editor_id, 'second text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_text = None
+        model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        self.assertEqual(thread.last_message_text, 'second text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_text, 'second text')
 
-    def test_update_to_author_cache_for_stale_cache_with_1_message(self):
-        thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        thread.last_message_author_id = None
-        thread.put()
-
-        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
-
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        self.assertEqual(thread.last_message_author_id, self.editor_id)
-
-    def test_update_to_author_cache_for_stale_cache_with_2_messages(self):
-        thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
-        feedback_services.create_message(
-            thread_id, self.editor_id, None, None, 'second text')
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        thread.last_message_author_id = None
-        thread.put()
+    def test_cache_update_to_thread_with_1_empty_message(self):
+        thread_id = self._create_thread(self.editor_id, '')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_text = 'Non-empty'
+        model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_text, None)
 
-    def test_update_to_author_cache_for_stale_cache_with_1_anon_message(self):
-        thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', None, 'Feedback', 'first text')
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        thread.last_message_author_id = self.editor_id
-        thread.put()
-
-        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
-
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        self.assertIsNone(thread.last_message_author_id)
-
-    def test_update_to_author_cache_for_stale_cache_with_2_anon_messages(self):
-        thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', None, 'Feedback', 'first text')
-        feedback_services.create_message(
-            thread_id, None, None, None, 'second text')
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        thread.last_message_author_id = self.editor_id
-        thread.put()
+    def test_cache_update_to_thread_with_2_empty_messages(self):
+        thread_id = self._create_thread(self.editor_id, '')
+        self._create_message(thread_id, self.editor_id, '')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_text = 'Non-empty'
+        model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        self.assertIsNone(thread.last_message_author_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_text, None)
 
-    def test_update_to_all_caches_for_stale_cache_with_0_messages(self):
-        thread_id = (
-            feedback_models.GeneralFeedbackThreadModel.generate_new_thread_id(
-                'exploration', 'exp_id'))
-        thread = feedback_models.GeneralFeedbackThreadModel.create(thread_id)
-        thread.entity_type = 'exploration'
-        thread.entity_id = 'exp_id'
-        thread.original_author = self.editor_id
-        thread.status = feedback_models.STATUS_CHOICES_OPEN
-        thread.subject = 'Feedback'
-        thread.has_suggestion = False
-        thread.message_count = 0
-        thread.last_message_text = 'non-existing message text'
-        thread.last_message_author_id = self.editor_id
-        thread.put()
+    def test_cache_update_to_thread_with_empty_then_nonempty_messages(self):
+        thread_id = self._create_thread(self.editor_id, '')
+        self._create_message(thread_id, self.editor_id, 'first text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_text = None
+        model.put()
 
         self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        self.assertIsNone(thread.last_message_text)
-        self.assertIsNone(thread.last_message_author_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_text, 'first text')
 
-    def test_no_update_to_text_and_author_cache_of_fresh_cache_with_1_message(
-            self):
-        thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
+    def test_cache_update_to_thread_with_nonempty_then_empty_messages(self):
+        thread_id = self._create_thread(self.editor_id, 'first text')
+        self._create_message(thread_id, self.editor_id, '')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_text = None
+        model.put()
 
-        self.assertEqual(self._run_one_off_job(), [])
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        self.assertEqual(thread.last_message_text, 'first text')
-        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_text, 'first text')
 
-    def test_no_update_to_text_and_author_cache_of_fresh_cache_with_2_messages(
-            self):
-        thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', self.editor_id, 'Feedback', 'first text')
-        feedback_services.create_message(
-            thread_id, self.editor_id, None, None, 'second text')
+    def test_cache_update_to_thread_with_1_user_message(self):
+        thread_id = self._create_thread(self.editor_id, 'first text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_author_id = None
+        model.put()
 
-        self.assertEqual(self._run_one_off_job(), [])
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
 
-        thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-        self.assertEqual(thread.last_message_text, 'second text')
-        self.assertEqual(thread.last_message_author_id, self.editor_id)
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
+
+    def test_cache_update_to_thread_with_2_user_messages(self):
+        thread_id = self._create_thread(self.editor_id, 'first text')
+        self._create_message(thread_id, self.editor_id, 'second text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_author_id = None
+        model.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
+
+    def test_cache_update_to_thread_with_1_anon_message(self):
+        thread_id = self._create_thread(None, 'first text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_author_id = self.editor_id
+        model.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertIsNone(model.last_nonempty_message_author_id)
+
+    def test_cache_update_to_thread_with_2_anon_messages(self):
+        thread_id = self._create_thread(None, 'first text')
+        self._create_message(thread_id, None, 'second text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_author_id = self.editor_id
+        model.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertIsNone(model.last_nonempty_message_author_id)
+
+    def test_cache_update_to_thread_with_user_then_anon_messages(self):
+        thread_id = self._create_thread(self.editor_id, 'first text')
+        self._create_message(thread_id, None, 'second text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_author_id = self.editor_id
+        model.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertIsNone(model.last_nonempty_message_author_id)
+
+    def test_cache_update_to_thread_with_anon_then_user_messages(self):
+        thread_id = self._create_thread(None, 'first text')
+        self._create_message(thread_id, self.editor_id, 'second text')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_author_id = None
+        model.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
+
+    def test_cache_update_to_thread_with_user_then_empty_messages(self):
+        thread_id = self._create_thread(self.editor_id, 'first text')
+        self._create_message(thread_id, None, '')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_author_id = None
+        model.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
+
+    def test_cache_update_to_thread_with_anon_then_empty_messages(self):
+        thread_id = self._create_thread(None, 'first text')
+        self._create_message(thread_id, self.editor_id, '')
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        model.last_nonempty_message_author_id = self.editor_id
+        model.put()
+
+        self.assertEqual(self._run_one_off_job(), [('Updated', 1)])
+
+        model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
+        self.assertIsNone(model.last_nonempty_message_author_id)

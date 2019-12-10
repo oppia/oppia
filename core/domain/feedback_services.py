@@ -167,8 +167,9 @@ def create_message(
     message.put()
 
     # Update the message data cache of the thread.
-    thread.last_message_text = text
-    thread.last_message_author_id = author_id
+    if text:
+        thread.last_nonempty_message_text = text
+        thread.last_nonempty_message_author_id = author_id
     if thread.message_count is not None:
         thread.message_count += 1
     else:
@@ -406,7 +407,8 @@ def _get_thread_from_model(thread_model):
         thread_model.original_author_id, thread_model.status,
         thread_model.subject, thread_model.summary, thread_model.has_suggestion,
         message_count, thread_model.created_on, thread_model.last_updated,
-        thread_model.last_message_text, thread_model.last_message_author_id)
+        thread_model.last_nonempty_message_text,
+        thread_model.last_nonempty_message_author_id)
 
 
 def get_full_message_id(thread_id, message_id):

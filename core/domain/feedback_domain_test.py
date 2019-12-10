@@ -45,8 +45,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'message_count': 1,
             'subject': u'a subject',
             'last_updated': utils.get_time_in_millisecs(fake_date),
-            'last_message_text': 'last message',
-            'last_message_author': self.VIEWER_USERNAME,
+            'last_nonempty_message_text': 'last message',
+            'last_nonempty_message_author': self.VIEWER_USERNAME,
         }
         observed_thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
