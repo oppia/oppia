@@ -140,6 +140,9 @@ def cleanup():
     """Kill the running subprocesses and server fired in this program."""
     dev_appserver_path = '%s/dev_appserver.py' % common.GOOGLE_APP_ENGINE_HOME
     webdriver_download_path = '%s/downloads' % WEBDRIVER_HOME_PATH
+    if common.is_windows_os():
+        # In windows system, the java command line will use absolute path.
+        webdriver_download_path = os.path.abspath(webdriver_download_path)
     processes_to_kill = [
         '.*%s.*' % re.escape(dev_appserver_path),
         '.*%s.*' % re.escape(webdriver_download_path)
@@ -354,12 +357,13 @@ def start_google_engine(dev_mode):
     """
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode else '')
 
-    subprocess.Popen(
+    p = subprocess.Popen(
         'python %s/dev_appserver.py  --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' % (
             common.GOOGLE_APP_ENGINE_HOME, GOOGLE_APP_ENGINE_PORT,
             app_yaml_filepath), shell=True)
+    SUBPROCESSES.append(p)
 
 
 def main(args=None):
