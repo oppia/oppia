@@ -248,7 +248,7 @@ def main(args=None):
         ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
         ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
         ('pygsheets', '2.0.2', common.OPPIA_TOOLS_DIR),
-        ('psutil', '5.6.7', common.OPPIA_TOOLS_DIR),
+        ('psutil', common.PSUTIL_VERSION, common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:
