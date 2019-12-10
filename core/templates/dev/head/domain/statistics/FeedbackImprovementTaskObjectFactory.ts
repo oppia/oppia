@@ -82,9 +82,9 @@ angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
     };
 
     // Add method to sort by last update
-    // FeedbackImprovementTask.prototype.getLastUpdatedTime = function() {
-    //   return this._feedbackThread.lastUpdated;
-    // };
+    FeedbackImprovementTask.prototype.getLastUpdatedTime = function() {
+      return this._feedbackThread.lastUpdated;
+    };
 
     return {
       /**
