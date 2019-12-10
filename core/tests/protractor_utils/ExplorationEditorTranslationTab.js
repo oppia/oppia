@@ -283,7 +283,7 @@ var ExplorationEditorTranslationTab = function() {
     playRecordButton.click();
     waitFor.pageToFullyLoad();
   };
-  
+
   this.setTranslation = function(richTextInstructions) {
     waitFor.elementToBeClickable(
       editTranslationButtton,
