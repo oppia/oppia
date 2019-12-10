@@ -222,6 +222,10 @@ for j in "$@"; do
     shift
     ;;
 
+    --community_dashboard_enabled*)
+    shift
+    ;;
+
     *)
     echo "Error: Unknown command line option: $j"
     ;;
