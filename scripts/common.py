@@ -418,10 +418,12 @@ def check_prs_for_current_release_are_released(repo):
                 'released before release summary generation.')
 
 
-def convert_filepath_to_url(file_path):
+def convert_to_posixpath(file_path):
     """Occassionally the Windows style file path just does not work, so we
-    may want to convert it to Unix style.
+    may want to convert it to posix style.
     """
+    if not is_windows_os():
+        return file_path
     return file_path.replace('\\', '/')
 
 

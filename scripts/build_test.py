@@ -248,7 +248,7 @@ class BuildTests(test_utils.GenericTestBase):
             MOCK_TEMPLATES_DEV_DIR, 'base.html')
         BASE_JS_RELATIVE_PATH = os.path.join('pages', 'Base.js')
         BASE_JS_FILE_URL = (
-            common.convert_filepath_to_url(
+            common.convert_to_posixpath(
                 BASE_JS_RELATIVE_PATH))
         BASE_JS_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
