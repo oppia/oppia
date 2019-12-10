@@ -18,30 +18,20 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // compare-versions.service.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
+import { RecordedVoiceoversObjectFactory } from 'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
+import { VoiceoverObjectFactory } from 'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
+import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VersionTreeService } from
-  'pages/exploration-editor-page/history-tab/services/version-tree.service';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
+import { VersionTreeService } from 'pages/exploration-editor-page/history-tab/services/version-tree.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -1218,6 +1208,12 @@ describe('Compare versions service', function() {
         target: 2,
         linkProperty: 'added'
       }]);
+    });
+
+    it('shouldn\'t compare versions if v1 > v2.', function() {
+      expect(function() {
+        cvs.getDiffGraphData(8, 5);
+      }).toThrow(Error('Tried to compare v1 > v2.'));
     });
   });
 });
