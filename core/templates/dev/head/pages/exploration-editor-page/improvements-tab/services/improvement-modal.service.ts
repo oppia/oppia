@@ -83,7 +83,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                */
               $scope.canExpandActions = function() {
                 return currActionIndex !== 0;
-              }
+              };
 
               /**
                * Iterates through the learner actions and expands the set of
@@ -110,7 +110,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                     // per block. If it has, we don't add more learner actions
                     // to the block.
                     if (currActionIndex - i >= (
-                        MAX_UNRELATED_ACTIONS_PER_BLOCK)) {
+                      MAX_UNRELATED_ACTIONS_PER_BLOCK)) {
                       currActionIndex = i + 1;
                       break;
                     }
