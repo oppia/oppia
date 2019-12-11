@@ -48,7 +48,12 @@ angular.module('oppia').factory('ImprovementModalService', [
       ThreadStatusDisplayService, UrlInterpolationService,
       UserExplorationPermissionsService, UserService) {
     return {
-      openPlaythroughModal: function(playthrough, index) {
+      /**
+       * Opens the modal for displaying playthrough actions.
+       * @param {Playthrough} playthrough.
+       * @param {int} playthroughIndex.
+       */
+      openPlaythroughModal: function(playthrough, playthroughIndex) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/statistics-tab/templates/' +
@@ -64,17 +69,12 @@ angular.module('oppia').factory('ImprovementModalService', [
                 LearnerActionRenderService,
                 ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
                 MAX_UNRELATED_ACTIONS_PER_BLOCK) {
-              $scope.playthroughIndex = index;
+              $scope.playthroughIndex = playthroughIndex;
 
-              // This is the index of the latest learner action that was
+              // This is the index of the first action in the range of actions
               // displayed. When this index reaches 0, we've displayed all the
               // learner actions.
-              let currActionIndex = playthrough.actions.length - 1;
-              // We keep track of the indices where we expanded till at each
-              // level so that we would be able to display the final block as
-              // a table in Multiple Incorrect Submissions issue.
-              let indicesToExpand = [];
-              let actionsToDisplay = [];
+              let indexOfFirstDisplayedAction = playthrough.actions.length - 1;
 
               /**
                * Identifies whether all learner actions have been displayed and
@@ -82,7 +82,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                * @returns {boolean}
                */
               $scope.canExpandActions = function() {
-                return currActionIndex !== 0;
+                return indexOfFirstDisplayedAction !== 0;
               };
 
               /**
@@ -92,54 +92,53 @@ angular.module('oppia').factory('ImprovementModalService', [
                */
               let expandActions = function() {
                 let i;
-                for (i = currActionIndex; i >= 0; i--) {
+                let previousStateName = null;
+                if (indexOfFirstDisplayedAction ===
+                    playthrough.actions.length) {
+                  previousStateName = (
+                    playthrough.actions[
+                      0].actionCustomizationArgs.state_name.value);
+                } else {
+                  let action = playthrough.actions[indexOfFirstDisplayedAction];
+                  previousStateName =
+                    action.actionCustomizationArgs.state_name.value;
+                }
+                for (i = indexOfFirstDisplayedAction; i >= 0; i--) {
                   let action = playthrough.actions[i];
                   let currentStateName =
                       action.actionCustomizationArgs.state_name.value;
-                  let latestStateName = actionsToDisplay.length === 0 ? (
-                      action.actionCustomizationArgs.state_name.value) : (
-                      actionsToDisplay[
-                        actionsToDisplay.length -
-                          1].actionCustomizationArgs.state_name.value);
 
-                  if (currentStateName !== latestStateName) {
+                  if (currentStateName !== previousStateName) {
                     // When the latest state name and the state name of the
                     // current learner action differ, they are part of
                     // different contexts. So, we identify whether the size
                     // of the block has crossed the threshold number of actions
                     // per block. If it has, we don't add more learner actions
                     // to the block.
-                    if (currActionIndex - i >= (
+                    if (indexOfFirstDisplayedAction - i >= (
                       MAX_UNRELATED_ACTIONS_PER_BLOCK)) {
-                      currActionIndex = i + 1;
+                      indexOfFirstDisplayedAction = i + 1;
                       break;
                     }
-                    actionsToDisplay.push(action);
-                  } else {
-                    // When the latest state name and the state name of the
-                    // current learner action are the same, they remain in the
-                    // same context. So, we keep them in the same block to
-                    // display them together.
-                    actionsToDisplay.push(action);
                   }
+                  previousStateName = currentStateName
                 }
                 // This is the case when all learner actions have been iterated
                 // over, and no more expansion is possible.
                 if (i === -1) {
-                  currActionIndex = 0;
+                  indexOfFirstDisplayedAction = 0;
                 }
-                indicesToExpand.push(i + 1);
               };
 
               expandActions();
 
               // Index to know where to start highlighting actions.
-              let indexOfFirstBlockDisplayed = currActionIndex;
+              let indexOfFirstDisplayedBlock = indexOfFirstDisplayedAction;
 
-              $scope.isIssueMIS = false;
+              $scope.issueIsMultipleIncorrectSubmissions = false;
               if (playthrough.issueType === (
                 ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
-                $scope.isIssueMIS = true;
+                $scope.issueIsMultipleIncorrectSubmissions = true;
               }
 
               /**
@@ -150,8 +149,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                 var lars = LearnerActionRenderService;
                 var tableHtml =
                   lars.renderFinalDisplayBlockForMISIssueHTML(
-                    playthrough.actions.slice(indicesToExpand[0]),
-                    indicesToExpand[0] + 1);
+                    playthrough.actions.slice(indexOfFirstDisplayedBlock),
+                    indexOfFirstDisplayedBlock + 1);
                 return tableHtml;
               };
 
@@ -161,16 +160,13 @@ angular.module('oppia').factory('ImprovementModalService', [
                * @returns {LearnerAction[]}
                */
               $scope.getActionsToRender = function() {
-                if ($scope.isIssueMIS) {
+                if ($scope.issueIsMultipleIncorrectSubmissions) {
                   // This corresponds to the case where we display the table
                   // for the issue.
-                  if (indicesToExpand.length === 1) {
-                    return [];
-                  }
-                  return actionsToDisplay.slice().reverse().slice(
-                    currActionIndex, indicesToExpand[0]);
+                  return playthrough.actions.slice(
+                    indexOfFirstDisplayedAction, indexOfFirstDisplayedBlock);
                 }
-                return actionsToDisplay.slice().reverse();
+                return playthrough.actions.slice(indexOfFirstDisplayedAction);
               };
 
               /**
@@ -189,7 +185,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                */
               $scope.isActionHighlighted = function(action) {
                 return $scope.getLearnerActionIndex(action) > (
-                  indexOfFirstBlockDisplayed);
+                  indexOfFirstDisplayedBlock);
               };
 
               /**
