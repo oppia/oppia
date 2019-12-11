@@ -217,6 +217,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Abbreviated name field should not exceed 12 characters.',
             'this is a lengthy name.')
 
+    def test_thumbnail_filename_validation(self):
+        self.topic.thumbnail_filename = 1
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received 1')
+
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')

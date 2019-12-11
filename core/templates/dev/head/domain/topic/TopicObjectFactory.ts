@@ -113,10 +113,6 @@ angular.module('oppia').factory('TopicObjectFactory', [
         issues.push('Abbreviated name should not be empty.');
       }
 
-      if (!this._thumbnailFilename) {
-        issues.push('Topic should have a thumbnail.');
-      }
-
       var subtopics = this._subtopics;
       var canonicalStoryIds = this.getCanonicalStoryIds();
       var additionalStoryIds = this.getAdditionalStoryIds();
@@ -166,6 +162,14 @@ angular.module('oppia').factory('TopicObjectFactory', [
               ' is duplicated in the topic');
           }
         }
+      }
+      return issues;
+    };
+
+    Topic.prototype.prepublishValidate = function() {
+      var issues = [];
+      if (!this._thumbnailFilename) {
+        issues.push('Topic should have a thumbnail.');
       }
       return issues;
     };

@@ -2,8 +2,11 @@
   <md-card class="oppia-page-card oppia-long-text">
     <div class="form-group">
       <label class="form-heading">Topic Thumbnail</label>
+      <h4 ng-if="!topic.getThumbnailFilename()" style="color: gray;">
+        Upload a 150 x 150 px thumbnail image for the topic
+      </h4>
       <div>
-        <div class="oppia-editable-section" title="Change Topic Thumbnail"
+        <div class="oppia-editable-section float-left" title="Change Topic Thumbnail"
              style="height: 150px; width: 150px">
           <div class="oppia-click-to-start-editing protractor-test-photo-clickable"
                ng-click="showEditThumbnailModal()">

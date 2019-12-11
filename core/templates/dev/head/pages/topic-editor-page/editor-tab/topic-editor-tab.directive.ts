@@ -141,6 +141,21 @@ angular.module('oppia').directive('topicEditorTab', [
             });
           };
 
+          var generateImageFilename = function() {
+          var date = new Date();
+          return 'img_' +
+            date.getFullYear() +
+            ('0' + (date.getMonth() + 1)).slice(-2) +
+            ('0' + date.getDate()).slice(-2) +
+            '_' +
+            ('0' + date.getHours()).slice(-2) +
+            ('0' + date.getMinutes()).slice(-2) +
+            ('0' + date.getSeconds()).slice(-2) +
+            '_' +
+            Math.random().toString(36).substr(2, 10) +
+            '.png';
+          };
+
           $scope.showEditThumbnailModal = function() {
             if (!$scope.topicRights.canEditTopic()) {
               return;
@@ -158,8 +173,7 @@ angular.module('oppia').directive('topicEditorTab', [
                   $scope.invalidImageWarningIsShown = false;
 
                   $scope.onFileChanged = function(file) {
-                    tempImageName = (
-                      file.name.split('.').slice(0, -1).join('.') + '.png');
+                    tempImageName = generateImageFilename();
                     $('.oppia-thumbnail-uploader').fadeOut(function() {
                       $scope.invalidImageWarningIsShown = false;
 
