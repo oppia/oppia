@@ -16,12 +16,14 @@
  * @fileoverview Unit tests for ClassroomBackendApiService.
  */
 
-require('domain/classroom/classroom-backend-api.service.ts');
-require('domain/topic/TopicSummaryObjectFactory.ts');
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+
+require('domain/classroom/classroom-backend-api.service.ts');
 
 describe('Classroom backend API service', function() {
   var ClassroomBackendApiService = null;
@@ -31,7 +33,7 @@ describe('Classroom backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
   var UndoRedoService = null;
-  var TopicSummaryObjectFactory = null;
+  var topicSummaryObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -48,7 +50,7 @@ describe('Classroom backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
-    TopicSummaryObjectFactory = $injector.get('TopicSummaryObjectFactory');
+    topicSummaryObjectFactory = $injector.get('TopicSummaryObjectFactory');
 
     // Sample topic object returnable from the backend
     responseDictionaries = {
@@ -72,9 +74,9 @@ describe('Classroom backend API service', function() {
     // Sample topic object returnable from the backend
     sampleDataResultsObjects = {
       topic_summary_objects: [
-        TopicSummaryObjectFactory.createFromBackendDict(
+        topicSummaryObjectFactory.createFromBackendDict(
           responseDictionaries.topic_summary_dicts[0]),
-        TopicSummaryObjectFactory.createFromBackendDict(
+        topicSummaryObjectFactory.createFromBackendDict(
           responseDictionaries.topic_summary_dicts[1])
       ]
     };
