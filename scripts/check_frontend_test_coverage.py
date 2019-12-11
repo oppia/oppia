@@ -33,7 +33,7 @@ def change_git_branch(branch):
     """Changes git branch.
 
     Args:
-      branch: str. Name of the branch to be changed.
+        branch: str. Name of the branch to be changed.
     """
     subprocess.check_call(['git', 'checkout', branch])
 
@@ -66,7 +66,7 @@ def delete_tmp_folder():
 
 def filter_lines(line):
     """Check if the line has file path (SF) or total lines (LF) or covered
-        lines (LH) of the test.
+    lines (LH) of the test.
 
     Args:
         line: str. A line from lcov file.
@@ -104,11 +104,11 @@ def get_lcov_file_tests(file_path):
     - File covered lines
 
     Args:
-      file_path: string. The path of lcov file.
+        file_path: string. The path of lcov file.
 
     Returns:
-      String array. An array with all tests filtered, including only important
-      data for the diff.
+        String array. An array with all tests filtered, including only important
+        data for the diff.
     """
     with python_utils.open_file(file_path, 'r') as f:
         tests_array = f.read().split('end_of_record')
@@ -130,7 +130,7 @@ def get_coverage_dict_for_fully_covered_tests():
         of each tested file.
 
     Raises:
-      Exception: If DEV_LCOV_FILE_PATH doesn't exist.
+        Exception: If DEV_LCOV_FILE_PATH doesn't exist.
     """
     coverage_dict = {}
 
@@ -157,7 +157,7 @@ def check_coverage_reduction_of_fully_covered_file():
     """Check if any 100% covered file had the coverage dropped.
 
     Raises:
-      Exception: If PR_LCOV_FILE_PATH doesn't exist.
+        Exception: If PR_LCOV_FILE_PATH doesn't exist.
     """
     fully_covered_tests = get_coverage_dict_for_fully_covered_tests()
 
@@ -182,11 +182,11 @@ def check_coverage_reduction_of_fully_covered_file():
 
 def main():
     """Runs all the steps for checking if there is any decrease of 100% covered
-      files. Only PR branches is going to be checked, develop branch doesn't
-      need this check because it has the right percentage to compare the
-      test coverage from new changes in the PRs. Master branch doesn't need the
-      check neither, because all changes in develop should already be checked
-      during the PR review.
+    files. Only PR branches is going to be checked, develop branch doesn't
+    need this check because it has the right percentage to compare the
+    test coverage from new changes in the PRs. Master branch doesn't need the
+    check neither, because all changes in develop should already be checked
+    during the PR review.
     """
     current_branch = subprocess.check_output([
         'git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip()
