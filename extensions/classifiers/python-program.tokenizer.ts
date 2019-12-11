@@ -30,7 +30,7 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 import { ClassifiersExtensionConstants } from
-  'classifiers/classifiers-extension.constants.ts';
+  'classifiers/classifiers-extension.constants';
 import { LoggerService } from 'services/contextual/logger.service';
 
 @Injectable({
