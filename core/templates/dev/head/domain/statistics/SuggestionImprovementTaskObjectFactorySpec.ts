@@ -18,41 +18,63 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // SuggestionImprovementTaskObjectFactory.ts is upgraded to Angular 8.
-/* eslint-disable max-len */
-import { StateEditorService } from 'components/state-editor/state-editor-properties-services/state-editor.service';
-import { AnswerClassificationResultObjectFactory } from 'domain/classifier/AnswerClassificationResultObjectFactory';
-import { ClassifierObjectFactory } from 'domain/classifier/ClassifierObjectFactory';
-import { AnswerGroupObjectFactory } from 'domain/exploration/AnswerGroupObjectFactory';
-import { ExplorationDraftObjectFactory } from 'domain/exploration/ExplorationDraftObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from 'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from 'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from 'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-/* eslint-enable max-len */
-import { SubtitledHtmlObjectFactory } from 'domain/exploration/SubtitledHtmlObjectFactory';
-import { VoiceoverObjectFactory } from 'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from 'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from 'domain/exploration/WrittenTranslationsObjectFactory';
-import { FeedbackThreadObjectFactory } from 'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { AngularNameService } from
+  'pages/exploration-editor-page/services/angular-name.service';
+import { AnswerClassificationResultObjectFactory } from
+  'domain/classifier/AnswerClassificationResultObjectFactory';
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { ClassifierObjectFactory } from
+  'domain/classifier/ClassifierObjectFactory';
+import { EditabilityService } from 'services/editability.service';
+import { ExplorationDraftObjectFactory } from
+  'domain/exploration/ExplorationDraftObjectFactory';
+import { FeedbackThreadObjectFactory } from
+  'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { ImprovementActionButtonObjectFactory } from
+  'domain/statistics/ImprovementActionButtonObjectFactory';
+import { OutcomeObjectFactory } from
+  'domain/exploration/OutcomeObjectFactory';
+import { ParamChangeObjectFactory } from
+  'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+/* eslint-disable max-len */
+import { SolutionValidityService } from
+  'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
+/* eslint-enable max-len */
+import { StateClassifierMappingService } from
+  'pages/exploration-player-page/services/state-classifier-mapping.service';
+/* eslint-disable max-len */
+import { StateEditorService } from
+  'components/state-editor/state-editor-properties-services/state-editor.service';
+/* eslint-enable max-len */
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
+import { SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
+/* eslint-disable max-len */
+import { ThreadStatusDisplayService } from
+  'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
 /* eslint-enable max-len */
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { ImprovementActionButtonObjectFactory } from 'domain/statistics/ImprovementActionButtonObjectFactory';
-import { LearnerAnswerDetailsObjectFactory } from 'domain/statistics/LearnerAnswerDetailsObjectFactory';
-import { LearnerAnswerInfoObjectFactory } from 'domain/statistics/LearnerAnswerInfoObjectFactory';
-import { SuggestionObjectFactory } from 'domain/suggestion/SuggestionObjectFactory';
 import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
-/* eslint-disable max-len */
-import { SolutionValidityService } from 'pages/exploration-editor-page/editor-tab/services/solution-validity.service';
-/* eslint-disable max-len */
-import { ThreadStatusDisplayService } from 'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
-import { AngularNameService } from 'pages/exploration-editor-page/services/angular-name.service';
-/* eslint-enable max-len */
-import { StateClassifierMappingService } from 'pages/exploration-player-page/services/state-classifier-mapping.service';
-import { EditabilityService } from 'services/editability.service';
-import { SuggestionModalService } from 'services/suggestion-modal.service';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+import { WrittenTranslationObjectFactory } from
+  'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } from
+  'domain/exploration/WrittenTranslationsObjectFactory';
+import { LearnerAnswerDetailsObjectFactory } from
+  'domain/statistics/LearnerAnswerDetailsObjectFactory';
+import { LearnerAnswerInfoObjectFactory } from
+  'domain/statistics/LearnerAnswerInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -133,24 +155,24 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
       'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
     $provide.value(
       'ThreadDataService', {
-      data: {
-        suggestionThreads: [{
-          threadId: 'abc1'
-        }, {
-          threadId: 'def2'
-        }]
-      },
-      fetchThreads: function() {
-        return $q.all(function() {
-          return this.fetchMessages();
-        });
-      },
-      fetchMessages: function() {
-      },
-      getData: function() {
-        return this.data;
-      }
-    });
+        data: {
+          suggestionThreads: [{
+            threadId: 'abc1'
+          }, {
+            threadId: 'def2'
+          }]
+        },
+        fetchThreads: function() {
+          return $q.all(function() {
+            return this.fetchMessages();
+          });
+        },
+        fetchMessages: function() {
+        },
+        getData: function() {
+          return this.data;
+        }
+      });
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
