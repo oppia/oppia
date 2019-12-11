@@ -97,14 +97,12 @@ describe('Topic object factory', function() {
   it('should validate the topic', function() {
     _sampleTopic.setName('');
     _sampleTopic.setAbbreviatedName(''),
-    _sampleTopic.setThumbnailFilename(null);
     _sampleTopic.addCanonicalStory('story_2');
     _sampleTopic.getSubtopics()[0].addSkill('skill_1');
 
     expect(_sampleTopic.validate()).toEqual([
       'Topic name should not be empty.',
       'Abbreviated name should not be empty.',
-      'Topic should have a thumbnail.',
       'The story with id story_2 is present in both canonical ' +
       'and additional stories.',
       'The skill with id skill_1 is duplicated in the topic'
