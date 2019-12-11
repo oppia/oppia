@@ -42,8 +42,6 @@ describe('Classroom backend API service', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
-    $provide.value(
-      'TopicSummaryObjectFactory', new TopicSummaryObjectFactory());
   }));
 
   beforeEach(angular.mock.inject(function($injector) {

@@ -164,6 +164,8 @@ import { TextInputValidationService } from
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
@@ -304,6 +306,8 @@ export class UpgradedServices {
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
+    upgradedServices['TopicSummaryObjectFactory'] =
+        new TopicSummaryObjectFactory();
     upgradedServices['UrlService'] =
       new UrlService(upgradedServices['WindowRef']);
     upgradedServices['ValidatorsService'] = new ValidatorsService(
@@ -312,6 +316,7 @@ export class UpgradedServices {
     upgradedServices['WrittenTranslationsObjectFactory'] =
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
+
 
     // Group 3: Services depending only on groups 1-2.
     upgradedServices['AnswerGroupObjectFactory'] =
