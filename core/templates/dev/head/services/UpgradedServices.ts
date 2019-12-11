@@ -317,7 +317,6 @@ export class UpgradedServices {
       new WrittenTranslationsObjectFactory(
         upgradedServices['WrittenTranslationObjectFactory']);
 
-
     // Group 3: Services depending only on groups 1-2.
     upgradedServices['AnswerGroupObjectFactory'] =
       new AnswerGroupObjectFactory(
