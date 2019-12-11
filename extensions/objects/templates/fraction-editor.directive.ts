@@ -43,7 +43,10 @@ angular.module('oppia').directive('fractionEditor', [
 
         $scope.$watch('$ctrl.localValue.label', function(newValue) {
           try {
-            ctrl.value = FractionObjectFactory.fromRawInputString(newValue);
+            var INTERMEDIATE_REGEX = /^\s*-?\s*$/;
+            if (!INTERMEDIATE_REGEX.test(newValue)) {
+              ctrl.value = FractionObjectFactory.fromRawInputString(newValue);
+            }
             errorMessage = '';
           } catch (parsingError) {
             errorMessage = parsingError.message;
