@@ -72,8 +72,8 @@ angular.module('oppia').factory('ImprovementModalService', [
               $scope.playthroughIndex = playthroughIndex;
 
               // This is the index of the first action in the range of actions
-              // displayed. When this index reaches 0, we've displayed all the
-              // learner actions.
+              // displayed. Initially, only one action is displayed. When this
+              // index reaches 0, we've displayed all the learner actions.
               let indexOfFirstDisplayedAction = playthrough.actions.length - 1;
 
               /**
@@ -93,15 +93,12 @@ angular.module('oppia').factory('ImprovementModalService', [
               let expandActions = function() {
                 let i;
                 let previousStateName = null;
-                if (indexOfFirstDisplayedAction ===
-                    playthrough.actions.length) {
-                  previousStateName = (
-                    playthrough.actions[
-                      0].actionCustomizationArgs.state_name.value);
-                } else {
-                  let action = playthrough.actions[indexOfFirstDisplayedAction];
+                if (indexOfFirstDisplayedAction <
+                    playthrough.actions.length - 1) {
+                  let action = playthrough.actions[
+                    indexOfFirstDisplayedAction];
                   previousStateName =
-                    action.actionCustomizationArgs.state_name.value;
+                      action.actionCustomizationArgs.state_name.value;
                 }
                 for (i = indexOfFirstDisplayedAction; i >= 0; i--) {
                   let action = playthrough.actions[i];
@@ -121,7 +118,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                       break;
                     }
                   }
-                  previousStateName = currentStateName
+                  previousStateName = currentStateName;
                 }
                 // This is the case when all learner actions have been iterated
                 // over, and no more expansion is possible.
@@ -133,7 +130,8 @@ angular.module('oppia').factory('ImprovementModalService', [
               expandActions();
 
               // Index to know where to start highlighting actions.
-              let indexOfFirstDisplayedBlock = indexOfFirstDisplayedAction;
+              let indexOfActionInFirstDisplayedBlock =
+                indexOfFirstDisplayedAction;
 
               $scope.issueIsMultipleIncorrectSubmissions = false;
               if (playthrough.issueType === (
@@ -149,8 +147,9 @@ angular.module('oppia').factory('ImprovementModalService', [
                 var lars = LearnerActionRenderService;
                 var tableHtml =
                   lars.renderFinalDisplayBlockForMISIssueHTML(
-                    playthrough.actions.slice(indexOfFirstDisplayedBlock),
-                    indexOfFirstDisplayedBlock + 1);
+                    playthrough.actions.slice(
+                      indexOfActionInFirstDisplayedBlock),
+                    indexOfActionInFirstDisplayedBlock + 1);
                 return tableHtml;
               };
 
@@ -164,7 +163,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                   // This corresponds to the case where we display the table
                   // for the issue.
                   return playthrough.actions.slice(
-                    indexOfFirstDisplayedAction, indexOfFirstDisplayedBlock);
+                    indexOfFirstDisplayedAction,
+                      indexOfActionInFirstDisplayedBlock);
                 }
                 return playthrough.actions.slice(indexOfFirstDisplayedAction);
               };
@@ -185,7 +185,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                */
               $scope.isActionHighlighted = function(action) {
                 return $scope.getLearnerActionIndex(action) > (
-                  indexOfFirstDisplayedBlock);
+                  indexOfActionInFirstDisplayedBlock);
               };
 
               /**
