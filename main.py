@@ -386,7 +386,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
-    get_redirect_route(r'/deleteaccounthandler', profile.DeleteAccountHandler),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
@@ -565,9 +564,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/resubmit/<suggestion_id>' % feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.ResubmitSuggestionHandler),
     get_redirect_route(
-        r'%s/topic/<target_id>/<suggestion_id>' %
+        r'%s/skill/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
-        suggestion.SuggestionToTopicActionHandler),
+        suggestion.SuggestionToSkillActionHandler),
     get_redirect_route(
         r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler),
@@ -633,11 +632,14 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<comma_separated_skill_ids>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
         concept_card_viewer.ConceptCardDataHandler),
     get_redirect_route(
-        r'%s/<question_id>/<skill_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
+        r'%s/<question_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
         question_editor.QuestionSkillLinkHandler),
     get_redirect_route(
         r'%s/<comma_separated_skill_ids>' % feconf.SKILL_DATA_URL_PREFIX,
         skill_editor.SkillDataHandler),
+    get_redirect_route(
+        r'%s' % feconf.FETCH_SKILLS_URL_PREFIX,
+        skill_editor.FetchSkillsHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),

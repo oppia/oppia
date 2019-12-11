@@ -16,29 +16,17 @@
  * @fileoverview Tests for TopicSummaryObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
 
-require('domain/topic/TopicSummaryObjectFactory.ts');
+describe('Topic summary object factory', () => {
+  let topicSummaryObjectFactory: TopicSummaryObjectFactory = null;
+  let _sampleTopicSummary = null;
 
-describe('Topic summary object factory', function() {
-  var TopicSummaryObjectFactory = null;
-  var _sampleTopicSummary = null;
+  beforeEach(() => {
+    topicSummaryObjectFactory = new TopicSummaryObjectFactory();
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    TopicSummaryObjectFactory = $injector.get('TopicSummaryObjectFactory');
-
-    var sampleTopicSummaryBackendDict = {
+    let sampleTopicSummaryBackendDict = {
       id: 'sample_topic_id',
       name: 'Topic Name',
       subtopic_count: 5,
@@ -46,11 +34,11 @@ describe('Topic summary object factory', function() {
       total_skill_count: 10,
       uncategorized_skill_count: 3
     };
-    _sampleTopicSummary = TopicSummaryObjectFactory.createFromBackendDict(
+    _sampleTopicSummary = topicSummaryObjectFactory.createFromBackendDict(
       sampleTopicSummaryBackendDict);
-  }));
+  });
 
-  it('should be able to get all the values', function() {
+  it('should be able to get all the values', () => {
     expect(_sampleTopicSummary.getId()).toEqual('sample_topic_id');
     expect(_sampleTopicSummary.getName()).toEqual('Topic Name');
     expect(_sampleTopicSummary.getSubtopicCount()).toEqual(5);

@@ -51,9 +51,8 @@ angular.module('oppia').directive('voiceoverOpportunities', [
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
-              var subheading = (
-                opportunity.topic_name + ' - ' + opportunity.story_title);
-              var heading = opportunity.chapter_title;
+              var subheading = opportunity.getOpportunitySubheading();
+              var heading = opportunity.getOpportunityHeading();
 
               ctrl.opportunities.push({
                 heading: heading,

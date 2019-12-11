@@ -45,6 +45,7 @@ class FailedMLTest(test_utils.GenericTestBase):
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
             feconf, 'CAN_SEND_FEEDBACK_MESSAGE_EMAILS', True)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         config_property = config_domain.Registry.get_config_property(
             'notification_emails_for_failed_tasks')
@@ -1792,12 +1793,10 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
 
             # Make sure correct email models are stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
-            all_models.sort(key=lambda x: x.recipient_id)
-            sent_email_model = all_models[0]
+            sent_email_model = python_utils.NEXT(
+                m for m in all_models if m.recipient_id == self.moderator_id)
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.moderator_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.MODERATOR_EMAIL)
             self.assertEqual(
@@ -1808,11 +1807,10 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.intent,
                 feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
-            sent_email_model = all_models[1]
+            sent_email_model = python_utils.NEXT(
+                m for m in all_models if m.recipient_id == self.moderator2_id)
             self.assertEqual(
                 sent_email_model.subject, expected_email_subject)
-            self.assertEqual(
-                sent_email_model.recipient_id, self.moderator2_id)
             self.assertEqual(
                 sent_email_model.recipient_email, self.moderator2_email)
             self.assertEqual(
@@ -2172,6 +2170,122 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
                 email_intent)
 
 
+class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
+    """Unit test related to voiceover application emails."""
+    APPLICANT_USERNAME = 'applicant'
+    APPLICANT_EMAIL = 'applicant@example.com'
+
+    def setUp(self):
+        super(VoiceoverApplicationEmailUnitTest, self).setUp()
+        self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
+        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
+        user_services.update_email_preferences(
+            self.applicant_id, True, False, False, False)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+
+    def test_that_email_not_sent_if_can_send_emails_is_false(self):
+        with self.can_not_send_emails_ctx:
+            email_manager.send_accepted_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en')
+
+        messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+        self.assertEqual(len(messages), 0)
+
+    def test_that_correct_accepted_voiceover_application_email_is_sent(self):
+        expected_email_subject = (
+            '[Accepted] Updates on submitted voiceover application')
+        expected_email_html_body = (
+            'Hi applicant,<br><br>'
+            'Congratulations! Your voiceover application for '
+            '"Lesson to voiceover" lesson got accepted and you have been '
+            'assigned with a voice artist role in the lesson. Now you will be '
+            'able to add voiceovers to the lesson in English '
+            'language.'
+            '<br><br>You can check the wiki page to learn'
+            '<a href="https://github.com/oppia/oppia/wiki/'
+            'Instructions-for-voice-artists">how to voiceover a lesson</a>'
+            '<br><br>'
+            'Thank you for helping improve Oppia\'s lessons!'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_accepted_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en')
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.applicant_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.APPLICANT_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
+
+    def test_that_correct_rejected_voiceover_application_email_is_sent(self):
+        expected_email_subject = 'Updates on submitted voiceover application'
+        expected_email_html_body = (
+            'Hi applicant,<br><br>'
+            'Your voiceover application for "Lesson to voiceover" lesson in '
+            'language English got rejected and the reviewer has left a message.'
+            '<br><br>Review message: A rejection message!<br><br>'
+            'You can create a new voiceover application through the'
+            '<a href="https://oppia.org/community_dashboard">'
+            'community dashboard</a> page.<br><br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_rejected_voiceover_application_email(
+                self.applicant_id, 'Lesson to voiceover', 'en',
+                'A rejection message!')
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.applicant_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.APPLICANT_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
+
+
 class BulkEmailsTests(test_utils.GenericTestBase):
     SENDER_EMAIL = 'sender@example.com'
     SENDER_USERNAME = 'sender'
@@ -2302,15 +2416,17 @@ class BulkEmailsTests(test_utils.GenericTestBase):
 class EmailPreferencesTests(test_utils.GenericTestBase):
 
     def test_can_users_receive_thread_email(self):
-        user_ids = ('someUser1', 'someUser2')
+        gae_ids = ('someUser1', 'someUser2')
         exp_id = 'someExploration'
         usernames = ('username1', 'username2')
         emails = ('user1@example.com', 'user2@example.com')
 
+        user_ids = []
         for user_id, username, user_email in python_utils.ZIP(
-                user_ids, usernames, emails):
-            user_services.create_new_user(user_id, user_email)
-            user_services.set_username(user_id, username)
+                gae_ids, usernames, emails):
+            user_settings = user_services.create_new_user(user_id, user_email)
+            user_ids.append(user_settings.user_id)
+            user_services.set_username(user_settings.user_id, username)
 
         # Both users can receive all emails in default setting.
         self.assertListEqual(email_manager.can_users_receive_thread_email(

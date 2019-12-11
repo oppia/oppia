@@ -325,9 +325,6 @@ class Rubric(python_utils.OBJECT):
                 'Expected explanation to be a string, received %s' %
                 self.explanation)
 
-        if self.explanation == '' or self.explanation == '<p></p>':
-            raise utils.ValidationError('Explanation should be non empty')
-
 
 class SkillContents(python_utils.OBJECT):
     """Domain object representing the skill_contents dict."""
@@ -855,17 +852,17 @@ class Skill(python_utils.OBJECT):
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
 
     def update_worked_examples(self, worked_examples):
-        """Updates the worked examples list of the skill.
+        """Updates the worked examples list of the skill by performing a copy
+        of the provided list.
 
         Args:
-            worked_examples: list(dict). The new worked examples of the skill.
+            worked_examples: list(SubtitledHtml). The new worked examples of
+                the skill.
         """
         old_content_ids = [worked_example.content_id for worked_example in (
             self.skill_contents.worked_examples)]
 
-        self.skill_contents.worked_examples = [
-            state_domain.SubtitledHtml.from_dict(worked_example)
-            for worked_example in worked_examples]
+        self.skill_contents.worked_examples = list(worked_examples)
 
         new_content_ids = [worked_example.content_id for worked_example in (
             self.skill_contents.worked_examples)]

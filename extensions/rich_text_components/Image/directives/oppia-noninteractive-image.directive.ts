@@ -91,7 +91,6 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
               ctrl.filepath);
           } catch (e) {
             var additionalInfo = (
-              '\nExploration ID: ' + ContextService.getExplorationId() +
               '\nEntity type: ' + ContextService.getEntityType() +
               '\nEntity ID: ' + ContextService.getEntityId() +
               '\nFilepath: ' + ctrl.filepath);

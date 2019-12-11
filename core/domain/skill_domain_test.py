@@ -134,15 +134,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.rubrics[0].explanation = 0
         self._assert_validation_error('Expected explanation to be a string')
 
-    def test_non_empty_rubric_explanation(self):
-        self.skill.rubrics = [
-            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], '')]
-        self._assert_validation_error('Explanation should be non empty')
-
-        self.skill.rubrics = [
-            skill_domain.Rubric(constants.SKILL_DIFFICULTIES[0], '<p></p>')]
-        self._assert_validation_error('Explanation should be non empty')
-
     def test_rubric_present_for_all_difficulties(self):
         self.skill.validate()
         self.skill.rubrics = [
@@ -386,7 +377,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(expected_dict, skill_rights.to_dict())
 
     def test_update_worked_examples(self):
-        worked_examples_dict = [{
+        worked_examples_dict_list = [{
             'content_id': 'worked_example_1',
             'html': '<p>Worked example</p>'
         }, {
@@ -394,13 +385,17 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'html': '<p>Another worked example</p>'
         }]
 
-        self.skill.update_worked_examples(worked_examples_dict)
+        worked_examples_object_list = [
+            state_domain.SubtitledHtml.from_dict(worked_example)
+            for worked_example in worked_examples_dict_list]
+
+        self.skill.update_worked_examples(worked_examples_object_list)
         self.skill.validate()
 
         # Delete the last worked_example.
-        worked_examples_dict.pop()
+        worked_examples_object_list.pop()
 
-        self.skill.update_worked_examples(worked_examples_dict)
+        self.skill.update_worked_examples(worked_examples_object_list)
         self.skill.validate()
 
     def test_skill_rights_is_creator(self):

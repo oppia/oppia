@@ -22,6 +22,7 @@ import logging
 from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -240,7 +241,8 @@ def get_multi_skill_summaries(skill_ids):
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
     skill_summaries = [
         get_skill_summary_from_model(skill_summary_model)
-        for skill_summary_model in skill_summaries_models]
+        for skill_summary_model in skill_summaries_models
+        if skill_summary_model is not None]
     return skill_summaries
 
 
@@ -501,7 +503,10 @@ def apply_change_list(skill_id, change_list, committer_id):
                     skill.update_explanation(change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    skill.update_worked_examples(change.new_value)
+                    worked_examples_list = [
+                        state_domain.SubtitledHtml.from_dict(worked_example)
+                        for worked_example in change.new_value]
+                    skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 skill.add_misconception(change.new_misconception_dict)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:

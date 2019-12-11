@@ -24,6 +24,7 @@ export class SkillDomainConstants {
 
   public static SKILL_DATA_URL_TEMPLATE =
     '/skill_data_handler/<comma_separated_skill_ids>';
+  public static FETCH_SKILLS_URL_TEMPLATE = '/fetch_skills';
   public static SKILL_EDITOR_QUESTION_URL_TEMPLATE =
     '/skill_editor_question_handler/<skill_id>?cursor=<cursor>';
 

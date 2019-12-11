@@ -1469,3 +1469,289 @@ class SingleNewlineAboveArgsCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
+
+
+class DivisionOperatorCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(DivisionOperatorCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.DivisionOperatorChecker)
+        self.checker_test_object.setup_method()
+
+    def test_division_operator(self):
+        node_division_operator = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""division = a / b
+                    division=a/b
+                """)
+        node_division_operator.file = filename
+        node_division_operator.path = filename
+
+        self.checker_test_object.checker.process_module(node_division_operator)
+
+        with self.checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='division-operator-used',
+                line=1
+            ),
+            testutils.Message(
+                msg_id='division-operator-used',
+                line=2
+            ),
+        ):
+            temp_file.close()
+
+    def test_division_operator_inside_single_line_comment(self):
+        node_single_line_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# Division = a / b.
+                    division = python_utils.divide(a, b)
+                """)
+        node_single_line_comment.file = filename
+        node_single_line_comment.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_single_line_comment)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_division_operator_inside_string(self):
+        node_division_inside_string = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""string = 'a / b or a/b' + 'a/b'
+                    division = python_utils.divide(a, b)
+                """)
+        node_division_inside_string.file = filename
+        node_division_inside_string.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_division_inside_string)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_divide_method_used(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""division = python_utils.divide(a, b)""")
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+
+class SingleLineCommentCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(SingleLineCommentCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.SingleLineCommentChecker)
+        self.checker_test_object.setup_method()
+
+    def test_invalid_punctuation(self):
+        node_invalid_punctuation = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# Something/
+                """)
+        node_invalid_punctuation.file = filename
+        node_invalid_punctuation.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_invalid_punctuation)
+
+        message = testutils.Message(
+            msg_id='invalid-punctuation-used',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_no_space_at_beginning(self):
+        node_no_space_at_beginning = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""#Something.
+                """)
+        node_no_space_at_beginning.file = filename
+        node_no_space_at_beginning.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_no_space_at_beginning)
+
+        message = testutils.Message(
+            msg_id='no-space-at-beginning',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_no_capital_letter_at_beginning(self):
+        node_no_capital_letter_at_beginning = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# something.
+                """)
+        node_no_capital_letter_at_beginning.file = filename
+        node_no_capital_letter_at_beginning.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_no_capital_letter_at_beginning)
+
+        message = testutils.Message(
+            msg_id='no-capital-letter-at-beginning',
+            line=1)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_comment_with_excluded_phrase(self):
+        node_comment_with_excluded_phrase = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# coding: utf-8
+                    # pylint: disable
+                """)
+        node_comment_with_excluded_phrase.file = filename
+        node_comment_with_excluded_phrase.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_comment_with_excluded_phrase)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_variable_name_in_comment(self):
+        node_variable_name_in_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# variable_name is used.
+                """)
+        node_variable_name_in_comment.file = filename
+        node_variable_name_in_comment.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_variable_name_in_comment)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_comment_with_version_info(self):
+        node_comment_with_version_info = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# v2 is used.
+                """)
+        node_comment_with_version_info.file = filename
+        node_comment_with_version_info.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_comment_with_version_info)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_data_type_in_comment(self):
+        node_data_type_in_comment = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# str. variable is type of str.
+                """)
+        node_data_type_in_comment.file = filename
+        node_data_type_in_comment.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_data_type_in_comment)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+
+    def test_well_formed_comment(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""# Multi
+                    # line
+                    # comment.
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()

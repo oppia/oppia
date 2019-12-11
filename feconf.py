@@ -130,6 +130,7 @@ ENTITY_TYPE_SKILL = 'skill'
 ENTITY_TYPE_STORY = 'story'
 ENTITY_TYPE_SUBTOPIC = 'subtopic'
 ENTITY_TYPE_QUESTION = 'question'
+ENTITY_TYPE_VOICEOVER_APPLICATION = 'voiceover_application'
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -353,7 +354,8 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# Committer id for system actions.
+# Committer id for system actions. The username for the system committer
+# (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
@@ -441,6 +443,7 @@ EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
 EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
 EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
+EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -652,6 +655,7 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
+FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'

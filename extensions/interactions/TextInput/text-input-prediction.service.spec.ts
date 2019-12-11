@@ -21,47 +21,39 @@
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { PredictionResultObjectFactory } from
   'domain/classifier/PredictionResultObjectFactory';
+import { TextInputPredictionService } from
+  'interactions/TextInput/text-input-prediction.service';
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
-import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-describe('Text Input Prediction Service', function() {
-  var $rootScope = null;
-  var $scope = null;
+describe('Text Input Prediction Service', () => {
+  let $rootScope = null;
+  let $scope = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('CountVectorizerService', new CountVectorizerService());
-    $provide.value(
-      'PredictionResultObjectFactory', new PredictionResultObjectFactory());
-    $provide.value(
-      'SVMPredictionService', new SVMPredictionService(
-        new PredictionResultObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
 
-  describe('Test text prediction service', function() {
-    var predictionService;
-    beforeEach(angular.mock.inject(function($injector) {
-      predictionService = $injector.get('TextInputPredictionService');
+  describe('Test text prediction service', () => {
+    let predictionService: TextInputPredictionService;
+    beforeEach(() => {
+      predictionService = new TextInputPredictionService(
+        new CountVectorizerService(),
+        new SVMPredictionService(new PredictionResultObjectFactory()),
+        new TextInputTokenizer());
+    });
+    beforeEach(angular.mock.inject(($injector) => {
       $rootScope = $injector.get('$rootScope');
       $scope = $rootScope.$new();
     }));
-    it('should predict the same as oppia-ml', function() {
-      var classifierData =
-        window.__fixtures__['core/tests/data/text_input_classifier_data'];
-      var trainingData =
-        window.__fixtures__['core/tests/data/text_classifier_results'];
-      var correctPredictions = 0, totalAnswers = 0;
-      var predictedAnswerGroup = null;
+    it('should predict the same as oppia-ml', () => {
+      const classifierData =
+          window.__fixtures__['core/tests/data/text_input_classifier_data'];
+      const trainingData =
+          window.__fixtures__['core/tests/data/text_classifier_results'];
+      let predictedAnswerGroup = null;
 
-      for (var i = 0; i < trainingData.length; i++) {
-        for (var j = 0; j < trainingData[i].answers.length; j++) {
+      for (let i = 0; i < trainingData.length; i++) {
+        for (let j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = predictionService.predict(
             classifierData, trainingData[i].answers[j]);
 
@@ -75,21 +67,21 @@ describe('Text Input Prediction Service', function() {
       }
     });
 
-    it('should not have accuracy less than 85', function() {
+    it('should not have accuracy less than 85', () => {
       // These answers are taken from the text_input_training_data.json
       // in Oppia-ml. Never test classifiers using training data unless it
       // is only the functionality that you want to test (like in this case).
-      var classifierData =
-        window.__fixtures__['core/tests/data/text_input_classifier_data'];
-      var trainingData =
-        window.__fixtures__['core/tests/data/text_input_training_data'];
-      var correctPredictions = 0, totalAnswers = 0;
+      const classifierData =
+          window.__fixtures__['core/tests/data/text_input_classifier_data'];
+      const trainingData =
+          window.__fixtures__['core/tests/data/text_input_training_data'];
+      let correctPredictions = 0, totalAnswers = 0;
 
       // To keep things simple, we will calculate accuracy score
       // and not F1 score.
-      var predictedAnswerGroup = null;
-      for (var i = 0; i < trainingData.length; i++) {
-        for (var j = 0; j < trainingData[i].answers.length; j++) {
+      let predictedAnswerGroup = null;
+      for (let i = 0; i < trainingData.length; i++) {
+        for (let j = 0; j < trainingData[i].answers.length; j++) {
           predictedAnswerGroup = predictionService.predict(
             classifierData, trainingData[i].answers[j]);
           if (predictedAnswerGroup === trainingData[i].answer_group_index) {

@@ -16,73 +16,59 @@
  * @fileoverview unit tests for the local save services.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// LocalStorageService.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { LocalStorageService } from 'services/local-storage.service';
 
-require('services/local-storage.service.ts');
-
-describe('LocalStorageService', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-
-  describe('behavior in editor', function() {
-    var LocalStorageService = null;
-    var ExplorationDraftObjectFactory = null;
-    var explorationIdOne = '100';
-    var draftChangeListIdOne = 2;
-    var changeList = [];
-    var explorationIdTwo = '101';
-    var draftChangeListIdTwo = 1;
-    var draftDictOne = {
+describe('LocalStorageService', () => {
+  describe('behavior in editor', () => {
+    let localStorageService = null;
+    let explorationDraftObjectFactory = null;
+    let explorationIdOne = '100';
+    let draftChangeListIdOne = 2;
+    let changeList = [];
+    let explorationIdTwo = '101';
+    let draftChangeListIdTwo = 1;
+    let draftDictOne = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListIdOne
     };
-    var draftDictTwo = {
+    let draftDictTwo = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListIdTwo
     };
-    var draftOne = null;
-    var draftTwo = null;
+    let draftOne = null;
+    let draftTwo = null;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      LocalStorageService = $injector.get('LocalStorageService');
-      ExplorationDraftObjectFactory = $injector.get(
-        'ExplorationDraftObjectFactory');
-      draftOne = ExplorationDraftObjectFactory.createFromLocalStorageDict(
+    beforeEach(() => {
+      localStorageService = TestBed.get(LocalStorageService);
+      explorationDraftObjectFactory = TestBed.get(
+        ExplorationDraftObjectFactory);
+
+      draftOne = explorationDraftObjectFactory.createFromLocalStorageDict(
         draftDictOne);
-      draftTwo = ExplorationDraftObjectFactory.createFromLocalStorageDict(
+      draftTwo = explorationDraftObjectFactory.createFromLocalStorageDict(
         draftDictTwo);
-    }));
+    });
 
-    it('should correctly save the draft', function() {
-      LocalStorageService.saveExplorationDraft(explorationIdOne,
+    it('should correctly save the draft', () => {
+      localStorageService.saveExplorationDraft(explorationIdOne,
         changeList, draftChangeListIdOne);
-      LocalStorageService.saveExplorationDraft(explorationIdTwo,
+      localStorageService.saveExplorationDraft(explorationIdTwo,
         changeList, draftChangeListIdTwo);
-      expect(LocalStorageService.getExplorationDraft(
+      expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
-      expect(LocalStorageService.getExplorationDraft(
+      expect(localStorageService.getExplorationDraft(
         explorationIdTwo)).toEqual(draftTwo);
     });
 
-    it('should correctly remove the draft', function() {
-      LocalStorageService.saveExplorationDraft(explorationIdTwo,
+    it('should correctly remove the draft', () => {
+      localStorageService.saveExplorationDraft(explorationIdTwo,
         changeList, draftChangeListIdTwo);
-      LocalStorageService.removeExplorationDraft(explorationIdTwo);
-      expect(LocalStorageService.getExplorationDraft(
+      localStorageService.removeExplorationDraft(explorationIdTwo);
+      expect(localStorageService.getExplorationDraft(
         explorationIdTwo)).toBeNull();
     });
   });

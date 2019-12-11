@@ -773,27 +773,6 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
             self.get_html_response('/delete-account', expected_status_int=404)
 
 
-class DeleteAccountHandlerTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(DeleteAccountHandlerTests, self).setUp()
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.login(self.EDITOR_EMAIL)
-
-    def test_post_remove_account(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
-            csrf_token = self.get_new_csrf_token()
-            self.assertEqual(self.post_json(
-                '/deleteaccounthandler', {}, csrf_token=csrf_token), {})
-
-    def test_post_remove_account_disabled(self):
-        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
-            csrf_token = self.get_new_csrf_token()
-            self.post_json(
-                '/deleteaccounthandler', {},
-                csrf_token=csrf_token, expected_status_int=404)
-
-
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 

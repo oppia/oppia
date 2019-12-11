@@ -63,6 +63,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -131,7 +132,7 @@ describe('StateTopAnswersStatsService', function() {
     $provide.value(
       'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
     $provide.value('FractionInputRulesService', new FractionInputRulesService(
-      new FractionObjectFactory()));
+      new FractionObjectFactory(), new UtilsService()));
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
     $provide.value(
       'HintObjectFactory', new HintObjectFactory(
@@ -165,7 +166,7 @@ describe('StateTopAnswersStatsService', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

@@ -39,7 +39,7 @@ describe('Editable topic backend API service', function() {
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -78,6 +78,7 @@ describe('Editable topic backend API service', function() {
         subtopics: [],
         language_code: 'en'
       },
+      grouped_skill_summary_dicts: {},
       skill_id_to_description_dict: {
         skill_id_1: 'Description 1'
       },
@@ -123,6 +124,7 @@ describe('Editable topic backend API service', function() {
         topicDict: sampleDataResults.topic_dict,
         skillIdToDescriptionDict:
           sampleDataResults.skill_id_to_description_dict,
+        groupedSkillSummaries: sampleDataResults.grouped_skill_summary_dicts,
         skillIdToRubricsDict: sampleDataResults.skill_id_to_rubrics_dict
       });
       expect(failHandler).not.toHaveBeenCalled();

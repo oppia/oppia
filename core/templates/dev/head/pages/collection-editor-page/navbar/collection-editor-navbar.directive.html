@@ -41,7 +41,8 @@
     <button class="btn btn-secondary oppia-save-draft-button protractor-test-save-draft-button"
             ng-class="{'btn-success': $ctrl.isCollectionSaveable()}"
             ng-click="$ctrl.saveChanges()"
-            ng-disabled="!$ctrl.isCollectionSaveable()">
+            ng-disabled="!$ctrl.isCollectionSaveable()"
+            style="width: fit-content;">
       <span ng-if="!$ctrl.isSaveInProgress()">
         <span ng-if="$ctrl.collectionRights.isPrivate()">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"

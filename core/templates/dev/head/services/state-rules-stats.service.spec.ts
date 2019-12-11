@@ -29,6 +29,7 @@ import { FractionInputRulesService } from
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { StateClassifierMappingService } from
   'pages/exploration-player-page/services/state-classifier-mapping.service';
+import { UtilsService } from 'services/utils.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
@@ -46,12 +47,12 @@ describe('State Rules Stats Service', function() {
       new AnswerClassificationResultObjectFactory());
     $provide.value(
       'FractionInputRulesService', new FractionInputRulesService(
-        new FractionObjectFactory()));
+        new FractionObjectFactory(), new UtilsService()));
     $provide.value('FractionObjectFactory', new FractionObjectFactory());
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

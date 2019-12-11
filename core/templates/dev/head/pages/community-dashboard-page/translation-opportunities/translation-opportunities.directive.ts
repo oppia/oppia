@@ -73,27 +73,21 @@ angular.module('oppia').directive(
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
-              var subheading = (
-                opportunity.topic_name + ' - ' + opportunity.story_title);
-              var heading = opportunity.chapter_title;
-              var progressPercentage = '0.00';
-              var totalContentCount = opportunity.content_count;
+              var subheading = opportunity.getOpportunitySubheading();
+              var heading = opportunity.getOpportunityHeading();
+              var totalContentCount = opportunity.getContentCount();
               var languageCode = (
                 TranslationLanguageService.getActiveLanguageCode());
               var languageDescription = (
                 TranslationLanguageService.getActiveLanguageDescription());
-              if (
-                opportunity.translation_counts.hasOwnProperty(languageCode) && (
-                  totalContentCount > 0)) {
-                var progressPercentage = (
-                  (opportunity.translation_counts[languageCode] /
-                    totalContentCount) * 100).toFixed(2);
-              }
+              var progressPercentage = (
+                opportunity.getTranslationProgressPercentage(languageCode));
+
               ctrl.opportunities.push({
-                id: opportunity.id,
+                id: opportunity.getExplorationId(),
                 heading: heading,
                 subheading: subheading,
-                progressPercentage: progressPercentage,
+                progressPercentage: progressPercentage.toFixed(2),
                 actionButtonTitle: 'Translate'
               });
             }

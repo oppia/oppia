@@ -17,7 +17,6 @@
  */
 
 import { DateTimeFormatService } from 'services/date-time-format.service';
-import { FormatTimePipe } from 'filters/format-timer.pipe';
 
 describe('datetimeformatter', () => {
   // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
@@ -26,12 +25,16 @@ describe('datetimeformatter', () => {
   let OldDate = Date;
 
   beforeEach(() => {
-    df = new DateTimeFormatService(new FormatTimePipe());
+    df = new DateTimeFormatService();
 
     // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
     // doesn't seem to be a good way to set the timezone locale directly.)
-    spyOn(window, 'Date').and.callFake(function() {
-      return new OldDate(NOW_MILLIS);
+    spyOn(window, 'Date').and.callFake(function(millisSinceEpoch = 0) {
+      if (millisSinceEpoch === 0) {
+        return new OldDate(NOW_MILLIS);
+      } else {
+        return new OldDate(millisSinceEpoch);
+      }
     });
   });
 
@@ -42,5 +45,21 @@ describe('datetimeformatter', () => {
     expect(df.isRecent(NOW_MILLIS - 72 * 60 * 60 * 1000)).toBe(true);
     // 8 days ago is not recent.
     expect(df.isRecent(NOW_MILLIS - 8 * 24 * 60 * 60 * 1000)).toBe(false);
+  });
+
+  it('should provide correct locale abbreviated datetime string', () => {
+    let expectedDatetime = new Date(NOW_MILLIS - 1).toLocaleTimeString([], {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    });
+    expect(df.getLocaleAbbreviatedDatetimeString(NOW_MILLIS - 1)).toBe(
+      expectedDatetime);
+    expect(
+      df.getLocaleAbbreviatedDatetimeString(
+        NOW_MILLIS + 48 * 60 * 60 * 1000)).toBe('Nov 23');
+    expect(
+      df.getLocaleAbbreviatedDatetimeString(
+        NOW_MILLIS - 365 * 24 * 60 * 60 * 1000)).toBe('11/21/13');
   });
 });
