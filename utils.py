@@ -415,7 +415,7 @@ def get_current_time_in_millisecs():
     """Returns time in milliseconds since the Epoch.
 
     Returns:
-        float. The time in the milliseconds since the Epoch.
+        float. The time in milliseconds since the Epoch.
     """
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
@@ -689,7 +689,7 @@ def get_asset_dir_prefix():
     It is used as a prefix in urls for images, css and script files.
 
     Returns:
-        str. Prefix '/build' if constants,DEV_MODE is false, otherwise
+        str. Prefix '/build' if constants.DEV_MODE is false, otherwise
             null string.
     """
     asset_dir_prefix = ''
