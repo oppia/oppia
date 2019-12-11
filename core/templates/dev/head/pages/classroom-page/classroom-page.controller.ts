@@ -57,13 +57,8 @@ angular.module('oppia').directive('classroomPage', [
 
           $rootScope.loadingMessage = 'Loading';
           ClassroomBackendApiService.fetchClassroomData(
-            ctrl.classroomName).then(function(topicSummaryDicts) {
-            ctrl.topicSummaries = topicSummaryDicts.map(
-              function(summaryDict) {
-                return TopicSummaryObjectFactory.createFromBackendDict(
-                  summaryDict);
-              }
-            );
+            ctrl.classroomName).then(function(topicSummaryObjects) {
+            ctrl.topicSummaries = topicSummaryObjects;
             $rootScope.loadingMessage = '';
           },
           function(errorResponse) {
