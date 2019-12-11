@@ -24,7 +24,7 @@ import {CamelCaseToHyphensPipe} from "../../../filters/string-utility-filters/ca
  */
 
 
-fdescribe('Extracting Image file names in the state service', function() {
+describe('Extracting Image file names in the state service', function() {
   let eifss: ExtractImageFilenamesFromStateService;
   let eof: ExplorationObjectFactory;
   let ecs: ContextService;

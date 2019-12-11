@@ -19,9 +19,10 @@
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import {ExplorationObjectFactory} from './ExplorationObjectFactory';
-import {StateObjectFactory} from '../state/StateObjectFactory';
+import {StateObjectFactory} from 'domain/state/StateObjectFactory';
 import {TestBed} from '@angular/core/testing';
-import {CamelCaseToHyphensPipe} from "../../filters/string-utility-filters/camel-case-to-hyphens.pipe";
+import {CamelCaseToHyphensPipe} from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 
 
 describe('Exploration object factory', () => {
