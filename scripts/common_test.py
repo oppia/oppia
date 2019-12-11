@@ -1,4 +1,3 @@
-# coding: utf-8
 #
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
@@ -31,10 +30,11 @@ import sys
 import tempfile
 
 from core.tests import test_utils
+
+import psutil
 import python_utils
 import release_constants
 
-import psutil
 
 from . import common
 

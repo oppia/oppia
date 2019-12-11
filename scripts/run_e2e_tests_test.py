@@ -48,10 +48,11 @@ class MockProcessClass(python_utils.OBJECT):
     # pylint: enable=missing-docstring
 
 
-class RunE2ETestsTests(test_utils.TestBase):
+class RunE2ETestsTests(test_utils.GenericTestBase):
     """Test the run_e2e_tests methods."""
 
     def setUp(self):
+        super(RunE2ETestsTests, self).setUp()
         def mock_print(unused_msg):
             return
 
