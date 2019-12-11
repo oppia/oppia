@@ -93,7 +93,8 @@ def get_test_file_name(test_path):
             'It\'s not possible to diff the test coverage correctly.')
         sys.exit(1)
 
-    return test_path[test_path.rindex('/') + 1:]
+    file_name = os.path.split(test_path)[1]
+    return file_name
 
 
 def get_lcov_file_tests(file_path):
