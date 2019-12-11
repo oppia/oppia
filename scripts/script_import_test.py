@@ -27,6 +27,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import subprocess
+import sys
 
 from core.tests import test_utils
 
@@ -43,7 +44,7 @@ class GcloudAdapterImportTests(test_utils.GenericTestBase):
             'google_appengine_1.9.67', 'google_appengine')
         with exists_swap, self.assertRaisesRegexp(
             Exception, 'Directory %s does not exist.' % gae_dir):
-            from . import gcloud_adapter # pylint: disable=unused-variable
+            from scripts.release_scripts import gcloud_adapter # pylint: disable=unused-variable
 
 
 class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
@@ -61,9 +62,10 @@ class InstallThirdPartyLibsImportTests(test_utils.GenericTestBase):
             return False
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         with self.check_call_swap, exists_swap:
-            from . import install_third_party_libs # pylint: disable=unused-variable
+            from scripts import install_third_party_libs # pylint: disable=unused-variable
         self.assertEqual(
             self.commands, [
-                'pip', 'install', 'pyyaml==5.1.2', '--target',
-                '../oppia_tools/pyyaml-5.1.2', 'pip', 'install',
-                'future==0.17.1', '--target', 'third_party/future-0.17.1'])
+                sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2',
+                '--target', '../oppia_tools/pyyaml-5.1.2', sys.executable,
+                '-m', 'pip', 'install', 'future==0.17.1', '--target',
+                'third_party/future-0.17.1'])

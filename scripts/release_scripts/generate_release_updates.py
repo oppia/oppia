@@ -23,8 +23,7 @@ import os
 
 import python_utils
 import release_constants
-
-from . import common
+from scripts import common
 
 SECTIONS_TO_ADD = [
     '[Add main changes]',
