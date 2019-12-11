@@ -58,16 +58,16 @@ angular.module('oppia').factory('ImprovementModalService', [
             '$scope', '$uibModalInstance', 'AlertsService',
             'LearnerActionRenderService',
             'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
-            'UNRELATED_ACTIONS_PER_BLOCK_THRESHOLD',
+            'MAX_UNRELATED_ACTIONS_PER_BLOCK',
             function(
                 $scope, $uibModalInstance, AlertsService,
                 LearnerActionRenderService,
                 ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
-                UNRELATED_ACTIONS_PER_BLOCK_THRESHOLD) {
+                MAX_UNRELATED_ACTIONS_PER_BLOCK) {
               $scope.playthroughIndex = index;
 
               // This is the index of the latest learner action that was
-              // displayed. When this index reaches -1, we've displayed all the
+              // displayed. When this index reaches 0, we've displayed all the
               // learner actions.
               let currActionIndex = playthrough.actions.length - 1;
               // We keep track of the indices where we expanded till at each
@@ -82,7 +82,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                * @returns {boolean}
                */
               $scope.canExpandActions = function() {
-                return currActionIndex !== -1;
+                return currActionIndex !== 0;
               }
 
               /**
@@ -110,8 +110,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                     // per block. If it has, we don't add more learner actions
                     // to the block.
                     if (currActionIndex - i >= (
-                        UNRELATED_ACTIONS_PER_BLOCK_THRESHOLD)) {
-                      currActionIndex = i;
+                        MAX_UNRELATED_ACTIONS_PER_BLOCK)) {
+                      currActionIndex = i + 1;
                       break;
                     }
                     actionsToDisplay.push(action);
@@ -126,7 +126,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                 // This is the case when all learner actions have been iterated
                 // over, and no more expansion is possible.
                 if (i === -1) {
-                  currActionIndex = -1;
+                  currActionIndex = 0;
                 }
                 indicesToExpand.push(i + 1);
               };
@@ -134,9 +134,7 @@ angular.module('oppia').factory('ImprovementModalService', [
               expandActions();
 
               // Index to know where to start highlighting actions.
-              let finalBlockStartIndex = currActionIndex + 1;
-
-              $scope.currentBlock = 0;
+              let indexOfFirstBlockDisplayed = currActionIndex;
 
               $scope.isIssueMIS = false;
               if (playthrough.issueType === (
@@ -170,7 +168,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                     return [];
                   }
                   return actionsToDisplay.slice().reverse().slice(
-                    currActionIndex + 1, indicesToExpand[0]);
+                    currActionIndex, indicesToExpand[0]);
                 }
                 return actionsToDisplay.slice().reverse();
               };
@@ -191,7 +189,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                */
               $scope.isActionHighlighted = function(action) {
                 return $scope.getLearnerActionIndex(action) > (
-                  finalBlockStartIndex);
+                  indexOfFirstBlockDisplayed);
               };
 
               /**
@@ -213,19 +211,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                * at all. If the current stop index is the second last one, the
                * arrow div is hidden after the final stop is reached.
                */
-              $scope.expandActionsToRender = function(pIdx) {
+              $scope.expandActionsToRender = function() {
                 expandActions();
-                if (!$scope.canExpandActions()) {
-                  $scope.currentBlock += 1;
-                  document.getElementById('arrowDiv').style.display = 'none';
-                } else {
-                  $scope.currentBlock += 1;
-                  if (actionsToDisplay.length ===
-                      playthrough.actions.length) {
-                    document.getElementById('arrowDiv').style.display =
-                      'none';
-                  }
-                }
               };
 
               $scope.cancel = function() {
