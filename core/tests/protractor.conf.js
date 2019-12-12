@@ -33,6 +33,10 @@ var suites = {
       'protractor_desktop/collections.js'
     ],
 
+    communityDashboard: [
+      'protractor_desktop/communityDashboard.js'
+    ],
+
     coreEditorAndPlayerFeatures: [
       'protractor_desktop/coreEditorAndPlayerFeatures.js'
     ],

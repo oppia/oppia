@@ -24,14 +24,14 @@ export class CommunityDashboardConstants {
       description: '',
       customizationOptions: []
     },
-    questionTab: {
+    submitQuestionTab: {
       ariaLabel: 'See opportunities for adding new questions.',
       tabName: 'Submit Question',
       description: 'Provide question in a topic of your choice for ' +
         'students to answer.',
       customizationOptions: ['sort']
     },
-    translationTab: {
+    translateTextTab: {
       ariaLabel: 'See opportunities for translation.',
       tabName: 'Translate Text',
       description: 'Translate the text in the lessons to break the ' +
