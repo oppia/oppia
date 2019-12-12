@@ -177,6 +177,14 @@ var SanitizedUrlEditor = function(elem) {
   };
 };
 
+var SkillSelector = function(elem) {
+  return {
+    setValue: function(index) {
+      elem.element(by.css('protractor-test-rte-skill-selector-item')).click();
+    }
+  };
+};
+
 var UnicodeStringEditor = function(elem) {
   return {
     setValue: function(text) {

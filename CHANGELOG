@@ -1,5 +1,88 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.8.7 (24 Nov 2019)
+------------------------
+Code health
+* Remove DubeySandeep from codeowner for various miscellaneous projects. (#7914)
+* Fix #6738: changed direct usage of window.location (#7879)
+* Fix part of #7427: Add valid args docstring for story_domain_test.py (#7832)
+* Migrating deviceinfo service (#7821)
+* Fixes #6240: adding e2e test for assigning and viewing roles (#7767)
+* Fix part of #6240 Add test for exploration stats on user profile (#7766)
+* Fixes part of #6240:  Mark correct answers after enabling correctness feedback (#7764)
+
+Development workflow
+* Resolves audit issues (#8056)
+* Resolve yarn audit (#8006)
+* Resolve audit errors (#7949)
+* Switch download source for CKEditor libs to GitHub for better stability. (#7920)
+* Fix part of #6975: Rename services directory files according to new naming conventions (#7896)
+* Fix #7890: Add more explicit codeowners fix (#7895)
+* Fix #7831: Added lint check for excessive new lines between function definitions (#7881)
+* Fix part of #7450: Modify private methods calls in GenerateHashTests to public calls (#7860)
+* Fix part of #6975 Apply the new naming convention to remaining directories (#7844)
+* Migrated DocumentAttributeCustomization & MetatagCustomization (#7835)
+* Migration url service (#7834)
+* Migrating dateTimeFormatService and format-timer.pipe (#7827)
+* Migration extension tag assembler serivce (#7805)
+* Upgrades AlertsService and NormalizeWhiteSpaceFilter to Angular (#7777)
+
+Translations
+* Adds Ewe language for translation and voiceover. (#7871)
+* Routine update of translations. (#7887)
+
+Community contribution and dashboard
+* Fix #7968: Adds missing language code in the exploration opportunity domain object (#7999)
+
+Bug fixes
+* Fix #8048: Fix refresher modal on small screens (#8054)
+* Fix #8024: Decrease 'min-width' of feedback editor (#8051)
+* Fix #7973: Fixes tutorial, navbar for small screens (#8044)
+* Fix #7974: Fix Lateral Scroll Bug on Learner Dashboard Mobile (#8026)
+* Fix #7976: Changes to display the avatar of a different user (#8017)
+* Fix #7975: 'this' was out of scope in SidebarStatusService (#8011)
+* Fix #8002: Unused skills table text overflow fix (#8003)
+* Fix #7967: ensure chapter editor validation failures are not cut off on right (#8001)
+* Fix #7963: Adds margin for logic proof help lines (#7997)
+* Fix #7960, #7995: Fix date, publish button (#7996)
+* Fix #7983: Minor CSS fixes (#7986)
+* Revert "Wipeout 3.4: Start using GAE user ID" (#7954)
+* Fixes 7939: Admin navbar misplaced fix (#7940)
+* Fix #7849: Add background color when hovering over sign-button (#7917)
+* Fix #7691: Card Basic Setting Alignment Fixed (#7904)
+* Fix #6909: Add a polyfill for SVGElement.prototype.outerHTML (#7886)
+* Fix #7381: Replace apply with applyAsync in top-navigation-bar.directive (#7885)
+* Fixes #6062: aligns the share buttons of any exploration page (#7883)
+* Fix #7869: Fixes collection page UI issues (#7878)
+* Fix #7873: Removes arrow function with function to resolve undefined `this` issue. (#7877)
+* Fix #7855: Change e.message() to e.message (#7866)
+* Fix #7529: Adds a strict check for Outcome object before executing hasNonemptyFeedback (#7856)
+* Fix #7794: Add warning when MIDI is unsupported in the browser (#7840)
+
+Infrastructural changes
+* Rename gae_user_id to gae_id (#7998)
+* Release Automation [Milestone 6]: Automate backup restoration for migrations on backup server (#7916)
+* Release Automation [Milestone 5]: Add checks to ensure that travis and circleci are run before prod deployment, changelog generation for hotfixes (#7912)
+* Wipeout 2.8: Add has_reference_to_user_id to remainig models (#7893)
+* Wipeout 2.7: Reindex all children of BaseSnapshotMetadataModel (#7874)
+* Wipeout 3.4: Start using GAE user ID (#7823)
+* Wipeout 2.5: Add has_reference_to_user_id to another models (#7813)
+* Release Automation [Milestone 4]: Add pre commit tests in deploy, automate hotfix branch creation (#7790)
+
+Testing coverage
+* Covered missing lines in skill_editor.py (#7905)
+
+New structures
+* Fix #8032: Truncate skill name to 35 characters for display (#8033)
+* Question editor fixes (#7910)
+* Added fields to skill editor (#7909)
+* Split flag for new structure viewers (#7898)
+* Add more interaction types to the question editor and fix question mode detection in outcome editor (#7894)
+* Removed the concept of "private skills" (#7891)
+* Flipped the ENABLE_NEW_STRUCTURES_VIEWER flag (#7889)
+* Changes to questions tab and rubrics editor (#7846)
+
+
 v2.8.6 (28 Oct 2019)
 ------------------------
 Bug fixes

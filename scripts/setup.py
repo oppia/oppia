@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
-import shutil
 import subprocess
 import sys
 import tarfile
@@ -32,8 +31,6 @@ from . import common
 _PARSER = argparse.ArgumentParser(description="""
 Python execution environent set up for all scripts.
 """)
-NODE_VERSION = 'v10.15.3'
-YARN_VERSION = 'v1.17.3'
 
 
 def create_directory(directory_path):
@@ -57,7 +54,7 @@ def test_python_version():
         python_utils.PRINT('Please use Python2.7. Exiting...')
         # If OS is Windows, print helpful error message about adding Python to
         # path.
-        if common.OS_NAME == 'Windows':
+        if common.is_windows_os():
             common.print_each_string_after_two_new_lines([
                 'It looks like you are using Windows. If you have Python '
                 'installed,',
@@ -82,19 +79,52 @@ def download_and_install_package(url_to_retrieve, filename):
         filename: string. The name of the tar file.
     """
     python_utils.url_retrieve(url_to_retrieve, filename=filename)
-    _, extension = os.path.splitext(filename)
-    if extension == '.gz' or extension == '.tgz':
-        tar = tarfile.open(name=filename)
-        tar.extractall(path=common.OPPIA_TOOLS_DIR)
-        tar.close()
-    elif common.OS_NAME == 'Windows' and extension == '.zip':
-        p = subprocess.Popen(
-            ['powershell', 'Expand-Archive',
-             filename, common.OPPIA_TOOLS_DIR],
-            stdout=sys.stdout)
-        p.communicate()
-
+    tar = tarfile.open(name=filename)
+    tar.extractall(path=common.OPPIA_TOOLS_DIR)
+    tar.close()
     os.remove(filename)
+
+
+def download_and_install_node():
+    """Download and install node to Oppia tools directory."""
+    outfile_name = 'node-download'
+
+    if common.is_windows_os():
+        if common.is_x64_architecture():
+            architecture = 'x64'
+        else:
+            architecture = 'x86'
+
+        extension = '.zip'
+        node_file_name = 'node-v%s-win-%s' % (
+            common.NODE_VERSION, architecture)
+        url_to_retrieve = 'https://nodejs.org/dist/v%s/%s%s' % (
+            common.NODE_VERSION, node_file_name, extension)
+        python_utils.url_retrieve(url_to_retrieve, outfile_name)
+        subprocess.check_call(
+            ['powershell.exe', '-c', 'expand-archive',
+             outfile_name, '-DestinationPath',
+             common.OPPIA_TOOLS_DIR])
+    else:
+        extension = '.tar.gz'
+        if common.is_x64_architecture():
+            if common.is_mac_os():
+                node_file_name = 'node-v%s-darwin-x64' % (common.NODE_VERSION)
+            elif common.is_linux_os():
+                node_file_name = 'node-v%s-linux-x64' % (common.NODE_VERSION)
+        else:
+            node_file_name = 'node-v%s' % common.NODE_VERSION
+        download_and_install_package(
+            'https://nodejs.org/dist/v%s/%s%s' % (
+                common.NODE_VERSION, node_file_name, extension),
+            outfile_name)
+    os.rename(
+        os.path.join(common.OPPIA_TOOLS_DIR, node_file_name),
+        common.NODE_PATH)
+    if node_file_name == 'node-v%s' % common.NODE_VERSION:
+        with common.CD(common.NODE_PATH):
+            subprocess.check_call(['./configure'])
+            subprocess.check_call(['make'])
 
 
 def main(args=None):
@@ -120,42 +150,15 @@ def main(args=None):
     create_directory(common.THIRD_PARTY_DIR)
     create_directory(common.NODE_MODULES_PATH)
 
+    # Download and install node.js.
     python_utils.PRINT(
         'Checking if node.js is installed in %s' % common.OPPIA_TOOLS_DIR)
     if not os.path.exists(common.NODE_PATH):
         python_utils.PRINT('Installing Node.js')
-        downloaded_file_name = 'node-download.tgz'
-        extension = '.tar.gz'
-        if common.OS_NAME == 'Darwin':
-            if common.ARCHITECTURE == 'x86_64':
-                node_file_name = 'node-%s-darwin-x64' % NODE_VERSION
-            else:
-                node_file_name = 'node-%s-darwin-x86' % NODE_VERSION
-        elif common.OS_NAME == 'Linux':
-            if common.ARCHITECTURE == 'x86_64':
-                node_file_name = 'node-%s-linux-x64' % NODE_VERSION
-            else:
-                node_file_name = 'node-%s-linux-x86' % NODE_VERSION
-        elif common.OS_NAME == 'Windows':
-            extension = '.zip'
-            if common.ARCHITECTURE == 'AMD64':
-                node_file_name = 'node-%s-win-x64' % NODE_VERSION
-            else:
-                node_file_name = 'node-%s-win-x86' % NODE_VERSION
-            downloaded_file_name = 'node-download.zip'
-        download_link = 'https://nodejs.org/dist/%s/%s%s' % (
-            NODE_VERSION, node_file_name, extension)
-        download_and_install_package(
-            download_link,
-            downloaded_file_name)
-        shutil.move(
-            os.path.join(
-                common.OPPIA_TOOLS_DIR, node_file_name),
-            common.NODE_PATH)
-
+        download_and_install_node()
     # Change ownership of node_modules.
     # Note: on some machines, these commands seem to take quite a long time.
-    if common.OS_NAME != 'Windows':
+    if not common.is_windows_os():
         common.recursive_chown(common.NODE_MODULES_PATH, os.getuid(), -1)
         common.recursive_chmod(common.NODE_MODULES_PATH, 0o744)
 
@@ -172,10 +175,12 @@ def main(args=None):
             'visit https://yarnpkg.com/en/docs/usage.'])
 
         # NB: Update .yarnrc if the yarn version below is changed.
-        yarn_file_name = 'yarn-%s.tar.gz' % YARN_VERSION
+        # TODO(#8125): Remove the `v` in the folder name, e.g., yarn-v1.17.3 ->
+        # yarn-1.17.3.
+        yarn_file_name = 'yarn-%s.tar.gz' % common.YARN_VERSION
         download_and_install_package(
             'https://github.com/yarnpkg/yarn/releases/download/%s/%s'
-            % (YARN_VERSION, yarn_file_name), yarn_file_name)
+            % (common.YARN_VERSION, yarn_file_name), yarn_file_name)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and
     # Mac OS.
@@ -193,9 +198,9 @@ def main(args=None):
         chrome_bin = (
             '/c/Program Files (x86)/Google/Chrome/Application/chrome.exe')
     elif os.path.isfile(
-            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'):
+            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe'):
         chrome_bin = (
-            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe')
+            'c:\\Program Files (x86)\\Google\\Chrome\\Application\\Chrome.exe')
     elif os.path.isfile(
             '/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe'):
         # WSL.

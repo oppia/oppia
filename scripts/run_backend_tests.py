@@ -47,6 +47,7 @@ import argparse
 import datetime
 import importlib
 import inspect
+import multiprocessing
 import os
 import re
 import subprocess
@@ -90,14 +91,8 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
-# Explicitly pass all current environment variables into subprocess.
-# Otherwise, there will be dll error for running coverage. (For Windows)
-SUBPROCESS_ENV = {
-    k.encode('utf-8'): v.encode('utf-8') for k, v in os.environ.items()
-}
-
-COVERAGE_DIR = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4')
+COVERAGE_PATH = os.path.join(
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.4', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -105,6 +100,7 @@ ALL_ERRORS = []
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
+MAX_CONCURRENT_RUNS = 24
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -155,8 +151,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
-
-    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, env=SUBPROCESS_ENV)
+    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
     last_stdout_str, last_stderr_str = p.communicate()
     # Converting to unicode to stay compatible with the rest of the strings.
     last_stdout_str = last_stdout_str.decode(encoding='utf-8')
@@ -181,13 +176,14 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
 class TaskThread(threading.Thread):
     """Runs a task in its own thread."""
 
-    def __init__(self, func, verbose, name=None):
+    def __init__(self, func, verbose, semaphore, name=None):
         super(TaskThread, self).__init__()
         self.func = func
         self.output = None
         self.exception = None
         self.verbose = verbose
         self.name = name
+        self.semaphore = semaphore
         self.finished = False
 
     def run(self):
@@ -199,13 +195,14 @@ class TaskThread(threading.Thread):
                 log('----------------------------------------')
             log('FINISHED %s: %.1f secs' %
                 (self.name, time.time() - self.start_time), show_time=True)
-            self.finished = True
         except Exception as e:
             self.exception = e
             if 'KeyboardInterrupt' not in python_utils.convert_to_bytes(
                     self.exception.args[0]):
                 log('ERROR %s: %.1f secs' %
                     (self.name, time.time() - self.start_time), show_time=True)
+        finally:
+            self.semaphore.release()
             self.finished = True
 
 
@@ -221,7 +218,7 @@ class TestingTaskSpec(python_utils.OBJECT):
         test_target_flag = '--test_target=%s' % self.test_target
         if self.generate_coverage_report:
             exc_list = [
-                'python', '-m', 'coverage', 'run', '-p', TEST_RUNNER_PATH,
+                'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
                 test_target_flag]
         else:
             exc_list = ['python', TEST_RUNNER_PATH, test_target_flag]
@@ -250,33 +247,36 @@ def _check_all_tasks(tasks):
             log(task_details)
 
 
-def _execute_tasks(tasks, batch_size=24):
+def _execute_tasks(tasks, semaphore):
     """Starts all tasks and checks the results.
+    Runs no more than the allowable limit defined in the semaphore.
 
-    Runs no more than 'batch_size' tasks at a time.
+    Args:
+        tasks: list(TestingTaskSpec). The tasks to run.
+        semaphore: threading.Semaphore. The object that controls how many tasks
+            can run at any time.
     """
     remaining_tasks = [] + tasks
-    currently_running_tasks = set([])
+    currently_running_tasks = []
 
-    while remaining_tasks or currently_running_tasks:
-        if currently_running_tasks:
-            for task in list(currently_running_tasks):
-                task.join(1)
-                if not task.isAlive():
-                    currently_running_tasks.remove(task)
+    while remaining_tasks:
+        task = remaining_tasks.pop()
+        semaphore.acquire()
+        task.start()
+        task.start_time = time.time()
+        currently_running_tasks.append(task)
 
-        while remaining_tasks and len(currently_running_tasks) < batch_size:
-            task = remaining_tasks.pop()
-            currently_running_tasks.add(task)
-            task.start()
-            task.start_time = time.time()
-
-        time.sleep(5)
-        if remaining_tasks:
-            log('----------------------------------------')
-            log('Number of unstarted tasks: %s' % len(remaining_tasks))
-        _check_all_tasks(tasks)
+        if len(remaining_tasks) % 5 == 0:
+            if remaining_tasks:
+                log('----------------------------------------')
+                log('Number of unstarted tasks: %s' % len(remaining_tasks))
+            _check_all_tasks(currently_running_tasks)
         log('----------------------------------------')
+
+    for task in currently_running_tasks:
+        task.join()
+
+    _check_all_tasks(currently_running_tasks)
 
 
 def _get_all_test_targets(test_path=None, include_load_tests=True):
@@ -295,7 +295,7 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
         """
         class_names = []
         test_target_path = os.path.relpath(
-            path, os.getcwd())[:-3].replace('/', '.').replace('\\', '.')
+            path, os.getcwd())[:-3].replace('/', '.')
         python_module = importlib.import_module(test_target_path)
         for name, clazz in inspect.getmembers(
                 python_module, predicate=inspect.isclass):
@@ -350,12 +350,6 @@ def main(args=None):
     dev_appserver.fix_sys_path()
 
     if parsed_args.generate_coverage_report:
-        # Specify the path to coverage so it can be viewed as a module.
-        # Also In case of some encoding issues on Windows.
-        SUBPROCESS_ENV.update({
-            'PYTHONPATH'.encode(encoding='utf-8'):
-                COVERAGE_DIR.encode(encoding='utf-8')
-        })
         python_utils.PRINT(
             'Checking whether coverage is installed in %s'
             % common.OPPIA_TOOLS_DIR)
@@ -396,18 +390,22 @@ def main(args=None):
             include_load_tests=include_load_tests)
 
     # Prepare tasks.
+    concurrent_count = min(multiprocessing.cpu_count(), MAX_CONCURRENT_RUNS)
+    semaphore = threading.Semaphore(concurrent_count)
+
     task_to_taskspec = {}
     tasks = []
     for test_target in all_test_targets:
         test = TestingTaskSpec(
             test_target, parsed_args.generate_coverage_report)
-        task = TaskThread(test.run, parsed_args.verbose, name=test_target)
+        task = TaskThread(
+            test.run, parsed_args.verbose, semaphore, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
 
     task_execution_failed = False
     try:
-        _execute_tasks(tasks)
+        _execute_tasks(tasks, semaphore)
     except Exception:
         task_execution_failed = True
 
@@ -488,16 +486,16 @@ def main(args=None):
     python_utils.PRINT('')
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
-    else:
-        python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
-            total_count, '' if total_count == 1 else 's',
-            len(tasks), '' if len(tasks) == 1 else 'es'))
 
-        if total_errors or total_failures:
-            python_utils.PRINT(
-                '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
-        else:
-            python_utils.PRINT('All tests passed.')
+    python_utils.PRINT('Ran %s test%s in %s test class%s.' % (
+        total_count, '' if total_count == 1 else 's',
+        len(tasks), '' if len(tasks) == 1 else 'es'))
+
+    if total_errors or total_failures:
+        python_utils.PRINT(
+            '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
+    else:
+        python_utils.PRINT('All tests passed.')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
@@ -506,16 +504,14 @@ def main(args=None):
             '%s errors, %s failures' % (total_errors, total_failures))
 
     if parsed_args.generate_coverage_report:
-        subprocess.check_call(
-            ['python', '-m', 'coverage', 'combine'], env=SUBPROCESS_ENV)
+        subprocess.check_call(['python', COVERAGE_PATH, 'combine'])
         subprocess.check_call([
-            'python', '-m', 'coverage', 'report',
+            'python', COVERAGE_PATH, 'report',
             '--omit="%s*","third_party/*","/usr/share/*"'
-            % common.OPPIA_TOOLS_DIR, '--show-missing'], env=SUBPROCESS_ENV)
+            % common.OPPIA_TOOLS_DIR, '--show-missing'])
 
         python_utils.PRINT('Generating xml coverage report...')
-        subprocess.check_call(
-            ['python', '-m', 'coverage', 'xml'], env=SUBPROCESS_ENV)
+        subprocess.check_call(['python', COVERAGE_PATH, 'xml'])
 
     python_utils.PRINT('')
     python_utils.PRINT('Done!')

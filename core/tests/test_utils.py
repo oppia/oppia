@@ -68,9 +68,6 @@ current_user_services = models.Registry.import_current_user_services()
 # We are using the b' prefix as all the stdouts are in bytes.
 LOG_LINE_PREFIX = b'LOG_INFO_TEST: '
 
-# Used when swap an attribute that does not exist.
-NO_ATTRIBUTE = 'NO SUCH ATTRIBUTE'
-
 
 def empty_environ():
     """Create an empty environment for the tests."""
@@ -580,7 +577,7 @@ tags: []
             is_super_admin: bool. Whether the user is a super admin.
        """
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_user_id_from_email(email)
+        os.environ['USER_ID'] = self.get_gae_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
@@ -918,6 +915,8 @@ tags: []
         # immediately once the signup is complete. This is done to avoid
         # external  calls being made to Gravatar when running the backend
         # tests.
+        gae_id = self.get_gae_id_from_email(email)
+        user_services.create_new_user(gae_id, email)
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
@@ -1010,15 +1009,28 @@ tags: []
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_user_id_from_email(self, email):
-        """Gets the user_id corresponding to the given email.
+        """Gets the user ID corresponding to the given email.
 
         Args:
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            user_id: str. ID of the user possessing the given email.
+            str. ID of the user possessing the given email.
         """
-        return current_user_services.get_user_id_from_email(email)
+        gae_id = self.get_gae_id_from_email(email)
+        return (
+            user_services.get_user_settings_by_gae_id(gae_id).user_id)
+
+    def get_gae_id_from_email(self, email):
+        """Gets the GAE user ID corresponding to the given email.
+
+        Args:
+            email: str. A valid email stored in the App Engine database.
+
+        Returns:
+            str. GAE ID of the user possessing the given email.
+        """
+        return current_user_services.get_gae_id_from_email(email)
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
@@ -1812,15 +1824,12 @@ tags: []
         the generator will immediately raise StopIteration, and contextlib will
         raise a RuntimeError.
         """
-        original = getattr(obj, attr, NO_ATTRIBUTE)
+        original = getattr(obj, attr)
         setattr(obj, attr, newvalue)
         try:
             yield
         finally:
-            if original == NO_ATTRIBUTE:
-                delattr(obj, attr)
-            else:
-                setattr(obj, attr, original)
+            setattr(obj, attr, original)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):

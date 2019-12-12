@@ -189,6 +189,20 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
+    def test_get_current_release_version_number_with_non_hotfix_branch(self):
+        self.assertEqual(
+            common.get_current_release_version_number('release-1.2.3'), '1.2.3')
+
+    def test_get_current_release_version_number_with_hotfix_branch(self):
+        self.assertEqual(
+            common.get_current_release_version_number('release-1.2.3-hotfix-1'),
+            '1.2.3')
+
+    def test_get_current_release_version_number_with_invalid_branch(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid branch name: invalid-branch.'):
+            common.get_current_release_version_number('invalid-branch')
+
     def test_is_current_branch_a_release_branch_with_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return 'On branch release-1.2.3'
@@ -228,8 +242,7 @@ class CommonTests(test_utils.GenericTestBase):
             common.verify_current_branch_name('test')
 
     def test_ensure_release_scripts_folder_exists_with_invalid_access(self):
-        process = subprocess.Popen(
-            ['python', '--version'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         def mock_isdir(unused_dirpath):
             return False
         def mock_chdir(unused_dirpath):
@@ -256,8 +269,7 @@ class CommonTests(test_utils.GenericTestBase):
                 common.ensure_release_scripts_folder_exists_and_is_up_to_date()
 
     def test_ensure_release_scripts_folder_exists_with_valid_access(self):
-        process = subprocess.Popen(
-            ['python', '--version'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
         def mock_isdir(unused_dirpath):
             return False
         def mock_chdir(unused_dirpath):

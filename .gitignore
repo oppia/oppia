@@ -6,7 +6,6 @@ gae_runtime/*
 # We have added .git over here such that "git check-ignore" command should
 # ignore the files and dirs inside the .git dir.
 .git/*
-.env
 third_party/*
 assets/hashes.json
 backend_prod_files/*
@@ -34,6 +33,8 @@ venv/
 .vagrant/*
 .lock
 yarn-error.log
+oppia-release-credentials.json
+sheets.googleapis.com-python.json
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated

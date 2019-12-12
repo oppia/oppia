@@ -63,18 +63,50 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             subprocess, 'check_call', mock_check_call)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
+    def test_tweak_yarn_executable(self):
+        def mock_is_file(unused_filename):
+            return True
+
+        def mock_rename(origin_name, new_name):
+            self.assertEqual(origin_name + '.sh', new_name)
+            mock_rename.called = True
+        mock_rename.called = False
+        isfile_swap = self.swap(os.path, 'isfile', mock_is_file)
+        rename_swap = self.swap(os, 'rename', mock_rename)
+        with isfile_swap, rename_swap:
+            install_third_party_libs.tweak_yarn_executable()
+        self.assertTrue(mock_rename.called)
+
+    def test_get_yarn_command_on_windows(self):
+        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
+        with os_name_swap:
+            command = install_third_party_libs.get_yarn_command()
+            self.assertEqual(command, 'yarn.cmd')
+
+    def test_get_yarn_command_on_linux(self):
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
+        with os_name_swap:
+            command = install_third_party_libs.get_yarn_command()
+            self.assertEqual(command, 'yarn')
+
+    def test_get_yarn_command_on_mac(self):
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        with os_name_swap:
+            command = install_third_party_libs.get_yarn_command()
+            self.assertEqual(command, 'yarn')
+
     def test_pip_install_without_import_error(self):
         with self.check_call_swap:
             install_third_party_libs.pip_install('package', 'version', 'path')
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_darwin_os(self):
-        os_swap = self.swap(common, 'OS_NAME', 'Darwin')
+        os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
 
         import pip
         try:
             sys.modules['pip'] = None
-            with os_swap, self.print_swap, self.check_call_swap:
+            with os_name_swap, self.print_swap, self.check_call_swap:
                 with self.assertRaises(Exception):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
@@ -86,12 +118,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertFalse(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_linux_os(self):
-        os_swap = self.swap(common, 'OS_NAME', 'Linux')
+        os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
 
         import pip
         try:
             sys.modules['pip'] = None
-            with os_swap, self.print_swap, self.check_call_swap:
+            with os_name_swap, self.print_swap, self.check_call_swap:
                 with self.assertRaises(Exception):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
@@ -103,11 +135,11 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertFalse(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_windows_os(self):
-        os_swap = self.swap(common, 'OS_NAME', 'Windows')
+        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
         import pip
         try:
             sys.modules['pip'] = None
-            with os_swap, self.print_swap, self.check_call_swap:
+            with os_name_swap, self.print_swap, self.check_call_swap:
                 with self.assertRaises(Exception):
                     install_third_party_libs.pip_install(
                         'package', 'version', 'path')
@@ -197,7 +229,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'setup_main_is_called': False,
             'setup_gae_main_is_called': False,
             'pre_commit_hook_main_is_called': False,
-            'pre_push_hook_main_is_called': False
+            'pre_push_hook_main_is_called': False,
+            'tweak_yarn_executable_is_called': False
         }
         expected_check_function_calls = {
             'ensure_pip_library_is_installed_is_called': True,
@@ -206,7 +239,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'setup_main_is_called': True,
             'setup_gae_main_is_called': True,
             'pre_commit_hook_main_is_called': True,
-            'pre_push_hook_main_is_called': True
+            'pre_push_hook_main_is_called': True,
+            'tweak_yarn_executable_is_called': False
         }
         def mock_ensure_pip_library_is_installed(
                 unused_package, unused_version, unused_path):
@@ -228,6 +262,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         def mock_main_for_pre_push_hook(args):
             check_function_calls['pre_push_hook_main_is_called'] = True
         # pylint: enable=unused-argument
+        def mock_tweak_yarn_executable():
+            check_function_calls['tweak_yarn_executable_is_called'] = True
 
         ensure_pip_install_swap = self.swap(
             install_third_party_libs, 'ensure_pip_library_is_installed',
@@ -244,6 +280,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
         pre_push_hook_main_swap = self.swap(
             pre_push_hook, 'main', mock_main_for_pre_push_hook)
+        tweak_yarn_executable_swap = self.swap(
+            install_third_party_libs, 'tweak_yarn_executable',
+            mock_tweak_yarn_executable)
 
         py_actual_text = (
             'ConverterMapping,\nLine ending with '
@@ -271,7 +310,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             with install_third_party_main_swap, setup_main_swap:
                 with setup_gae_main_swap, pre_commit_hook_main_swap:
                     with pre_push_hook_main_swap, py_config_swap:
-                        with pq_config_swap:
+                        with pq_config_swap, tweak_yarn_executable_swap:
                             install_third_party_libs.main(args=[])
         self.assertEqual(check_function_calls, expected_check_function_calls)
         with python_utils.open_file(temp_py_config_file, 'r') as f:
@@ -279,50 +318,102 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         with python_utils.open_file(temp_pq_config_file, 'r') as f:
             self.assertEqual(f.read(), pq_expected_text)
 
-    def test_get_yarn_command_on_linux(self):
-        check_function_call = {
-            'exists': False,
-            'rename': False
+
+    def test_function_calls_on_windows(self):
+        check_function_calls = {
+            'ensure_pip_library_is_installed_is_called': False,
+            'install_skulpt_is_called': False,
+            'install_third_party_main_is_called': False,
+            'setup_main_is_called': False,
+            'setup_gae_main_is_called': False,
+            'pre_commit_hook_main_is_called': False,
+            'pre_push_hook_main_is_called': False,
+            'tweak_yarn_executable_is_called': False
         }
-        def mock_exists(path):
-            self.assertTrue(path.endswith('yarn'))
-            check_function_call['exists'] = True
-            return True
-
-        def mock_rename(origin, new):
-            self.assertTrue(origin.endswith('yarn'))
-            self.assertTrue(new.endswith('yarn.sh'))
-            check_function_call['rename'] = True
-
-        os_swap = self.swap(common, 'OS_NAME', 'Linux')
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        rename_swap = self.swap(os, 'rename', mock_rename)
-        with os_swap, exists_swap, rename_swap:
-            self.assertEqual(
-                install_third_party_libs.get_yarn_command(), 'yarn')
-        for called in check_function_call.values():
-            self.assertFalse(called)
-
-    def test_get_yarn_command_on_windows(self):
-        check_function_call = {
-            'exists': False,
-            'rename': False
+        expected_check_function_calls = {
+            'ensure_pip_library_is_installed_is_called': True,
+            'install_skulpt_is_called': True,
+            'install_third_party_main_is_called': True,
+            'setup_main_is_called': True,
+            'setup_gae_main_is_called': True,
+            'pre_commit_hook_main_is_called': True,
+            'pre_push_hook_main_is_called': False,
+            'tweak_yarn_executable_is_called': True
         }
-        def mock_exists(path):
-            self.assertTrue(path.endswith('yarn'))
-            check_function_call['exists'] = True
-            return True
+        def mock_ensure_pip_library_is_installed(
+                unused_package, unused_version, unused_path):
+            check_function_calls[
+                'ensure_pip_library_is_installed_is_called'] = True
+        def mock_install_skulpt(unused_parsed_args):
+            check_function_calls['install_skulpt_is_called'] = True
+        def mock_check_call(unused_cmd_tokens):
+            pass
+        # pylint: disable=unused-argument
+        def mock_main_for_install_third_party(args):
+            check_function_calls['install_third_party_main_is_called'] = True
+        def mock_main_for_setup(args):
+            check_function_calls['setup_main_is_called'] = True
+        def mock_main_for_setup_gae(args):
+            check_function_calls['setup_gae_main_is_called'] = True
+        def mock_main_for_pre_commit_hook(args):
+            check_function_calls['pre_commit_hook_main_is_called'] = True
+        def mock_main_for_pre_push_hook(args):
+            check_function_calls['pre_push_hook_main_is_called'] = True
+        # pylint: enable=unused-argument
+        def mock_tweak_yarn_executable():
+            check_function_calls['tweak_yarn_executable_is_called'] = True
 
-        def mock_rename(origin, new):
-            self.assertTrue(origin.endswith('yarn'))
-            self.assertTrue(new.endswith('yarn.sh'))
-            check_function_call['rename'] = True
+        ensure_pip_install_swap = self.swap(
+            install_third_party_libs, 'ensure_pip_library_is_installed',
+            mock_ensure_pip_library_is_installed)
+        install_skulpt_swap = self.swap(
+            install_third_party_libs, 'install_skulpt', mock_install_skulpt)
+        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
+        install_third_party_main_swap = self.swap(
+            install_third_party, 'main', mock_main_for_install_third_party)
+        setup_main_swap = self.swap(setup, 'main', mock_main_for_setup)
+        setup_gae_main_swap = self.swap(
+            setup_gae, 'main', mock_main_for_setup_gae)
+        pre_commit_hook_main_swap = self.swap(
+            pre_commit_hook, 'main', mock_main_for_pre_commit_hook)
+        pre_push_hook_main_swap = self.swap(
+            pre_push_hook, 'main', mock_main_for_pre_push_hook)
+        tweak_yarn_executable_swap = self.swap(
+            install_third_party_libs, 'tweak_yarn_executable',
+            mock_tweak_yarn_executable)
+        os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
 
-        os_swap = self.swap(common, 'OS_NAME', 'Windows')
-        exists_swap = self.swap(os.path, 'exists', mock_exists)
-        rename_swap = self.swap(os, 'rename', mock_rename)
-        with os_swap, exists_swap, rename_swap:
-            self.assertEqual(
-                install_third_party_libs.get_yarn_command(), 'yarn.cmd')
-        for called in check_function_call.values():
-            self.assertTrue(called)
+        py_actual_text = (
+            'ConverterMapping,\nLine ending with '
+            '"ConverterMapping",\nOther Line\n')
+        py_expected_text = ('Line ending with \nOther Line\n')
+        temp_py_config_file = tempfile.NamedTemporaryFile(prefix='py').name
+        with python_utils.open_file(temp_py_config_file, 'w') as f:
+            f.write(py_actual_text)
+
+        pq_actual_text = (
+            'ConverterMapping,\n"ConverterMapping",\nOther Line\n')
+        pq_expected_text = ('Other Line\n')
+        temp_pq_config_file = tempfile.NamedTemporaryFile(prefix='pq').name
+        with python_utils.open_file(temp_pq_config_file, 'w') as f:
+            f.write(pq_actual_text)
+
+        py_config_swap = self.swap(
+            install_third_party_libs, 'PYLINT_CONFIGPARSER_FILEPATH',
+            temp_py_config_file)
+        pq_config_swap = self.swap(
+            install_third_party_libs, 'PQ_CONFIGPARSER_FILEPATH',
+            temp_pq_config_file)
+
+        with ensure_pip_install_swap, install_skulpt_swap, check_call_swap:
+            with install_third_party_main_swap, setup_main_swap:
+                with setup_gae_main_swap, pre_commit_hook_main_swap:
+                    with pre_push_hook_main_swap, py_config_swap:
+                        with pq_config_swap, tweak_yarn_executable_swap:
+                            with os_name_swap:
+                                install_third_party_libs.main(args=[])
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+        with python_utils.open_file(temp_py_config_file, 'r') as f:
+            self.assertEqual(f.read(), py_expected_text)
+        with python_utils.open_file(temp_pq_config_file, 'r') as f:
+            self.assertEqual(f.read(), pq_expected_text)

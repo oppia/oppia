@@ -31,13 +31,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
-import platform
 import shutil
 import subprocess
 import sys
 
 sys.path.append(os.getcwd())
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
+from scripts import common  # isort:skip # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
@@ -67,9 +67,10 @@ def install_hook():
     if os.path.islink(pre_commit_file):
         python_utils.PRINT('Symlink already exists')
     else:
+        # This is needed, because otherwise some systems symlink/copy the .pyc
+        # file instead of the .py file.
+        this_file = __file__.replace('pyc', 'py')
         try:
-            # On Windows, it will try to copy the pyc file instead the py file.
-            this_file = __file__.replace('pyc', 'py')
             os.symlink(os.path.abspath(this_file), pre_commit_file)
             python_utils.PRINT('Created symlink in .git/hooks directory')
         # Raises AttributeError on windows, OSError added as failsafe.
@@ -78,7 +79,7 @@ def install_hook():
             python_utils.PRINT('Copied file to .git/hooks directory')
 
     python_utils.PRINT('Making pre-commit hook file executable ...')
-    if platform.uname()[0] != 'Windows':
+    if not common.is_windows_os():
         _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
         if not err_chmod_cmd:

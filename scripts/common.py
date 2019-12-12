@@ -27,6 +27,9 @@ import subprocess
 import python_utils
 import release_constants
 
+NODE_VERSION = '10.15.3'
+YARN_VERSION = 'v1.17.3'
+
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
@@ -35,17 +38,41 @@ GOOGLE_APP_ENGINE_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
 GOOGLE_CLOUD_SDK_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google-cloud-sdk-251.0.0', 'google-cloud-sdk')
-NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-10.15.3')
+NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
-YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-v1.17.3')
-OS_NAME = platform.uname()[0]
-ARCHITECTURE = platform.uname()[4]
-# Add path for node which is required by the node_modules.
+YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
+OS_NAME = platform.system()
+ARCHITECTURE = platform.machine()
 
+
+def is_windows_os():
+    """Check if the running system is Windows."""
+    return OS_NAME == 'Windows'
+
+
+def is_mac_os():
+    """Check if the running system is MacOS."""
+    return OS_NAME == 'Darwin'
+
+
+def is_linux_os():
+    """Check if the running system is Linux."""
+    return OS_NAME == 'Linux'
+
+
+def is_x64_architecture():
+    """Check if the architecture is on X64."""
+    return ARCHITECTURE == 'x86_64'
+
+
+NODE_BIN_PATH = os.path.join(
+    NODE_PATH, '' if is_windows_os() else 'bin', 'node')
+
+# Add path for node which is required by the node_modules.
 os.environ['PATH'] = os.pathsep.join([
-    NODE_PATH, os.path.join(NODE_PATH, 'bin'),
-    os.path.join(YARN_PATH, 'bin'), os.environ['PATH']])
+    os.path.dirname(NODE_BIN_PATH), os.path.join(YARN_PATH, 'bin'),
+    os.environ['PATH']])
 
 
 def run_cmd(cmd_tokens):
@@ -140,13 +167,37 @@ def verify_local_repo_is_clean():
 
 
 def get_current_branch_name():
-    """Get the current branch name."""
+    """Get the current branch name.
+
+    Returns:
+        str. The name of current branch.
+    """
     git_status_output = subprocess.check_output(
         ['git', 'status']).strip().split('\n')
     branch_message_prefix = 'On branch '
     git_status_first_line = git_status_output[0]
     assert git_status_first_line.startswith(branch_message_prefix)
     return git_status_first_line[len(branch_message_prefix):]
+
+
+def get_current_release_version_number(release_branch_name):
+    """Gets the release version given a release branch name.
+
+    Args:
+        release_branch_name: str. The name of release branch.
+
+    Returns:
+        str. The version of release.
+    """
+    release_match = re.match(r'release-(\d+\.\d+\.\d+)$', release_branch_name)
+    hotfix_match = re.match(
+        r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$', release_branch_name)
+    if release_match:
+        return release_match.group(1)
+    elif hotfix_match:
+        return hotfix_match.group(1)
+    else:
+        raise Exception('Invalid branch name: %s.' % release_branch_name)
 
 
 def is_current_branch_a_release_branch():

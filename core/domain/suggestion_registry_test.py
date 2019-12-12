@@ -1053,7 +1053,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_TOPIC,
+            'target_type': suggestion_models.TARGET_TYPE_SKILL,
             'target_id': 'exp1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
