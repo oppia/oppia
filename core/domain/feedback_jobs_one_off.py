@@ -35,13 +35,12 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(thread_model):
         """Implements the map function for this job."""
+        last_nonempty_message = None
         for message in reversed(
                 feedback_services.get_messages(thread_model.id)):
             if message.text:
                 last_nonempty_message = message
                 break
-        else:
-            last_nonempty_message = None
 
         cache_updated = any([
             FeedbackThreadCacheOneOffJob._cache_last_nonempty_message_text(
