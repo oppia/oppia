@@ -60,8 +60,13 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { ExplorationObjectFactory } from
+  'domain/exploration/ExplorationObjectFactory';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
+import { ExtractImageFilenamesFromStateService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -97,6 +102,10 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory';
+import { ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PlaythroughIssueObjectFactory } from
@@ -152,6 +161,8 @@ import { SubtitledHtmlObjectFactory } from
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { SuggestionThreadObjectFactory } from
+  'domain/suggestion/SuggestionThreadObjectFactory';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
@@ -180,7 +191,6 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import {SuggestionThreadObjectFactory} from '../domain/suggestion/SuggestionThreadObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -232,6 +242,7 @@ export class UpgradedServices {
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
+    upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
     upgradedServices['PredictionResultObjectFactory'] =
@@ -284,6 +295,9 @@ export class UpgradedServices {
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
+    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory(
+      upgradedServices['ParamTypeObjectFactory']
+    );
     upgradedServices['PlaythroughObjectFactory'] =
       new PlaythroughObjectFactory(
         upgradedServices['LearnerActionObjectFactory']);
@@ -329,6 +343,9 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['ExtractImageFilenamesFromStateService'] =
+        new ExtractImageFilenamesFromStateService(
+          upgradedServices['HtmlEscaperService']);
     upgradedServices['PencilCodeEditorRulesService'] =
       new PencilCodeEditorRulesService(
         upgradedServices['NormalizeWhitespacePipe'],
@@ -401,6 +418,13 @@ export class UpgradedServices {
     // Group 8: Services depending on groups 1-7.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
+    upgradedServices['ExplorationObjectFactory'] = new ExplorationObjectFactory(
+      upgradedServices['LoggerService'],
+      upgradedServices['ParamChangesObjectFactory'],
+      upgradedServices['ParamSpecsObjectFactory'],
+      upgradedServices['StatesObjectFactory'],
+      upgradedServices['UrlInterpolationService']
+    );
     /* eslint-enable dot-notation */
     return upgradedServices;
   }

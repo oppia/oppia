@@ -16,9 +16,10 @@
  * @fileoverview Service to extract image filenames in a State.
  */
 
-import {Injectable} from '@angular/core';
-import {HtmlEscaperService} from '../../../services/html-escaper.service';
-import {downgradeInjectable} from '@angular/upgrade/static';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import { HtmlEscaperService } from 'services/html-escaper.service';
 
 @Injectable({
   providedIn: 'root'

@@ -16,14 +16,15 @@
  * @fileoverview Unit tests for the Exploration object factory.
  */
 
+import { TestBed } from '@angular/core/testing';
+
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ExplorationObjectFactory } from
+  'domain/exploration/ExplorationObjectFactory';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
-import {ExplorationObjectFactory} from './ExplorationObjectFactory';
-import {StateObjectFactory} from 'domain/state/StateObjectFactory';
-import {TestBed} from '@angular/core/testing';
-import {CamelCaseToHyphensPipe} from
-  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;

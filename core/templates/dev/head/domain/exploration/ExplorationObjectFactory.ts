@@ -12,23 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-import {LoggerService} from '../../services/contextual/logger.service';
-import {ParamChangesObjectFactory} from './ParamChangesObjectFactory';
-import {ParamSpecsObjectFactory} from './ParamSpecsObjectFactory';
-import {StatesObjectFactory} from './StatesObjectFactory';
-import {UrlInterpolationService} from '../utilities/url-interpolation.service';
-
-import {AppConstants} from '../../app.constants';
-import cloneDeep from 'lodash/cloneDeep';
-import {Injectable} from '@angular/core';
-import {downgradeInjectable} from '@angular/upgrade/static';
-import {UserInfoObjectFactory} from '../user/UserInfoObjectFactory';
-
 /**
  * @fileoverview Factory for creating new frontend instances of Exploration
  * domain objects.
  */
+
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+import cloneDeep from 'lodash/cloneDeep';
+
+import { AppConstants } from 'app.constants';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
@@ -39,17 +41,19 @@ export class Exploration {
   states;
   title;
   languageCode;
-
+  logger: LoggerService;
+  urlInterpolationService: UrlInterpolationService;
   constructor(
       initStateName, paramChanges, paramSpecs, states, title, languageCode,
-      private loggerService: LoggerService,
-      private urlInterpolationService: UrlInterpolationService) {
+      loggerService, urlInterpolationService) {
     this.initStateName = initStateName;
     this.paramChanges = paramChanges;
     this.paramSpecs = paramSpecs;
     this.states = states;
     this.title = title;
     this.languageCode = languageCode;
+    this.logger = loggerService;
+    this.urlInterpolationService = urlInterpolationService;
   }
 
   // Instance methods
@@ -73,7 +77,7 @@ export class Exploration {
   getInteraction(stateName) {
     let state = this.states.getState(stateName);
     if (!state) {
-      this.loggerService.error('Invalid state name: ' + stateName);
+      this.logger.error('Invalid state name: ' + stateName);
       return null;
     }
     return state.interaction;
@@ -186,8 +190,7 @@ export class ExplorationObjectFactory {
               private paramChangesObjectFactory: ParamChangesObjectFactory,
               private paramSpecsObjectFactory: ParamSpecsObjectFactory,
               private statesObjectFactory: StatesObjectFactory,
-              private urlInterpolationService: UrlInterpolationService) {
-  }
+              private urlInterpolationService: UrlInterpolationService) {}
   // Static class methods. Note that "this" is not available in
   // static contexts.
   // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
@@ -207,6 +210,7 @@ export class ExplorationObjectFactory {
       this.logger, this.urlInterpolationService);
   }
 }
+
 angular.module('oppia').factory(
   'ExplorationObjectFactory',
   downgradeInjectable(ExplorationObjectFactory));
