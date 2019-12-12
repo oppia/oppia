@@ -22,6 +22,7 @@ import { InteractionsExtensionsConstants } from
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { UtilsService } from 'services/utils.service';
 
 interface Note {
   readableNoteName: string,
@@ -35,6 +36,8 @@ interface Note {
   providedIn: 'root'
 })
 export class MusicNotesInputRulesService {
+  constructor(private utilsService: UtilsService) {}
+
   static _getMidiNoteValue(note: Note): number {
     if (
       InteractionsExtensionsConstants.NOTE_NAMES_TO_MIDI_VALUES.hasOwnProperty(
@@ -53,7 +56,7 @@ export class MusicNotesInputRulesService {
   }
 
   Equals(answer: Note[], inputs: {x: Note[]}): boolean {
-    return angular.equals(
+    return this.utilsService.isEquivalent(
       MusicNotesInputRulesService._convertSequenceToMidi(answer),
       MusicNotesInputRulesService._convertSequenceToMidi(inputs.x));
   }
