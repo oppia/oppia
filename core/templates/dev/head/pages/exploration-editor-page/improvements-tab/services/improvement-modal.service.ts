@@ -88,11 +88,10 @@ angular.module('oppia').factory('ImprovementModalService', [
 
                 $scope.issueIsMultipleIncorrectSubmissions = false;
                 if (playthrough.issueType === (
-                    ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
+                  ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
                   $scope.issueIsMultipleIncorrectSubmissions = true;
                 }
-
-              }
+              };
 
               /**
                * Identifies whether all learner actions have been displayed and
@@ -108,7 +107,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                * actions to be displayed. If all learner actions have been
                * handled, no more expansion is possible.
                */
-               $scope.expandActionsToRender = function() {
+              $scope.expandActionsToRender = function() {
                 let i;
                 let previousStateName = null;
                 if (indexOfFirstDisplayedAction <
@@ -173,7 +172,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   // for the issue.
                   return playthrough.actions.slice(
                     indexOfFirstDisplayedAction,
-                      indexOfActionInFirstDisplayedBlock);
+                    indexOfActionInFirstDisplayedBlock);
                 }
                 return playthrough.actions.slice(indexOfFirstDisplayedAction);
               };
