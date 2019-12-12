@@ -59,20 +59,30 @@ angular.module('oppia').factory('SuggestionThreadObjectFactory', [
       this.messages = messages;
     };
 
+    SuggestionThread.prototype.getMessages = function() {
+      return this.messages;
+    };
+
     SuggestionThread.prototype.isSuggestionHandled = function() {
-      return this.suggestion.status !== 'review';
+      return this.suggestion ? this.suggestion.status !== 'review' : null;
     };
 
     SuggestionThread.prototype.getSuggestionStateName = function() {
-      return this.suggestion.stateName;
+      return this.suggestion ? this.suggestion.stateName : null;
+    };
+
+    SuggestionThread.prototype.setSuggestionStatus = function(status) {
+      if (this.suggestion) {
+        this.suggestion.status = status;
+      }
     };
 
     SuggestionThread.prototype.getSuggestionStatus = function() {
-      return this.suggestion.status;
+      return this.suggestion ? this.suggestion.status : null;
     };
 
     SuggestionThread.prototype.getReplacementHtmlFromSuggestion = function() {
-      return this.suggestion.newValue.html;
+      return this.suggestion ? this.suggestion.newValue.html : null;
     };
 
     SuggestionThread.prototype.isSuggestionThread = function() {
