@@ -43,7 +43,7 @@ export class LanguageUtilService {
   // TODO(#7165): Replace any with correct type.
   getSupportedAudioLanguages(): any {
     var supportedAudioLanguages = {};
-    this.supportedAudioLanguageList.forEach((audioLanguageDict) => {
+    this.supportedAudioLanguageList.forEach((audioLanguageDict: any) => {
       supportedAudioLanguages[audioLanguageDict.id] =
         this.audioLanguageObject.createFromDict(audioLanguageDict);
     });
@@ -51,8 +51,9 @@ export class LanguageUtilService {
   }
 
   getAllAudioLanguageCodes(): Array<string> {
+    // TODO(#7165): Replace any with exact type.
     var allAudioLanguageCodes = (
-      this.supportedAudioLanguageList.map(function(audioLanguage) {
+      this.supportedAudioLanguageList.map(function(audioLanguage: any) {
         return audioLanguage.id;
       }));
     return allAudioLanguageCodes;
@@ -93,8 +94,9 @@ export class LanguageUtilService {
 
   // TODO(#7165): Replace any with correct type.
   getLanguageIdsAndTexts(): any {
+    // TODO(#7165): Replace any with exact type.
     var languageIdsAndTexts = CONSTANTS.SUPPORTED_CONTENT_LANGUAGES.map(
-      (languageItem) => {
+      (languageItem: any) => {
         return {
           id: languageItem.code,
           text: this.getShortLanguageDescription(languageItem.description)
@@ -115,7 +117,8 @@ export class LanguageUtilService {
   // the list of audio language codes not in the input list.
   getComplementAudioLanguageCodes(
       audioLanguageCodes: Array<string>): Array<string> {
-    return this.getAllAudioLanguageCodes().filter(function(languageCode) {
+    // TODO(#7165): Replace any with exact type.
+    return this.getAllAudioLanguageCodes().filter(function(languageCode: any) {
       return audioLanguageCodes.indexOf(languageCode) === -1;
     });
   }
