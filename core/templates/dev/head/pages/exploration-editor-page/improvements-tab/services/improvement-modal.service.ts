@@ -69,12 +69,30 @@ angular.module('oppia').factory('ImprovementModalService', [
                 LearnerActionRenderService,
                 ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
                 MAX_UNRELATED_ACTIONS_PER_BLOCK) {
-              $scope.playthroughIndex = playthroughIndex;
+              let indexOfFirstDisplayedAction = null;
+              let indexOfActionInFirstDisplayedBlock = null;
 
-              // This is the index of the first action in the range of actions
-              // displayed. Initially, only one action is displayed. When this
-              // index reaches 0, we've displayed all the learner actions.
-              let indexOfFirstDisplayedAction = playthrough.actions.length - 1;
+              let init = function() {
+                $scope.playthroughIndex = playthroughIndex;
+
+                // This is the index of the first action in the range of actions
+                // displayed. Initially, only one action is displayed. When this
+                // index reaches 0, we've displayed all the learner actions.
+                indexOfFirstDisplayedAction = playthrough.actions.length - 1;
+
+                $scope.expandActionsToRender();
+
+                // Index to know where to start highlighting actions.
+                indexOfActionInFirstDisplayedBlock =
+                  indexOfFirstDisplayedAction;
+
+                $scope.issueIsMultipleIncorrectSubmissions = false;
+                if (playthrough.issueType === (
+                    ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
+                  $scope.issueIsMultipleIncorrectSubmissions = true;
+                }
+
+              }
 
               /**
                * Identifies whether all learner actions have been displayed and
@@ -90,7 +108,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                * actions to be displayed. If all learner actions have been
                * handled, no more expansion is possible.
                */
-              let expandActions = function() {
+               $scope.expandActionsToRender = function() {
                 let i;
                 let previousStateName = null;
                 if (indexOfFirstDisplayedAction <
@@ -100,7 +118,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   previousStateName =
                       action.actionCustomizationArgs.state_name.value;
                 }
-                for (i = indexOfFirstDisplayedAction; i >= 0; i--) {
+                for (i = indexOfFirstDisplayedAction - 1; i >= 0; i--) {
                   let action = playthrough.actions[i];
                   let currentStateName =
                       action.actionCustomizationArgs.state_name.value;
@@ -121,23 +139,14 @@ angular.module('oppia').factory('ImprovementModalService', [
                   previousStateName = currentStateName;
                 }
                 // This is the case when all learner actions have been iterated
-                // over, and no more expansion is possible.
+                // over, and no more expansion is possible. This updation needs
+                // to happen because the indexOfFirstDisplayedAction would not
+                // be updated when the final display block has less than the
+                // threshold number of learner actions.
                 if (i === -1) {
                   indexOfFirstDisplayedAction = 0;
                 }
               };
-
-              expandActions();
-
-              // Index to know where to start highlighting actions.
-              let indexOfActionInFirstDisplayedBlock =
-                indexOfFirstDisplayedAction;
-
-              $scope.issueIsMultipleIncorrectSubmissions = false;
-              if (playthrough.issueType === (
-                ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
-                $scope.issueIsMultipleIncorrectSubmissions = true;
-              }
 
               /**
                * Renders a table for MultipleIncorrectSubmissions issue for a
@@ -171,20 +180,20 @@ angular.module('oppia').factory('ImprovementModalService', [
 
               /**
                * Returns the index of the learner action.
-               * @param {LearnerAction} learnerAction.
+               * @param {int} displayedActionIndex.
                * @returns {int}
                */
-              $scope.getLearnerActionIndex = function(learnerAction) {
-                return playthrough.actions.indexOf(learnerAction) + 1;
+              $scope.getLearnerActionIndex = function(displayedActionIndex) {
+                return indexOfFirstDisplayedAction + displayedActionIndex + 1;
               };
 
               /**
                * Computes whether the learner action needs to be highlighted.
-               * @param {LearnerAction} learnerAction.
+               * @param {int} actionIndex.
                * @returns {boolean}
                */
-              $scope.isActionHighlighted = function(action) {
-                return $scope.getLearnerActionIndex(action) > (
+              $scope.isActionHighlighted = function(actionIndex) {
+                return $scope.getLearnerActionIndex(actionIndex) > (
                   indexOfActionInFirstDisplayedBlock);
               };
 
@@ -200,21 +209,12 @@ angular.module('oppia').factory('ImprovementModalService', [
                   learnerAction, actionIndex);
               };
 
-
-              /**
-               * Expands the displayed learner actions by the next start
-               * index. If there is only one index, the arrow div is not shown
-               * at all. If the current stop index is the second last one, the
-               * arrow div is hidden after the final stop is reached.
-               */
-              $scope.expandActionsToRender = function() {
-                expandActions();
-              };
-
               $scope.cancel = function() {
                 $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
+
+              init();
             }
           ]
         });

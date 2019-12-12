@@ -44,7 +44,7 @@ angular.module('oppia').directive('multipleIncorrectSubmissionsIssue', [
         ctrl.finalBlock = HtmlEscaperService.escapedJsonToObj(
           $attrs.finalBlock);
         ctrl.index = this.finalBlock.length - 1;
-        ctrl.actionStartIndex = $attrs.actionStartIndex;
+        ctrl.actionStartIndex = parseInt($attrs.actionStartIndex);
         ctrl.stateName =
           this.finalBlock[this.index].actionCustomizationArgs.state_name.value;
 
@@ -55,7 +55,7 @@ angular.module('oppia').directive('multipleIncorrectSubmissionsIssue', [
           _nonSubmitActions.push(this.finalBlock[i]);
         }
         ctrl.nonSubmitActions = _nonSubmitActions;
-        ctrl.tableIndex = +this.actionStartIndex + i;
+        ctrl.tableIndex = this.actionStartIndex + i;
 
         ctrl.getShortAnswerHtml = function(action) {
           var _answer = action.actionCustomizationArgs.submitted_answer.value;
@@ -78,12 +78,12 @@ angular.module('oppia').directive('multipleIncorrectSubmissionsIssue', [
 
         /**
          * Returns the index of the learner action.
-         * @param {LearnerAction} learnerAction.
+         * @param {int} learnerActionIndex.
          * @returns {int}
          */
-        ctrl.getLearnerActionIndex = function(learnerAction) {
+        ctrl.getLearnerActionIndex = function(learnerActionIndex) {
           return (
-            this.actionStartIndex + this.finalBlock.indexOf(learnerAction) + 1);
+            this.actionStartIndex + learnerActionIndex + 1);
         };
 
         /**
