@@ -625,6 +625,14 @@ class CommonTests(test_utils.GenericTestBase):
             common.kill_processes_based_on_regex(r'.*dev_appserver\.py')
         self.assertEqual(killed, [])
 
+    def test_kill_process_when_psutil_not_in_path(self):
+        path_swap = self.swap(sys, 'path', [])
+        def mock_process_iter():
+            return []
+        process_iter_swap = self.swap(psutil, 'process_iter', mock_process_iter)
+        with path_swap, process_iter_swap:
+            common.kill_processes_based_on_regex('')
+
     def test_inplace_replace_file(self):
         constant_file = 'constant.js'
         origin_lines = [
