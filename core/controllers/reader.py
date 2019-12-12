@@ -424,7 +424,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         """
         playthrough_data = self.payload.get('playthrough_data')
         try:
-            unused_playthrough = stats_domain.Playthrough.from_backend_dict(
+            unused_playthrough = stats_domain.Playthrough.from_dict(
                 playthrough_data)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)

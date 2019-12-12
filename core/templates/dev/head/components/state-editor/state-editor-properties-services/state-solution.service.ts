@@ -15,11 +15,24 @@
 /**
  * @fileoverview A data service that stores the current interaction solution.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StateSolutionService', [
-  'StatePropertyService', function(StatePropertyService) {
-    var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveSolution';
-    return child;
+import { AlertsService } from 'services/alerts.service';
+import { StatePropertyService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-property.service';
+import { UtilsService } from 'services/utils.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StateSolutionService extends StatePropertyService {
+  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+    super(alertsService, utilsService);
+    this.setterMethodKey = 'saveSolution';
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'StateSolutionService', downgradeInjectable(StateSolutionService));

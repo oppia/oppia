@@ -37,6 +37,7 @@ angular.module('oppia').directive('storiesList', [
           $scope.leftmostCardIndices = 0;
           var MAX_NUM_TILES_PER_ROW = 4;
           $scope.tileDisplayCount = 0;
+          $scope.canonicalStories = $scope.getCanonicalStories();
 
           var initCarousels = function() {
             $scope.canonicalStories = $scope.getCanonicalStories();
