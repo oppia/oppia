@@ -690,7 +690,8 @@ def _transform_user_settings(user_settings_model):
             preferred_site_language_code=(
                 user_settings_model.preferred_site_language_code),
             preferred_audio_language_code=(
-                user_settings_model.preferred_audio_language_code)
+                user_settings_model.preferred_audio_language_code),
+            to_be_deleted=user_settings_model.to_be_deleted
         )
     else:
         return None
@@ -1015,6 +1016,35 @@ def update_user_role(user_id, role):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.role = role
     _save_user_settings(user_settings)
+
+
+def set_user_to_be_deleted(
+        user_id, exploration_ids, collection_ids, skill_ids, topic_ids):
+    """Set to_be_deleted of the user with given user_id to True and create
+    PendingDeletionRequestModel for that user.
+
+    Args:
+        user_id: str. The unique ID of the user who should be deleted.
+        exploration_ids: list(str). List of exploration ids that were soft
+            deleted and should be hard deleted later.
+        collection_ids: list(str). List of collection ids that were soft
+            deleted and should be hard deleted later.
+        skill_ids: list(str). List of skill ids that were soft deleted and
+            should be hard deleted later.
+        topic_ids: list(str). List of topic ids that were soft deleted and
+            should be hard deleted later.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.to_be_deleted = True
+    _save_user_settings(user_settings)
+
+    user_models.PendingDeletionRequestModel(
+        id=user_id,
+        exploration_ids=exploration_ids,
+        collection_ids=collection_ids,
+        skill_ids=skill_ids,
+        topic_ids=topic_ids
+    ).put()
 
 
 def get_human_readable_user_ids(user_ids):

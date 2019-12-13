@@ -530,6 +530,36 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_services.get_user_role_from_id(user_id),
                          feconf.ROLE_ID_COLLECTION_EDITOR)
 
+    def test_set_user_to_be_deleted(self):
+        gae_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+        exploration_ids = ['exp_id']
+        collection_ids = ['col_id']
+        skill_ids = ['skill_id']
+        topic_ids = ['topic_id']
+
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        user_services.set_user_to_be_deleted(
+            user_id, exploration_ids, collection_ids, skill_ids, topic_ids)
+
+        user_settings = user_services.get_user_settings(user_id)
+
+        self.assertTrue(user_settings.to_be_deleted)
+
+        pending_deletion_model = (
+            user_models.PendingDeletionRequestModel.get_by_id(user_id))
+        self.assertEqual(
+            pending_deletion_model.exploration_ids, exploration_ids)
+        self.assertEqual(
+            pending_deletion_model.collection_ids, collection_ids)
+        self.assertEqual(
+            pending_deletion_model.skill_ids, skill_ids)
+        self.assertEqual(
+            pending_deletion_model.topic_ids, topic_ids)
+
     def test_get_current_date_as_string(self):
         custom_datetimes = [
             datetime.date(2011, 1, 1),
