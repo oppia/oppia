@@ -259,7 +259,7 @@ def convert_png_binary_to_data_url(content):
         content: str. PNG binary file content.
 
     Returns:
-        *. Data url created from the binary content of the PNG.
+        str. Data url created from the binary content of the PNG.
 
     Raises:
         Exception: If the given binary string is not of a PNG image.
@@ -272,7 +272,14 @@ def convert_png_binary_to_data_url(content):
 
 
 def convert_png_to_data_url(filepath):
-    """Converts the png file at filepath to a data URL."""
+    """Converts the png file at filepath to a data URL.
+
+    Args:
+        filepath: str. A full path to the file.
+
+    Returns:
+        str. Data url created from the filepath of the PNG.
+    """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
     return convert_png_binary_to_data_url(file_contents)
 
@@ -398,20 +405,30 @@ def get_time_in_millisecs(datetime_obj):
         datetime_obj: datetime. An object of type datetime.datetime.
 
     Returns:
-        float. This returns the time in the millisecond since the Epoch.
+        float. The time in milliseconds since the Epoch.
     """
     seconds = time.mktime(datetime_obj.utctimetuple()) * 1000
     return seconds + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
 def get_current_time_in_millisecs():
-    """Returns time in milliseconds since the Epoch."""
+    """Returns time in milliseconds since the Epoch.
+
+    Returns:
+        float. The time in milliseconds since the Epoch.
+    """
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
 def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
+
+    Args:
+        time_msec: float. Time in milliseconds since the Epoch.
+
+    Returns:
+        str. A string representing the time.
     """
     return time.strftime(
         '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
@@ -420,6 +437,14 @@ def get_human_readable_time_string(time_msec):
 def are_datetimes_close(later_datetime, earlier_datetime):
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+
+    Args:
+        later_datetime: datetime. The later datetime.
+        earlier_datetime: datetime. The earlier datetime.
+
+    Returns:
+        bool. True if difference between two datetimes is less than
+            feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise false.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
@@ -447,7 +472,15 @@ def generate_new_session_id():
 
 
 def vfs_construct_path(base_path, *path_components):
-    """Mimics behavior of os.path.join on Posix machines."""
+    """Mimics behavior of os.path.join on Posix machines.
+
+    Args:
+        base_path: str. The initial path upon which components would be added.
+        path_components: list(str). Components that would be added to the path.
+
+    Returns:
+        str. The path that is obtained after adding the components.
+    """
     path = base_path
     for component in path_components:
         if component.startswith('/'):
@@ -460,7 +493,14 @@ def vfs_construct_path(base_path, *path_components):
 
 
 def vfs_normpath(path):
-    """Normalize path from posixpath.py, eliminating double slashes, etc."""
+    """Normalize path from posixpath.py, eliminating double slashes, etc.
+
+    Args:
+        path: str. Path that is to be normalized.
+
+    Returns:
+        str. Path if it is not null else a dot string.
+    """
     # Preserve unicode (if path is unicode).
     slash, dot = (u'/', u'.') if isinstance(path, python_utils.UNICODE) else (
         '/', '.')
@@ -498,6 +538,14 @@ def require_valid_name(name, name_type, allow_empty=False):
         name_type: str. A human-readable string, like 'the exploration title' or
             'a state name'. This will be shown in error messages.
         allow_empty: bool. If True, empty strings are allowed.
+
+    Raises:
+        Exception: Name isn't a string.
+        Exception: The length of the name_type isn't between
+            1 and 50.
+        Exception: Name starts or ends with whitespace.
+        Exception: Adjacent whitespace in name_type isn't collapsed.
+        Exception: Invalid character is present in name.
     """
     if not isinstance(name, python_utils.BASESTRING):
         raise ValidationError('%s must be a string.' % name)
@@ -624,13 +672,25 @@ def get_supported_audio_language_description(language_code):
 
 
 def unescape_encoded_uri_component(escaped_string):
-    """Unescape a string that is encoded with encodeURIComponent."""
+    """Unescape a string that is encoded with encodeURIComponent.
+
+    Args:
+        escaped_string: str. String that is encoded with encodeURIComponent.
+
+    Returns:
+        str. Decoded string that was initially encoded with
+            encodeURIComponent.
+    """
     return python_utils.urllib_unquote(escaped_string).decode('utf-8')
 
 
 def get_asset_dir_prefix():
     """Returns prefix for asset directory depending whether dev or prod.
     It is used as a prefix in urls for images, css and script files.
+
+    Returns:
+        str. Prefix '/build' if constants.DEV_MODE is false, otherwise
+            null string.
     """
     asset_dir_prefix = ''
     if not constants.DEV_MODE:
