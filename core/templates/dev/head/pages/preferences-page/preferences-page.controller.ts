@@ -106,8 +106,6 @@ angular.module('oppia').directive('preferencesPage', [
 
           ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
 
-          ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
-
           var _saveDataItem = function(updateType, data) {
             $http.put(_PREFERENCES_DATA_URL, {
               update_type: updateType,
