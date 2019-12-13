@@ -1579,11 +1579,6 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
     USER_2_ID = 'user_2_id'
     SCORE_CATEGORY = 'category'
 
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            user_models.UserContributionScoringModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.DELETE)
-
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserContributionsScoringModelTests, self).setUp()
@@ -1603,6 +1598,11 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             has_email_been_sent=False,
             deleted=True
         ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserContributionScoringModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
 
     def test_has_reference_to_user_id(self):
         self.assertTrue(
@@ -1716,3 +1716,36 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
+    """Tests for PendingDeletionRequestModel."""
+
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_1_ID = 'user_1_id'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(PendingDeletionRequestModelTests, self).setUp()
+
+        user_models.PendingDeletionRequestModel(
+            id=self.USER_1_ID,
+            exploration_ids=[],
+            collection_ids=[],
+            skill_ids=[],
+            topic_ids=[]
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            user_models.PendingDeletionRequestModel
+            .has_reference_to_user_id(self.USER_1_ID)
+        )
+        self.assertFalse(
+            user_models.PendingDeletionRequestModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )

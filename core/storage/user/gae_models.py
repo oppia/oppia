@@ -1632,3 +1632,39 @@ class UserContributionScoringModel(base_models.BaseModel):
         else:
             model.score += increment_by
             model.put()
+
+
+class PendingDeletionRequestModel(base_models.BaseModel):
+    """Model for storing pending deletion requests.
+
+    Model contains activity ids that were marked as deleted and should be
+    force deleted in the deletion process.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    # IDs of all the private explorations created by this user.
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=False)
+    # IDs of all the private collections created by this user.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=False)
+    # IDs of all the private skills created by this user.
+    skill_ids = ndb.StringProperty(repeated=True, indexed=False)
+    # IDs of all the private topics created by this user.
+    topic_ids = ndb.StringProperty(repeated=True, indexed=False)
+
+    @staticmethod
+    def get_deletion_policy():
+        """PendingDeletionRequestModel should be kept for tracking purposes."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether PendingDeletionRequestModel exist for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the models for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
