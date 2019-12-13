@@ -22,6 +22,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
+from core.domain import wipeout_service
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
@@ -349,6 +350,8 @@ class DeleteAccountHandler(base.BaseHandler):
         """Handles DELETE requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
             raise self.PageNotFoundException
+
+        wipeout_service.pre_delete_user(self.user_id)
         self.render_json({})
 
 
