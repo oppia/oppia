@@ -59,15 +59,14 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _cache_last_nonempty_message_text(thread_model, last_nonempty_message):
-        """Ensures the given thread's cache for the last message's text is
-        correct.
+        """Ensures the cached text for the given thread's last non-empty message
+        is correct.
 
         Args:
             thread_model: feedback_models.GeneralFeedbackThreadModel. Model of
                 the thread to have its cache updated.
-            last_nonempty_message: feedback_models.GeneralFeedbackMessageModel.
-                Model of the message which represents the most recent message,
-                or None.
+            last_nonempty_message: feedback_domain.FeedbackMessage. The most
+                recent message with non-empty text, or None.
 
         Returns:
             bool. Whether the cache was actually updated.
@@ -81,15 +80,14 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def _cache_last_nonempty_message_author_id(
             thread_model, last_nonempty_message):
-        """Ensures the given thread's cache for the last message's author is
-        correct.
+        """Ensures the cached author ID for the given thread's last non-empty
+        message is correct.
 
         Args:
             thread_model: feedback_models.GeneralFeedbackThreadModel. Model of
                 the thread to have its cache updated.
-            last_nonempty_message: feedback_models.GeneralFeedbackMessageModel.
-                Model of the message which represents the most recent message,
-                or None.
+            last_nonempty_message: feedback_domain.FeedbackMessage. The most
+                recent message with non-empty text, or None.
 
         Returns:
             bool. Whether the cache was actually updated.
