@@ -203,7 +203,7 @@ export class CodeReplPredictionService {
     return this.calcJaccardIndex(multisetA, multisetB);
   }
 
-  findNearestNeighborsIndexes(knnData: IKNN, program: string): Array<number> {
+  findNearestNeighborsIndexes(knnData: IKNN, program: string): Array<number[]> {
     // Find index of nearest neighbor programs to given program.
     const K = knnData.K;
     const T = knnData.T;
@@ -216,7 +216,7 @@ export class CodeReplPredictionService {
 
     // Empty lines in between program causes parser to think that program
     // has ended which leads to generation of wrong set of tokens.
-    programLines = programLines.filter(line => {
+    programLines = programLines.filter((line: string) => {
       return line.trim().length !== 0;
     });
 
@@ -272,7 +272,7 @@ export class CodeReplPredictionService {
     const nearesNeighborsClasses = [];
 
     // Find classes of nearest neighbor programs.
-    nearestNeighborsIndexes.forEach((neighbor: number) => {
+    nearestNeighborsIndexes.forEach((neighbor: number[]) => {
       const index = neighbor[0];
       const outputClassPropertyName = 'class';
       const similarity = neighbor[1];
@@ -282,7 +282,7 @@ export class CodeReplPredictionService {
 
     // Count how many times a class appears in nearest neighbors.
     const classCount = {};
-    nearesNeighborsClasses.forEach((neighbor: any) => {
+    nearesNeighborsClasses.forEach((neighbor: any[]) => {
       const outputClass = neighbor[0];
       if (classCount.hasOwnProperty(outputClass)) {
         classCount[outputClass] += 1;
@@ -325,7 +325,7 @@ export class CodeReplPredictionService {
 
     // Empty lines in between program causes parser to think that program
     // has ended which leads to generation of wrong set of tokens.
-    programLines = programLines.filter(line => {
+    programLines = programLines.filter((line: string) => {
       return line.trim().length !== 0;
     });
 
