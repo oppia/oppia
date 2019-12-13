@@ -240,20 +240,20 @@ class ConfigProperty(python_utils.OBJECT):
 class Registry(python_utils.OBJECT):
     """Registry of all configuration properties."""
 
-    # The keys of config_registry are the property names, and the values are
+    # The keys of _config_registry are the property names, and the values are
     # ConfigProperty instances.
-    config_registry = {}
+    _config_registry = {}
 
     @classmethod
     def init_config_property(cls, name, instance):
-        """Initializes config_registry with keys as the property names and
+        """Initializes _config_registry with keys as the property names and
         values as instances of the specified property.
 
         Args:
             name: str. The name of the configuration property.
             instance: *. The instance of the configuration property.
         """
-        cls.config_registry[name] = instance
+        cls._config_registry[name] = instance
 
     @classmethod
     def get_config_property(cls, name):
@@ -266,7 +266,7 @@ class Registry(python_utils.OBJECT):
         Returns:
             instance. The instance of the specified configuration property.
         """
-        return cls.config_registry.get(name)
+        return cls._config_registry.get(name)
 
     @classmethod
     def get_config_property_schemas(cls):
@@ -277,7 +277,7 @@ class Registry(python_utils.OBJECT):
         """
         schemas_dict = {}
 
-        for (property_name, instance) in cls.config_registry.items():
+        for (property_name, instance) in cls._config_registry.items():
             schemas_dict[property_name] = {
                 'schema': instance.schema,
                 'description': instance.description,
@@ -285,6 +285,15 @@ class Registry(python_utils.OBJECT):
             }
 
         return schemas_dict
+
+    @classmethod
+    def get_all_config_property_names(cls):
+        """Return a list of all the config property names.
+
+        Returns:
+            list. The list of all config property names.
+        """
+        return cls._config_registry.keys()
 
 
 PROMO_BAR_ENABLED = ConfigProperty(

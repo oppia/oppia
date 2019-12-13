@@ -85,7 +85,7 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
     """Tests for the config property registry."""
 
     def test_config_property_schemas_are_valid(self):
-        for property_name in config_domain.Registry.config_registry:
+        for property_name in config_domain.Registry.get_all_config_property_names():
             schema = config_domain.Registry.get_config_property(
                 property_name).schema
             schema_utils_test.validate_schema(schema)
