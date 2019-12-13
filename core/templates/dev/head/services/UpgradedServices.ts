@@ -125,8 +125,6 @@ import { StateEditorService } from
 import { StateImprovementSuggestionService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
-import { StopwatchObjectFactory } from
-  'domain/utilities/StopwatchObjectFactory';
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
