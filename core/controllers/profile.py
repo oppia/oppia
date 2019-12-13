@@ -22,11 +22,11 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
-from core.domain import wipeout_service
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import utils

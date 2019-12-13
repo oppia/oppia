@@ -516,6 +516,7 @@
 
 # User Data Takeout.
 /core/domain/takeout_service*.py @vojtechjelinek @seanlip
+/core/domain/wipeout_service*.py @vojtechjelinek @seanlip
 
 
 # User’s profile page.
