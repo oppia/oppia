@@ -112,7 +112,7 @@ export class MessengerService {
     EXPLORATION_COMPLETED: 'explorationCompleted',
     sendMessage: (messageTitle: string, messageData: string) => {
       // TODO(sll): For the stateTransition and explorationCompleted events,
-      // we now send paramValues in the messageData: string. We should broadcast these
+      // we now send paramValues in the messageData. We should broadcast these
       // to the parent page as well.
       // TODO(sll): Delete/deprecate 'reset exploration' from the list of
       // events sent to a container page.
