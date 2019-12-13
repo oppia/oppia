@@ -356,7 +356,7 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
         model1 = user_models.UserSettingsModel(
-            id=user_id_a, email=self.USER_A_EMAIL)
+            id=user_id_a, gae_id='gae_id', email=self.USER_A_EMAIL)
         model1.put()
 
         result = self._run_one_off_job()
@@ -1219,6 +1219,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.owner_id,
+            gae_id='gae_id',
             email=self.OWNER_EMAIL,
             last_created_an_exploration=None
         ).put()
@@ -1249,6 +1250,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.editor_id,
+            gae_id='gae_id',
             email=self.EDITOR_EMAIL,
             last_edited_an_exploration=None
         ).put()
@@ -1287,6 +1289,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.owner_id,
+            gae_id='gae_id',
             email=self.OWNER_EMAIL,
             last_created_an_exploration=None,
             last_edited_an_exploration=None
@@ -1294,6 +1297,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.editor_id,
+            gae_id='gae_id',
             email=self.EDITOR_EMAIL,
             last_edited_an_exploration=None
         ).put()
@@ -1319,6 +1323,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
     def test_that_last_edited_and_created_time_are_not_updated(self):
         user_models.UserSettingsModel(
             id=self.owner_id,
+            gae_id='gae_id',
             email=self.OWNER_EMAIL,
             last_created_an_exploration=None,
             last_edited_an_exploration=None
@@ -1431,9 +1436,10 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
 
     def test_successful_migration(self):
         user_id = 'user'
+        gae_id = 'gae_id'
         email = 'user@domain.com'
         user_models.UserSettingsModel(
-            id=user_id, email=email, gae_id=None).put()
+            id=user_id, gae_id=gae_id, email=email).put()
 
         output = self._run_one_off_job()
 
@@ -1446,13 +1452,16 @@ class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
 
     def test_multiple_user_settings(self):
         user_1_id = 'user1'
+        user_1_gae_id = 'gae1_id'
         user_1_email = 'user1@domain.com'
         user_models.UserSettingsModel(
-            id=user_1_id, email=user_1_email, gae_id=None).put()
+            id=user_1_id, gae_id=user_1_gae_id, email=user_1_email).put()
 
         user_2_id = 'user2'
+        user_2_gae_id = 'gae2_id'
         user_2_email = 'user2@domain.com'
-        user_models.UserSettingsModel(id=user_2_id, email=user_2_email).put()
+        user_models.UserSettingsModel(
+            id=user_2_id, gae_id=user_2_gae_id, email=user_2_email).put()
 
         output = self._run_one_off_job()
 
