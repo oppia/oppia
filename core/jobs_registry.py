@@ -75,8 +75,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    user_jobs_one_off.UserGaeIdOneOffJob
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
