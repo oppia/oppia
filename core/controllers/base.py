@@ -55,7 +55,8 @@ def _clear_login_cookies(response_headers):
 
     Args:
         response_headers: Response Headers Object.
-            Response headers are used to give a more detailed context of the response.
+            Response headers are used to give a more detailed
+            context of the response.
     """
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
