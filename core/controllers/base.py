@@ -154,7 +154,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 
-            if user_settings.to_be_removed:
+            if user_settings.to_be_deleted:
                 self.user_id = None
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not

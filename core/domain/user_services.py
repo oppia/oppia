@@ -100,7 +100,7 @@ class UserSettings(python_utils.OBJECT):
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None, to_be_removed=False):
+            preferred_audio_language_code=None, to_be_deleted=False):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -138,7 +138,7 @@ class UserSettings(python_utils.OBJECT):
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
-            to_be_removed: bool. If user requested removal of their account.
+            to_be_deleted: bool. If user requested removal of their account.
         """
         self.user_id = user_id
         self.gae_id = gae_id
@@ -164,7 +164,7 @@ class UserSettings(python_utils.OBJECT):
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
-        self.to_be_removed = to_be_removed
+        self.to_be_deleted = to_be_deleted
 
     def validate(self):
         """Checks that user_id and email fields of this UserSettings domain
@@ -645,7 +645,8 @@ def _save_user_settings(user_settings):
         preferred_site_language_code=(
             user_settings.preferred_site_language_code),
         preferred_audio_language_code=(
-            user_settings.preferred_audio_language_code)
+            user_settings.preferred_audio_language_code),
+        to_be_deleted=user_settings.to_be_deleted
     ).put()
 
 

@@ -99,8 +99,8 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
-    # If user requested removal.
-    to_be_removed = ndb.BooleanProperty(default=False)
+    # If user requested deletion.
+    to_be_deleted  = ndb.BooleanProperty(default=False)
 
 
     @staticmethod

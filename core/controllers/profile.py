@@ -344,11 +344,9 @@ class DeleteAccountPage(base.BaseHandler):
 class DeleteAccountHandler(base.BaseHandler):
     """Provides data for the delete account page."""
 
-    POST_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.can_manage_own_profile
-    def post(self):
-        """Handles POST requests."""
+    def delete(self):
+        """Handles DELETE requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
             raise self.PageNotFoundException
         self.render_json({})
