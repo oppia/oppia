@@ -191,6 +191,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import {ParamSpecsObjectFactory} from '../domain/exploration/ParamSpecsObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -343,6 +344,8 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
+      upgradedServices['ParamSpecObjectFactory']);
     upgradedServices['ExtractImageFilenamesFromStateService'] =
         new ExtractImageFilenamesFromStateService(
           upgradedServices['HtmlEscaperService']);

@@ -41,7 +41,6 @@ export class Exploration {
   states;
   title;
   languageCode;
-  logger: LoggerService;
   urlInterpolationService: UrlInterpolationService;
   constructor(
       initStateName, paramChanges, paramSpecs, states, title, languageCode,
@@ -52,7 +51,6 @@ export class Exploration {
     this.states = states;
     this.title = title;
     this.languageCode = languageCode;
-    this.logger = loggerService;
     this.urlInterpolationService = urlInterpolationService;
   }
 
@@ -77,7 +75,7 @@ export class Exploration {
   getInteraction(stateName) {
     let state = this.states.getState(stateName);
     if (!state) {
-      this.logger.error('Invalid state name: ' + stateName);
+      console.error('Invalid state name: ' + stateName);
       return null;
     }
     return state.interaction;
