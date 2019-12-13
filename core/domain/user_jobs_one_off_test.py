@@ -221,7 +221,7 @@ class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
         output = {}
         for stringified_distribution in stringified_output:
             value = re.findall(r'\d+', stringified_distribution)
-            # output['username length'] = number of users.
+            # The following is output['username length'] = number of users.
             output[value[0]] = int(value[1])
 
         return output
@@ -342,17 +342,18 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
 
     def test_diff_userbio_length(self):
         """Tests the case where two users have different userbio lengths."""
-        self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
-        user_id_d = self.get_user_id_from_email(self.USER_D_EMAIL)
-        user_services.update_user_bio(user_id_d, self.USER_D_BIO)
         self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         user_id_c = self.get_user_id_from_email(self.USER_C_EMAIL)
         user_services.update_user_bio(user_id_c, self.USER_C_BIO)
-        result = self._run_one_off_job()
+        self.signup(self.USER_D_EMAIL, self.USER_D_USERNAME)
+        user_id_d = self.get_user_id_from_email(self.USER_D_EMAIL)
+        user_services.update_user_bio(user_id_d, self.USER_D_BIO)
+        result = sorted(self._run_one_off_job(), key=lambda x: x[0])
         expected_result = [[800, ['c']], [2400, ['d']]]
         self.assertEqual(result, expected_result)
 
     def test_bio_length_for_users_with_no_bio(self):
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
         model1 = user_models.UserSettingsModel(
             id=user_id_a, email=self.USER_A_EMAIL)
@@ -1341,7 +1342,7 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
         super(CleanupUserSubscriptionsModelUnitTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
+        self.signup('user@email', 'user')
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email('user@email')
         self.owner = user_services.UserActionsInfo(self.owner_id)

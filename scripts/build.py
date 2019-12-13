@@ -29,6 +29,7 @@ import subprocess
 import threading
 
 import python_utils
+from scripts import common
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -79,8 +80,6 @@ REMOVE_WS = re.compile(r'\s{2,}').sub
 YUICOMPRESSOR_DIR = os.path.join(
     '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-NODE_FILE = os.path.join(
-    PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
@@ -94,15 +93,9 @@ JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
-# These files are present in both extensions and local_compiled_js/extensions.
-# They are required in local_compiled_js since they contain code used in
-# other ts files and excluding them from compilation will create compile
-# errors due to missing variables. So, the files should be built only from
-# one location instead of both the locations.
 JS_FILEPATHS_NOT_TO_BUILD = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/expression-parser.service.js')
+    'core/templates/dev/head/expressions/expression-parser.service.js',
+    'extensions/ckeditor_plugins/pre/plugin.js')
 
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -240,7 +233,7 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
     python_utils.PRINT('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        NODE_FILE, UGLIFY_FILE, source_path,
+        common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     subprocess.check_call(cmd, shell=True)
 
@@ -650,8 +643,8 @@ def should_file_be_built(filepath):
         bool. True if filepath should be built, else False.
     """
     if filepath.endswith('.js'):
-        return filepath not in JS_FILEPATHS_NOT_TO_BUILD and not any(
-            filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
+        return all(
+            not filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
         return False
     elif filepath.endswith('.ts'):
@@ -1325,8 +1318,8 @@ def compile_typescript_files_continuously(project_dir):
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files in watch mode...')
     cmd = [
-        './node_modules/typescript/bin/tsc', '--project', project_dir,
-        '--watch']
+        common.NODE_BIN_PATH, './node_modules/typescript/bin/tsc', '--project',
+        project_dir, '--watch']
 
     with python_utils.open_file('tsc_output_log.txt', 'w') as out:
         subprocess.Popen(cmd, stdout=out)

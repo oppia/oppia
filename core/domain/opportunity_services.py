@@ -373,7 +373,8 @@ def get_translation_opportunities(language_code, cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(ExplorationOpportunitySummary). A list of
+                ExplorationOpportunitySummary domain objects.
             cursor: str or None. A query cursor pointing to the next batch of
                 results. If there are no more results, this might be None.
             more: bool. If True, there are (probably) more results after this
@@ -389,7 +390,7 @@ def get_translation_opportunities(language_code, cursor):
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary.to_dict())
+        opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
 
 
@@ -406,7 +407,8 @@ def get_voiceover_opportunities(language_code, cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(ExplorationOpportunitySummary). A list of
+                ExplorationOpportunitySummary domain objects.
             cursor: str or None. A query cursor pointing to the next
                 batch of results. If there are no more results, this might
                 be None.
@@ -423,7 +425,7 @@ def get_voiceover_opportunities(language_code, cursor):
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities.append(exp_opportunity_summary.to_dict())
+        opportunities.append(exp_opportunity_summary)
     return opportunities, cursor, more
 
 
@@ -432,21 +434,21 @@ def get_exploration_opportunity_summaries_by_ids(ids):
     the given list of ids.
 
     Args:
-        ids: list(str). A list of the opportunity ids.
+        ids: list(str). A list of opportunity ids.
 
     Returns:
-        dict(str, ExplorationOpportunitySummary). A dict with key as an ID and
-        value as corresponding ExplorationOpportunitySummary object.
+        list(ExplorationOpportunitySummary). A list of
+            ExplorationOpportunitySummary domain objects corresponding to the
+            supplied ids.
     """
     exp_opportunity_summary_models = (
         opportunity_models.ExplorationOpportunitySummaryModel.get_multi(ids))
-    opportunities = {}
+    opportunities = []
     for exp_opportunity_summary_model in exp_opportunity_summary_models:
         exp_opportunity_summary = (
             get_exploration_opportunity_summary_from_model(
                 exp_opportunity_summary_model))
-        opportunities[exp_opportunity_summary.id] = exp_opportunity_summary
-
+        opportunities.append(exp_opportunity_summary)
     return opportunities
 
 
@@ -499,7 +501,8 @@ def get_skill_opportunities(cursor):
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
-            opportunities: list(dict). A list of dict of opportunity details.
+            opportunities: list(SkillOpportunity). A list of SkillOpportunity
+                domain objects.
             cursor: str or None. A query cursor pointing to the next
                 batch of results. If there are no more results, this might
                 be None.
@@ -514,10 +517,30 @@ def get_skill_opportunities(cursor):
     opportunities = []
     for skill_opportunity_model in skill_opportunity_models:
         skill_opportunity = (
-            get_skill_opportunity_from_model(
-                skill_opportunity_model))
-        opportunities.append(skill_opportunity.to_dict())
+            get_skill_opportunity_from_model(skill_opportunity_model))
+        opportunities.append(skill_opportunity)
     return opportunities, cursor, more
+
+
+def get_skill_opportunities_by_ids(ids):
+    """Returns a list of SkillOpportunity domain objects corresponding to the
+    given list of ids.
+
+    Args:
+        ids: list(str). A list of the opportunity ids.
+
+    Returns:
+        list(SkillOpportunity). A list of SkillOpportunity domain objects
+            corresponding to the supplied ids.
+    """
+    skill_opportunity_models = (
+        opportunity_models.SkillOpportunityModel.get_multi(ids))
+    opportunities = []
+    for skill_opportunity_model in skill_opportunity_models:
+        skill_opportunity = (
+            get_skill_opportunity_from_model(skill_opportunity_model))
+        opportunities.append(skill_opportunity)
+    return opportunities
 
 
 def create_skill_opportunity(skill_id, skill_description):

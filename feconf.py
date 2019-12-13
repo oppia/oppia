@@ -354,7 +354,8 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# Committer id for system actions.
+# Committer id for system actions. The username for the system committer
+# (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
@@ -654,6 +655,7 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
+FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
@@ -692,6 +694,7 @@ QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
 QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+DELETE_ACCOUNT_URL = '/delete-account'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
 ROBOTS_TXT_URL = '/robots.txt'

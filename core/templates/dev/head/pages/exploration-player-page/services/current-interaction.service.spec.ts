@@ -20,6 +20,7 @@
 // current-interaction.service.ts is upgraded to Angular 8.
 import { AngularNameService } from
   'pages/exploration-editor-page/services/angular-name.service';
+import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 import { EditabilityService } from 'services/editability.service';
 /* eslint-disable max-len */
 import { SolutionValidityService } from
@@ -58,6 +59,7 @@ describe('Current Interaction Service', function() {
         }
       });
       $provide.value('AngularNameService', new AngularNameService());
+      $provide.value('DebugInfoTrackerService', new DebugInfoTrackerService());
       $provide.value('EditabilityService', new EditabilityService());
       $provide.value('SolutionValidityService', new SolutionValidityService());
       $provide.value(
