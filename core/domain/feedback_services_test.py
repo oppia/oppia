@@ -503,7 +503,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread = feedback_services.get_thread(thread_id)
         self.assertEqual(thread.message_count, 1)
 
-    def test_cache_update_after_create_thread_with_text_from_user(self):
+    def test_cache_update_after_create_thread_with_user_text(self):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, self.user_id, 'subject',
             'initial text')
@@ -512,7 +512,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
-    def test_cache_update_after_create_thread_with_text_from_anon(self):
+    def test_cache_update_after_create_thread_with_anon_text(self):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
 
@@ -520,7 +520,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.last_nonempty_message_text, 'initial text')
         self.assertIsNone(thread.last_nonempty_message_author_id)
 
-    def test_cache_update_after_create_message_with_text_from_user(self):
+    def test_cache_update_after_create_message_with_user_text(self):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
 
@@ -536,7 +536,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.last_nonempty_message_text, 'anonymous text')
         self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
 
-    def test_cache_update_after_create_message_with_text_from_anon(self):
+    def test_cache_update_after_create_message_with_anon_text(self):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, self.user_id, 'subject',
             'initial text')
