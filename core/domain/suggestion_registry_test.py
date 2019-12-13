@@ -1069,7 +1069,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1']
                 },
-                'skill_id': 'skill_1'
+                'skill_id': 'skill_1',
+                'topic_name': 'topic_1'
             },
             'score_category': 'question.topic_1',
             'last_updated': utils.get_time_in_millisecs(self.fake_date)

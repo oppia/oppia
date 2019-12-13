@@ -19,7 +19,7 @@
 angular.module('oppia').factory('AddQuestionService', [
   '$http', function($http) {
     return {
-      addQuestion: function(question, associatedSkill) {
+      addQuestion: function(question, associatedSkill, topicName) {
         var url = '/suggestionhandler/';
         var data = {
           suggestion_type: 'add_question',
@@ -32,7 +32,8 @@ angular.module('oppia').factory('AddQuestionService', [
           change: {
             cmd: 'create_new_fully_specified_question',
             question_dict: question.toBackendDict(true),
-            skill_id: associatedSkill._id
+            skill_id: associatedSkill._id,
+            topic_name: topicName,
           }
         };
         $http.post(url, data);

@@ -70,6 +70,14 @@ angular.module('oppia').directive('questionOpportunities', [
           ctrl.moreOpportunitiesAvailable = true;
           ctrl.progressBarRequired = true;
 
+          var getOpportunity = function(skillId) {
+            for (var index in ctrl.opportunities) {
+              if (ctrl.opportunities[index].id === skillId) {
+                return ctrl.opportunities[index];
+              }
+            }
+          };
+
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
@@ -100,6 +108,7 @@ angular.module('oppia').directive('questionOpportunities', [
           };
 
           ctrl.onClickButton = function(skillId) {
+            var opportunity = getOpportunity(skillId);
             var question =
               QuestionObjectFactory.createDefaultQuestion([skillId]);
             var questionId = question.getId();
@@ -155,7 +164,8 @@ angular.module('oppia').directive('questionOpportunities', [
                       return;
                     }
                     AddQuestionService.addQuestion(
-                      $scope.question, $scope.associatedSkill);
+                      $scope.question, $scope.associatedSkill,
+                      opportunity.heading);
                     $uibModalInstance.close();
                   };
                   // Checking if Question contains all requirements to enable

@@ -109,7 +109,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                 id: suggestion.suggestion_id,
                 heading: $filter('formatRtePreview')(
                   change.question_dict.question_state_data.content.html),
-                subheading: (details.topic_name + ' / ' +
+                subheading: (change.topic_name + ' / ' +
                   details.skill_description),
                 labelText: SUGGESTION_LABELS[suggestion.status].text,
                 labelColor: SUGGESTION_LABELS[suggestion.status].color,
@@ -138,7 +138,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                 labelText: SUGGESTION_LABELS[suggestion.status].text,
                 labelColor: SUGGESTION_LABELS[suggestion.status].color,
                 actionButtonTitle: (
-                  ctrl.activeContributionTab ===
+                  ctrl.activeReviewTab ===
                   ctrl.SUGGESTION_TYPE_TRANSLATE ?
                     'Review' :
                     'View'
@@ -167,7 +167,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             var targetId = suggestion.target_id;
             var suggestionId = suggestion.suggestion_id;
             var authorName = suggestion.author_name;
-            var questionHeader = (contributionDetails.topic_name + ' / ' +
+            var questionHeader = (suggestion.change.topic_name + ' / ' +
               contributionDetails.skill_description);
             var question = QuestionObjectFactory.createFromBackendDict(
               suggestion.change.question_dict);
