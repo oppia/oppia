@@ -54,7 +54,7 @@ def _clear_login_cookies(response_headers):
     """Clears login cookies from the given response headers.
 
     Args:
-        response_headers: Response headers are used to give a more
+        response_headers: Response Headers Object. Response headers are used to give a more
             detailed context of the response.
     """
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
@@ -301,9 +301,9 @@ class BaseHandler(webapp2.RequestHandler):
         """Prepares downloadable content to be sent to the client.
 
         Args:
-            values: The key-value pairs to include in the response.
-            filename: The name of the file to be rendered.
-            content_type: The type of file to be rendered.
+            values: dict. The key-value pairs to include in the response.
+            filename: str. The name of the file to be rendered.
+            content_type: str. The type of file to be rendered.
         """
         self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
             content_type)
