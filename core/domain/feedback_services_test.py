@@ -503,6 +503,104 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread = feedback_services.get_thread(thread_id)
         self.assertEqual(thread.message_count, 1)
 
+    def test_cache_update_after_create_thread_with_text_from_user(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, self.user_id, 'subject',
+            'initial text')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'initial text')
+        self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
+
+    def test_cache_update_after_create_thread_with_text_from_anon(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'initial text')
+        self.assertIsNone(thread.last_nonempty_message_author_id)
+
+    def test_cache_update_after_create_message_with_text_from_user(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'initial text')
+        self.assertIsNone(thread.last_nonempty_message_author_id)
+
+        feedback_services.create_message(
+            thread_id, self.user_id, feedback_models.STATUS_CHOICES_FIXED, None,
+            'anonymous text')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'anonymous text')
+        self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
+
+    def test_cache_update_after_create_message_with_text_from_anon(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, self.user_id, 'subject',
+            'initial text')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'initial text')
+        self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
+
+        feedback_services.create_message(
+            thread_id, None, feedback_models.STATUS_CHOICES_FIXED, None,
+            'anonymous text')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'anonymous text')
+        self.assertIsNone(thread.last_nonempty_message_author_id)
+
+    def test_no_cache_update_after_create_thread_with_empty_user_text(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, self.user_id, 'subject', None)
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertIsNone(thread.last_nonempty_message_text)
+        self.assertIsNone(thread.last_nonempty_message_author_id)
+
+    def test_no_cache_update_after_create_thread_with_empty_anon_text(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, None, 'subject', None)
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertIsNone(thread.last_nonempty_message_text)
+        self.assertIsNone(thread.last_nonempty_message_author_id)
+
+    def test_no_cache_update_after_create_message_with_empty_user_text(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, None, 'subject', 'initial text')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'initial text')
+        self.assertIsNone(thread.last_nonempty_message_author_id)
+
+        feedback_services.create_message(
+            thread_id, self.user_id, feedback_models.STATUS_CHOICES_FIXED, None,
+            None)
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'initial text')
+        self.assertIsNone(thread.last_nonempty_message_author_id)
+
+    def test_no_cache_update_after_create_message_with_empty_anon_text(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', self.EXP_ID_1, self.user_id, 'subject',
+            'initial text')
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'initial text')
+        self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
+
+        feedback_services.create_message(
+            thread_id, None, feedback_models.STATUS_CHOICES_FIXED, None, None)
+
+        thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+        self.assertEqual(thread.last_nonempty_message_text, 'initial text')
+        self.assertEqual(thread.last_nonempty_message_author_id, self.user_id)
+
 
 class EmailsTaskqueueTests(test_utils.GenericTestBase):
     """Tests for tasks in emails taskqueue."""
