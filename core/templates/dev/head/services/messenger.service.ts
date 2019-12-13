@@ -52,9 +52,11 @@ export class MessengerService {
     explorationLoaded: (): boolean => {
       return true;
     },
+    // TODO(#7165): Replace any with exact type.
     stateTransition: (payload: any): boolean => {
       return Boolean(payload.oldStateName) || Boolean(payload.newStateName);
     },
+    // TODO(#7165): Replace any with exact type.
     explorationReset: (payload: any): boolean => {
       return Boolean(payload.stateName);
     },
