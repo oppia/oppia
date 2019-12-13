@@ -352,7 +352,7 @@ class DeleteAccountHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         wipeout_service.pre_delete_user(self.user_id)
-        self.render_json({})
+        self.render_json({'success': True})
 
 
 class UsernameCheckHandler(base.BaseHandler):
