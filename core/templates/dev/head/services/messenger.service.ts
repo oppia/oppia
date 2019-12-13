@@ -66,19 +66,22 @@ export class MessengerService {
   };
 
   getPayload = {
-    heightChange: function(data) {
+    // TODO(#7165): Replace any with exact type.
+    heightChange: function(data: any) {
       return {
         height: data.height,
         scroll: data.scroll
       };
     },
-    explorationLoaded: function(data) {
+    // TODO(#7165): Replace any with exact type.
+    explorationLoaded: function(data: any) {
       return {
         explorationVersion: data.explorationVersion,
         explorationTitle: data.explorationTitle
       };
     },
-    stateTransition: function(data) {
+    // TODO(#7165): Replace any with exact type.
+    stateTransition: function(data: any) {
       return {
         explorationVersion: data.explorationVersion,
         oldStateName: data.oldStateName,
@@ -86,13 +89,15 @@ export class MessengerService {
         newStateName: data.newStateName
       };
     },
-    explorationCompleted: function(data) {
+    // TODO(#7165): Replace any with exact type.
+    explorationCompleted: function(data: any) {
       return {
         explorationVersion: data.explorationVersion
       };
     },
     // DEPRECATED
-    explorationReset: function(data) {
+    // TODO(#7165): Replace any with exact type.
+    explorationReset: function(data: any) {
       return {
         stateName: data
       };
