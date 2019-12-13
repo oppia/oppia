@@ -5071,6 +5071,16 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
             cls._validate_score]
 
 
+class PendingDeletionRequestModelValidator(BaseUserModelValidator):
+    """Class for validating UserContributionScoringModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (user_models.UserSettingsModel, [item.id]),
+        }
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -5217,7 +5227,9 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.UserBulkEmailsModel: UserBulkEmailsModelValidator,
     user_models.UserSkillMasteryModel: UserSkillMasteryModelValidator,
     user_models.UserContributionScoringModel: (
-        UserContributionScoringModelValidator)
+        UserContributionScoringModelValidator),
+    user_models.PendingDeletionRequestModel: (
+        PendingDeletionRequestModelValidator)
 }
 
 
@@ -6092,3 +6104,12 @@ class UserContributionScoringModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserContributionScoringModel]
+
+
+class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates PendingDeletionRequestModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.PendingDeletionRequestModel]
+

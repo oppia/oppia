@@ -87,7 +87,7 @@ class WipeoutServiceTests(test_utils.GenericTestBase):
 
     def tests_pre_delete_user_with_activities_multiple_owners(self):
         user_services.update_user_role(
-            self.user_1_id, feconf.ROLE_ID_ADMIN)
+            self.user_1_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         user_1_actions = user_services.UserActionsInfo(self.user_1_id)
         self.save_new_valid_exploration('exp_id', self.user_1_id)
         rights_manager.assign_role_for_exploration(
