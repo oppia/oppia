@@ -546,7 +546,6 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             user_id, exploration_ids, collection_ids, skill_ids, topic_ids)
 
         user_settings = user_services.get_user_settings(user_id)
-
         self.assertTrue(user_settings.to_be_deleted)
 
         pending_deletion_model = (
