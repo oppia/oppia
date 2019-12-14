@@ -39,7 +39,8 @@ export class ExtractImageFilenamesFromStateService {
      * @param {object} state - The state from which the html of the content
      *                         should be returned.
      */
-    _getStateContentHtml(state) {
+    // TODO(#7165): Replace any with exact type.
+    _getStateContentHtml(state: any): string {
       return state.content.getHtml();
     }
 
@@ -49,7 +50,8 @@ export class ExtractImageFilenamesFromStateService {
      * @param {object} state - The state from which the html of the outcomes of
      *                         the answer groups should be returned.
      */
-    _getOutcomesHtml(state) {
+    // TODO(#7165): Replace any with exact type.
+    _getOutcomesHtml(state: any): string {
       let outcomesHtml = '';
       state.interaction.answerGroups.forEach(function(answerGroup) {
         let answerGroupHtml = answerGroup.outcome.feedback.getHtml();
@@ -66,7 +68,8 @@ export class ExtractImageFilenamesFromStateService {
      * Gets the html from the hints in the state.
      * @param {object} state - The state whose hints' html should be returned.
      */
-    _getHintsHtml(state) {
+    // TODO(#7165): Replace any with exact type.
+    _getHintsHtml(state: any): string {
       let hintsHtml = '';
       state.interaction.hints.forEach(function(hint) {
         let hintHtml = hint.hintContent.getHtml();
@@ -80,7 +83,8 @@ export class ExtractImageFilenamesFromStateService {
      * @param {object} state - The state whose solution's html should be
      *                         returned.
      */
-    _getSolutionHtml(state) {
+    // TODO(#7165): Replace any with exact type.
+    _getSolutionHtml(state: any): string {
       return state.interaction.solution.explanation.getHtml();
     }
 
@@ -88,7 +92,8 @@ export class ExtractImageFilenamesFromStateService {
      * Gets all the html in a state.
      * @param {object} state - The state whose html is to be fetched.
      */
-    _getAllHtmlOfState(state) {
+    // TODO(#7165): Replace any with exact type.
+    _getAllHtmlOfState(state: any): Array<string> {
       let _allHtmlInTheState = [];
       // The order of the extracted image names is same as they appear in a
       // state. The images should be preloaded in the following order ---
@@ -124,8 +129,9 @@ export class ExtractImageFilenamesFromStateService {
      * @param {string} strHtml - The string from which the object of
      *                           filepath should be extracted.
      */
+    // TODO(#7165): Replace any with exact type.
     _extractFilepathValueFromOppiaNonInteractiveImageTag(
-        strHtml) {
+        strHtml: string): Array<any> {
       let filenames = [];
       let dummyElement = document.createElement('div');
       dummyElement.innerHTML = (
@@ -150,7 +156,8 @@ export class ExtractImageFilenamesFromStateService {
      * @param {object} state - The state from which the filenames of the image
      *                         should be extracted.
      */
-    _getImageFilenamesInState(state) {
+    // TODO(#7165): Replace any with exact type.
+    _getImageFilenamesInState(state: any): Array<string> {
       let filenamesInState = [];
       // The Image Click Input interaction has an image whose filename is
       // directly stored in the customizationArgs.imageAndRegion.value

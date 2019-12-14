@@ -255,7 +255,8 @@ export class UpgradedServices {
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
-    upgradedServices['ParamTypeObjectFactory'] = new ParamTypeObjectFactory();
+    upgradedServices['ParamTypeObjectFactory'] =
+      new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
@@ -309,9 +310,8 @@ export class UpgradedServices {
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
-    upgradedServices['ParamSpecObjectFactory'] = new ParamSpecObjectFactory(
-      upgradedServices['ParamTypeObjectFactory']
-    );
+    upgradedServices['ParamSpecObjectFactory'] =
+      new ParamSpecObjectFactory(upgradedServices['ParamTypeObjectFactory']);
     upgradedServices['PlaythroughObjectFactory'] =
       new PlaythroughObjectFactory(
         upgradedServices['LearnerActionObjectFactory']);

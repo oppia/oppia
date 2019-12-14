@@ -25,7 +25,7 @@ import { ContextService } from 'services/context.service';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExtractImageFilenamesFromStateService } from
-      // eslint-disable-next-line max-len
+  // eslint-disable-next-line max-len
   'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 
 
