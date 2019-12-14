@@ -30,6 +30,7 @@ export class Suggestion {
   stateName: string;
   // TODO(#7165): Replace 'any' with the exact type.
   newValue: any;
+  // TODO(#7165): Replace 'any' with the exact type.
   oldValue: any;
   lastUpdated: number;
 
