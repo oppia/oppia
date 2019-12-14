@@ -51,6 +51,8 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if cache_updated:
             thread_model.put(update_last_updated_time=False)
             yield ('Updated', 1)
+        else:
+            yield ('Correct', 1)
 
     @staticmethod
     def reduce(key, value_strs):
