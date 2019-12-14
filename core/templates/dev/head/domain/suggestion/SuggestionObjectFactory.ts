@@ -28,7 +28,8 @@ export class Suggestion {
   status: string;
   authorName: string;
   stateName: string;
-  newValue: string;
+  // TODO(#7165): Replace 'any' with the exact type.
+  newValue: any;
   oldValue: string;
   lastUpdated: number;
 
