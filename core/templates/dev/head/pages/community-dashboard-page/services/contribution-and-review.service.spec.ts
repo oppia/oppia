@@ -29,6 +29,12 @@ require(
 
 describe('ContributionAndReviewService', function() {
   var ContributionAndReviewService, $httpBackend, $q, UrlInterpolationService;
+  var suggestion1;
+  var opportunityDict1;
+  var mockSuggestionsBackendObject;
+  var expectedSuggestionDict;
+  var suggestionIdToSuggestions;
+  var onSuccess;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -45,48 +51,64 @@ describe('ContributionAndReviewService', function() {
       'UrlInterpolationService');
     $httpBackend = $injector.get('$httpBackend');
     $q = $injector.get('$q');
+
+    suggestion1 = {
+      suggestion_id: 'suggestion_id_1',
+      target_id: 'skill_id_1',
+    };
+    opportunityDict1 = {
+      skill_id: 'skill_id_1',
+      skill_description: 'skill_description_1',
+    };
+    mockSuggestionsBackendObject = {
+      suggestions: [
+        suggestion1
+      ],
+      target_id_to_opportunity_dict: {
+        skill_id_1: opportunityDict1,
+      },
+    };
+    expectedSuggestionDict = {
+      suggestion: suggestion1,
+      details: opportunityDict1,
+    }
+    suggestionIdToSuggestions = {};
+    onSuccess = function(data) {
+      suggestionIdToSuggestions = data;
+    };
   }));
+
+  afterEach(function() {
+    $httpBackend.flush();
+  });
 
   describe('getUserCreatedQuestionSuggestions', function() {
     fit('should return available question suggestions and opportunity details',
       function() {
-        var suggestion1 = {
-          suggestion_id: 'suggestion_id_1',
-          target_id: 'skill_id_1',
-        };
-        var opportunityDict1 = {
-          skill_id: 'skill_id_1',
-          skill_description: 'skill_description_1',
-        };
-        var mockSuggestionsBackendObject = {
-          suggestions: [
-            suggestion1
-          ],
-          target_id_to_opportunity_dict: {
-            skill_id_1: opportunityDict1,
-          },
-        };
-        var expectedSuggestionDict = {
-          suggestion: suggestion1,
-          details: opportunityDict1,
-        }
-
         $httpBackend.expect(
           'GET', '/getsubmittedsuggestions/skill/add_question').respond(
             200, mockSuggestionsBackendObject);
-
-        var suggestionIdToSuggestions = {};
-        var onSuccess = function(data) {
-          suggestionIdToSuggestions = data;
-        };
 
         ContributionAndReviewService.getUserCreatedQuestionSuggestions(
           onSuccess).then(function() {
             expect(suggestionIdToSuggestions['suggestion_id_1']).toEqual(
               expectedSuggestionDict);
           });
+      });
+  });
 
-        $httpBackend.flush();
+  describe('getReviewableQuestionSuggestions', function() {
+    fit('should return available question suggestions and opportunity details',
+      function() {
+        $httpBackend.expect(
+          'GET', '/getreviewablesuggestions/skill/add_question').respond(
+            200, mockSuggestionsBackendObject);
+
+        ContributionAndReviewService.getReviewableQuestionSuggestions(
+          onSuccess).then(function() {
+            expect(suggestionIdToSuggestions['suggestion_id_1']).toEqual(
+              expectedSuggestionDict);
+          });
       });
   });
 });
