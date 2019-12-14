@@ -17,174 +17,204 @@
  * domain objects.
  */
 
-require('domain/exploration/ParamChangesObjectFactory.ts');
-require('domain/exploration/ParamSpecsObjectFactory.ts');
-require('domain/exploration/StatesObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ExplorationObjectFactory', [
-  '$log', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-  'StatesObjectFactory', 'UrlInterpolationService',
-  'INTERACTION_DISPLAY_MODE_INLINE',
-  'INTERACTION_SPECS', function(
-      $log, ParamChangesObjectFactory, ParamSpecsObjectFactory,
-      StatesObjectFactory, UrlInterpolationService,
-      INTERACTION_DISPLAY_MODE_INLINE,
-      INTERACTION_SPECS) {
-    var Exploration = function(
-        initStateName, paramChanges, paramSpecs, states, title, languageCode) {
-      this.initStateName = initStateName;
-      this.paramChanges = paramChanges;
-      this.paramSpecs = paramSpecs;
-      this.states = states;
-      this.title = title;
-      this.languageCode = languageCode;
-    };
+import cloneDeep from 'lodash/cloneDeep';
 
-    // Instance methods
-    Exploration.prototype.isStateTerminal = function(stateName) {
-      return (
-        stateName && this.getInteractionId(stateName) &&
-        INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
-    };
+import { AppConstants } from 'app.constants';
+import { LoggerService } from 'services/contextual/logger.service';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-    Exploration.prototype.getAuthorRecommendedExpIds = function(stateName) {
-      if (!this.isStateTerminal(stateName)) {
-        throw Error(
-          'Tried to get recommendations for a non-terminal state: ' +
-          stateName);
-      }
+const INTERACTION_SPECS = require('interactions/interaction_specs.json');
 
-      return this.getInteractionCustomizationArgs(
-        stateName).recommendedExplorationIds.value;
-    };
-
-    Exploration.prototype.getInteraction = function(stateName) {
-      var state = this.states.getState(stateName);
-      if (!state) {
-        $log.error('Invalid state name: ' + stateName);
-        return null;
-      }
-      return state.interaction;
-    };
-
-    Exploration.prototype.getInteractionId = function(stateName) {
-      var interaction = this.getInteraction(stateName);
-      if (interaction === null) {
-        return null;
-      }
-      return interaction.id;
-    };
-
-    Exploration.prototype.getInteractionCustomizationArgs =
-      function(stateName) {
-        var interaction = this.getInteraction(stateName);
-        if (interaction === null) {
-          return null;
-        }
-        return interaction.customizationArgs;
-      };
-
-    Exploration.prototype.getInteractionInstructions = function(stateName) {
-      var interactionId = this.getInteractionId(stateName);
-      return interactionId ? INTERACTION_SPECS[interactionId].instructions : '';
-    };
-
-    Exploration.prototype.getNarrowInstructions = function(stateName) {
-      var interactionId = this.getInteractionId(stateName);
-      return (
-        interactionId ?
-          INTERACTION_SPECS[interactionId].narrow_instructions :
-          '');
-    };
-
-    Exploration.prototype.getInteractionThumbnailSrc = function(stateName) {
-      // TODO(sll): unify this with the 'choose interaction' modal in
-      // state_editor_interaction.html.
-      var interactionId = this.getInteractionId(stateName);
-      return interactionId ? (
-        UrlInterpolationService
-          .getInteractionThumbnailImageUrl(interactionId)) : '';
-    };
-
-    Exploration.prototype.isInteractionInline = function(stateName) {
-      var interactionId = this.getInteractionId(stateName);
-
-      // Note that we treat a null interaction as an inline one, so that the
-      // error message associated with it is displayed in the most compact way
-      // possible in the learner view.
-      return (
-        !interactionId ||
-        INTERACTION_SPECS[interactionId].display_mode ===
-          INTERACTION_DISPLAY_MODE_INLINE);
-    };
-
-    Exploration.prototype.getStates = function() {
-      return angular.copy(this.states);
-    };
-
-    Exploration.prototype.getState = function(stateName) {
-      return this.states.getState(stateName);
-    };
-
-    Exploration.prototype.getInitialState = function() {
-      return this.getState(this.initStateName);
-    };
-
-    Exploration.prototype.setInitialStateName = function(stateName) {
-      this.initStateName = stateName;
-    };
-
-    Exploration.prototype.getUninterpolatedContentHtml = function(stateName) {
-      return this.getState(stateName).content.getHtml();
-    };
-
-    Exploration.prototype.getVoiceovers = function(stateName) {
-      var state = this.getState(stateName);
-      var recordedVoiceovers = state.recordedVoiceovers;
-      var contentId = state.content.getContentId();
-      return recordedVoiceovers.getBindableVoiceovers(
-        contentId);
-    };
-
-    Exploration.prototype.getVoiceover = function(
-        stateName, languageCode) {
-      var state = this.getState(stateName);
-      var recordedVoiceovers = state.recordedVoiceovers;
-      var contentId = state.content.getContentId();
-      return recordedVoiceovers.getVoiceover(contentId, languageCode);
-    };
-
-    Exploration.prototype.getAllVoiceovers = function(languageCode) {
-      return this.states.getAllVoiceovers(languageCode);
-    };
-
-    Exploration.prototype.getLanguageCode = function() {
-      return this.languageCode;
-    };
-
-    Exploration.prototype.getAllVoiceoverLanguageCodes = function() {
-      return this.states.getAllVoiceoverLanguageCodes();
-    };
-
-    // Static class methods. Note that "this" is not available in
-    // static contexts.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Exploration['createFromBackendDict'] = function(explorationBackendDict) {
-    /* eslint-enable dot-notation */
-      return new Exploration(
-        explorationBackendDict.init_state_name,
-        ParamChangesObjectFactory.createFromBackendList(
-          explorationBackendDict.param_changes),
-        ParamSpecsObjectFactory.createFromBackendDict(
-          explorationBackendDict.param_specs),
-        StatesObjectFactory.createFromBackendDict(
-          explorationBackendDict.states),
-        explorationBackendDict.title,
-        explorationBackendDict.language_code);
-    };
-
-    return Exploration;
+export class Exploration {
+  initStateName;
+  paramChanges;
+  paramSpecs;
+  states;
+  title;
+  languageCode;
+  logger: LoggerService;
+  urlInterpolationService: UrlInterpolationService;
+  // TODO(#7165): Replace any with exact type.
+  constructor(
+      initStateName: string, paramChanges: any, paramSpecs: any, states: any,
+      title: string, languageCode: string, loggerService: LoggerService,
+      urlInterpolationService: UrlInterpolationService) {
+    this.initStateName = initStateName;
+    this.paramChanges = paramChanges;
+    this.paramSpecs = paramSpecs;
+    this.states = states;
+    this.title = title;
+    this.languageCode = languageCode;
+    this.logger = loggerService;
+    this.urlInterpolationService = urlInterpolationService;
   }
-]);
+
+  // Instance methods
+  isStateTerminal(stateName: string): boolean {
+    return (
+      stateName && this.getInteractionId(stateName) &&
+        INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
+  }
+
+  // TODO(#7165): Replace any with exact type
+  getAuthorRecommendedExpIds(stateName: string): any {
+    if (!this.isStateTerminal(stateName)) {
+      throw Error(
+        'Tried to get recommendations for a non-terminal state: ' +
+          stateName);
+    }
+
+    return this.getInteractionCustomizationArgs(
+      stateName).recommendedExplorationIds.value;
+  }
+
+  // TODO(#7165): Replace any with exact type
+  getInteraction(stateName: string): any {
+    let state = this.states.getState(stateName);
+    if (!state) {
+      this.logger.error('Invalid state name: ' + stateName);
+      return null;
+    }
+    return state.interaction;
+  }
+
+  getInteractionId(stateName: string): string {
+    let interaction = this.getInteraction(stateName);
+    if (interaction === null) {
+      return null;
+    }
+    return interaction.id;
+  }
+
+  // TODO(#7165): Replace any with exact type
+  getInteractionCustomizationArgs(stateName: string): any {
+    let interaction = this.getInteraction(stateName);
+    if (interaction === null) {
+      return null;
+    }
+    return interaction.customizationArgs;
+  }
+
+  getInteractionInstructions(stateName: string): string {
+    let interactionId = this.getInteractionId(stateName);
+    return interactionId ? INTERACTION_SPECS[interactionId].instructions : '';
+  }
+
+  getNarrowInstructions(stateName: string): string {
+    let interactionId = this.getInteractionId(stateName);
+    return (
+        interactionId ?
+            INTERACTION_SPECS[interactionId].narrow_instructions :
+            '');
+  }
+
+  // TODO(#7165): Replace any with exact type
+  getInteractionThumbnailSrc(stateName: string): any {
+    // TODO(sll): unify this with the 'choose interaction' modal in
+    // state_editor_interaction.html.
+    let interactionId = this.getInteractionId(stateName);
+    return interactionId ? (
+        this.urlInterpolationService
+          .getInteractionThumbnailImageUrl(interactionId)) : '';
+  }
+
+  isInteractionInline(stateName: string): boolean {
+    let interactionId = this.getInteractionId(stateName);
+
+    // Note that we treat a null interaction as an inline one, so that the
+    // error message associated with it is displayed in the most compact way
+    // possible in the learner view.
+    return (
+      !interactionId ||
+        INTERACTION_SPECS[interactionId].display_mode ===
+        AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
+  }
+  // TODO(#7165): Replace any with exact type
+  getStates(): any {
+    return cloneDeep(this.states);
+  }
+  // TODO(#7165): Replace any with exact type
+  getState(stateName: string): any {
+    return this.states.getState(stateName);
+  }
+  // TODO(#7165): Replace any with exact type
+  getInitialState(): any {
+    return this.getState(this.initStateName);
+  }
+
+  setInitialStateName(stateName: string): void {
+    this.initStateName = stateName;
+  }
+
+  getUninterpolatedContentHtml(stateName: string): string {
+    return this.getState(stateName).content.getHtml();
+  }
+  // TODO(#7165): Replace any with exact type
+  getVoiceovers(stateName: string): any {
+    let state = this.getState(stateName);
+    let recordedVoiceovers = state.recordedVoiceovers;
+    let contentId = state.content.getContentId();
+    return recordedVoiceovers.getBindableVoiceovers(
+      contentId);
+  }
+  // TODO(#7165): Replace any with exact type
+  getVoiceover(
+      stateName: string, languageCode: string): any {
+    let state = this.getState(stateName);
+    let recordedVoiceovers = state.recordedVoiceovers;
+    let contentId = state.content.getContentId();
+    return recordedVoiceovers.getVoiceover(contentId, languageCode);
+  }
+  // TODO(#7165): Replace any with exact type
+  getAllVoiceovers(languageCode: string): any {
+    return this.states.getAllVoiceovers(languageCode);
+  }
+
+  getLanguageCode(): string {
+    return this.languageCode;
+  }
+
+  getAllVoiceoverLanguageCodes(): Array<string> {
+    return this.states.getAllVoiceoverLanguageCodes();
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationObjectFactory {
+  constructor(private logger: LoggerService,
+              private paramChangesObjectFactory: ParamChangesObjectFactory,
+              private paramSpecsObjectFactory: ParamSpecsObjectFactory,
+              private statesObjectFactory: StatesObjectFactory,
+              private urlInterpolationService: UrlInterpolationService) {}
+
+  // TODO(#7165): Replace any with exact type
+  createFromBackendDict(explorationBackendDict: any): Exploration {
+    /* eslint-enable dot-notation */
+    return new Exploration(
+      explorationBackendDict.init_state_name,
+      this.paramChangesObjectFactory.createFromBackendList(
+        explorationBackendDict.param_changes),
+      this.paramSpecsObjectFactory.createFromBackendDict(
+        explorationBackendDict.param_specs),
+      this.statesObjectFactory.createFromBackendDict(
+        explorationBackendDict.states),
+      explorationBackendDict.title,
+      explorationBackendDict.language_code,
+      this.logger, this.urlInterpolationService);
+  }
+}
+
+angular.module('oppia').factory(
+  'ExplorationObjectFactory',
+  downgradeInjectable(ExplorationObjectFactory));

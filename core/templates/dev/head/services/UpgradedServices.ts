@@ -66,6 +66,8 @@ import { ExplorationFeaturesService } from
   'services/exploration-features.service';
 import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
+import { ExplorationObjectFactory } from
+  'domain/exploration/ExplorationObjectFactory';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { FeedbackThreadObjectFactory } from
@@ -104,6 +106,12 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+import { ParamSpecObjectFactory } from
+  'domain/exploration/ParamSpecObjectFactory';
+import { ParamSpecsObjectFactory } from
+  'domain/exploration/ParamSpecsObjectFactory';
+import { ParamTypeObjectFactory } from
+  'domain/exploration/ParamTypeObjectFactory';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
 import { PlaythroughIssueObjectFactory } from
@@ -242,6 +250,8 @@ export class UpgradedServices {
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
+    upgradedServices['ParamTypeObjectFactory'] =
+      new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
@@ -295,6 +305,8 @@ export class UpgradedServices {
     upgradedServices['ParamChangesObjectFactory'] =
       new ParamChangesObjectFactory(
         upgradedServices['ParamChangeObjectFactory']);
+    upgradedServices['ParamSpecObjectFactory'] =
+      new ParamSpecObjectFactory(upgradedServices['ParamTypeObjectFactory']);
     upgradedServices['PlaythroughObjectFactory'] =
       new PlaythroughObjectFactory(
         upgradedServices['LearnerActionObjectFactory']);
@@ -336,6 +348,8 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
+      upgradedServices['ParamSpecObjectFactory']);
     upgradedServices['PencilCodeEditorRulesService'] =
       new PencilCodeEditorRulesService(
         upgradedServices['NormalizeWhitespacePipe'],
@@ -402,6 +416,15 @@ export class UpgradedServices {
     // Group 8: Services depending on groups 1-7.
     upgradedServices['StatesObjectFactory'] = new StatesObjectFactory(
       upgradedServices['StateObjectFactory']);
+
+    // Group 9: Services depending on groups 1-8.
+    upgradedServices['ExplorationObjectFactory'] =
+      new ExplorationObjectFactory(
+        upgradedServices['LoggerService'],
+        upgradedServices['ParamChangesObjectFactory'],
+        upgradedServices['ParamSpecsObjectFactory'],
+        upgradedServices['StatesObjectFactory'],
+        upgradedServices['UrlInterpolationService']);
     /* eslint-enable dot-notation */
     return upgradedServices;
   }
