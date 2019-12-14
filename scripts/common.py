@@ -32,9 +32,11 @@ NODE_VERSION = '10.15.3'
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = 'v1.21.1'
 
+COVERAGE_VERSION = '4.5.4'
+
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 GOOGLE_APP_ENGINE_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
@@ -107,7 +109,7 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
     current_dirname = os.path.basename(os.path.normpath(os.getcwd()))
     is_deploy_dir = (
         current_dirname.startswith('deploy-') and
-        os.path.isdir(os.path.join(os.getcwd(), '..', 'oppia')))
+        os.path.isdir(os.path.join(os.getcwd(), os.pardir, 'oppia')))
 
     if is_oppia_dir or (allow_deploy_dir and is_deploy_dir):
         return
