@@ -42,11 +42,12 @@ class FeedbackThread(python_utils.OBJECT):
             created.
         last_updated: datetime.datetime. The time when the feedback thread
             was last updated.
-        last_nonempty_message_text: str. Cached text of the last message in the
-            thread with non-empty content, or None if there is no such message.
-        last_nonempty_message_author_id: str. Cached ID for the user of the last
-            message in the thread with non-empty content, or None if the message
-            was made anonymously or if there is no such message.
+        last_nonempty_message_text: str|None. Cached text of the last message in
+            the thread with non-empty content, or None if there is no such
+            message.
+        last_nonempty_message_author_id: str|None. Cached ID for the user of the
+            last message in the thread with non-empty content, or None if the
+            message was made anonymously or if there is no such message.
     """
 
     def __init__(
