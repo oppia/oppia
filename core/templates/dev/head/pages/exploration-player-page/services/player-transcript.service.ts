@@ -53,7 +53,8 @@ export class PlayerTranscriptService {
   }
 
   hasEncounteredStateBefore(stateName: string): boolean {
-    return this.transcript.some(function(transcriptItem) {
+    // TODO(#7165): Replace 'any' with the exact type.
+    return this.transcript.some((transcriptItem: any) => {
       return transcriptItem.getStateName() === stateName;
     });
   }
