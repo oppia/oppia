@@ -65,10 +65,10 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         is correct.
 
         Args:
-            thread_model: feedback_models.GeneralFeedbackThreadModel. Model of
-                the thread to have its cache updated.
-            last_nonempty_message: feedback_domain.FeedbackMessage|None. The
-                most recent message with non-empty text, or None.
+            thread_model: GeneralFeedbackThreadModel. Model of the thread to
+                have its cache updated.
+            last_nonempty_message: FeedbackMessage|None. The most recent message
+                with non-empty text, or None.
 
         Returns:
             bool. Whether the cache was actually updated.
@@ -86,10 +86,10 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         message is correct.
 
         Args:
-            thread_model: feedback_models.GeneralFeedbackThreadModel. Model of
-                the thread to have its cache updated.
-            last_nonempty_message: feedback_domain.FeedbackMessage|None. The
-                most recent message with non-empty text, or None.
+            thread_model: GeneralFeedbackThreadModel. Model of the thread to
+                have its cache updated.
+            last_nonempty_message: FeedbackMessage|None. The most recent message
+                with non-empty text, or None.
 
         Returns:
             bool. Whether the cache was actually updated.
