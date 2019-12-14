@@ -359,11 +359,11 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
-    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
-      upgradedServices['ParamSpecObjectFactory']);
     upgradedServices['ExtractImageFilenamesFromStateService'] =
         new ExtractImageFilenamesFromStateService(
           upgradedServices['HtmlEscaperService']);
+    upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
+      upgradedServices['ParamSpecObjectFactory']);
     upgradedServices['PencilCodeEditorRulesService'] =
       new PencilCodeEditorRulesService(
         upgradedServices['NormalizeWhitespacePipe'],
