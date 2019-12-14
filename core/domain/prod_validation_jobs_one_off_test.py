@@ -10810,6 +10810,40 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             ), u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_model_with_abbreviated_name_is_empty(self):
+        self.model_instance_0.abbreviated_name = None
+        self.model_instance_0.commit(self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for abbreviated name check '
+                'of TopicModel\', '
+                '[u\'Entity id 0: Expected nonempty abbreviated name '
+                'received None.\']]'
+            ), (
+                u'[u\'failed validation check for domain object check '
+                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
+                'validation with the error Abbreviated name should be a '
+                'string.\']]'
+            ), u'[u\'fully-validated TopicModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_abbreviated_name_is_empty_string(self):
+        self.model_instance_0.abbreviated_name = ''
+        self.model_instance_0.commit(self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for abbreviated name check '
+                'of TopicModel\', '
+                '[u\'Entity id 0: Expected nonempty abbreviated name '
+                'received .\']]'
+            ), (
+                u'[u\'failed validation check for domain object check '
+                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
+                'validation with the error Abbreviated name field should '
+                'not be empty.\']]'
+            ), u'[u\'fully-validated TopicModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
 
 class TopicSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):

@@ -50,6 +50,20 @@ angular.module('oppia').factory('ImageUploadHelperService', [
         return $sce.trustAsResourceUrl(
           AssetsBackendApiService.getTopicThumbnailUrlForPreview(
             entityType, entityId, encodedFilepath));
+      },
+
+      generateImageFilename: function() {
+        var date = new Date();
+        return 'img_' +
+          date.getFullYear() +
+          ('0' + (date.getMonth() + 1)).slice(-2) +
+          ('0' + date.getDate()).slice(-2) +
+          '_' +
+          ('0' + date.getHours()).slice(-2) +
+          ('0' + date.getMinutes()).slice(-2) +
+          ('0' + date.getSeconds()).slice(-2) +
+          '_' +
+          Math.random().toString(36).substr(2, 10);
       }
     };
   }
