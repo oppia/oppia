@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Factory for creating new frontend instances of suggestion
- thread domain objects.
+   thread domain objects.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
@@ -24,18 +24,19 @@ import { Suggestion, SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 
 class SuggestionThread {
-  status;
-  subject;
-  summary;
-  originalAuthorName;
-  lastUpdated;
-  messageCount;
-  threadId;
-  suggestion;
-  messages;
+  status: string;
+  subject: string;
+  summary: string;
+  originalAuthorName: string;
+  lastUpdated: number;
+  messageCount: number;
+  threadId: string;
+  suggestion: Suggestion;
+  messages: Array<{text: string}>;
   constructor(
-      status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-      threadId, suggestion) {
+      status: string, subject: string, summary: string,
+      originalAuthorName: string, lastUpdated: number, messageCount: number,
+      threadId: string, suggestion: Suggestion) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -81,6 +82,7 @@ class SuggestionThread {
 })
 export class SuggestionThreadObjectFactory {
   constructor(private suggestionObjectFactory: SuggestionObjectFactory) {}
+  // TODO(#7165): Replace 'any' with the exact type.
   createFromBackendDicts(
       suggestionThreadBackendDict: any,
       suggestionBackendDict: any): SuggestionThread {
