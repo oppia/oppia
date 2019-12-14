@@ -325,9 +325,6 @@ export class UpgradedServices {
     upgradedServices['SuggestionThreadObjectFactory'] =
         new SuggestionThreadObjectFactory(
           upgradedServices['SuggestionObjectFactory']);
-    upgradedServices['SVMPredictionService'] =
-      new SVMPredictionService(
-        upgradedServices['PredictionResultObjectFactory']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
