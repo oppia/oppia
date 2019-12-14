@@ -33,7 +33,7 @@ require(
 
 require(
   'pages/community-dashboard-page/services/' +
-  'contribution-and-review.services.ts');
+  'contribution-and-review.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').directive('contributionsAndReview', [
