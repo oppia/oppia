@@ -2664,7 +2664,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_id',
+            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
@@ -2801,7 +2801,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
 
         user_models.UserSettingsModel(
             id=feconf.SYSTEM_COMMITTER_ID,
-            gae_id='gae_id',
+            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
             email='system@committer.com').put()
         self.model_instance = (
             config_models.ConfigPropertySnapshotContentModel.get_by_id(
@@ -2902,13 +2902,17 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         self.sender_email = 'sender@email.com'
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id, gae_id='gae_id', email=self.sender_email)
+            id=self.sender_id,
+            gae_id='gae_' + self.sender_id,
+            email=self.sender_email)
         self.sender_model.put()
 
         self.recipient_email = 'recipient@email.com'
         self.recipient_id = 'recipient'
         self.recipient_model = user_models.UserSettingsModel(
-            id=self.recipient_id, gae_id='gae_id', email=self.recipient_email)
+            id=self.recipient_id,
+            gae_id='gae_' + self.recipient_id,
+            email=self.recipient_email)
         self.recipient_model.put()
 
         with self.swap(
@@ -3046,18 +3050,20 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         self.sender_email = 'sender@email.com'
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id, gae_id='gae_id', email=self.sender_email)
+            id=self.sender_id,
+            gae_id='gae_' + self.sender_id,
+            email=self.sender_email)
         self.sender_model.put()
 
         self.recipient_ids = ['recipient1', 'recipient2']
         self.recipient_model_1 = user_models.UserSettingsModel(
             id=self.recipient_ids[0],
-            gae_id='gae_id',
+            gae_id='gae_' + self.recipient_ids[0],
             email='recipient1@email.com')
         self.recipient_model_1.put()
         self.recipient_model_2 = user_models.UserSettingsModel(
             id=self.recipient_ids[1],
-            gae_id='gae_id',
+            gae_id='gae_' + self.recipient_ids[1],
             email='recipient2@email.com')
         self.recipient_model_2.put()
 

@@ -1313,7 +1313,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
         # Create an unregistered user who has no username.
         user_models.UserSettingsModel(
             id='unregistered_user_id',
-            gae_id='gae_id',
+            gae_id='gae_unregistered_user_id',
             email='user@example.com',
             username='').put()
 
