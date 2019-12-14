@@ -28,7 +28,7 @@ import python_utils
 import release_constants
 
 NODE_VERSION = '10.15.3'
-YARN_VERSION = 'v1.17.3'
+YARN_VERSION = 'v1.21.1'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
