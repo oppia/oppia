@@ -315,8 +315,6 @@ export class UpgradedServices {
       new ParamSpecObjectFactory(upgradedServices['ParamTypeObjectFactory']);
     upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
       upgradedServices['LoggerService']);
-    upgradedServices['PlayerTranscriptService'] = new PlayerTranscriptService(
-      upgradedServices['LoggerService']);
     upgradedServices['PlaythroughObjectFactory'] =
       new PlaythroughObjectFactory(
         upgradedServices['LearnerActionObjectFactory']);
