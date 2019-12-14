@@ -44,6 +44,8 @@ import { ChangesInHumanReadableFormService } from
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from 'services/code-normalizer.service';
+import { CodeReplRulesService } from
+  'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ContextService } from 'services/context.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -341,6 +343,9 @@ export class UpgradedServices {
       new AnswerGroupObjectFactory(
         upgradedServices['OutcomeObjectFactory'],
         upgradedServices['RuleObjectFactory']);
+    upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
+      upgradedServices['NormalizeWhitespacePipe'],
+      upgradedServices['CodeNormalizerService']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
