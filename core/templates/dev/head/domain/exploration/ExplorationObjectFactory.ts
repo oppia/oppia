@@ -41,27 +41,32 @@ export class Exploration {
   states;
   title;
   languageCode;
+  logger: LoggerService;
   urlInterpolationService: UrlInterpolationService;
+  // TODO(#7165): Replace any with exact type.
   constructor(
-      initStateName, paramChanges, paramSpecs, states, title, languageCode,
-      loggerService, urlInterpolationService) {
+      initStateName: string, paramChanges: any, paramSpecs: any, states: any,
+      title: string, languageCode: string, loggerService: LoggerService,
+      urlInterpolationService: UrlInterpolationService) {
     this.initStateName = initStateName;
     this.paramChanges = paramChanges;
     this.paramSpecs = paramSpecs;
     this.states = states;
     this.title = title;
     this.languageCode = languageCode;
+    this.logger = loggerService;
     this.urlInterpolationService = urlInterpolationService;
   }
 
   // Instance methods
-  isStateTerminal(stateName) {
+  isStateTerminal(stateName: string): boolean {
     return (
       stateName && this.getInteractionId(stateName) &&
         INTERACTION_SPECS[this.getInteractionId(stateName)].is_terminal);
   }
 
-  getAuthorRecommendedExpIds(stateName) {
+  // TODO(#7165): Replace any with exact type
+  getAuthorRecommendedExpIds(stateName: string): any {
     if (!this.isStateTerminal(stateName)) {
       throw Error(
         'Tried to get recommendations for a non-terminal state: ' +
@@ -72,16 +77,17 @@ export class Exploration {
       stateName).recommendedExplorationIds.value;
   }
 
-  getInteraction(stateName) {
+  // TODO(#7165): Replace any with exact type
+  getInteraction(stateName: string): any {
     let state = this.states.getState(stateName);
     if (!state) {
-      console.error('Invalid state name: ' + stateName);
+      this.logger.error('Invalid state name: ' + stateName);
       return null;
     }
     return state.interaction;
   }
 
-  getInteractionId(stateName) {
+  getInteractionId(stateName: string): string {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
@@ -89,7 +95,8 @@ export class Exploration {
     return interaction.id;
   }
 
-  getInteractionCustomizationArgs(stateName) {
+  // TODO(#7165): Replace any with exact type
+  getInteractionCustomizationArgs(stateName: string): any {
     let interaction = this.getInteraction(stateName);
     if (interaction === null) {
       return null;
@@ -97,12 +104,12 @@ export class Exploration {
     return interaction.customizationArgs;
   }
 
-  getInteractionInstructions(stateName) {
+  getInteractionInstructions(stateName: string): string {
     let interactionId = this.getInteractionId(stateName);
     return interactionId ? INTERACTION_SPECS[interactionId].instructions : '';
   }
 
-  getNarrowInstructions(stateName) {
+  getNarrowInstructions(stateName: string): string {
     let interactionId = this.getInteractionId(stateName);
     return (
         interactionId ?
@@ -110,7 +117,8 @@ export class Exploration {
             '');
   }
 
-  getInteractionThumbnailSrc(stateName) {
+  // TODO(#7165): Replace any with exact type
+  getInteractionThumbnailSrc(stateName: string): any {
     // TODO(sll): unify this with the 'choose interaction' modal in
     // state_editor_interaction.html.
     let interactionId = this.getInteractionId(stateName);
@@ -119,7 +127,7 @@ export class Exploration {
           .getInteractionThumbnailImageUrl(interactionId)) : '';
   }
 
-  isInteractionInline(stateName) {
+  isInteractionInline(stateName: string): boolean {
     let interactionId = this.getInteractionId(stateName);
 
     // Note that we treat a null interaction as an inline one, so that the
@@ -130,52 +138,52 @@ export class Exploration {
         INTERACTION_SPECS[interactionId].display_mode ===
         AppConstants.INTERACTION_DISPLAY_MODE_INLINE);
   }
-
-  getStates() {
+  // TODO(#7165): Replace any with exact type
+  getStates(): any {
     return cloneDeep(this.states);
   }
-
-  getState(stateName) {
+  // TODO(#7165): Replace any with exact type
+  getState(stateName: string): any {
     return this.states.getState(stateName);
   }
-
-  getInitialState() {
+  // TODO(#7165): Replace any with exact type
+  getInitialState(): any {
     return this.getState(this.initStateName);
   }
 
-  setInitialStateName(stateName) {
+  setInitialStateName(stateName: string): void {
     this.initStateName = stateName;
   }
 
-  getUninterpolatedContentHtml(stateName) {
+  getUninterpolatedContentHtml(stateName: string): string {
     return this.getState(stateName).content.getHtml();
   }
-
-  getVoiceovers(stateName) {
+  // TODO(#7165): Replace any with exact type
+  getVoiceovers(stateName: string): any {
     let state = this.getState(stateName);
     let recordedVoiceovers = state.recordedVoiceovers;
     let contentId = state.content.getContentId();
     return recordedVoiceovers.getBindableVoiceovers(
       contentId);
   }
-
+  // TODO(#7165): Replace any with exact type
   getVoiceover(
-      stateName, languageCode) {
+      stateName: string, languageCode: string): any {
     let state = this.getState(stateName);
     let recordedVoiceovers = state.recordedVoiceovers;
     let contentId = state.content.getContentId();
     return recordedVoiceovers.getVoiceover(contentId, languageCode);
   }
-
-  getAllVoiceovers(languageCode) {
+  // TODO(#7165): Replace any with exact type
+  getAllVoiceovers(languageCode: string): any {
     return this.states.getAllVoiceovers(languageCode);
   }
 
-  getLanguageCode() {
+  getLanguageCode(): string {
     return this.languageCode;
   }
 
-  getAllVoiceoverLanguageCodes() {
+  getAllVoiceoverLanguageCodes(): Array<string> {
     return this.states.getAllVoiceoverLanguageCodes();
   }
 }
@@ -189,11 +197,9 @@ export class ExplorationObjectFactory {
               private paramSpecsObjectFactory: ParamSpecsObjectFactory,
               private statesObjectFactory: StatesObjectFactory,
               private urlInterpolationService: UrlInterpolationService) {}
-  // Static class methods. Note that "this" is not available in
-  // static contexts.
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  createFromBackendDict(explorationBackendDict): Exploration {
+
+  // TODO(#7165): Replace any with exact type
+  createFromBackendDict(explorationBackendDict: any): Exploration {
     /* eslint-enable dot-notation */
     return new Exploration(
       explorationBackendDict.init_state_name,
