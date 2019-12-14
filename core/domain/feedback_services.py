@@ -281,9 +281,11 @@ def get_messages(thread_id):
     Returns:
         list(FeedbackMessage). Contains all the messages in the thread.
     """
-    return [_get_message_from_model(m)
-            for m in feedback_models.GeneralFeedbackMessageModel.get_messages(
-                thread_id)]
+    return [
+        _get_message_from_model(m)
+        for m in feedback_models.GeneralFeedbackMessageModel.get_messages(
+            thread_id)
+    ]
 
 
 def get_message(thread_id, message_id):
@@ -384,9 +386,11 @@ def get_multiple_threads(thread_ids):
     Returns:
         list(FeedbackThread). The list of feedback threads.
     """
-    return [_get_thread_from_model(t)
-            for t in feedback_models.GeneralFeedbackThreadModel.get_multi(
-                thread_ids)]
+    return [
+        _get_thread_from_model(t)
+        for t in feedback_models.GeneralFeedbackThreadModel.get_multi(
+            thread_ids)
+    ]
 
 
 def _get_thread_from_model(thread_model):
@@ -438,9 +442,11 @@ def get_last_two_message_ids(thread):
         list(str|None). The ids of the last two messages of the thread. If
             the message does not exist, None is returned.
     """
-    return [get_full_message_id(thread.id, i) if i >= 0 else None
-            for i in python_utils.RANGE(
-                thread.message_count - 1, thread.message_count - 3, -1)]
+    return [
+        get_full_message_id(thread.id, i) if i >= 0 else None
+        for i in python_utils.RANGE(
+            thread.message_count - 1, thread.message_count - 3, -1)
+    ]
 
 
 def get_thread_summaries(user_id, thread_ids):
@@ -476,9 +482,10 @@ def get_thread_summaries(user_id, thread_ids):
                 exploration belongs.
         int. The number of threads not read by the user.
     """
-    feedback_thread_user_model_ids = (
-        [feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
-            user_id, thread_id) for thread_id in thread_ids])
+    feedback_thread_user_model_ids = [
+        feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
+            user_id, thread_id) for thread_id in thread_ids
+    ]
     exploration_ids = [thread_id.split('.')[1] for thread_id in thread_ids]
     multiple_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models([
@@ -491,8 +498,8 @@ def get_thread_summaries(user_id, thread_ids):
     feedback_thread_user_models = multiple_models[1]
     explorations = multiple_models[2]
 
-    threads = [_get_thread_from_model(thread_model)
-               for thread_model in thread_models]
+    threads = [
+        _get_thread_from_model(thread_model) for thread_model in thread_models]
 
     last_two_messages_ids = []
     for thread in threads:
