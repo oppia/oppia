@@ -52,7 +52,7 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             thread_model.put(update_last_updated_time=False)
             yield ('Updated', 1)
         else:
-            yield ('Correct', 1)
+            yield ('Already up-to-date', 1)
 
     @staticmethod
     def reduce(key, value_strs):
@@ -68,7 +68,7 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             thread_model: GeneralFeedbackThreadModel. Model of the thread to
                 have its cache updated.
             last_nonempty_message: FeedbackMessage|None. The most recent message
-                with non-empty text, or None.
+                with non-empty text, or None when no such message exists.
 
         Returns:
             bool. Whether the cache was actually updated.
@@ -89,7 +89,7 @@ class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             thread_model: GeneralFeedbackThreadModel. Model of the thread to
                 have its cache updated.
             last_nonempty_message: FeedbackMessage|None. The most recent message
-                with non-empty text, or None.
+                with non-empty text, or None when no such message exists.
 
         Returns:
             bool. Whether the cache was actually updated.
