@@ -141,7 +141,7 @@ export class ExtractImageFilenamesFromStateService {
         'oppia-noninteractive-image');
       for (let i = 0; i < imageTagList.length; i++) {
         // We have the attribute of filepath in oppia-noninteractive-image tag.
-        // But it actually contains the filename only. We use the letiable
+        // But it actually contains the filename only. We use the variable
         // filename instead of filepath since in the end we are retrieving the
         // filenames in the exploration.
         let filename = JSON.parse(
