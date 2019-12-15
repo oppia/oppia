@@ -28,7 +28,8 @@ describe('Voiceover object factory', () => {
     voiceover = vof.createFromBackendDict({
       filename: 'a.mp3',
       file_size_bytes: 200000,
-      needs_update: false
+      needs_update: false,
+      duration: 10.0
     });
   });
 
@@ -37,7 +38,8 @@ describe('Voiceover object factory', () => {
     expect(voiceover).toEqual(vof.createFromBackendDict({
       filename: 'a.mp3',
       file_size_bytes: 200000,
-      needs_update: true
+      needs_update: true,
+      duration: 10.0
     }));
   });
 
@@ -46,14 +48,16 @@ describe('Voiceover object factory', () => {
     expect(voiceover).toEqual(vof.createFromBackendDict({
       filename: 'a.mp3',
       file_size_bytes: 200000,
-      needs_update: true
+      needs_update: true,
+      duration: 10.0
     }));
 
     voiceover.toggleNeedsUpdateAttribute();
     expect(voiceover).toEqual(vof.createFromBackendDict({
       filename: 'a.mp3',
       file_size_bytes: 200000,
-      needs_update: false
+      needs_update: false,
+      duration: 10.0
     }));
   });
 
@@ -61,16 +65,18 @@ describe('Voiceover object factory', () => {
     expect(voiceover.toBackendDict()).toEqual({
       filename: 'a.mp3',
       file_size_bytes: 200000,
-      needs_update: false
+      needs_update: false,
+      duration: 10.0
     });
   });
 
   it('should create a new voiceover object', () => {
-    expect(vof.createNew('filename.mp3', 100000)).toEqual(
+    expect(vof.createNew('filename.mp3', 100000, 5.0)).toEqual(
       vof.createFromBackendDict({
         filename: 'filename.mp3',
         file_size_bytes: 100000,
-        needs_update: false
+        needs_update: false,
+        duration: 5.0
       })
     );
   });
