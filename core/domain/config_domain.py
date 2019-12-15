@@ -286,6 +286,15 @@ class Registry(python_utils.OBJECT):
 
         return schemas_dict
 
+    @classmethod
+    def get_all_config_property_names(cls):
+        """Return a list of all the config property names.
+
+        Returns:
+            list. The list of all config property names.
+        """
+        return list(cls._config_registry)
+
 
 PROMO_BAR_ENABLED = ConfigProperty(
     'promo_bar_enabled', BOOL_SCHEMA,
