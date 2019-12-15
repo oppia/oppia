@@ -48,7 +48,7 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           imageFileName, entityType, entityId) {
         var encodedFilepath = window.encodeURIComponent(imageFileName);
         return $sce.trustAsResourceUrl(
-          AssetsBackendApiService.getTopicThumbnailUrlForPreview(
+          AssetsBackendApiService.getThumbnailUrlForPreview(
             entityType, entityId, encodedFilepath));
       },
 
