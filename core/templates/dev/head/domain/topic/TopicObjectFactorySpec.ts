@@ -18,11 +18,11 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 
 describe('Topic object factory', () => {
-  let topicObjectFactory: TopicObjectFactory = null;
-  let _sampleTopic = null;
+  let topicObjectFactory: TopicObjectFactory;
+  let _sampleTopic: Topic;
 
   beforeEach(() => {
     topicObjectFactory = TestBed.get(TopicObjectFactory);
@@ -71,7 +71,7 @@ describe('Topic object factory', () => {
   it('should validate the topic', () => {
     _sampleTopic.setName('');
     _sampleTopic.addCanonicalStory('story_2');
-    _sampleTopic.getSubtopics()[0].addSkill('skill_1');
+    _sampleTopic.getSubtopics()[0].addSkill('skill_1', '');
 
     expect(_sampleTopic.validate()).toEqual([
       'Topic name should not be empty.',

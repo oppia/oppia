@@ -17,10 +17,10 @@
  * topic domain objects.
  */
 
-import { Injectable} from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-import { cloneDeep} from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
@@ -50,7 +50,7 @@ export class Topic {
       additionalStoryReferences: Array<StoryReference>,
       uncategorizedSkillIds: Array<string>,
       nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
-      skillIdToDescriptionMap: Array<string>,
+      skillIdToDescriptionMap: any,
       skillSummaryObjectFactory: SkillSummaryObjectFactory,
       subtopicObjectFactory: SubtopicObjectFactory,
       storyReferenceObjectFactory: StoryReferenceObjectFactory) {
@@ -60,6 +60,7 @@ export class Topic {
     this._languageCode = languageCode;
     this._canonicalStoryReferences = canonicalStoryReferences;
     this._additionalStoryReferences = additionalStoryReferences;
+    this.skillSummaryObjectFactory = skillSummaryObjectFactory;
     this._uncategorizedSkillSummaries = uncategorizedSkillIds.map(
       (skillId: string) => {
         return this.skillSummaryObjectFactory.create(
@@ -68,7 +69,6 @@ export class Topic {
     this._nextSubtopicId = nextSubtopicId;
     this._version = version;
     this._subtopics = cloneDeep(subtopics);
-    this.skillSummaryObjectFactory = skillSummaryObjectFactory;
     this.subtopicObjectFactory = subtopicObjectFactory;
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
   }
@@ -152,7 +152,7 @@ export class Topic {
     for (let i = 0; i < subtopics.length; i++) {
       issues = issues.concat(subtopics[i].validate());
       let skillIds = subtopics[i].getSkillSummaries().map(
-        function(skillSummary) {
+        (skillSummary) => {
           return skillSummary.getId();
         }
       );
@@ -401,20 +401,22 @@ export class TopicObjectFactory {
       private skillSummaryObjectFactory: SkillSummaryObjectFactory) {}
   // TODO(#7165): Replace any with exact type
   create(topicBackendDict: any, skillIdToDescriptionDict: any): Topic {
-    let subtopics = topicBackendDict.subtopics.map((subtopic) => {
+    let subtopics = topicBackendDict.subtopics.map((subtopic: Subtopic) => {
       return this.subtopicObjectFactory.create(
         subtopic, skillIdToDescriptionDict);
     });
     let canonicalStoryReferences =
-        topicBackendDict.canonical_story_references.map((reference) => {
-          return this.storyReferenceObjectFactory.createFromBackendDict(
-            reference);
-        });
+        topicBackendDict.canonical_story_references.map(
+          (reference: StoryReference) => {
+            return this.storyReferenceObjectFactory.createFromBackendDict(
+              reference);
+          });
     let additionalStoryReferences =
-        topicBackendDict.additional_story_references.map((reference) => {
-          return this.storyReferenceObjectFactory.createFromBackendDict(
-            reference);
-        });
+        topicBackendDict.additional_story_references.map(
+          (reference: StoryReference) => {
+            return this.storyReferenceObjectFactory.createFromBackendDict(
+              reference);
+          });
     return new Topic(
       topicBackendDict.id, topicBackendDict.name,
       topicBackendDict.description, topicBackendDict.language_code,
@@ -432,8 +434,8 @@ export class TopicObjectFactory {
     return new Topic(
       null, 'Topic name loading', 'Topic description loading',
       'en', [], [], [], 1, 1, [], {},
-      this.skillSummaryObjectFactory,
-      this.subtopicObjectFactory, this.storyReferenceObjectFactory
+      this.skillSummaryObjectFactory, this.subtopicObjectFactory,
+      this.storyReferenceObjectFactory
     );
   }
 }
