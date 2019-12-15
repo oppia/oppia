@@ -567,7 +567,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration': 0.3
                             }
                         }
                     }
@@ -608,7 +609,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
                         'en': {
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration': 0.3
                         }
                     }
                 }

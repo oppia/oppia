@@ -2332,6 +2332,31 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
+    def _convert_states_v30_dict_to_v31_dict(cls, states_dict):
+        """Converts from version 30 to 31. Version 31 updates
+        the Voiceover duration to have duration of the audio file
+        under FileModel.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            voiceovers_mapping = (state_dict['recorded_voiceovers']
+                                  ['voiceovers_mapping'])
+            for voiceover in voiceovers_mapping.keys():
+                for content in voiceovers_mapping[voiceover].keys():
+                    # Add 0.0 to any existing voiceover content
+                    # in Content, Feedback, Hints, Solutions.
+                    voiceovers_mapping[voiceover][content]['duration'] = 0.0
+        return states_dict
+
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2366,7 +2391,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 35
+    CURRENT_EXP_SCHEMA_VERSION = 36
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3004,6 +3029,29 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
+    def _convert_v35_dict_to_v36_dict(cls, exploration_dict):
+        """Converts a v35 exploration dict into a v36 exploration dict.
+        Updates existing explorations to match the Voiceover class to have
+        the duration attribute initalised to 0.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v35.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v36.
+        """
+        exploration_dict['schema_version'] = 36
+
+        exploration_dict['states'] = cls._convert_states_v30_dict_to_v31_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 31
+
+        return exploration_dict
+
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3210,6 +3258,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v34_dict_to_v35_dict(
                 exploration_dict)
             exploration_schema_version = 35
+
+        if exploration_schema_version == 35:
+            exploration_dict = cls._convert_v35_dict_to_v36_dict(
+                exploration_dict)
+            exploration_schema_version = 36
 
         return (exploration_dict, initial_schema_version)
 

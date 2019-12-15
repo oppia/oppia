@@ -398,7 +398,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration': 0.34342
                             }
                         }
                     }
@@ -472,7 +473,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                         'en': {
                             'file_size_bytes': 100,
                             'filename': 'test.mp3',
-                            'needs_update': False
+                            'needs_update': False,
+                            'duration': 0.34342
                         }
                     }
                 }
@@ -586,7 +588,8 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                             'en': {
                                 'filename': 'test.mp3',
                                 'file_size_bytes': 100,
-                                'needs_update': False
+                                'needs_update': False,
+                                'duration': 0.34342
                             }
                         }
                     }

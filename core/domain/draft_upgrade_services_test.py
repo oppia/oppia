@@ -119,6 +119,19 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
             msg='Current schema version is %d but DraftUpgradeUtil.%s is '
             'unimplemented.' % (state_schema_version, conversion_fn_name))
 
+    def test_convert_states_v30_dict_to_v31_dict(self):
+        draft_change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': 'Intro',
+                'property_name': 'content',
+                'new_value': 'new value'
+            })]
+        self.assertEqual(
+            draft_upgrade_services.DraftUpgradeUtil._convert_states_v30_dict_to_v31_dict(  # pylint: disable=protected-access,line-too-long
+                draft_change_list)[0].to_dict(),
+            draft_change_list[0].to_dict())
+
     def test_convert_states_v29_dict_to_v30_dict(self):
         draft_change_list = [
             exp_domain.ExplorationChange({

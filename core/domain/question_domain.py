@@ -228,6 +228,30 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
+        """Converts from version 30 to 31. Version 31 updates
+        the Voiceover duration to have duration of the audio file
+        under FileModel.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initalize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        voiceovers_mapping = (question_state_dict['recorded_voiceovers']
+                              ['voiceovers_mapping'])
+        for voiceover in voiceovers_mapping.keys():
+            for content in voiceovers_mapping[voiceover].keys():
+                # Add 0.0 to any existing voiceover content
+                # in Content, Feedback, Hints, Solutions.
+                voiceovers_mapping[voiceover][content]['duration'] = 0.0
+        return question_state_dict
+
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
