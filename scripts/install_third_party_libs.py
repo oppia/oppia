@@ -126,16 +126,18 @@ def pip_install(package, version, install_path):
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
     try:
-        FNULL = open(os.devnull, 'w')
+        fnull = open(os.devnull, 'w')
         subprocess.check_call([
-            sys.executable, '-m', 'pip', 'install', '%s==%s' % (package, version),
-            '--target', install_path], stdout=FNULL, stderr=subprocess.STDOUT)
+            sys.executable, '-m', 'pip', 'install',
+            '%s==%s' % (package, version), '--target', install_path],
+            stdout=fnull, stderr=subprocess.STDOUT)
     except Exception as ex:
-        print('\033[0;31;40m' + str(ex) + '\033[0m')
-        print('Trying by setting --user flag')
+        python_utils.PRINT('\033[0;31;40m' + str(ex) + '\033[0m')
+        python_utils.PRINT('Trying by setting --user flag')
         subprocess.check_call([
-            sys.executable, '-m', 'pip', 'install', '%s==%s' % (package, version),
-            '--target', install_path, '--user', '--prefix=', '--system'])
+            sys.executable, '-m', 'pip', 'install',
+            '%s==%s' % (package, version), '--target', install_path,
+            '--user', '--prefix=', '--system'])
 
 
 def install_skulpt(parsed_args):
