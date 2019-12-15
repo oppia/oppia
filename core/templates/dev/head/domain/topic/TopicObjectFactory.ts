@@ -20,7 +20,7 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { cloneDeep } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
@@ -50,6 +50,7 @@ export class Topic {
       additionalStoryReferences: Array<StoryReference>,
       uncategorizedSkillIds: Array<string>,
       nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
+      // TODO(#7165): Replace any with exact type.
       skillIdToDescriptionMap: any,
       skillSummaryObjectFactory: SkillSummaryObjectFactory,
       subtopicObjectFactory: SubtopicObjectFactory,

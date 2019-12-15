@@ -18,10 +18,10 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { PlayerTranscriptService } from
-  'pages/exploration-player-page/services/player-transcript.service';
 import { PlayerPositionService } from
   'pages/exploration-player-page/services/player-position.service';
+import { PlayerTranscriptService } from
+  'pages/exploration-player-page/services/player-transcript.service';
 import { StateCardObjectFactory } from
   'domain/state_card/StateCardObjectFactory';
 
