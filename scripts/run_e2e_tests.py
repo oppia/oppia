@@ -217,6 +217,7 @@ def tweak_feconf_file(feconf_file_path, enable_community_dashboard):
     enabled.
 
     Args:
+        feconf_file_path: str. Path to the feconf.py file.
         enable_community_dashboard: boolean. Represents whether community
             dashboard is enabled.
     """
