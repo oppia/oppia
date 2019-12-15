@@ -468,6 +468,7 @@ def inplace_replace_file(filename, regex_pattern, replace):
         line = line.rstrip()
         line = regex.sub(replace, line)
         python_utils.PRINT(line)
+    os.remove('%s.bak' % filename)
 
 
 class CD(python_utils.OBJECT):

@@ -649,6 +649,8 @@ class CommonTests(test_utils.GenericTestBase):
         # pylint: enable=unused-argument
         def mock_print(unused_output):
             return
+        def mock_remove(unused_arg):
+            return
 
         input_swap = self.swap_with_checks(
             fileinput, 'input', mock_input,
@@ -660,7 +662,9 @@ class CommonTests(test_utils.GenericTestBase):
         print_swap = self.swap_with_checks(
             python_utils, 'PRINT', mock_print,
             expected_args=[(line,) for line in expected_lines], called_times=4)
-        with print_swap, input_swap:
+        remove_swap = self.swap_with_checks(
+            os, 'remove', mock_remove, expected_args=('constant.js.bak',))
+        with print_swap, input_swap, remove_swap:
             common.inplace_replace_file(
                 constant_file, '"DEV_MODE": .*', '"DEV_MODE": true')
 
