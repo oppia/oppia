@@ -28,7 +28,10 @@ import python_utils
 import release_constants
 
 NODE_VERSION = '10.15.3'
-YARN_VERSION = 'v1.17.3'
+
+# NB: Please ensure that the version is consistent with the version in .yarnrc.
+YARN_VERSION = 'v1.21.1'
+
 COVERAGE_VERSION = '4.5.4'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
