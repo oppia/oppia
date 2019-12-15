@@ -200,6 +200,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import {PlayerPositionService} from '../pages/exploration-player-page/services/player-position.service';
 
 @Injectable({
   providedIn: 'root'
@@ -368,6 +369,9 @@ export class UpgradedServices {
         upgradedServices['NormalizeWhitespacePipe'],
         upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
         upgradedServices['CodeNormalizerService']);
+    upgradedServices['PlayerPositionService'] = new PlayerPositionService(
+      upgradedServices['ContextService'],
+      upgradedServices['PlayerTranscriptService']);
     upgradedServices['StateContentService'] = new StateContentService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateHintsService'] = new StateHintsService(
