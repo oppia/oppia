@@ -102,7 +102,7 @@ angular.module('oppia').directive('inputResponsePair', [
           };
 
           $scope.getFeedbackAudioHighlightClass = function() {
-            if (!$scope.isLastPair) {
+            if (!$scope.isLastPair()) {
               return '';
             }
             if (AudioTranslationManagerService
