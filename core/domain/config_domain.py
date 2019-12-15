@@ -293,10 +293,7 @@ class Registry(python_utils.OBJECT):
         Returns:
             list. The list of all config property names.
         """
-        property_names = list()
-        for property_name in cls._config_registry:
-            property_names.append(property_name)
-        return property_names
+        return list(cls._config_registry)
 
 
 PROMO_BAR_ENABLED = ConfigProperty(
