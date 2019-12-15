@@ -237,9 +237,10 @@ def run_webdriver_manager(parameters):
     python_utils.PRINT(common.run_cmd(web_driver_command))
 
 
-def setup_and_install_dependencies():
+def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
-    install_third_party_libs.main(args=[])
+    if not skip_install:
+        install_third_party_libs.main(args=[])
     setup.main(args=[])
     setup_gae.main(args=[])
 
@@ -428,7 +429,7 @@ def main(args=None):
 
     if other_instance_running:
         sys.exit(1)
-    setup_and_install_dependencies()
+    setup_and_install_dependencies(parsed_args.skip_install)
 
 
     atexit.register(cleanup)
@@ -451,6 +452,7 @@ def main(args=None):
 
     p = subprocess.Popen(commands)
     p.communicate()
+    sys.exit(p.returncode)
 
 
 if __name__ == '__main__':  # pragma: no cover

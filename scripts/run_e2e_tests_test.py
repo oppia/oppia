@@ -298,7 +298,7 @@ of the failed tests in ../protractor-screenshots/
         with print_swap, run_cmd_swap:
             run_e2e_tests.run_webdriver_manager(['start', '--detach'])
 
-    def test_setup_and_install_dependencies(self):
+    def test_setup_and_install_dependencies_without_skip(self):
         # pylint: disable=unused-argument
         def mock_setup_main(args):
             return
@@ -320,7 +320,31 @@ of the failed tests in ../protractor-screenshots/
             mock_install_third_party_libs_main, expected_kwargs={'args': []})
 
         with setup_swap, setup_gae_swap, install_swap:
-            run_e2e_tests.setup_and_install_dependencies()
+            run_e2e_tests.setup_and_install_dependencies(False)
+
+    def test_setup_and_install_dependencies_with_skip(self):
+        # pylint: disable=unused-argument
+        def mock_setup_main(args):
+            return
+
+        def mock_install_third_party_libs_main(args):
+            return
+
+        def mock_setup_gae_main(args):
+            return
+        # pylint: enable=unused-argument
+
+        setup_swap = self.swap_with_checks(
+            setup, 'main', mock_setup_main, expected_kwargs={'args': []})
+        setup_gae_swap = self.swap_with_checks(
+            setup_gae, 'main', mock_setup_gae_main, expected_kwargs={'args': []}
+            )
+        install_swap = self.swap_with_checks(
+            install_third_party_libs, 'main',
+            mock_install_third_party_libs_main, called=False)
+
+        with setup_swap, setup_gae_swap, install_swap:
+            run_e2e_tests.setup_and_install_dependencies(True)
 
     def test_tweak_feconf_file_with_dashboard_enabled(self):
         swap_inplace_replace = self.inplace_replace_swap(expected_args=(
@@ -638,7 +662,7 @@ of the failed tests in ../protractor-screenshots/
         def mock_check_running_instance(*unused_args):
             return False
 
-        def mock_setup_and_install_dependencies():
+        def mock_setup_and_install_dependencies(unused_arg):
             return
 
         def mock_register(unused_func):
@@ -675,7 +699,11 @@ of the failed tests in ../protractor-screenshots/
                 return
             result = MockProcessClass()
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
+            result.returncode = 0
             return result
+
+        def mock_exit(unused_code):
+            return
 
         check_swap = self.swap_with_checks(
             run_e2e_tests, 'check_running_instance',
@@ -684,7 +712,7 @@ of the failed tests in ../protractor-screenshots/
 
         setup_and_install_swap = self.swap_with_checks(
             run_e2e_tests, 'setup_and_install_dependencies',
-            mock_setup_and_install_dependencies)
+            mock_setup_and_install_dependencies, expected_args=(False,))
 
         register_swap = self.swap_with_checks(
             atexit, 'register', mock_register, expected_args=(mock_cleanup,))
@@ -717,8 +745,10 @@ of the failed tests in ../protractor-screenshots/
             subprocess, 'Popen', mock_popen, expected_args=([
                 common.NODE_BIN_PATH, run_e2e_tests.PROTRACTOR_BIN_PATH,
                 'commands'],))
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=(0,))
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap, start_google_engine_swap:
                 with wait_swap, check_screenshot_swap, get_parameters_swap:
-                    with popen_swap:
+                    with popen_swap, exit_swap:
                         run_e2e_tests.main(args=[])
