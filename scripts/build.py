@@ -215,7 +215,8 @@ def _minify(source_path, target_path):
     # https://circleci.com/blog/how-to-handle-java-oom-errors/
     # Use relative path to avoid java command line parameter parse error on
     # Windows. Convert to posix style path on Windows because the Windows
-    # style path may cause syntax error.
+    # style path may cause syntax error when the java program tries to
+    # interpret this path.
     target_path = common.convert_to_posixpath(
         os.path.relpath(target_path))
     source_path = common.convert_to_posixpath(
@@ -425,10 +426,11 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         # This is because html paths are used by backend and we work with
         # paths without hash part in backend.
         if not filepath.endswith('.html'):
-            # The path to the required file in the compiled HTML is in url,
-            # while on Windows, the path here will be in Windows-Style. We need
-            # to convert the Windows-Style path to url style so the target
-            # path can be successfully replaced with the one with hash.
+            # The path to the required file in the compiled HTML is in
+            # url-style, while on Windows, the path here will be in
+            # Windows-Style. We need to convert the Windows-Style path to url
+            # style so the target path can be successfully replaced with the
+            # one with hash.
             filepath_with_hash = convert_filepath_to_hashed_url(
                 filepath, file_hash)
             content = content.replace(
