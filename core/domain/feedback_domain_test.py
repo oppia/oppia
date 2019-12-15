@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import feedback_domain
+from core.domain import feedback_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -56,6 +57,29 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'last message', self.viewer_id)
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict())
+
+    def test_get_last_two_message_ids_from_thread_with_many_messages(self):
+        fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+        thread = feedback_domain.FeedbackThread(
+            self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
+            5, # This value decides the number of messages.
+            fake_date, fake_date, 'last message', self.VIEWER_USERNAME)
+
+        self.assertEqual(
+            thread.get_last_two_message_ids(),
+            ['exp0.thread0.4', 'exp0.thread0.3'])
+
+    def test_get_last_two_message_ids_from_thread_with_only_one_message(self):
+        fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+        thread = feedback_domain.FeedbackThread(
+            self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
+            u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
+            1, # This value decides the number of messages.
+            fake_date, fake_date, 'last message', self.VIEWER_USERNAME)
+
+        self.assertEqual(
+            thread.get_last_two_message_ids(), ['exp0.thread0.0', None])
 
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):

@@ -96,6 +96,33 @@ class FeedbackThread(python_utils.OBJECT):
                 if self.last_nonempty_message_author_id else None),
         }
 
+    def get_last_two_message_ids(self):
+        """Returns the full message ids of the last two messages of the thread.
+        If the thread has only one message, the id of the second last message is
+        None.
+
+        Returns:
+            list(str|None). The ids of the last two messages of the thread. If
+                the message does not exist, None is returned.
+        """
+        return [
+            self._get_full_message_id(i) if i >= 0 else None
+            for i in python_utils.RANGE(
+                self.message_count - 1, self.message_count - 3, -1)
+        ]
+
+    def _get_full_message_id(self, message_id):
+        """Returns the full id of the message.
+
+        Args:
+            message_id: int. The id of the message for which we have to fetch
+                the complete message id.
+
+        Returns:
+            str. The full id corresponding to the given message id.
+        """
+        return '.'.join([self.id, python_utils.UNICODE(message_id)])
+
 
 class FeedbackMessage(python_utils.OBJECT):
     """Domain object for a feedback message.

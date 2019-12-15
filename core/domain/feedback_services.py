@@ -415,40 +415,6 @@ def _get_thread_from_model(thread_model):
         thread_model.last_nonempty_message_author_id)
 
 
-def get_full_message_id(thread_id, message_id):
-    """Returns the full id of the message.
-
-    Args:
-        thread_id: str. The ID of the thread to build the message id for.
-        message_id: int. The id of the message for which we have to fetch
-            the complete message id.
-
-    Returns:
-        str. The full id corresponding to the given message id.
-    """
-    return '.'.join([thread_id, python_utils.UNICODE(message_id)])
-
-
-def get_last_two_message_ids(thread):
-    """Returns the full message ids of the last two messages of the thread.
-    If the thread has only one message, the id of the second last message is
-    None.
-
-    Args:
-        thread: FeedbackThread|GeneralFeedbackThreadModel. The thread to build
-            the message ids from.
-
-    Returns:
-        list(str|None). The ids of the last two messages of the thread. If
-            the message does not exist, None is returned.
-    """
-    return [
-        get_full_message_id(thread.id, i) if i >= 0 else None
-        for i in python_utils.RANGE(
-            thread.message_count - 1, thread.message_count - 3, -1)
-    ]
-
-
 def get_thread_summaries(user_id, thread_ids):
     """Returns a list of summaries corresponding to each of the threads given.
     It also returns the number of threads that are currently not read by the
@@ -503,7 +469,7 @@ def get_thread_summaries(user_id, thread_ids):
 
     last_two_messages_ids = []
     for thread in threads:
-        last_two_messages_ids += get_last_two_message_ids(thread)
+        last_two_messages_ids += thread.get_last_two_message_ids()
 
     messages = feedback_models.GeneralFeedbackMessageModel.get_multi(
         last_two_messages_ids)
