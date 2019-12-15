@@ -116,6 +116,8 @@ import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import { PlayerPositionService } from
+  'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { PlaythroughIssueObjectFactory } from
@@ -127,6 +129,8 @@ import { RecordedVoiceoversObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -166,8 +170,12 @@ import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+import { StoryReferenceObjectFactory } from
+  'domain/topic/StoryReferenceObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtopicObjectFactory } from
+  'domain/topic/SubtopicObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
@@ -182,6 +190,8 @@ import { TextInputValidationService } from
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { TopicObjectFactory } from
+  'domain/topic/TopicObjectFactory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -200,16 +210,6 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { PlayerPositionService } from
-  'pages/exploration-player-page/services/player-position.service';
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
-import { SubtopicObjectFactory } from
-  'domain/topic/SubtopicObjectFactory';
-import { StoryReferenceObjectFactory } from
-  'domain/topic/StoryReferenceObjectFactory';
-import { TopicObjectFactory } from
-  'domain/topic/TopicObjectFactory';
 
 @Injectable({
   providedIn: 'root'
