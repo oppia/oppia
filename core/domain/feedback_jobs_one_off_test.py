@@ -253,6 +253,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(self.editor_id, 'first text')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_text, 'first text')
 
@@ -261,6 +262,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'second text')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_text, 'second text')
 
@@ -268,6 +270,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(self.editor_id, '')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_text, None)
 
@@ -276,6 +279,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, '')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_text, None)
 
@@ -284,6 +288,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'first text')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_text, 'first text')
 
@@ -292,6 +297,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, '')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_text, 'first text')
 
@@ -299,6 +305,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(self.editor_id, 'first text')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
@@ -307,6 +314,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'second text')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
@@ -314,6 +322,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         thread_id = self._create_thread(None, 'first text')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
@@ -322,6 +331,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, None, 'second text')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
@@ -330,6 +340,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, None, 'second text')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(model.last_nonempty_message_author_id)
 
@@ -338,6 +349,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, 'second text')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
@@ -346,6 +358,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, None, '')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertEqual(model.last_nonempty_message_author_id, self.editor_id)
 
@@ -354,5 +367,6 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
         self._create_message(thread_id, self.editor_id, '')
 
         self.assertEqual(self._run_one_off_job(), [('Already up-to-date', 1)])
+
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(model.last_nonempty_message_author_id)
