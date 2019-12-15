@@ -92,7 +92,7 @@ describe('State card object factory', () => {
       'content');
   });
 
-  it('should be able to get the letious fields', () => {
+  it('should be able to get the various fields', () => {
     expect(_sampleCard.getStateName()).toEqual('State 1');
     expect(_sampleCard.getContentHtml()).toEqual('<p>Content</p>');
     expect(_sampleCard.getInteraction().id).toEqual('TextInput');
@@ -165,7 +165,7 @@ describe('State card object factory', () => {
     expect(_sampleCard.getInputResponsePairs()).toEqual([]);
   });
 
-  it('should be able to set the letious fields', () => {
+  it('should be able to set the various fields', () => {
     _sampleCard.setInteractionHtml('<interaction_2></interaction_2>');
     expect(_sampleCard.getInteractionHtml()).toEqual(
       '<interaction_2></interaction_2>');

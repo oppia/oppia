@@ -42,7 +42,6 @@ export class StateCard {
   _contentHtml: string;
   _interactionHtml: string;
   _interaction: Interaction;
-  // TODO(#7165): Replace 'any' with the exact type.
   _inputResponsePairs: Array<IInputResponsePair>;
   _recordedVoiceovers: RecordedVoiceovers;
   _contentId: string;
