@@ -132,8 +132,7 @@ def pip_install(package, version, install_path):
             '%s==%s' % (package, version),
             '--target', install_path], stdout=fnull, stderr=subprocess.STDOUT)
     except Exception as ex:
-        python_utils.PRINT(python_utils.convert_to_bytes(
-            '\033[0;31;40m' + str(ex) + '\033[0m'))
+        python_utils.PRINT(ex)
         python_utils.PRINT('Trying by setting --user flag')
         subprocess.check_call([
             sys.executable, '-m', 'pip', 'install',
