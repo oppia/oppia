@@ -41,6 +41,7 @@ PROTRACTOR_BIN_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'protractor', 'bin', 'protractor')
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
+FECONF_FILE_PATH = os.path.join('feconf.py')
 WAIT_PORT_TIMEOUT = 1000
 WEBDRIVER_HOME_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'webdriver-manager')
@@ -112,6 +113,9 @@ _PARSER.add_argument(
     help='Run the tests in prod mode. Static resources are served from'
          ' build directory and use cache slugs.',
     action='store_true')
+_PARSER.add_argument(
+    '--community_dashboard_enabled', action='store_true',
+    help='Run the test after enabling the community dashboard page.')
 
 _PARSER.add_argument(
     '--suite', default='full',
@@ -208,6 +212,19 @@ def tweak_constant_file(constant_file, dev_mode):
     common.inplace_replace_file(constant_file, pattern, replace)
 
 
+def tweak_feconf_file(feconf_file_path, enable_community_dashboard):
+    """Change feconf.py file based on whether the community dashboard is
+    enabled.
+
+    Args:
+        enable_community_dashboard: boolean. Represents whether community
+            dashboard is enabled.
+    """
+    pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
+    replace = 'COMMUNITY_DASHBOARD_ENABLED = %s' % enable_community_dashboard
+    common.inplace_replace_file(feconf_file_path, pattern, replace)
+
+
 def run_webdriver_manager(parameters):
     """Run commands of webdriver manager.
 
@@ -242,7 +259,6 @@ def build_js_files(dev_mode):
             [common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
              'webpack.dev.config.ts'])
     build.main(args=(['--prod_env'] if not dev_mode else []))
-    os.remove('%s.bak' % CONSTANT_FILE_PATH)
 
 
 def tweak_webdriver_manager():
@@ -419,6 +435,7 @@ def main(args=None):
 
     dev_mode = not parsed_args.prod_env
     run_on_browserstack = parsed_args.browserstack
+    tweak_feconf_file(FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
     build_js_files(dev_mode)
     start_webdriver_manager()
 

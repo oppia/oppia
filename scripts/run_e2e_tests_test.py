@@ -322,6 +322,27 @@ of the failed tests in ../protractor-screenshots/
         with setup_swap, setup_gae_swap, install_swap:
             run_e2e_tests.setup_and_install_dependencies()
 
+    def test_tweak_feconf_file_with_dashboard_enabled(self):
+        swap_inplace_replace = self.inplace_replace_swap(expected_args=(
+            run_e2e_tests.FECONF_FILE_PATH,
+            'COMMUNITY_DASHBOARD_ENABLED = .*',
+            'COMMUNITY_DASHBOARD_ENABLED = True'
+        ))
+
+        with swap_inplace_replace:
+            run_e2e_tests.tweak_feconf_file(
+                run_e2e_tests.FECONF_FILE_PATH, True)
+
+    def test_tweak_feconf_file_with_dashboard_disabled(self):
+        swap_inplace_replace = self.inplace_replace_swap(expected_args=(
+            run_e2e_tests.FECONF_FILE_PATH,
+            'COMMUNITY_DASHBOARD_ENABLED = .*',
+            'COMMUNITY_DASHBOARD_ENABLED = False'
+        ))
+        with swap_inplace_replace:
+            run_e2e_tests.tweak_feconf_file(
+                run_e2e_tests.FECONF_FILE_PATH, False)
+
     def test_build_js_files_in_dev_mode(self):
 
         def mock_tweak_constant_file(unused_filename, unused_dev_mode):
@@ -340,15 +361,11 @@ of the failed tests in ../protractor-screenshots/
             expected_args=(expected_commands,))
         build_main_swap = self.swap_with_checks(
             build, 'main', self.mock_build_main, expected_kwargs={'args': []})
-        remove_swap = self.swap_with_checks(
-            os, 'remove', self.mock_remove,
-            expected_args=('%s.bak' % self.mock_constant_file_path,))
         print_swap = self.print_swap(called=False)
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with tweak_constant_file_swap, run_cmd_swap, build_main_swap:
-                    with remove_swap:
-                        run_e2e_tests.build_js_files(True)
+                    run_e2e_tests.build_js_files(True)
 
     def test_build_js_files_in_prod_mode(self):
 
@@ -366,15 +383,10 @@ of the failed tests in ../protractor-screenshots/
             build, 'main', self.mock_build_main,
             expected_kwargs={'args': ['--prod_env']})
 
-        remove_swap = self.swap_with_checks(
-            os, 'remove', self.mock_remove,
-            expected_args=('%s.bak' % self.mock_constant_file_path,))
-
         with self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with tweak_constant_file_swap, run_cmd_swap, build_main_swap:
-                    with remove_swap:
-                        run_e2e_tests.build_js_files(False)
+                    run_e2e_tests.build_js_files(False)
 
     def test_tweak_webdriver_manager_on_x64_machine(self):
         expected_replace = 'this.osArch = "x64";'
@@ -635,6 +647,9 @@ of the failed tests in ../protractor-screenshots/
         def mock_cleanup():
             return
 
+        def mock_tweak_feconf_file(unused_file, unused_arg):
+            return
+
         def mock_build_js_files(unused_arg):
             return
 
@@ -675,6 +690,9 @@ of the failed tests in ../protractor-screenshots/
             atexit, 'register', mock_register, expected_args=(mock_cleanup,))
 
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
+        tweak_feconf_file_swap = self.swap_with_checks(
+            run_e2e_tests, 'tweak_feconf_file', mock_tweak_feconf_file,
+            expected_args=(run_e2e_tests.FECONF_FILE_PATH, False,))
         build_swap = self.swap_with_checks(
             run_e2e_tests, 'build_js_files', mock_build_js_files,
             expected_args=(True,))
