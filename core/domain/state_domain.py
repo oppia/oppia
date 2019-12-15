@@ -658,6 +658,7 @@ class Voiceover(python_utils.OBJECT):
             'filename': self.filename,
             'file_size_bytes': self.file_size_bytes,
             'needs_update': self.needs_update,
+            'duration': self.duration
         }
 
     @classmethod
@@ -674,9 +675,10 @@ class Voiceover(python_utils.OBJECT):
         return cls(
             voiceover_dict['filename'],
             voiceover_dict['file_size_bytes'],
-            voiceover_dict['needs_update'])
+            voiceover_dict['needs_update'],
+            voiceover_dict['duration'])
 
-    def __init__(self, filename, file_size_bytes, needs_update):
+    def __init__(self, filename, file_size_bytes, needs_update, duration):
         """Initializes a Voiceover domain object.
 
         Args:
@@ -685,6 +687,8 @@ class Voiceover(python_utils.OBJECT):
                 potential bandwidth usage to the learner before they download
                 the file.
             needs_update: bool. Whether voiceover is marked for needing review.
+            duration: float. The duration in seconds for the voiceover
+                recording.
         """
         # str. The corresponding audio file path, e.g.
         # "content-en-2-h7sjp8s.mp3".
@@ -694,6 +698,8 @@ class Voiceover(python_utils.OBJECT):
         self.file_size_bytes = file_size_bytes
         # bool. Whether audio is marked for needing review.
         self.needs_update = needs_update
+        # int. The duration in seconds for the voiceover recording.
+        self.duration = duration
 
     def validate(self):
         """Validates properties of the Voiceover.
@@ -730,6 +736,13 @@ class Voiceover(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Expected needs_update to be a bool, received %s' %
                 self.needs_update)
+        if not isinstance(self.duration, float):
+            raise utils.ValidationError(
+                'Expected duration to be an float, received %s' %
+                self.duration)
+        if self.duration < 0:
+            raise utils.ValidationError(
+                'Invalid duration: %s' % self.duration)
 
 
 class WrittenTranslation(python_utils.OBJECT):
