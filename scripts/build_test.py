@@ -94,6 +94,8 @@ class BuildTests(test_utils.GenericTestBase):
         non_existent_filepaths = [INVALID_INPUT_FILEPATH]
         # Exception will be raised at first file determined to be non-existent.
         error_message = ('File %s does not exist.') % non_existent_filepaths[0]
+        # When run on Windows, the path contains `\` which should be escaped
+        # in regex.
         error_message = re.escape(error_message)
         with self.assertRaisesRegexp(
             OSError, error_message):
@@ -247,9 +249,7 @@ class BuildTests(test_utils.GenericTestBase):
         BASE_HTML_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_DEV_DIR, 'base.html')
         BASE_JS_RELATIVE_PATH = os.path.join('pages', 'Base.js')
-        BASE_JS_FILE_URL = (
-            common.convert_to_posixpath(
-                BASE_JS_RELATIVE_PATH))
+        BASE_JS_FILE_URL = 'pages/Base.js'
         BASE_JS_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
 
@@ -745,10 +745,11 @@ class BuildTests(test_utils.GenericTestBase):
                          'directory in %s: %s' % (
                              MOCK_COMPILED_JS_DIR, build.TSCONFIG_FILEPATH,
                              out_dir))
+        # When run on Windows, the path contains `\` which should be escaped
+        # in regex.
         error_message = re.escape(error_message)
         with self.assertRaisesRegexp(
-            Exception,
-            error_message), self.swap(
+            Exception, error_message), self.swap(
                 build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR):
             build.require_compiled_js_dir_to_be_valid()
 
@@ -988,8 +989,7 @@ class BuildTests(test_utils.GenericTestBase):
                 common.NODE_BIN_PATH, build.WEBPACK_FILE,
                 build.WEBPACK_PROD_CONFIG
             )
-            self.assertEqual(
-                cmd, expected_command)
+            self.assertEqual(cmd, expected_command)
 
         with self.swap(subprocess, 'check_call', mock_check_call):
             build.build_using_webpack()

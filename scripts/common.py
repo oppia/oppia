@@ -421,6 +421,13 @@ def check_prs_for_current_release_are_released(repo):
 def convert_to_posixpath(file_path):
     """Occassionally the Windows style file path just does not work, so we
     may want to convert it to posix style.
+
+    Args:
+        file_path: str. The path to be converted.
+
+    Returns:
+        If the program is running on Windows, convert it to posix style,
+        otherwise, return the original path.
     """
     if not is_windows_os():
         return file_path
