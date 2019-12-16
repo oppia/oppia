@@ -71,10 +71,18 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     # Summary text of the thread.
     summary = ndb.TextProperty(indexed=False)
     # Specifies whether this thread has a related suggestion.
-    has_suggestion = ndb.BooleanProperty(
-        indexed=True, default=False, required=True)
-    # The number of messages in the thread.
+    has_suggestion = (
+        ndb.BooleanProperty(indexed=True, default=False, required=True))
+
+    # Cached value of the number of messages in the thread.
     message_count = ndb.IntegerProperty(indexed=True, default=0)
+    # Cached text of the last message in the thread with non-empty content, or
+    # None if there is no such message.
+    last_nonempty_message_text = ndb.StringProperty(indexed=True)
+    # Cached ID for the user of the last message in the thread with non-empty
+    # content, or None if the message was made anonymously or if there is no
+    # such message.
+    last_nonempty_message_author_id = ndb.StringProperty(indexed=True)
 
     @staticmethod
     def get_deletion_policy():
@@ -212,8 +220,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     text = ndb.StringProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
     # the web).
-    received_via_email = ndb.BooleanProperty(
-        default=False, indexed=True, required=True)
+    received_via_email = (
+        ndb.BooleanProperty(default=False, indexed=True, required=True))
 
     @staticmethod
     def get_deletion_policy():
