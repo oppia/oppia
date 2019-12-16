@@ -30,12 +30,18 @@ from google.appengine.ext import ndb
 
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class ExplorationModel(base_models.VersionedModel):
@@ -162,17 +168,27 @@ class ExplorationModel(base_models.VersionedModel):
         exploration_commit_log.exploration_id = self.id
         exploration_commit_log.put()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class ExplorationRightsModel(base_models.VersionedModel):
@@ -450,6 +466,11 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
+
 
 class ExpSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia exploration.
@@ -646,3 +667,8 @@ class ExpSummaryModel(base_models.BaseModel):
         ).order(
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

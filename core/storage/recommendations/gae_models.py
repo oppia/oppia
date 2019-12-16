@@ -58,6 +58,10 @@ class ExplorationRecommendationsModel(
         """
         return False
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class TopicSimilaritiesModel(base_models.BaseModel):
     """This model stores the similarity between any two topics. The topic
@@ -79,3 +83,8 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         codebase.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

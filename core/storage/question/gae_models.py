@@ -35,12 +35,18 @@ from google.appengine.ext import ndb
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class QuestionModel(base_models.VersionedModel):
@@ -179,6 +185,11 @@ class QuestionModel(base_models.VersionedModel):
             to put into the datastore.
         """
         cls.put_multi(questions)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class QuestionSkillLinkModel(base_models.BaseModel):
@@ -520,6 +531,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         cls.delete_multi(question_skill_links)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
+
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to questions.
@@ -554,6 +570,10 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'question-%s-%s' % (question_id, question_version)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class QuestionSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia question.
@@ -617,16 +637,26 @@ class QuestionSummaryModel(base_models.BaseModel):
         return QuestionSummaryModel.query().filter(
             cls.creator_id == creator_id).fetch()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class QuestionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class QuestionRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class QuestionRightsModel(base_models.VersionedModel):
@@ -672,3 +702,8 @@ class QuestionRightsModel(base_models.VersionedModel):
                     return True
         return (cls.query(cls.creator_id == user_id).get() is not None or
                 cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

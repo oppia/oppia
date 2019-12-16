@@ -585,6 +585,11 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
             num_total_threads=num_total_threads
         ).put()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
+
 
 class UnsentFeedbackEmailModel(base_models.BaseModel):
     """Model for storing feedback messages that need to be sent to creators.
@@ -623,3 +628,8 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

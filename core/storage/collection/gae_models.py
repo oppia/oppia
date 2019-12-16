@@ -30,12 +30,18 @@ from google.appengine.ext import ndb
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class CollectionModel(base_models.VersionedModel):
@@ -133,17 +139,28 @@ class CollectionModel(base_models.VersionedModel):
         collection_commit_log.collection_id = self.id
         collection_commit_log.put()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
+
 
 class CollectionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class CollectionRightsModel(base_models.VersionedModel):
@@ -396,6 +413,10 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class CollectionSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia collection.
@@ -543,3 +564,8 @@ class CollectionSummaryModel(base_models.BaseModel):
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

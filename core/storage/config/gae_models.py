@@ -26,12 +26,18 @@ from google.appengine.ext import ndb
 class ConfigPropertySnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a config property snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class ConfigPropertyModel(base_models.VersionedModel):

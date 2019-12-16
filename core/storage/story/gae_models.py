@@ -27,12 +27,18 @@ from google.appengine.ext import ndb
 
 class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a story snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a story snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class StoryModel(base_models.VersionedModel):
@@ -115,6 +121,10 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry.story_id = self.id
         story_commit_log_entry.put()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to stories.
@@ -149,6 +159,10 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'story-%s-%s' % (story_id, version)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class StorySummaryModel(base_models.BaseModel):
     """Summary model for an Oppia Story.
@@ -200,3 +214,8 @@ class StorySummaryModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

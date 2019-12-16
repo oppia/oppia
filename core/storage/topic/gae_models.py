@@ -29,12 +29,18 @@ from google.appengine.ext import ndb
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class TopicModel(base_models.VersionedModel):
@@ -150,6 +156,10 @@ class TopicModel(base_models.VersionedModel):
             cls.canonical_name == topic_name.lower()).filter(
                 cls.deleted == False).get() #pylint: disable=singleton-comparison
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to topics.
@@ -184,6 +194,10 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'topic-%s-%s' % (topic_id, version)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class TopicSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia Topic.
@@ -244,15 +258,25 @@ class TopicSummaryModel(base_models.BaseModel):
         """
         return False
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class SubtopicPageModel(base_models.VersionedModel):
@@ -326,6 +350,10 @@ class SubtopicPageModel(base_models.VersionedModel):
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         subtopic_page_commit_log_entry.put()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to subtopic pages.
@@ -361,15 +389,25 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class TopicRightsModel(base_models.VersionedModel):
@@ -479,3 +517,8 @@ class TopicRightsModel(base_models.VersionedModel):
             post_commit_community_owned=False,
             post_commit_is_private=not topic_rights.topic_is_published
         ).put()
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

@@ -45,8 +45,6 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
-TAKEOUT_POLICY_NOT_NEEDED = 'DOES_NOT_CONTAIN_USER_DATA'
-
 # Constant used when retrieving big number of models.
 FETCH_BATCH_SIZE = 1000
 

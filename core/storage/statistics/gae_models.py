@@ -114,6 +114,10 @@ class StateCounterModel(base_models.BaseModel):
             counter = cls(id=instance_id)
         return counter
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student submitting an answer."""
@@ -169,6 +173,10 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         answer_submitted_event_entity.put()
         return entity_id
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student entering an exploration. In this context,
@@ -219,6 +227,10 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         actual_start_event_entity.put()
         return entity_id
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class SolutionHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student triggering the solution."""
@@ -271,6 +283,10 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         solution_hit_event_entity.put()
         return entity_id
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student starting the exploration.
@@ -376,6 +392,10 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         start_event_entity.put()
         return entity_id
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a reader attempting to leave the
@@ -494,6 +514,10 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION)
         leave_event_entity.put()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a learner reaching a terminal state of an
@@ -606,6 +630,10 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         complete_event_entity.put()
         return entity_id
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class RateExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a learner rating the exploration.
@@ -677,6 +705,10 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
             event_schema_version=feconf.CURRENT_EVENT_MODELS_SCHEMA_VERSION
         ).put()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class StateHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student getting to a particular state. The
@@ -778,6 +810,10 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         state_event_entity.put()
         return entity_id
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class StateCompleteEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student completing a state."""
@@ -830,6 +866,10 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         state_finish_event_entity.put()
         return entity_id
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student leaving for a refresher exploration."""
@@ -885,6 +925,10 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         leave_for_refresher_exp_entity.put()
         return entity_id
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class ExplorationStatsModel(base_models.BaseModel):
     """Model for storing analytics data for an exploration. This model contains
@@ -1068,6 +1112,10 @@ class ExplorationStatsModel(base_models.BaseModel):
             exploration_stats_models.append(stats_instance)
         cls.put_multi(exploration_stats_models)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class ExplorationIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
@@ -1141,6 +1189,10 @@ class ExplorationIssuesModel(base_models.BaseModel):
         exp_issues_instance.put()
         return instance_id
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class PlaythroughModel(base_models.BaseModel):
     """Model for storing recorded useful playthrough data in the datastore.
@@ -1239,6 +1291,10 @@ class PlaythroughModel(base_models.BaseModel):
         instances = cls.get_multi(playthrough_ids)
         cls.delete_multi(instances)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class LearnerAnswerDetailsModel(base_models.BaseModel):
     """Model for storing the answer details that a learner enters when they
@@ -1389,6 +1445,10 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             return model_instance
         return None
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
@@ -1473,6 +1533,10 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
                 cls.exploration_id == exploration_id
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class StateAnswersModel(base_models.BaseModel):
     """Store all answers of a state. This model encapsulates a sharded storage
@@ -1821,6 +1885,10 @@ class StateAnswersModel(base_models.BaseModel):
         """
         return sys.getsizeof(json.dumps(answer_dict))
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     """Store output of calculation performed on StateAnswers.
@@ -1935,3 +2003,8 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         return ':'.join([
             exploration_id, python_utils.UNICODE(exploration_version),
             state_name, calculation_id])
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

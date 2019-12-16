@@ -202,6 +202,10 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         cls.put_multi(job_models)
         return job_ids
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class TrainingJobExplorationMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierTrainingJob.
@@ -325,3 +329,8 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
             mapping_ids.append(instance_id)
         cls.put_multi(mapping_models)
         return mapping_ids
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

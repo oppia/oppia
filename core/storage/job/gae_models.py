@@ -163,6 +163,11 @@ class JobModel(base_models.BaseModel):
         """
         return bool(cls.get_unfinished_jobs(job_type).count(limit=1))
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
+
 
 # Allowed transitions: idle --> running --> stopping --> idle.
 CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE = 'idle'
@@ -206,3 +211,8 @@ class ContinuousComputationModel(base_models.BaseModel):
     def get_deletion_policy():
         """Continuous computation is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

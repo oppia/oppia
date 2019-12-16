@@ -29,12 +29,18 @@ from google.appengine.ext import ndb
 
 class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file metadata snapshot commit history."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Class for storing the content of the file metadata snapshots."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class FileMetadataModel(base_models.VersionedModel):
@@ -164,10 +170,17 @@ class FileMetadataModel(base_models.VersionedModel):
         super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file snapshot commit history."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -316,3 +329,8 @@ class FileModel(base_models.VersionedModel):
         """
         model_id = cls._construct_id(assets_path, filepath)
         return super(FileModel, cls).get_version(model_id, version_number)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

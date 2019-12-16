@@ -27,12 +27,18 @@ from google.appengine.ext import ndb
 
 class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class SkillModel(base_models.VersionedModel):
@@ -149,6 +155,10 @@ class SkillModel(base_models.VersionedModel):
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to skills.
@@ -183,6 +193,10 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return 'skill-%s-%s' % (skill_id, version)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class SkillSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia Skill.
@@ -233,15 +247,25 @@ class SkillSummaryModel(base_models.BaseModel):
         """
         return False
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class SkillRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill rights snapshot."""
-    pass
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 
 class SkillRightsModel(base_models.VersionedModel):
@@ -366,3 +390,8 @@ class SkillRightsModel(base_models.VersionedModel):
             private.
         """
         return cls.query(cls.skill_is_private == True, cls.deleted == False) # pylint: disable=singleton-comparison
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

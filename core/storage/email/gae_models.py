@@ -255,6 +255,11 @@ class SentEmailModel(base_models.BaseModel):
 
         return False
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
+
 
 class BulkEmailModel(base_models.BaseModel):
     """Records the content of an email sent from Oppia to multiple users.
@@ -290,6 +295,11 @@ class BulkEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

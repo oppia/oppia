@@ -46,7 +46,7 @@ def export_data_for_user(user_id):
         }
     """
     all_models = []
-    model_names_list = [model_name for model_name in dir(models.NAMES) if not model_name.startswith('__')]
+    model_names_list = [model_name for model_name in dir(models.NAMES) if not model_name.startswith('__') and not model_name == 'base_model']
     model_modules = models.Registry.import_models(model_names_list)
     for model_module in model_modules:
         for name, obj in inspect.getmembers(model_module):
@@ -64,7 +64,7 @@ def export_data_for_user(user_id):
         # Join the split name with underscores and add _data for final name.
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
         export_result = model.export_data(user_id)
-        if export_result != base_model.TAKEOUT_POLICY_NOT_NEEDED:
+        if export_result != None:
             exported_data[final_name] = model.export_data(user_id)
 
     # Combine the data into a single dictionary.

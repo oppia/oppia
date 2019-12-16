@@ -159,6 +159,11 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         keys = cls.query().fetch(keys_only=True)
         ndb.delete_multi(keys)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
+
 
 class SkillOpportunityModel(base_models.BaseModel):
     """Model for opportunities to add questions to skills.
@@ -227,3 +232,8 @@ class SkillOpportunityModel(base_models.BaseModel):
         results, cursor, more = cls.get_all().order(
             cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None

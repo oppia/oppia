@@ -442,3 +442,8 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         return cls.query(ndb.AND(
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
+
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
