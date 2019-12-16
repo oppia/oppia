@@ -47,4 +47,13 @@ describe('ImageUploadHelperService', function() {
         'data:image/png;base64,xyz'));
     expect(imageFile instanceof Blob).toBe(true);
   });
+
+  it('should generate a filename', function() {
+    var height = 720;
+    var width = 180;
+    var format = 'png';
+    var generatedFilename = (
+      ImageUploadHelperService.generateImageFilename(height, width, format));
+    expect(generatedFilename.endsWith('_height_720_width_180.png')).toBe(true);
+  });
 });

@@ -748,7 +748,7 @@ angular.module('oppia').directive('filepathEditor', [
           let form = new FormData();
           form.append('image', resampledFile);
           form.append('payload', JSON.stringify({
-            filename: ctrl.generateImageFilename(
+            filename: ImageUploadHelperService.generateImageFilename(
               dimensions.height, dimensions.width, imageType)
           }));
           var imageUploadUrlTemplate = '/createhandler/imageupload/' +
@@ -789,14 +789,6 @@ angular.module('oppia').directive('filepathEditor', [
               $scope.$apply();
             });
           });
-        };
-
-
-        ctrl.generateImageFilename = function(height, width,
-            imageType = 'png') {
-          var imageFilename = (
-            ImageUploadHelperService.generateImageFilename(height, width));
-          return imageFilename + '.' + OUTPUT_IMAGE_FORMAT[imageType];
         };
 
         // This variable holds information about the image upload flow.

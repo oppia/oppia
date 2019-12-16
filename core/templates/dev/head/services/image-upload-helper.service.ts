@@ -52,7 +52,7 @@ angular.module('oppia').factory('ImageUploadHelperService', [
             entityType, entityId, encodedFilepath));
       },
 
-      generateImageFilename: function(height, width) {
+      generateImageFilename: function(height, width, extension) {
         var date = new Date();
         return 'img_' +
           date.getFullYear() +
@@ -65,7 +65,8 @@ angular.module('oppia').factory('ImageUploadHelperService', [
           '_' +
           Math.random().toString(36).substr(2, 10) +
           '_height_' + height +
-          '_width_' + width;
+          '_width_' + width +
+          '.' + extension;
       }
     };
   }

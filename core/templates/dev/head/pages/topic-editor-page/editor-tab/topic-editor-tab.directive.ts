@@ -160,7 +160,7 @@ angular.module('oppia').directive('topicEditorTab', [
                   $scope.onFileChanged = function(file) {
                     tempImageName = (
                       ImageUploadHelperService.generateImageFilename(
-                        150, 150) + '.png');
+                        150, 150, 'png'));
                     $('.oppia-thumbnail-uploader').fadeOut(function() {
                       $scope.invalidImageWarningIsShown = false;
 
