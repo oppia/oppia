@@ -242,7 +242,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """
         user_model = CompletedActivitiesModel.get(user_id, strict=False)
         if not user_model:
-            return None
+            return {}
 
         return {
             'completed_exploration_ids': user_model.exploration_ids,
@@ -296,7 +296,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         """
         user_model = IncompleteActivitiesModel.get(user_id, strict=False)
         if not user_model:
-            return None
+            return {}
 
         return {
             'incomplete_exploration_ids': user_model.exploration_ids,
@@ -460,7 +460,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
         """
         user_model = LearnerPlaylistModel.get(user_id, strict=False)
         if not user_model:
-            return None
+            return {}
 
         return {
             'playlist_exploration_ids': user_model.exploration_ids,
@@ -516,7 +516,7 @@ class UserContributionsModel(base_models.BaseModel):
         """
         user_model = UserContributionsModel.get(user_id, strict=False)
         if not user_model:
-            return None
+            return {}
 
         return {
             'created_exploration_ids': user_model.created_exploration_ids,
@@ -804,7 +804,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         user_model = UserStatsModel.get(user_id, strict=False)
         if not user_model:
-            return None
+            return {}
 
         weekly_stats = user_model.weekly_creator_stats_list
         weekly_stats_constructed = []

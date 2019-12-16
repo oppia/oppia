@@ -191,6 +191,10 @@ class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
     # Overwrite the superclass member to use a BlobProperty for raw strings.
     content = ndb.BlobProperty(indexed=False)
 
+    @classmethod
+    def export_data(cls, user_id):
+        """Defines the Takeout export data policy for this model."""
+        return None
 
 class FileModel(base_models.VersionedModel):
     """File data model, keyed by path to the assets folder and absolute file

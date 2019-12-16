@@ -74,6 +74,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
+    MESSAGE_IDS_READ_BY_USER = [0, 1]
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
     DEGREE_OF_MASTERY = 0.5
@@ -314,8 +315,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'viewable_collection_ids': [],
             'voiced_collection_ids': []
         }
-        completed_activities_data = None
-        contribution_data = None
+        completed_activities_data = {}
+        contribution_data = {}
         exploration_rights_data = {
             'editable_exploration_ids': [],
             'owned_exploration_ids': [],
@@ -326,10 +327,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         reply_to_data = {}
         general_feedback_message_data = {}
         general_feedback_thread_data = {}
+        general_feedback_thread_user_data = {}
         general_suggestion_data = {}
         last_playthrough_data = {}
-        learner_playlist_data = None
-        incomplete_activities_data = None
+        learner_playlist_data = {}
+        incomplete_activities_data = {}
         settings_data = {
             'email': 'user1@example.com',
             'role': feconf.ROLE_ID_ADMIN,
@@ -351,7 +353,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': None
         }
         skill_data = {}
-        stats_data = None
+        stats_data = {}
         story_progress_data = {}
         subscriptions_data = {
             'activity_ids': [],
@@ -374,6 +376,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'collection_progress_data': collection_progress_data,
             'story_progress_data': story_progress_data,
             'general_feedback_thread_data': general_feedback_thread_data,
+            'general_feedback_thread_user_data': general_feedback_thread_user_data,
             'general_feedback_message_data': general_feedback_message_data,
             'collection_rights_data': collection_rights_data,
             'general_suggestion_data': general_suggestion_data,
@@ -387,6 +390,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
+        self.maxDiff = None
         self.set_up_non_trivial()
 
         # We set up the feedback_thread_model here so that we can easily
@@ -494,6 +498,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                                  get(thread_id).last_updated)
             }
         }
+        expected_general_feedback_thread_user_data = {
+            thread_id: self.MESSAGE_IDS_READ_BY_USER
+        }
         expected_general_feedback_message_data = {
             thread_id + '.0': {
                 'thread_id': thread_id,
@@ -591,6 +598,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'story_progress_data': expected_story_progress_data,
             'general_feedback_thread_data':
                 expected_general_feedback_thread_data,
+            'general_feedback_thread_user_data':
+                expected_general_feedback_thread_user_data,
             'general_feedback_message_data':
                 expected_general_feedback_message_data,
             'collection_rights_data':

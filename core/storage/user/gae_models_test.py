@@ -215,7 +215,7 @@ class CompletedActivitiesModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.CompletedActivitiesModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
@@ -276,7 +276,7 @@ class IncompleteActivitiesModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.IncompleteActivitiesModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
@@ -467,7 +467,7 @@ class LearnerPlaylistModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.LearnerPlaylistModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_existent_user(self):
         """Test if export_data works as intended on a user in datastore."""
@@ -550,7 +550,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in datastore."""
         user_data = user_models.UserContributionsModel.export_data(
             self.NONEXISTENT_USER_ID)
-        self.assertEqual(None, user_data)
+        self.assertEqual({}, user_data)
 
     def test_export_data_on_partially_involved_user(self):
         """Test export_data on user with no creations and two edits."""
@@ -900,7 +900,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         """Test if export_data returns None when user is not in data store."""
         user_data = user_models.UserStatsModel.export_data(
             self.NONEXISTENT_USER_ID)
-        test_data = None
+        test_data = {}
         self.assertEqual(user_data, test_data)
 
 
