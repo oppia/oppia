@@ -156,50 +156,58 @@ describe('States object factory', () => {
                 en: {
                   filename: 'myfile1.mp3',
                   file_size_bytes: 0.5,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 0.5
                 },
                 'hi-en': {
                   filename: 'myfile3.mp3',
                   file_size_bytes: 0.8,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 0.8
                 }
               },
               default_outcome: {
                 he: {
                   filename: 'myfile10.mp3',
                   file_size_bytes: 0.5,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 0.5
                 }
               },
               feedback_1: {
                 zh: {
                   filename: 'myfile4.mp3',
                   file_size_bytes: 1.1,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 1.1
                 }
               },
               hint_1: {
                 es: {
                   filename: 'myfile5.mp3',
                   file_size_bytes: 0.7,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 0.7
                 },
                 zh: {
                   filename: 'myfile6.mp3',
                   file_size_bytes: 0.9,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 0.9
                 },
                 'hi-en': {
                   filename: 'myfile8.mp3',
                   file_size_bytes: 1.2,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 1.2
                 }
               },
               hint_2: {
                 cs: {
                   filename: 'myfile7.mp3',
                   file_size_bytes: 0.2,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 0.2
                 }
               }
             }
@@ -270,7 +278,8 @@ describe('States object factory', () => {
                 'hi-en': {
                   filename: 'myfile2.mp3',
                   file_size_bytes: 0.8,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 0.8
                 }
               },
               default_outcome: {},
@@ -278,7 +287,8 @@ describe('States object factory', () => {
                 de: {
                   filename: 'myfile9.mp3',
                   file_size_bytes: 0.5,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 0.5
                 }
               }
             }
@@ -384,16 +394,19 @@ describe('States object factory', () => {
           'first state': [vof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
-            needs_update: false
+            needs_update: false,
+            duration: 0.8
           }), vof.createFromBackendDict({
             filename: 'myfile8.mp3',
             file_size_bytes: 1.2,
-            needs_update: false
+            needs_update: false,
+            duration: 1.2
           })],
           'second state': [vof.createFromBackendDict({
             filename: 'myfile2.mp3',
             file_size_bytes: 0.8,
-            needs_update: false
+            needs_update: false,
+            duration: 0.8
           })]
         });
     });

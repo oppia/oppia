@@ -48,7 +48,8 @@ describe('Subtopic page contents object factory', () => {
           en: {
             filename: 'test.mp3',
             file_size_bytes: 100,
-            needs_update: false
+            needs_update: false,
+            duration: 0.2
           }
         }
       }
@@ -80,7 +81,8 @@ describe('Subtopic page contents object factory', () => {
       'content', 'en').toBackendDict()).toEqual({
       filename: 'test.mp3',
       file_size_bytes: 100,
-      needs_update: false
+      needs_update: false,
+      duration: 0.2
     });
   });
 

@@ -182,7 +182,8 @@ describe('Audio preloader service', function() {
                 en: {
                   filename: 'en-1.mp3',
                   file_size_bytes: 120000,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 1.2
                 }
               },
               default_outcome: {}
@@ -229,7 +230,8 @@ describe('Audio preloader service', function() {
                 en: {
                   filename: 'en-3.mp3',
                   file_size_bytes: 120000,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 1.2
                 }
               }
             }
@@ -267,7 +269,8 @@ describe('Audio preloader service', function() {
                 en: {
                   filename: 'en-2.mp3',
                   file_size_bytes: 120000,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 1.2
                 }
               },
               default_outcome: {}
@@ -314,7 +317,8 @@ describe('Audio preloader service', function() {
                 en: {
                   filename: 'en-0.mp3',
                   file_size_bytes: 120000,
-                  needs_update: false
+                  needs_update: false,
+                  duration: 1.2
                 }
               },
               default_outcome: {},

@@ -42,12 +42,14 @@ describe('Audio translation manager service', () => {
       en: vof.createFromBackendDict({
         filename: 'audio-en.mp3',
         file_size_bytes: 0.5,
-        needs_update: false
+        needs_update: false,
+        duration: 0.5
       }),
       es: vof.createFromBackendDict({
         filename: 'audio-es.mp3',
         file_size_bytes: 0.5,
-        needs_update: false
+        needs_update: false,
+        duration: 0.5
       })
     };
 
@@ -55,12 +57,14 @@ describe('Audio translation manager service', () => {
       zh: vof.createFromBackendDict({
         filename: 'audio-zh.mp3',
         file_size_bytes: 0.5,
-        needs_update: false
+        needs_update: false,
+        duration: 0.5
       }),
       'hi-en': vof.createFromBackendDict({
         filename: 'audio-hi-en.mp3',
         file_size_bytes: 0.5,
-        needs_update: false
+        needs_update: false,
+        duration: 0.5
       })
     };
   });
@@ -72,12 +76,14 @@ describe('Audio translation manager service', () => {
         en: vof.createFromBackendDict({
           filename: 'audio-en.mp3',
           file_size_bytes: 0.5,
-          needs_update: false
+          needs_update: false,
+          duration: 0.5
         }),
         es: vof.createFromBackendDict({
           filename: 'audio-es.mp3',
           file_size_bytes: 0.5,
-          needs_update: false
+          needs_update: false,
+          duration: 0.5
         })
       });
       atms.setSecondaryAudioTranslations(testAudioTranslations2, '', '');
@@ -85,12 +91,14 @@ describe('Audio translation manager service', () => {
         zh: vof.createFromBackendDict({
           filename: 'audio-zh.mp3',
           file_size_bytes: 0.5,
-          needs_update: false
+          needs_update: false,
+          duration: 0.5
         }),
         'hi-en': vof.createFromBackendDict({
           filename: 'audio-hi-en.mp3',
           file_size_bytes: 0.5,
-          needs_update: false
+          needs_update: false,
+          duration: 0.5
         })
       });
       atms.clearSecondaryAudioTranslations();
@@ -98,12 +106,14 @@ describe('Audio translation manager service', () => {
         en: vof.createFromBackendDict({
           filename: 'audio-en.mp3',
           file_size_bytes: 0.5,
-          needs_update: false
+          needs_update: false,
+          duration: 0.5
         }),
         es: vof.createFromBackendDict({
           filename: 'audio-es.mp3',
           file_size_bytes: 0.5,
-          needs_update: false
+          needs_update: false,
+          duration: 0.5
         })
       });
     });

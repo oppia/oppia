@@ -79,12 +79,14 @@ describe('State card object factory', () => {
             en: {
               filename: 'filename1.mp3',
               file_size_bytes: 100000,
-              needs_update: false
+              needs_update: false,
+              duration: 10.0
             },
             hi: {
               filename: 'filename2.mp3',
               file_size_bytes: 11000,
-              needs_update: false
+              needs_update: false,
+              duration: 0.11
             }
           }
         }
@@ -106,24 +108,28 @@ describe('State card object factory', () => {
       en: voiceoverObjectFactory.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
-        needs_update: false
+        needs_update: false,
+        duration: 10.0
       }),
       hi: voiceoverObjectFactory.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
-        needs_update: false
+        needs_update: false,
+        duration: 0.11
       })
     });
     expect(_sampleCard.getVoiceovers()).toEqual({
       en: voiceoverObjectFactory.createFromBackendDict({
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
-        needs_update: false
+        needs_update: false,
+        duration: 10.0
       }),
       hi: voiceoverObjectFactory.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
-        needs_update: false
+        needs_update: false,
+        duration: 0.11
       })
     });
 
