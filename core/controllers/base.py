@@ -51,8 +51,13 @@ CSRF_SECRET = config_domain.ConfigProperty(
 
 
 def _clear_login_cookies(response_headers):
-    """Clears login cookies from the given response headers."""
+    """Clears login cookies from the given response headers.
 
+    Args:
+        response_headers: webapp2.ResponseHeaders.
+            Response headers are used to give a more detailed
+            context of the response.
+    """
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
     cookie = http.cookies.SimpleCookie()
@@ -245,19 +250,35 @@ class BaseHandler(webapp2.RequestHandler):
         super(BaseHandler, self).dispatch()
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """Base method to handle GET requests."""
+        """Base method to handle GET requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def post(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle POST requests."""
+        """Base method to handle POST requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def put(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle PUT requests."""
+        """Base method to handle PUT requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def delete(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle DELETE requests."""
+        """Base method to handle DELETE requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def render_json(self, values):
@@ -278,7 +299,13 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
     def render_downloadable_file(self, values, filename, content_type):
-        """Prepares downloadable content to be sent to the client."""
+        """Prepares downloadable content to be sent to the client.
+
+        Args:
+            values: dict. The key-value pairs to include in the response.
+            filename: str. The name of the file to be rendered.
+            content_type: str. The type of file to be rendered.
+        """
         self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
             content_type)
         self.response.headers[
