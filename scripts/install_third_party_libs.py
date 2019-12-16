@@ -145,6 +145,7 @@ def pip_install(package, version, install_path):
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
 
+
 def install_skulpt(parsed_args):
     """Download and install Skulpt. Skulpt is built using a Python script
     included within the Skulpt repository (skulpt.py). This script normally
