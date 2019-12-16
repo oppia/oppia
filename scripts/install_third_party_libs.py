@@ -125,12 +125,18 @@ def pip_install(package, version, install_path):
 
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
+    process = None
     try:
         fnull = python_utils.open_file(os.devnull, 'w')
-        subprocess.check_call([
+        process = subprocess.Popen([
             sys.executable, '-m', 'pip', 'install',
             '%s==%s' % (package, version),
-            '--target', install_path], stdout=fnull, stderr=subprocess.STDOUT)
+            '--target', install_path], stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        #subprocess.check_call([
+        #    sys.executable, '-m', 'pip', 'install',
+        #    '%s==%s' % (package, version),
+        #    '--target', install_path], stdout=fnull)
     except Exception as ex:
         python_utils.PRINT(ex)
         python_utils.PRINT('Trying by setting --user flag')
