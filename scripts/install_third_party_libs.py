@@ -131,7 +131,7 @@ def pip_install(package, version, install_path):
     process = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = process.communicate()
-    if stderr == '':
+    if stderr == '' or stderr.find('pip install --upgrade pip') > -1:
         python_utils.PRINT(stdout)
     elif stderr.find('can\'t combine user with prefix') > -1:
         python_utils.PRINT('trying by setting --user flag')
