@@ -322,7 +322,7 @@ def get_parameter_for_config_file(run_on_browserstack):
         run_on_browserstack: bool. Whether run the test on browserstack.
 
     Returns:
-        A str represents the config file path.
+        str. Represents the config file path.
     """
     if not run_on_browserstack:
         return PROTRACTOR_CONFIG_FILE
@@ -339,7 +339,7 @@ def get_parameter_for_sharding(sharding, sharding_instances):
         sharding_instances: int. How many sharding instances to be running.
 
     Returns:
-        A list of parameters to represent the sharding configuration.
+        list[str]. A list of parameters to represent the sharding configuration.
     """
     if not sharding or sharding_instances == 1:
         return []
@@ -355,7 +355,7 @@ def get_parameter_for_dev_mode(dev_mode):
         dev_mode: bool. Whether the test is running on dev_mode.
 
     Returns:
-        A string for the testing mode command line parameter.
+        str. A string for the testing mode command line parameter.
     """
     return '--params.devMode=%s' % dev_mode
 
@@ -368,7 +368,7 @@ def get_parameter_for_suite(suite):
             `full`, all tests will run.
 
     Returns:
-        A list of command line parameter for suite.
+        list[str]. A list of command line parameter for suite.
     """
     return ['--suite', suite]
 
