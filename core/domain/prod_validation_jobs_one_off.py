@@ -3538,7 +3538,7 @@ class TopicModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. TopicModel to validate.
         """
-        if item.abbreviated_name == '' or item.abbreviated_name is None:
+        if not item.abbreviated_name:
             cls.errors['abbreviated name check'].append(
                 'Entity id %s: Expected nonempty abbreviated name '
                 'received %s.' % (item.id, item.abbreviated_name))

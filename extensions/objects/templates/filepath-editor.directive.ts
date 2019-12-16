@@ -794,11 +794,9 @@ angular.module('oppia').directive('filepathEditor', [
 
         ctrl.generateImageFilename = function(height, width,
             imageType = 'png') {
-          var imageFilename = ImageUploadHelperService.generateImageFilename();
-          return imageFilename +
-            '_height_' + height +
-            '_width_' + width +
-            '.' + OUTPUT_IMAGE_FORMAT[imageType];
+          var imageFilename = (
+            ImageUploadHelperService.generateImageFilename(height, width));
+          return imageFilename + '.' + OUTPUT_IMAGE_FORMAT[imageType];
         };
 
         // This variable holds information about the image upload flow.
