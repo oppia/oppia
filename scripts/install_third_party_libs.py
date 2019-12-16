@@ -133,7 +133,7 @@ def pip_install(package, version, install_path):
     stdout, stderr = process.communicate()
     if not stderr or 'pip install --upgrade pip' in stderr:
         python_utils.PRINT(stdout)
-    elif selif 'can\'t combine user with prefix' in stderr:
+    elif 'can\'t combine user with prefix' in stderr:
         python_utils.PRINT('Trying by setting --user and --prefix flags.')
         subprocess.check_call([
             sys.executable, '-m', 'pip', 'install',
