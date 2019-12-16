@@ -54,7 +54,7 @@ def _clear_login_cookies(response_headers):
     """Clears login cookies from the given response headers.
 
     Args:
-        response_headers: ResponseHeaders Object in webapp2 library.
+        response_headers: webapp2.ResponseHeaders.
             Response headers are used to give a more detailed
             context of the response.
     """
