@@ -77,7 +77,7 @@ angular.module('oppia').directive('adminNavbar', [
               username: ctrl.username
             })
           );
-        });  
+        });
 
         ctrl.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/logo/288x128_logo_white.png');
@@ -105,7 +105,6 @@ angular.module('oppia').directive('adminNavbar', [
           angular.element(evt.currentTarget).parent().removeClass('open');
           ctrl.hiddenMenu = false;
         };
-
       }]
     };
   }
