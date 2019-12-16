@@ -27,7 +27,7 @@ class ConfigPropertySnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a config property snapshot."""
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -35,7 +35,7 @@ class ConfigPropertySnapshotMetadataModel(
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content for a config property snapshot."""
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -60,6 +60,6 @@ class ConfigPropertyModel(base_models.VersionedModel):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None

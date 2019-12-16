@@ -160,7 +160,7 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         ndb.delete_multi(keys)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -234,6 +234,6 @@ class SkillOpportunityModel(base_models.BaseModel):
         return (results, (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None

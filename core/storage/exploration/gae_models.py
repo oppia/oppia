@@ -31,7 +31,7 @@ from google.appengine.ext import ndb
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -39,7 +39,7 @@ class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -169,7 +169,7 @@ class ExplorationModel(base_models.VersionedModel):
         exploration_commit_log.put()
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -177,7 +177,7 @@ class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -186,7 +186,7 @@ class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -467,7 +467,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             query, page_size, urlsafe_start_cursor)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -669,6 +669,6 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(limit)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None

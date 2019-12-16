@@ -444,6 +444,6 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             cls.language_code == language_code)).fetch()
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None

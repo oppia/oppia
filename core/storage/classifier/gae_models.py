@@ -203,7 +203,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         return job_ids
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -331,6 +331,6 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         return mapping_ids
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None

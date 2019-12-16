@@ -115,7 +115,7 @@ class StateCounterModel(base_models.BaseModel):
         return counter
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -174,7 +174,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -228,7 +228,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -284,7 +284,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -393,7 +393,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -515,7 +515,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         leave_event_entity.put()
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -631,7 +631,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -706,7 +706,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         ).put()
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -811,7 +811,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -867,7 +867,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -926,7 +926,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
         return entity_id
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -1113,7 +1113,7 @@ class ExplorationStatsModel(base_models.BaseModel):
         cls.put_multi(exploration_stats_models)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -1190,7 +1190,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
         return instance_id
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -1292,7 +1292,7 @@ class PlaythroughModel(base_models.BaseModel):
         cls.delete_multi(instances)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -1446,7 +1446,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         return None
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -1534,7 +1534,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
             ).fetch(feconf.DEFAULT_QUERY_LIMIT)]
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -1886,7 +1886,7 @@ class StateAnswersModel(base_models.BaseModel):
         return sys.getsizeof(json.dumps(answer_dict))
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -2005,6 +2005,6 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             state_name, calculation_id])
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None

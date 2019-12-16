@@ -56,6 +56,6 @@ class ActivityReferencesModel(base_models.BaseModel):
         return entity
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None

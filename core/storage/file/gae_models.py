@@ -30,7 +30,7 @@ from google.appengine.ext import ndb
 class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file metadata snapshot commit history."""
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -38,7 +38,7 @@ class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Class for storing the content of the file metadata snapshots."""
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -171,14 +171,14 @@ class FileMetadataModel(base_models.VersionedModel):
             committer_id, '', commit_cmds)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
 class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file snapshot commit history."""
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -192,7 +192,7 @@ class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
     content = ndb.BlobProperty(indexed=False)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
 
@@ -335,6 +335,6 @@ class FileModel(base_models.VersionedModel):
         return super(FileModel, cls).get_version(model_id, version_number)
 
     @classmethod
-    def export_data(cls, user_id):
+    def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
