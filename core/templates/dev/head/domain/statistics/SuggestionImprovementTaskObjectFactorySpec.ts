@@ -90,6 +90,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
   var SuggestionThreadObjectFactory = null;
   var ThreadDataService = null;
   var SUGGESTION_IMPROVEMENT_TASK_TYPE = null;
+  var $httpBackend = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -153,26 +154,6 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
       new LearnerAnswerDetailsObjectFactory());
     $provide.value(
       'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
-    $provide.value(
-      'ThreadDataService', {
-        data: {
-          suggestionThreads: [{
-            threadId: 'abc1'
-          }, {
-            threadId: 'def2'
-          }]
-        },
-        fetchThreads: function() {
-          return $q.all(function() {
-            return this.fetchMessages();
-          });
-        },
-        fetchMessages: function() {
-        },
-        getData: function() {
-          return this.data;
-        }
-      });
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -181,7 +162,8 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
     }
   }));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _$uibModal_, _ImprovementModalService_,
+      $injector, _$q_, _$rootScope_, _$uibModal_,
+      _ImprovementModalService_,
       _SuggestionImprovementTaskObjectFactory_,
       _SuggestionModalForExplorationEditorService_,
       _SuggestionThreadObjectFactory_, _ThreadDataService_,
@@ -197,6 +179,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
     SuggestionThreadObjectFactory = _SuggestionThreadObjectFactory_;
     ThreadDataService = _ThreadDataService_;
     SUGGESTION_IMPROVEMENT_TASK_TYPE = _SUGGESTION_IMPROVEMENT_TASK_TYPE_;
+    $httpBackend = $injector.get('$httpBackend');
   }));
 
   describe('.createNew', function() {
@@ -212,7 +195,23 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
 
   describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
+      var threads = {
+        suggestionThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
+      };
+
+      spyOn(ThreadDataService, 'fetchThreads').and.callFake(function() {
+        ThreadDataService.data = threads;
+        var deferred = $q.defer();
+        deferred.resolve();
+        return deferred.promise;
+      });
+      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages').and
+        .callFake(done);
+      spyOn(ThreadDataService, 'getData').and.returnValue(threads);
+
       SuggestionImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
+        expect(fetchMessagesSpy).toHaveBeenCalledTimes(threads.suggestionThreads
+          .length);
         expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
         expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);

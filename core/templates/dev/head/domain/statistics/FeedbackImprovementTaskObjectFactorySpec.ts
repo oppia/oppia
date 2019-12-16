@@ -80,7 +80,6 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('domain/statistics/FeedbackImprovementTaskObjectFactory.ts');
 
-
 describe('FeedbackImprovementTaskObjectFactory', function() {
   var $q = null;
   var $rootScope = null;
@@ -89,6 +88,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
   var ImprovementModalService = null;
   var ThreadDataService = null;
   var FEEDBACK_IMPROVEMENT_TASK_TYPE = null;
+  var $httpBackend = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -153,26 +153,6 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
       new LearnerAnswerDetailsObjectFactory());
     $provide.value(
       'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
-    $provide.value(
-      'ThreadDataService', {
-        data: {
-          feedbackThreads: [{
-            threadId: 'abc1'
-          }, {
-            threadId: 'def2'
-          }]
-        },
-        fetchThreads: function() {
-          return $q.all(function() {
-            return this.fetchMessages();
-          });
-        },
-        fetchMessages: function() {
-        },
-        getData: function() {
-          return this.data;
-        }
-      });
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -181,7 +161,8 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
     }
   }));
   beforeEach(angular.mock.inject(function(
-      _$q_, _$rootScope_, _$uibModal_, _FeedbackImprovementTaskObjectFactory_,
+      $injector, _$q_, _$rootScope_, _$uibModal_,
+      _FeedbackImprovementTaskObjectFactory_,
       _ImprovementModalService_, _ThreadDataService_,
       _FEEDBACK_IMPROVEMENT_TASK_TYPE_) {
     $q = _$q_;
@@ -192,6 +173,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
     ImprovementModalService = _ImprovementModalService_;
     ThreadDataService = _ThreadDataService_;
     FEEDBACK_IMPROVEMENT_TASK_TYPE = _FEEDBACK_IMPROVEMENT_TASK_TYPE_;
+    $httpBackend = $injector.get('$httpBackend');
   }));
 
   describe('.createNew', function() {
@@ -206,8 +188,29 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
   });
 
   describe('.fetchTasks', function() {
+    afterEach(function() {
+      $httpBackend.verifyNoOutstandingExpectation();
+      $httpBackend.verifyNoOutstandingRequest();
+    });
+
     it('fetches threads from the backend', function(done) {
+      var threads = {
+        feedbackThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
+      };
+
+      spyOn(ThreadDataService, 'fetchThreads').and.callFake(function() {
+        ThreadDataService.data = threads;
+        var deferred = $q.defer();
+        deferred.resolve();
+        return deferred.promise;
+      });
+      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages').and
+        .callFake(done);
+      spyOn(ThreadDataService, 'getData').and.returnValue(threads);
+
       FeedbackImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
+        expect(fetchMessagesSpy).toHaveBeenCalledTimes(threads.feedbackThreads
+          .length);
         expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
         expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);
