@@ -48,18 +48,17 @@
           <li uib-dropdown-toggle class="nav-item oppia-clickable-navbar-element"
               ng-mouseover="$ctrl.onMouseoverHiddenMenu($event)"
               ng-mouseleave="$ctrl.onMouseoutHiddenMenu($event)">
-              <a class="nav-link oppia-navbar-tab"
-                 uib-tooltip="Menu"
-                 tooltip-placement="bottom">
+            <a class="nav-link oppia-navbar-tab"
+               uib-tooltip="Menu"
+               tooltip-placement="bottom">
               <i class="fa fa-bars hidden-icon-favicon"></i>
-              </a>
+            </a>
           </li>
-          <ul
-          class="uib-dropdown-menu dropdown-menu hidden-menu"
-          ng-mouseover="$ctrl.onMouseoverHiddenMenu($event)"
-          ng-mouseleave="$ctrl.onMouseoutHiddenMenu($event)"
-          ng-show="$ctrl.hiddenMenu"
-          role="menu">
+          <ul class="uib-dropdown-menu dropdown-menu hidden-menu"
+              ng-mouseover="$ctrl.onMouseoverHiddenMenu($event)"
+              ng-mouseleave="$ctrl.onMouseoutHiddenMenu($event)"
+              ng-show="$ctrl.hiddenMenu"
+              role="menu">
             <li>
               <a
               class="dropdown-item nav-link oppia-navbar-tab"
