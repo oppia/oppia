@@ -125,26 +125,25 @@ def pip_install(package, version, install_path):
 
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
-    process = None
-    try:
-        fnull = python_utils.open_file(os.devnull, 'w')
-        process = subprocess.Popen([
-            sys.executable, '-m', 'pip', 'install',
-            '%s==%s' % (package, version),
-            '--target', install_path], stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-        #subprocess.check_call([
-        #    sys.executable, '-m', 'pip', 'install',
-        #    '%s==%s' % (package, version),
-        #    '--target', install_path], stdout=fnull)
-    except Exception as ex:
-        python_utils.PRINT(ex)
-        python_utils.PRINT('Trying by setting --user flag')
+    process = subprocess.Popen([
+        sys.executable, '-m', 'pip', 'install',
+        '%s==%s' % (package, version),
+        '--target', install_path], stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
+    stdout,stderr = process.communicate()
+    if stderr == "":
+        print(stdout)
+    elif stderr.find("can\'t combine user with prefix") > -1:
+        print("trying by setting --user flag")
         subprocess.check_call([
             sys.executable, '-m', 'pip', 'install',
             '%s==%s' % (package, version), '--target', install_path,
             '--user', '--prefix=', '--system'])
-
+    else:
+        print(stderr)
+        python_utils.PRINT(
+            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        raise Exception('Error installing package')
 
 def install_skulpt(parsed_args):
     """Download and install Skulpt. Skulpt is built using a Python script
