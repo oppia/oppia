@@ -73,9 +73,9 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
 }
 
 # This json file contains a json object. The object's keys are file paths and
-# the values are corresponded hash value. The pathes need to be in posix style,
-# as it is interpreted by the `url-interpolation` service, which assumes the
-# pathes in this file are in posix style.
+# the values are corresponded hash value. The paths need to be in posix style,
+# as it is interpreted by the `url-interpolation` service, which which
+# interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
@@ -162,9 +162,21 @@ def convert_filepath_to_hashed_url(filepath, hashes):
         hashes: str. The calculated hash for this file.
 
     Returns:
-        Generated url style path.
+        str. Generated url style path with hash inserted.
     """
     return _insert_hash(common.convert_to_posixpath(filepath), hashes)
+
+
+def convert_filepath_to_url(filepath):
+    """Convert the original filepath to url path.
+
+    Args:
+        filepath: str. The original file path.
+
+    Returns:
+        str. Generated url style path.
+    """
+    return common.convert_to_posixpath(filepath)
 
 
 def generate_app_yaml():
@@ -429,38 +441,39 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         # This is because html paths are used by backend and we work with
         # paths without hash part in backend.
         if not filepath.endswith('.html'):
-            # The pathes to the required files in the compiled HTML is in
-            # url-style.
+            # This reconstructs the hashed version of the URL, so that it can
+            # be used to substitute the raw URL in the HTML file stream.
             filepath_with_hash = convert_filepath_to_hashed_url(
                 filepath, file_hash)
             content = content.replace(
+                # This and the following lines, convert the original file paths
+                # to URL paths, so the URLs in HTML files can be replaced.
                 '%s%s' % (
-                    common.convert_to_posixpath(TEMPLATES_DEV_DIR),
+                    convert_filepath_to_url(TEMPLATES_DEV_DIR),
                     filepath),
-
                 '%s%s' % (
-                    common.convert_to_posixpath(
+                    convert_filepath_to_url(
                         TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']),
                     filepath_with_hash))
             content = content.replace(
                 '%s%s' % (
-                    common.convert_to_posixpath(ASSETS_DEV_DIR), filepath),
+                    convert_filepath_to_url(ASSETS_DEV_DIR), filepath),
                 '%s%s' % (
-                    common.convert_to_posixpath(ASSETS_OUT_DIR),
+                    convert_filepath_to_url(ASSETS_OUT_DIR),
                     filepath_with_hash))
             content = content.replace(
                 '%s%s' % (
-                    common.convert_to_posixpath(
+                    convert_filepath_to_url(
                         EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir']), filepath),
                 '%s%s' % (
-                    common.convert_to_posixpath(
+                    convert_filepath_to_url(
                         EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']),
                     filepath_with_hash))
             content = content.replace(
-                '%s%s' % (common.convert_to_posixpath(
+                '%s%s' % (convert_filepath_to_url(
                     THIRD_PARTY_GENERATED_DEV_DIR), filepath),
                 '%s%s' % (
-                    common.convert_to_posixpath(
+                    convert_filepath_to_url(
                         THIRD_PARTY_GENERATED_OUT_DIR), filepath_with_hash))
     content = REMOVE_WS(' ', content)
     write_to_file_stream(target_file_stream, content)
@@ -731,7 +744,7 @@ def generate_copy_tasks_to_copy_from_source_to_target(
                     source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 target_path = source_path
                 # The path in hashes.json file is in posix style,
-                # see the comment above about HASHES_JSON_FILENAME for details.
+                # see the comment above HASHES_JSON_FILENAME for details.
                 relative_path = common.convert_to_posixpath(
                     os.path.relpath(source_path, source))
                 if (hash_should_be_inserted(source + relative_path) and
@@ -826,7 +839,7 @@ def get_file_hashes(directory_path):
             if should_file_be_built(filepath) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 # The path in hashes.json file is in posix style,
-                # see the comment above about HASHES_JSON_FILENAME for details.
+                # see the comment above HASHES_JSON_FILENAME for details.
                 complete_filepath = common.convert_to_posixpath(
                     os.path.join(root, filename))
                 relative_filepath = common.convert_to_posixpath(os.path.relpath(
@@ -1236,14 +1249,14 @@ def _verify_hashes(output_dirnames, file_hashes):
 
 
     # The path in hashes.json (generated via file_hashes) file is in posix
-    # style, see the comment above about HASHES_JSON_FILENAME for details.
+    # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
         file_hashes[common.convert_to_posixpath(
             MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
     # The path in hashes.json (generated via file_hashes) file is in posix
-    # style, see the comment above about HASHES_JSON_FILENAME for details.
+    # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
         file_hashes[common.convert_to_posixpath(

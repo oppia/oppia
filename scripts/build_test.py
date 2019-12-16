@@ -92,10 +92,13 @@ class BuildTests(test_utils.GenericTestBase):
         filepath.
         """
         non_existent_filepaths = [INVALID_INPUT_FILEPATH]
+        # Escape the special characters, like '\', in the file paths.
+        # The '\' character is usually seem in Windows style path.
+        # https://docs.python.org/2/library/os.html#os.sep
+        # https://docs.python.org/2/library/re.html#regular-expression-syntax
+        error_message = ('File %s does not exist.') % re.escape(
+            non_existent_filepaths[0])
         # Exception will be raised at first file determined to be non-existent.
-        error_message = ('File %s does not exist.') % non_existent_filepaths[0]
-        # Escape the special characters in error message.
-        error_message = re.escape(error_message)
         with self.assertRaisesRegexp(
             OSError, error_message):
             build._ensure_files_exist(non_existent_filepaths)
@@ -740,7 +743,10 @@ class BuildTests(test_utils.GenericTestBase):
         with python_utils.open_file(build.TSCONFIG_FILEPATH, 'r') as f:
             config_data = json.load(f)
             out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
-        # Escape the special charaters in file path.
+        # Escape the special characters, like '\', in the file paths.
+        # The '\' character is usually seem in Windows style path.
+        # https://docs.python.org/2/library/os.html#os.sep
+        # https://docs.python.org/2/library/re.html#regular-expression-syntax
         error_message = ('COMPILED_JS_DIR: %s does not match the output '
                          'directory in %s: %s' % (
                              re.escape(MOCK_COMPILED_JS_DIR),
