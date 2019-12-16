@@ -385,6 +385,7 @@
 /main_mail.py @aks681
 /main.py @nithusha21 @seanlip
 /feconf.py @nithusha21 @seanlip
+/feconf.py.bak @nithusha21 @seanlip
 /constants*.py @nithusha21
 /assets/constants.ts @nithusha21
 /core/controllers/incoming_emails*.py @aks681
