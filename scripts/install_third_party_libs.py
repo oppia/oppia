@@ -132,15 +132,15 @@ def pip_install(package, version, install_path):
         stderr=subprocess.PIPE)
     stdout,stderr = process.communicate()
     if stderr == "":
-        print(stdout)
+        python_utils.PRINT(stdout)
     elif stderr.find("can\'t combine user with prefix") > -1:
-        print("trying by setting --user flag")
+        python_utils.PRINT("trying by setting --user flag")
         subprocess.check_call([
             sys.executable, '-m', 'pip', 'install',
             '%s==%s' % (package, version), '--target', install_path,
             '--user', '--prefix=', '--system'])
     else:
-        print(stderr)
+        python_utils.PRINT(stderr)
         python_utils.PRINT(
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
         raise Exception('Error installing package')
