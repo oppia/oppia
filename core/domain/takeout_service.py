@@ -28,8 +28,8 @@ from core.platform import models
     feedback_models, suggestion_models,
     user_models) = models.Registry.import_models(
         [models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-         models.NAMES.exploration, models.NAMES.feedback, models.NAMES.suggestion,
-         models.NAMES.user])
+         models.NAMES.exploration, models.NAMES.feedback,
+         models.NAMES.suggestion, models.NAMES.user])
 
 
 def export_data_for_user(user_id):
@@ -63,7 +63,6 @@ def export_data_for_user(user_id):
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
         # Join the split name with underscores and add _data for final name.
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
-        print("MODEL:", model.__name__)
         export_result = model.export_data(user_id)
         if export_result != None:
             exported_data[final_name] = model.export_data(user_id)
