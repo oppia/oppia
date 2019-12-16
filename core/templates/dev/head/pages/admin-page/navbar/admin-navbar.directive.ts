@@ -95,7 +95,7 @@ angular.module('oppia').directive('adminNavbar', [
           ctrl.profileDropdownIsActive = false;
         };
 
-        ctrl.hiddenMenu=false;
+        ctrl.hiddenMenu = false;
         ctrl.onMouseoverHiddenMenu = function(evt) {
           angular.element(evt.currentTarget).parent().addClass('open');
           ctrl.hiddenMenu = true;
