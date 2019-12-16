@@ -17,28 +17,35 @@
  * configured to support.
  */
 
-require('services/services.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ExplorationFeaturesBackendApiService', [
-  '$http', 'UrlInterpolationService', 'EXPLORATION_FEATURES_URL',
-  function($http, UrlInterpolationService, EXPLORATION_FEATURES_URL) {
-    return {
-      /**
-       * Retrieves data regarding the features the given exploration supports.
-       *
-       * NOTE: This service requires play-access for the Exploration so that the
-       * features can be fetched in both the exploration player and editor.
-       *
-       * @returns {Object.<string, *>} - Describes the features the given
-       *     exploration supports.
-       */
-      fetchExplorationFeatures: function(explorationId) {
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            EXPLORATION_FEATURES_URL, {exploration_id: explorationId})
-        ).then(function(response) {
-          return response.data;
-        });
-      },
-    };
-  }]);
+import { UrlInterpolationService } from 
+  'domain/utilities/url-interpolation.service';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExplorationFeaturesBackendApiService {
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient
+  ) {}
+
+  _fetchExplorationFeatures(explorationId): Promise<Object> {
+    return this.http.get(
+      this.urlInterpolationService.interpolateUrl(
+        '/explorehandler/features/<exploration_id>', {exploration_id: explorationId}
+      )
+    ).toPromise();
+  }
+  
+  fetchExplorationFeatures(explorationId): Promise<Object> {
+    return this._fetchExplorationFeatures(explorationId);
+  }
+}
+
+angular.module('oppia').factory(
+  'ExplorationFeaturesBackendApiService',
+  downgradeInjectable(ExplorationFeaturesBackendApiService));
