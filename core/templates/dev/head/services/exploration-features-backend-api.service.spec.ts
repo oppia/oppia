@@ -17,10 +17,10 @@
  */
 
 import { HttpClientTestingModule, HttpTestingController } from
-'@angular/common/http/testing';
+  '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-import { ExplorationFeaturesBackendApiService } from 
+import { ExplorationFeaturesBackendApiService } from
   'services/exploration-features-backend-api.service';
 
 describe('exploration features backend api service', () => {
@@ -31,10 +31,10 @@ describe('exploration features backend api service', () => {
   var ERROR_STATUS_CODE = 500;
 
   var sampleDataResults = {
-    'is_improvements_tab_enabled': true,
-    'is_exploration_whitelisted': true,
-    'always_ask_learners_for_answer_details': false
-  }
+    is_improvements_tab_enabled: true,
+    is_exploration_whitelisted: true,
+    always_ask_learners_for_answer_details: false
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
