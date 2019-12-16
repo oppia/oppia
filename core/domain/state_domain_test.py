@@ -2004,6 +2004,13 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception, 'Expected needs_update to be a bool'):
             self.voiceover.validate()
 
+    def test_validate_non_float_duration(self):
+        self.voiceover.validate()
+        self.voiceover.duration = 'duration'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected duration to be a float'):
+            self.voiceover.validate()
+
     def test_validate_negative_duration_seconds(self):
         self.voiceover.validate()
         self.voiceover.duration = -1.45

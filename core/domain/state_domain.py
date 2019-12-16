@@ -738,7 +738,7 @@ class Voiceover(python_utils.OBJECT):
                 self.needs_update)
         if not isinstance(self.duration, float):
             raise utils.ValidationError(
-                'Expected duration to be an float, received %s' %
+                'Expected duration to be a float, received %s' %
                 self.duration)
         if self.duration < 0:
             raise utils.ValidationError(
