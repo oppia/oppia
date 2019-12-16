@@ -72,6 +72,10 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
     'out_dir': os.path.join('build', 'webpack_bundles', '')
 }
 
+# This json file contains a json object. The object's keys are file paths and
+# the values are corresponded hash value. The pathes need to be in posix style,
+# as it is interpreted by the `url-interpolation` service, which assumes the
+# pathes in this file are in posix style.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
@@ -214,9 +218,8 @@ def _minify(source_path, target_path):
     # out-of-memory error.
     # https://circleci.com/blog/how-to-handle-java-oom-errors/
     # Use relative path to avoid java command line parameter parse error on
-    # Windows. Convert to posix style path on Windows because the Windows
-    # style path may cause syntax error when the java program tries to
-    # interpret this path.
+    # Windows. Convert to posix style path because the java program requires
+    # the filepath arguments to be in posix path style.
     target_path = common.convert_to_posixpath(
         os.path.relpath(target_path))
     source_path = common.convert_to_posixpath(
@@ -426,11 +429,8 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         # This is because html paths are used by backend and we work with
         # paths without hash part in backend.
         if not filepath.endswith('.html'):
-            # The path to the required file in the compiled HTML is in
-            # url-style, while on Windows, the path here will be in
-            # Windows-Style. We need to convert the Windows-Style path to url
-            # style so the target path can be successfully replaced with the
-            # one with hash.
+            # The pathes to the required files in the compiled HTML is in
+            # url-style.
             filepath_with_hash = convert_filepath_to_hashed_url(
                 filepath, file_hash)
             content = content.replace(
@@ -730,9 +730,8 @@ def generate_copy_tasks_to_copy_from_source_to_target(
             if not any(
                     source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 target_path = source_path
-                # Path in hashes is in posix style, if we are on Windows,
-                # we need to convert the path to posix style so it can run the
-                # check correctly.
+                # The path in hashes.json file is in posix style,
+                # see the comment above about HASHES_JSON_FILENAME for details.
                 relative_path = common.convert_to_posixpath(
                     os.path.relpath(source_path, source))
                 if (hash_should_be_inserted(source + relative_path) and
@@ -826,9 +825,8 @@ def get_file_hashes(directory_path):
             filepath = os.path.join(root, filename)
             if should_file_be_built(filepath) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                # In case the path in in Windows-style, We need to convert the
-                # it to posix style so it can cooparate with the
-                # `url-interpolation` service in frontend.
+                # The path in hashes.json file is in posix style,
+                # see the comment above about HASHES_JSON_FILENAME for details.
                 complete_filepath = common.convert_to_posixpath(
                     os.path.join(root, filename))
                 relative_filepath = common.convert_to_posixpath(os.path.relpath(
@@ -1236,15 +1234,16 @@ def _verify_hashes(output_dirnames, file_hashes):
     hash_final_filename = _insert_hash(
         HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME])
 
-    # Convert Windows-Style path to posix style, as the pathes in hashes is in
-    # posix style.
+
+    # The path in hashes.json (generated via file_hashes) file is in posix
+    # style, see the comment above about HASHES_JSON_FILENAME for details.
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
         file_hashes[common.convert_to_posixpath(
             MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
-    # Convert Windows-Style path to posix style, as the pathes in hashes is in
-    # posix style.
+    # The path in hashes.json (generated via file_hashes) file is in posix
+    # style, see the comment above about HASHES_JSON_FILENAME for details.
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
         file_hashes[common.convert_to_posixpath(

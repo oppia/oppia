@@ -94,8 +94,7 @@ class BuildTests(test_utils.GenericTestBase):
         non_existent_filepaths = [INVALID_INPUT_FILEPATH]
         # Exception will be raised at first file determined to be non-existent.
         error_message = ('File %s does not exist.') % non_existent_filepaths[0]
-        # When run on Windows, the path contains `\` which should be escaped
-        # in regex.
+        # Escape the special characters in error message.
         error_message = re.escape(error_message)
         with self.assertRaisesRegexp(
             OSError, error_message):
@@ -741,13 +740,12 @@ class BuildTests(test_utils.GenericTestBase):
         with python_utils.open_file(build.TSCONFIG_FILEPATH, 'r') as f:
             config_data = json.load(f)
             out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
+        # Escape the special charaters in file path.
         error_message = ('COMPILED_JS_DIR: %s does not match the output '
                          'directory in %s: %s' % (
-                             MOCK_COMPILED_JS_DIR, build.TSCONFIG_FILEPATH,
-                             out_dir))
-        # When run on Windows, the path contains `\` which should be escaped
-        # in regex.
-        error_message = re.escape(error_message)
+                             re.escape(MOCK_COMPILED_JS_DIR),
+                             re.escape(build.TSCONFIG_FILEPATH),
+                             re.escape(out_dir)))
         with self.assertRaisesRegexp(
             Exception, error_message), self.swap(
                 build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR):
