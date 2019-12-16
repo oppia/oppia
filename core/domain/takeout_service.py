@@ -18,18 +18,18 @@ user_id.
 from __future__ import absolute_import   # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import re
-import sys
 import inspect
+import re
 
 from core.platform import models
 
 (
-    base_model, collection_models, email_models, exploration_models, feedback_models,
-    suggestion_models, user_models) = models.Registry.import_models([
-        models.NAMES.base_model, models.NAMES.collection, models.NAMES.email, \
-        models.NAMES.exploration, models.NAMES.feedback, models.NAMES.suggestion, 
-        models.NAMES.user])
+    base_models, collection_models, email_models, exploration_models,
+    feedback_models, suggestion_models,
+    user_models) = models.Registry.import_models(
+        [models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
+         models.NAMES.exploration, models.NAMES.feedback, models.NAMES.suggestion,
+         models.NAMES.user])
 
 
 def export_data_for_user(user_id):
@@ -46,16 +46,16 @@ def export_data_for_user(user_id):
         }
     """
     all_models = []
-    model_names_list = [model_name for model_name in dir(models.NAMES) if not model_name.startswith('__') and not model_name == 'base_model']
+    model_names_list = [
+        model_name
+        for model_name in dir(models.NAMES)
+        if not model_name.startswith('__') and not model_name == 'base_model'
+    ]
     model_modules = models.Registry.import_models(model_names_list)
     for model_module in model_modules:
-        for name, obj in inspect.getmembers(model_module):
+        for _, obj in inspect.getmembers(model_module):
             if inspect.isclass(obj):
                 all_models.append(obj)
-
-    # # Exclude the BaseModel.
-    # print(all_models)
-    # all_models.remove(base_model)
 
     exported_data = dict()
     for model in all_models:
