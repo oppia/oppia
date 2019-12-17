@@ -27,8 +27,8 @@ import { SubtopicDataObjectFactory } from
 describe('Subtopic data object factory', () => {
   describe('subtopic data object factory', () => {
     var _sampleSubtopicData = null;
-    let subtopicDataObjectFactory: SubtopicDataObjectFactory =
-      null;
+    let subtopicDataObjectFactory: SubtopicDataObjectFactory = (
+      null);
     let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
       null;
 

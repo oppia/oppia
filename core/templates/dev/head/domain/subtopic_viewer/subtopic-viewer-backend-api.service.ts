@@ -19,14 +19,14 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ajs.ts');
 
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SubtopicDataObjectFactory } from
   'domain/subtopic_viewer/SubtopicDataObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 

@@ -77,8 +77,7 @@ describe('Subtopic viewer backend API service', function() {
     };
 
     sampleDataResultsObjects = subtopicDataObjectFactory.createFromBackendDict(
-      sampleDataResults
-    );
+      sampleDataResults);
   }));
 
   afterEach(function() {
