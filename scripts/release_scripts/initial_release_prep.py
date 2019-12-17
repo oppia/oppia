@@ -281,35 +281,46 @@ def main():
         one_time_job_names = [
             job_detail['job_name'] for job_detail in one_time_job_details]
 
-        python_utils.PRINT(
-            'Repeatable jobs to run:\n%s\n' % ('\n').join(repeatable_job_names))
-        python_utils.PRINT(
-            'One time jobs to run:\n%s\n' % ('\n').join(one_time_job_names))
-        common.open_new_tab_in_browser_if_possible(
-            release_constants.RELEASE_DRIVE_URL)
-        common.ask_user_to_confirm(
-            'Please enter the above job names to release journal.')
-
-        common.open_new_tab_in_browser_if_possible(
-            release_constants.REPEATABLE_JOBS_SPREADSHEETS_URL)
-        common.open_new_tab_in_browser_if_possible(
-            release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
-        python_utils.PRINT(
-            get_mail_message_template(
-                repeatable_job_details + one_time_job_details))
-        author_mail_ids = [
-            job_details['author_email'] for job_details in (
-                repeatable_job_details + one_time_job_details)]
-        common.ask_user_to_confirm(
-            'Note: Send the mail only after deploying to backup server.\n\n'
-            'Note: Add author email ids: %s to the cc list when you send '
-            'the mail\n\n.'
-            'Note: Please check manually if the details in the above mail are '
-            'correct and add anything extra if required.\n\n'
-            'Copy and save the above template for sending a mail to Sean '
-            'to run these jobs on backup server.\n\n'
-            'If the jobs are successful on backup server, run them on test '
-            'and prod server.' % list(set(author_mail_ids)))
+        if repeatable_job_names:
+            python_utils.PRINT(
+                'Repeatable jobs to run:\n%s\n' % ('\n').join(
+                    repeatable_job_names))
+        if one_time_job_names:
+            python_utils.PRINT(
+                'One time jobs to run:\n%s\n' % ('\n').join(one_time_job_names))
+        if repeatable_job_names or one_time_job_names:
+            common.open_new_tab_in_browser_if_possible(
+                release_constants.RELEASE_DRIVE_URL)
+            common.ask_user_to_confirm(
+                'Please enter the above job names to release journal.')
+            common.open_new_tab_in_browser_if_possible(
+                release_constants.REPEATABLE_JOBS_SPREADSHEETS_URL)
+            common.open_new_tab_in_browser_if_possible(
+                release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
+            python_utils.PRINT(
+                get_mail_message_template(
+                    repeatable_job_details + one_time_job_details))
+            author_mail_ids = [
+                job_details['author_email'] for job_details in (
+                    repeatable_job_details + one_time_job_details)]
+            common.ask_user_to_confirm(
+                'Note: Send the mail only after deploying to backup server.\n\n'
+                'Note: Add author email ids: %s to the cc list when you send '
+                'the mail.\n\n'
+                'Note: Please check manually if the details in the above mail '
+                'are correct and add anything extra if required.\n\n'
+                'Copy and save the above template for sending a mail to Sean '
+                'to run these jobs on backup server.\n\n'
+                'If the jobs are successful on backup server, run them on test '
+                'and prod server.' % list(set(author_mail_ids)))
+        else:
+            python_utils.PRINT('No jobs to run for the release.')
+            common.open_new_tab_in_browser_if_possible(
+                release_constants.REPEATABLE_JOBS_SPREADSHEETS_URL)
+            common.open_new_tab_in_browser_if_possible(
+                release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
+            common.ask_user_to_confirm(
+                'Please check manually if there are no jobs to run.')
     finally:
         if os.path.isfile(RELEASE_CREDENTIALS_FILEPATH):
             os.remove(RELEASE_CREDENTIALS_FILEPATH)
