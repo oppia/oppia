@@ -76,6 +76,9 @@ import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
+import { ExtractImageFilenamesFromStateService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -176,6 +179,8 @@ import { SubtitledHtmlObjectFactory } from
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { SuggestionThreadObjectFactory } from
+  'domain/suggestion/SuggestionThreadObjectFactory';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
@@ -333,6 +338,9 @@ export class UpgradedServices {
       new SidebarStatusService(upgradedServices['WindowDimensionsService']);
     upgradedServices['SiteAnalyticsService'] =
       new SiteAnalyticsService(upgradedServices['WindowRef']);
+    upgradedServices['SuggestionThreadObjectFactory'] =
+        new SuggestionThreadObjectFactory(
+          upgradedServices['SuggestionObjectFactory']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
@@ -373,6 +381,9 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['ExtractImageFilenamesFromStateService'] =
+        new ExtractImageFilenamesFromStateService(
+          upgradedServices['HtmlEscaperService']);
     upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
       upgradedServices['ParamSpecObjectFactory']);
     upgradedServices['PencilCodeEditorRulesService'] =
