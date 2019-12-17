@@ -376,7 +376,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'collection_progress_data': collection_progress_data,
             'story_progress_data': story_progress_data,
             'general_feedback_thread_data': general_feedback_thread_data,
-            'general_feedback_thread_user_data': 
+            'general_feedback_thread_user_data':
                 general_feedback_thread_user_data,
             'general_feedback_message_data': general_feedback_message_data,
             'collection_rights_data': collection_rights_data,
