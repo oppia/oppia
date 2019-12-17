@@ -557,6 +557,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         exploration, exp_versions_diff=exp_versions_diff,
         revert_to_version=None)
 
+def save_exploration_test_helper(
+    committer_id, exploration, commit_message, change_list):
+    _save_exploration(committer_id, exploration, commit_message, change_list)
 
 def _create_exploration(
         committer_id, exploration, commit_message, commit_cmds):
