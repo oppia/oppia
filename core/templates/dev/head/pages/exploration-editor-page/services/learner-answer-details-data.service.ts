@@ -71,7 +71,7 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
             var interactionId = learnerAnswerInfoData[i].interaction_id;
             var customizationArgs = learnerAnswerInfoData[i].customization_args;
             var learnerAnswerInfoDicts = (
-              learnerAnswerInfoData[i].learner_answer_info_dicts) || [];
+              learnerAnswerInfoData[i].learner_answer_info_dicts);
             var learnerAnswerDetails = (
               // eslint-disable-next-line max-len
               LearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
