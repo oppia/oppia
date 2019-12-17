@@ -95,15 +95,15 @@ angular.module('oppia').directive('adminNavbar', [
           ctrl.profileDropdownIsActive = false;
         };
 
-        ctrl.hiddenMenu = false;
-        ctrl.onMouseoverHiddenMenu = function(evt) {
+        ctrl.dropdownMenuisActive = false;
+        ctrl.onMouseoverDropdownIconOrMenu = function(evt) {
           angular.element(evt.currentTarget).parent().addClass('open');
-          ctrl.hiddenMenu = true;
+          ctrl.dropdownMenuisActive = true;
         };
 
-        ctrl.onMouseoutHiddenMenu = function(evt) {
+        ctrl.onMouseoutDropdownIconOrMenu = function(evt) {
           angular.element(evt.currentTarget).parent().removeClass('open');
-          ctrl.hiddenMenu = false;
+          ctrl.dropdownMenuisActive = false;
         };
       }]
     };
