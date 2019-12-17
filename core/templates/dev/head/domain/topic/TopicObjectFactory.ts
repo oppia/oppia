@@ -29,7 +29,6 @@ import { StoryReference, StoryReferenceObjectFactory } from
 import { Subtopic, SubtopicObjectFactory } from
   'domain/topic/SubtopicObjectFactory';
 
-
 export class Topic {
   _id: string;
   _name: string;
