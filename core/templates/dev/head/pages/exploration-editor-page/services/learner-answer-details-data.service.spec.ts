@@ -75,20 +75,19 @@ describe('Learner answer details service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  describe(
-    'should successfully fetch learner answer info data from the backend',
-    function() {
-      beforeEach(function() {
-        sampleDataResults = {
-          learner_answer_info_data: [{
-            state_name: 'fakeStateName',
-            interaction_id: 'fakeInteractionId',
-            customization_args: 'fakeCustomizationArgs',
-          }]
-        };
-      });
+  describe('.fetchLearnerAnswerInfoData', function() {
+    beforeEach(function() {
+      sampleDataResults = {
+        learner_answer_info_data: [{
+          state_name: 'fakeStateName',
+          interaction_id: 'fakeInteractionId',
+          customization_args: 'fakeCustomizationArgs',
+        }]
+      };
+    });
 
-      it('if it has all the information', function() {
+    it('should successfully fetch learner answer info data from the backend',
+      function() {
         sampleDataResults.learner_answer_info_dicts = [{
           id: '123',
           answer: 'My answer',
@@ -112,7 +111,8 @@ describe('Learner answer details service', function() {
           .toBe(sampleDataResults.learner_answer_info_data.length);
       });
 
-      it('if it doesn\'t have info dicts', function() {
+    it('should not create info dicts if it is not in learner answer info',
+      function() {
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
 
@@ -132,39 +132,35 @@ describe('Learner answer details service', function() {
         expect(LearnerAnswerDetailsDataService.getData().length)
           .toBe(sampleDataResults.learner_answer_info_data.length);
       });
-    }
-  );
+  });
 
-  it('should delete learner answer info',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      $httpBackend.expect('DELETE', '/learneranswerinfohandler/' +
-      'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
-      'learner_answer_info_id=fakeId').respond(200);
-      LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
-        '12345', 'fakeStateName', 'fakeId').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+  it('should delete learner answer info', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+    $httpBackend.expect('DELETE', '/learneranswerinfohandler/' +
+    'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
+    'learner_answer_info_id=fakeId').respond(200);
+    LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
+      '12345', 'fakeStateName', 'fakeId').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(200);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    expect(successHandler).toHaveBeenCalledWith(200);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
 
-  it('shouldn\'t delete learner answer info',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-      $httpBackend.expect('DELETE', '/learneranswerinfohandler/' +
-      'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
-      'learner_answer_info_id=fakeId').respond(404);
-      LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
-        '12345', 'fakeStateName', 'fakeId').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+  it('should not delete learner answer info', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+    $httpBackend.expect('DELETE', '/learneranswerinfohandler/' +
+    'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
+    'learner_answer_info_id=fakeId').respond(404);
+    LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
+      '12345', 'fakeStateName', 'fakeId').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(undefined);
-    });
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(undefined);
+  });
 });
