@@ -52,7 +52,7 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
             self.topic_id, self.admin_id, 'Name', 'abbrev', None,
             'Description', [], [], [self.skill_id], [], 1)
 
-    def _delete_skill_model_and_memcache(self, user_id, skill_id):
+    def delete_skill_model_and_memcache(self, user_id, skill_id):
         """Deletes skill model and memcache corresponding to the given skill
         id.
         """
@@ -102,7 +102,7 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
 
         # Check GET returns 404 when cannot get skill by id.
-        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_html_response(self.url, expected_status_int=404)
         self.logout()
 
@@ -185,7 +185,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
     def test_editable_skill_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
-        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
         self.logout()
 
@@ -221,7 +221,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             self.url, self.put_payload, csrf_token=csrf_token,
             expected_status_int=400)
         # Check PUT returns 404 when cannot get skill by id.
-        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.put_json(
             self.url, {}, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
@@ -272,7 +272,7 @@ class SkillDataHandlerTest(BaseSkillEditorControllerTests):
     def test_skill_data_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
-        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
         self.url = '%s/1,%s' % (
             feconf.SKILL_DATA_URL_PREFIX, self.skill_id_2)
@@ -298,6 +298,6 @@ class FetchSkillsHandlerTest(BaseSkillEditorControllerTests):
     def test_skill_data_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
         # Check GET returns 404 when cannot get skill by id.
-        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.delete_skill_model_and_memcache(self.admin_id, self.skill_id)
         self.get_json(self.url, expected_status_int=404)
         self.logout()
