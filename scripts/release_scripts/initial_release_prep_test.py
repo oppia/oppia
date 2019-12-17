@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import os
+import subprocess
 import sys
 
 import constants
@@ -146,14 +147,19 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             pass
         def mock_input():
             return 'n'
+        def mock_verify_current_branch_name(unused_branch_name):
+            pass
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        branch_check_swap = self.swap(
+            common, 'verify_current_branch_name',
+            mock_verify_current_branch_name)
 
-        with open_tab_swap, ask_user_swap, input_swap:
+        with open_tab_swap, ask_user_swap, input_swap, branch_check_swap:
             with self.assertRaisesRegexp(
                 Exception,
                 'Please ensure a new doc is created for the '
@@ -236,6 +242,63 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
                 ['git', 'reset', 'assets/constants.ts'],
                 ['git', 'checkout', '--', 'assets/constants.ts']])
 
+    def test_cut_release_branch_with_correct_version(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'check_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'check_call_is_called': True
+        }
+        def mock_open_tab(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_is_called'] = True
+        def mock_input():
+            return '1.2.3'
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible',
+            mock_open_tab)
+        check_call_swap = self.swap(
+            subprocess, 'check_call', mock_check_call)
+        input_swap = self.swap(
+            python_utils, 'INPUT', mock_input)
+        with open_tab_swap, check_call_swap, input_swap:
+            initial_release_prep.cut_release_branch()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_cut_release_branch_with_incorrect_version(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'check_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'check_call_is_called': False
+        }
+        def mock_open_tab(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_is_called'] = True
+        def mock_input():
+            return 'invalid'
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible',
+            mock_open_tab)
+        check_call_swap = self.swap(
+            subprocess, 'check_call', mock_check_call)
+        input_swap = self.swap(
+            python_utils, 'INPUT', mock_input)
+        with open_tab_swap, check_call_swap, input_swap:
+            with self.assertRaises(AssertionError):
+                initial_release_prep.cut_release_branch()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_function_calls_with_jobs_to_run(self):
         check_function_calls = {
             'get_all_records_is_called': False,
@@ -251,7 +314,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'remove_is_called': False,
             'get_extra_jobs_due_to_schema_changes_is_called': False,
             'did_supported_audio_languages_change_is_called': False,
-            'get_remote_alias_is_called': False
+            'get_remote_alias_is_called': False,
+            'verify_current_branch_name_is_called': False,
+            'cut_release_branch_is_called': False
         }
         expected_check_function_calls = {
             'get_all_records_is_called': True,
@@ -267,7 +332,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'remove_is_called': True,
             'get_extra_jobs_due_to_schema_changes_is_called': True,
             'did_supported_audio_languages_change_is_called': True,
-            'get_remote_alias_is_called': True
+            'get_remote_alias_is_called': True,
+            'verify_current_branch_name_is_called': True,
+            'cut_release_branch_is_called': True
         }
         class MockWorksheet(python_utils.OBJECT):
             def get_all_records(self):
@@ -338,6 +405,10 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             return True
         def mock_get_remote_alias(unused_remote_url):
             check_function_calls['get_remote_alias_is_called'] = True
+        def mock_verify_current_branch_name(unused_branch_name):
+            check_function_calls['verify_current_branch_name_is_called'] = True
+        def mock_cut_release_branch():
+            check_function_calls['cut_release_branch_is_called'] = True
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
@@ -363,12 +434,19 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             mock_did_supported_audio_languages_change)
         get_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
+        branch_check_swap = self.swap(
+            common, 'verify_current_branch_name',
+            mock_verify_current_branch_name)
+        cut_branch_swap = self.swap(
+            initial_release_prep, 'cut_release_branch',
+            mock_cut_release_branch)
 
         with open_tab_swap, ask_user_swap, input_swap, print_swap:
             with job_details_swap, mail_msg_swap, open_file_swap:
                 with authorize_swap, isfile_swap, remove_swap, get_alias_swap:
                     with get_extra_jobs_swap, check_changes_swap:
-                        initial_release_prep.main()
+                        with branch_check_swap, cut_branch_swap:
+                            initial_release_prep.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_function_calls_with_no_jobs_to_run(self):
@@ -386,7 +464,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'remove_is_called': False,
             'get_extra_jobs_due_to_schema_changes_is_called': False,
             'did_supported_audio_languages_change_is_called': False,
-            'get_remote_alias_is_called': False
+            'get_remote_alias_is_called': False,
+            'verify_current_branch_name_is_called': False,
+            'cut_release_branch_is_called': False
         }
         expected_check_function_calls = {
             'get_all_records_is_called': True,
@@ -402,7 +482,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             'remove_is_called': True,
             'get_extra_jobs_due_to_schema_changes_is_called': True,
             'did_supported_audio_languages_change_is_called': True,
-            'get_remote_alias_is_called': True
+            'get_remote_alias_is_called': True,
+            'verify_current_branch_name_is_called': True,
+            'cut_release_branch_is_called': True
         }
         class MockWorksheet(python_utils.OBJECT):
             def get_all_records(self):
@@ -468,6 +550,10 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             return True
         def mock_get_remote_alias(unused_remote_url):
             check_function_calls['get_remote_alias_is_called'] = True
+        def mock_verify_current_branch_name(unused_branch_name):
+            check_function_calls['verify_current_branch_name_is_called'] = True
+        def mock_cut_release_branch():
+            check_function_calls['cut_release_branch_is_called'] = True
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
@@ -493,11 +579,18 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             mock_did_supported_audio_languages_change)
         get_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
+        branch_check_swap = self.swap(
+            common, 'verify_current_branch_name',
+            mock_verify_current_branch_name)
+        cut_branch_swap = self.swap(
+            initial_release_prep, 'cut_release_branch',
+            mock_cut_release_branch)
 
         with open_tab_swap, ask_user_swap, input_swap, print_swap:
             with job_details_swap, mail_msg_swap, open_file_swap:
                 with authorize_swap, isfile_swap, remove_swap, get_alias_swap:
                     with get_extra_jobs_swap, check_changes_swap:
-                        initial_release_prep.main()
+                        with branch_check_swap, cut_branch_swap:
+                            initial_release_prep.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
         self.assertTrue('No jobs to run for the release.' in print_arr)

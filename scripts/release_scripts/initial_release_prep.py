@@ -22,6 +22,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 import os
 import re
+import subprocess
 import sys
 
 import python_utils
@@ -201,9 +202,33 @@ def did_supported_audio_languages_change(
             supported_audio_language_ids_for_previous_release))
 
 
+def cut_release_branch():
+    """Calls the cut_release_or_hotfix_branch script to cut a release branch.
+
+    Raises:
+        AssertionError. The version entered is invalid.
+    """
+    common.open_new_tab_in_browser_if_possible(
+        'https://github.com/oppia/oppia/releases')
+    python_utils.PRINT(
+        'Enter the new version for the release.\n'
+        'If major changes occurred since the last release, or if '
+        'the third version is a 9, increment the minor version '
+        '(e.g. 2.5.3 -> 2.6.0 or 2.5.9 -> 2.6.0)\n'
+        'Otherwise, increment the third version number '
+        '(e.g. 2.5.3 -> 2.5.4)\n')
+    release_version = python_utils.INPUT()
+    assert re.match(r'\d+\.\d+\.\d+$', release_version)
+    subprocess.check_call([
+        'python', '-m',
+        'scripts.release_scripts.cut_release_or_hotfix_branch',
+        '--new_version=%s' % release_version])
+
+
 def main():
     """Performs task to initiate the release."""
     common.require_cwd_to_be_oppia()
+    common.verify_current_branch_name('develop')
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_NOTES_URL)
     common.ask_user_to_confirm(
@@ -321,6 +346,8 @@ def main():
                 release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
             common.ask_user_to_confirm(
                 'Please check manually if there are no jobs to run.')
+
+        cut_release_branch()
     finally:
         if os.path.isfile(RELEASE_CREDENTIALS_FILEPATH):
             os.remove(RELEASE_CREDENTIALS_FILEPATH)
