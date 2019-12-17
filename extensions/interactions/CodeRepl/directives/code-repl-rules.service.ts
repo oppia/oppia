@@ -16,53 +16,62 @@
  * @fileoverview Rules service for the interaction.
  */
 
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('services/code-normalizer.service.ts');
+import { Injectable } from '@angular/core';
+import { downgradeInjectable } from '@angular/upgrade/static';
 
-angular.module('oppia').factory('CodeReplRulesService', [
-  '$filter', 'CodeNormalizerService',
-  function($filter, CodeNormalizerService) {
-    return {
-      CodeEquals: function(answer, inputs) {
-        var normalizedCode =
-          CodeNormalizerService.getNormalizedCode(answer.code);
-        var normalizedExpectedCode =
-          CodeNormalizerService.getNormalizedCode(inputs.x);
-        return normalizedCode === normalizedExpectedCode;
-      },
-      CodeContains: function(answer, inputs) {
-        var normalizedCode =
-          CodeNormalizerService.getNormalizedCode(answer.code);
-        var normalizedSnippet =
-          CodeNormalizerService.getNormalizedCode(inputs.x);
-        return normalizedCode.indexOf(normalizedSnippet) !== -1;
-      },
-      CodeDoesNotContain: function(answer, inputs) {
-        var normalizedCode =
-          CodeNormalizerService.getNormalizedCode(answer.code);
-        var normalizedSnippet =
-          CodeNormalizerService.getNormalizedCode(inputs.x);
-        return normalizedCode.indexOf(normalizedSnippet) === -1;
-      },
-      OutputContains: function(answer, inputs) {
-        var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
-        var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-        return normalizedOutput.indexOf(normalizedSnippet) !== -1;
-      },
-      OutputEquals: function(answer, inputs) {
-        var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
-        var normalizedExpectedOutput =
-          $filter('normalizeWhitespace')(inputs.x);
-        return normalizedOutput === normalizedExpectedOutput;
-      },
-      ResultsInError: function(answer) {
-        return !!(answer.error.trim());
-      },
-      ErrorContains: function(answer, inputs) {
-        var normalizedError = $filter('normalizeWhitespace')(answer.error);
-        var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-        return normalizedError.indexOf(normalizedSnippet) !== -1;
-      }
-    };
+import { CodeNormalizerService } from 'services/code-normalizer.service';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CodeReplRulesService {
+  constructor(
+    private normalizeWhitespace: NormalizeWhitespacePipe,
+    private codeNormalizer: CodeNormalizerService) {}
+
+  CodeEquals(answer: {code: string}, inputs: {x: string}): boolean {
+    var normalizedCode =
+      this.codeNormalizer.getNormalizedCode(answer.code);
+    var normalizedExpectedCode =
+      this.codeNormalizer.getNormalizedCode(inputs.x);
+    return normalizedCode === normalizedExpectedCode;
   }
-]);
+  CodeContains(answer: {code: string}, inputs: {x: string}): boolean {
+    var normalizedCode =
+      this.codeNormalizer.getNormalizedCode(answer.code);
+    var normalizedSnippet =
+      this.codeNormalizer.getNormalizedCode(inputs.x);
+    return normalizedCode.indexOf(normalizedSnippet) !== -1;
+  }
+  CodeDoesNotContain(answer: {code: string}, inputs: {x: string}): boolean {
+    var normalizedCode =
+      this.codeNormalizer.getNormalizedCode(answer.code);
+    var normalizedSnippet =
+      this.codeNormalizer.getNormalizedCode(inputs.x);
+    return normalizedCode.indexOf(normalizedSnippet) === -1;
+  }
+  OutputContains(answer: {output: string}, inputs: {x: string}): boolean {
+    var normalizedOutput = this.normalizeWhitespace.transform(answer.output);
+    var normalizedSnippet = this.normalizeWhitespace.transform(inputs.x);
+    return normalizedOutput.indexOf(normalizedSnippet) !== -1;
+  }
+  OutputEquals(answer: {output: string}, inputs: {x: string}): boolean {
+    var normalizedOutput = this.normalizeWhitespace.transform(answer.output);
+    var normalizedExpectedOutput =
+      this.normalizeWhitespace.transform(inputs.x);
+    return normalizedOutput === normalizedExpectedOutput;
+  }
+  ResultsInError(answer: {error: string}): boolean {
+    return !!(answer.error.trim());
+  }
+  ErrorContains(answer: {error: string}, inputs: {x: string}): boolean {
+    var normalizedError = this.normalizeWhitespace.transform(answer.error);
+    var normalizedSnippet = this.normalizeWhitespace.transform(inputs.x);
+    return normalizedError.indexOf(normalizedSnippet) !== -1;
+  }
+}
+
+angular.module('oppia').factory(
+  'CodeReplRulesService', downgradeInjectable(CodeReplRulesService));
