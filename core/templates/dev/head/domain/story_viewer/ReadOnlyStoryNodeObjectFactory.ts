@@ -17,72 +17,88 @@
  * story viewer.
  */
 
-angular.module('oppia').factory('ReadOnlyStoryNodeObjectFactory', [function() {
-  var StoryNode = function(
-      id, title, destinationNodeIds, prerequisiteSkillIds, acquiredSkillIds,
-      outline, outlineIsFinalized, explorationId, explorationSummary,
-      completed) {
-    this._id = id;
-    this._title = title;
-    this._destinationNodeIds = destinationNodeIds;
-    this._prerequisiteSkillIds = prerequisiteSkillIds;
-    this._acquiredSkillIds = acquiredSkillIds;
-    this._outline = outline;
-    this._outlineIsFinalized = outlineIsFinalized;
-    this._explorationId = explorationId;
-    this._explorationSummaryObject = explorationSummary;
-    this._completed = completed;
-  };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-  // Instance methods
+export class StoryNode {
+  id;
+  title;
+  destinationNodeIds;
+  prerequisiteSkillIds;
+  acquiredSkillIds;
+  outline;
+  outlineIsFinalized;
+  explorationId;
+  explorationSummary;
+  completed;
 
-  StoryNode.prototype.getId = function() {
-    return this._id;
-  };
+  constructor(id, title, destinationNodeIds, prerequisiteSkillIds,
+      acquiredSkillIds, outline, outlineIsFinalized, explorationId,
+      explorationSummary, completed) {
+    this.id = id;
+    this.title = title;
+    this.destinationNodeIds = destinationNodeIds;
+    this.prerequisiteSkillIds = prerequisiteSkillIds;
+    this.acquiredSkillIds = acquiredSkillIds;
+    this.outline = outline;
+    this.outlineIsFinalized = outlineIsFinalized;
+    this.explorationId = explorationId;
+    this.explorationSummary = explorationSummary;
+    this.completed = completed;
+  }
 
-  StoryNode.prototype.getTitle = function() {
-    return this._title;
-  };
+  getId() {
+    return this.id;
+  }
 
-  StoryNode.prototype.getExplorationId = function() {
-    return this._explorationId;
-  };
+  getTitle() {
+    return this.title;
+  }
 
-  StoryNode.prototype.isCompleted = function() {
-    return this._completed;
-  };
+  getExplorationId() {
+    return this.explorationId;
+  }
 
-  StoryNode.prototype.getExplorationSummaryObject = function() {
-    return this._explorationSummaryObject;
-  };
+  isCompleted() {
+    return this.completed;
+  }
 
-  StoryNode.prototype.getOutline = function() {
-    return this._outline;
-  };
+  getExplorationSummaryObject() {
+    return this.explorationSummary;
+  }
 
-  StoryNode.prototype.getOutlineStatus = function() {
-    return this._outlineIsFinalized;
-  };
+  getOutline() {
+    return this.outline;
+  }
 
-  // Static class methods. Note that "this" is not available in static
-  // contexts. This function takes a JSON object which represents a backend
-  // story python dict.
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  StoryNode['createFromBackendDict'] = function(storyNodeBackendObject) {
-  /* eslint-enable dot-notation */
-    return new StoryNode(
-      storyNodeBackendObject.id, storyNodeBackendObject.title,
-      storyNodeBackendObject.destination_node_ids,
-      storyNodeBackendObject.prerequisite_skill_ids,
-      storyNodeBackendObject.acquired_skill_ids,
-      storyNodeBackendObject.outline,
-      storyNodeBackendObject.outline_is_finalized,
-      storyNodeBackendObject.exploration_id,
-      storyNodeBackendObject.exp_summary_dict,
-      storyNodeBackendObject.completed
-    );
-  };
+  getOutlineStatus() {
+    return this.outlineIsFinalized;
+  }
+}
 
-  return StoryNode;
-}]);
+@Injectable({
+  providedIn: 'root'
+})
+export class ReadOnlyStoryNodeObjectFactory {
+  constructor() {}
+
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(storyNodeBackendDict: any): StoryNode {
+    return new StoryNode(storyNodeBackendDict.id, storyNodeBackendDict.title,
+      storyNodeBackendDict.destination_node_ids,
+      storyNodeBackendDict.prerequisite_skill_ids,
+      storyNodeBackendDict.acquired_skill_ids,
+      storyNodeBackendDict.outline,
+      storyNodeBackendDict.outline_is_finalized,
+      storyNodeBackendDict.exploration_id,
+      storyNodeBackendDict.exp_summary_dict,
+      storyNodeBackendDict.completed);
+  }
+}
+
+angular.module('oppia').factory(
+  'ReadOnlyStoryNodeObjectFactory',
+  downgradeInjectable(ReadOnlyStoryNodeObjectFactory));
