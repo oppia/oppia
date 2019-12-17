@@ -19,10 +19,10 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
-import { HttpClient } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class ExplorationFeaturesBackendApiService {
     private http: HttpClient
   ) {}
 
-  _fetchExplorationFeatures(explorationId): Promise<Object> {
+  _fetchExplorationFeatures(explorationId: String): Promise<Object> {
     return this.http.get(
       this.urlInterpolationService.interpolateUrl(
         '/explorehandler/features/<exploration_id>',
@@ -42,7 +42,7 @@ export class ExplorationFeaturesBackendApiService {
     ).toPromise();
   }
 
-  fetchExplorationFeatures(explorationId): Promise<Object> {
+  fetchExplorationFeatures(explorationId: String): Promise<Object> {
     return this._fetchExplorationFeatures(explorationId);
   }
 }
