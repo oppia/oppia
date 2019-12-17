@@ -90,7 +90,6 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
   var SuggestionThreadObjectFactory = null;
   var ThreadDataService = null;
   var SUGGESTION_IMPROVEMENT_TASK_TYPE = null;
-  var $httpBackend = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -162,8 +161,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
     }
   }));
   beforeEach(angular.mock.inject(function(
-      $injector, _$q_, _$rootScope_, _$uibModal_,
-      _ImprovementModalService_,
+      _$q_, _$rootScope_, _$uibModal_, _ImprovementModalService_,
       _SuggestionImprovementTaskObjectFactory_,
       _SuggestionModalForExplorationEditorService_,
       _SuggestionThreadObjectFactory_, _ThreadDataService_,
@@ -179,7 +177,6 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
     SuggestionThreadObjectFactory = _SuggestionThreadObjectFactory_;
     ThreadDataService = _ThreadDataService_;
     SUGGESTION_IMPROVEMENT_TASK_TYPE = _SUGGESTION_IMPROVEMENT_TASK_TYPE_;
-    $httpBackend = $injector.get('$httpBackend');
   }));
 
   describe('.createNew', function() {

@@ -88,7 +88,6 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
   var ImprovementModalService = null;
   var ThreadDataService = null;
   var FEEDBACK_IMPROVEMENT_TASK_TYPE = null;
-  var $httpBackend = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -161,8 +160,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
     }
   }));
   beforeEach(angular.mock.inject(function(
-      $injector, _$q_, _$rootScope_, _$uibModal_,
-      _FeedbackImprovementTaskObjectFactory_,
+      _$q_, _$rootScope_, _$uibModal_, _FeedbackImprovementTaskObjectFactory_,
       _ImprovementModalService_, _ThreadDataService_,
       _FEEDBACK_IMPROVEMENT_TASK_TYPE_) {
     $q = _$q_;
@@ -173,7 +171,6 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
     ImprovementModalService = _ImprovementModalService_;
     ThreadDataService = _ThreadDataService_;
     FEEDBACK_IMPROVEMENT_TASK_TYPE = _FEEDBACK_IMPROVEMENT_TASK_TYPE_;
-    $httpBackend = $injector.get('$httpBackend');
   }));
 
   describe('.createNew', function() {
@@ -188,11 +185,6 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
   });
 
   describe('.fetchTasks', function() {
-    afterEach(function() {
-      $httpBackend.verifyNoOutstandingExpectation();
-      $httpBackend.verifyNoOutstandingRequest();
-    });
-
     it('fetches threads from the backend', function(done) {
       var threads = {
         feedbackThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
