@@ -603,7 +603,6 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     COL_ID_4 = '4_languages_learning_basic_verbs_in_spanish'
     COL_ID_5 = '5_languages_private_collection_in_spanish'
 
-
     def setUp(self):
         super(CollectionSummaryQueriesUnitTests, self).setUp()
 
@@ -639,7 +638,6 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
         collection_services.index_collections_given_ids([
             self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, self.COL_ID_3,
             self.COL_ID_4])
-
 
     def _create_search_query(self, terms, categories):
         """Returns the search query derived from terms and categories."""
