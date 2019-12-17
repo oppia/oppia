@@ -48,6 +48,8 @@ import { ClassifierObjectFactory } from
 import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { CodeReplPredictionService } from
   'interactions/CodeRepl/code-repl-prediction.service';
+import { CodeReplRulesService } from
+  'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
 import { ContextService } from 'services/context.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
@@ -360,8 +362,10 @@ export class UpgradedServices {
     upgradedServices['AudioTranslationLanguageService'] =
         new AudioTranslationLanguageService(
           upgradedServices['BrowserCheckerService'],
-          upgradedServices['LanguageUtilService']
-        );
+          upgradedServices['LanguageUtilService']);
+    upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
+      upgradedServices['NormalizeWhitespacePipe'],
+      upgradedServices['CodeNormalizerService']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
