@@ -32,7 +32,8 @@ class SuggestionThread {
   messageCount: number;
   threadId: string;
   suggestion: Suggestion;
-  messages: Array<{text: string}>;
+  // TODO(#7165): Replace any with exact type.
+  messages: Array<any>;
   constructor(
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdated: number, messageCount: number,
@@ -47,25 +48,35 @@ class SuggestionThread {
     this.suggestion = suggestion;
     this.messages = [];
   }
-
-  setMessages(messages: Array<{text: string}>): void {
+  // TODO(#7165): Replace any with exact type.
+  setMessages(messages: Array<any>): void {
     this.messages = messages;
   }
-
-  isSuggestionHandled(): boolean {
-    return this.suggestion.status !== 'review';
+  // TODO(#7165): Replace any with exact type.
+  getMessages(): Array<any> {
+    return this.messages;
   }
 
-  getSuggestionStateName(): string {
-    return this.suggestion.stateName;
+  isSuggestionHandled(): boolean | null {
+    return this.suggestion ? this.suggestion.status !== 'review' : null;
   }
 
-  getSuggestionStatus(): string {
-    return this.suggestion.status;
+  getSuggestionStateName(): string | null {
+    return this.suggestion ? this.suggestion.stateName : null;
   }
 
-  getReplacementHtmlFromSuggestion(): string {
-    return this.suggestion.newValue.html;
+  setSuggestionStatus(status: string): void {
+    if (this.suggestion) {
+      this.suggestion.status = status;
+    }
+  }
+
+  getSuggestionStatus(): string | null {
+    return this.suggestion ? this.suggestion.status : null;
+  }
+
+  getReplacementHtmlFromSuggestion(): string | null {
+    return this.suggestion ? this.suggestion.newValue.html : null;
   }
 
   isSuggestionThread(): boolean {
