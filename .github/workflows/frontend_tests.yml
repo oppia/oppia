@@ -13,6 +13,10 @@ jobs:
         with:
           python-version: '2.x'
           architecture: 'x64'
+      - name: Upgrade packages
+        run: |
+          sudo apt-get update
+          sudo apt-get -yqq upgrade
       - name: Install third party
         run: python -m scripts.install_third_party_libs
       - name: Run frontend tests
