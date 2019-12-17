@@ -575,6 +575,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class QuestionSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia question.
 
@@ -641,6 +642,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class QuestionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):

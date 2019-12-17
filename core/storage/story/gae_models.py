@@ -126,6 +126,7 @@ class StoryModel(base_models.VersionedModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to stories.
 
@@ -163,6 +164,7 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class StorySummaryModel(base_models.BaseModel):
     """Summary model for an Oppia Story.

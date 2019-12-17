@@ -63,6 +63,7 @@ class ExplorationRecommendationsModel(
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class TopicSimilaritiesModel(base_models.BaseModel):
     """This model stores the similarity between any two topics. The topic
     similarities are stored as a JSON object, representing a 2D dict where the

@@ -160,6 +160,7 @@ class SkillModel(base_models.VersionedModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to skills.
 
@@ -197,6 +198,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class SkillSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia Skill.
@@ -251,6 +253,7 @@ class SkillSummaryModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill rights snapshot."""

@@ -207,6 +207,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class TrainingJobExplorationMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierTrainingJob.
 

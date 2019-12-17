@@ -175,6 +175,7 @@ class FileMetadataModel(base_models.VersionedModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file snapshot commit history."""
     @classmethod
@@ -195,6 +196,7 @@ class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class FileModel(base_models.VersionedModel):
     """File data model, keyed by path to the assets folder and absolute file

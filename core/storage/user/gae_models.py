@@ -581,6 +581,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
 
@@ -680,6 +681,7 @@ class UserSubscribersModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     """A list of recent changes corresponding to things a user subscribes to.
 
@@ -715,6 +717,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
     """User-specific statistics keyed by user id.
@@ -1395,6 +1398,7 @@ class UserQueryModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class UserBulkEmailsModel(base_models.BaseModel):
     """Model to store IDs BulkEmailModel sent to a user.
 
@@ -1427,6 +1431,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class UserSkillMasteryModel(base_models.BaseModel):
     """Model for storing a user's degree of mastery of a skill in Oppia.

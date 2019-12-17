@@ -119,6 +119,7 @@ class StateCounterModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student submitting an answer."""
     # Id of exploration currently being played.
@@ -178,6 +179,7 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student entering an exploration. In this context,
     'actually' entering an exploration means the student has completed the
@@ -231,6 +233,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class SolutionHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student triggering the solution."""
@@ -287,6 +290,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student starting the exploration.
@@ -396,6 +400,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a reader attempting to leave the
@@ -519,6 +524,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a learner reaching a terminal state of an
     exploration.
@@ -635,6 +641,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class RateExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a learner rating the exploration.
 
@@ -709,6 +716,7 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class StateHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student getting to a particular state. The
@@ -815,6 +823,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class StateCompleteEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student completing a state."""
     # Id of exploration currently being played.
@@ -870,6 +879,7 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student leaving for a refresher exploration."""
@@ -929,6 +939,7 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class ExplorationStatsModel(base_models.BaseModel):
     """Model for storing analytics data for an exploration. This model contains
@@ -1117,6 +1128,7 @@ class ExplorationStatsModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class ExplorationIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
     issues.
@@ -1193,6 +1205,7 @@ class ExplorationIssuesModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class PlaythroughModel(base_models.BaseModel):
     """Model for storing recorded useful playthrough data in the datastore.
@@ -1295,6 +1308,7 @@ class PlaythroughModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class LearnerAnswerDetailsModel(base_models.BaseModel):
     """Model for storing the answer details that a learner enters when they
@@ -1450,6 +1464,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
@@ -1537,6 +1552,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class StateAnswersModel(base_models.BaseModel):
     """Store all answers of a state. This model encapsulates a sharded storage
@@ -1889,6 +1905,7 @@ class StateAnswersModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
     """Store output of calculation performed on StateAnswers.

@@ -418,6 +418,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class CollectionSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia collection.
 

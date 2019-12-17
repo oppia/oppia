@@ -161,6 +161,7 @@ class TopicModel(base_models.VersionedModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to topics.
 
@@ -198,6 +199,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class TopicSummaryModel(base_models.BaseModel):
     """Summary model for an Oppia Topic.
@@ -262,6 +264,7 @@ class TopicSummaryModel(base_models.BaseModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -355,6 +358,7 @@ class SubtopicPageModel(base_models.VersionedModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to subtopic pages.
 
@@ -393,6 +397,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     def export_data(cls, user_id): # pylint: disable=unused-argument
         """Defines the Takeout export data policy for this model."""
         return None
+
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""

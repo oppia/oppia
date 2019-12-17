@@ -173,6 +173,7 @@ class ExplorationModel(base_models.VersionedModel):
         """Defines the Takeout export data policy for this model."""
         return None
 
+
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
