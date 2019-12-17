@@ -57,7 +57,7 @@ class WipeoutServiceTests(test_utils.GenericTestBase):
         self.assertEqual(
             email_preferences.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
-        self.assertFalse(
+        self.assertEqual(
             email_preferences.can_receive_subscription_email,
             feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
@@ -121,10 +121,6 @@ class WipeoutServiceTests(test_utils.GenericTestBase):
         self.assertEqual(
             pending_deletion_model.exploration_ids, [])
         self.assertEqual(pending_deletion_model.collection_ids, [])
-
-        pending_deletion_model = (
-            user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))
-        self.assertEqual(pending_deletion_model.topic_ids, [])
 
     def tests_pre_delete_user_collection_is_marked_deleted(self):
         self.save_new_valid_collection(

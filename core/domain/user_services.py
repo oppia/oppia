@@ -1030,10 +1030,6 @@ def mark_user_for_deletion(
             deleted and should be hard deleted later.
         collection_ids: list(str). List of collection ids that were soft
             deleted and should be hard deleted later.
-        skill_ids: list(str). List of skill ids that were soft deleted and
-            should be hard deleted later.
-        topic_ids: list(str). List of topic ids that were soft deleted and
-            should be hard deleted later.
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.to_be_deleted = True
@@ -1043,8 +1039,6 @@ def mark_user_for_deletion(
         id=user_id,
         exploration_ids=exploration_ids,
         collection_ids=collection_ids,
-        skill_ids=skill_ids,
-        topic_ids=topic_ids
     ).put()
 
 
