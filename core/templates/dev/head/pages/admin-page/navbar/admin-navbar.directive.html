@@ -1,5 +1,6 @@
 <style>
-  .hidden-icon-favicon,admin-navbar .nav > li > a:focus {
+  admin-navbar .nav > li > a:focus,
+  admin-navbar .oppia-admin-page-dropdown-icon {
     background-color: #00376d;
     color: #fff;
   }
@@ -9,7 +10,8 @@
   admin-navbar .oppia-navbar-profile-admin .open > a:hover,
   admin-navbar .oppia-navbar-profile-admin .open > a:focus,
   admin-navbar .oppia-navbar-tabs-admin > li > a:hover,
-  .hidden-icon-favicon,admin-navbar .oppia-navbar-tabs-admin > li > a.active {
+  admin-navbar .oppia-navbar-tabs-admin > li > a.active, 
+  admin-navbar .oppia-admin-page-dropdown-icon {
     background-color: #fff;
     color: #00376d;
   }
@@ -17,7 +19,7 @@
     top: 0;
   }
   @media screen and (max-width:710px){
-    .hidden-icon{
+    .oppia-admin-page-dropdown{
       display:block;
     }
     .tabs-to-hide{
@@ -25,7 +27,9 @@
     }
   }
   @media screen and (min-width: 711px){
-    .hidden-icon-favicon,.hidden-menu,.hidden-icon{
+    .oppia-admin-page-dropdown
+    .oppia-admin-page-dropdown-icon, 
+    .oppia-admin-page-dropdown-menu{
       display:none;
     }
   }
@@ -44,17 +48,17 @@
     </div>
     <div ng-cloak class="navbar-header float-right">
       <ul class="nav oppia-navbar-nav oppia-navbar-profile-admin">
-        <ul class="nav oppia-navbar-tabs-admin hidden-icon" uib-dropdown>
+        <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown" uib-dropdown>
           <li uib-dropdown-toggle class="nav-item oppia-clickable-navbar-element"
               ng-mouseover="$ctrl.onMouseoverHiddenMenu($event)"
               ng-mouseleave="$ctrl.onMouseoutHiddenMenu($event)">
             <a class="nav-link oppia-navbar-tab"
                uib-tooltip="Menu"
                tooltip-placement="bottom">
-              <i class="fa fa-bars hidden-icon-favicon"></i>
+              <i class="fa fa-bars oppia-admin-page-dropdown-icon"></i>
             </a>
           </li>
-          <ul class="uib-dropdown-menu dropdown-menu hidden-menu"
+          <ul class="uib-dropdown-menu dropdown-menu oppia-admin-page-dropdown-menu"
               ng-mouseover="$ctrl.onMouseoverHiddenMenu($event)"
               ng-mouseleave="$ctrl.onMouseoutHiddenMenu($event)"
               ng-show="$ctrl.hiddenMenu"
