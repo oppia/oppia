@@ -22,19 +22,20 @@ import fileinput
 import os
 import shutil
 import subprocess
+import sys
 
 # These libraries need to be installed before running or importing any script.
-TOOLS_DIR = os.path.join('..', 'oppia_tools')
+TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 # Download and install pyyaml.
 if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
     subprocess.check_call([
-        'pip', 'install', 'pyyaml==5.1.2', '--target',
+        sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2', '--target',
         os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
 # Download and install future.
 if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
     subprocess.check_call([
-        'pip', 'install', 'future==0.17.1', '--target',
+        sys.executable, '-m', 'pip', 'install', 'future==0.17.1', '--target',
         os.path.join('third_party', 'future-0.17.1')])
 
 # pylint: disable=wrong-import-position
@@ -122,9 +123,11 @@ def pip_install(package, version, install_path):
                 'Windows%29')
         raise Exception
 
+    # The call to python -m is used to ensure that Python and Pip versions are
+    # compatible.
     subprocess.check_call([
-        'pip', 'install', '%s==%s' % (package, version), '--target',
-        install_path])
+        sys.executable, '-m', 'pip', 'install', '%s==%s' % (package, version),
+        '--target', install_path])
 
 
 def install_skulpt(parsed_args):
@@ -200,7 +203,7 @@ def install_skulpt(parsed_args):
 
             # NB: Check call cannot be used because the commands above make the
             # git tree for skulpt dirty.
-            subprocess.call(['python', skulpt_filepath, 'dist'])
+            subprocess.call([sys.executable, skulpt_filepath, 'dist'])
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
@@ -236,6 +239,7 @@ def main(args=None):
     setup.main(args=[])
     setup_gae.main(args=[])
     pip_dependencies = [
+        ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
         ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
         ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
