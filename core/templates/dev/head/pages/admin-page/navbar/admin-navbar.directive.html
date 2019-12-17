@@ -63,44 +63,11 @@
               ng-mouseleave="$ctrl.onMouseoutDropdownIconOrMenu($event)"
               ng-show="$ctrl.dropdownMenuisActive"
               role="menu">
-            <li>
+            <li ng-repeat="(tabName, url) in $ctrl.ADMIN_TAB_URLS">
               <a class="dropdown-item nav-link oppia-navbar-tab"
                  style = "color: #00376d"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.ACTIVITIES]>"
-                 ng-class="{active: $ctrl.isActivitiesTabOpen()}">
-                ACTIVITIES
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item nav-link oppia-navbar-tab"
-                 style="color: #00376d"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.JOBS]>"
-                 ng-class="{active: $ctrl.isJobsTabOpen()}">
-                JOBS
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item nav-link oppia-navbar-tab"
-                 style = "color: #00376d"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.CONFIG]>"
-                 ng-class="{active: $ctrl.isConfigTabOpen()}">
-                CONFIG
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item nav-link oppia-navbar-tab"
-                 style = "color: #00376d"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.ROLES]>"
-                 ng-class="{active: $ctrl.isRolesTabOpen()}">
-                ROLES
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item nav-link oppia-navbar-tab"
-                 style = "color: #00376d"
-                 ng-href="<[::$ctrl.ADMIN_TAB_URLS.MISC]>"
-                 ng-class="{active: $ctrl.isMiscTabOpen()}">
-                MISC
+                 ng-href="<[url]>">
+                 {{tabName}}
               </a>
             </li>
           </ul>
