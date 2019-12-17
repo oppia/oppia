@@ -119,7 +119,7 @@ def get_redirect_route(regex_route, handler, defaults=None):
     Args:
         regex_route: unicode. A raw string representing a route.
         handler: BaseHandler. A callable to handle the route.
-        defaults: NoneType. Default or keywords to be passed into a
+        defaults: NoneType/dict. Default or keywords to be passed into a
             RedirectRoute constructor.
 
     Returns:
