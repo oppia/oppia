@@ -1731,8 +1731,6 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             id=self.USER_1_ID,
             exploration_ids=[],
             collection_ids=[],
-            skill_ids=[],
-            topic_ids=[]
         ).put()
 
     def test_get_deletion_policy(self):

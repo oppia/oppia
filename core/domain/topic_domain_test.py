@@ -890,3 +890,30 @@ class TopicSummaryTests(test_utils.GenericTestBase):
                 'Expected subtopic_count to be non-negative, '
                 'received \'-1\'')):
             self.topic_summary.validate()
+
+
+class TopicRightsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopicRightsTests, self).setUp()
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.topic_summary_dict = {
+            'topic_id': 'topic_id',
+            'manager_names': ['A'],
+            'topic_is_published': False,
+        }
+
+        self.topic_summary = topic_domain.TopicRights(
+            'topic_id', [self.user_id_a], False
+        )
+
+    def test_topic_summary_gets_created(self):
+        self.assertEqual(
+            self.topic_summary.to_dict(), self.topic_summary_dict)
+
+    def test_is_manager(self):
+        self.assertTrue(self.topic_summary.is_manager(self.user_id_a))
+        self.assertFalse(self.topic_summary.is_manager(self.user_id_b))

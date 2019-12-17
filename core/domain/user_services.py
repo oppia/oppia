@@ -138,7 +138,8 @@ class UserSettings(python_utils.OBJECT):
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
-            to_be_deleted: bool. If user requested removal of their account.
+            to_be_deleted: bool. Whether the user has requested removal of their
+                account.
         """
         self.user_id = user_id
         self.gae_id = gae_id
@@ -1018,8 +1019,8 @@ def update_user_role(user_id, role):
     _save_user_settings(user_settings)
 
 
-def set_user_to_be_deleted(
-        user_id, exploration_ids, collection_ids, skill_ids, topic_ids):
+def mark_user_for_deletion(
+        user_id, exploration_ids, collection_ids):
     """Set to_be_deleted of the user with given user_id to True and create
     PendingDeletionRequestModel for that user.
 

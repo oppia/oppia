@@ -283,11 +283,11 @@ def get_exploration_summaries_subscribed_to(user_id):
     subscribes to.
 
     Args:
-        user_id: str. The id fo the user..
+        user_id: str. The id of the user.
 
     Returns:
-        list(ExplorationSummary). List of ExplorationSummary domain objects
-        that the user subscribes to.
+        list(ExplorationSummary). List of ExplorationSummary domain objects that
+        the user subscribes to.
     """
     return [
         summary for summary in

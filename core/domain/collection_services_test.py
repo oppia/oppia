@@ -603,6 +603,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
     COL_ID_4 = '4_languages_learning_basic_verbs_in_spanish'
     COL_ID_5 = '5_languages_private_collection_in_spanish'
 
+
     def setUp(self):
         super(CollectionSummaryQueriesUnitTests, self).setUp()
 
@@ -647,6 +648,24 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             query += ' category=(' + ' OR '.join([
                 '"%s"' % category for category in categories]) + ')'
         return query
+
+    def test_get_collection_summaries_matching_ids(self):
+        summaries = collection_services.get_collection_summaries_matching_ids([
+            self.COL_ID_0, self.COL_ID_1, self.COL_ID_2, 'nonexistent'])
+        self.assertEqual(summaries[0].title, 'Bridges in England')
+        self.assertEqual(summaries[1].title, 'Introduce Oppia')
+        self.assertEqual(summaries[2].title, 'Introduce Interactions in Oppia')
+        self.assertIsNone(summaries[3])
+
+    def test_get_collection_summaries_subscribed_to(self):
+        summaries = collection_services.get_collection_summaries_subscribed_to(
+            self.owner_id)
+        self.assertEqual(summaries[0].title, 'Bridges in England')
+        self.assertEqual(summaries[1].title, 'Introduce Oppia')
+        self.assertEqual(summaries[2].title, 'Introduce Interactions in Oppia')
+        self.assertEqual(summaries[3].title, 'Welcome')
+        self.assertEqual(summaries[4].title, 'Learning basic verbs in Spanish')
+        self.assertEqual(summaries[5].title, 'Private collection in Spanish')
 
     def test_get_collection_summaries_with_no_query(self):
         # An empty query should return all collections.

@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 
+from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.tests import test_utils
@@ -876,7 +877,7 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         current_time = datetime.datetime.utcnow()
         self.collection_summary_dict = {
             'category': 'category',
-            'status': 'status',
+            'status': constants.ACTIVITY_STATUS_PRIVATE,
             'community_owned': True,
             'viewer_ids': ['viewer_id'],
             'version': 1,
@@ -894,9 +895,10 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         }
 
         self.collection_summary = collection_domain.CollectionSummary(
-            'col_id', 'title', 'category', 'objective', 'en', [], 'status',
-            True, ['owner_id'], ['editor_id'], ['viewer_id'],
-            ['contributor_id'], {}, 1, 1, current_time, current_time)
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PRIVATE, True, ['owner_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            current_time, current_time)
 
     def test_collection_summary_gets_created(self):
         self.assertEqual(
@@ -1077,3 +1079,18 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected each id in contributor_ids to be string, received 2'):
             self.collection_summary.validate()
+
+    def test_is_private(self):
+        self.assertTrue(self.collection_summary.is_private())
+        self.collection_summary.status = constants.ACTIVITY_STATUS_PUBLIC
+        self.assertFalse(self.collection_summary.is_private())
+
+    def test_is_solely_owned_by_user(self):
+        self.assertTrue(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.collection_summary.owner_ids = ['other_id']
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.collection_summary.owner_ids = ['owner_id', 'other_id']
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))

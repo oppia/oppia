@@ -1644,27 +1644,25 @@ class PendingDeletionRequestModel(base_models.BaseModel):
     """
 
     # IDs of all the private explorations created by this user.
-    exploration_ids = ndb.StringProperty(repeated=True, indexed=False)
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of all the private collections created by this user.
-    collection_ids = ndb.StringProperty(repeated=True, indexed=False)
-    # IDs of all the private skills created by this user.
-    skill_ids = ndb.StringProperty(repeated=True, indexed=False)
-    # IDs of all the private topics created by this user.
-    topic_ids = ndb.StringProperty(repeated=True, indexed=False)
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """PendingDeletionRequestModel should be kept for tracking purposes."""
+        """PendingDeletionRequestModel should be deleted after the user is
+        deleted.
+        """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether PendingDeletionRequestModel exist for user.
+        """Check whether PendingDeletionRequestModel exists for the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
 
         Returns:
-            bool. Whether the models for user_id exists.
+            bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None

@@ -5072,7 +5072,7 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
 
 
 class PendingDeletionRequestModelValidator(BaseUserModelValidator):
-    """Class for validating UserContributionScoringModels."""
+    """Class for validating PendingDeletionRequestModelValidator."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):

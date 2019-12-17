@@ -22,6 +22,7 @@ import copy
 import os
 import re
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -1661,9 +1662,9 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ExplorationSummaryTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         exploration = exp_domain.Exploration.create_default_exploration('eid')
-        exp_services.save_new_exploration(owner_id, exploration)
+        exp_services.save_new_exploration(self.owner_id, exploration)
         self.exp_summary = exp_fetchers.get_exploration_summary_by_id('eid')
 
     def test_validation_passes_with_valid_properties(self):
@@ -1882,6 +1883,20 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError,
             'Expected each id in contributor_ids to be string, received 2'):
             self.exp_summary.validate()
+
+    def test_is_private(self):
+        self.assertTrue(self.exp_summary.is_private())
+        self.exp_summary.status = constants.ACTIVITY_STATUS_PUBLIC
+        self.assertFalse(self.exp_summary.is_private())
+
+    def test_is_solely_owned_by_user(self):
+        self.assertTrue(self.exp_summary.is_solely_owned_by_user(self.owner_id))
+        self.exp_summary.owner_ids = ['other_id']
+        self.assertFalse(
+            self.exp_summary.is_solely_owned_by_user(self.owner_id))
+        self.exp_summary.owner_ids = [self.owner_id, 'other_id']
+        self.assertFalse(
+            self.exp_summary.is_solely_owned_by_user(self.owner_id))
 
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):

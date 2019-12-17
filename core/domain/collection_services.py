@@ -529,6 +529,16 @@ def get_collection_summaries_matching_ids(collection_ids):
 
 
 def get_collection_summaries_subscribed_to(user_id):
+    """Returns a list of CollectionSummary domain objects that the user
+    subscribes to.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(CollectionSummary). List of CollectionSummary domain objects that
+        the user subscribes to.
+    """
     return [
         summary for summary in
         get_collection_summaries_matching_ids(
