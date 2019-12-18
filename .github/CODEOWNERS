@@ -101,7 +101,50 @@
 /codecov.yml @lilithxxx
 /core/templates/dev/head/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
-/scripts/ @kevinlee12
+/scripts/__init__.py @kevinlee12
+/scripts/build.py @kevinlee12
+/scripts/build_test.py @kevinlee12
+/scripts/clean.py @kevinlee12
+/scripts/clean_test.py @kevinlee12
+/scripts/common.py @kevinlee12
+/scripts/common_test.py @kevinlee12
+/scripts/create_expression_parser.py @kevinlee12
+/scripts/create_topological_sort_of_all_services.py @bansalnitish @kevinlee12
+/scripts/create_topological_sort_of_all_services_test.py @bansalnitish @kevinlee12
+/scripts/docstrings_checker.py @kevinlee12
+/scripts/docstrings_checker_test.py @kevinlee12
+/scripts/install_chrome_on_travis.py @kevinlee12
+/scripts/install_prerequisites.sh @kevinlee12
+/scripts/install_third_party.py @kevinlee12
+/scripts/install_third_party_libs.py @kevinlee12
+/scripts/install_third_party_libs_test.py @kevinlee12
+/scripts/install_third_party_test.py @kevinlee12
+/scripts/linter_utils.py @kevinlee12
+/scripts/linter_utils_test.py @kevinlee12
+/scripts/pre_commit_hook.py @kevinlee12
+/scripts/pre_commit_hook_test.py @kevinlee12
+/scripts/pre_commit_linter.py @kevinlee12
+/scripts/pre_push_hook.py @kevinlee12
+/scripts/pre_push_hook_test.py @kevinlee12
+/scripts/pylint_extensions.py @kevinlee12
+/scripts/pylint_extensions_test.py @kevinlee12
+/scripts/release_scripts/deploy.py @ankita240796 @kevinlee12
+/scripts/release_scripts/deploy_test.py @ankita24079 @kevinlee12
+/scripts/run_backend_tests.py @kevinlee12
+/scripts/run_e2e_tests.sh @kevinlee12
+/scripts/run_frontend_tests.py @kevinlee12
+/scripts/run_performance_tests.py @kevinlee12
+/scripts/run_presubmit_checks.py @kevinlee12
+/scripts/run_tests.py @kevinlee12
+/scripts/script_import_test.py @kevinlee12
+/scripts/setup.py @kevinlee12
+/scripts/setup_gae.py @kevinlee12
+/scripts/setup_gae_test.py @kevinlee12
+/scripts/setup_test.py @kevinlee12
+/scripts/start.py @kevinlee12
+/scripts/third_party_size_check.py @kevinlee12
+/scripts/typescript_checks.py @ankita240796 @kevinlee12
+/scripts/typescript_checks_test.py @ankita240796 @kevinlee12
 /ubuntu_dockerfile @ezl-13 @kevinlee12
 
 
@@ -138,6 +181,7 @@
 /core/templates/dev/head/services/editability.service*.ts @aks681
 /core/templates/dev/head/services/exploration-features*.ts @aks681
 /core/templates/dev/head/services/exploration-html-formatter.service*.ts @aks681
+/core/templates/dev/head/services/image-upload-helper.service*.ts @aks681
 /core/templates/dev/head/services/validators.service*.ts @aks681
 
 
@@ -224,28 +268,29 @@
 
 
 # Lesson Analytics team.
-/core/controllers/features*.py @brianrodri
-/core/domain/action_registry*.py @brianrodri
-/core/domain/calculation_registry*.py @brianrodri
-/core/domain/event_services*.py @brianrodri
-/core/domain/playthrough_issue_registry*.py @brianrodri
-/core/domain/stats*.py @brianrodri
-/core/domain/visualization_registry*.py @brianrodri
-/core/storage/statistics/ @brianrodri
-/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
-/core/templates/dev/head/domain/statistics/ @brianrodri
-/core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
-/core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/dev/head/services/improvement-task.service*.ts @brianrodri
-/core/templates/dev/head/services/improvements.service*.ts @brianrodri
-/core/templates/dev/head/services/messenger.service.ts @brianrodri
-/core/templates/dev/head/services/playthrough*.ts @brianrodri
-/core/templates/dev/head/services/state-rules-stats.service*.ts @brianrodri
-/core/templates/dev/head/services/state-top-answers-stats*.ts @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+# Temporarily handed off from @brianrodri to @seanlip while on leave.
+/core/controllers/features*.py @seanlip
+/core/domain/action_registry*.py @seanlip
+/core/domain/calculation_registry*.py @seanlip
+/core/domain/event_services*.py @seanlip
+/core/domain/playthrough_issue_registry*.py @seanlip
+/core/domain/stats*.py @seanlip
+/core/domain/visualization_registry*.py @seanlip
+/core/storage/statistics/ @seanlip
+/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @seanlip
+/core/templates/dev/head/domain/statistics/ @seanlip
+/core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @seanlip
+/core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @seanlip
+/core/templates/dev/head/services/improvement-task.service*.ts @seanlip
+/core/templates/dev/head/services/improvements.service*.ts @seanlip
+/core/templates/dev/head/services/messenger.service.ts @seanlip
+/core/templates/dev/head/services/playthrough*.ts @seanlip
+/core/templates/dev/head/services/state-rules-stats.service*.ts @seanlip
+/core/templates/dev/head/services/state-top-answers-stats*.ts @seanlip
+/extensions/actions/ @seanlip
+/extensions/answer_summarizers/ @seanlip
+/extensions/issues/ @seanlip
+/extensions/visualizations/ @seanlip
 
 
 # Library page.
@@ -317,7 +362,7 @@
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
-/core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts.ts @aks681
+/core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts @aks681
 /core/templates/dev/head/domain/classroom/ @aks681
 /core/templates/dev/head/domain/subtopic_viewer/ @aks681
 /core/templates/dev/head/domain/topic/ @aks681
@@ -393,6 +438,10 @@
 /data/ @nithusha21
 
 
+# Release team.
+/scripts/release_scripts/ @ankita240796
+
+
 # Rich text editor team.
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-4-rte.directive.ts @aks681
 /core/templates/dev/head/directives/mathjax-bind.directive.ts @aks681
@@ -413,6 +462,7 @@
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
 /core/templates/dev/head/services/suggestion-modal.service.ts @nithusha21
+
 
 # Feedback project.
 /core/controllers/feedback*.py @nithusha21

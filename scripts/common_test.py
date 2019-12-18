@@ -189,6 +189,20 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.get_current_branch_name(), 'test')
 
+    def test_get_current_release_version_number_with_non_hotfix_branch(self):
+        self.assertEqual(
+            common.get_current_release_version_number('release-1.2.3'), '1.2.3')
+
+    def test_get_current_release_version_number_with_hotfix_branch(self):
+        self.assertEqual(
+            common.get_current_release_version_number('release-1.2.3-hotfix-1'),
+            '1.2.3')
+
+    def test_get_current_release_version_number_with_invalid_branch(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid branch name: invalid-branch.'):
+            common.get_current_release_version_number('invalid-branch')
+
     def test_is_current_branch_a_release_branch_with_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return 'On branch release-1.2.3'
@@ -542,3 +556,23 @@ class CommonTests(test_utils.GenericTestBase):
                     'generation.') % (
                         release_constants.LABEL_FOR_RELEASED_PRS)):
                 common.check_prs_for_current_release_are_released(mock_repo)
+
+    def test_convert_to_posixpath_on_windows(self):
+        def mock_is_windows():
+            return True
+
+        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+        original_filepath = 'c:\\path\\to\\a\\file.js'
+        with is_windows_swap:
+            actual_file_path = common.convert_to_posixpath(original_filepath)
+        self.assertEqual(actual_file_path, 'c:/path/to/a/file.js')
+
+    def test_convert_to_posixpath_on_platform_other_than_windows(self):
+        def mock_is_windows():
+            return False
+
+        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+        original_filepath = 'c:\\path\\to\\a\\file.js'
+        with is_windows_swap:
+            actual_file_path = common.convert_to_posixpath(original_filepath)
+        self.assertEqual(actual_file_path, original_filepath)
