@@ -863,6 +863,7 @@ class Topic(python_utils.OBJECT):
             new_name: str. The updated name for the topic.
         """
         self.name = new_name
+        self.canonical_name = new_name.lower()
 
     def update_abbreviated_name(self, new_abbreviated_name):
         """Updates the abbreviated_name of a topic object.

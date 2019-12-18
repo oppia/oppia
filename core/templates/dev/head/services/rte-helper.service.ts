@@ -75,7 +75,7 @@ angular.module('oppia').factory('RteHelperService', [
         return angular.copy(_RICH_TEXT_COMPONENTS);
       },
       isInlineComponent: function(richTextComponent) {
-        var inlineComponents = ['link', 'math', 'concept-card'];
+        var inlineComponents = ['link', 'math', 'skillreview'];
         return inlineComponents.indexOf(richTextComponent) !== -1;
       },
       // The refocusFn arg is a function that restores focus to the text editor
