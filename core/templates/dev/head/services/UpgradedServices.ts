@@ -76,6 +76,9 @@ import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
+import { ExtractImageFilenamesFromStateService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
 import { FormatTimePipe } from 'filters/format-timer.pipe';
@@ -120,6 +123,8 @@ import { ParamTypeObjectFactory } from
   'domain/exploration/ParamTypeObjectFactory';
 import { PencilCodeEditorRulesService } from
   'interactions/PencilCodeEditor/directives/pencil-code-editor-rules.service';
+import { PlayerPositionService } from
+  'pages/exploration-player-page/services/player-position.service';
 import { PlayerTranscriptService } from
   'pages/exploration-player-page/services/player-transcript.service';
 import { PlaythroughIssueObjectFactory } from
@@ -132,6 +137,8 @@ import { RecordedVoiceoversObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
 import { SolutionValidityService } from
@@ -171,11 +178,17 @@ import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+import { StoryReferenceObjectFactory } from
+  'domain/topic/StoryReferenceObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtopicObjectFactory } from
+  'domain/topic/SubtopicObjectFactory';
 import { SuggestionModalService } from 'services/suggestion-modal.service';
 import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
+import { SuggestionThreadObjectFactory } from
+  'domain/suggestion/SuggestionThreadObjectFactory';
 import { SVMPredictionService } from 'classifiers/svm-prediction.service';
 import { TextInputPredictionService } from
   'interactions/TextInput/text-input-prediction.service';
@@ -186,6 +199,8 @@ import { TextInputValidationService } from
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { TopicObjectFactory } from
+  'domain/topic/TopicObjectFactory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
 import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
@@ -327,17 +342,24 @@ export class UpgradedServices {
       new PlaythroughObjectFactory(
         upgradedServices['LearnerActionObjectFactory']);
     upgradedServices['RecordedVoiceoversObjectFactory'] =
-      new RecordedVoiceoversObjectFactory(
-        upgradedServices['VoiceoverObjectFactory']);
+        new RecordedVoiceoversObjectFactory(
+          upgradedServices['VoiceoverObjectFactory']);
+    upgradedServices['SkillSummaryObjectFactory'] =
+        new SkillSummaryObjectFactory();
     upgradedServices['SidebarStatusService'] =
       new SidebarStatusService(upgradedServices['WindowDimensionsService']);
     upgradedServices['SiteAnalyticsService'] =
       new SiteAnalyticsService(upgradedServices['WindowRef']);
+    upgradedServices['SuggestionThreadObjectFactory'] =
+        new SuggestionThreadObjectFactory(
+          upgradedServices['SuggestionObjectFactory']);
     upgradedServices['StateClassifierMappingService'] =
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
     upgradedServices['StateEditorService'] =
-      new StateEditorService(upgradedServices['SolutionValidityService']);
+    new StateEditorService(upgradedServices['SolutionValidityService']);
+    upgradedServices['StoryReferenceObjectFactory'] =
+        new StoryReferenceObjectFactory();
     upgradedServices['TextInputValidationService'] =
       new TextInputValidationService(
         upgradedServices['baseInteractionValidationService']);
@@ -373,6 +395,9 @@ export class UpgradedServices {
       new ExtensionTagAssemblerService(
         upgradedServices['HtmlEscaperService'],
         upgradedServices['CamelCaseToHyphensPipe']);
+    upgradedServices['ExtractImageFilenamesFromStateService'] =
+        new ExtractImageFilenamesFromStateService(
+          upgradedServices['HtmlEscaperService']);
     upgradedServices['ParamSpecsObjectFactory'] = new ParamSpecsObjectFactory(
       upgradedServices['ParamSpecObjectFactory']);
     upgradedServices['PencilCodeEditorRulesService'] =
@@ -380,6 +405,9 @@ export class UpgradedServices {
         upgradedServices['NormalizeWhitespacePipe'],
         upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'],
         upgradedServices['CodeNormalizerService']);
+    upgradedServices['PlayerPositionService'] = new PlayerPositionService(
+      upgradedServices['ContextService'],
+      upgradedServices['PlayerTranscriptService']);
     upgradedServices['StateContentService'] = new StateContentService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateHintsService'] = new StateHintsService(
@@ -398,8 +426,10 @@ export class UpgradedServices {
     upgradedServices['StateSolutionService'] = new StateSolutionService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateWrittenTranslationsService'] =
-      new StateWrittenTranslationsService(
-        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+        new StateWrittenTranslationsService(
+          upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['SubtopicObjectFactory'] = new SubtopicObjectFactory(
+      upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
@@ -424,6 +454,10 @@ export class UpgradedServices {
     upgradedServices['StateCardObjectFactory'] =
         new StateCardObjectFactory(
           upgradedServices['AudioTranslationLanguageService']);
+    upgradedServices['TopicObjectFactory'] = new TopicObjectFactory(
+      upgradedServices['SubtopicObjectFactory'],
+      upgradedServices['StoryReferenceObjectFactory'],
+      upgradedServices['SkillSummaryObjectFactory']);
 
     // Group 5: Services depending on groups 1-4.
     upgradedServices['SolutionObjectFactory'] =

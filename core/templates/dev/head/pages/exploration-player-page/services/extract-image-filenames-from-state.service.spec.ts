@@ -17,128 +17,33 @@
  * @fileoverview Unit tests for the extracting image files in state service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// extract-image-filenames-from-state.service.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { ParamSpecObjectFactory } from
-  'domain/exploration/ParamSpecObjectFactory';
-import { ParamSpecsObjectFactory } from
-  'domain/exploration/ParamSpecsObjectFactory';
-import { ParamTypeObjectFactory } from
-  'domain/exploration/ParamTypeObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/exploration/ExplorationObjectFactory.ts');
-require(
-  'pages/exploration-player-page/services/' +
-  'extract-image-filenames-from-state.service.ts');
-require('services/context.service.ts');
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ContextService } from 'services/context.service';
+import { ExplorationObjectFactory } from
+  'domain/exploration/ExplorationObjectFactory';
+import { ExtractImageFilenamesFromStateService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-player-page/services/extract-image-filenames-from-state.service';
 
-describe('Extracting Image file names in the state service', function() {
-  beforeEach(function() {
-    angular.mock.module('oppia');
-    angular.mock.module('oppia', function($provide) {
-      $provide.value(
-        'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-          new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-          new RuleObjectFactory()));
-      $provide.value('FractionObjectFactory', new FractionObjectFactory());
-      $provide.value(
-        'HintObjectFactory', new HintObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'OutcomeObjectFactory', new OutcomeObjectFactory(
-          new SubtitledHtmlObjectFactory()));
-      $provide.value(
-        'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-      $provide.value(
-        'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-          new ParamChangeObjectFactory()));
-      $provide.value(
-        'ParamSpecObjectFactory',
-        new ParamSpecObjectFactory(new ParamTypeObjectFactory()));
-      $provide.value(
-        'ParamSpecsObjectFactory',
-        new ParamSpecsObjectFactory(
-          new ParamSpecObjectFactory(new ParamTypeObjectFactory())));
-      $provide.value('ParamTypeObjectFactory', new ParamTypeObjectFactory());
-      $provide.value(
-        'RecordedVoiceoversObjectFactory',
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-      $provide.value('RuleObjectFactory', new RuleObjectFactory());
-      $provide.value(
-        'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-      $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-      $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-      $provide.value(
-        'WrittenTranslationObjectFactory',
-        new WrittenTranslationObjectFactory());
-      $provide.value(
-        'WrittenTranslationsObjectFactory',
-        new WrittenTranslationsObjectFactory(
-          new WrittenTranslationObjectFactory()));
+
+describe('Extracting Image file names in the state service', () => {
+  let eifss: ExtractImageFilenamesFromStateService;
+  let eof: ExplorationObjectFactory;
+  let ecs: ContextService;
+  let explorationDict;
+  let ImageFilenamesInExploration;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe]
     });
-    // Set a global value for INTERACTION_SPECS that will be used by all the
-    // descendant dependencies.
-    angular.mock.module(function($provide) {
-      $provide.constant('INTERACTION_SPECS', {
-        TextInput: {
-          is_terminal: false
-        },
-        ItemSelectionInput: {
-          is_terminal: false
-        },
-        MultipleChoiceInput: {
-          is_terminal: false
-        },
-        Continue: {
-          is_terminal: false
-        },
-        EndExploration: {
-          is_terminal: true
-        }
-      });
-    });
-  });
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  var eifss, eof, ecs;
-  var $rootScope = null;
-  var explorationDict;
-  var ImageFilenamesInExploration;
-  beforeEach(angular.mock.inject(function($injector) {
-    eof = $injector.get('ExplorationObjectFactory');
-    ecs = $injector.get('ContextService');
-    eifss = $injector.get('ExtractImageFilenamesFromStateService');
+    eof = TestBed.get(ExplorationObjectFactory);
+    ecs = TestBed.get(ContextService);
+    eifss = TestBed.get(ExtractImageFilenamesFromStateService);
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
-    $rootScope = $injector.get('$rootScope');
+
     explorationDict = {
       id: 1,
       title: 'My Title',
@@ -749,15 +654,15 @@ describe('Extracting Image file names in the state service', function() {
       Introduction: ['sIMultipleChoice1.png', 'sIMultipleChoice2.png',
         'sIOutcomeFeedback.png']
     };
-  }));
+  });
 
   it('should get all the filenames of the images in a state',
-    function() {
-      var exploration = eof.createFromBackendDict(explorationDict);
-      var states = exploration.getStates();
-      var stateNames = states.getStateNames();
-      stateNames.forEach(function(statename) {
-        var filenamesInState = (
+    () => {
+      let exploration = eof.createFromBackendDict(explorationDict);
+      let states = exploration.getStates();
+      let stateNames = states.getStateNames();
+      stateNames.forEach((statename) => {
+        let filenamesInState = (
           eifss.getImageFilenamesInState(states.getState(statename)));
         filenamesInState.forEach(function(filename) {
           expect(ImageFilenamesInExploration[statename]).toContain(filename);
