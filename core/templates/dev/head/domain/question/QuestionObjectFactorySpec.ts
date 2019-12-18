@@ -18,32 +18,40 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // QuestionObjectFactory.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+// import { AnswerGroupObjectFactory } from
+//   'domain/exploration/AnswerGroupObjectFactory';
+// import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+// import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+// import { MisconceptionObjectFactory } from
+//   'domain/skill/MisconceptionObjectFactory';
+// import { OutcomeObjectFactory } from
+//   'domain/exploration/OutcomeObjectFactory';
+// import { ParamChangeObjectFactory } from
+//   'domain/exploration/ParamChangeObjectFactory';
+// import { ParamChangesObjectFactory } from
+//   'domain/exploration/ParamChangesObjectFactory';
+// import { RecordedVoiceoversObjectFactory } from
+//   'domain/exploration/RecordedVoiceoversObjectFactory';
+// import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
+// import { SubtitledHtmlObjectFactory } from
+//   'domain/exploration/SubtitledHtmlObjectFactory';
+// import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+// import { VoiceoverObjectFactory } from
+//   'domain/exploration/VoiceoverObjectFactory';
+// import { WrittenTranslationObjectFactory } from
+//   'domain/exploration/WrittenTranslationObjectFactory';
+// import { WrittenTranslationsObjectFactory } from
+//   'domain/exploration/WrittenTranslationsObjectFactory';
+// import { UpgradedServices } from 'services/UpgradedServices';
+// // ^^^ This block is to be removed.
+
+import { testbed } from '@angular/core/testing';
+
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+
+import { QuestionObjectFactory } from
+  'domain/question/QuestionObjectFactory.ts';
 
 require('domain/question/QuestionObjectFactory.ts');
 
