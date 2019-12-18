@@ -1,5 +1,25 @@
 <div role="form" class="form-horizontal topic-editor">
   <md-card class="oppia-page-card oppia-long-text">
+    <div class="form-group">
+      <label class="form-heading">Topic Thumbnail</label>
+      <h4 ng-if="!topic.getThumbnailFilename()" style="color: gray;">
+        Upload a 150 x 150 px thumbnail image for the topic
+      </h4>
+      <div>
+        <div class="oppia-editable-section float-left" title="Change Topic Thumbnail"
+             style="height: 150px; width: 150px">
+          <div class="oppia-click-to-start-editing protractor-test-photo-clickable"
+               ng-click="showEditThumbnailModal()">
+          </div>
+          <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
+          <img ng-if="editableThumbnailDataUrl"
+               ng-src="<[editableThumbnailDataUrl]>"
+               class="img-thumbnail protractor-test-custom-photo">
+          <img ng-if="!editableThumbnailDataUrl" ng-src="<[getStaticImageUrl('/general/no_profile_picture.png')]>" class="img-thumbnail">
+        </div>
+      </div>
+    </div>
+
     <div class="topic-name">
       <label for="topicName" class="form-heading">Topic Name</label>
       <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
@@ -11,11 +31,21 @@
       </span>
     </div>
 
+    <div class="abbreviated-name">
+      <label for="abbreviatedName" class="form-heading">Abbreviated Topic Name</label>
+      <input id="abbreviatedName" type="text" class="form-control protractor-test-abbreviated-topic-name-field"
+             ng-disabled="!topicRights.canEditTopic()"
+             ng-model="editableAbbreviatedName" ng-blur="updateAbbreviatedName(editableAbbreviatedName)"
+             placeholder="Enter an abbreviated topic name." maxlength="12" ng-trim="false">
+      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableAbbreviatedName.length === 12">
+        <em>Please use at most 12 characters for the abbreviated topic name.</em>
+      </span>
+    </div>
+
     <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
       <label for="topicDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control protractor-test-topic-description-field"
-                ng-model="editableDescription"
-                maxlength="120"
+                ng-model="editableDescription" maxlength="120"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
                 placeholder="Enter the description of the topic">

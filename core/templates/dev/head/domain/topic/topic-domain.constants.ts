@@ -47,6 +47,8 @@ export class TopicDomainConstants {
     CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property';
 
   public static TOPIC_PROPERTY_NAME = 'name';
+  public static TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name';
+  public static TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
   public static TOPIC_PROPERTY_DESCRIPTION = 'description';
   public static TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code';
 
