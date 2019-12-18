@@ -16,23 +16,21 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-require(
-  'domain/topics_and_skills_dashboard/' +
-  'topics-and-skills-dashboard-backend-api.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
+import { TopicsAndSkillsDashboardBackendApiService } from
+  // eslint-disable-next-line max-len
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-backend-api.service';
 
-describe('Topics and Skills Dashboard backend API service', function() {
-  var TopicsAndSkillsDashboardBackendApiService = null;
-  var $httpBackend = null;
-  var UrlInterpolationService = null;
-  var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
+describe('Topics and Skills Dashboard backend API service', () => {
+  let topicsAndSkillsDashboardBackendApiService:
+    TopicsAndSkillsDashboardBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
 
-  var sampleDataResults = {
+  let sampleDataResults = {
     topic_summary_dicts: [{
       id: SAMPLE_TOPIC_ID,
       name: 'Sample Name',
@@ -48,61 +46,61 @@ describe('Topics and Skills Dashboard backend API service', function() {
     skill_summary_dicts: []
   };
 
-  var TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
+  let TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
     '/topics_and_skills_dashboard/data';
-  var ERROR_STATUS_CODE = 500;
+  let ERROR_STATUS_CODE = 500;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+    topicsAndSkillsDashboardBackendApiService = TestBed.get(
+      TopicsAndSkillsDashboardBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    TopicsAndSkillsDashboardBackendApiService = $injector.get(
-      'TopicsAndSkillsDashboardBackendApiService');
-    UrlInterpolationService = $injector.get('UrlInterpolationService');
-    $httpBackend = $injector.get('$httpBackend');
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch topics and skills dashboard data from the ' +
       'backend',
-  function() {
+  fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-      sampleDataResults);
-    TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+    topicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
       successHandler, failHandler);
-    $httpBackend.flush();
+    var req = httpTestingController.expectOne(
+      TOPICS_AND_SKILLS_DASHBOARD_DATA_URL);
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleDataResults);
+
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
-  });
+  }));
 
   it('should use rejection handler if dashboard data backend request failed',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-        ERROR_STATUS_CODE, 'Error loading dashboard data.');
-      TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+      topicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
         successHandler, failHandler);
-      $httpBackend.flush();
+
+      var req = httpTestingController.expectOne(
+        TOPICS_AND_SKILLS_DASHBOARD_DATA_URL);
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading dashboard data', {
+        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-    }
+    })
   );
 });
