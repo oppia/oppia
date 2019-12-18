@@ -38,7 +38,7 @@ export class ConceptCard {
     this._workedExamples = workedExamples;
     this._recordedVoiceovers = recordedVoiceovers;
   }
-
+  // TODO(#7165): Replace 'any' with the exact type.
   toBackendDict(): any {
     return {
       explanation: this._explanation.toBackendDict(),
