@@ -61,6 +61,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call)
+        self.Popen_swap = self.swap(
+            subprocess, 'Popen', mock_check_call)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_tweak_yarn_executable(self):
@@ -96,7 +98,7 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             self.assertEqual(command, 'yarn')
 
     def test_pip_install_without_import_error(self):
-        with self.check_call_swap:
+        with self.Popen_swap:
             install_third_party_libs.pip_install('package', 'version', 'path')
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
