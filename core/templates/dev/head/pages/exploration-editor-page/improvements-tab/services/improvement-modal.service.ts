@@ -70,7 +70,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                 ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
                 MAX_UNRELATED_ACTIONS_PER_BLOCK) {
               let indexOfFirstDisplayedAction = null;
-              let indexOfActionInFirstDisplayedBlock = null;
+              let   actionIndexAtStartOfFinalBlock = null;
 
               let init = function() {
                 $scope.playthroughIndex = playthroughIndex;
@@ -82,9 +82,10 @@ angular.module('oppia').factory('ImprovementModalService', [
 
                 $scope.expandActionsToRender();
 
-                // Index to know where to start highlighting actions.
-                indexOfActionInFirstDisplayedBlock =
-                  indexOfFirstDisplayedAction;
+                // Index to know where to start highlighting actions. This is
+                // set to the index of the first learner action in the final
+                // display block, and is never updated after that.
+                actionIndexAtStartOfFinalBlock = indexOfFirstDisplayedAction;
 
                 $scope.issueIsMultipleIncorrectSubmissions = false;
                 if (playthrough.issueType === (
@@ -156,23 +157,23 @@ angular.module('oppia').factory('ImprovementModalService', [
                 var tableHtml =
                   lars.renderFinalDisplayBlockForMISIssueHTML(
                     playthrough.actions.slice(
-                      indexOfActionInFirstDisplayedBlock),
-                    indexOfActionInFirstDisplayedBlock + 1);
+                        actionIndexAtStartOfFinalBlock),
+                      actionIndexAtStartOfFinalBlock + 1);
                 return tableHtml;
               };
 
               /**
-               * Returns the list of learner actions to currently be
-               * displayed in the playthrough modal.
+               * Returns the list of learner actions to currently be displayed
+               * in the playthrough modal. If the issue is a Multiple Incorrect
+               * Submissions one, we return the list of learner actions
+               * excluding the final display block alone.
                * @returns {LearnerAction[]}
                */
               $scope.getActionsToRender = function() {
                 if ($scope.issueIsMultipleIncorrectSubmissions) {
-                  // This corresponds to the case where we display the table
-                  // for the issue.
                   return playthrough.actions.slice(
                     indexOfFirstDisplayedAction,
-                    indexOfActionInFirstDisplayedBlock);
+                      actionIndexAtStartOfFinalBlock);
                 }
                 return playthrough.actions.slice(indexOfFirstDisplayedAction);
               };
@@ -193,7 +194,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                */
               $scope.isActionHighlighted = function(actionIndex) {
                 return $scope.getLearnerActionIndex(actionIndex) > (
-                  indexOfActionInFirstDisplayedBlock);
+                    actionIndexAtStartOfFinalBlock);
               };
 
               /**

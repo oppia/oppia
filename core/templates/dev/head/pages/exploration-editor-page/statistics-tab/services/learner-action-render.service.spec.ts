@@ -205,5 +205,20 @@ describe('Learner Action Render Service', function() {
           '4. Left the exploration after spending a total of 120 seconds on ' +
           'card "stateName2".');
       });
+
+    fit('should render the table for a Multiple Incorrect Submissions issue.',
+      function() {
+
+        // We pass a sample learner actions array just to find out whether
+        // the directive rendered is being initialised with the right values.
+        var learnerActions = [{key: 'value'}];
+        var lars = this.LearnerActionRenderService;
+        var tableDirective = lars.renderFinalDisplayBlockForMISIssueHTML(
+          learnerActions, 1);
+        expect(tableDirective).toEqual(
+          '<multiple-incorrect-submissions-issue final-block="[{&amp;quot;ke' +
+          'y&amp;quot;:&amp;quot;value&amp;quot;}]" action-start-index="1"><' +
+          '/multiple-incorrect-submissions-issue>');
+      });
   });
 });
