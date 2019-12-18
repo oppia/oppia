@@ -22,19 +22,20 @@ import fileinput
 import os
 import shutil
 import subprocess
+import sys
 
 # These libraries need to be installed before running or importing any script.
-TOOLS_DIR = os.path.join('..', 'oppia_tools')
+TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 # Download and install pyyaml.
 if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
     subprocess.check_call([
-        'pip', 'install', 'pyyaml==5.1.2', '--target',
+        sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2', '--target',
         os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
 
 # Download and install future.
 if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
     subprocess.check_call([
-        'pip', 'install', 'future==0.17.1', '--target',
+        sys.executable, '-m', 'pip', 'install', 'future==0.17.1', '--target',
         os.path.join('third_party', 'future-0.17.1')])
 
 # pylint: disable=wrong-import-position
@@ -69,6 +70,26 @@ PQ_CONFIGPARSER_FILEPATH = os.path.join(
     common.OPPIA_TOOLS_DIR, 'pylint-quotes-0.1.8', 'configparser.py')
 
 
+def tweak_yarn_executable():
+    """When yarn is run on Windows, the file yarn will be executed by default.
+    However, this file is a bash script, and can't be executed directly on
+    Windows. So, to prevent Windows automatically executing it by default
+    (while preserving the behavior on other systems), we rename it to yarn.sh
+    here.
+    """
+    origin_file_path = os.path.join(common.YARN_PATH, 'bin', 'yarn')
+    if os.path.isfile(origin_file_path):
+        renamed_file_path = os.path.join(common.YARN_PATH, 'bin', 'yarn.sh')
+        os.rename(origin_file_path, renamed_file_path)
+
+
+def get_yarn_command():
+    """Get the executable file for yarn."""
+    if common.is_windows_os():
+        return 'yarn.cmd'
+    return 'yarn'
+
+
 def pip_install(package, version, install_path):
     """Installs third party libraries with pip.
 
@@ -88,12 +109,11 @@ def pip_install(package, version, install_path):
             'Please see \'Installing Oppia\' on the Oppia developers\' wiki '
             'page:'])
 
-        os_info = os.uname()
-        if os_info[0] == 'Darwin':
+        if common.is_mac_os():
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Mac-'
                 'OS%29')
-        elif os_info[0] == 'Linux':
+        elif common.is_linux_os():
             python_utils.PRINT(
                 'https://github.com/oppia/oppia/wiki/Installing-Oppia-%28Linux'
                 '%29')
@@ -103,9 +123,11 @@ def pip_install(package, version, install_path):
                 'Windows%29')
         raise Exception
 
+    # The call to python -m is used to ensure that Python and Pip versions are
+    # compatible.
     subprocess.check_call([
-        'pip', 'install', '%s==%s' % (package, version), '--target',
-        install_path])
+        sys.executable, '-m', 'pip', 'install', '%s==%s' % (package, version),
+        '--target', install_path])
 
 
 def install_skulpt(parsed_args):
@@ -181,7 +203,7 @@ def install_skulpt(parsed_args):
 
             # NB: Check call cannot be used because the commands above make the
             # git tree for skulpt dirty.
-            subprocess.call(['python', skulpt_filepath, 'dist'])
+            subprocess.call([sys.executable, skulpt_filepath, 'dist'])
 
             # Return to the Oppia root folder.
             os.chdir(common.CURR_DIR)
@@ -217,6 +239,7 @@ def main(args=None):
     setup.main(args=[])
     setup_gae.main(args=[])
     pip_dependencies = [
+        ('coverage', common.COVERAGE_VERSION, common.OPPIA_TOOLS_DIR),
         ('pylint', '1.9.4', common.OPPIA_TOOLS_DIR),
         ('Pillow', '6.0.0', common.OPPIA_TOOLS_DIR),
         ('pylint-quotes', '0.1.8', common.OPPIA_TOOLS_DIR),
@@ -227,6 +250,7 @@ def main(args=None):
         ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
         ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
         ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
+        ('pygsheets', '2.0.2', common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:
@@ -265,8 +289,11 @@ def main(args=None):
     python_utils.PRINT('Installing third-party JS libraries and zip files.')
     install_third_party.main(args=[])
 
+    if common.is_windows_os():
+        tweak_yarn_executable()
+
     # Install third-party node modules needed for the build process.
-    subprocess.check_call(['yarn'])
+    subprocess.check_call([get_yarn_command()])
 
     install_skulpt(parsed_args)
 
@@ -274,9 +301,12 @@ def main(args=None):
     python_utils.PRINT('Installing pre-commit hook for git')
     pre_commit_hook.main(args=['--install'])
 
-    # Install pre-push script.
-    python_utils.PRINT('Installing pre-push hook for git')
-    pre_push_hook.main(args=['--install'])
+    # TODO(#8112): Once pre_commit_linter is working correctly, this
+    # condition should be removed.
+    if not common.is_windows_os():
+        # Install pre-push script.
+        python_utils.PRINT('Installing pre-push hook for git')
+        pre_push_hook.main(args=['--install'])
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

@@ -14,34 +14,89 @@
 
 """One-off jobs for feedback models."""
 from __future__ import absolute_import # pylint: disable=import-only-modules
-from __future__ import unicode_literals  # pylint: disable=import-only-modules
+from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from core import jobs
+from core.domain import feedback_services
+from core.domain import user_services
 from core.platform import models
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
 
-class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for setting user_id and thread_id for all
-     GeneralFeedbackThreadUserModels.
-    """
+class FeedbackThreadCacheOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job to populate message data cache of threads."""
+
     @classmethod
     def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [feedback_models.GeneralFeedbackThreadUserModel]
+        """The list of datastore classes to map over."""
+        return [feedback_models.GeneralFeedbackThreadModel]
 
     @staticmethod
-    def map(model_instance):
+    def map(thread_model):
         """Implements the map function for this job."""
-        user_id, thread_id = model_instance.id.split('.', 1)
-        if model_instance.user_id is None:
-            model_instance.user_id = user_id
-        if model_instance.thread_id is None:
-            model_instance.thread_id = thread_id
-        model_instance.put(update_last_updated_time=False)
-        yield ('SUCCESS', model_instance.id)
+        last_nonempty_message = None
+        for message in reversed(
+                feedback_services.get_messages(thread_model.id)):
+            if message.text:
+                last_nonempty_message = message
+                break
+
+        cache_updated = any([
+            FeedbackThreadCacheOneOffJob._cache_last_nonempty_message_text(
+                thread_model, last_nonempty_message),
+            FeedbackThreadCacheOneOffJob._cache_last_nonempty_message_author_id(
+                thread_model, last_nonempty_message),
+        ])
+        if cache_updated:
+            thread_model.put(update_last_updated_time=False)
+            yield ('Updated', 1)
+        else:
+            yield ('Already up-to-date', 1)
 
     @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
+    def reduce(key, value_strs):
+        """Implements the reduce function for this job."""
+        yield (key, sum(int(s) for s in value_strs))
+
+    @staticmethod
+    def _cache_last_nonempty_message_text(thread_model, last_nonempty_message):
+        """Ensures the cached text for the given thread's last non-empty message
+        is correct.
+
+        Args:
+            thread_model: GeneralFeedbackThreadModel. Model of the thread to
+                have its cache updated.
+            last_nonempty_message: FeedbackMessage|None. The most recent message
+                with non-empty text, or None when no such message exists.
+
+        Returns:
+            bool. Whether the cache was actually updated.
+        """
+        message_text = last_nonempty_message and last_nonempty_message.text
+        if thread_model.last_nonempty_message_text != message_text:
+            thread_model.last_nonempty_message_text = message_text
+            return True
+        return False
+
+    @staticmethod
+    def _cache_last_nonempty_message_author_id(
+            thread_model, last_nonempty_message):
+        """Ensures the cached author ID for the given thread's last non-empty
+        message is correct.
+
+        Args:
+            thread_model: GeneralFeedbackThreadModel. Model of the thread to
+                have its cache updated.
+            last_nonempty_message: FeedbackMessage|None. The most recent message
+                with non-empty text, or None when no such message exists.
+
+        Returns:
+            bool. Whether the cache was actually updated.
+        """
+        message_author_id = (
+            last_nonempty_message and last_nonempty_message.author_id)
+        if thread_model.last_nonempty_message_author_id != message_author_id:
+            thread_model.last_nonempty_message_author_id = message_author_id
+            return True
+        return False

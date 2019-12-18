@@ -178,6 +178,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
       var mockThread = {threadId: 1};
       var task = FeedbackImprovementTaskObjectFactory.createNew(mockThread);
 
+      expect(task.isObsolete()).toBe(false);
       expect(task.getDirectiveData()).toBe(mockThread);
       expect(task.getDirectiveType()).toEqual(FEEDBACK_IMPROVEMENT_TASK_TYPE);
     });
@@ -185,13 +186,23 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
 
   describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
-      spyOn(ThreadDataService, 'fetchThreads').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'fetchMessages').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'getData').and.returnValue({
-        feedbackThreads: [{threadId: 'abc1'}, {threadId: 'def2'}]
+      var threads = {
+        feedbackThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
+      };
+
+      spyOn(ThreadDataService, 'fetchThreads').and.callFake(function() {
+        ThreadDataService.data = threads;
+        var deferred = $q.defer();
+        deferred.resolve();
+        return deferred.promise;
       });
+      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages').and
+        .callFake(done);
+      spyOn(ThreadDataService, 'getData').and.returnValue(threads);
 
       FeedbackImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
+        expect(fetchMessagesSpy).toHaveBeenCalledTimes(threads.feedbackThreads
+          .length);
         expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
         expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);

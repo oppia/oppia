@@ -17,9 +17,18 @@
  * topic summary domain objects.
  */
 
-angular.module('oppia').factory('TopicSummaryObjectFactory', [function() {
-  var TopicSummary = function(
-      id, name, canonicalStoryCount, subtopicCount, totalSkillCount,
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+class TopicSummary {
+  _id: string;
+  _name: string;
+  _canonicalStoryCount: number;
+  _subtopicCount: number;
+  _totalSkillCount: number;
+  _uncategorizedSkillCount: number;
+
+  constructor(id, name, canonicalStoryCount, subtopicCount, totalSkillCount,
       uncategorizedSkillCount) {
     this._id = id;
     this._name = name;
@@ -27,39 +36,43 @@ angular.module('oppia').factory('TopicSummaryObjectFactory', [function() {
     this._totalSkillCount = totalSkillCount;
     this._uncategorizedSkillCount = uncategorizedSkillCount;
     this._subtopicCount = subtopicCount;
-  };
-
+  }
   // Instance methods
 
-  TopicSummary.prototype.getId = function() {
+  getId(): string {
     return this._id;
-  };
+  }
 
-  TopicSummary.prototype.getName = function() {
+  getName(): string {
     return this._name;
-  };
+  }
 
-  TopicSummary.prototype.getCanonicalStoryCount = function() {
+  getCanonicalStoryCount(): number {
     return this._canonicalStoryCount;
-  };
+  }
 
-  TopicSummary.prototype.getSubtopicCount = function() {
+  getSubtopicCount(): number {
     return this._subtopicCount;
-  };
+  }
 
-  TopicSummary.prototype.getTotalSkillCount = function() {
+  getTotalSkillCount(): number {
     return this._totalSkillCount;
-  };
+  }
 
-  TopicSummary.prototype.getUncategorizedSkillCount = function() {
+  getUncategorizedSkillCount(): number {
     return this._uncategorizedSkillCount;
-  };
+  }
+}
 
-
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  TopicSummary['createFromBackendDict'] = function(topicSummaryBackendDict) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class TopicSummaryObjectFactory {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'topicSummaryBackendDict' is a dict with  underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(topicSummaryBackendDict: any): TopicSummary {
     return new TopicSummary(
       topicSummaryBackendDict.id,
       topicSummaryBackendDict.name,
@@ -68,7 +81,9 @@ angular.module('oppia').factory('TopicSummaryObjectFactory', [function() {
       topicSummaryBackendDict.total_skill_count,
       topicSummaryBackendDict.uncategorized_skill_count
     );
-  };
+  }
+}
 
-  return TopicSummary;
-}]);
+angular.module('oppia').factory(
+  'TopicSummaryObjectFactory',
+  downgradeInjectable(TopicSummaryObjectFactory));
