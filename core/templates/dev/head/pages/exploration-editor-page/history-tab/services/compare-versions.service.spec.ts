@@ -1219,5 +1219,11 @@ describe('Compare versions service', function() {
         linkProperty: 'added'
       }]);
     });
+
+    it('shouldn\'t compare versions if v1 > v2.', function() {
+      expect(function() {
+        cvs.getDiffGraphData(8, 5);
+      }).toThrow(Error('Tried to compare v1 > v2.'));
+    });
   });
 });
