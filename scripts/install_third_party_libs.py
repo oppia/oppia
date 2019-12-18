@@ -143,7 +143,9 @@ def pip_install(package, version, install_path):
         python_utils.PRINT(stderr)
         python_utils.PRINT(
             'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
-        raise Exception('Error installing package')
+        python_utils.PRINT('Error installing package %s==%s'
+            %(package, version))
+        raise Exception
 
 
 def install_skulpt(parsed_args):
