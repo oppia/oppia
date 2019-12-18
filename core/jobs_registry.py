@@ -232,9 +232,6 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
     def dispatch_event(cls, event_type, *args, **kwargs):
         """Dispatches an incoming event to the ContinuousComputation
         classes which listen to events of that type.
-        Args:
-            *args : tuple of data according to the event_type listened to,
-            **kwargs : dict of data according to the event_type listened to.
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
             if event_type in klass.get_event_types_listened_to():
