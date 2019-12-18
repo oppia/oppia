@@ -23,6 +23,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
+import { ServicesConstants } from 'services/services.constants';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +37,7 @@ export class ExplorationFeaturesBackendApiService {
   _fetchExplorationFeatures(explorationId: String): Promise<Object> {
     return this.http.get(
       this.urlInterpolationService.interpolateUrl(
-        '/explorehandler/features/<exploration_id>',
+        ServicesConstants.EXPLORATION_FEATURES_URL,
         {exploration_id: explorationId}
       )
     ).toPromise();
