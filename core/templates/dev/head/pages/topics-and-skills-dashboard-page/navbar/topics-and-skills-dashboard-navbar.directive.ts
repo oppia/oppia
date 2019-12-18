@@ -17,7 +17,7 @@
  */
 
 require('components/entity-creation-services/skill-creation.service.ts');
-require('components/entity-creation-services/topic-creation.service.ts.ts');
+require('components/entity-creation-services/topic-creation.service.ts');
 require(
   'components/review-material-editor/review-material-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');

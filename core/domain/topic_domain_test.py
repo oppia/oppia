@@ -37,7 +37,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name')
+            self.topic_id, 'Name', 'abbrev')
         self.topic.subtopics = [
             topic_domain.Subtopic(1, 'Title', ['skill_id_1'])]
         self.topic.next_subtopic_id = 2
@@ -50,10 +50,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""
-        topic = topic_domain.Topic.create_default_topic(self.topic_id, 'Name')
+        topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'Name', 'abbrev')
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
+            'abbreviated_name': 'abbrev',
+            'thumbnail_filename': None,
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
             'additional_story_references': [],
@@ -194,9 +197,30 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
+    def _assert_valid_abbreviated_name(
+            self, expected_error_substring, name):
+        """Checks that the topic passes strict validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            topic_domain.Topic.require_valid_abbreviated_name(name)
+
     def test_valid_topic_id(self):
         self._assert_valid_topic_id('Topic id should be a string', 10)
         self._assert_valid_topic_id('Topic id abc is invalid', 'abc')
+
+    def test_valid_abbreviated_name(self):
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name should be a string.', 10)
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name field should not be empty.', '')
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name field should not exceed 12 characters.',
+            'this is a lengthy name.')
+
+    def test_thumbnail_filename_validation(self):
+        self.topic.thumbnail_filename = 1
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received 1')
 
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
@@ -410,6 +434,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.language_code, 'en')
         self.topic.update_language_code('bn')
         self.assertEqual(self.topic.language_code, 'bn')
+
+    def test_update_abbreviated_name(self):
+        self.assertEqual(self.topic.abbreviated_name, 'abbrev')
+        self.topic.update_abbreviated_name('name')
+        self.assertEqual(self.topic.abbreviated_name, 'name')
+
+    def test_update_thumbnail_filename(self):
+        self.assertEqual(self.topic.thumbnail_filename, None)
+        self.topic.update_thumbnail_filename('img.png')
+        self.assertEqual(self.topic.thumbnail_filename, 'img.png')
 
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):

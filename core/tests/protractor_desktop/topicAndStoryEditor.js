@@ -51,7 +51,7 @@ describe('Topic editor functionality', function() {
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 1');
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
     browser.getCurrentUrl().then(function(url) {
       topicId = url.split('/')[4];
     });
@@ -62,8 +62,18 @@ describe('Topic editor functionality', function() {
     topicEditorPage.get(topicId);
   });
 
-  it('should edit topic name and description correctly', function() {
+  it('should edit topic name, abbreviated topic name, ' +
+    'thumbnail and description correctly', function() {
     topicEditorPage.changeTopicName('Topic 1 edited');
+    expect(topicEditorPage.getTopicThumbnailSource())
+      .not
+      .toEqual(
+        topicEditorPage.submitTopicThumbnail('../data/img.png')
+          .then(function() {
+            return topicEditorPage.getTopicThumbnailSource();
+          })
+      );
+    topicEditorPage.changeAbbreviatedTopicName('short name');
     topicEditorPage.changeTopicDescription('Topic Description');
     topicEditorPage.saveTopic('Changed topic name and description.');
 
@@ -72,6 +82,7 @@ describe('Topic editor functionality', function() {
 
     topicEditorPage.get(topicId);
     topicEditorPage.expectTopicNameToBe('Topic 1 edited');
+    topicEditorPage.expectAbbreviatedTopicNameToBe('short name');
     topicEditorPage.expectTopicDescriptionToBe('Topic Description');
   });
 
@@ -280,7 +291,7 @@ describe('Chapter editor functionality', function() {
       userEmail, 'creatorChapterTest');
     dummyExplorationIds = createDummyExplorations(3);
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopicWithTitle(topicName);
+    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
     topicEditorPage.createStory('Story 0');
     browser.getCurrentUrl().then(function(url) {
       storyId = url.split('/')[4];

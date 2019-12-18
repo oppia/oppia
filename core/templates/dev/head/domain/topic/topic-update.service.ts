@@ -29,25 +29,27 @@ require('domain/topic/topic-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
-  'CMD_ADD_SUBTOPIC',
-  'CMD_DELETE_ADDITIONAL_STORY', 'CMD_DELETE_CANONICAL_STORY',
-  'CMD_DELETE_SUBTOPIC', 'CMD_MOVE_SKILL_ID_TO_SUBTOPIC',
-  'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC', 'CMD_REMOVE_UNCATEGORIZED_SKILL_ID',
-  'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY', 'CMD_UPDATE_SUBTOPIC_PROPERTY',
-  'CMD_UPDATE_TOPIC_PROPERTY', 'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO',
+  'CMD_ADD_SUBTOPIC', 'CMD_DELETE_ADDITIONAL_STORY',
+  'CMD_DELETE_CANONICAL_STORY', 'CMD_DELETE_SUBTOPIC',
+  'CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC',
+  'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY',
+  'CMD_UPDATE_SUBTOPIC_PROPERTY', 'CMD_UPDATE_TOPIC_PROPERTY',
+  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO',
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'SUBTOPIC_PROPERTY_TITLE',
-  'TOPIC_PROPERTY_DESCRIPTION', 'TOPIC_PROPERTY_LANGUAGE_CODE',
-  'TOPIC_PROPERTY_NAME', function(
+  'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
+  'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
+  'TOPIC_PROPERTY_THUMBNAIL_FILENAME', function(
       ChangeObjectFactory, UndoRedoService,
-      CMD_ADD_SUBTOPIC,
-      CMD_DELETE_ADDITIONAL_STORY, CMD_DELETE_CANONICAL_STORY,
-      CMD_DELETE_SUBTOPIC, CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-      CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
-      CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY, CMD_UPDATE_SUBTOPIC_PROPERTY,
-      CMD_UPDATE_TOPIC_PROPERTY, SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
+      CMD_ADD_SUBTOPIC, CMD_DELETE_ADDITIONAL_STORY,
+      CMD_DELETE_CANONICAL_STORY, CMD_DELETE_SUBTOPIC,
+      CMD_MOVE_SKILL_ID_TO_SUBTOPIC, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+      CMD_REMOVE_UNCATEGORIZED_SKILL_ID, CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+      CMD_UPDATE_SUBTOPIC_PROPERTY, CMD_UPDATE_TOPIC_PROPERTY,
+      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML, SUBTOPIC_PROPERTY_TITLE,
-      TOPIC_PROPERTY_DESCRIPTION, TOPIC_PROPERTY_LANGUAGE_CODE,
-      TOPIC_PROPERTY_NAME) {
+      TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
+      TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
+      TOPIC_PROPERTY_THUMBNAIL_FILENAME) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // topic.
@@ -70,7 +72,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       _applyChange(topic, CMD_UPDATE_TOPIC_PROPERTY, {
         property_name: propertyName,
         new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
+        old_value: angular.copy(oldValue) || null
       }, apply, reverse);
     };
 
@@ -121,6 +123,45 @@ angular.module('oppia').factory('TopicUpdateService', [
           }, function(changeDict, topic) {
             // Undo.
             topic.setName(oldName);
+          });
+      },
+
+      /**
+       * Changes the abbreviated name of a topic and records the change in the
+       * undo/redo service.
+       */
+      setAbbreviatedTopicName: function(topic, abbreviatedName) {
+        var oldAbbreviatedName = angular.copy(topic.getAbbreviatedName());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_ABBREVIATED_NAME,
+          abbreviatedName, oldAbbreviatedName,
+          function(changeDict, topic) {
+            // Apply
+            var name = _getNewPropertyValueFromChangeDict(changeDict);
+            topic.setAbbreviatedName(name);
+          }, function(changeDict, topic) {
+            // Undo.
+            topic.setAbbreviatedName(oldAbbreviatedName);
+          });
+      },
+
+      /**
+       * Changes the thumbnail filename of a topic and records the change in the
+       * undo/redo service.
+       */
+      setThumbnailFilename: function(topic, thumbnailFilename) {
+        var oldThumbnailFilename = angular.copy(topic.getThumbnailFilename());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_THUMBNAIL_FILENAME,
+          thumbnailFilename, oldThumbnailFilename,
+          function(changeDict, topic) {
+            // Apply
+            var thumbnailFilename = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            topic.setThumbnailFilename(thumbnailFilename);
+          }, function(changeDict, topic) {
+            // Undo.
+            topic.setThumbnailFilename(oldThumbnailFilename);
           });
       },
 

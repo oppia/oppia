@@ -57,7 +57,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should add a new topic to list', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 1');
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
 
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);

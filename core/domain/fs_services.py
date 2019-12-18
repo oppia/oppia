@@ -26,7 +26,8 @@ gae_image_services = models.Registry.import_gae_image_services()
 
 
 def save_original_and_compressed_versions_of_image(
-        user_id, filename, entity_type, entity_id, original_image_content):
+        user_id, filename, entity_type, entity_id,
+        original_image_content, filename_prefix):
     """Saves the three versions of the image file.
 
     Args:
@@ -35,19 +36,21 @@ def save_original_and_compressed_versions_of_image(
         entity_type: str. The type of the entity.
         entity_id: str. The id of the entity.
         original_image_content: str. The content of the original image.
+        filename_prefix: str. The string to prefix to the filename.
     """
-    filepath = 'image/%s' % filename
+    filepath = '%s/%s' % (filename_prefix, filename)
 
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
 
     compressed_image_filename = '%s_compressed.%s' % (
         filename_wo_filetype, filetype)
-    compressed_image_filepath = 'image/%s' % compressed_image_filename
+    compressed_image_filepath = '%s/%s' % (
+        filename_prefix, compressed_image_filename)
 
     micro_image_filename = '%s_micro.%s' % (
         filename_wo_filetype, filetype)
-    micro_image_filepath = 'image/%s' % micro_image_filename
+    micro_image_filepath = '%s/%s' % (filename_prefix, micro_image_filename)
 
     file_system_class = get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(

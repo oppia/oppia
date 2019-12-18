@@ -48,8 +48,8 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
             self.linked_skill_id, self.admin_id, 'Description 3')
         skill_services.publish_skill(self.linked_skill_id, self.admin_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
-            [self.linked_skill_id], [], 1)
+            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
+            'Description', [], [], [self.linked_skill_id], [], 1)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(
@@ -160,9 +160,12 @@ class NewTopicHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_topic_creation(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
-
+        payload = {
+            'name': 'Topic name',
+            'abbreviated_name': 'name'
+        }
         json_response = self.post_json(
-            self.url, {'name': 'Topic name'}, csrf_token=csrf_token)
+            self.url, payload, csrf_token=csrf_token)
         topic_id = json_response['topicId']
         self.assertEqual(len(topic_id), 12)
         self.assertIsNotNone(

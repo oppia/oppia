@@ -149,8 +149,8 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             story_id, admin_id, 'Title', 'Description', 'Notes',
             topic_id)
         self.save_new_topic(
-            topic_id, admin_id, 'Name', 'Description',
-            [story_id], [], [], [subtopic], 2)
+            topic_id, admin_id, 'Name', 'abbrev', None,
+            'Description', [story_id], [], [], [subtopic], 2)
         self.save_new_skill(skill_id, admin_id, 'Description')
 
         # Page context: Exploration.

@@ -623,6 +623,9 @@ class ImageUploadHandler(EditorHandler):
 
         raw = self.request.get('image')
         filename = self.payload.get('filename')
+        filename_prefix = self.payload.get('filename_prefix')
+        if filename_prefix is None:
+            filename_prefix = self._FILENAME_PREFIX
         if not raw:
             raise self.InvalidInputException('No image supplied')
 
@@ -659,7 +662,7 @@ class ImageUploadHandler(EditorHandler):
         file_system_class = fs_services.get_entity_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
             entity_type, entity_id))
-        filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
+        filepath = '%s/%s' % (filename_prefix, filename)
 
         if fs.isfile(filepath):
             raise self.InvalidInputException(
@@ -667,7 +670,8 @@ class ImageUploadHandler(EditorHandler):
                 'different name.' % filename)
 
         fs_services.save_original_and_compressed_versions_of_image(
-            self.user_id, filename, entity_type, entity_id, raw)
+            self.user_id, filename, entity_type, entity_id,
+            raw, filename_prefix)
 
         self.render_json({'filename': filename})
 

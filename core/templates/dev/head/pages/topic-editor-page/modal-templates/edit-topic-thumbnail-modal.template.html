@@ -1,0 +1,56 @@
+<div class="modal-header">
+  <h3>Upload Topic Thumbnail</h3>
+</div>
+
+<div class="modal-body" style="min-height: 300px;">
+  <div class="oppia-thumbnail-uploader">
+    <div ng-hide="uploadedImage">
+      <image-uploader on-file-changed="onFileChanged">
+      </image-uploader>
+    </div>
+
+    <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;" translate="I18N_PREFERENCES_PROFILE_PICTURE_ERROR"></div>
+    <div ng-show="uploadedImage">
+      <span translate="I18N_PREFERENCES_PROFILE_PICTURE_DRAG"></span>
+      <div class="oppia-thumbnail-crop-area" ng-show="uploadedImage">
+        <button class="btn btn-secondary oppia-thumbnail-reset-button" ng-click="reset()">
+          <i class="material-icons oppia-vcenter">&#xE14C;</i>
+        </button>
+        <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
+                  area-type="square" result-image-size="150"
+                  on-load-error="onInvalidImageLoaded()"
+                  result-image-format="image/png"
+                  class="protractor-test-photo-crop">
+        </img-crop>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" ng-click="cancel()" translate="I18N_MODAL_CANCEL_BUTTON"></button>
+  <!--
+      The two checks for ng-disabled are necessary. The former is needed because
+      img-crop loads a default white image even when nothing is uploaded. The latter
+      is needed to prevent the saving of invalid files.
+  -->
+  <button class="btn btn-success protractor-test-photo-upload-submit"
+          ng-click="confirm()"
+          ng-disabled="!uploadedImage || !croppedImageDataUrl">
+    Add Thumbnail
+  </button>
+</div>
+<style>
+  .oppia-thumbnail-crop-area {
+    background: #E4E4E4;
+    height: 350px;
+    margin-top: 20px;
+    position: relative;
+    width: 500px;
+  }
+  .oppia-thumbnail-reset-button {
+    position: absolute;
+    right: -50px;
+    top: 0;
+  }
+</style>
