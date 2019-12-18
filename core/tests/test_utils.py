@@ -1425,7 +1425,8 @@ tags: []
             }])
 
     def save_new_topic(
-            self, topic_id, owner_id, name='topic', description='description',
+            self, topic_id, owner_id, name='topic', abbreviated_name='topic',
+            thumbnail_filename='topic.png', description='description',
             canonical_story_ids=None, additional_story_ids=None,
             uncategorized_skill_ids=None, subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
@@ -1435,6 +1436,8 @@ tags: []
             topic_id: str. ID for the topic to be created.
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
+            abbreviated_name: str. The abbreviated name of the topic.
+            thumbnail_filename: str|None. The thumbnail filename of the topic.
             description: str. The desscription of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -1462,7 +1465,8 @@ tags: []
         uncategorized_skill_ids = uncategorized_skill_ids or []
         subtopics = subtopics or []
         topic = topic_domain.Topic(
-            topic_id, name, description, canonical_story_references,
+            topic_id, name, abbreviated_name, thumbnail_filename,
+            description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
@@ -1471,7 +1475,8 @@ tags: []
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
-            self, topic_id, owner_id, name, canonical_name, description,
+            self, topic_id, owner_id, name, abbreviated_name,
+            canonical_name, description,
             canonical_story_references, additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
@@ -1491,6 +1496,7 @@ tags: []
             topic_id: str. ID for the topic to be created.
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
+            abbreviated_name: str. The abbreviated name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The desscription of the topic.
             canonical_story_references: list(StoryReference). A set of story
@@ -1513,6 +1519,7 @@ tags: []
         topic_model = topic_models.TopicModel(
             id=topic_id,
             name=name,
+            abbreviated_name=abbreviated_name,
             canonical_name=canonical_name,
             description=description,
             language_code=language_code,

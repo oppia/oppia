@@ -484,7 +484,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         for index, test_case in enumerate(test_cases_for_textangular):
             actual_output_for_textangular = (
-                html_validation_service._validate_soup_for_rte( # pylint: disable=protected-access
+                html_validation_service.validate_soup_for_rte(
                     bs4.BeautifulSoup(test_case, 'html.parser'),
                     feconf.RTE_FORMAT_TEXTANGULAR, err_dict))
 
@@ -512,7 +512,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         for index, test_case in enumerate(test_cases_for_ckeditor):
             actual_output_for_ckeditor = (
-                html_validation_service._validate_soup_for_rte( # pylint: disable=protected-access
+                html_validation_service.validate_soup_for_rte(
                     bs4.BeautifulSoup(test_case, 'html.parser'),
                     feconf.RTE_FORMAT_CKEDITOR, err_dict))
 
@@ -1268,7 +1268,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             soup = bs4.BeautifulSoup(
                 html_string.encode(encoding='utf-8'), 'html.parser')
             actual_output.append(list(
-                html_validation_service._validate_customization_args_in_tag( # pylint: disable=protected-access
+                html_validation_service.validate_customization_args_in_tag(
                     soup.find(name=tag_name))))
 
         self.assertEqual(actual_output, expected_output)

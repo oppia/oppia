@@ -3532,11 +3532,24 @@ class TopicModelValidator(BaseModelValidator):
                             item.id, skill_id, subtopic['id']))
 
     @classmethod
+    def _validate_abbreviated_name_is_nonempty(cls, item):
+        """Validate that abbreviated name is nonempty.
+
+        Args:
+            item: ndb.Model. TopicModel to validate.
+        """
+        if not item.abbreviated_name:
+            cls.errors['abbreviated name check'].append(
+                'Entity id %s: Expected nonempty abbreviated name '
+                'received %s.' % (item.id, item.abbreviated_name))
+
+    @classmethod
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_canonical_name_is_unique,
             cls._validate_canonical_name_matches_name_in_lowercase,
-            cls._validate_uncategorized_skill_ids_not_in_subtopic_skill_ids]
+            cls._validate_uncategorized_skill_ids_not_in_subtopic_skill_ids,
+            cls._validate_abbreviated_name_is_nonempty]
 
 
 class TopicSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
