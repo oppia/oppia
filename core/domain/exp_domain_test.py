@@ -1899,7 +1899,7 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.exp_summary.owner_ids = ['other_id']
         self.assertFalse(
             self.exp_summary.is_solely_owned_by_user(self.owner_id))
-        self.assertFalse(self.exp_summary.is_solely_owned_by_user('other_id'))
+        self.assertTrue(self.exp_summary.is_solely_owned_by_user('other_id'))
 
     def test_is_solely_owned_by_user_multiple_owners(self):
         self.assertTrue(self.exp_summary.is_solely_owned_by_user(self.owner_id))
