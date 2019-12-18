@@ -234,11 +234,11 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
         classes which listen to events of that type.
 
 
-        Args: event_type : hello.
+        Arg: event_type : hello.
             data_tuple (str):str that is displayed.
             data_dict (str):str to be displayed.
 
-            
+
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
             if event_type in klass.get_event_types_listened_to():
