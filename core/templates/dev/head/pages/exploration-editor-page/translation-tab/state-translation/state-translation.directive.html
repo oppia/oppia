@@ -140,8 +140,13 @@
           </a>
           <div ng-if="activeHintIndex === $index">
             <div class="oppia-editor-card-section protractor-test-hint-<[$index]>-text">
-              <angular-html-bind html-data="getRequiredHtml(hint.hintContent)" class="oppia-rte-editor">
-              </angular-html-bind>
+              <span ng-show="!getRequiredHtml(hint.hintContent)" class="oppia-placeholder">
+                <[getEmptyContentMessage()]>
+              </span>
+              <span>
+                <angular-html-bind html-data="getRequiredHtml(hint.hintContent)" class="oppia-rte-editor">
+                </angular-html-bind>
+              </span>
             </div>
           </div>
         </li>
