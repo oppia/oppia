@@ -556,3 +556,23 @@ class CommonTests(test_utils.GenericTestBase):
                     'generation.') % (
                         release_constants.LABEL_FOR_RELEASED_PRS)):
                 common.check_prs_for_current_release_are_released(mock_repo)
+
+    def test_convert_to_posixpath_on_windows(self):
+        def mock_is_windows():
+            return True
+
+        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+        original_filepath = 'c:\\path\\to\\a\\file.js'
+        with is_windows_swap:
+            actual_file_path = common.convert_to_posixpath(original_filepath)
+        self.assertEqual(actual_file_path, 'c:/path/to/a/file.js')
+
+    def test_convert_to_posixpath_on_platform_other_than_windows(self):
+        def mock_is_windows():
+            return False
+
+        is_windows_swap = self.swap(common, 'is_windows_os', mock_is_windows)
+        original_filepath = 'c:\\path\\to\\a\\file.js'
+        with is_windows_swap:
+            actual_file_path = common.convert_to_posixpath(original_filepath)
+        self.assertEqual(actual_file_path, original_filepath)
