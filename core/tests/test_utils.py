@@ -1456,14 +1456,14 @@ tags: []
         """
         canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in canonical_story_ids or []
+            for story_id in (canonical_story_ids or [])
         ]
         additional_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in additional_story_ids or []
+            for story_id in (additional_story_ids or [])
         ]
-        uncategorized_skill_ids = uncategorized_skill_ids or []
-        subtopics = subtopics or []
+        uncategorized_skill_ids = (uncategorized_skill_ids or [])
+        subtopics = (subtopics or [])
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, thumbnail_filename,
             description, canonical_story_references,

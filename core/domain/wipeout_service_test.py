@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for voiceover services."""
+"""Tests for wipeout service."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
@@ -89,7 +89,7 @@ class WipeoutServiceTests(test_utils.GenericTestBase):
         self.assertEqual(pending_deletion_model.exploration_ids, [])
         self.assertEqual(pending_deletion_model.collection_ids, [])
 
-    def tests_pre_delete_user_with_activities(self):
+    def test_pre_delete_user_with_activities(self):
         self.save_new_valid_exploration('exp_id', self.user_1_id)
         self.save_new_valid_collection(
             'col_id', self.user_1_id, exploration_id='exp_id')
@@ -102,7 +102,7 @@ class WipeoutServiceTests(test_utils.GenericTestBase):
             pending_deletion_model.exploration_ids, ['exp_id'])
         self.assertEqual(pending_deletion_model.collection_ids, ['col_id'])
 
-    def tests_pre_delete_user_with_activities_multiple_owners(self):
+    def test_pre_delete_user_with_activities_multiple_owners(self):
         user_services.update_user_role(
             self.user_1_id, feconf.ROLE_ID_COLLECTION_EDITOR)
         user_1_actions = user_services.UserActionsInfo(self.user_1_id)
@@ -122,7 +122,7 @@ class WipeoutServiceTests(test_utils.GenericTestBase):
             pending_deletion_model.exploration_ids, [])
         self.assertEqual(pending_deletion_model.collection_ids, [])
 
-    def tests_pre_delete_user_collection_is_marked_deleted(self):
+    def test_pre_delete_user_collection_is_marked_deleted(self):
         self.save_new_valid_collection(
             'col_id', self.user_1_id)
 
@@ -134,7 +134,7 @@ class WipeoutServiceTests(test_utils.GenericTestBase):
         collection_model = collection_models.CollectionModel.get_by_id('col_id')
         self.assertTrue(collection_model.deleted)
 
-    def tests_pre_delete_user_exploration_is_marked_deleted(self):
+    def test_pre_delete_user_exploration_is_marked_deleted(self):
         self.save_new_valid_exploration('exp_id', self.user_1_id)
 
         exp_model = exp_models.ExplorationModel.get_by_id('exp_id')

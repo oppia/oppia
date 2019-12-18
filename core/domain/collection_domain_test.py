@@ -1085,12 +1085,32 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         self.collection_summary.status = constants.ACTIVITY_STATUS_PUBLIC
         self.assertFalse(self.collection_summary.is_private())
 
-    def test_is_solely_owned_by_user(self):
+    def test_is_solely_owned_by_user_one_owner(self):
         self.assertTrue(
             self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
         self.collection_summary.owner_ids = ['other_id']
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertTrue(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+
+    def test_is_solely_owned_by_user_multiple_owners(self):
+        self.assertTrue(
+            self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
         self.collection_summary.owner_ids = ['owner_id', 'other_id']
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('other_id'))
+
+    def test_is_solely_owned_by_user_other_users(self):
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('editor_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('viewer_id'))
+        self.assertFalse(
+            self.collection_summary.is_solely_owned_by_user('contributor_id'))
