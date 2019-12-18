@@ -32,6 +32,7 @@ import { Subtopic, SubtopicObjectFactory } from
 export class Topic {
   _id: string;
   _name: string;
+  _abbreviatedName: string;
   _description: string;
   _languageCode: string;
   _canonicalStoryReferences: Array<StoryReference>;
@@ -40,15 +41,17 @@ export class Topic {
   _nextSubtopicId: number;
   _version: number;
   _subtopics: Array<Subtopic>;
+  _thumbnailFilename: string;
   skillSummaryObjectFactory: SkillSummaryObjectFactory;
   subtopicObjectFactory: SubtopicObjectFactory;
   storyReferenceObjectFactory: StoryReferenceObjectFactory;
   constructor(
-      id: string, name: string, description: string, languageCode: string,
-      canonicalStoryReferences: Array<StoryReference>,
+      id: string, name: string, abbreviatedName: string, description: string,
+      languageCode: string, canonicalStoryReferences: Array<StoryReference>,
       additionalStoryReferences: Array<StoryReference>,
       uncategorizedSkillIds: Array<string>,
       nextSubtopicId: number, version: number, subtopics: Array<Subtopic>,
+      thumbnailFilename: string,
       // TODO(#7165): Replace any with exact type.
       skillIdToDescriptionMap: any,
       skillSummaryObjectFactory: SkillSummaryObjectFactory,
@@ -56,6 +59,7 @@ export class Topic {
       storyReferenceObjectFactory: StoryReferenceObjectFactory) {
     this._id = id;
     this._name = name;
+    this._abbreviatedName = abbreviatedName;
     this._description = description;
     this._languageCode = languageCode;
     this._canonicalStoryReferences = canonicalStoryReferences;
@@ -69,6 +73,7 @@ export class Topic {
     this._nextSubtopicId = nextSubtopicId;
     this._version = version;
     this._subtopics = cloneDeep(subtopics);
+    this._thumbnailFilename = thumbnailFilename;
     this.subtopicObjectFactory = subtopicObjectFactory;
     this.storyReferenceObjectFactory = storyReferenceObjectFactory;
   }
@@ -84,6 +89,22 @@ export class Topic {
 
   setName(name: string): void {
     this._name = name;
+  }
+
+  getAbbreviatedName(): string {
+    return this._abbreviatedName;
+  }
+
+  setAbbreviatedName(abbreviatedName: string): void {
+    this._abbreviatedName = abbreviatedName;
+  }
+
+  setThumbnailFilename(thumbnailFilename: string): void {
+    this._thumbnailFilename = thumbnailFilename;
+  }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
   }
 
   getDescription(): string {
@@ -114,6 +135,10 @@ export class Topic {
     let issues = [];
     if (this._name === '') {
       issues.push('Topic name should not be empty.');
+    }
+
+    if (!this._abbreviatedName) {
+      issues.push('Abbreviated name should not be empty.');
     }
 
     let subtopics = this._subtopics;
@@ -165,6 +190,14 @@ export class Topic {
               ' is duplicated in the topic');
         }
       }
+    }
+    return issues;
+  }
+
+  prepublishValidate(): Array<string> {
+    let issues = [];
+    if (!this._thumbnailFilename) {
+      issues.push('Topic should have a thumbnail.');
     }
     return issues;
   }
@@ -366,6 +399,8 @@ export class Topic {
   copyFromTopic(otherTopic: Topic): void {
     this._id = otherTopic.getId();
     this.setName(otherTopic.getName());
+    this.setAbbreviatedName(otherTopic.getAbbreviatedName());
+    this.setThumbnailFilename(otherTopic.getThumbnailFilename());
     this.setDescription(otherTopic.getDescription());
     this.setLanguageCode(otherTopic.getLanguageCode());
     this._version = otherTopic.getVersion();
@@ -419,11 +454,13 @@ export class TopicObjectFactory {
           });
     return new Topic(
       topicBackendDict.id, topicBackendDict.name,
+      topicBackendDict.abbreviated_name,
       topicBackendDict.description, topicBackendDict.language_code,
       canonicalStoryReferences, additionalStoryReferences,
       topicBackendDict.uncategorized_skill_ids,
       topicBackendDict.next_subtopic_id, topicBackendDict.version,
-      subtopics, skillIdToDescriptionDict, this.skillSummaryObjectFactory,
+      subtopics, topicBackendDict.thumbnail_filename,
+      skillIdToDescriptionDict, this.skillSummaryObjectFactory,
       this.subtopicObjectFactory, this.storyReferenceObjectFactory
     );
   }
@@ -432,8 +469,8 @@ export class TopicObjectFactory {
   // the actual topic is fetched from the backend.
   createInterstitialTopic(): Topic {
     return new Topic(
-      null, 'Topic name loading', 'Topic description loading',
-      'en', [], [], [], 1, 1, [], {},
+      null, 'Topic name loading', 'Topic abbreviated name loading',
+      'Topic description loading', 'en', [], [], [], 1, 1, [], '', {},
       this.skillSummaryObjectFactory, this.subtopicObjectFactory,
       this.storyReferenceObjectFactory
     );
