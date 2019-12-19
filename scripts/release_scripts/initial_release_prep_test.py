@@ -19,9 +19,7 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-import os
-import sys
+import subprocess
 
 import constants
 from core.tests import test_utils
@@ -29,114 +27,25 @@ import python_utils
 from scripts import common
 from scripts.release_scripts import initial_release_prep
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYGSHEETS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pygsheets-2.0.2')
-sys.path.insert(0, _PYGSHEETS_PATH)
-
-# pylint: disable=wrong-import-position
-import pygsheets # isort:skip
-# pylint: enable=wrong-import-position
-
 
 class InitialReleasePrepTests(test_utils.GenericTestBase):
     """Test the methods for intial release preparation."""
-
-    def test_get_job_details_for_current_release(self):
-        short_current_month_name = datetime.datetime.utcnow().strftime('%h')
-        full_current_month_name = datetime.datetime.utcnow().strftime('%B')
-        job_details = [{
-            'Timestamp': '11/7/2019 12:31:32',
-            'Email Address': 'bob@email.com',
-            'What is your name?': 'Bob',
-            'Select the job you want to test': 'Job1',
-            (
-                'Which upcoming release are you '
-                'targeting this job for?'): short_current_month_name,
-            'Instructions': (
-                'https://docs.google.com/document/d/'
-                'instructionsforjob1'),
-            '(Optional) Anything else you\'d like to tell us?': 'No'
-        }, {
-            'Timestamp': '11/8/2019 12:31:32',
-            'Email Address': 'alice@email.com',
-            'What is your name?': 'Alice',
-            'Select the job you want to test': 'Job2',
-            (
-                'Which upcoming release are you '
-                'targeting this job for?'): full_current_month_name,
-            'Instructions': (
-                'https://docs.google.com/document/d/'
-                'instructionsforjob2'),
-            '(Optional) Anything else you\'d like to tell us?': 'Test-job'
-        }, {
-            'Timestamp': '11/9/2019 12:31:32',
-            'Email Address': 'paul@email.com',
-            'What is your name?': 'Paul',
-            'Select the job you want to test': 'Job3',
-            (
-                'Which upcoming release are you '
-                'targeting this job for?'): 'Random month',
-            'Instructions': (
-                'https://docs.google.com/document/d/'
-                'instructionsforjob3'),
-            '(Optional) Anything else you\'d like to tell us?': 'No'
-        }]
-        expected_job_details = [{
-            'job_name': 'Job1',
-            'author_email': 'bob@email.com',
-            'author_name': 'Bob',
-            'instruction_doc': (
-                'https://docs.google.com/document/d/'
-                'instructionsforjob1')
-        }, {
-            'job_name': 'Job2',
-            'author_email': 'alice@email.com',
-            'author_name': 'Alice',
-            'instruction_doc': (
-                'https://docs.google.com/document/d/'
-                'instructionsforjob2')
-        }]
-        self.assertEqual(
-            initial_release_prep.get_job_details_for_current_release(
-                job_details, 'Select the job you want to test',
-                'Which upcoming release are you targeting this job for?',
-                'Email Address', 'What is your name?', 'Instructions'),
-            expected_job_details)
-
     def test_get_mail_message_template(self):
-        job_details = [{
-            'job_name': 'Job1',
-            'author_email': 'bob@email.com',
-            'author_name': 'Bob',
-            'instruction_doc': (
-                'https://docs.google.com/document/d/'
-                'instructionsforjob1')
-        }, {
-            'job_name': 'Job2',
-            'author_email': 'alice@email.com',
-            'author_name': 'Alice',
-            'instruction_doc': (
-                'https://docs.google.com/document/d/'
-                'instructionsforjob2')
-        }]
         expected_mail_message_template = (
             'Hi Sean,\n\n'
             'You will need to run these jobs on the backup server:\n\n'
-            'Job1 (Instructions: https://docs.google.com/document/d/'
-            'instructionsforjob1) (Author: Bob)\n'
-            'Job2 (Instructions: https://docs.google.com/document/d/'
-            'instructionsforjob2) (Author: Alice)\n\n'
+            '[List of jobs formatted as: {{Job Name}} (instructions: '
+            '{{Instruction doc url}}) (Author: {{Author Name}})]\n'
             'The specific instructions for jobs are linked with them. '
             'The general instructions are as follows:\n\n'
             '1. Login as admin\n'
             '2. Navigate to the admin panel and then the jobs tab\n'
             '3. Run the above jobs\n'
             '4. In case of failure/success, please send the output logs for '
-            'the job to me and the job authors: '
-            '[u\'Bob: bob@email.com\', u\'Alice: alice@email.com\']\n\n'
+            'the job to me and the job authors: {{Author names}}\n\n'
             'Thanks!\n')
         self.assertEqual(
-            initial_release_prep.get_mail_message_template(job_details),
+            initial_release_prep.get_mail_message_template(),
             expected_mail_message_template)
 
     def test_exception_is_raised_if_release_journal_is_not_created(self):
@@ -146,14 +55,19 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             pass
         def mock_input():
             return 'n'
+        def mock_verify_current_branch_name(unused_branch_name):
+            pass
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
         ask_user_swap = self.swap(
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
+        branch_check_swap = self.swap(
+            common, 'verify_current_branch_name',
+            mock_verify_current_branch_name)
 
-        with open_tab_swap, ask_user_swap, input_swap:
+        with open_tab_swap, ask_user_swap, input_swap, branch_check_swap:
             with self.assertRaisesRegexp(
                 Exception,
                 'Please ensure a new doc is created for the '
@@ -236,56 +150,84 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
                 ['git', 'reset', 'assets/constants.ts'],
                 ['git', 'checkout', '--', 'assets/constants.ts']])
 
-    def test_function_calls_with_jobs_to_run(self):
+    def test_cut_release_branch_with_correct_version(self):
         check_function_calls = {
-            'get_all_records_is_called': False,
-            'open_is_called': False,
-            'close_is_called': False,
             'open_new_tab_in_browser_if_possible_is_called': False,
-            'ask_user_to_confirm_is_called': False,
-            'get_job_details_for_current_release_is_called': False,
-            'get_mail_message_template_is_called': False,
-            'open_file_is_called': False,
-            'authorize_is_called': False,
-            'isfile_is_called': False,
-            'remove_is_called': False,
-            'get_extra_jobs_due_to_schema_changes_is_called': False,
-            'did_supported_audio_languages_change_is_called': False,
-            'get_remote_alias_is_called': False
+            'check_call_is_called': False
         }
         expected_check_function_calls = {
-            'get_all_records_is_called': True,
-            'open_is_called': True,
-            'close_is_called': True,
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'check_call_is_called': True
+        }
+        def mock_open_tab(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_is_called'] = True
+        def mock_input():
+            return '1.2.3'
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible',
+            mock_open_tab)
+        check_call_swap = self.swap(
+            subprocess, 'check_call', mock_check_call)
+        input_swap = self.swap(
+            python_utils, 'INPUT', mock_input)
+        with open_tab_swap, check_call_swap, input_swap:
+            initial_release_prep.cut_release_branch()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_cut_release_branch_with_incorrect_version(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'check_call_is_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': True,
+            'check_call_is_called': False
+        }
+        def mock_open_tab(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_is_called'] = True
+        def mock_check_call(unused_cmd_tokens):
+            check_function_calls['check_call_is_called'] = True
+        def mock_input():
+            return 'invalid'
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible',
+            mock_open_tab)
+        check_call_swap = self.swap(
+            subprocess, 'check_call', mock_check_call)
+        input_swap = self.swap(
+            python_utils, 'INPUT', mock_input)
+        with open_tab_swap, check_call_swap, input_swap:
+            with self.assertRaises(AssertionError):
+                initial_release_prep.cut_release_branch()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_function_calls(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_is_called': False,
+            'ask_user_to_confirm_is_called': False,
+            'get_mail_message_template_is_called': False,
+            'get_extra_jobs_due_to_schema_changes_is_called': False,
+            'did_supported_audio_languages_change_is_called': False,
+            'get_remote_alias_is_called': False,
+            'verify_current_branch_name_is_called': False,
+            'cut_release_branch_is_called': False
+        }
+        expected_check_function_calls = {
             'open_new_tab_in_browser_if_possible_is_called': True,
             'ask_user_to_confirm_is_called': True,
-            'get_job_details_for_current_release_is_called': True,
             'get_mail_message_template_is_called': True,
-            'open_file_is_called': True,
-            'authorize_is_called': True,
-            'isfile_is_called': True,
-            'remove_is_called': True,
             'get_extra_jobs_due_to_schema_changes_is_called': True,
             'did_supported_audio_languages_change_is_called': True,
-            'get_remote_alias_is_called': True
+            'get_remote_alias_is_called': True,
+            'verify_current_branch_name_is_called': True,
+            'cut_release_branch_is_called': True
         }
-        class MockWorksheet(python_utils.OBJECT):
-            def get_all_records(self):
-                """Mock function for obtaining all records in a sheet."""
-                check_function_calls['get_all_records_is_called'] = True
-                return ['Record1', 'Record2']
-        class MockClient(python_utils.OBJECT):
-            def __init__(self):
-                self.sheet1 = MockWorksheet()
-            def open(self, unused_sheet_name):
-                """Mock function for opening a worksheet."""
-                check_function_calls['open_is_called'] = True
-                return self
-        class MockFile(python_utils.OBJECT):
-            def close(self):
-                """Mock function to close a file."""
-                check_function_calls['close_is_called'] = True
-
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_is_called'] = True
@@ -298,34 +240,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             return 'y'
         def mock_print(msg):
             print_arr.append(msg)
-        def mock_get_job_details_for_current_release(
-                unused_job_details, unused_job_name_header,
-                unused_month_header, unused_author_email_header,
-                unused_author_name_header, unused_instruction_doc_header):
-            check_function_calls[
-                'get_job_details_for_current_release_is_called'] = True
-            return [{
-                'job_name': 'Job1',
-                'author_email': 'bob@email.com',
-                'author_name': 'Bob',
-                'instruction_doc': 'Instructions for job 1'
-            }]
-        def mock_get_mail_message_template(unused_job_details):
+        def mock_get_mail_message_template():
             check_function_calls['get_mail_message_template_is_called'] = True
             return 'Mail message for testing.'
-        def mock_open_file(unused_file_path, unused_mode):
-            check_function_calls['open_file_is_called'] = True
-            return MockFile()
-        # pylint: disable=unused-argument
-        def mock_authorize(client_secret):
-            check_function_calls['authorize_is_called'] = True
-            return MockClient()
-        # pylint: enable=unused-argument
-        def mock_isfile(unused_filepath):
-            check_function_calls['isfile_is_called'] = True
-            return True
-        def mock_remove(unused_filepath):
-            check_function_calls['remove_is_called'] = True
         def mock_get_extra_jobs_due_to_schema_changes(
                 unused_remote_alias, unused_previous_release_version):
             check_function_calls[
@@ -338,6 +255,10 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             return True
         def mock_get_remote_alias(unused_remote_url):
             check_function_calls['get_remote_alias_is_called'] = True
+        def mock_verify_current_branch_name(unused_branch_name):
+            check_function_calls['verify_current_branch_name_is_called'] = True
+        def mock_cut_release_branch():
+            check_function_calls['cut_release_branch_is_called'] = True
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
@@ -345,16 +266,9 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        job_details_swap = self.swap(
-            initial_release_prep, 'get_job_details_for_current_release',
-            mock_get_job_details_for_current_release)
         mail_msg_swap = self.swap(
             initial_release_prep, 'get_mail_message_template',
             mock_get_mail_message_template)
-        open_file_swap = self.swap(python_utils, 'open_file', mock_open_file)
-        authorize_swap = self.swap(pygsheets, 'authorize', mock_authorize)
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        remove_swap = self.swap(os, 'remove', mock_remove)
         get_extra_jobs_swap = self.swap(
             initial_release_prep, 'get_extra_jobs_due_to_schema_changes',
             mock_get_extra_jobs_due_to_schema_changes)
@@ -363,141 +277,15 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
             mock_did_supported_audio_languages_change)
         get_alias_swap = self.swap(
             common, 'get_remote_alias', mock_get_remote_alias)
+        branch_check_swap = self.swap(
+            common, 'verify_current_branch_name',
+            mock_verify_current_branch_name)
+        cut_branch_swap = self.swap(
+            initial_release_prep, 'cut_release_branch',
+            mock_cut_release_branch)
 
         with open_tab_swap, ask_user_swap, input_swap, print_swap:
-            with job_details_swap, mail_msg_swap, open_file_swap:
-                with authorize_swap, isfile_swap, remove_swap, get_alias_swap:
-                    with get_extra_jobs_swap, check_changes_swap:
-                        initial_release_prep.main()
+            with mail_msg_swap, get_alias_swap, check_changes_swap:
+                with get_extra_jobs_swap, branch_check_swap, cut_branch_swap:
+                    initial_release_prep.main()
         self.assertEqual(check_function_calls, expected_check_function_calls)
-
-    def test_function_calls_with_no_jobs_to_run(self):
-        check_function_calls = {
-            'get_all_records_is_called': False,
-            'open_is_called': False,
-            'close_is_called': False,
-            'open_new_tab_in_browser_if_possible_is_called': False,
-            'ask_user_to_confirm_is_called': False,
-            'get_job_details_for_current_release_is_called': False,
-            'get_mail_message_template_is_called': False,
-            'open_file_is_called': False,
-            'authorize_is_called': False,
-            'isfile_is_called': False,
-            'remove_is_called': False,
-            'get_extra_jobs_due_to_schema_changes_is_called': False,
-            'did_supported_audio_languages_change_is_called': False,
-            'get_remote_alias_is_called': False
-        }
-        expected_check_function_calls = {
-            'get_all_records_is_called': True,
-            'open_is_called': True,
-            'close_is_called': True,
-            'open_new_tab_in_browser_if_possible_is_called': True,
-            'ask_user_to_confirm_is_called': True,
-            'get_job_details_for_current_release_is_called': True,
-            'get_mail_message_template_is_called': False,
-            'open_file_is_called': True,
-            'authorize_is_called': True,
-            'isfile_is_called': True,
-            'remove_is_called': True,
-            'get_extra_jobs_due_to_schema_changes_is_called': True,
-            'did_supported_audio_languages_change_is_called': True,
-            'get_remote_alias_is_called': True
-        }
-        class MockWorksheet(python_utils.OBJECT):
-            def get_all_records(self):
-                """Mock function for obtaining all records in a sheet."""
-                check_function_calls['get_all_records_is_called'] = True
-                return ['Record1', 'Record2']
-        class MockClient(python_utils.OBJECT):
-            def __init__(self):
-                self.sheet1 = MockWorksheet()
-            def open(self, unused_sheet_name):
-                """Mock function for opening a worksheet."""
-                check_function_calls['open_is_called'] = True
-                return self
-        class MockFile(python_utils.OBJECT):
-            def close(self):
-                """Mock function to close a file."""
-                check_function_calls['close_is_called'] = True
-
-        def mock_open_tab(unused_url):
-            check_function_calls[
-                'open_new_tab_in_browser_if_possible_is_called'] = True
-        def mock_ask_user_to_confirm(unused_msg):
-            check_function_calls['ask_user_to_confirm_is_called'] = True
-        print_arr = []
-        def mock_input():
-            if print_arr[-1] == 'Enter version of previous release.':
-                return '1.2.3'
-            return 'y'
-        def mock_print(msg):
-            print_arr.append(msg)
-        def mock_get_job_details_for_current_release(
-                unused_job_details, unused_job_name_header,
-                unused_month_header, unused_author_email_header,
-                unused_author_name_header, unused_instruction_doc_header):
-            check_function_calls[
-                'get_job_details_for_current_release_is_called'] = True
-            return []
-        def mock_get_mail_message_template(unused_job_details):
-            check_function_calls['get_mail_message_template_is_called'] = True
-            return 'Mail message for testing.'
-        def mock_open_file(unused_file_path, unused_mode):
-            check_function_calls['open_file_is_called'] = True
-            return MockFile()
-        # pylint: disable=unused-argument
-        def mock_authorize(client_secret):
-            check_function_calls['authorize_is_called'] = True
-            return MockClient()
-        # pylint: enable=unused-argument
-        def mock_isfile(unused_filepath):
-            check_function_calls['isfile_is_called'] = True
-            return True
-        def mock_remove(unused_filepath):
-            check_function_calls['remove_is_called'] = True
-        def mock_get_extra_jobs_due_to_schema_changes(
-                unused_remote_alias, unused_previous_release_version):
-            check_function_calls[
-                'get_extra_jobs_due_to_schema_changes_is_called'] = True
-            return []
-        def mock_did_supported_audio_languages_change(
-                unused_remote_alias, unused_previous_release_version):
-            check_function_calls[
-                'did_supported_audio_languages_change_is_called'] = True
-            return True
-        def mock_get_remote_alias(unused_remote_url):
-            check_function_calls['get_remote_alias_is_called'] = True
-
-        open_tab_swap = self.swap(
-            common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
-        ask_user_swap = self.swap(
-            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
-        input_swap = self.swap(python_utils, 'INPUT', mock_input)
-        print_swap = self.swap(python_utils, 'PRINT', mock_print)
-        job_details_swap = self.swap(
-            initial_release_prep, 'get_job_details_for_current_release',
-            mock_get_job_details_for_current_release)
-        mail_msg_swap = self.swap(
-            initial_release_prep, 'get_mail_message_template',
-            mock_get_mail_message_template)
-        open_file_swap = self.swap(python_utils, 'open_file', mock_open_file)
-        authorize_swap = self.swap(pygsheets, 'authorize', mock_authorize)
-        isfile_swap = self.swap(os.path, 'isfile', mock_isfile)
-        remove_swap = self.swap(os, 'remove', mock_remove)
-        get_extra_jobs_swap = self.swap(
-            initial_release_prep, 'get_extra_jobs_due_to_schema_changes',
-            mock_get_extra_jobs_due_to_schema_changes)
-        check_changes_swap = self.swap(
-            initial_release_prep, 'did_supported_audio_languages_change',
-            mock_did_supported_audio_languages_change)
-        get_alias_swap = self.swap(
-            common, 'get_remote_alias', mock_get_remote_alias)
-
-        with open_tab_swap, ask_user_swap, input_swap, print_swap:
-            with job_details_swap, mail_msg_swap, open_file_swap:
-                with authorize_swap, isfile_swap, remove_swap, get_alias_swap:
-                    with get_extra_jobs_swap, check_changes_swap:
-                        initial_release_prep.main()
-        self.assertEqual(check_function_calls, expected_check_function_calls)
-        self.assertTrue('No jobs to run for the release.' in print_arr)
