@@ -23,6 +23,7 @@ import collections
 import json
 import os
 import random
+import re
 import subprocess
 import tempfile
 import threading
@@ -31,6 +32,7 @@ from core.tests import test_utils
 import python_utils
 
 from . import build
+from . import common
 
 TEST_DIR = os.path.join('core', 'tests', 'build', '')
 TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
@@ -90,9 +92,15 @@ class BuildTests(test_utils.GenericTestBase):
         filepath.
         """
         non_existent_filepaths = [INVALID_INPUT_FILEPATH]
+        # Escape the special characters, like '\', in the file paths.
+        # The '\' character is usually seem in Windows style path.
+        # https://docs.python.org/2/library/os.html#os.sep
+        # https://docs.python.org/2/library/re.html#regular-expression-syntax
+        error_message = ('File %s does not exist.') % re.escape(
+            non_existent_filepaths[0])
         # Exception will be raised at first file determined to be non-existent.
         with self.assertRaisesRegexp(
-            OSError, ('File %s does not exist.') % non_existent_filepaths[0]):
+            OSError, error_message):
             build._ensure_files_exist(non_existent_filepaths)
 
     def test_join_files(self):
@@ -243,6 +251,7 @@ class BuildTests(test_utils.GenericTestBase):
         BASE_HTML_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_DEV_DIR, 'base.html')
         BASE_JS_RELATIVE_PATH = os.path.join('pages', 'Base.js')
+        BASE_JS_FILE_URL = 'pages/Base.js'
         BASE_JS_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
 
@@ -268,7 +277,8 @@ class BuildTests(test_utils.GenericTestBase):
                 msg='No white spaces detected in %s unexpectedly'
                 % BASE_HTML_SOURCE_PATH)
             # Look for templates/pages/Base.js in source_base_file_content.
-            self.assertIn(BASE_JS_RELATIVE_PATH, source_base_file_content)
+            self.assertIn(
+                BASE_JS_FILE_URL, source_base_file_content)
 
         # Build base.html file.
         with python_utils.open_file(
@@ -285,7 +295,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Final filepath in base.html example:
         # /build/templates/head/pages/Base.081ce90f17ecdf07701d83cb860985c2.js.
         final_filename = build._insert_hash(
-            BASE_JS_RELATIVE_PATH, file_hashes[BASE_JS_RELATIVE_PATH])
+            BASE_JS_FILE_URL, file_hashes[BASE_JS_RELATIVE_PATH])
         # Look for templates/pages/Base.081ce90f17ecdf07701d83cb860985c2.js in
         # minified_html_file_content.
         self.assertIn(final_filename, minified_html_file_content)
@@ -296,11 +306,6 @@ class BuildTests(test_utils.GenericTestBase):
         """
         service_js_filepath = os.path.join(
             'local_compiled_js', 'core', 'pages', 'AudioService.js')
-        generated_parser_js_filepath = os.path.join(
-            'core', 'expressions', 'expression-parser.service.js')
-        compiled_generated_parser_js_filepath = os.path.join(
-            'local_compiled_js', 'core', 'expressions',
-            'expression-parser.service.js')
         service_ts_filepath = os.path.join('core', 'pages', 'AudioService.ts')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
         protractor_filepath = os.path.join('extensions', 'protractor.js')
@@ -327,15 +332,6 @@ class BuildTests(test_utils.GenericTestBase):
             build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)):
             self.assertFalse(build.should_file_be_built(service_js_filepath))
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
-
-        with self.swap(
-            build, 'JS_FILEPATHS_NOT_TO_BUILD', (
-                'core/expressions/expression-parser.service.js',)):
-            self.assertFalse(
-                build.should_file_be_built(generated_parser_js_filepath))
-            self.assertTrue(
-                build.should_file_be_built(
-                    compiled_generated_parser_js_filepath))
 
     def test_hash_should_be_inserted(self):
         """Test hash_should_be_inserted returns the correct boolean value
@@ -635,7 +631,8 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_re_build_recently_changed_files_at_dev_dir(self):
         temp_file = tempfile.NamedTemporaryFile()
-        temp_file.name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
+        temp_file_name = '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR
+        temp_file.name = temp_file_name
         with python_utils.open_file(
             '%ssome_file.js' % MOCK_EXTENSIONS_DEV_DIR, 'w') as tmp:
             tmp.write(u'Some content.')
@@ -699,6 +696,10 @@ class BuildTests(test_utils.GenericTestBase):
         build.safe_delete_directory_tree(TEST_DIR)
         temp_file.close()
 
+        if os.path.isfile(temp_file_name):
+            # On Windows system, occasionally this temp file is not deleted.
+            os.remove(temp_file_name)
+
     def test_get_recently_changed_filenames(self):
         """Test get_recently_changed_filenames detects file recently added."""
         # Create an empty folder.
@@ -742,13 +743,18 @@ class BuildTests(test_utils.GenericTestBase):
         with python_utils.open_file(build.TSCONFIG_FILEPATH, 'r') as f:
             config_data = json.load(f)
             out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
+        # Escape the special characters, like '\', in the file paths.
+        # The '\' character is usually seem in Windows style path.
+        # https://docs.python.org/2/library/os.html#os.sep
+        # https://docs.python.org/2/library/re.html#regular-expression-syntax
+        error_message = ('COMPILED_JS_DIR: %s does not match the output '
+                         'directory in %s: %s' % (
+                             re.escape(MOCK_COMPILED_JS_DIR),
+                             re.escape(build.TSCONFIG_FILEPATH),
+                             re.escape(out_dir)))
         with self.assertRaisesRegexp(
-            Exception,
-            'COMPILED_JS_DIR: %s does not match the output directory '
-            'in %s: %s' % (
-                MOCK_COMPILED_JS_DIR, build.TSCONFIG_FILEPATH,
-                out_dir)), self.swap(
-                    build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR):
+            Exception, error_message), self.swap(
+                build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR):
             build.require_compiled_js_dir_to_be_valid()
 
     def test_compiled_js_dir_is_deleted_before_compilation(self):
@@ -983,10 +989,11 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_build_using_webpack_command(self):
         def mock_check_call(cmd, **unused_kwargs):
-            self.assertEqual(
-                cmd,
-                '%s --config %s'
-                % (build.WEBPACK_FILE, build.WEBPACK_PROD_CONFIG))
+            expected_command = '%s %s --config %s' % (
+                common.NODE_BIN_PATH, build.WEBPACK_FILE,
+                build.WEBPACK_PROD_CONFIG
+            )
+            self.assertEqual(cmd, expected_command)
 
         with self.swap(subprocess, 'check_call', mock_check_call):
             build.build_using_webpack()

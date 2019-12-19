@@ -33,6 +33,8 @@ venv/
 .vagrant/*
 .lock
 yarn-error.log
+oppia-release-credentials.json
+sheets.googleapis.com-python.json
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated

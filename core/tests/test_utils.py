@@ -577,7 +577,7 @@ tags: []
             is_super_admin: bool. Whether the user is a super admin.
        """
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_user_id_from_email(email)
+        os.environ['USER_ID'] = self.get_gae_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
@@ -915,6 +915,8 @@ tags: []
         # immediately once the signup is complete. This is done to avoid
         # external  calls being made to Gravatar when running the backend
         # tests.
+        gae_id = self.get_gae_id_from_email(email)
+        user_services.create_new_user(gae_id, email)
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
@@ -1007,15 +1009,28 @@ tags: []
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_user_id_from_email(self, email):
-        """Gets the user_id corresponding to the given email.
+        """Gets the user ID corresponding to the given email.
 
         Args:
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            user_id: str. ID of the user possessing the given email.
+            str. ID of the user possessing the given email.
         """
-        return current_user_services.get_user_id_from_email(email)
+        gae_id = self.get_gae_id_from_email(email)
+        return (
+            user_services.get_user_settings_by_gae_id(gae_id).user_id)
+
+    def get_gae_id_from_email(self, email):
+        """Gets the GAE user ID corresponding to the given email.
+
+        Args:
+            email: str. A valid email stored in the App Engine database.
+
+        Returns:
+            str. GAE ID of the user possessing the given email.
+        """
+        return current_user_services.get_gae_id_from_email(email)
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
@@ -1410,9 +1425,10 @@ tags: []
             }])
 
     def save_new_topic(
-            self, topic_id, owner_id, name, description,
-            canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
-            subtopics, next_subtopic_id,
+            self, topic_id, owner_id, name, abbreviated_name,
+            thumbnail_filename, description,
+            canonical_story_ids, additional_story_ids,
+            uncategorized_skill_ids, subtopics, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
 
@@ -1420,6 +1436,8 @@ tags: []
             topic_id: str. ID for the topic to be created.
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
+            abbreviated_name: str. The abbreviated name of the topic.
+            thumbnail_filename: str|None. The thumbnail filename of the topic.
             description: str. The desscription of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -1445,7 +1463,8 @@ tags: []
             for story_id in additional_story_ids
         ]
         topic = topic_domain.Topic(
-            topic_id, name, description, canonical_story_references,
+            topic_id, name, abbreviated_name, thumbnail_filename,
+            description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
@@ -1454,7 +1473,8 @@ tags: []
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
-            self, topic_id, owner_id, name, canonical_name, description,
+            self, topic_id, owner_id, name, abbreviated_name,
+            canonical_name, description,
             canonical_story_references, additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
@@ -1474,6 +1494,7 @@ tags: []
             topic_id: str. ID for the topic to be created.
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
+            abbreviated_name: str. The abbreviated name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The desscription of the topic.
             canonical_story_references: list(StoryReference). A set of story
@@ -1496,6 +1517,7 @@ tags: []
         topic_model = topic_models.TopicModel(
             id=topic_id,
             name=name,
+            abbreviated_name=abbreviated_name,
             canonical_name=canonical_name,
             description=description,
             language_code=language_code,
