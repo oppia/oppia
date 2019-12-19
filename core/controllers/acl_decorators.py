@@ -2524,12 +2524,66 @@ def get_decorator_for_accepting_suggestion(decorator):
                     self.user_id, suggestion.score_category):
                 return handler(self, target_id, suggestion_id, **kwargs)
 
+            if suggestion.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+                if user_services.can_review_translation_suggestions(
+                        self.user_id,
+                        language_code=suggestion.change.language_code):
+                    return handler(self, target_id, suggestion_id, **kwargs)
+            elif suggestion.suggestion_type == (
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+                if user_services.can_review_questions(self.user_id):
+                    return handler(self, target_id, suggestion_id, **kwargs)
+
             return decorator(handler)(self, target_id, suggestion_id, **kwargs)
 
         test_can_accept_suggestion.__wrapped__ = True
         return test_can_accept_suggestion
 
     return generate_decorator_for_handler
+
+
+def can_view_reviewable_suggestions(handler):
+    """Decorator to check whether user can view reviewable suggestions.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now checks
+            if the user can view reviewable suggestions.
+    """
+    def test_can_view_reviewable_suggestions(
+            self, target_type, suggestion_type, **kwargs):
+        """Checks whether the user can view reviewable suggestions.
+
+        Args:
+            target_type: str. The targeted entity type of suggestion.
+            suggestion_type: str. The type of the suggestion.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The given page cannot be found.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+        if suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT):
+            if user_services.can_review_translation_suggestions(self.user_id):
+                return handler(self, target_type, suggestion_type, **kwargs)
+        elif suggestion_type == (
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
+            if user_services.can_review_questions(self.user_id):
+                return handler(self, target_type, suggestion_type, **kwargs)
+        else:
+            raise self.PageNotFoundException
+
+    test_can_view_reviewable_suggestions.__wrapped__ = True
+
+    return test_can_view_reviewable_suggestions
 
 
 def can_edit_entity(handler):

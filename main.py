@@ -191,6 +191,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.ADMIN_URL, admin.AdminPage),
     get_redirect_route(r'/adminhandler', admin.AdminHandler),
     get_redirect_route(r'/adminrolehandler', admin.AdminRoleHandler),
+    get_redirect_route(r'/adminaddreviewerhandler', admin.AddReviewerHandler),
+    get_redirect_route(
+        r'/allcommunityreviewers', admin.CommunityReviewersHandler),
     get_redirect_route(r'/adminjoboutput', admin.AdminJobOutputHandler),
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
@@ -225,6 +228,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/gettranslatabletexthandler',
         community_dashboard.TranslatableTextHandler),
+    get_redirect_route(
+        r'/usercommunityrightsdatahandler',
+        community_dashboard.UserCommunityRightsDataHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),

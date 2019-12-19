@@ -57,7 +57,7 @@ angular.module('oppia').directive('contributionsAndReview', [
           };
           var ctrl = this;
           var username = null;
-          ctrl.isAdmin = false;
+          userCanReviewTranslationSuggestionsInLanguages = [];
           ctrl.userDeatilsLoading = true;
           ctrl.userIsLoggedIn = false;
           ctrl.contributions = {};
@@ -180,6 +180,9 @@ angular.module('oppia').directive('contributionsAndReview', [
             }
           };
 
+          ctrl.canReviewSuggestion = function() {
+            return userCanReviewTranslationSuggestionsInLanguages.length > 0;
+          };
           ctrl.switchToReviewTab = function() {
             if (!ctrl.reviewTabActive) {
               ctrl.reviewTabActive = true;
@@ -191,21 +194,32 @@ angular.module('oppia').directive('contributionsAndReview', [
                   ctrl.contributionSummaries = (
                     getTranslationContributionsSummary());
                   ctrl.contributionsDataLoading = false;
-                });
+                }
+              );
             }
           };
 
+
           UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.isAdmin = userInfo.isAdmin();
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
             ctrl.userDeatilsLoading = false;
             username = userInfo.getUsername();
-            if (ctrl.isAdmin) {
-              ctrl.reviewTabActive = false;
-              ctrl.switchToReviewTab();
-            } else if (ctrl.userIsLoggedIn) {
-              ctrl.reviewTabActive = true;
-              ctrl.switchToContributionsTab();
+            if (ctrl.userIsLoggedIn) {
+              UserService.getUserCommunityRightsData().then(
+                function(UserCommunityRights) {
+                  userCanReviewTranslationSuggestionsInLanguages = (
+                    UserCommunityRights.can_review_translation_in_languages);
+                  if (
+                    userCanReviewTranslationSuggestionsInLanguages.length > 0) {
+                    ctrl.canReviewTranslation = true;
+                    ctrl.reviewTabActive = false;
+                    ctrl.switchToReviewTab();
+                  } else {
+                    canReviewTranslation = false;
+                    ctrl.reviewTabActive = true;
+                    ctrl.switchToContributionsTab();
+                  }
+                });
             }
           });
         }

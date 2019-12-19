@@ -232,7 +232,7 @@ class ReviewableSuggestionsHandler(SuggestionsProviderHandler):
     suggestion type.
     """
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_view_reviewable_suggestions
     def get(self, target_type, suggestion_type):
         """Handles GET requests."""
         try:

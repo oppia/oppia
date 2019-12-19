@@ -633,3 +633,62 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'data': extracted_answers
         }
         self.render_json(response)
+
+
+class AddReviewerHandler(base.BaseHandler):
+    """Handles adding reviewer for community dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        new_reviewer_username = self.payload.get('username')
+        new_reviewer_user_id = (
+            user_services.get_user_id_from_username(new_reviewer_username))
+
+        if new_reviewer_user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % new_reviewer_username)
+
+        user_allowed_to_review = self.payload.get('review')
+
+        if user_allowed_to_review == 'translation':
+            language_code = self.payload.get('language_code')
+            if utils.is_supported_audio_language_code(language_code):
+                user_services.allow_user_review_translation_in_language(
+                    new_reviewer_user_id, language_code)
+            else:
+                raise self.InvalidInputException(
+                    'Invalid language_code: %s' % language_code)
+        elif user_allowed_to_review == 'voiceover':
+            language_code = self.payload.get('language_code')
+            if utils.is_supported_audio_language_code(language_code):
+                user_services.allow_user_review_voiceover_in_language(
+                    new_reviewer_user_id, language_code)
+            else:
+                raise self.InvalidInputException(
+                    'Invalid language_code: %s' % language_code)
+        elif user_allowed_to_review == 'question':
+            user_services.allow_user_review_question(new_reviewer_user_id)
+        else:
+            raise self.InvalidInputException(
+                'Invalid assignment: %s' % user_allowed_to_review)
+
+
+class CommunityReviewersHandler(base.BaseHandler):
+    """Handler to show the existing reviewers."""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        all_reviewers = {
+            'reviewers': [{
+                'username': user_services.get_username(reviewer.id),
+                'can_review_translation_in_languages': (
+                    reviewer.can_review_translation_in_languages),
+                'can_review_voiceover_in_languages': (
+                    reviewer.can_review_voiceover_in_languages),
+                'can_review_questions': reviewer.can_review_questions
+            } for reviewer in user_services.get_all_community_reviewers()]
+        }
+        self.render_json(all_reviewers)

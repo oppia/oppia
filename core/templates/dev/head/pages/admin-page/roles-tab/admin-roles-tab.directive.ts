@@ -18,6 +18,7 @@
 
 require('pages/admin-page/roles-tab/role-graph.directive.ts');
 
+require('domain/utilities/language-util.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
@@ -25,11 +26,13 @@ require('pages/admin-page/services/admin-task-manager.service.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminRolesTab', [
-  '$http', 'AdminDataService', 'AdminTaskManagerService',
-  'UrlInterpolationService', 'ADMIN_ROLE_HANDLER_URL',
+  '$http', 'AdminDataService', 'AdminTaskManagerService', 'LanguageUtilService',
+  'UrlInterpolationService', 'ADMIN_ADD_REVIEWER_HANDLER_URL',
+  'ADMIN_ROLE_HANDLER_URL',
   function(
-      $http, AdminDataService, AdminTaskManagerService,
-      UrlInterpolationService, ADMIN_ROLE_HANDLER_URL) {
+      $http, AdminDataService, AdminTaskManagerService, LanguageUtilService,
+      UrlInterpolationService, ADMIN_ADD_REVIEWER_HANDLER_URL,
+      ADMIN_ROLE_HANDLER_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -48,8 +51,24 @@ angular.module('oppia').directive('adminRolesTab', [
         ctrl.viewFormValues = {};
         ctrl.updateFormValues = {};
         ctrl.viewFormValues.method = 'role';
+        ctrl.communityReviewersDataFetched = false;
 
         ctrl.UPDATABLE_ROLES = {};
+        ctrl.REVIEWABLE_ITEMS = {
+          TRANSLATION: 'translation',
+          VOICEOVER: 'voiceover',
+          QUESTION: 'question'
+        };
+        ctrl.languageCodesAndDescriptions = (
+          LanguageUtilService.getAllVoiceoverLanguageCodes().map(
+            function(languageCode) {
+              return {
+                id: languageCode,
+                description: (
+                  LanguageUtilService.getAudioLanguageDescription(
+                    languageCode))
+              };
+            }));
         ctrl.VIEWABLE_ROLES = {};
         ctrl.topicSummaries = {};
         ctrl.graphData = {};
@@ -140,6 +159,66 @@ angular.module('oppia').directive('adminRolesTab', [
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
+        };
+
+        ctrl.submitAddReviewerForm = function(values) {
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          ctrl.setStatusMessage('Add new reviewer');
+          AdminTaskManagerService.startTask();
+          $http.post(ADMIN_ADD_REVIEWER_HANDLER_URL, {
+            review: values.allowReviewing,
+            username: values.username,
+            language_code: values.languageCode
+          }).then(function() {
+            ctrl.setStatusMessage(
+              'Successfully added ' + values.username + ' as ' +
+              values.allowReviewing + ' reviewer.');
+            ctrl.updateFormValues.username = '';
+            ctrl.updateFormValues.allowReviewing = '';
+            ctrl.updateFormValues.languageCode = '';
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+          AdminTaskManagerService.finishTask();
+        };
+
+        ctrl.getAllCommunityReviewers = function() {
+          $http.get('/allcommunityreviewers').then(function(response) {
+            ctrl.translationReviewers = {};
+            ctrl.voiceoverReviewers = {};
+            ctrl.questionReviewers = [];
+            response.data.reviewers.forEach(function(reviewer) {
+              reviewer.can_review_translation_in_languages.forEach(
+                function(languageCode) {
+                  langauge = LanguageUtilService.getAudioLanguageDescription(
+                    languageCode);
+                  if (ctrl.translationReviewers.hasOwnProperty(langauge)) {
+                    ctrl.translationReviewers.push(reviewer.username);
+                  } else {
+                    ctrl.translationReviewers[langauge] = [reviewer.username];
+                  }
+                });
+
+              reviewer.can_review_voiceover_in_languages.forEach(
+                function(languageCode) {
+                  langauge = LanguageUtilService.getAudioLanguageDescription(
+                    languageCode);
+                  if (ctrl.voiceoverReviewers.hasOwnProperty(langauge)) {
+                    ctrl.voiceoverReviewers.push(reviewer.username);
+                  } else {
+                    ctrl.voiceoverReviewers[langauge] = [reviewer.username];
+                  }
+                });
+
+              if (reviewer.can_review_questions) {
+                ctrl.questionReviewers.push(reviewer.username);
+              }
+              ctrl.communityReviewersDataFetched = true;
+            });
+          });
         };
       }]
     };

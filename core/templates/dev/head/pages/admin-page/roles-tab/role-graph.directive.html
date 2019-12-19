@@ -6,6 +6,25 @@
   .roles-tab .view-results-table {
     margin-top: 20px;
   }
+
+  .oppia-reviewer-details-table td, th {
+    border: 1px solid #ddd;
+    text-align: left;
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .oppia-reviewer-details-table tr:nth-child(even) {
+    background-color: #ccc;
+  }
+
+  .oppia-community-reviewer-table-container {
+    padding-top: 15px;
+  }
+  .oppia-community-reviewer-list {
+    border: 1px solid;
+    padding: 5px;
+  }
 </style>
 
 <div class="container-fluid roles-tab">
@@ -92,6 +111,74 @@
           </div>
           <button type="submit" class="btn btn-success protractor-update-form-submit" ng-disabled="!$ctrl.updateFormValues.newRole || !$ctrl.updateFormValues.username || ($ctrl.updateFormValues.newRole==='TOPIC_MANAGER' && !$ctrl.updateFormValues.topicId)" value="update role">Update Role</button>
         </form>
+      </md-card>
+
+      <md-card class="oppia-page-card oppia-long-text">
+        <form class="form-horizontal" name="$ctrl.updateRoleForm" ng-submit="$ctrl.submitAddReviewerForm($ctrl.updateFormValues)">
+          <legend class="text-center">Add Reviewer For Community</legend>
+          <div class="d-xl-inline-flex form-group">
+            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Enter Username</label>
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <input type="text" placeholder="Enter username" ng-model="$ctrl.updateFormValues.username" class="form-control protractor-update-form-name">
+            </div>
+          </div>
+
+          <div class="d-xl-inline-flex form-group">
+            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Allow reviewing</label>
+            <div class="col-md-8 col-lg-8 col-sm-8 ml-auto">
+              <select ng-options="value as key for (key, value) in $ctrl.REVIEWABLE_ITEMS" ng-model="$ctrl.updateFormValues.allowReviewing" class="form-control protractor-update-form-role-select">
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group"
+               ng-if="$ctrl.updateFormValues.allowReviewing === $ctrl.REVIEWABLE_ITEMS.TRANSLATION || $ctrl.updateFormValues.allowReviewing === $ctrl.REVIEWABLE_ITEMS.VOICEOVER">
+            <label class="col-md-4 col-lg-4 col-sm-4 col-form-label">Select language</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+
+              <select ng-model="$ctrl.updateFormValues.languageCode"
+                      class="form-control protractor-update-form-role-select"
+                      ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
+              </select>
+            </div>
+          </div>
+          <button type="submit"
+                  class="btn btn-success protractor-update-form-submit"
+                  ng-disabled="!($ctrl.updateFormValues.allowReviewing === $ctrl.REVIEWABLE_ITEMS.QUESTION || ($ctrl.updateFormValues.allowReviewing && $ctrl.updateFormValues.languageCode))" value="update role">Add Reviewer
+          </button>
+        </form>
+        <button class="btn btn-link" ng-click="$ctrl.getAllCommunityReviewers()">Show existing reviewers</button>
+        <div class="oppia-community-reviewer-list" ng-if="$ctrl.communityReviewersDataFetched" style="border: 1px solid">
+          <div class="oppia-community-reviewer-table-container" ng-if="$ctrl.translationReviewers">
+            <strong>Translation reviewers:</strong>
+            <table class="oppia-reviewer-details-table">
+              <tr>
+                <th>Language</th>
+                <th>Usernames</th>
+              </tr>
+              <tr ng-repeat="(language, userNames) in $ctrl.translationReviewers">
+                <td><[language]></td>
+                <td><[userNames.toString()]></td>
+              </tr>
+            </table>
+          </div>
+          <div class="oppia-community-reviewer-table-container" ng-if="$ctrl.voiceoverReviewers">
+            <strong>Voiceover reviewers:</strong>
+            <table class="oppia-reviewer-details-table">
+              <tr>
+                <th>Language</th>
+                <th>Usernames</th>
+              </tr>
+              <tr ng-repeat="(language, userNames) in $ctrl.voiceoverReviewers">
+                <td><[language]></td>
+                <td><[userNames.toString()]></td>
+              </tr>
+            </table>
+          </div>
+          <div ng-if="$ctrl.questionReviewers.length > 0">
+            <strong>Question reviewers:</strong> <[$ctrl.questionReviewers.toString()]>
+          </div>
+        </div>
       </md-card>
     </div>
 

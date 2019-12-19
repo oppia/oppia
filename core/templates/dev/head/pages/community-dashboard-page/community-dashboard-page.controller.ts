@@ -68,13 +68,46 @@ angular.module('oppia').directive('communityDashboardPage', [
           var ctrl = this;
           ctrl.profilePictureDataUrl = null;
           ctrl.username = null;
-
+          ctrl.userIsReviewer = false;
+          ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
+          ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
+          ctrl.userCanReviewQuestions = false;
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
             ctrl.profilePictureDataUrl = dataUrl;
           });
 
           UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.username = userInfo.getUsername();
+            if (userInfo.isLoggedIn()) {
+              ctrl.username = userInfo.getUsername();
+              UserService.getUserCommunityRightsData().then(
+                function(userCommunityRights) {
+                  userCommunityRights
+                    .can_review_translation_in_languages.forEach(function(
+                        languageCode) {
+                      ctrl.userCanReviewTranslationSuggestionsInLanguages.push(
+                        LanguageUtilService.getAudioLanguageDescription(
+                          languageCode));
+                    });
+
+                  userCommunityRights
+                    .can_review_voiceover_in_languages.forEach(function(
+                        languageCode) {
+                      ctrl.userCanReviewVoiceoverSuggestionsInLanguages.push(
+                        LanguageUtilService.getAudioLanguageDescription(
+                          languageCode));
+                    });
+
+                  ctrl.userCanReviewQuestions = (
+                    userCommunityRights.can_review_questions);
+
+                  if (
+                    ctrl.userCanReviewTranslationSuggestionsInLanguages ||
+                      ctrl.userCanReviewVoiceoverSuggestionsInLanguages ||
+                      ctrl.userCanReviewQuestions) {
+                    ctrl.userIsReviewer = true;
+                  }
+                });
+            }
           });
 
           var prevSelectedLanguageCode = (

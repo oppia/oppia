@@ -25,6 +25,24 @@
         <span ng-show="!$ctrl.username">Guest</span>
         <span ng-show="$ctrl.username"><[$ctrl.username]></span>
       </div>
+      <div ng-if="$ctrl.userIsReviewer">
+        <strong>Review rights:</strong>
+        <div ng-if="$ctrl.userCanReviewTranslationSuggestionsInLanguages.length > 0">
+          Translation in languages:
+          <span ng-repeat="langaugeCode in $ctrl.userCanReviewTranslationSuggestionsInLanguages">
+            <span class="oppia-review-item-detail-container"><[langaugeCode]></span>
+          </span>
+        </div>
+        <div ng-if="$ctrl.userCanReviewVoiceoverSuggestionsInLanguages.length > 0">
+          Voicoever in languages:
+          <span ng-repeat="langaugeCode in $ctrl.userCanReviewVoiceoverSuggestionsInLanguages">
+            <span class="oppia-review-item-detail-container"><[langaugeCode]></span>
+          </span>
+        </div>
+        <div ng-if="$ctrl.userCanReviewQuestions">
+          Questions: Allowed
+        </div>
+      </div>
     </div>
     <div class="oppia-opportunities-tab-header" ng-if="$ctrl.activeTabName !== 'myContributionTab'">
       <div class="oppia-mascot-avatar-container">
@@ -47,10 +65,10 @@
   <div ng-if="$ctrl.activeTabName === 'myContributionTab' || !$ctrl.activeTabName">
     <contributions-and-review></contributions-and-review>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'questionTab'">
+  <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'">
     <question-opportunities></question-opportunities>
   </div>
-  <div ng-if="$ctrl.activeTabName === 'translationTab'">
+  <div ng-if="$ctrl.activeTabName === 'translateTextTab'">
     <translation-opportunities></translation-opportunities>
   </div>
   <div ng-if="$ctrl.activeTabName === 'voiceoverTab'">
@@ -87,7 +105,8 @@
     font-size: 24px;
     position: absolute;
   }
-  .oppia-contributor-username-container {
+  .oppia-contributor-username-container,
+  .oppia-review-right-details-container {
     color: #009688;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
     font-size: 24px;
@@ -192,5 +211,11 @@
   }
   .oppia-active-opportunities-tab a:hover {
     color: #009688;
+  }
+  .oppia-review-item-detail-container {
+    border-radius: 10%;
+    background-color: #009688;
+    color: #fff;
+    padding: 1px 5px;
   }
 </style>

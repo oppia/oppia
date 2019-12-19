@@ -357,12 +357,21 @@ def get_reviewable_suggestions(user_id, suggestion_type):
         list(Suggestion). A list of suggestions which the given user is allowed
             to review.
     """
-    return ([
+    all_suggestions = ([
         get_suggestion_from_model(s) for s in (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
+    user_reviewable_suggestions = []
+    community_rights = user_services.get_user_community_rights(user_id)
+    if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        language_codes = community_rights.can_review_translation_in_languages
+        for suggestion in all_suggestions:
+            if suggestion.change.language_code in language_codes:
+                user_reviewable_suggestions.append(suggestion)
+        return user_reviewable_suggestions
+    return all_suggestions
 
 
 def get_submitted_suggestions(user_id, suggestion_type):
@@ -423,6 +432,25 @@ def check_user_can_review_in_category(user_id, score_category):
     if score is None:
         return False
     return score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+
+
+def check_user_can_review_in_type(user_id, suggestion_type):
+    """Checks if user can review suggestions in the given suggestion_type.
+
+    Args:
+        user_id: str. The id of the user.
+        suggestion_type: str. The type of the suggestion.
+
+    Returns:
+        bool. Whether the user can review suggestions for the given suggestion
+        type.
+    """
+    if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        return user_services.can_review_translation_suggestions(user_id)
+    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
+        return user_services.can_review_questions(user_id)
+    else:
+        return False
 
 
 def check_if_email_has_been_sent_to_user(user_id, score_category):

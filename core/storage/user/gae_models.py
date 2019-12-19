@@ -1629,3 +1629,37 @@ class UserContributionScoringModel(base_models.BaseModel):
         else:
             model.score += increment_by
             model.put()
+
+
+class UserCommunityRightsModel(base_models.BaseModel):
+    """Model for storing user's rights on community contribution.
+
+    Instances of this class are keyed by the user id.
+    """
+    # User id used to identify user by GAE. Is not required for now because we
+    # need to perform migration to fill this for existing users.
+    gae_id = ndb.StringProperty(required=False, indexed=True)
+    can_review_translation_in_languages = ndb.StringProperty(
+        repeated=True, indexed=True)
+    can_review_voiceover_in_languages = ndb.StringProperty(
+        repeated=True, indexed=True)
+    can_review_questions = ndb.BooleanProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information relevant
+        to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserCommunityRightsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
