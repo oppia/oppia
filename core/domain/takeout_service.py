@@ -59,13 +59,15 @@ def export_data_for_user(user_id):
 
     exported_data = dict()
     for model in all_models:
+        print(model.__name__)
+        if model.get_export_policy() == model.EXPORT_POLICY.NOT_APPLICABLE:
+            continue
         # Split the model name by uppercase characters.
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
         # Join the split name with underscores and add _data for final name.
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
         export_result = model.export_data(user_id)
-        if export_result != None:
-            exported_data[final_name] = model.export_data(user_id)
+        exported_data[final_name] = model.export_data(user_id)
 
     # Combine the data into a single dictionary.
     return exported_data
