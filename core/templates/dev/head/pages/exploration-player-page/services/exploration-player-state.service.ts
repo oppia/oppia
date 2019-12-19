@@ -81,7 +81,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
       StateClassifierMappingService.init(returnDict.state_classifier_mapping);
-      returnDict.version = null;
       StatsReportingService.initSession(
         explorationId, returnDict.exploration.title, returnDict.version,
         returnDict.session_id, UrlService.getCollectionIdFromExplorationUrl());
