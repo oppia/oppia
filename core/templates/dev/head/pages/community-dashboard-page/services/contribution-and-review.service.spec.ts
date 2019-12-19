@@ -102,7 +102,7 @@ describe('ContributionAndReviewService', function() {
       function() {
         $httpBackend.expect(
           'GET', '/getreviewablesuggestions/skill/add_question').respond(
-            200, mockSuggestionsBackendObject);
+          200, mockSuggestionsBackendObject);
 
         ContributionAndReviewService.getReviewableQuestionSuggestions(
           onSuccess).then(function() {
