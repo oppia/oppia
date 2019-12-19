@@ -90,7 +90,7 @@ module.exports = function(config) {
       }
     },
     autoWatch: true,
-    browsers: ['Chrome_Travis'],
+    browsers: ['Chrome_Headless'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
     browserConsoleLogOptions: {
@@ -102,14 +102,14 @@ module.exports = function(config) {
     // Continue running in the background after running tests.
     singleRun: true,
     customLaunchers: {
-      Chrome_Travis: {
+      Chrome_Headless: {
         base: 'ChromeHeadless',
         // Discussion of the necessity of extra flags can be found here:
         // https://github.com/karma-runner/karma-chrome-launcher/issues/154
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
         flags: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox'
+          '--no-first-run',
+          '--no-sandbox'
         ]
       }
     },
