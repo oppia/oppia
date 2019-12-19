@@ -81,6 +81,11 @@ class SentEmailModel(base_models.BaseModel):
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether SentEmailModel exists for user.
@@ -255,10 +260,6 @@ class SentEmailModel(base_models.BaseModel):
 
         return False
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
 
 
 class BulkEmailModel(base_models.BaseModel):
@@ -296,10 +297,10 @@ class BulkEmailModel(base_models.BaseModel):
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -361,6 +362,12 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     def get_deletion_policy():
         """Feedback email reply to id should be deleted."""
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

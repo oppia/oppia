@@ -35,18 +35,18 @@ from google.appengine.ext import ndb
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question snapshot."""
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question snapshot."""
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class QuestionModel(base_models.VersionedModel):
@@ -74,6 +74,11 @@ class QuestionModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Question should be kept but the creator should be anonymized."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -186,11 +191,6 @@ class QuestionModel(base_models.VersionedModel):
         """
         cls.put_multi(questions)
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
-
 
 class QuestionSkillLinkModel(base_models.BaseModel):
     """Model for storing Question-Skill Links.
@@ -212,6 +212,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         anonymized and are not deleted whe user is deleted.
         """
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
@@ -531,11 +536,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         cls.delete_multi(question_skill_links)
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
-
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to questions.
@@ -556,6 +556,11 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _get_instance_id(cls, question_id, question_version):
         """Returns ID of the question commit log entry model.
@@ -569,11 +574,6 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 question version.
         """
         return 'question-%s-%s' % (question_id, question_version)
-
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
 
 
 class QuestionSummaryModel(base_models.BaseModel):
@@ -611,6 +611,11 @@ class QuestionSummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether any existing QuestionSummaryModel refers to the given
@@ -638,27 +643,22 @@ class QuestionSummaryModel(base_models.BaseModel):
         return QuestionSummaryModel.query().filter(
             cls.creator_id == creator_id).fetch()
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
-
 
 class QuestionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a question rights snapshot."""
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class QuestionRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a question rights snapshot."""
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class QuestionRightsModel(base_models.VersionedModel):
@@ -680,6 +680,11 @@ class QuestionRightsModel(base_models.VersionedModel):
         anonymized.
         """
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -704,8 +709,3 @@ class QuestionRightsModel(base_models.VersionedModel):
                     return True
         return (cls.query(cls.creator_id == user_id).get() is not None or
                 cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
-
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None

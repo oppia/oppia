@@ -44,6 +44,11 @@ class ExplorationRecommendationsModel(
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """ExplorationRecommendationsModel doesn't reference any user_id
@@ -57,11 +62,6 @@ class ExplorationRecommendationsModel(
             bool. Whether any models refer to the given user ID.
         """
         return False
-
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
 
 
 class TopicSimilaritiesModel(base_models.BaseModel):
@@ -85,7 +85,7 @@ class TopicSimilaritiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE

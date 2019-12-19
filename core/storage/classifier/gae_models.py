@@ -74,6 +74,11 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         """Classifier training job is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def _generate_id(cls, exp_id):
         """Generates a unique id for the training job of the form
@@ -202,11 +207,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
         cls.put_multi(job_models)
         return job_ids
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
-
 
 class TrainingJobExplorationMappingModel(base_models.BaseModel):
     """Model for mapping exploration attributes to a ClassifierTrainingJob.
@@ -229,6 +229,11 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
     def get_deletion_policy():
         """Training job exploration mapping is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
@@ -330,8 +335,3 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
             mapping_ids.append(instance_id)
         cls.put_multi(mapping_models)
         return mapping_ids
-
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None

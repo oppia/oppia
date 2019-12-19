@@ -29,18 +29,18 @@ from google.appengine.ext import ndb
 
 class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file metadata snapshot commit history."""
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Class for storing the content of the file metadata snapshots."""
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class FileMetadataModel(base_models.VersionedModel):
@@ -59,6 +59,11 @@ class FileMetadataModel(base_models.VersionedModel):
     def get_deletion_policy():
         """File metadata are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_id(cls, entity_name):
@@ -170,18 +175,18 @@ class FileMetadataModel(base_models.VersionedModel):
         super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file snapshot commit history."""
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -192,10 +197,10 @@ class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
     # Overwrite the superclass member to use a BlobProperty for raw strings.
     content = ndb.BlobProperty(indexed=False)
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class FileModel(base_models.VersionedModel):
@@ -215,6 +220,11 @@ class FileModel(base_models.VersionedModel):
     def get_deletion_policy():
         """File is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     def _reconstitute(self, snapshot_blob):
         """Overrides the superclass method. Reconstitutes a FileModel
@@ -335,8 +345,3 @@ class FileModel(base_models.VersionedModel):
         """
         model_id = cls._construct_id(assets_path, filepath)
         return super(FileModel, cls).get_version(model_id, version_number)
-
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None

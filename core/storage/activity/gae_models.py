@@ -39,6 +39,11 @@ class ActivityReferencesModel(base_models.BaseModel):
         """Activity references are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_or_create(cls, list_name):
         """This creates the relevant model instance, if it does not already
@@ -54,8 +59,3 @@ class ActivityReferencesModel(base_models.BaseModel):
             entity.put()
 
         return entity
-
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None

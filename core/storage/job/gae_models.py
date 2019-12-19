@@ -96,6 +96,11 @@ class JobModel(base_models.BaseModel):
         """Job is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @property
     def is_cancelable(self):
         """Checks if the job is cancelable.
@@ -163,11 +168,6 @@ class JobModel(base_models.BaseModel):
         """
         return bool(cls.get_unfinished_jobs(job_type).count(limit=1))
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
-
 
 # Allowed transitions: idle --> running --> stopping --> idle.
 CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE = 'idle'
@@ -212,7 +212,7 @@ class ContinuousComputationModel(base_models.BaseModel):
         """Continuous computation is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
-    @classmethod
-    def export_data(cls, user_id): # pylint: disable=unused-argument
-        """Defines the Takeout export data policy for this model."""
-        return None
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE

@@ -45,6 +45,11 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
+EXPORT_POLICY = utils.create_enum( # pylint: disable=invalid-name
+    'CONTAINS_USER_DATA',
+    'NOT_APPLICABLE'
+)
+
 # Constant used when retrieving big number of models.
 FETCH_BATCH_SIZE = 1000
 
@@ -110,6 +115,16 @@ class BaseModel(ndb.Model):
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def get_export_policy():
+        """This method should be implemented by subclasses.
 
         Raises:
             NotImplementedError: The method is not overwritten in a derived
