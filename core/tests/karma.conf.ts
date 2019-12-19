@@ -107,8 +107,11 @@ module.exports = function(config) {
         // Discussion of the necessity of extra flags can be found here:
         // https://github.com/karma-runner/karma-chrome-launcher/issues/154
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=737678
         flags: [
-          '--no-sandbox'
+          '--no-sandbox',
+          '--headless',
+          '--disable-gpu'
         ]
       }
     },
