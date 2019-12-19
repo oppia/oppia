@@ -111,7 +111,8 @@ module.exports = function(config) {
         flags: [
           '--no-sandbox',
           '--headless',
-          '--disable-gpu'
+          '--disable-gpu',
+          'window-size=1400,2100'
         ]
       }
     },
