@@ -335,10 +335,9 @@
           </md-card>
 
           <div ui-sortable="$ctrl.explorationPlaylistSortableOptions" ng-model="$ctrl.explorationPlaylist">
-            <div class="oppia-learner-playlist-tiles"
-                 ng-repeat="tile in $ctrl.explorationPlaylist track by $index"
+            <div ng-repeat="tile in $ctrl.explorationPlaylist track by $index"
                  ng-mouseenter="showRemoveIcon=true" ng-mouseleave="showRemoveIcon=false"
-                 style="height: 145px; display: block;">
+                 style="display: inline-block; margin-left: 1px;">
               <i class="remove-icon fa fa-times"
                  ng-show="showRemoveIcon"
                  aria-hidden="true"
@@ -347,8 +346,7 @@
                  uib-tooltip="Remove"
                  tooltip-placement="top">
               </i>
-              <exploration-summary-tile style="height: 145px;"
-                                        exploration-id="tile.id"
+              <exploration-summary-tile exploration-id="tile.id"
                                         exploration-title="tile.title"
                                         last-updated-msec="tile.last_updated_msec"
                                         objective="tile.objective"
@@ -358,7 +356,7 @@
                                         thumbnail-icon-url="tile.thumbnail_icon_url"
                                         thumbnail-bg-color="tile.thumbnail_bg_color"
                                         class="protractor-test-exp-summary-tile"
-                                        is-playlist-tile="true">
+                                        >
               </exploration-summary-tile>
             </div>
           </div>
