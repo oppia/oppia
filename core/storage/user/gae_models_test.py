@@ -1716,3 +1716,45 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+
+class UserCommunityRightsModelTests(test_utils.GenericTestBase):
+    """Tests for UserCommunityRightsModel."""
+
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    NONEXISTENT_USER_ID = 'id_3'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserCommunityRightsModelTests, self).setUp()
+
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_1,
+            can_review_translation_in_languages=['hi', 'en'],
+            can_review_voiceover_in_languages=[],
+            can_review_questions=False).put()
+        user_models.UserCommunityRightsModel(
+            id=self.USER_ID_2,
+            can_review_translation_in_languages=['hi', 'en'],
+            can_review_voiceover_in_languages=['hi'],
+            can_review_questions=True).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.UserCommunityRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_1)
+        )
+        self.assertTrue(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.USER_ID_2)
+        )
+        self.assertFalse(
+            user_models.UserCommunityRightsModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )

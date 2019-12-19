@@ -1774,7 +1774,7 @@ def can_review_translation_suggestions(user_id, language_code=None):
         return True if reviewable_language_codes else None
 
 
-def can_review_vocieover_applications(user_id, language_code=None):
+def can_review_voiceover_applications(user_id, language_code=None):
     """Returns whether the user can review voiceover applications in any
     language or in the given language.
 

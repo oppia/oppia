@@ -1632,7 +1632,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
 
 class UserCommunityRightsModel(base_models.BaseModel):
-    """Model for storing user's rights on community contribution.
+    """Model for storing user's rights on community dashboard.
 
     Instances of this class are keyed by the user id.
     """

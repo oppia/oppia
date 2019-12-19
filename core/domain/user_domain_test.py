@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.domain import user_domain
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class UserGlobalPrefsTests(test_utils.GenericTestBase):
@@ -403,3 +404,59 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
         self.assertEqual(user_contribution_scoring.score_category, 'category0')
         self.assertEqual(user_contribution_scoring.score, 5)
         self.assertEqual(user_contribution_scoring.has_email_been_sent, True)
+
+
+class UserCommunityRightsTests(test_utils.GenericTestBase):
+    """Testing UserCommunityRights domain object."""
+
+    def setUp(self):
+        super(UserCommunityRightsTests, self).setUp()
+        self.user_community_rights = user_domain.UserCommunityRights(
+            'user_id', ['hi'], [], True)
+
+    def test_initialization(self):
+        """Testing init method."""
+
+        self.assertEqual(self.user_community_rights.id, 'user_id')
+        self.assertEqual(
+            self.user_community_rights.can_review_translation_in_languages,
+            ['hi'])
+        self.assertEqual(
+            self.user_community_rights.can_review_voiceover_in_languages, [])
+        self.assertEqual(self.user_community_rights.can_review_questions, True)
+
+    def test_can_review_translation_in_languages_incorrect_type_raise_error(
+            self):
+        self.user_community_rights.can_review_translation_in_languages = 5
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_translation_in_languages to be a list'):
+            self.user_community_rights.validate()
+
+    def test_can_review_voiceover_in_languages_incorrect_type_raise_error(self):
+        self.user_community_rights.can_review_voiceover_in_languages = 5
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_voiceover_in_languages to be a list'):
+            self.user_community_rights.validate()
+
+    def test_incorrect_langauge_code_for_voiceover_raise_error(self):
+        self.user_community_rights.can_review_voiceover_in_languages = [
+            'invalid_lang_code']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
+            self.user_community_rights.validate()
+
+    def test_incorrect_langauge_code_for_translation_raise_error(self):
+        self.user_community_rights.can_review_translation_in_languages = [
+            'invalid_lang_code']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
+            self.user_community_rights.validate()
+
+    def test_incorrect_type_for_can_review_questions_raise_error(self):
+        self.user_community_rights.can_review_questions = 5
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_questions to be a boolean value'):
+            self.user_community_rights.validate()

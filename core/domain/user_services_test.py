@@ -1420,3 +1420,68 @@ class UserContributionsTests(test_utils.GenericTestBase):
             migration_bot_contributions_model.created_exploration_ids, [])
         self.assertEqual(
             migration_bot_contributions_model.edited_exploration_ids, [])
+
+
+class UserContributionReviewRightsTests(test_utils.GenericTestBase):
+
+    TRANSLATOR_EMAIL = 'translator@community.org'
+    TRANSLATOR_USERNAME = 'translator'
+
+    VOICE_ARTIST_EMAIL = 'voiceartist@community.org'
+    VOICE_ARTIST_USERNAME = 'voiceartist'
+    def setUp(self):
+        super(UserContributionReviewRightsTests, self).setUp()
+        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+
+    def test_assign_user_review_translation_suggestion_in_language(self):
+        self.assertFalse(
+            user_services.can_review_translation_suggestions(
+                self.translator_id))
+
+        user_services.allow_user_review_translation_in_language(
+            self.translator_id, 'hi')
+
+        self.assertTrue(
+            user_services.can_review_translation_suggestions(
+                self.translator_id, language_code='hi'))
+
+    def test_assign_user_review_voiceover_application_in_language(self):
+        self.assertFalse(
+            user_services.can_review_voiceover_applications(
+                self.voice_artist_id))
+
+        user_services.allow_user_review_voiceover_in_language(
+            self.voice_artist_id, 'hi')
+
+        self.assertTrue(
+            user_services.can_review_voiceover_applications(
+                self.voice_artist_id, language_code='hi'))
+
+    def test_assign_user_review_question_suggestion(self):
+        self.assertFalse(
+            user_services.can_review_questions(self.voice_artist_id))
+
+        user_services.allow_user_review_question(self.voice_artist_id)
+
+        self.assertTrue(
+            user_services.can_review_questions(self.voice_artist_id))
+
+    def test_get_all_community_reviewers(self):
+        self.assertEqual(user_services.get_all_community_reviewers(), [])
+
+        user_services.allow_user_review_voiceover_in_language(
+            self.voice_artist_id, 'hi')
+
+        user_services.allow_user_review_translation_in_language(
+            self.translator_id, 'hi')
+
+        all_reviewers = user_services.get_all_community_reviewers()
+        self.assertEqual(len(all_reviewers), 2)
+
+        self.assertEqual(all_reviewers[0].id, self.voice_artist_id)
+        self.assertEqual(all_reviewers[1].id, self.translator_id)
