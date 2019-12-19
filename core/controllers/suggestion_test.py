@@ -84,7 +84,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 3'].update_content(
             state_domain.SubtitledHtml.from_dict(self.old_content))
-        exp_services.save_exploration_test_helper(self.editor_id, exploration, '', [])
+        exp_services.save_exploration(self.editor_id, exploration, '', [])
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
@@ -973,7 +973,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
+            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -1145,7 +1145,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
+            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(

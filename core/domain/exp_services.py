@@ -460,7 +460,7 @@ def apply_change_list(exploration_id, change_list):
         raise
 
 
-def _save_exploration(committer_id, exploration, commit_message, change_list):
+def save_exploration(committer_id, exploration, commit_message, change_list):
     """Validates an exploration and commits it to persistent storage.
 
     If successful, increments the version number of the incoming exploration
@@ -557,15 +557,11 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         exploration, exp_versions_diff=exp_versions_diff,
         revert_to_version=None)
 
-def save_exploration_test_helper(
-    committer_id, exploration, commit_message, change_list):
-    _save_exploration(committer_id, exploration, commit_message, change_list)
-
 def _create_exploration(
         committer_id, exploration, commit_message, commit_cmds):
     """Ensures that rights for a new exploration are saved first.
 
-    This is because _save_exploration() depends on the rights object being
+    This is because save_exploration() depends on the rights object being
     present to tell it whether to do strict validation or not.
 
     Args:
@@ -849,7 +845,7 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     updated_exploration = apply_change_list(exploration_id, change_list)
-    _save_exploration(
+    save_exploration(
         committer_id, updated_exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)

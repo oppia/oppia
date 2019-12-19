@@ -103,7 +103,7 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
     the state in the older version of the exploration. If there's been a change
     in the state name, we retrieve the old state name and create the mapping
     accordingly.
-    This method is called only from exp_services._save_exploration() method and
+    This method is called only from exp_services.save_exploration() method and
     is never called from exp_services._create_exploration().
     In this method, the current_state_name refers to the name of the state in
     the current version of the exploration whereas the old_state_name refers to
