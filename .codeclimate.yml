@@ -1,0 +1,7 @@
+engines:
+  pylint:
+    enabled: true
+    channel: "beta"
+  eslint:
+    enabled: true
+    channel: "eslint-6"
