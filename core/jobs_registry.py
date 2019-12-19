@@ -240,4 +240,4 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
             if event_type in klass.get_event_types_listened_to():
-                klass.on_incoming_event(event_type,*args, **kwargs)
+                klass.on_incoming_event(event_type, *args, **kwargs)
