@@ -114,6 +114,7 @@
 /scripts/create_topological_sort_of_all_services_test.py @bansalnitish @kevinlee12
 /scripts/docstrings_checker.py @kevinlee12
 /scripts/docstrings_checker_test.py @kevinlee12
+/scripts/fully_covered_files.py @marianazangrossi @kevinlee12
 /scripts/install_chrome_on_travis.py @kevinlee12
 /scripts/install_prerequisites.sh @kevinlee12
 /scripts/install_third_party.py @kevinlee12
