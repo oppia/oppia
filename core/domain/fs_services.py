@@ -18,19 +18,22 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import json
+
 from constants import constants
 from core.domain import fs_domain
 from core.platform import models
+import feconf
+import python_utils
 
 gae_image_services = models.Registry.import_gae_image_services()
 
 
 def save_original_and_compressed_versions_of_image(
-        user_id, filename, entity_type, entity_id, original_image_content):
+        filename, entity_type, entity_id, original_image_content):
     """Saves the three versions of the image file.
 
     Args:
-        user_id: str. The id of the user who wants to upload the image.
         filename: str. The name of the image file.
         entity_type: str. The type of the entity.
         entity_id: str. The id of the entity.
@@ -64,26 +67,79 @@ def save_original_and_compressed_versions_of_image(
     # the same.
     if not fs.isfile(filepath.encode('utf-8')):
         fs.commit(
-            user_id, filepath.encode('utf-8'), original_image_content,
+            filepath.encode('utf-8'), original_image_content,
             mimetype='image/%s' % filetype)
 
     if not fs.isfile(compressed_image_filepath.encode('utf-8')):
         fs.commit(
-            user_id, compressed_image_filepath.encode('utf-8'),
+            compressed_image_filepath.encode('utf-8'),
             compressed_image_content, mimetype='image/%s' % filetype)
 
     if not fs.isfile(micro_image_filepath.encode('utf-8')):
         fs.commit(
-            user_id, micro_image_filepath.encode('utf-8'),
+            micro_image_filepath.encode('utf-8'),
             micro_image_content, mimetype='image/%s' % filetype)
 
 
+def save_classifier_data(exp_id, job_id, classifier_data):
+    """Store classifier model data in a file.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        job_id: str. The id of the classifier training job model.
+        classifier_data: dict. Classifier data to be stored.
+    """
+    filepath = '%s-classifier-data.json' % (job_id)
+    file_system_class = get_entity_file_system_class()
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+    fs.commit(
+        filepath, json.dumps(classifier_data), mimetype='application/json')
+
+
+def read_classifier_data(exp_id, job_id):
+    """Read the classifier data from file.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        job_id: str. The id of the classifier training job model.
+    
+    Returns:
+        dict. The classifier data read from the file.
+    """
+    filepath = '%s-classifier-data.json' % (job_id)
+    file_system_class = get_entity_file_system_class()
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+    if not fs.isfile(filepath):
+        return None
+    classifier_data = fs.get(filepath)
+    return json.loads(classifier_data)
+
+
+def delete_classifier_data(exp_id, job_id):
+    """Delete the classifier data from file.
+
+    Args:
+        exp_id: str. The id of the exploration.
+        job_id: str. The id of the classifier training job model.
+    
+    Returns:
+        dict. The classifier data read from the file.
+    """
+    filepath = '%s-classifier-data.json' % (job_id)
+    file_system_class = get_entity_file_system_class()
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+    fs.delete(filepath)
+
+
 def get_entity_file_system_class():
-    """Returns DatastoreBackedFileSystem class to the client if DEV_MODE is
+    """Returns DiskBackedFileSystem class to the client if DEV_MODE is
     True. Otherwise, returns GcsFileSystem.
 
     Returns:
-        class. The correct file system class (either DatastoreBackedFileSystem
+        class. The correct file system class (either DiskBackedFileSystem
             or GcsFileSystem).
     """
     if constants.DEV_MODE:

@@ -19,8 +19,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
-import shutil
 import os
+import shutil
 
 from constants import constants
 from core.domain import fs_domain
@@ -48,7 +48,7 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
 
     def test_get_and_save(self):
-        self.fs.commit(self.user_id, 'abc.png', 'file_contents')
+        self.fs.commit('abc.png', 'file_contents')
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
     def test_validate_entity_parameters(self):
@@ -68,7 +68,7 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
             fs_domain.DatastoreBackedFileSystem('invalid_name', 'exp_id')
 
     def test_get_raises_error_when_file_size_is_more_than_1_mb(self):
-        self.fs.commit(self.user_id, 'abc.png', 'file_contents')
+        self.fs.commit('abc.png', 'file_contents')
 
         with python_utils.open_file(
             os.path.join(
@@ -78,7 +78,7 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception, 'The maximum allowed file size is 1 MB.'):
-            self.fs.commit(self.user_id, 'large_file.png', raw_bytes)
+            self.fs.commit('large_file.png', raw_bytes)
 
     def test_get_save_raises_error_when_metadata_and_data_are_not_in_sync(self):
         observed_log_messages = []
@@ -87,11 +87,11 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg)
 
         with self.swap(logging, 'error', mock_logging_function):
-            self.fs.commit(self.user_id, 'abc.png', 'file_contents')
+            self.fs.commit('abc.png', 'file_contents')
 
             data = file_models.FileModel.get_model(
                 'exploration/eid', 'assets/abc.png')
-            data.delete(self.user_id, '', True)
+            data.delete(feconf.SYSTEM_COMMITTER_ID, '', True)
 
             with self.assertRaisesRegexp(
                 IOError, r'File abc\.png .* not found'):
@@ -108,22 +108,22 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
 
     def test_delete(self):
         self.assertFalse(self.fs.isfile('abc.png'))
-        self.fs.commit(self.user_id, 'abc.png', 'file_contents')
+        self.fs.commit('abc.png', 'file_contents')
         self.assertTrue(self.fs.isfile('abc.png'))
 
-        self.fs.delete(self.user_id, 'abc.png')
+        self.fs.delete('abc.png')
         self.assertFalse(self.fs.isfile('abc.png'))
         with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
             self.fs.get('abc.png')
 
         # Nothing happens when one tries to delete a file that does not exist.
-        self.fs.delete(self.user_id, 'fake_file.png')
+        self.fs.delete('fake_file.png')
 
     def test_listdir(self):
-        self.fs.commit(self.user_id, 'abc.png', 'file_contents')
-        self.fs.commit(self.user_id, 'abcd.png', 'file_contents_2')
-        self.fs.commit(self.user_id, 'abc/abcd.png', 'file_contents_3')
-        self.fs.commit(self.user_id, 'bcd/bcde.png', 'file_contents_4')
+        self.fs.commit('abc.png', 'file_contents')
+        self.fs.commit('abcd.png', 'file_contents_2')
+        self.fs.commit('abc/abcd.png', 'file_contents_3')
+        self.fs.commit('bcd/bcde.png', 'file_contents_4')
 
         self.assertEqual(self.fs.listdir(''), [
             'abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png'])
@@ -141,13 +141,13 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_versioning(self):
-        self.fs.commit(self.user_id, 'abc.png', 'file_contents')
+        self.fs.commit('abc.png', 'file_contents')
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
         file_stream = self.fs.open('abc.png')
         self.assertEqual(file_stream.version, 1)
         self.assertEqual(file_stream.metadata.size, len('file_contents'))
 
-        self.fs.commit(self.user_id, 'abc.png', 'file_contents_2_abcdefg')
+        self.fs.commit('abc.png', 'file_contents_2_abcdefg')
         self.assertEqual(self.fs.get('abc.png'), 'file_contents_2_abcdefg')
         file_stream = self.fs.open('abc.png')
         self.assertEqual(file_stream.version, 2)
@@ -161,7 +161,7 @@ class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(old_file_stream.metadata.size, len('file_contents'))
 
     def test_independence_of_file_systems(self):
-        self.fs.commit(self.user_id, 'abc.png', 'file_contents')
+        self.fs.commit('abc.png', 'file_contents')
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
         fs2 = fs_domain.AbstractFileSystem(
@@ -179,18 +179,13 @@ class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
         self.USER_EMAIL = 'abc@example.com'
         self.signup(self.USER_EMAIL, 'username')
         self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        os.makedirs(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
         self.fs = fs_domain.AbstractFileSystem(
             fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
         self.image_content = python_utils.convert_to_bytes('image_content')
 
-    def tearDown(self):
-        super(DiskBackedFileSystemUnitTests, self).tearDown()
-        shutil.rmtree(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
-
     def test_get_and_save(self):
-        self.fs.commit(self.user_id, 'abc.png', self.image_content)
+        self.fs.commit('abc.png', self.image_content)
         self.assertEqual(self.fs.get('abc.png'), self.image_content)
 
     def test_validate_entity_parameters(self):
@@ -216,27 +211,27 @@ class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
             'rb', encoding=None) as f:
             raw_bytes = f.read()
 
-        self.fs.commit(self.user_id, 'audio_file.mp3', raw_bytes)
+        self.fs.commit('audio_file.mp3', raw_bytes)
         self.assertEqual(self.fs.get('audio_file.mp3'), raw_bytes)
 
     def test_delete(self):
         self.assertFalse(self.fs.isfile('abc.png'))
-        self.fs.commit(self.user_id, 'abc.png', self.image_content)
+        self.fs.commit('abc.png', self.image_content)
         self.assertTrue(self.fs.isfile('abc.png'))
 
-        self.fs.delete(self.user_id, 'abc.png')
+        self.fs.delete('abc.png')
         self.assertFalse(self.fs.isfile('abc.png'))
         with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
             self.fs.get('abc.png')
 
         # Nothing happens when one tries to delete a file that does not exist.
-        self.fs.delete(self.user_id, 'fake_file.png')
+        self.fs.delete('fake_file.png')
 
     def test_listdir(self):
-        self.fs.commit(self.user_id, 'abc.png', self.image_content)
-        self.fs.commit(self.user_id, 'abcd.png', self.image_content)
-        self.fs.commit(self.user_id, 'abc/abcd.png', self.image_content)
-        self.fs.commit(self.user_id, 'bcd/bcde.png', self.image_content)
+        self.fs.commit('abc.png', self.image_content)
+        self.fs.commit('abcd.png', self.image_content)
+        self.fs.commit('abc/abcd.png', self.image_content)
+        self.fs.commit('bcd/bcde.png', self.image_content)
 
         self.assertEqual(self.fs.listdir(''), [
             'abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png'])
@@ -254,7 +249,7 @@ class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_independence_of_file_systems(self):
-        self.fs.commit(self.user_id, 'abc.png', self.image_content)
+        self.fs.commit('abc.png', self.image_content)
         self.assertEqual(self.fs.get('abc.png'), self.image_content)
 
         fs2 = fs_domain.AbstractFileSystem(
@@ -277,7 +272,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
     def test_get_and_save(self):
         with self.swap(constants, 'DEV_MODE', False):
-            self.fs.commit(self.user_id, 'abc.png', 'file_contents')
+            self.fs.commit('abc.png', 'file_contents')
             self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
     def test_validate_entity_parameters(self):
@@ -297,10 +292,10 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
     def test_delete(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.assertFalse(self.fs.isfile('abc.png'))
-            self.fs.commit(self.user_id, 'abc.png', 'file_contents')
+            self.fs.commit('abc.png', 'file_contents')
             self.assertTrue(self.fs.isfile('abc.png'))
 
-            self.fs.delete(self.user_id, 'abc.png')
+            self.fs.delete('abc.png')
             self.assertFalse(self.fs.isfile('abc.png'))
             with self.assertRaisesRegexp(
                 IOError, r'File abc\.png .* not found'):
@@ -308,14 +303,14 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
 
             with self.assertRaisesRegexp(
                 IOError, 'Image does not exist: fake_file.png'):
-                self.fs.delete(self.user_id, 'fake_file.png')
+                self.fs.delete('fake_file.png')
 
     def test_listdir(self):
         with self.swap(constants, 'DEV_MODE', False):
-            self.fs.commit(self.user_id, 'abc.png', 'file_contents')
-            self.fs.commit(self.user_id, 'abcd.png', 'file_contents_2')
-            self.fs.commit(self.user_id, 'abc/abcd.png', 'file_contents_3')
-            self.fs.commit(self.user_id, 'bcd/bcde.png', 'file_contents_4')
+            self.fs.commit('abc.png', 'file_contents')
+            self.fs.commit('abcd.png', 'file_contents_2')
+            self.fs.commit('abc/abcd.png', 'file_contents_3')
+            self.fs.commit('bcd/bcde.png', 'file_contents_4')
 
             bucket_name = app_identity_services.get_gcs_resource_bucket_name()
             gcs_file_dir = (
@@ -379,8 +374,8 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
                 fs.get(filepath)
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
-                fs.commit(self.user_id, filepath, 'raw_file')
+                fs.commit(filepath, 'raw_file')
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
-                fs.delete(self.user_id, filepath)
+                fs.delete(filepath)
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
                 fs.listdir(filepath)

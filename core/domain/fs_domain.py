@@ -136,16 +136,20 @@ class GeneralFileSystem(python_utils.OBJECT):
         entity_id: str. The ID of the corresponding entity.
     """
 
-    def __init__(self, entity_name, entity_id):
+    def __init__(
+            self, entity_name, entity_id):
         """Constructs a GeneralFileSystem object.
 
         Args:
             entity_name: str. The name of the entity
                 (eg: exploration, topic etc).
             entity_id: str. The ID of the corresponding entity.
+            user_id: str. The ID of the user on behalf of whom the file system
+                manages objects.
         """
         self._validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
+        self._user_id = feconf.SYSTEM_COMMITTER_ID
 
     def _validate_entity_parameters(self, entity_name, entity_id):
         """Checks whether the entity_id and entity_name passed in are valid.
@@ -184,7 +188,7 @@ class DiskBackedFileSystem(GeneralFileSystem):
     hard disk on which the development server is running.
     """
     def __init__(self, entity_name, entity_id):
-        """Constructs a GeneralFileSystem object.
+        """Constructs a DiskBackedFileSystem object.
 
         Args:
             entity_name: str. The name of the entity
@@ -198,23 +202,20 @@ class DiskBackedFileSystem(GeneralFileSystem):
             os.makedirs(assets_dir)
 
     def _get_file_path(self, filepath):
-        """Generate the path where file will be stored in local disk system.
-        """
+        """Generate the path where file will be stored in local disk system."""
         return utils.vfs_construct_path(
             feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path,
             filepath)
 
-    def _save_file(self, user_id, filepath, raw_bytes):
+    def _save_file(self, filepath, raw_bytes):
         """Create or update a file.
 
         Args:
-            user_id: str. The user_id of the user who wants to create or update
-                a file.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in file.
         """
-        file_obj = open(self._get_file_path(filepath), 'wb+')
+        file_obj = python_utils.open_file(self._get_file_path(filepath), 'wb+')
         file_obj.write(raw_bytes)
         file_obj.close()
 
@@ -242,18 +243,16 @@ class DiskBackedFileSystem(GeneralFileSystem):
             logging.error('File %s not found.' % (filepath))
             return None
 
-        file_obj = open(self._get_file_path(filepath))
+        file_obj = python_utils.open_file(self._get_file_path(filepath))
         data = file_obj.read()
         file_obj.close()
 
         return FileStreamWithMetadata(data, None, None)
 
-    def commit(self, user_id, filepath, raw_bytes, unused_mimetype):
+    def commit(self, filepath, raw_bytes, unused_mimetype):
         """Saves a raw bytestring as a file in the database.
 
         Args:
-            user_id: str. The user_id of the user who wants to create or update
-                a file.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in the file.
@@ -262,14 +261,12 @@ class DiskBackedFileSystem(GeneralFileSystem):
         dir_path = utils.vfs_get_directory_path_from_filepath(filepath)
         if dir_path and not os.path.exists(self._get_file_path(dir_path)):
             os.makedirs(self._get_file_path(dir_path))
-        self._save_file(user_id, filepath, raw_bytes)
+        self._save_file(filepath, raw_bytes)
 
-    def delete(self, user_id, filepath):
+    def delete(self, filepath):
         """Marks the current version of a file as deleted.
 
         Args:
-            user_id: str. The user_id of the user who wants to create or update
-                a file.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
@@ -383,12 +380,10 @@ class DatastoreBackedFileSystem(GeneralFileSystem):
             return file_models.FileModel.get_version(
                 self._assets_path, filepath, version)
 
-    def _save_file(self, user_id, filepath, raw_bytes):
+    def _save_file(self, filepath, raw_bytes):
         """Create or update a file.
 
         Args:
-            user_id: str. The user_id of the user who wants to create or update
-                a file.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in file.
@@ -411,8 +406,8 @@ class DatastoreBackedFileSystem(GeneralFileSystem):
                 self._assets_path, filepath)
         data.content = raw_bytes
 
-        data.commit(user_id, CHANGE_LIST_SAVE)
-        metadata.commit(user_id, CHANGE_LIST_SAVE)
+        data.commit(self._user_id, CHANGE_LIST_SAVE)
+        metadata.commit(self._user_id, CHANGE_LIST_SAVE)
 
     def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
         """Gets a file as an unencoded stream of raw bytes.
@@ -449,36 +444,32 @@ class DatastoreBackedFileSystem(GeneralFileSystem):
         else:
             return None
 
-    def commit(self, user_id, filepath, raw_bytes, unused_mimetype):
+    def commit(self, filepath, raw_bytes, unused_mimetype):
         """Saves a raw bytestring as a file in the database.
 
         Args:
-            user_id: str. The user_id of the user who wants to create or update
-                a file.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in the file.
             unused_mimetype: str. Unused argument.
         """
-        self._save_file(user_id, filepath, raw_bytes)
+        self._save_file(filepath, raw_bytes)
 
-    def delete(self, user_id, filepath):
+    def delete(self, filepath):
         """Marks the current version of a file as deleted.
 
         Args:
-            user_id: str. The user_id of the user who wants to create or update
-                a file.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
 
         metadata = self._get_file_metadata(filepath, None)
         if metadata:
-            metadata.delete(user_id, '')
+            metadata.delete(self._user_id, '')
 
         data = self._get_file_data(filepath, None)
         if data:
-            data.delete(user_id, '')
+            data.delete(self._user_id, '')
 
     def isfile(self, filepath):
         """Checks the existence of a file.
@@ -581,9 +572,8 @@ class GcsFileSystem(GeneralFileSystem):
         else:
             return None
 
-    def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
+    def commit(self, filepath, raw_bytes, mimetype):
         """Args:
-            unused_user_id: str. Unused argument.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in the file.
@@ -601,15 +591,10 @@ class GcsFileSystem(GeneralFileSystem):
         gcs_file.write(raw_bytes)
         gcs_file.close()
 
-    def delete(self, user_id, filepath):  # pylint: disable=unused-argument
+    def delete(self, filepath):  # pylint: disable=unused-argument
         """Deletes a file and the metadata associated with it.
 
-        `user_id` argument is unused. It is included so that this method
-        signature matches that of other file systems.
-
         Args:
-            user_id: str. The user_id of the user who wants to create or update
-                a file.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
@@ -744,12 +729,10 @@ class AbstractFileSystem(python_utils.OBJECT):
                 % (filepath, version if version else 'latest'))
         return file_stream.read()
 
-    def commit(self, user_id, filepath, raw_bytes, mimetype=None):
+    def commit(self, filepath, raw_bytes, mimetype=None):
         """Replaces the contents of the file with the given by test string.
 
         Args:
-            user_id: str. The user_id of the user who wants to create or update
-                a file.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
             raw_bytes: str. The content to be stored in the file.
@@ -757,19 +740,17 @@ class AbstractFileSystem(python_utils.OBJECT):
         """
         raw_bytes = python_utils.convert_to_bytes(raw_bytes)
         self._check_filepath(filepath)
-        self._impl.commit(user_id, filepath, raw_bytes, mimetype)
+        self._impl.commit(filepath, raw_bytes, mimetype)
 
-    def delete(self, user_id, filepath):
+    def delete(self, filepath):
         """Deletes a file and the metadata associated with it.
 
         Args:
-            user_id: str. The user_id of the user who wants to create or update
-                a file.
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
         """
         self._check_filepath(filepath)
-        self._impl.delete(user_id, filepath)
+        self._impl.delete(filepath)
 
     def listdir(self, dir_name):
         """Lists all the files in a directory. Similar to os.listdir(...).

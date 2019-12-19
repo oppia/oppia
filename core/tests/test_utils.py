@@ -25,6 +25,7 @@ import inspect
 import itertools
 import json
 import os
+import shutil
 import unittest
 
 from constants import constants
@@ -1902,10 +1903,20 @@ class AppEngineTestBase(TestBase):
 
         self.signup_superadmin_user()
 
+        # Set up local directory for file system. Remove the folder if it
+        # already exists otherwise the makedirs function will cause tests to
+        # fail.
+        if os.path.exists(feconf.DISK_BACKED_FILE_SYSTEM_PATH):
+            shutil.rmtree(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
+        os.makedirs(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
+
     def tearDown(self):
         self.logout()
         self._delete_all_models()
         self.testbed.deactivate()
+
+        # Remove the local directory used for file system.
+        shutil.rmtree(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
 
     def _get_all_queue_names(self):
         """Returns all the queue names.
