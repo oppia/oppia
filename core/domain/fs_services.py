@@ -87,6 +87,6 @@ def get_entity_file_system_class():
             or GcsFileSystem).
     """
     if constants.DEV_MODE:
-        return fs_domain.DatastoreBackedFileSystem
+        return fs_domain.DiskBackedFileSystem
     else:
         return fs_domain.GcsFileSystem

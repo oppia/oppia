@@ -19,6 +19,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
+import os
 
 from core.domain import change_domain
 from core.platform import models
@@ -174,6 +175,148 @@ class GeneralFileSystem(python_utils.OBJECT):
             str. The path.
         """
         return self._assets_path
+
+
+class DiskBackedFileSystem(GeneralFileSystem):
+    """A local disk-backed read-write file system.
+
+    This file system stores all necessary assets of an entity on the local
+    hard disk on which the development server is running.
+    """
+    def __init__(self, entity_name, entity_id):
+        """Constructs a GeneralFileSystem object.
+
+        Args:
+            entity_name: str. The name of the entity
+                (eg: exploration, topic etc).
+            entity_id: str. The ID of the corresponding entity.
+        """
+        super(DiskBackedFileSystem, self).__init__(entity_name, entity_id)
+        assets_dir = utils.vfs_construct_path(
+            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path)
+        if not os.path.exists(os.path.join(assets_dir)):
+            os.makedirs(assets_dir)
+
+    def _get_file_path(self, filepath):
+        """Generate the path where file will be stored in local disk system.
+        """
+        return utils.vfs_construct_path(
+            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path,
+            filepath)
+
+    def _save_file(self, user_id, filepath, raw_bytes):
+        """Create or update a file.
+
+        Args:
+            user_id: str. The user_id of the user who wants to create or update
+                a file.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+            raw_bytes: str. The content to be stored in file.
+        """
+        file_obj = open(self._get_file_path(filepath), 'wb+')
+        file_obj.write(raw_bytes)
+        file_obj.close()
+
+    def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
+        """Gets a file as an unencoded stream of raw bytes.
+
+        If `version` is not supplied, the latest version is retrieved. If the
+        file does not exist, None is returned.
+
+        The 'mode' argument is unused. It is included so that this method
+        signature matches that of other file systems.
+
+        Args:
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+            version: int or None. The version number of the file. None indicates
+                the latest version of the file.
+            mode: str. Unused argument.
+
+        Returns:
+            FileStreamWithMetadata or None. It returns FileStreamWithMetadata
+                domain object if the file exists. Otherwise, it returns None.
+        """
+        if not os.path.exists(self._get_file_path(filepath)):
+            logging.error('File %s not found.' % (filepath))
+            return None
+
+        file_obj = open(self._get_file_path(filepath))
+        data = file_obj.read()
+        file_obj.close()
+
+        return FileStreamWithMetadata(data, None, None)
+
+    def commit(self, user_id, filepath, raw_bytes, unused_mimetype):
+        """Saves a raw bytestring as a file in the database.
+
+        Args:
+            user_id: str. The user_id of the user who wants to create or update
+                a file.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+            raw_bytes: str. The content to be stored in the file.
+            unused_mimetype: str. Unused argument.
+        """
+        dir_path = utils.vfs_get_directory_path_from_filepath(filepath)
+        if dir_path and not os.path.exists(self._get_file_path(dir_path)):
+            os.makedirs(self._get_file_path(dir_path))
+        self._save_file(user_id, filepath, raw_bytes)
+
+    def delete(self, user_id, filepath):
+        """Marks the current version of a file as deleted.
+
+        Args:
+            user_id: str. The user_id of the user who wants to create or update
+                a file.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+        """
+        if self.isfile(filepath):
+            os.remove(self._get_file_path(filepath))
+
+    def isfile(self, filepath):
+        """Checks the existence of a file.
+
+        Args:
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
+
+        Returns:
+            bool. Whether the file exists.
+        """
+        return os.path.isfile(self._get_file_path(filepath))
+
+    def listdir(self, dir_name):
+        """Lists all files in a directory.
+
+        Args:
+            dir_name: str. The directory whose files should be listed. This
+                should not start with '/' or end with '/'.
+
+        Returns:
+            list(str). A lexicographically-sorted list of filenames,
+                each of which is prefixed with dir_name.
+        """
+        prefix = '%s' % utils.vfs_construct_path(
+            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path, dir_name)
+
+        assets_prefix = utils.vfs_construct_path(
+            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path)
+        if not assets_prefix.endswith('/'):
+            assets_prefix += '/'
+
+        entity_files = list({
+            os.path.join(dp, f)
+            for dp, dn, fn in os.walk(prefix) for f in fn})
+
+        # os.walk() returns the directory tree structure containing paths
+        # from oppia root directory and, thus, contain the local file system
+        # path as prefix which should be removed for final result.
+        result = [
+            filename.replace(assets_prefix, '') for filename in entity_files]
+        return sorted(result)
 
 
 class DatastoreBackedFileSystem(GeneralFileSystem):

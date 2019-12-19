@@ -24,6 +24,7 @@ import atexit
 import fileinput
 import os
 import re
+import shutil
 import subprocess
 import time
 
@@ -146,6 +147,14 @@ def main(args=None):
         # Give webpack few seconds to do the initial compilation.
         time.sleep(10)
 
+    # Create local disk directory used for storing files in development mode.
+    disk_backed_file_system_dir = '.local'
+    disk_backed_file_system_path  = os.path.join(
+        '..', disk_backed_file_system_dir)
+    if not parsed_args.prod_env and not os.path.exists(
+            disk_backed_file_system_path):
+        os.mkdir(disk_backed_file_system_path)
+
     python_utils.PRINT('Starting GAE development server')
     background_processes.append(subprocess.Popen(
         'python %s/dev_appserver.py %s %s %s --admin_host 0.0.0.0 --admin_port '
@@ -204,6 +213,9 @@ def main(args=None):
 
     for process in background_processes:
         process.wait()
+
+    if os.path.exists(disk_backed_file_system_path):
+        shutil.rmtree(disk_backed_file_system_path)
 
 
 if __name__ == '__main__':

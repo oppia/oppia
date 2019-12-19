@@ -492,6 +492,24 @@ def vfs_construct_path(base_path, *path_components):
     return path
 
 
+def vfs_get_directory_path_from_filepath(filepath):
+    """Separates the directory from entire filepath.
+
+    Args:
+        filepath: str. The path of the file that ends with a filename.
+
+    Returns:
+        str. The directory path extracted from filepath.
+    """
+    filepath_components = filepath.split('/')[:-1]
+    if len(filepath_components) == 0:
+        return ''
+    elif len(filepath_components) == 1:
+        return filepath_components[0]
+    else:
+        return vfs_construct_path(*filepath_components)
+
+
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc.
 

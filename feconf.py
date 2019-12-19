@@ -49,6 +49,10 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
+# The parent directory which stores files locally on disk.
+DISK_BACKED_FILE_SYSTEM_DIR = '.local'
+DISK_BACKED_FILE_SYSTEM_PATH = os.path.join('.', DISK_BACKED_FILE_SYSTEM_DIR)
+
 # backend_prod_files contain processed JS and HTML files that are served by
 # Jinja, we are moving away from Jinja so this folder might not be needed later
 # (#6964)
