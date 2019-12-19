@@ -136,7 +136,7 @@ export class Question {
       return returnString;
     }
     return false;
-  };
+  }
 
   toBackendDict(isNewQuestion: any): any {
     let questionBackendDict = {
@@ -150,13 +150,13 @@ export class Question {
       questionBackendDict.version = this._version;
     }
     return questionBackendDict;
-  };
+  }
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class QuestionObjectFactory{
+export class QuestionObjectFactory {
   constructor(private logger: LoggerService,
               private StateObjectFactory: StateObjectFactory) {}
 
@@ -167,7 +167,7 @@ export class QuestionObjectFactory{
     return new Question(
       null, this.StateObjectFactory.createDefaultState(null),
       AppConstants.DEFAULT_LANGUAGE_CODE, 1, skillIds);
-  };
+  }
 
   // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
   /* eslint-disable dot-notation */
@@ -180,7 +180,7 @@ export class QuestionObjectFactory{
       questionBackendDict.language_code, questionBackendDict.version,
       questionBackendDict.linked_skill_ids
     );
-  };
+  }
 }
 
 angular.module('oppia').factory(
