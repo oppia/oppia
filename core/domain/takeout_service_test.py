@@ -391,7 +391,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
     def test_export_data_nontrivial(self):
         """Nontrivial test of export_data functionality."""
-        self.maxDiff = None
         self.set_up_non_trivial()
 
         # We set up the feedback_thread_model here so that we can easily
