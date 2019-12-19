@@ -60,7 +60,7 @@ def export_data_for_user(user_id):
     exported_data = dict()
     for model in all_models:
         print(model.__name__)
-        if model.get_export_policy() == model.EXPORT_POLICY.NOT_APPLICABLE:
+        if model.get_export_policy() == base_models.EXPORT_POLICY.NOT_APPLICABLE:
             continue
         # Split the model name by uppercase characters.
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
