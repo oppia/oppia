@@ -52,15 +52,17 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'check_call_is_called': False
         }
         self.print_arr = []
-        def mock_check_call(unused_cmd_tokens,*args,**kwargs):
+        # pylint: disable=unused-argument
+        def mock_check_call(unused_cmd_tokens, *args, **kwargs):
             self.check_function_calls['check_call_is_called'] = True
-            class ret:
+            class Ret(python_utils.OBJECT):
+                """Return object with required attributes."""
                 def __init__(self):
                     self.returncode = 0
                 def communicate(self):
+                    """Return required meathod."""
                     return '', ''
-            return ret()
-        # pylint: disable=unused-argument
+            return Ret()
         def mock_print(msg, end=''):
             self.print_arr.append(msg)
         # pylint: enable=unused-argument
