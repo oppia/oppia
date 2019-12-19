@@ -58,7 +58,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
-        opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
+    opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     question_jobs_one_off.QuestionSummaryModelIndexesOneOffJob,
