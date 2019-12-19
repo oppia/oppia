@@ -83,7 +83,7 @@ describe('ContributionAndReviewService', function() {
   });
 
   describe('getUserCreatedQuestionSuggestions', function() {
-    fit('should return available question suggestions and opportunity details',
+    it('should return available question suggestions and opportunity details',
       function() {
         $httpBackend.expect(
           'GET', '/getsubmittedsuggestions/skill/add_question').respond(
@@ -98,7 +98,7 @@ describe('ContributionAndReviewService', function() {
   });
 
   describe('getReviewableQuestionSuggestions', function() {
-    fit('should return available question suggestions and opportunity details',
+    it('should return available question suggestions and opportunity details',
       function() {
         $httpBackend.expect(
           'GET', '/getreviewablesuggestions/skill/add_question').respond(
