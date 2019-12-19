@@ -110,8 +110,8 @@ angular.module('oppia').config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'AlertsService', 'CsrfTokenService',
-      function($q, $log, AlertsService, CsrfTokenService) {
+      '$exceptionHandler', '$q', '$log', 'AlertsService', 'CsrfTokenService',
+      function($exceptionHandler, $q, $log, AlertsService, CsrfTokenService) {
         return {
           request: function(config) {
             if (config.data) {
@@ -130,6 +130,7 @@ angular.module('oppia').config([
             return config;
           },
           responseError: function(rejection) {
+            var warningMessage = 'Error communicating with server.';
             // A rejection status of -1 seems to indicate (it's hard to find
             // documentation) that the response has not completed,
             // which can occur if the user navigates away from the page
@@ -137,17 +138,15 @@ angular.module('oppia').config([
             // an error.
             if (rejection.status !== -1) {
               $log.error(rejection.data);
-
-              var warningMessage = 'Error communicating with server.';
               if (rejection.data && rejection.data.error) {
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
-              var additionalLoggingInfo = warningMessage +
+            }
+            var additionalLoggingInfo = warningMessage +
               '\n URL: ' + rejection.config.url +
               '\n data: ' + JSON.stringify(rejection.data);
-              throw Error(additionalLoggingInfo);
-            }
+            $exceptionHandler(new Error(additionalLoggingInfo));
             return $q.reject(rejection);
           }
         };
