@@ -22,31 +22,32 @@ import { Injectable } from '@angular/core';
 
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
+import { StoryNode } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 
 export class StoryPlaythrough {
-  nodes;
+  nodes: Array<StoryNode>;
 
-  constructor(nodes) {
+  constructor(nodes: Array<StoryNode>) {
     this.nodes = nodes;
   }
 
-  getInitialNode() {
+  getInitialNode(): StoryNode {
     return this.nodes[0];
   }
 
-  getStoryNodeCount() {
+  getStoryNodeCount(): Number {
     return this.nodes.length;
   }
 
-  getStoryNodes() {
+  getStoryNodes(): Array<StoryNode> {
     return this.nodes;
   }
 
-  hasFinishedStory() {
+  hasFinishedStory(): Boolean {
     return this.nodes.slice(-1)[0].isCompleted();
   }
 
-  getNextPendingNodeId() {
+  getNextPendingNodeId(): String {
     for (var i = 0; i < this.nodes.length; i++) {
       if (!this.nodes[i].isCompleted()) {
         return this.nodes[i].getId();
@@ -54,7 +55,7 @@ export class StoryPlaythrough {
     }
   }
 
-  hasStartedStory() {
+  hasStartedStory(): Boolean {
     return this.nodes[0].isCompleted();
   }
 }

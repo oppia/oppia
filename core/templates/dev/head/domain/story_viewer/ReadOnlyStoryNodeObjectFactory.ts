@@ -21,20 +21,21 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class StoryNode {
-  id;
-  title;
-  destinationNodeIds;
-  prerequisiteSkillIds;
-  acquiredSkillIds;
-  outline;
-  outlineIsFinalized;
-  explorationId;
-  explorationSummary;
-  completed;
+  id: String;
+  title: String;
+  destinationNodeIds: Array<String>;
+  prerequisiteSkillIds: Array<String>;
+  acquiredSkillIds: Array<String>;
+  outline: String;
+  outlineIsFinalized: Boolean;
+  explorationId: String;
+  explorationSummary: Object;
+  completed: Boolean;
 
-  constructor(id, title, destinationNodeIds, prerequisiteSkillIds,
-      acquiredSkillIds, outline, outlineIsFinalized, explorationId,
-      explorationSummary, completed) {
+  constructor(id: String, title: String, destinationNodeIds: Array<String>,
+      prerequisiteSkillIds: Array<String>, acquiredSkillIds: Array<String>,
+      outline: String, outlineIsFinalized: Boolean, explorationId: String,
+      explorationSummary: Object, completed: Boolean) {
     this.id = id;
     this.title = title;
     this.destinationNodeIds = destinationNodeIds;
@@ -47,31 +48,31 @@ export class StoryNode {
     this.completed = completed;
   }
 
-  getId() {
+  getId(): String {
     return this.id;
   }
 
-  getTitle() {
+  getTitle(): String {
     return this.title;
   }
 
-  getExplorationId() {
+  getExplorationId(): String {
     return this.explorationId;
   }
 
-  isCompleted() {
+  isCompleted(): Boolean {
     return this.completed;
   }
 
-  getExplorationSummaryObject() {
+  getExplorationSummaryObject(): Object {
     return this.explorationSummary;
   }
 
-  getOutline() {
+  getOutline(): String {
     return this.outline;
   }
 
-  getOutlineStatus() {
+  getOutlineStatus(): Boolean {
     return this.outlineIsFinalized;
   }
 }
@@ -80,8 +81,6 @@ export class StoryNode {
   providedIn: 'root'
 })
 export class ReadOnlyStoryNodeObjectFactory {
-  constructor() {}
-
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
