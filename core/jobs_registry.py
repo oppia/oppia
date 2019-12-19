@@ -41,8 +41,11 @@ import python_utils
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
+    activity_jobs_one_off.SnapshotMetadataModelsIndexesJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
+    email_jobs_one_off.EmailModelsIndexesOneOffJob,
+    email_jobs_one_off.GeneralFeedbackEmailReplyToIdOneOffJob,
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
@@ -55,9 +58,10 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
-    feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
-    opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
+        opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
+    feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
+    question_jobs_one_off.QuestionSummaryModelIndexesOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     stats_jobs_one_off.PlaythroughAudit,
@@ -225,7 +229,7 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
     """Dispatches events to the relevant ContinuousComputation classes."""
 
     @classmethod
-    def dispatch_event(cls, event_type,*args, **kwargs):
+    def dispatch_event(cls, event_type, *args, **kwargs):
         """Dispatches an incoming event to the ContinuousComputation
         classes which listen to events of that type.
 
