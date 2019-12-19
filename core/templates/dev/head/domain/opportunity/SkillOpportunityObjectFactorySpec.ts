@@ -49,7 +49,7 @@ describe('Skill opportunity object factory', () => {
         skillOpportunityObjectFactory.createFromBackendDict(backendDict));
 
       expect(skillOpportunity.getOpportunityHeading()).toEqual(
-        'A new topic');
+        'A new skill for question');
     });
 
     it('should return a correct opportunity subheading', () => {
@@ -57,7 +57,7 @@ describe('Skill opportunity object factory', () => {
         skillOpportunityObjectFactory.createFromBackendDict(backendDict));
 
       expect(skillOpportunity.getOpportunitySubheading()).toEqual(
-        'A new skill for question');
+        'A new topic');
     });
 
     it('should return a correct content count', () => {
