@@ -154,6 +154,9 @@
     </div>
 
     <div ng-if="isActive(TAB_ID_SOLUTION)" class="translation-state-content protractor-test-solution-text">
+      <span ng-show="!getRequiredHtml(stateSolution.explanation)" class="oppia-placeholder">
+        <[getEmptyContentMessage()]>
+      </span>
       <span>
         <angular-html-bind html-data="getRequiredHtml(stateSolution.explanation)" class="oppia-rte-editor">
         </angular-html-bind>
