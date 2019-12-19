@@ -63,9 +63,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # It is incremented by TTL when a job with status NEW is picked up by VM.
     next_scheduled_check_time = ndb.DateTimeProperty(required=True,
                                                      indexed=True)
-    # The classifier data which will be populated when storing the results of
-    # the job.
-    classifier_data = ndb.JsonProperty(default=None)
     # The schema version for the data that is being classified.
     data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
 
@@ -108,7 +105,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     def create(
             cls, algorithm_id, interaction_id, exp_id, exp_version,
             next_scheduled_check_time, training_data, state_name, status,
-            classifier_data, data_schema_version):
+            data_schema_version):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -124,7 +121,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             state_name: str. The name of the state to which the classifier
                 belongs.
             status: str. The status of the training job.
-            classifier_data: dict|None. The data stored as result of training.
             data_schema_version: int. The schema version for the data.
 
         Returns:
@@ -143,7 +139,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             next_scheduled_check_time=next_scheduled_check_time,
             state_name=state_name, status=status,
             training_data=training_data,
-            classifier_data=classifier_data,
             data_schema_version=data_schema_version
             )
 
@@ -194,7 +189,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 next_scheduled_check_time=job_dict['next_scheduled_check_time'],
                 state_name=job_dict['state_name'], status=job_dict['status'],
                 training_data=job_dict['training_data'],
-                classifier_data=job_dict['classifier_data'],
                 data_schema_version=job_dict['data_schema_version'])
 
             job_models.append(training_job_instance)

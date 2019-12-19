@@ -49,6 +49,6 @@ def get_gcs_resource_bucket_name():
         production mode.
     """
     if constants.DEV_MODE:
-        return None
+        return app_identity.get_default_gcs_bucket_name()
     else:
         return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX

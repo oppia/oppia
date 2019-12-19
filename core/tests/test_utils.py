@@ -25,6 +25,7 @@ import inspect
 import itertools
 import json
 import os
+import shutil
 import unittest
 
 from constants import constants
@@ -33,6 +34,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
