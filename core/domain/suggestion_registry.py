@@ -503,6 +503,10 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.author_id = author_id
         self.final_reviewer_id = final_reviewer_id
         self.change = question_domain.QuestionChange(change)
+        # Update question_state_data_schema_version here instead of surfacing the
+        # version in the frontend.
+        self.change.question_dict['question_state_data_schema_version'] = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
         self.last_updated = last_updated
 

@@ -20,10 +20,8 @@
 require('domain/state/StateObjectFactory.ts');
 
 angular.module('oppia').factory('QuestionObjectFactory', [
-  'StateObjectFactory', 'CURRENT_STATE_SCHEMA_VERSION',
-  'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
-  function(StateObjectFactory, CURRENT_STATE_SCHEMA_VERSION,
-      DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
+  'StateObjectFactory', 'DEFAULT_LANGUAGE_CODE', 'INTERACTION_SPECS',
+  function(StateObjectFactory, DEFAULT_LANGUAGE_CODE, INTERACTION_SPECS) {
     var Question = function(id, stateData, languageCode, version,
         linkedSkillIds) {
       this._id = id;
@@ -151,7 +149,6 @@ angular.module('oppia').factory('QuestionObjectFactory', [
       var questionBackendDict = {
         id: null,
         question_state_data: this._stateData.toBackendDict(),
-        question_state_data_schema_version: CURRENT_STATE_SCHEMA_VERSION,
         language_code: this._languageCode,
         linked_skill_ids: this._linkedSkillIds,
         version: 1,

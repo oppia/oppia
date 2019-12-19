@@ -37,7 +37,9 @@ require('interactions/codemirrorRequires.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
-require('pages/community-dashboard-page/services/add-question.service.ts');
+require(
+  'pages/community-dashboard-page/services/' +
+  'add-question-suggestion.service.ts');
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
@@ -55,12 +57,12 @@ angular.module('oppia').directive('questionOpportunities', [
       'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$uibModal', 'AddQuestionService', 'AlertsService',
+        '$scope', '$uibModal', 'AddQuestionSuggestionService', 'AlertsService',
         'ContributionOpportunitiesService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'QuestionUndoRedoService', 'SkillObjectFactory',
         function(
-            $scope, $uibModal, AddQuestionService, AlertsService,
+            $scope, $uibModal, AddQuestionSuggestionService, AlertsService,
             ContributionOpportunitiesService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionUndoRedoService, SkillObjectFactory) {
@@ -163,7 +165,7 @@ angular.module('oppia').directive('questionOpportunities', [
                         'correspond to a correct answer';
                       return;
                     }
-                    AddQuestionService.addQuestion(
+                    AddQuestionSuggestionService.addSuggestion(
                       $scope.question, $scope.associatedSkill,
                       opportunity.heading);
                     $uibModalInstance.close();

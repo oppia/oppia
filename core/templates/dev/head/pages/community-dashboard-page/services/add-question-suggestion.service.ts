@@ -13,26 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service for adding new questions.
+ * @fileoverview A service for adding new question suggestions.
  */
 
-angular.module('oppia').factory('AddQuestionService', [
+angular.module('oppia').factory('AddQuestionSuggestionService', [
   '$http', function($http) {
     return {
-      addQuestion: function(question, associatedSkill, topicName) {
+      addSuggestion: function(question, associatedSkill, topicName) {
         var url = '/suggestionhandler/';
         var data = {
           suggestion_type: 'add_question',
           target_type: 'skill',
           description: 'Add new question',
-          target_id: associatedSkill._id,
-          target_version_at_submission: associatedSkill._version,
+          target_id: associatedSkill.getId(),
+          target_version_at_submission: associatedSkill.getVersion(),
           assigned_reviewer_id: '',
           final_reviewer_id: '',
           change: {
             cmd: 'create_new_fully_specified_question',
             question_dict: question.toBackendDict(true),
-            skill_id: associatedSkill._id,
+            skill_id: associatedSkill.getId(),
             topic_name: topicName,
           }
         };
