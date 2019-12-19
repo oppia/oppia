@@ -17,7 +17,7 @@
  * expected.
  */
 
- // TODO(#7222): Remove the following block of unnnecessary imports once
+// TODO(#7222): Remove the following block of unnnecessary imports once
 // UserService.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
@@ -71,7 +71,7 @@ describe('ContributionAndReviewService', function() {
     expectedSuggestionDict = {
       suggestion: suggestion1,
       details: opportunityDict1,
-    }
+    };
     suggestionIdToSuggestions = {};
     onSuccess = function(data) {
       suggestionIdToSuggestions = data;
@@ -87,13 +87,13 @@ describe('ContributionAndReviewService', function() {
       function() {
         $httpBackend.expect(
           'GET', '/getsubmittedsuggestions/skill/add_question').respond(
-            200, mockSuggestionsBackendObject);
+          200, mockSuggestionsBackendObject);
 
         ContributionAndReviewService.getUserCreatedQuestionSuggestions(
           onSuccess).then(function() {
-            expect(suggestionIdToSuggestions['suggestion_id_1']).toEqual(
-              expectedSuggestionDict);
-          });
+          expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
+            expectedSuggestionDict);
+        });
       });
   });
 
@@ -106,9 +106,9 @@ describe('ContributionAndReviewService', function() {
 
         ContributionAndReviewService.getReviewableQuestionSuggestions(
           onSuccess).then(function() {
-            expect(suggestionIdToSuggestions['suggestion_id_1']).toEqual(
-              expectedSuggestionDict);
-          });
+          expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
+            expectedSuggestionDict);
+        });
       });
   });
 });
