@@ -16,35 +16,17 @@
  * @fileoverview Unit tests for SuggestionThreadObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// SuggestionThreadObjectFactory.ts is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/suggestion/SuggestionThreadObjectFactory.ts');
+import { SuggestionThreadObjectFactory } from
+  'domain/suggestion/SuggestionThreadObjectFactory';
 
-describe('Suggestion thread object factory', function() {
-  var SuggestionThreadObjectFactory = null;
-  var suggestionThreadBackendDict;
-  var suggestionBackendDict;
+describe('Suggestion thread object factory', () => {
+  let suggestionThreadObjectFactory: SuggestionThreadObjectFactory = null;
+  let suggestionThreadBackendDict;
+  let suggestionBackendDict;
 
-  beforeEach(function() {
-    angular.mock.module('oppia');
-  });
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    SuggestionThreadObjectFactory = $injector.get(
-      'SuggestionThreadObjectFactory');
-  }));
-
-  beforeEach(function() {
+  beforeEach(() => {
     suggestionThreadBackendDict = {
       last_updated: 1000,
       original_author_username: 'author',
@@ -76,13 +58,15 @@ describe('Suggestion thread object factory', function() {
       },
       last_updated: 1000
     };
+
+    suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
   });
 
-  it('should create a new suggestion thread from a backend dict.', function() {
+  it('should create a new suggestion thread from a backend dict.', () => {
     suggestionBackendDict.suggestion_type = 'edit_exploration_state_content';
 
-    var suggestionThread = (
-      SuggestionThreadObjectFactory.createFromBackendDicts(
+    let suggestionThread = (
+      suggestionThreadObjectFactory.createFromBackendDicts(
         suggestionThreadBackendDict, suggestionBackendDict));
 
     expect(suggestionThread.lastUpdated).toEqual(1000);
@@ -93,7 +77,7 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
 
-    var suggestion = suggestionThread.getSuggestion();
+    let suggestion = suggestionThread.getSuggestion();
     expect(suggestion.suggestionId).toEqual('exploration.exp1.thread1');
     expect(suggestion.suggestionType).toEqual(
       'edit_exploration_state_content');
@@ -116,8 +100,8 @@ describe('Suggestion thread object factory', function() {
       'new suggestion content');
   });
 
-  it('should create a new suggestion thread.', function() {
-    var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
+  it('should create a new suggestion thread.', () => {
+    let suggestionThread = suggestionThreadObjectFactory.createFromBackendDicts(
       suggestionThreadBackendDict, suggestionBackendDict);
 
     expect(suggestionThread.lastUpdated).toEqual(1000);
@@ -128,9 +112,9 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
 
-    var suggestion = suggestionThread.getSuggestion();
+    let suggestion = suggestionThread.getSuggestion();
     expect(suggestion).toBeUndefined();
-    suggestionThread.setSuggestionStatus();
+    suggestionThread.setSuggestionStatus(null);
     expect(suggestionThread.isSuggestionHandled()).toEqual(null);
     expect(suggestionThread.getSuggestionStatus()).toEqual(null);
     expect(suggestionThread.getSuggestionStateName()).toEqual(null);
@@ -138,12 +122,12 @@ describe('Suggestion thread object factory', function() {
       null);
   });
 
-  it('should handle message getter and setter.', function() {
-    var suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
+  it('should handle message getter and setter.', () => {
+    let suggestionThread = suggestionThreadObjectFactory.createFromBackendDicts(
       suggestionThreadBackendDict, suggestionBackendDict);
 
     expect(suggestionThread.getMessages().length).toBe(0);
-    var messages = [{
+    let messages = [{
       text: 'message1'
     }, {
       text: 'message2'
