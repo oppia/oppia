@@ -53,13 +53,13 @@ import { CamelCaseToHyphensPipe } from
 import { QuestionObjectFactory } from
   'domain/question/QuestionObjectFactory.ts';
 
-require('domain/question/QuestionObjectFactory.ts');
+// require('domain/question/QuestionObjectFactory.ts');
 
-describe('Question object factory', function() {
-  var QuestionObjectFactory = null;
-  var _sampleQuestion = null;
-  var _sampleQuestionBackendDict = null;
-  var misconceptionObjectFactory = null;
+describe('Question object factory', () => {
+  let QuestionObjectFactory = null;
+  let _sampleQuestion = null;
+  let _sampleQuestionBackendDict = null;
+  let misconceptionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
