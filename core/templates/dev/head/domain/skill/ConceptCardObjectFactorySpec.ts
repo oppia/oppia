@@ -84,5 +84,4 @@ describe('Concept card object factory', () => {
         'Loading review material', 'explanation'));
     expect(conceptCard.getWorkedExamples()).toEqual([]);
   });
-
 });
