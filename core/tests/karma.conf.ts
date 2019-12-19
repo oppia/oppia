@@ -110,9 +110,7 @@ module.exports = function(config) {
         // https://bugs.chromium.org/p/chromium/issues/detail?id=737678
         flags: [
           '--no-sandbox',
-          '--headless',
-          '--disable-gpu',
-          'window-size=1400,2100'
+          '--disable-gpu'
         ]
       }
     },
