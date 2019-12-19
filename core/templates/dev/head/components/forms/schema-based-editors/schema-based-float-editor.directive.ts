@@ -46,72 +46,73 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
         '$scope', '$filter', '$timeout', 'FocusManagerService',
         function($scope, $filter, $timeout, FocusManagerService) {
           var ctrl = this;
-          ctrl.hasLoaded = false;
-          ctrl.isUserCurrentlyTyping = false;
-          ctrl.hasFocusedAtLeastOnce = false;
-
-          ctrl.labelForErrorFocusTarget =
-            FocusManagerService.generateFocusLabel();
-
-          ctrl.validate = function(localValue) {
-            return $filter('isFloat')(localValue) !== undefined;
-          };
-
-          ctrl.onFocus = function() {
-            ctrl.hasFocusedAtLeastOnce = true;
-            if (ctrl.onInputFocus) {
-              ctrl.onInputFocus();
-            }
-          };
-
-          ctrl.onBlur = function() {
+          ctrl.$onInit = function() {
+            ctrl.hasLoaded = false;
             ctrl.isUserCurrentlyTyping = false;
-            if (ctrl.onInputBlur) {
-              ctrl.onInputBlur();
-            }
-          };
+            ctrl.hasFocusedAtLeastOnce = false;
 
-          // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
-          ctrl.getMinValue = function() {
-            for (var i = 0; i < ctrl.validators().length; i++) {
-              if (ctrl.validators()[i].id === 'is_at_least') {
-                return ctrl.validators()[i].min_value;
+            ctrl.labelForErrorFocusTarget =
+              FocusManagerService.generateFocusLabel();
+
+            ctrl.validate = function(localValue) {
+              return $filter('isFloat')(localValue) !== undefined;
+            };
+
+            ctrl.onFocus = function() {
+              ctrl.hasFocusedAtLeastOnce = true;
+              if (ctrl.onInputFocus) {
+                ctrl.onInputFocus();
               }
-            }
-          };
+            };
 
-          ctrl.getMaxValue = function() {
-            for (var i = 0; i < ctrl.validators().length; i++) {
-              if (ctrl.validators()[i].id === 'is_at_most') {
-                return ctrl.validators()[i].max_value;
+            ctrl.onBlur = function() {
+              ctrl.isUserCurrentlyTyping = false;
+              if (ctrl.onInputBlur) {
+                ctrl.onInputBlur();
               }
-            }
-          };
+            };
 
-          ctrl.onKeypress = function(evt) {
-            if (evt.keyCode === 13) {
-              if (
-                Object.keys(ctrl.floatForm.floatValue.$error).length !== 0) {
-                ctrl.isUserCurrentlyTyping = false;
-                FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
+            // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
+            ctrl.getMinValue = function() {
+              for (var i = 0; i < ctrl.validators().length; i++) {
+                if (ctrl.validators()[i].id === 'is_at_least') {
+                  return ctrl.validators()[i].min_value;
+                }
+              }
+            };
+
+            ctrl.getMaxValue = function() {
+              for (var i = 0; i < ctrl.validators().length; i++) {
+                if (ctrl.validators()[i].id === 'is_at_most') {
+                  return ctrl.validators()[i].max_value;
+                }
+              }
+            };
+
+            ctrl.onKeypress = function(evt) {
+              if (evt.keyCode === 13) {
+                if (
+                  Object.keys(ctrl.floatForm.floatValue.$error).length !== 0) {
+                  ctrl.isUserCurrentlyTyping = false;
+                  FocusManagerService.setFocus(ctrl.labelForErrorFocusTarget);
+                } else {
+                  $scope.$emit('submittedSchemaBasedFloatForm');
+                }
               } else {
-                $scope.$emit('submittedSchemaBasedFloatForm');
+                ctrl.isUserCurrentlyTyping = true;
               }
-            } else {
-              ctrl.isUserCurrentlyTyping = true;
+            };
+
+            if (ctrl.localValue === undefined) {
+              ctrl.localValue = 0.0;
             }
+
+            // This prevents the red 'invalid input' warning message from
+            // flashing at the outset.
+            $timeout(function() {
+              ctrl.hasLoaded = true;
+            });
           };
-
-          if (ctrl.localValue === undefined) {
-            ctrl.localValue = 0.0;
-          }
-
-          // This prevents the red 'invalid input' warning message from flashing
-          // at the outset.
-          $timeout(function() {
-            ctrl.hasLoaded = true;
-          });
-        }
-      ]
+        }]
     };
   }]);

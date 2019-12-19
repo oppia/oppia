@@ -66,58 +66,62 @@ angular.module('oppia').directive('communityDashboardPage', [
             COMMUNITY_DASHBOARD_TABS_DETAILS,
             DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
           var ctrl = this;
-          ctrl.profilePictureDataUrl = null;
-          ctrl.username = null;
+          ctrl.$onInit = function() {
+            ctrl.profilePictureDataUrl = null;
+            ctrl.username = null;
 
-          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            ctrl.profilePictureDataUrl = dataUrl;
-          });
+            UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+              ctrl.profilePictureDataUrl = dataUrl;
+            });
 
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.username = userInfo.getUsername();
-          });
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.username = userInfo.getUsername();
+            });
 
-          var prevSelectedLanguageCode = (
-            LocalStorageService.getLastSelectedTranslationLanguageCode());
-          var allAudioLanguageCodes = LanguageUtilService
-            .getAllVoiceoverLanguageCodes();
+            var prevSelectedLanguageCode = (
+              LocalStorageService.getLastSelectedTranslationLanguageCode());
+            var allAudioLanguageCodes = LanguageUtilService
+              .getAllVoiceoverLanguageCodes();
 
-          ctrl.languageCodesAndDescriptions = (
-            allAudioLanguageCodes.map(function(languageCode) {
-              return {
-                id: languageCode,
-                description: (
-                  LanguageUtilService.getAudioLanguageDescription(
-                    languageCode))
-              };
-            }));
-          ctrl.languageCode = (
-            allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
-            prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
+            ctrl.languageCodesAndDescriptions = (
+              allAudioLanguageCodes.map(function(languageCode) {
+                return {
+                  id: languageCode,
+                  description: (
+                    LanguageUtilService.getAudioLanguageDescription(
+                      languageCode))
+                };
+              }));
+            ctrl.languageCode = (
+              allAudioLanguageCodes.indexOf(prevSelectedLanguageCode) !== -1 ?
+              prevSelectedLanguageCode : DEFAULT_OPPORTUNITY_LANGUAGE_CODE);
 
-          TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
-
-          ctrl.onChangeLanguage = function() {
-            TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
-            LocalStorageService.updateLastSelectedTranslationLanguageCode(
+            TranslationLanguageService.setActiveLanguageCode(
               ctrl.languageCode);
-          };
 
-          ctrl.showLanguageSelector = function() {
-            var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
-            return (
-              activeTabDetail.customizationOptions.indexOf('language') !== -1);
-          };
+            ctrl.onChangeLanguage = function() {
+              TranslationLanguageService.setActiveLanguageCode(
+                ctrl.languageCode);
+              LocalStorageService.updateLastSelectedTranslationLanguageCode(
+                ctrl.languageCode);
+            };
 
-          ctrl.activeTabName = 'myContributionTab';
-          ctrl.tabsDetails = COMMUNITY_DASHBOARD_TABS_DETAILS;
-          ctrl.OPPIA_AVATAR_IMAGE_URL = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/avatar/oppia_avatar_100px.svg'));
-          ctrl.onTabClick = function(activeTabName) {
-            ctrl.activeTabName = activeTabName;
+            ctrl.showLanguageSelector = function() {
+              var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
+              return (
+                activeTabDetail.customizationOptions.indexOf(
+                  'language') !== -1);
+            };
+
+            ctrl.activeTabName = 'myContributionTab';
+            ctrl.tabsDetails = COMMUNITY_DASHBOARD_TABS_DETAILS;
+            ctrl.OPPIA_AVATAR_IMAGE_URL = (
+              UrlInterpolationService.getStaticImageUrl(
+                '/avatar/oppia_avatar_100px.svg'));
+            ctrl.onTabClick = function(activeTabName) {
+              ctrl.activeTabName = activeTabName;
+            };
           };
-        }
-      ]
+        }]
     };
   }]);

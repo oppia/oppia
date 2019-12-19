@@ -148,6 +148,9 @@ angular.module('oppia').factory('ExplorationSaveService', [
             };
           }
         ]
+      }).result.then(function() {}, function() {
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       });
     };
 
@@ -302,6 +305,8 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in ExplorationDataService).
           $window.location.reload();
+        }, function() {
+
         });
       },
 

@@ -55,138 +55,140 @@ angular.module('oppia').directive('collectionNodeCreator', [
             SearchExplorationsBackendApiService, SiteAnalyticsService,
             INVALID_NAME_CHARS) {
           var ctrl = this;
-          ctrl.collection = CollectionEditorStateService.getCollection();
-          ctrl.newExplorationId = '';
-          ctrl.newExplorationTitle = '';
-          ctrl.searchQueryHasError = false;
-
-          var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
-
-          /**
-           * Fetches a list of exploration metadata dicts from backend, given
-           * a search query. It then extracts the title and id of the
-           * exploration to prepare typeahead options.
-           */
-          ctrl.fetchTypeaheadResults = function(searchQuery) {
-            if (isValidSearchQuery(searchQuery)) {
-              ctrl.searchQueryHasError = false;
-              return SearchExplorationsBackendApiService.fetchExplorations(
-                searchQuery
-              ).then(function(explorationMetadataBackendDict) {
-                var options = [];
-                explorationMetadataBackendDict.collection_node_metadata_list.
-                  map(function(item) {
-                    if (!ctrl.collection.containsCollectionNode(item.id)) {
-                      options.push(item.title + ' (' + item.id + ')');
-                    }
-                  });
-                return options;
-              }, function() {
-                AlertsService.addWarning(
-                  'There was an error when searching for matching ' +
-                  'explorations.');
-              });
-            } else {
-              ctrl.searchQueryHasError = true;
-            }
-          };
-
-          var isValidSearchQuery = function(searchQuery) {
-            // Allow underscores because they are allowed in exploration IDs.
-            var INVALID_SEARCH_CHARS = (
-              INVALID_NAME_CHARS.filter(function(item) {
-                return item !== '_';
-              }));
-            for (var i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
-              if (searchQuery.indexOf(INVALID_SEARCH_CHARS[i]) !== -1) {
-                return false;
-              }
-            }
-            return true;
-          };
-
-          var addExplorationToCollection = function(newExplorationId) {
-            if (!newExplorationId) {
-              AlertsService.addWarning('Cannot add an empty exploration ID.');
-              return;
-            }
-            if (ctrl.collection.containsCollectionNode(newExplorationId)) {
-              AlertsService.addWarning(
-                'There is already an exploration in this collection ' +
-                'with that id.');
-              return;
-            }
-
-            ExplorationSummaryBackendApiService
-              .loadPublicAndPrivateExplorationSummaries([newExplorationId])
-              .then(function(summaries) {
-                var summaryBackendObject = null;
-                if (summaries.length !== 0 &&
-                    summaries[0].id === newExplorationId) {
-                  summaryBackendObject = summaries[0];
-                }
-                if (summaryBackendObject) {
-                  CollectionLinearizerService.appendCollectionNode(
-                    ctrl.collection, newExplorationId, summaryBackendObject);
-                } else {
-                  AlertsService.addWarning(
-                    'That exploration does not exist or you do not have edit ' +
-                    'access to it.');
-                }
-              }, function() {
-                AlertsService.addWarning(
-                  'There was an error while adding an exploration to the ' +
-                  'collection.');
-              });
-          };
-
-          var convertTypeaheadToExplorationId = function(typeaheadOption) {
-            var matchResults = typeaheadOption.match(/\((.*?)\)$/);
-            if (matchResults === null) {
-              return typeaheadOption;
-            }
-            return matchResults[1];
-          };
-
-          // Creates a new exploration, then adds it to the collection.
-          ctrl.createNewExploration = function() {
-            var title = $filter('normalizeWhitespace')(
-              ctrl.newExplorationTitle);
-
-            if (!ValidatorsService.isValidExplorationTitle(title, true)) {
-              return;
-            }
-
-            // Create a new exploration with the given title.
-            $http.post('/contributehandler/create_new', {
-              title: title
-            }).then(function(response) {
-              ctrl.newExplorationTitle = '';
-              var newExplorationId = response.data.explorationId;
-
-              SiteAnalyticsService
-                .registerCreateNewExplorationInCollectionEvent(
-                  newExplorationId);
-              addExplorationToCollection(newExplorationId);
-            });
-          };
-
-          // Checks whether the user has left a '#' at the end of their ID
-          // by accident (which can happen if it's being copy/pasted from the
-          // editor page.
-          ctrl.isMalformedId = function(typedExplorationId) {
-            return (
-              typedExplorationId &&
-              typedExplorationId.lastIndexOf('#') ===
-              typedExplorationId.length - 1);
-          };
-
-          ctrl.addExploration = function() {
-            addExplorationToCollection(convertTypeaheadToExplorationId(
-              ctrl.newExplorationId));
+          ctrl.$onInit = function() {
+            ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.newExplorationId = '';
+            ctrl.newExplorationTitle = '';
+            ctrl.searchQueryHasError = false;
+
+            var CREATE_NEW_EXPLORATION_URL_TEMPLATE =
+            '/create/<exploration_id>';
+
+            /**
+             * Fetches a list of exploration metadata dicts from backend, given
+             * a search query. It then extracts the title and id of the
+             * exploration to prepare typeahead options.
+             */
+            ctrl.fetchTypeaheadResults = function(searchQuery) {
+              if (isValidSearchQuery(searchQuery)) {
+                ctrl.searchQueryHasError = false;
+                return SearchExplorationsBackendApiService.fetchExplorations(
+                  searchQuery
+                ).then(function(explorationMetadataBackendDict) {
+                  var options = [];
+                  explorationMetadataBackendDict.collection_node_metadata_list.
+                    map(function(item) {
+                      if (!ctrl.collection.containsCollectionNode(item.id)) {
+                        options.push(item.title + ' (' + item.id + ')');
+                      }
+                    });
+                  return options;
+                }, function() {
+                  AlertsService.addWarning(
+                    'There was an error when searching for matching ' +
+                    'explorations.');
+                });
+              } else {
+                ctrl.searchQueryHasError = true;
+              }
+            };
+
+            var isValidSearchQuery = function(searchQuery) {
+              // Allow underscores because they are allowed in exploration IDs.
+              var INVALID_SEARCH_CHARS = (
+                INVALID_NAME_CHARS.filter(function(item) {
+                  return item !== '_';
+                }));
+              for (var i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
+                if (searchQuery.indexOf(INVALID_SEARCH_CHARS[i]) !== -1) {
+                  return false;
+                }
+              }
+              return true;
+            };
+
+            var addExplorationToCollection = function(newExplorationId) {
+              if (!newExplorationId) {
+                AlertsService.addWarning('Cannot add an empty exploration ID.');
+                return;
+              }
+              if (ctrl.collection.containsCollectionNode(newExplorationId)) {
+                AlertsService.addWarning(
+                  'There is already an exploration in this collection ' +
+                  'with that id.');
+                return;
+              }
+
+              ExplorationSummaryBackendApiService
+                .loadPublicAndPrivateExplorationSummaries([newExplorationId])
+                .then(function(summaries) {
+                  var summaryBackendObject = null;
+                  if (summaries.length !== 0 &&
+                      summaries[0].id === newExplorationId) {
+                    summaryBackendObject = summaries[0];
+                  }
+                  if (summaryBackendObject) {
+                    CollectionLinearizerService.appendCollectionNode(
+                      ctrl.collection, newExplorationId, summaryBackendObject);
+                  } else {
+                    AlertsService.addWarning(
+                      'That exploration does not exist or you do not have' +
+                      'edit access to it.');
+                  }
+                }, function() {
+                  AlertsService.addWarning(
+                    'There was an error while adding an exploration to the ' +
+                    'collection.');
+                });
+            };
+
+            var convertTypeaheadToExplorationId = function(typeaheadOption) {
+              var matchResults = typeaheadOption.match(/\((.*?)\)$/);
+              if (matchResults === null) {
+                return typeaheadOption;
+              }
+              return matchResults[1];
+            };
+
+            // Creates a new exploration, then adds it to the collection.
+            ctrl.createNewExploration = function() {
+              var title = $filter('normalizeWhitespace')(
+                ctrl.newExplorationTitle);
+
+              if (!ValidatorsService.isValidExplorationTitle(title, true)) {
+                return;
+              }
+
+              // Create a new exploration with the given title.
+              $http.post('/contributehandler/create_new', {
+                title: title
+              }).then(function(response) {
+                ctrl.newExplorationTitle = '';
+                var newExplorationId = response.data.explorationId;
+
+                SiteAnalyticsService
+                  .registerCreateNewExplorationInCollectionEvent(
+                    newExplorationId);
+                addExplorationToCollection(newExplorationId);
+              });
+            };
+
+            // Checks whether the user has left a '#' at the end of their ID
+            // by accident (which can happen if it's being copy/pasted from the
+            // editor page.
+            ctrl.isMalformedId = function(typedExplorationId) {
+              return (
+                typedExplorationId &&
+                typedExplorationId.lastIndexOf('#') ===
+                typedExplorationId.length - 1);
+            };
+
+            ctrl.addExploration = function() {
+              addExplorationToCollection(convertTypeaheadToExplorationId(
+                ctrl.newExplorationId));
+              ctrl.newExplorationId = '';
+            };
           };
-        }
-      ]
+        }]
     };
   }]);

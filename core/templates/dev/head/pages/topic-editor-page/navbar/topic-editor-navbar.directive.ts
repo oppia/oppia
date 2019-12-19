@@ -92,6 +92,9 @@ angular.module('oppia').directive('topicEditorNavbar', [
                   AlertsService.addSuccessMessage(
                     successToast, 1000);
                 });
+              }, function() {
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
               return;
             }

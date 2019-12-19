@@ -37,12 +37,13 @@ angular.module('oppia').directive('oppiaResponseImageClickInput', [
         '$attrs', 'HtmlEscaperService',
         function($attrs, HtmlEscaperService) {
           var ctrl = this;
-          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          ctrl.clickRegionLabel = '(Clicks on ' + (
-            _answer.clickedRegions.length > 0 ?
-              '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
-        }
-      ]
+          ctrl.$onInit = function() {
+            var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+            ctrl.clickRegionLabel = '(Clicks on ' + (
+              _answer.clickedRegions.length > 0 ?
+                '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+          };
+        }]
     };
   }
 ]);

@@ -142,6 +142,9 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.subtopicPage, subtopic.getId(), subtitledHtml);
                 TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
               }
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -244,6 +247,9 @@ angular.module('oppia').directive('subtopicsListTab', [
               TopicEditorStateService.setSubtopicPage(subtopicPage);
               TopicUpdateService.addSubtopic($scope.topic, title);
               _initEditor();
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

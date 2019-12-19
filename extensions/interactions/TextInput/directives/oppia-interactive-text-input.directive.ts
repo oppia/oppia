@@ -46,44 +46,45 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
             $attrs, FocusManagerService, TextInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
-            $attrs.placeholderWithValue);
-          ctrl.rows = (
-            HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue));
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          ctrl.$onInit = function() {
+            ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
+              $attrs.placeholderWithValue);
+            ctrl.rows = (
+              HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue));
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          ctrl.schema = {
-            type: 'unicode',
-            ui_config: {}
-          };
-          if (ctrl.placeholder) {
-            ctrl.schema.ui_config.placeholder = ctrl.placeholder;
-          }
-          if (ctrl.rows && ctrl.rows !== 1) {
-            ctrl.schema.ui_config.rows = ctrl.rows;
-          }
-
-          ctrl.submitAnswer = function(answer) {
-            if (!answer) {
-              return;
+            ctrl.schema = {
+              type: 'unicode',
+              ui_config: {}
+            };
+            if (ctrl.placeholder) {
+              ctrl.schema.ui_config.placeholder = ctrl.placeholder;
+            }
+            if (ctrl.rows && ctrl.rows !== 1) {
+              ctrl.schema.ui_config.rows = ctrl.rows;
             }
 
-            CurrentInteractionService.onSubmit(answer, TextInputRulesService);
-          };
+            ctrl.submitAnswer = function(answer) {
+              if (!answer) {
+                return;
+              }
 
-          var submitAnswerFn = function() {
-            ctrl.submitAnswer(ctrl.answer);
-          };
+              CurrentInteractionService.onSubmit(answer, TextInputRulesService);
+            };
 
-          var validityCheckFn = function() {
-            return ctrl.answer.length > 0;
-          };
+            var submitAnswerFn = function() {
+              ctrl.submitAnswer(ctrl.answer);
+            };
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, validityCheckFn);
-        }
-      ]
+            var validityCheckFn = function() {
+              return ctrl.answer.length > 0;
+            };
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, validityCheckFn);
+          };
+        }]
     };
   }
 ]);

@@ -49,118 +49,119 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
             FractionObjectFactory, FRACTION_PARSING_ERRORS,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          ctrl.$onInit = function() {
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          var requireSimplestForm = (
-            $attrs.requireSimplestFormWithValue === 'true');
-          var allowImproperFraction = (
-            $attrs.allowImproperFractionWithValue === 'true');
-          ctrl.allowNonzeroIntegerPart = (
-            $attrs.allowNonzeroIntegerPartWithValue === 'true');
-          ctrl.customPlaceholder = HtmlEscaperService.escapedJsonToObj(
-            $attrs.customPlaceholderWithValue);
+            var requireSimplestForm = (
+              $attrs.requireSimplestFormWithValue === 'true');
+            var allowImproperFraction = (
+              $attrs.allowImproperFractionWithValue === 'true');
+            ctrl.allowNonzeroIntegerPart = (
+              $attrs.allowNonzeroIntegerPartWithValue === 'true');
+            ctrl.customPlaceholder = HtmlEscaperService.escapedJsonToObj(
+              $attrs.customPlaceholderWithValue);
 
-          var errorMessage = '';
-          // Label for errors caused whilst parsing a fraction.
-          var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
-          ctrl.FRACTION_INPUT_FORM_SCHEMA = {
-            type: 'unicode',
-            ui_config: {}
-          };
+            var errorMessage = '';
+            // Label for errors caused whilst parsing a fraction.
+            var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
+            ctrl.FRACTION_INPUT_FORM_SCHEMA = {
+              type: 'unicode',
+              ui_config: {}
+            };
 
-          ctrl.getWarningText = function() {
-            return errorMessage;
-          };
+            ctrl.getWarningText = function() {
+              return errorMessage;
+            };
 
-          /**
-           * Disables the input box if the data entered is not a valid prefix
-           * for a fraction.
-           * Examples of valid prefixes:
-           * -- 1
-           * -- 1 2
-           * -- 1 2/
-           * -- 2/
-           * -- 1 2/3
-           */
-          $scope.$watch('$ctrl.answer', function(newValue) {
-            var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
-            // Accepts incomplete fraction inputs
-            // (see examples above except last).
-            var PARTIAL_FRACTION_REGEX =
-              /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
-            // Accepts complete fraction inputs.
-            var FRACTION_REGEX =
-              /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
-            if (INVALID_CHARS_REGEX.test(newValue)) {
-              errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS;
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            } else if (!(FRACTION_REGEX.test(newValue) ||
-                PARTIAL_FRACTION_REGEX.test(newValue))) {
-              errorMessage = FRACTION_PARSING_ERRORS.INVALID_FORMAT;
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            } else {
-              errorMessage = '';
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, true);
-            }
-          });
-
-          ctrl.submitAnswer = function(answer) {
-            try {
-              var fraction = FractionObjectFactory.fromRawInputString(
-                answer);
-              if (requireSimplestForm &&
-                !angular.equals(fraction, fraction.convertToSimplestForm())
-              ) {
-                errorMessage = (
-                  'Please enter an answer in simplest form ' +
-                  '(e.g., 1/3 instead of 2/6).');
+            /**
+             * Disables the input box if the data entered is not a valid prefix
+             * for a fraction.
+             * Examples of valid prefixes:
+             * -- 1
+             * -- 1 2
+             * -- 1 2/
+             * -- 2/
+             * -- 1 2/3
+             */
+            $scope.$watch('$ctrl.answer', function(newValue) {
+              var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
+              // Accepts incomplete fraction inputs
+              // (see examples above except last).
+              var PARTIAL_FRACTION_REGEX =
+                /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
+              // Accepts complete fraction inputs.
+              var FRACTION_REGEX =
+                /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
+              if (INVALID_CHARS_REGEX.test(newValue)) {
+                errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS;
                 ctrl.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
-              } else if (
-                !allowImproperFraction && fraction.isImproperFraction()) {
-                errorMessage = (
-                  'Please enter an answer with a "proper" fractional part ' +
-                  '(e.g., 1 2/3 instead of 5/3).');
-                ctrl.FractionInputForm.answer.$setValidity(
-                  FORM_ERROR_TYPE, false);
-              } else if (
-                !ctrl.allowNonzeroIntegerPart &&
-                  fraction.hasNonzeroIntegerPart()) {
-                errorMessage = (
-                  'Please enter your answer as a fraction (e.g., 5/3 instead ' +
-                  'of 1 2/3).');
+              } else if (!(FRACTION_REGEX.test(newValue) ||
+                  PARTIAL_FRACTION_REGEX.test(newValue))) {
+                errorMessage = FRACTION_PARSING_ERRORS.INVALID_FORMAT;
                 ctrl.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else {
-                CurrentInteractionService.onSubmit(
-                  fraction, FractionInputRulesService);
+                errorMessage = '';
+                ctrl.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, true);
               }
-            } catch (parsingError) {
-              errorMessage = parsingError.message;
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            }
-          };
+            });
 
-          ctrl.isAnswerValid = function() {
-            if (ctrl.FractionInputForm === undefined) {
-              return false;
-            }
-            return (!ctrl.FractionInputForm.$invalid && ctrl.answer !== '');
-          };
+            ctrl.submitAnswer = function(answer) {
+              try {
+                var fraction = FractionObjectFactory.fromRawInputString(
+                  answer);
+                if (requireSimplestForm &&
+                  !angular.equals(fraction, fraction.convertToSimplestForm())
+                ) {
+                  errorMessage = (
+                    'Please enter an answer in simplest form ' +
+                    '(e.g., 1/3 instead of 2/6).');
+                  ctrl.FractionInputForm.answer.$setValidity(
+                    FORM_ERROR_TYPE, false);
+                } else if (
+                  !allowImproperFraction && fraction.isImproperFraction()) {
+                  errorMessage = (
+                    'Please enter an answer with a "proper" fractional part ' +
+                    '(e.g., 1 2/3 instead of 5/3).');
+                  ctrl.FractionInputForm.answer.$setValidity(
+                    FORM_ERROR_TYPE, false);
+                } else if (
+                  !ctrl.allowNonzeroIntegerPart &&
+                    fraction.hasNonzeroIntegerPart()) {
+                  errorMessage = (
+                    'Please enter your answer as a fraction (e.g., 5/3 ' +
+                    'instead of 1 2/3).');
+                  ctrl.FractionInputForm.answer.$setValidity(
+                    FORM_ERROR_TYPE, false);
+                } else {
+                  CurrentInteractionService.onSubmit(
+                    fraction, FractionInputRulesService);
+                }
+              } catch (parsingError) {
+                errorMessage = parsingError.message;
+                ctrl.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              }
+            };
 
-          var submitAnswerFn = function() {
-            ctrl.submitAnswer(ctrl.answer);
-          };
+            ctrl.isAnswerValid = function() {
+              if (ctrl.FractionInputForm === undefined) {
+                return false;
+              }
+              return (!ctrl.FractionInputForm.$invalid && ctrl.answer !== '');
+            };
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, ctrl.isAnswerValid);
-        }
-      ]
+            var submitAnswerFn = function() {
+              ctrl.submitAnswer(ctrl.answer);
+            };
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, ctrl.isAnswerValid);
+          };
+        }]
     };
   }
 ]);

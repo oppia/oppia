@@ -30,30 +30,32 @@ angular.module('oppia').directive('numberWithUnitsEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        var errorMessage = '';
-        var numberWithUnitsString = '';
-        if (ctrl.value !== null) {
-          var defaultNumberWithUnits =
-            NumberWithUnitsObjectFactory.fromDict(ctrl.value);
-          numberWithUnitsString = defaultNumberWithUnits.toString();
-        }
-        ctrl.localValue = {
-          label: numberWithUnitsString
-        };
-
-        $scope.$watch('$ctrl.localValue.label', function(newValue) {
-          try {
-            var numberWithUnits =
-              NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-            ctrl.value = numberWithUnits;
-            errorMessage = '';
-          } catch (parsingError) {
-            errorMessage = parsingError.message;
+        ctrl.$onInit = function() {
+          var errorMessage = '';
+          var numberWithUnitsString = '';
+          if (ctrl.value !== null) {
+            var defaultNumberWithUnits =
+              NumberWithUnitsObjectFactory.fromDict(ctrl.value);
+            numberWithUnitsString = defaultNumberWithUnits.toString();
           }
-        });
+          ctrl.localValue = {
+            label: numberWithUnitsString
+          };
 
-        ctrl.getWarningText = function() {
-          return errorMessage;
+          $scope.$watch('$ctrl.localValue.label', function(newValue) {
+            try {
+              var numberWithUnits =
+                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+              ctrl.value = numberWithUnits;
+              errorMessage = '';
+            } catch (parsingError) {
+              errorMessage = parsingError.message;
+            }
+          });
+
+          ctrl.getWarningText = function() {
+            return errorMessage;
+          };
         };
       }]
     };

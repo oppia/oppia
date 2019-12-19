@@ -64,21 +64,22 @@ angular.module('oppia').directive('solutionEditor', [
         'StateSolutionService',
         function(StateSolutionService) {
           var ctrl = this;
-          ctrl.StateSolutionService = StateSolutionService;
+          ctrl.$onInit = function() {
+            ctrl.StateSolutionService = StateSolutionService;
 
-          ctrl.EXPLANATION_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
+            ctrl.EXPLANATION_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
 
-          ctrl.getAnswerHtml = function() {
-            return ExplorationHtmlFormatterService.getAnswerHtml(
-              StateSolutionService.savedMemento.correctAnswer,
-              StateInteractionIdService.savedMemento,
-              StateCustomizationArgsService.savedMemento);
+            ctrl.getAnswerHtml = function() {
+              return ExplorationHtmlFormatterService.getAnswerHtml(
+                StateSolutionService.savedMemento.correctAnswer,
+                StateInteractionIdService.savedMemento,
+                StateCustomizationArgsService.savedMemento);
+            };
           };
-        }
-      ]
+        }]
     };
   }
 ]);

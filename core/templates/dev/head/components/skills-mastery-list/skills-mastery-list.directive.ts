@@ -40,67 +40,71 @@ angular.module('oppia').directive('skillsMasteryList', [
             $scope, $uibModal, UserService,
             MASTERY_CUTOFF, MASTERY_COLORS) {
           var ctrl = this;
-          ctrl.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          });
-          ctrl.sortedSkillIds = [];
-
-          var degreesOfMastery = ctrl.getDegreesOfMastery();
-          ctrl.skillIdsAndMastery =
-            Object.keys(degreesOfMastery).map(function(skillId) {
-              return {
-                skillId: skillId,
-                mastery: degreesOfMastery[skillId]
-              };
+          ctrl.$onInit = function() {
+            ctrl.userIsLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
             });
+            ctrl.sortedSkillIds = [];
 
-          ctrl.getMasteryPercentage = function(degreeOfMastery) {
-            return Math.round(degreeOfMastery * 100);
-          };
+            var degreesOfMastery = ctrl.getDegreesOfMastery();
+            ctrl.skillIdsAndMastery =
+              Object.keys(degreesOfMastery).map(function(skillId) {
+                return {
+                  skillId: skillId,
+                  mastery: degreesOfMastery[skillId]
+                };
+              });
 
-          ctrl.getColorForMastery = function(degreeOfMastery) {
-            if (degreeOfMastery >= MASTERY_CUTOFF.GOOD_CUTOFF) {
-              return MASTERY_COLORS.GOOD_MASTERY_COLOR;
-            } else if (degreeOfMastery >= MASTERY_CUTOFF.MEDIUM_CUTOFF) {
-              return MASTERY_COLORS.MEDIUM_MASTERY_COLOR;
-            } else {
-              return MASTERY_COLORS.BAD_MASTERY_COLOR;
-            }
-          };
+            ctrl.getMasteryPercentage = function(degreeOfMastery) {
+              return Math.round(degreeOfMastery * 100);
+            };
 
-          ctrl.getMasteryBarStyle = function(skillId) {
-            return {
-              width: ctrl.getMasteryPercentage(
-                ctrl.getDegreesOfMastery()[skillId]) + '%',
-              background: ctrl.getColorForMastery(
-                ctrl.getDegreesOfMastery()[skillId])
+            ctrl.getColorForMastery = function(degreeOfMastery) {
+              if (degreeOfMastery >= MASTERY_CUTOFF.GOOD_CUTOFF) {
+                return MASTERY_COLORS.GOOD_MASTERY_COLOR;
+              } else if (degreeOfMastery >= MASTERY_CUTOFF.MEDIUM_CUTOFF) {
+                return MASTERY_COLORS.MEDIUM_MASTERY_COLOR;
+              } else {
+                return MASTERY_COLORS.BAD_MASTERY_COLOR;
+              }
+            };
+
+            ctrl.getMasteryBarStyle = function(skillId) {
+              return {
+                width: ctrl.getMasteryPercentage(
+                  ctrl.getDegreesOfMastery()[skillId]) + '%',
+                background: ctrl.getColorForMastery(
+                  ctrl.getDegreesOfMastery()[skillId])
+              };
+            };
+
+            ctrl.openConceptCardModal = function(skillId) {
+              var skillDescription = ctrl.getSkillDescriptions()[skillId];
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/components/concept-card/concept-card-modal.template.html'
+                ),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function(
+                      $scope, $uibModalInstance) {
+                    $scope.skillIds = [skillId];
+                    $scope.index = 0;
+                    $scope.currentSkill = skillDescription;
+
+                    $scope.closeModal = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
+              });
             };
           };
-
-          ctrl.openConceptCardModal = function(skillId) {
-            var skillDescription = ctrl.getSkillDescriptions()[skillId];
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/concept-card/concept-card-modal.template.html'
-              ),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function(
-                    $scope, $uibModalInstance) {
-                  $scope.skillIds = [skillId];
-                  $scope.index = 0;
-                  $scope.currentSkill = skillDescription;
-
-                  $scope.closeModal = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            });
-          };
-        }
-      ]
+        }]
     };
   }]);

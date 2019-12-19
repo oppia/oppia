@@ -63,300 +63,311 @@ angular.module('oppia').directive('libraryPage', [
             WindowDimensionsService, ALL_CATEGORIES,
             LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
           var ctrl = this;
-          $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
-          var possibleBannerFilenames = [
-            'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
-          ctrl.bannerImageFilename = possibleBannerFilenames[
-            Math.floor(Math.random() * possibleBannerFilenames.length)];
+          ctrl.$onInit = function() {
+            $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
+            var possibleBannerFilenames = [
+              'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+            ctrl.bannerImageFilename = possibleBannerFilenames[
+              Math.floor(Math.random() * possibleBannerFilenames.length)];
 
-          ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-            '/library/' + ctrl.bannerImageFilename);
+            ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+              '/library/' + ctrl.bannerImageFilename);
 
-          ctrl.activeGroupIndex = null;
+            ctrl.activeGroupIndex = null;
 
-          var currentPath = $window.location.pathname;
-          if (!LIBRARY_PATHS_TO_MODES.hasOwnProperty(currentPath)) {
-            $log.error('INVALID URL PATH: ' + currentPath);
-          }
-          ctrl.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
-          ctrl.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
+            var currentPath = $window.location.pathname;
+            if (!LIBRARY_PATHS_TO_MODES.hasOwnProperty(currentPath)) {
+              $log.error('INVALID URL PATH: ' + currentPath);
+            }
+            ctrl.pageMode = LIBRARY_PATHS_TO_MODES[currentPath];
+            ctrl.LIBRARY_PAGE_MODES = LIBRARY_PAGE_MODES;
 
-          var title = 'Exploration Library - Oppia';
-          if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP ||
-              ctrl.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
-            title = 'Find explorations to learn from - Oppia';
-          }
-          PageTitleService.setPageTitle(title);
+            var title = 'Exploration Library - Oppia';
+            if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP ||
+                ctrl.pageMode === LIBRARY_PAGE_MODES.SEARCH) {
+              title = 'Find explorations to learn from - Oppia';
+            }
+            PageTitleService.setPageTitle(title);
 
-          // Keeps track of the index of the left-most visible card of each
-          // group.
-          ctrl.leftmostCardIndices = [];
+            // Keeps track of the index of the left-most visible card of each
+            // group.
+            ctrl.leftmostCardIndices = [];
 
-          if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP) {
-            var pathnameArray = $window.location.pathname.split('/');
-            ctrl.groupName = pathnameArray[2];
+            if (ctrl.pageMode === LIBRARY_PAGE_MODES.GROUP) {
+              var pathnameArray = $window.location.pathname.split('/');
+              ctrl.groupName = pathnameArray[2];
 
-            $http.get('/librarygrouphandler', {
-              params: {
-                group_name: ctrl.groupName
-              }
-            }).success(
-              function(data) {
-                ctrl.activityList = data.activity_list;
+              $http.get('/librarygrouphandler', {
+                params: {
+                  group_name: ctrl.groupName
+                }
+              }).then(
+                function(response) {
+                  ctrl.activityList = response.data.activity_list;
 
-                ctrl.groupHeaderI18nId = data.header_i18n_id;
+                  ctrl.groupHeaderI18nId = response.data.header_i18n_id;
+
+                  $rootScope.$broadcast(
+                    'preferredLanguageCodesLoaded',
+                    response.data.preferred_language_codes);
+
+                  $rootScope.loadingMessage = '';
+                }, function() {
+                  // This callback is triggered when the Cancel button is
+                  // clicked. No further action is needed.
+                });
+            } else {
+              $http.get('/libraryindexhandler').then(function(response) {
+                ctrl.libraryGroups =
+                response.data.activity_summary_dicts_by_category;
+                UserService.getUserInfoAsync().then(function(userInfo) {
+                  ctrl.activitiesOwned = {explorations: {}, collections: {}};
+                  if (userInfo.isLoggedIn()) {
+                    $http.get('/creatordashboardhandler/data')
+                      .then(function(response) {
+                        ctrl.libraryGroups.forEach(function(libraryGroup) {
+                          var activitySummaryDicts = (
+                            libraryGroup.activity_summary_dicts);
+
+                          var ACTIVITY_TYPE_EXPLORATION = 'exploration';
+                          var ACTIVITY_TYPE_COLLECTION = 'collection';
+                          activitySummaryDicts.forEach(function(
+                              activitySummaryDict) {
+                            if (activitySummaryDict.activity_type === (
+                              ACTIVITY_TYPE_EXPLORATION)) {
+                              ctrl.activitiesOwned.explorations[
+                                activitySummaryDict.id] = false;
+                            } else if (activitySummaryDict.activity_type === (
+                              ACTIVITY_TYPE_COLLECTION)) {
+                              ctrl.activitiesOwned.collections[
+                                activitySummaryDict.id] = false;
+                            } else {
+                              $log.error('INVALID ACTIVITY TYPE: Activity' +
+                              '(id: ' + activitySummaryDict.id +
+                              ', name: ' + activitySummaryDict.title +
+                              ', type: ' + activitySummaryDict.activity_type +
+                              ') has an invalid activity type, which could ' +
+                              'not be recorded as an exploration or a ' +
+                              'collection.'
+                              );
+                            }
+                          });
+
+                          response.data.explorations_list
+                            .forEach(function(ownedExplorations) {
+                              ctrl.activitiesOwned.explorations[
+                                ownedExplorations.id] = true;
+                            });
+
+                          response.data.collections_list
+                            .forEach(function(ownedCollections) {
+                              ctrl.activitiesOwned.collections[
+                                ownedCollections.id] = true;
+                            });
+                        });
+                        $rootScope.loadingMessage = '';
+                      });
+                  } else {
+                    $rootScope.loadingMessage = '';
+                  }
+                });
 
                 $rootScope.$broadcast(
                   'preferredLanguageCodesLoaded',
-                  data.preferred_language_codes);
+                  response.data.preferred_language_codes);
 
-                $rootScope.loadingMessage = '';
-              });
-          } else {
-            $http.get('/libraryindexhandler').success(function(data) {
-              ctrl.libraryGroups = data.activity_summary_dicts_by_category;
+                // Initialize the carousel(s) on the library index page.
+                // Pause is necessary to ensure all elements have loaded.
+                $timeout(initCarousels, 390);
 
-              UserService.getUserInfoAsync().then(function(userInfo) {
-                ctrl.activitiesOwned = {explorations: {}, collections: {}};
-                if (userInfo.isLoggedIn()) {
-                  $http.get('/creatordashboardhandler/data')
-                    .then(function(response) {
-                      ctrl.libraryGroups.forEach(function(libraryGroup) {
-                        var activitySummaryDicts = (
-                          libraryGroup.activity_summary_dicts);
 
-                        var ACTIVITY_TYPE_EXPLORATION = 'exploration';
-                        var ACTIVITY_TYPE_COLLECTION = 'collection';
-                        activitySummaryDicts.forEach(function(
-                            activitySummaryDict) {
-                          if (activitySummaryDict.activity_type === (
-                            ACTIVITY_TYPE_EXPLORATION)) {
-                            ctrl.activitiesOwned.explorations[
-                              activitySummaryDict.id] = false;
-                          } else if (activitySummaryDict.activity_type === (
-                            ACTIVITY_TYPE_COLLECTION)) {
-                            ctrl.activitiesOwned.collections[
-                              activitySummaryDict.id] = false;
-                          } else {
-                            $log.error('INVALID ACTIVITY TYPE: Activity' +
-                            '(id: ' + activitySummaryDict.id +
-                            ', name: ' + activitySummaryDict.title +
-                            ', type: ' + activitySummaryDict.activity_type +
-                            ') has an invalid activity type, which could ' +
-                            'not be recorded as an exploration or a collection.'
-                            );
-                          }
-                        });
-
-                        response.data.explorations_list
-                          .forEach(function(ownedExplorations) {
-                            ctrl.activitiesOwned.explorations[
-                              ownedExplorations.id] = true;
-                          });
-
-                        response.data.collections_list
-                          .forEach(function(ownedCollections) {
-                            ctrl.activitiesOwned.collections[
-                              ownedCollections.id] = true;
-                          });
-                      });
-                      $rootScope.loadingMessage = '';
-                    });
-                } else {
-                  $rootScope.loadingMessage = '';
+                // Check if actual and expected widths are the same.
+                // If not produce an error that would be caught by e2e tests.
+                $timeout(function() {
+                  var actualWidth = $('exploration-summary-tile').width();
+                  if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
+                    console.error(
+                      'The actual width of tile is different than the ' +
+                      'expected width. Actual size: ' + actualWidth +
+                      ', Expected size: ' + LIBRARY_TILE_WIDTH_PX);
+                  }
+                }, 3000);
+                // The following initializes the tracker to have all
+                // elements flush left.
+                // Transforms the group names into translation ids
+                ctrl.leftmostCardIndices = [];
+                for (var i = 0; i < ctrl.libraryGroups.length; i++) {
+                  ctrl.leftmostCardIndices.push(0);
                 }
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
-
-              $rootScope.$broadcast(
-                'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-              // Initialize the carousel(s) on the library index page.
-              // Pause is necessary to ensure all elements have loaded.
-              $timeout(initCarousels, 390);
-
-
-              // Check if actual and expected widths are the same.
-              // If not produce an error that would be caught by e2e tests.
-              $timeout(function() {
-                var actualWidth = $('exploration-summary-tile').width();
-                if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
-                  console.error(
-                    'The actual width of tile is different than the expected ' +
-                    'width. Actual size: ' + actualWidth + ', Expected size: ' +
-                    LIBRARY_TILE_WIDTH_PX);
-                }
-              }, 3000);
-              // The following initializes the tracker to have all
-              // elements flush left.
-              // Transforms the group names into translation ids
-              ctrl.leftmostCardIndices = [];
-              for (var i = 0; i < ctrl.libraryGroups.length; i++) {
-                ctrl.leftmostCardIndices.push(0);
-              }
-            });
-          }
-
-          ctrl.setActiveGroup = function(groupIndex) {
-            ctrl.activeGroupIndex = groupIndex;
-          };
-
-          ctrl.clearActiveGroup = function() {
-            ctrl.activeGroupIndex = null;
-          };
-
-          // If the value below is changed, the following CSS values in
-          // oppia.css must be changed:
-          // - .oppia-exp-summary-tiles-container: max-width
-          // - .oppia-library-carousel: max-width
-          var MAX_NUM_TILES_PER_ROW = 4;
-          ctrl.tileDisplayCount = 0;
-
-          var initCarousels = function() {
-            // This prevents unnecessary execution of this method immediately
-            // after a window resize event is fired.
-            if (!ctrl.libraryGroups) {
-              return;
             }
 
-            var windowWidth = $(window).width() * 0.85;
-            // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
-            // compensate for padding and margins. 20 is just an arbitrary
-            // number.
-            ctrl.tileDisplayCount = Math.min(
-              Math.floor(windowWidth / (LIBRARY_TILE_WIDTH_PX + 20)),
-              MAX_NUM_TILES_PER_ROW);
+            ctrl.setActiveGroup = function(groupIndex) {
+              ctrl.activeGroupIndex = groupIndex;
+            };
 
-            $('.oppia-library-carousel').css({
-              width: (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX) + 'px'
-            });
+            ctrl.clearActiveGroup = function() {
+              ctrl.activeGroupIndex = null;
+            };
 
-            // The following determines whether to enable left scroll after
-            // resize.
-            for (var i = 0; i < ctrl.libraryGroups.length; i++) {
+            // If the value below is changed, the following CSS values in
+            // oppia.css must be changed:
+            // - .oppia-exp-summary-tiles-container: max-width
+            // - .oppia-library-carousel: max-width
+            var MAX_NUM_TILES_PER_ROW = 4;
+            ctrl.tileDisplayCount = 0;
+
+            var initCarousels = function() {
+              // This prevents unnecessary execution of this method immediately
+              // after a window resize event is fired.
+              if (!ctrl.libraryGroups) {
+                return;
+              }
+
+              var windowWidth = $(window).width() * 0.85;
+              // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
+              // compensate for padding and margins. 20 is just an arbitrary
+              // number.
+              ctrl.tileDisplayCount = Math.min(
+                Math.floor(windowWidth / (LIBRARY_TILE_WIDTH_PX + 20)),
+                MAX_NUM_TILES_PER_ROW);
+
+              $('.oppia-library-carousel').css({
+                width: (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX) + 'px'
+              });
+
+              // The following determines whether to enable left scroll after
+              // resize.
+              for (var i = 0; i < ctrl.libraryGroups.length; i++) {
+                var carouselJQuerySelector = (
+                  '.oppia-library-carousel-tiles:eq(n)'.replace(
+                    'n', <string><any>i));
+                var carouselScrollPositionPx = $(
+                  carouselJQuerySelector).scrollLeft();
+                var index = Math.ceil(
+                  carouselScrollPositionPx / LIBRARY_TILE_WIDTH_PX);
+                ctrl.leftmostCardIndices[i] = index;
+              }
+            };
+
+            var isAnyCarouselCurrentlyScrolling = false;
+
+            ctrl.scroll = function(ind, isLeftScroll) {
+              if (isAnyCarouselCurrentlyScrolling) {
+                return;
+              }
               var carouselJQuerySelector = (
-                '.oppia-library-carousel-tiles:eq(n)'.replace(
-                  'n', <string><any>i));
+                '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
+
+              var direction = isLeftScroll ? -1 : 1;
               var carouselScrollPositionPx = $(
                 carouselJQuerySelector).scrollLeft();
-              var index = Math.ceil(
-                carouselScrollPositionPx / LIBRARY_TILE_WIDTH_PX);
-              ctrl.leftmostCardIndices[i] = index;
-            }
-          };
 
-          var isAnyCarouselCurrentlyScrolling = false;
-
-          ctrl.scroll = function(ind, isLeftScroll) {
-            if (isAnyCarouselCurrentlyScrolling) {
-              return;
-            }
-            var carouselJQuerySelector = (
-              '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
-
-            var direction = isLeftScroll ? -1 : 1;
-            var carouselScrollPositionPx = $(
-              carouselJQuerySelector).scrollLeft();
-
-            // Prevent scrolling if there more carousel pixed widths than
-            // there are tile widths.
-            if (ctrl.libraryGroups[ind].activity_summary_dicts.length <=
-                ctrl.tileDisplayCount) {
-              return;
-            }
-
-            carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
-
-            if (isLeftScroll) {
-              ctrl.leftmostCardIndices[ind] = Math.max(
-                0, ctrl.leftmostCardIndices[ind] - ctrl.tileDisplayCount);
-            } else {
-              ctrl.leftmostCardIndices[ind] = Math.min(
-                ctrl.libraryGroups[ind].activity_summary_dicts.length -
-                  ctrl.tileDisplayCount + 1,
-                ctrl.leftmostCardIndices[ind] + ctrl.tileDisplayCount);
-            }
-
-            var newScrollPositionPx = carouselScrollPositionPx +
-              (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX * direction);
-
-            $(carouselJQuerySelector).animate({
-              scrollLeft: newScrollPositionPx
-            }, {
-              duration: 800,
-              queue: false,
-              start: function() {
-                isAnyCarouselCurrentlyScrolling = true;
-              },
-              complete: function() {
-                isAnyCarouselCurrentlyScrolling = false;
+              // Prevent scrolling if there more carousel pixed widths than
+              // there are tile widths.
+              if (ctrl.libraryGroups[ind].activity_summary_dicts.length <=
+                  ctrl.tileDisplayCount) {
+                return;
               }
-            });
-          };
 
-          // The carousels do not work when the width is 1 card long, so we need
-          // to handle this case discretely and also prevent swiping past the
-          // first and last card.
-          ctrl.incrementLeftmostCardIndex = function(ind) {
-            var lastItem = ((
-              ctrl.libraryGroups[ind].activity_summary_dicts.length -
-              ctrl.tileDisplayCount) <= ctrl.leftmostCardIndices[ind]);
-            if (!lastItem) {
-              ctrl.leftmostCardIndices[ind]++;
-            }
-          };
-          ctrl.decrementLeftmostCardIndex = function(ind) {
-            ctrl.leftmostCardIndices[ind] = (
-              Math.max(ctrl.leftmostCardIndices[ind] - 1, 0));
-          };
+              carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
 
-          $(window).resize(function() {
-            initCarousels();
-            // This is needed, otherwise ctrl.tileDisplayCount takes a long
-            // time (several seconds) to update.
-            $scope.$apply();
-          });
+              if (isLeftScroll) {
+                ctrl.leftmostCardIndices[ind] = Math.max(
+                  0, ctrl.leftmostCardIndices[ind] - ctrl.tileDisplayCount);
+              } else {
+                ctrl.leftmostCardIndices[ind] = Math.min(
+                  ctrl.libraryGroups[ind].activity_summary_dicts.length -
+                    ctrl.tileDisplayCount + 1,
+                  ctrl.leftmostCardIndices[ind] + ctrl.tileDisplayCount);
+              }
 
-          var activateSearchMode = function() {
-            if (ctrl.pageMode !== LIBRARY_PAGE_MODES.SEARCH) {
-              $('.oppia-library-container').fadeOut(function() {
-                ctrl.pageMode = LIBRARY_PAGE_MODES.SEARCH;
-                $timeout(function() {
-                  $('.oppia-library-container').fadeIn();
-                }, 50);
+              var newScrollPositionPx = carouselScrollPositionPx +
+                (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX * direction);
+
+              $(carouselJQuerySelector).animate({
+                scrollLeft: newScrollPositionPx
+              }, {
+                duration: 800,
+                queue: false,
+                start: function() {
+                  isAnyCarouselCurrentlyScrolling = true;
+                },
+                complete: function() {
+                  isAnyCarouselCurrentlyScrolling = false;
+                }
               });
-            }
-          };
+            };
 
-          // The following loads explorations belonging to a particular group.
-          // If fullResultsUrl is given it loads the page corresponding to
-          // the url. Otherwise, it will initiate a search query for the
-          // given list of categories.
-          ctrl.showFullResultsPage = function(categories, fullResultsUrl) {
-            if (fullResultsUrl) {
-              $window.location.href = fullResultsUrl;
-            } else {
-              var selectedCategories = {};
-              for (var i = 0; i < categories.length; i++) {
-                selectedCategories[categories[i]] = true;
+            // The carousels do not work when the width is 1 card long, so we
+            // need to handle this case discretely and also prevent swiping
+            // past the first and last card.
+            ctrl.incrementLeftmostCardIndex = function(ind) {
+              var lastItem = ((
+                ctrl.libraryGroups[ind].activity_summary_dicts.length -
+                ctrl.tileDisplayCount) <= ctrl.leftmostCardIndices[ind]);
+              if (!lastItem) {
+                ctrl.leftmostCardIndices[ind]++;
               }
+            };
+            ctrl.decrementLeftmostCardIndex = function(ind) {
+              ctrl.leftmostCardIndices[ind] = (
+                Math.max(ctrl.leftmostCardIndices[ind] - 1, 0));
+            };
 
-              var targetSearchQueryUrl = SearchService.getSearchUrlQueryString(
-                '', selectedCategories, {});
-              $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
-            }
-          };
+            $(window).resize(function() {
+              initCarousels();
+              // This is needed, otherwise ctrl.tileDisplayCount takes a long
+              // time (several seconds) to update.
+              $scope.$apply();
+            });
 
-          var libraryWindowCutoffPx = 530;
-          ctrl.libraryWindowIsNarrow = (
-            WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+            var activateSearchMode = function() {
+              if (ctrl.pageMode !== LIBRARY_PAGE_MODES.SEARCH) {
+                $('.oppia-library-container').fadeOut(function() {
+                  ctrl.pageMode = LIBRARY_PAGE_MODES.SEARCH;
+                  $timeout(function() {
+                    $('.oppia-library-container').fadeIn();
+                  }, 50);
+                });
+              }
+            };
 
-          WindowDimensionsService.registerOnResizeHook(function() {
+            // The following loads explorations belonging to a particular group.
+            // If fullResultsUrl is given it loads the page corresponding to
+            // the url. Otherwise, it will initiate a search query for the
+            // given list of categories.
+            ctrl.showFullResultsPage = function(categories, fullResultsUrl) {
+              if (fullResultsUrl) {
+                $window.location.href = fullResultsUrl;
+              } else {
+                var selectedCategories = {};
+                for (var i = 0; i < categories.length; i++) {
+                  selectedCategories[categories[i]] = true;
+                }
+
+                var targetSearchQueryUrl =
+                SearchService.getSearchUrlQueryString(
+                  '', selectedCategories, {});
+                $window.location.href =
+                '/search/find?q=' + targetSearchQueryUrl;
+              }
+            };
+
+            var libraryWindowCutoffPx = 530;
             ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-            $scope.$apply();
-          });
-        }
-      ]
+
+            WindowDimensionsService.registerOnResizeHook(function() {
+              ctrl.libraryWindowIsNarrow = (
+                WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+              $scope.$apply();
+            });
+          };
+        }]
     };
   }
 ]);

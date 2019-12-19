@@ -42,62 +42,64 @@ angular.module('oppia').directive('logicQuestionEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.alwaysEditable = true;
-        ctrl.localValue = {
-          assumptionsString: logicProofShared.displayExpressionArray(
-            ctrl.value.assumptions,
-            logicProofData.BASE_STUDENT_LANGUAGE.operators),
-          targetString: logicProofShared.displayExpression(
-            ctrl.value.results[0],
-            logicProofData.BASE_STUDENT_LANGUAGE.operators),
-          errorMessage: '',
-          proofString: ctrl.value.default_proof_string
-        };
+        ctrl.$onInit = function() {
+          ctrl.alwaysEditable = true;
+          ctrl.localValue = {
+            assumptionsString: logicProofShared.displayExpressionArray(
+              ctrl.value.assumptions,
+              logicProofData.BASE_STUDENT_LANGUAGE.operators),
+            targetString: logicProofShared.displayExpression(
+              ctrl.value.results[0],
+              logicProofData.BASE_STUDENT_LANGUAGE.operators),
+            errorMessage: '',
+            proofString: ctrl.value.default_proof_string
+          };
 
-        // NOTE: we use ng-change rather than $watch because the latter runs in
-        // response to any change to the watched value, and we only want to
-        // respond to changes made by the user.
-        ctrl.changeAssumptions = function() {
-          ctrl.convertThenBuild(
-            'logicQuestionAssumptions', 'assumptionsString');
-        };
-        ctrl.changeTarget = function() {
-          ctrl.convertThenBuild('logicQuestionTarget', 'targetString');
-        };
-        ctrl.changeProof = function() {
-          ctrl.convertThenBuild('logicQuestionProof', 'proofString');
-        };
+          // NOTE: we use ng-change rather than $watch because the latter runs
+          // in response to any change to the watched value, and we only want to
+          // respond to changes made by the user.
+          ctrl.changeAssumptions = function() {
+            ctrl.convertThenBuild(
+              'logicQuestionAssumptions', 'assumptionsString');
+          };
+          ctrl.changeTarget = function() {
+            ctrl.convertThenBuild('logicQuestionTarget', 'targetString');
+          };
+          ctrl.changeProof = function() {
+            ctrl.convertThenBuild('logicQuestionProof', 'proofString');
+          };
 
-        ctrl.convertThenBuild = function(elementID, nameOfString) {
-          var element = document.getElementById(elementID);
-          var cursorPosition = (<HTMLInputElement>element).selectionEnd;
-          ctrl.localValue[nameOfString] =
-            logicProofConversion.convertToLogicCharacters(
-              ctrl.localValue[nameOfString]);
-          ctrl.buildQuestion();
-          // NOTE: angular will reset the position of the cursor after this
-          // function runs, so we need to delay our re-resetting.
-          setTimeout(function() {
-            (<HTMLInputElement>element).selectionEnd = cursorPosition;
-          }, 2);
-        };
+          ctrl.convertThenBuild = function(elementID, nameOfString) {
+            var element = document.getElementById(elementID);
+            var cursorPosition = (<HTMLInputElement>element).selectionEnd;
+            ctrl.localValue[nameOfString] =
+              logicProofConversion.convertToLogicCharacters(
+                ctrl.localValue[nameOfString]);
+            ctrl.buildQuestion();
+            // NOTE: angular will reset the position of the cursor after this
+            // function runs, so we need to delay our re-resetting.
+            setTimeout(function() {
+              (<HTMLInputElement>element).selectionEnd = cursorPosition;
+            }, 2);
+          };
 
-        ctrl.buildQuestion = function() {
-          try {
-            var builtQuestion = angular.copy(
-              logicProofTeacher.buildQuestion(
-                ctrl.localValue.assumptionsString,
-                ctrl.localValue.targetString,
-                LOGIC_PROOF_DEFAULT_QUESTION_DATA.vocabulary));
-            ctrl.value = {
-              assumptions: builtQuestion.assumptions,
-              results: builtQuestion.results,
-              default_proof_string: ctrl.localValue.proofString
-            };
-            ctrl.localValue.errorMessage = '';
-          } catch (err) {
-            ctrl.localValue.errorMessage = err.message;
-          }
+          ctrl.buildQuestion = function() {
+            try {
+              var builtQuestion = angular.copy(
+                logicProofTeacher.buildQuestion(
+                  ctrl.localValue.assumptionsString,
+                  ctrl.localValue.targetString,
+                  LOGIC_PROOF_DEFAULT_QUESTION_DATA.vocabulary));
+              ctrl.value = {
+                assumptions: builtQuestion.assumptions,
+                results: builtQuestion.results,
+                default_proof_string: ctrl.localValue.proofString
+              };
+              ctrl.localValue.errorMessage = '';
+            } catch (err) {
+              ctrl.localValue.errorMessage = err.message;
+            }
+          };
         };
       }]
     };

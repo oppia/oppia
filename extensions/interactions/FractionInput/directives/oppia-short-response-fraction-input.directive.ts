@@ -34,8 +34,10 @@ angular.module('oppia').directive('oppiaShortResponseFractionInput', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.answer = FractionObjectFactory.fromDict(answer).toString();
+        ctrl.$onInit = function() {
+          var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.answer = FractionObjectFactory.fromDict(answer).toString();
+        };
       }]
     };
   }

@@ -63,6 +63,9 @@ angular.module('oppia').directive('storiesList', [
                     };
                   }
                 ]
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               $window.open(
@@ -100,9 +103,11 @@ angular.module('oppia').directive('storiesList', [
                   $scope.storySummaries.splice(i, 1);
                 }
               }
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
-        }
-      ]
+        }]
     };
   }]);

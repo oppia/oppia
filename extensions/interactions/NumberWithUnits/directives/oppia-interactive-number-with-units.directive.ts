@@ -46,82 +46,86 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
             NumberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
             CurrentInteractionService) {
           var ctrl = this;
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          ctrl.$onInit = function() {
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          var errorMessage = '';
-          // Label for errors caused whilst parsing number with units.
-          var FORM_ERROR_TYPE = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
-          ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {
-            type: 'unicode',
-            ui_config: {}
-          };
+            var errorMessage = '';
+            // Label for errors caused whilst parsing number with units.
+            var FORM_ERROR_TYPE = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
+            ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {
+              type: 'unicode',
+              ui_config: {}
+            };
 
-          ctrl.getWarningText = function() {
-            return errorMessage;
-          };
+            ctrl.getWarningText = function() {
+              return errorMessage;
+            };
 
-          try {
-            NumberWithUnitsObjectFactory.createCurrencyUnits();
-          } catch (parsingError) {}
-
-          $scope.$watch('$ctrl.answer', function(newValue) {
             try {
-              var numberWithUnits =
-                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-              errorMessage = '';
-              ctrl.NumberWithUnitsForm.answer.$setValidity(
-                FORM_ERROR_TYPE, true);
-            } catch (parsingError) {
-              errorMessage = parsingError.message;
-              ctrl.NumberWithUnitsForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            }
-          });
+              NumberWithUnitsObjectFactory.createCurrencyUnits();
+            } catch (parsingError) {}
 
-          ctrl.submitAnswer = function(answer) {
-            try {
-              var numberWithUnits =
-                NumberWithUnitsObjectFactory.fromRawInputString(answer);
-              CurrentInteractionService.onSubmit(
-                numberWithUnits, NumberWithUnitsRulesService);
-            } catch (parsingError) {
-              errorMessage = parsingError.message;
-              ctrl.NumberWithUnitsForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            }
-          };
+            $scope.$watch('$ctrl.answer', function(newValue) {
+              try {
+                var numberWithUnits =
+                  NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+                errorMessage = '';
+                ctrl.NumberWithUnitsForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, true);
+              } catch (parsingError) {
+                errorMessage = parsingError.message;
+                ctrl.NumberWithUnitsForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              }
+            });
 
-          ctrl.isAnswerValid = function() {
-            if (ctrl.NumberWithUnitsForm === undefined) {
-              return true;
-            }
-            return (!ctrl.NumberWithUnitsForm.$invalid &&
-              ctrl.answer !== '');
-          };
+            ctrl.submitAnswer = function(answer) {
+              try {
+                var numberWithUnits =
+                  NumberWithUnitsObjectFactory.fromRawInputString(answer);
+                CurrentInteractionService.onSubmit(
+                  numberWithUnits, NumberWithUnitsRulesService);
+              } catch (parsingError) {
+                errorMessage = parsingError.message;
+                ctrl.NumberWithUnitsForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              }
+            };
 
-          var submitAnswerFn = function() {
-            ctrl.submitAnswer(ctrl.answer);
-          };
+            ctrl.isAnswerValid = function() {
+              if (ctrl.NumberWithUnitsForm === undefined) {
+                return true;
+              }
+              return (!ctrl.NumberWithUnitsForm.$invalid &&
+                ctrl.answer !== '');
+            };
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, ctrl.isAnswerValid);
+            var submitAnswerFn = function() {
+              ctrl.submitAnswer(ctrl.answer);
+            };
 
-          ctrl.showHelp = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/NumberWithUnits/directives/' +
-                'number-with-units-help-modal.directive.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.close = function() {
-                    $uibModalInstance.close();
-                  };
-                }
-              ]
-            }).result.then(function() {});
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, ctrl.isAnswerValid);
+
+            ctrl.showHelp = function() {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/NumberWithUnits/directives/' +
+                  'number-with-units-help-modal.directive.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.close = function() {
+                      $uibModalInstance.close();
+                    };
+                  }
+                ]
+              }).result.then(function() {}, function() {
+
+              });
+            };
           };
         }]
     };

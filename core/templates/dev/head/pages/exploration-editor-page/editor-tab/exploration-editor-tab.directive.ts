@@ -107,12 +107,13 @@ angular.module('oppia').directive('explorationEditorTab', [
               StateEditorService.getActiveStateName() ===
               ExplorationInitStateNameService.savedMemento) {
               return (
-                'This is the first card of your exploration. Use this space ' +
-                'to introduce your topic and engage the learner, then ask ' +
-                'them a question.');
+                'This is the first card of your exploration. Use this' +
+                'space to introduce your topic and engage the learner,' +
+                'then ask them a question.');
             } else {
               return (
-                'You can speak to the learner here, then ask them a question.');
+                'You can speak to the learner here, ' +
+                'then ask them a question.');
             }
           };
 
@@ -259,6 +260,9 @@ angular.module('oppia').directive('explorationEditorTab', [
                   ExplorationStatesService.saveWrittenTranslations(
                     stateName, writtenTranslations);
                 }
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             }
           };
@@ -266,7 +270,6 @@ angular.module('oppia').directive('explorationEditorTab', [
           ctrl.navigateToState = function(stateName) {
             RouterService.navigateToMainTab(stateName);
           };
-        }
-      ]
+        }]
     };
   }]);

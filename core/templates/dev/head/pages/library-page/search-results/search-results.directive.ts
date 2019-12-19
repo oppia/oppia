@@ -39,39 +39,40 @@ angular.module('oppia').directive('searchResults', [
         function($scope, $rootScope, $q, $timeout, $window,
             SiteAnalyticsService, UserService) {
           var ctrl = this;
-          ctrl.someResultsExist = true;
+          ctrl.$onInit = function() {
+            ctrl.someResultsExist = true;
 
-          ctrl.userIsLoggedIn = null;
-          $rootScope.loadingMessage = 'Loading';
-          var userInfoPromise = UserService.getUserInfoAsync();
-          userInfoPromise.then(function(userInfo) {
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          });
+            ctrl.userIsLoggedIn = null;
+            $rootScope.loadingMessage = 'Loading';
+            var userInfoPromise = UserService.getUserInfoAsync();
+            userInfoPromise.then(function(userInfo) {
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            });
 
-          // Called when the first batch of search results is retrieved from the
-          // server.
-          var searchResultsPromise = $scope.$on(
-            'initialSearchResultsLoaded', function(evt, activityList) {
-              ctrl.someResultsExist = activityList.length > 0;
-            }
-          );
+            // Called when the first batch of search results is retrieved from
+            // the server.
+            var searchResultsPromise = $scope.$on(
+              'initialSearchResultsLoaded', function(evt, activityList) {
+                ctrl.someResultsExist = activityList.length > 0;
+              }
+            );
 
-          $q.all([userInfoPromise, searchResultsPromise]).then(function() {
-            $rootScope.loadingMessage = '';
-          });
+            $q.all([userInfoPromise, searchResultsPromise]).then(function() {
+              $rootScope.loadingMessage = '';
+            });
 
-          ctrl.onRedirectToLogin = function(destinationUrl) {
-            SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
-            $timeout(function() {
-              $window.location = destinationUrl;
-            }, 150);
-            return false;
+            ctrl.onRedirectToLogin = function(destinationUrl) {
+              SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
+              $timeout(function() {
+                $window.location = destinationUrl;
+              }, 150);
+              return false;
+            };
+
+            ctrl.noExplorationsImgUrl =
+             UrlInterpolationService.getStaticImageUrl(
+               '/general/no_explorations_found.png');
           };
-
-          ctrl.noExplorationsImgUrl =
-           UrlInterpolationService.getStaticImageUrl(
-             '/general/no_explorations_found.png');
-        }
-      ]
+        }]
     };
   }]);

@@ -153,9 +153,9 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                       params: {
                         state_name: stateName
                       }
-                    }).success(function(response) {
+                    }).then(function(response) {
                       $scope.showUnresolvedAnswers(response.unresolved_answers);
-                    }).error(function(response) {
+                    }, function(response) {
                       $log.error(
                         'Error occurred while fetching unresolved answers ' +
                         'for exploration ' + _explorationId + 'state ' +
@@ -254,6 +254,9 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                   $scope.loadingDotsAreShown = true;
                   fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
                 }]
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -261,7 +264,6 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
             return StateTopAnswersStatsService.getUnresolvedStateStats(
               StateEditorService.getActiveStateName());
           };
-        }
-      ]
+        }]
     };
   }]);

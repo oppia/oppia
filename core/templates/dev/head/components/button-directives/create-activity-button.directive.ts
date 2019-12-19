@@ -43,95 +43,96 @@ angular.module('oppia').directive('createActivityButton', [
             SiteAnalyticsService, UrlService, UserService,
             ALLOW_YAML_FILE_UPLOAD) {
           var ctrl = this;
-          ctrl.creationInProgress = false;
-          ctrl.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
+          ctrl.$onInit = function() {
+            ctrl.creationInProgress = false;
+            ctrl.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
 
-          ctrl.canCreateCollections = null;
-          ctrl.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.canCreateCollections = userInfo.canCreateCollections();
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          });
+            ctrl.canCreateCollections = null;
+            ctrl.userIsLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.canCreateCollections = userInfo.canCreateCollections();
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            });
 
-          ctrl.showUploadExplorationModal = (
-            ExplorationCreationService.showUploadExplorationModal);
+            ctrl.showUploadExplorationModal = (
+              ExplorationCreationService.showUploadExplorationModal);
 
-          ctrl.onRedirectToLogin = function(destinationUrl) {
-            SiteAnalyticsService.registerStartLoginEvent(
-              'createActivityButton');
-            $timeout(function() {
-              $window.location = destinationUrl;
-            }, 150);
-            return false;
+            ctrl.onRedirectToLogin = function(destinationUrl) {
+              SiteAnalyticsService.registerStartLoginEvent(
+                'createActivityButton');
+              $timeout(function() {
+                $window.location = destinationUrl;
+              }, 150);
+              return false;
+            };
+
+            ctrl.initCreationProcess = function() {
+              // Without this, the modal keeps reopening when the window is
+              // resized.
+              if (ctrl.creationInProgress) {
+                return;
+              }
+
+              ctrl.creationInProgress = true;
+
+              if (!ctrl.canCreateCollections) {
+                ExplorationCreationService.createNewExploration();
+              } else if (UrlService.getPathname() !== '/creator_dashboard') {
+                $window.location.replace('/creator_dashboard?mode=create');
+              } else {
+                $uibModal.open({
+                  templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                    '/pages/creator-dashboard-page/modal-templates/' +
+                    'create-activity-modal.directive.html'),
+                  backdrop: true,
+                  controller: [
+                    '$scope', '$uibModalInstance',
+                    function($scope, $uibModalInstance) {
+                      UserService.getUserInfoAsync().then(function(userInfo) {
+                        $scope.canCreateCollections = (
+                          userInfo.canCreateCollections());
+                      });
+
+                      $scope.chooseExploration = function() {
+                        ExplorationCreationService.createNewExploration();
+                        $uibModalInstance.close();
+                      };
+
+                      $scope.chooseCollection = function() {
+                        CollectionCreationService.createNewCollection();
+                        $uibModalInstance.close();
+                      };
+
+                      $scope.cancel = function() {
+                        $uibModalInstance.dismiss('cancel');
+                      };
+
+                      $scope.explorationImgUrl = (
+                        UrlInterpolationService.getStaticImageUrl(
+                          '/activity/exploration.svg'));
+
+                      $scope.collectionImgUrl = (
+                        UrlInterpolationService.getStaticImageUrl(
+                          '/activity/collection.svg'));
+                    }],
+                  windowClass: 'oppia-creation-modal'
+                }).result.then(function() {}, function() {
+                  ctrl.creationInProgress = false;
+                });
+              }
+            };
+
+            // If the user clicked on a 'create' button to get to the dashboard,
+            // open the create modal immediately (or redirect to the exploration
+            // editor if the create modal does not need to be shown).
+            if (UrlService.getUrlParams().mode === 'create') {
+              if (!ctrl.canCreateCollections) {
+                ExplorationCreationService.createNewExploration();
+              } else {
+                ctrl.initCreationProcess();
+              }
+            }
           };
-
-          ctrl.initCreationProcess = function() {
-            // Without this, the modal keeps reopening when the window is
-            // resized.
-            if (ctrl.creationInProgress) {
-              return;
-            }
-
-            ctrl.creationInProgress = true;
-
-            if (!ctrl.canCreateCollections) {
-              ExplorationCreationService.createNewExploration();
-            } else if (UrlService.getPathname() !== '/creator_dashboard') {
-              $window.location.replace('/creator_dashboard?mode=create');
-            } else {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/creator-dashboard-page/modal-templates/' +
-                  'create-activity-modal.directive.html'),
-                backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    UserService.getUserInfoAsync().then(function(userInfo) {
-                      $scope.canCreateCollections = (
-                        userInfo.canCreateCollections());
-                    });
-
-                    $scope.chooseExploration = function() {
-                      ExplorationCreationService.createNewExploration();
-                      $uibModalInstance.close();
-                    };
-
-                    $scope.chooseCollection = function() {
-                      CollectionCreationService.createNewCollection();
-                      $uibModalInstance.close();
-                    };
-
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-
-                    $scope.explorationImgUrl = (
-                      UrlInterpolationService.getStaticImageUrl(
-                        '/activity/exploration.svg'));
-
-                    $scope.collectionImgUrl = (
-                      UrlInterpolationService.getStaticImageUrl(
-                        '/activity/collection.svg'));
-                  }],
-                windowClass: 'oppia-creation-modal'
-              }).result.then(function() {}, function() {
-                ctrl.creationInProgress = false;
-              });
-            }
-          };
-
-          // If the user clicked on a 'create' button to get to the dashboard,
-          // open the create modal immediately (or redirect to the exploration
-          // editor if the create modal does not need to be shown).
-          if (UrlService.getUrlParams().mode === 'create') {
-            if (!ctrl.canCreateCollections) {
-              ExplorationCreationService.createNewExploration();
-            } else {
-              ctrl.initCreationProcess();
-            }
-          }
-        }
-      ]
+        }]
     };
   }]);

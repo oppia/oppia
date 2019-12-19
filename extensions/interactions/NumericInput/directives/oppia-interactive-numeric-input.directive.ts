@@ -44,35 +44,36 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             $attrs, FocusManagerService, NumericInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          ctrl.$onInit = function() {
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          ctrl.NUMERIC_INPUT_FORM_SCHEMA = {
-            type: 'float',
-            ui_config: {}
+            ctrl.NUMERIC_INPUT_FORM_SCHEMA = {
+              type: 'float',
+              ui_config: {}
+            };
+
+            var isAnswerValid = function() {
+              return (
+                ctrl.answer !== undefined &&
+                ctrl.answer !== null && ctrl.answer !== '');
+            };
+
+            ctrl.submitAnswer = function(answer) {
+              if (isAnswerValid()) {
+                CurrentInteractionService.onSubmit(
+                  answer, NumericInputRulesService);
+              }
+            };
+
+            var submitAnswerFn = function() {
+              ctrl.submitAnswer(ctrl.answer);
+            };
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, isAnswerValid);
           };
-
-          var isAnswerValid = function() {
-            return (
-              ctrl.answer !== undefined &&
-              ctrl.answer !== null && ctrl.answer !== '');
-          };
-
-          ctrl.submitAnswer = function(answer) {
-            if (isAnswerValid()) {
-              CurrentInteractionService.onSubmit(
-                answer, NumericInputRulesService);
-            }
-          };
-
-          var submitAnswerFn = function() {
-            ctrl.submitAnswer(ctrl.answer);
-          };
-
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, isAnswerValid);
-        }
-      ]
+        }]
     };
   }
 ]);

@@ -219,6 +219,9 @@ angular.module('oppia').directive('topicEditorTab', [
                     };
                   }
                 ]
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               StoryCreationService.createNewCanonicalStory(

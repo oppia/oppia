@@ -35,32 +35,34 @@ angular.module('oppia').directive('setOfHtmlStringEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'html'
-          }
-        };
+        ctrl.$onInit = function() {
+          ctrl.SCHEMA = {
+            type: 'list',
+            items: {
+              type: 'html'
+            }
+          };
 
-        if (!ctrl.value) {
-          ctrl.value = [];
-        }
-        ctrl.initArgs = ctrl.getInitArgs();
-        ctrl.choices = ctrl.initArgs.choices;
-        ctrl.selections = ctrl.choices.map(function(choice) {
-          return ctrl.value.indexOf(choice.id) !== -1;
-        });
-
-        // The following function is necessary to insert elements into the
-        // answer groups for the Item Selection Widget.
-        ctrl.toggleSelection = function(choiceListIndex) {
-          var choiceHtml = ctrl.choices[choiceListIndex].id;
-          var selectedChoicesIndex = ctrl.value.indexOf(choiceHtml);
-          if (selectedChoicesIndex > -1) {
-            ctrl.value.splice(selectedChoicesIndex, 1);
-          } else {
-            ctrl.value.push(choiceHtml);
+          if (!ctrl.value) {
+            ctrl.value = [];
           }
+          ctrl.initArgs = ctrl.getInitArgs();
+          ctrl.choices = ctrl.initArgs.choices;
+          ctrl.selections = ctrl.choices.map(function(choice) {
+            return ctrl.value.indexOf(choice.id) !== -1;
+          });
+
+          // The following function is necessary to insert elements into the
+          // answer groups for the Item Selection Widget.
+          ctrl.toggleSelection = function(choiceListIndex) {
+            var choiceHtml = ctrl.choices[choiceListIndex].id;
+            var selectedChoicesIndex = ctrl.value.indexOf(choiceHtml);
+            if (selectedChoicesIndex > -1) {
+              ctrl.value.splice(selectedChoicesIndex, 1);
+            } else {
+              ctrl.value.push(choiceHtml);
+            }
+          };
         };
       }]
     };

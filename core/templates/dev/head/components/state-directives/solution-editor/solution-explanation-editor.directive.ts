@@ -40,49 +40,51 @@ angular.module('oppia').directive('solutionExplanationEditor', [
         '$scope', 'EditabilityService', 'StateSolutionService',
         function($scope, EditabilityService, StateSolutionService) {
           var ctrl = this;
-          ctrl.isEditable = EditabilityService.isEditable();
-          ctrl.editSolutionForm = {};
-          ctrl.explanationEditorIsOpen = false;
-
-          ctrl.StateSolutionService = StateSolutionService;
-
-          ctrl.EXPLANATION_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
-          ctrl.openExplanationEditor = function() {
-            if (ctrl.isEditable) {
-              ctrl.explanationEditorIsOpen = true;
-            }
-          };
-
-          ctrl.saveThisExplanation = function() {
-            var contentHasChanged = (
-              StateSolutionService.displayed.explanation.getHtml() !==
-              StateSolutionService.savedMemento.explanation.getHtml());
-            if (contentHasChanged) {
-              var solutionContentId = StateSolutionService.displayed.explanation
-                .getContentId();
-              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                solutionContentId);
-            }
-            StateSolutionService.saveDisplayedValue();
-            ctrl.onSaveSolution(StateSolutionService.displayed);
+          ctrl.$onInit = function() {
+            ctrl.isEditable = EditabilityService.isEditable();
+            ctrl.editSolutionForm = {};
             ctrl.explanationEditorIsOpen = false;
-          };
 
-          ctrl.cancelThisExplanationEdit = function() {
-            ctrl.explanationEditorIsOpen = false;
-          };
+            ctrl.StateSolutionService = StateSolutionService;
 
-          $scope.$on('externalSave', function() {
-            if (ctrl.explanationEditorIsOpen &&
-              ctrl.editSolutionForm.$valid) {
-              ctrl.saveThisExplanation();
-            }
-          });
-        }
-      ]
+            ctrl.EXPLANATION_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
+
+            ctrl.openExplanationEditor = function() {
+              if (ctrl.isEditable) {
+                ctrl.explanationEditorIsOpen = true;
+              }
+            };
+
+            ctrl.saveThisExplanation = function() {
+              var contentHasChanged = (
+                StateSolutionService.displayed.explanation.getHtml() !==
+                StateSolutionService.savedMemento.explanation.getHtml());
+              if (contentHasChanged) {
+                var solutionContentId =
+                StateSolutionService.displayed.explanation
+                  .getContentId();
+                ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+                  solutionContentId);
+              }
+              StateSolutionService.saveDisplayedValue();
+              ctrl.onSaveSolution(StateSolutionService.displayed);
+              ctrl.explanationEditorIsOpen = false;
+            };
+
+            ctrl.cancelThisExplanationEdit = function() {
+              ctrl.explanationEditorIsOpen = false;
+            };
+
+            $scope.$on('externalSave', function() {
+              if (ctrl.explanationEditorIsOpen &&
+                ctrl.editSolutionForm.$valid) {
+                ctrl.saveThisExplanation();
+              }
+            });
+          };
+        }]
     };
   }]);

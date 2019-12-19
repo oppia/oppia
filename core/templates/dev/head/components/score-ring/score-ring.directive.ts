@@ -31,45 +31,45 @@ angular.module('oppia').directive('scoreRing', [
       controller: ['$scope', '$timeout', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
         function($scope, $timeout, $window, COLORS_FOR_PASS_FAIL_MODE) {
           var ctrl = this;
+          ctrl.$onInit = function() {
+            const circle = <SVGCircleElement>(
+              document.querySelector('.score-ring-circle'));
+            const radius = circle.r.baseVal.value;
+            const circumference = (radius * 2 * Math.PI);
 
-          const circle = <SVGCircleElement>(
-            document.querySelector('.score-ring-circle'));
-          const radius = circle.r.baseVal.value;
-          const circumference = (radius * 2 * Math.PI);
+            var setScore = function(percent) {
+              const offset = circumference - percent / 100 * circumference;
+              circle.style.strokeDashoffset = offset.toString();
+            };
 
-          var setScore = function(percent) {
-            const offset = circumference - percent / 100 * circumference;
-            circle.style.strokeDashoffset = offset.toString();
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference.toString();
+            $scope.$watch(function() {
+              return ctrl.getScore();
+            }, function(newScore) {
+              if (newScore && newScore > 0) {
+                setScore(newScore);
+              }
+            });
+
+            ctrl.getScoreRingColor = function() {
+              if (ctrl.testIsPassed()) {
+                return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
+              } else {
+                return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
+              }
+            };
+
+            ctrl.getScoreOuterRingColor = function() {
+              if (ctrl.testIsPassed()) {
+                // return color green when passed.
+                return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
+              } else {
+                // return color orange when failed.
+                return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
+              }
+            };
           };
-
-          circle.style.strokeDasharray = `${circumference} ${circumference}`;
-          circle.style.strokeDashoffset = circumference.toString();
-          $scope.$watch(function() {
-            return ctrl.getScore();
-          }, function(newScore) {
-            if (newScore && newScore > 0) {
-              setScore(newScore);
-            }
-          });
-
-          ctrl.getScoreRingColor = function() {
-            if (ctrl.testIsPassed()) {
-              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR;
-            } else {
-              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR;
-            }
-          };
-
-          ctrl.getScoreOuterRingColor = function() {
-            if (ctrl.testIsPassed()) {
-              // return color green when passed.
-              return COLORS_FOR_PASS_FAIL_MODE.PASSED_COLOR_OUTER;
-            } else {
-              // return color orange when failed.
-              return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
-            }
-          };
-        }
-      ]
+        }]
     };
   }]);

@@ -258,6 +258,9 @@ angular.module('oppia').directive('stateSolutionEditor', [
                     INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
                 }
               }
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -288,6 +291,9 @@ angular.module('oppia').directive('stateSolutionEditor', [
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
               StateEditorService.deleteCurrentSolutionValidity();
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

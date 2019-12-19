@@ -79,6 +79,9 @@ angular.module('oppia').config([
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
       $interpolateProvider, $locationProvider, $provide) {
+    // Refer: https://docs.angularjs.org/guide/migration
+    // #migrate1.5to1.6-ng-services-$location.
+    $locationProvider.hashPrefix('');
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -96,6 +99,10 @@ angular.module('oppia').config([
     if (window.location.pathname === '/search/find') {
       $locationProvider.html5Mode(true);
     }
+
+    // The default location prefix is '!' we have to change it to '' to avoid
+    // '!' as a prefix in urls
+    $locationProvider.hashPrefix('');
 
     // Prevent storing duplicate cookies for translation language.
     $cookiesProvider.defaults.path = '/';
@@ -204,7 +211,7 @@ angular.module('oppia').factory('$exceptionHandler', [
   '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     var TPLOAD_STATUS_CODE_REGEX = (
-      new RegExp(/\[\$compile:tpload\].*p1=(.*?)&p2=/));
+      new RegExp(/\[\$templateRequest:tpload\].*p1=(.*?)&p2=/));
     var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
     return function(exception, cause) {

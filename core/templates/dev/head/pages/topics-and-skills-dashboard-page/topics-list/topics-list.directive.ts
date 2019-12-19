@@ -90,6 +90,9 @@ angular.module('oppia').directive('topicsList', [
                     error || 'There was an error when deleting the topic.');
                 }
               );
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
         }

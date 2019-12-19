@@ -64,8 +64,8 @@ angular.module('oppia').directive('historyTab', [
 
           /* Variable definitions:
           *
-          * explorationSnapshots is a list of all snapshots for the exploration
-          * in ascending order.
+          * explorationSnapshots is a list of all snapshots for the
+          * exploration in ascending order.
           *
           * explorationVersionMetadata is an object whose keys are version
           * numbers and whose values are objects containing data of that
@@ -97,7 +97,8 @@ angular.module('oppia').directive('historyTab', [
                 versionCheckbox) {
               versionCheckbox.selected = false;
             });
-            if (data.forceRefresh || ctrl.explorationVersionMetadata === null) {
+            if (data.forceRefresh ||
+              ctrl.explorationVersionMetadata === null) {
               ctrl.refreshVersionHistory();
             }
           });
@@ -160,11 +161,12 @@ angular.module('oppia').directive('historyTab', [
 
               ctrl.hideHistoryGraph = true;
 
-              // Disable all comparisons if there are less than two revisions in
-              // total.
+              // Disable all comparisons if there are less than two revisions
+              // in total.
               ctrl.comparisonsAreDisabled = (currentVersion < 2);
 
-              ctrl.compareVersionsButtonIsHidden = ctrl.comparisonsAreDisabled;
+              ctrl.compareVersionsButtonIsHidden =
+              ctrl.comparisonsAreDisabled;
 
               ctrl.versionCountPrompt = 'Please select any 2.';
 
@@ -179,8 +181,10 @@ angular.module('oppia').directive('historyTab', [
                   ctrl.explorationVersionMetadata = {};
                   var lowestVersionIndex = 0;
                   for (
-                    var i = currentVersion - 1; i >= lowestVersionIndex; i--) {
-                    var versionNumber = explorationSnapshots[i].version_number;
+                    var i = currentVersion - 1;
+                    i >= lowestVersionIndex; i--) {
+                    var versionNumber =
+                  explorationSnapshots[i].version_number;
                     ctrl.explorationVersionMetadata[versionNumber] = {
                       committerId: explorationSnapshots[i].committer_id,
                       createdOnStr: (
@@ -244,21 +248,24 @@ angular.module('oppia').directive('historyTab', [
           // Check if valid versions were selected
           ctrl.areCompareVersionsSelected = function() {
             return (
-              ctrl.compareVersions && ctrl.selectedVersionsArray.length === 2);
+              ctrl.compareVersions &&
+              ctrl.selectedVersionsArray.length === 2);
           };
 
-          // Check if other checkboxes should be disabled once two are selected.
+          // Check if other checkboxes should be disabled once two are
+          // selected.
           ctrl.isCheckboxDisabled = function(versionNumber) {
             if (ctrl.selectedVersionsArray.length === 2) {
-              return (ctrl.selectedVersionsArray.indexOf(versionNumber) === -1);
+              return (ctrl.selectedVersionsArray.indexOf(
+                versionNumber) === -1);
             }
             return false;
           };
 
           // Downloads the zip file for an exploration.
           ctrl.downloadExplorationWithVersion = function(versionNumber) {
-            // Note that this opens (and then immediately closes) a new tab. If
-            // we do this in the same tab, the beforeunload handler is
+            // Note that this opens (and then immediately closes) a new tab.
+            // If we do this in the same tab, the beforeunload handler is
             // triggered.
             window.open(
               ctrl.explorationDownloadUrl + '?v=' + versionNumber,
@@ -268,8 +275,8 @@ angular.module('oppia').directive('historyTab', [
           ctrl.showRevertExplorationModal = function(version) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/history-tab/modal-templates/' +
-                'revert-exploration-modal.template.html'),
+                '/pages/exploration-editor-page/history-tab' +
+                '/modal-templates/revert-exploration-modal.template.html'),
               backdrop: true,
               resolve: {
                 version: function() {
@@ -313,13 +320,14 @@ angular.module('oppia').directive('historyTab', [
             currentPage = ctrl.displayedCurrentPageNumber - 1;
             var begin = (currentPage * ctrl.VERSIONS_PER_PAGE);
             var end = Math.min(
-              begin + ctrl.VERSIONS_PER_PAGE, ctrl.versionCheckboxArray.length);
+              begin + ctrl.VERSIONS_PER_PAGE,
+              ctrl.versionCheckboxArray.length);
             ctrl.versionNumbersToDisplay = [];
             for (var i = begin; i < end; i++) {
               ctrl.versionNumbersToDisplay.push(
                 ctrl.versionCheckboxArray[i].vnum);
             }
           };
-        }
-      ]};
+        }]
+    };
   }]);

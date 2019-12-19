@@ -32,8 +32,10 @@ angular.module('oppia').directive('circularImage', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.isLinkAvailable = function() {
-          return ctrl.link() ? true : false;
+        ctrl.$onInit = function() {
+          ctrl.isLinkAvailable = function() {
+            return ctrl.link() ? true : false;
+          };
         };
       }]
     };

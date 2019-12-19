@@ -55,41 +55,43 @@ angular.module('oppia').directive('responseHeader', [
             PLACEHOLDER_OUTCOME_DEST,
             StateInteractionIdService, INTERACTION_SPECS) {
           var ctrl = this;
-          ctrl.EditabilityService = EditabilityService;
-          ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
+          ctrl.$onInit = function() {
+            ctrl.EditabilityService = EditabilityService;
+            ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
 
-          ctrl.getCurrentInteractionId = function() {
-            return StateInteractionIdService.savedMemento;
-          };
+            ctrl.getCurrentInteractionId = function() {
+              return StateInteractionIdService.savedMemento;
+            };
 
-          ctrl.isCorrectnessFeedbackEnabled = function() {
-            return StateEditorService.getCorrectnessFeedbackEnabled();
-          };
-          // This returns false if the current interaction ID is null.
-          ctrl.isCurrentInteractionLinear = function() {
-            var interactionId = ctrl.getCurrentInteractionId();
-            return interactionId && INTERACTION_SPECS[interactionId].is_linear;
-          };
+            ctrl.isCorrectnessFeedbackEnabled = function() {
+              return StateEditorService.getCorrectnessFeedbackEnabled();
+            };
+            // This returns false if the current interaction ID is null.
+            ctrl.isCurrentInteractionLinear = function() {
+              var interactionId = ctrl.getCurrentInteractionId();
+              return interactionId &&
+              INTERACTION_SPECS[interactionId].is_linear;
+            };
 
-          ctrl.isCorrect = function() {
-            return ctrl.getOutcome() && ctrl.getOutcome().labelledAsCorrect;
-          };
+            ctrl.isCorrect = function() {
+              return ctrl.getOutcome() && ctrl.getOutcome().labelledAsCorrect;
+            };
 
-          ctrl.isOutcomeLooping = function() {
-            var outcome = ctrl.getOutcome();
-            var activeStateName = StateEditorService.getActiveStateName();
-            return outcome && (outcome.dest === activeStateName);
-          };
+            ctrl.isOutcomeLooping = function() {
+              var outcome = ctrl.getOutcome();
+              var activeStateName = StateEditorService.getActiveStateName();
+              return outcome && (outcome.dest === activeStateName);
+            };
 
-          ctrl.isCreatingNewState = function() {
-            var outcome = ctrl.getOutcome();
-            return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
-          };
+            ctrl.isCreatingNewState = function() {
+              var outcome = ctrl.getOutcome();
+              return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
+            };
 
-          ctrl.deleteResponse = function(evt) {
-            ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
+            ctrl.deleteResponse = function(evt) {
+              ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
+            };
           };
-        }
-      ]
+        }]
     };
   }]);

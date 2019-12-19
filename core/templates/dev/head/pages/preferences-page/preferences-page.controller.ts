@@ -73,6 +73,15 @@ angular.module('oppia').directive('preferencesPage', [
             ctrl.email = userInfo.getEmail();
           });
 
+          ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
+            function(languageItem) {
+              return {
+                id: languageItem.id,
+                text: languageItem.description
+              };
+            }
+          );
+
           ctrl.hasPageLoaded = false;
           var preferencesPromise = $http.get(_PREFERENCES_DATA_URL);
           preferencesPromise.then(function(response) {
@@ -83,17 +92,20 @@ angular.module('oppia').directive('preferencesPage', [
             ctrl.profilePictureDataUrl = data.profile_picture_data_url;
             ctrl.defaultDashboard = data.default_dashboard;
             ctrl.canReceiveEmailUpdates = data.can_receive_email_updates;
-            ctrl.canReceiveEditorRoleEmail = data.can_receive_editor_role_email;
+            ctrl.canReceiveEditorRoleEmail =
+            data.can_receive_editor_role_email;
             ctrl.canReceiveSubscriptionEmail =
               data.can_receive_subscription_email;
             ctrl.canReceiveFeedbackMessageEmail = (
               data.can_receive_feedback_message_email);
-            ctrl.preferredSiteLanguageCode = data.preferred_site_language_code;
+            ctrl.preferredSiteLanguageCode =
+            data.preferred_site_language_code;
             ctrl.preferredAudioLanguageCode =
               data.preferred_audio_language_code;
             ctrl.subscriptionList = data.subscription_list;
             ctrl.hasPageLoaded = true;
             _forceSelect2Refresh();
+          }).then(null, function onError(response) {
           });
 
           $q.all([userInfoPromise, preferencesPromise]).then(function() {
@@ -158,7 +170,8 @@ angular.module('oppia').directive('preferencesPage', [
             }
           };
 
-          ctrl.onSubjectInterestsSelectionChange = function(subjectInterests) {
+          ctrl.onSubjectInterestsSelectionChange = function(
+              subjectInterests) {
             AlertsService.clearWarnings();
             ctrl.subjectInterestsChangedAtLeastOnce = true;
             ctrl.subjectInterestsWarningText = null;
@@ -183,9 +196,9 @@ angular.module('oppia').directive('preferencesPage', [
           };
 
           ctrl.showUsernamePopover = function(creatorUsername) {
-            // The popover on the subscription card is only shown if the length
-            // of the creator username is greater than 10 and the user hovers
-            // over the truncated username.
+            // The popover on the subscription card is only shown if the
+            // length of the creator username is greater than 10 and the user
+            // hovers over the truncated username.
             if (creatorUsername.length > 10) {
               return 'mouseenter';
             } else {
@@ -234,7 +247,8 @@ angular.module('oppia').directive('preferencesPage', [
                       var reader = new FileReader();
                       reader.onload = function(e) {
                         $scope.$apply(function() {
-                          $scope.uploadedImage = (<FileReader>e.target).result;
+                          $scope.uploadedImage = (
+                            <FileReader>e.target).result;
                         });
                       };
                       reader.readAsDataURL(file);
@@ -266,26 +280,22 @@ angular.module('oppia').directive('preferencesPage', [
                 }
               ]
             }).result.then(function(newProfilePictureDataUrl) {
-              UserService.setProfileImageDataUrlAsync(newProfilePictureDataUrl)
+              UserService.setProfileImageDataUrlAsync(
+                newProfilePictureDataUrl)
                 .then(function() {
-                  // The reload is needed in order to update the profile picture
-                  // in the top-right corner.
+                  // The reload is needed in order to update the profile
+                  // picture in the top-right corner.
                   $window.location.reload();
                 });
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
-          ctrl.LANGUAGE_CHOICES = LanguageUtilService.getLanguageIdsAndTexts();
+          ctrl.LANGUAGE_CHOICES =
+          LanguageUtilService.getLanguageIdsAndTexts();
           ctrl.SITE_LANGUAGE_CHOICES = SUPPORTED_SITE_LANGUAGES;
-          ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
-            function(languageItem) {
-              return {
-                id: languageItem.id,
-                text: languageItem.description
-              };
-            }
-          );
-        }
-      ]
+        }]
     };
   }]);

@@ -79,6 +79,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
                     };
                   }
                 ]
+              }).result.then(null, function() {
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               SkillEditorRoutingService.navigateToQuestionsTab();
@@ -138,6 +141,9 @@ angular.module('oppia').directive('skillEditorNavbar', [
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
               AlertsService.addSuccessMessage('Changes Saved.');
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
         }]

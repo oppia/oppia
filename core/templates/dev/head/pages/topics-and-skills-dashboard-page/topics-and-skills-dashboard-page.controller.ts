@@ -73,147 +73,151 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES) {
           var ctrl = this;
-          ctrl.TAB_NAME_TOPICS = 'topics';
-          ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
-          ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
+          ctrl.$onInit = function() {
+            ctrl.TAB_NAME_TOPICS = 'topics';
+            ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
+            ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
 
-          var _initDashboard = function() {
-            TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-              function(response) {
-                ctrl.topicSummaries = response.data.topic_summary_dicts;
-                ctrl.editableTopicSummaries = ctrl.topicSummaries.filter(
-                  function(summary) {
-                    return summary.can_edit_topic === true;
+            var _initDashboard = function() {
+              TopicsAndSkillsDashboardBackendApiService.fetchDashboardData(
+              ).then(
+                function(response) {
+                  ctrl.topicSummaries = response.data.topic_summary_dicts;
+                  ctrl.editableTopicSummaries = ctrl.topicSummaries.filter(
+                    function(summary) {
+                      return summary.can_edit_topic === true;
+                    }
+                  );
+                  ctrl.untriagedSkillSummaries =
+                    response.data.untriaged_skill_summary_dicts;
+                  ctrl.mergeableSkillSummaries =
+                    response.data.mergeable_skill_summary_dicts;
+                  ctrl.unpublishedSkillSummaries =
+                    response.data.unpublished_skill_summary_dicts;
+                  ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
+                  ctrl.userCanCreateTopic = response.data.can_create_topic;
+                  ctrl.userCanCreateSkill = response.data.can_create_skill;
+                  $rootScope.$broadcast(
+                    EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
+                  $rootScope.$broadcast(
+                    EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
+                  ctrl.userCanDeleteTopic = response.data.can_delete_topic;
+                  ctrl.userCanDeleteSkill = response.data.can_delete_skill;
+                  if (ctrl.topicSummaries.length === 0 &&
+                      ctrl.untriagedSkillSummaries.length !== 0) {
+                    ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
+                  } else if (
+                    ctrl.topicSummaries.length === 0 &&
+                    ctrl.unpublishedSkillSummaries.length !== 0) {
+                    ctrl.activeTab = ctrl.TAB_NAME_UNPUBLISHED_SKILLS;
                   }
-                );
-                ctrl.untriagedSkillSummaries =
-                  response.data.untriaged_skill_summary_dicts;
-                ctrl.mergeableSkillSummaries =
-                  response.data.mergeable_skill_summary_dicts;
-                ctrl.unpublishedSkillSummaries =
-                  response.data.unpublished_skill_summary_dicts;
-                ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
-                ctrl.userCanCreateTopic = response.data.can_create_topic;
-                ctrl.userCanCreateSkill = response.data.can_create_skill;
-                $rootScope.$broadcast(
-                  EVENT_TYPE_TOPIC_CREATION_ENABLED, ctrl.userCanCreateTopic);
-                $rootScope.$broadcast(
-                  EVENT_TYPE_SKILL_CREATION_ENABLED, ctrl.userCanCreateSkill);
-                ctrl.userCanDeleteTopic = response.data.can_delete_topic;
-                ctrl.userCanDeleteSkill = response.data.can_delete_skill;
-                if (ctrl.topicSummaries.length === 0 &&
-                    ctrl.untriagedSkillSummaries.length !== 0) {
-                  ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
-                } else if (
-                  ctrl.topicSummaries.length === 0 &&
-                  ctrl.unpublishedSkillSummaries.length !== 0) {
-                  ctrl.activeTab = ctrl.TAB_NAME_UNPUBLISHED_SKILLS;
+                },
+                function(errorResponse) {
+                  if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                    AlertsService.addWarning('Failed to get dashboard data');
+                  } else {
+                    AlertsService.addWarning(
+                      'Unexpected error code from the server.');
+                  }
                 }
-              },
-              function(errorResponse) {
-                if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                  AlertsService.addWarning('Failed to get dashboard data');
-                } else {
-                  AlertsService.addWarning(
-                    'Unexpected error code from the server.');
-                }
-              }
-            );
-          };
-
-          ctrl.isTopicTabHelpTextVisible = function() {
-            return (
-              (ctrl.topicSummaries.length === 0) &&
-              (ctrl.untriagedSkillSummaries.length > 0 ||
-              ctrl.unpublishedSkillSummaries.length > 0));
-          };
-          ctrl.isSkillsTabHelpTextVisible = function() {
-            return (
-              (ctrl.untriagedSkillSummaries.length === 0) &&
-              (ctrl.topicSummaries.length > 0) &&
-              (ctrl.unpublishedSkillSummaries.length === 0));
-          };
-          ctrl.setActiveTab = function(tabName) {
-            ctrl.activeTab = tabName;
-          };
-          ctrl.createTopic = function() {
-            TopicCreationService.createNewTopic();
-          };
-          ctrl.createSkill = function() {
-            var rubrics = [];
-            for (var idx in SKILL_DIFFICULTIES) {
-              rubrics.push(
-                RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], '')
               );
-            }
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard-page/templates/' +
-                'create-new-skill-modal.template.html'),
-              backdrop: 'static',
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.newSkillDescription = '';
-                  $scope.rubrics = rubrics;
-                  $scope.allRubricsAdded = true;
-                  $scope.bindableDict = {
-                    displayedConceptCardExplanation: ''
-                  };
-                  var newExplanationObject = null;
+            };
 
-                  $scope.$watch('newSkillDescription', function() {
-                    $scope.rubrics[1].setExplanation(
-                      '<p>' + $scope.newSkillDescription + '</p>');
-                  });
-
-                  var areAllRubricsPresent = function() {
-                    for (var idx in $scope.rubrics) {
-                      if ($scope.rubrics[idx].getExplanation() === '') {
-                        $scope.allRubricsAdded = false;
-                        return;
-                      }
-                    }
+            ctrl.isTopicTabHelpTextVisible = function() {
+              return (
+                (ctrl.topicSummaries.length === 0) &&
+                (ctrl.untriagedSkillSummaries.length > 0 ||
+                ctrl.unpublishedSkillSummaries.length > 0));
+            };
+            ctrl.isSkillsTabHelpTextVisible = function() {
+              return (
+                (ctrl.untriagedSkillSummaries.length === 0) &&
+                (ctrl.topicSummaries.length > 0) &&
+                (ctrl.unpublishedSkillSummaries.length === 0));
+            };
+            ctrl.setActiveTab = function(tabName) {
+              ctrl.activeTab = tabName;
+            };
+            ctrl.createTopic = function() {
+              TopicCreationService.createNewTopic();
+            };
+            ctrl.createSkill = function() {
+              var rubrics = [];
+              for (var idx in SKILL_DIFFICULTIES) {
+                rubrics.push(
+                  RubricObjectFactory.create(SKILL_DIFFICULTIES[idx], '')
+                );
+              }
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/topics-and-skills-dashboard-page/templates/' +
+                  'create-new-skill-modal.template.html'),
+                backdrop: 'static',
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.newSkillDescription = '';
+                    $scope.rubrics = rubrics;
                     $scope.allRubricsAdded = true;
-                  };
+                    $scope.bindableDict = {
+                      displayedConceptCardExplanation: ''
+                    };
+                    var newExplanationObject = null;
 
-                  $scope.onSaveExplanation = function(explanationObject) {
-                    newExplanationObject = explanationObject.toBackendDict();
-                    $scope.bindableDict.displayedConceptCardExplanation =
-                      explanationObject.getHtml();
-                  };
-
-                  $scope.onSaveRubric = function(difficulty, explanation) {
-                    for (var idx in $scope.rubrics) {
-                      if ($scope.rubrics[idx].getDifficulty() === difficulty) {
-                        $scope.rubrics[idx].setExplanation(explanation);
-                      }
-                    }
-                    areAllRubricsPresent();
-                  };
-
-                  $scope.createNewSkill = function() {
-                    $uibModalInstance.close({
-                      description: $scope.newSkillDescription,
-                      rubrics: $scope.rubrics,
-                      explanation: newExplanationObject
+                    $scope.$watch('newSkillDescription', function() {
+                      $scope.rubrics[1].setExplanation(
+                        '<p>' + $scope.newSkillDescription + '</p>');
                     });
-                  };
 
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            }).result.then(function(result) {
-              SkillCreationService.createNewSkill(
-                result.description, result.rubrics, result.explanation, []);
-            });
+                    var areAllRubricsPresent = function() {
+                      for (var idx in $scope.rubrics) {
+                        if ($scope.rubrics[idx].getExplanation() === '') {
+                          $scope.allRubricsAdded = false;
+                          return;
+                        }
+                      }
+                      $scope.allRubricsAdded = true;
+                    };
+
+                    $scope.onSaveExplanation = function(explanationObject) {
+                      newExplanationObject = explanationObject.toBackendDict();
+                      $scope.bindableDict.displayedConceptCardExplanation =
+                        explanationObject.getHtml();
+                    };
+
+                    $scope.onSaveRubric = function(difficulty, explanation) {
+                      for (var idx in $scope.rubrics) {
+                        if (
+                          $scope.rubrics[idx].getDifficulty() === difficulty) {
+                          $scope.rubrics[idx].setExplanation(explanation);
+                        }
+                      }
+                      areAllRubricsPresent();
+                    };
+
+                    $scope.createNewSkill = function() {
+                      $uibModalInstance.close({
+                        description: $scope.newSkillDescription,
+                        rubrics: $scope.rubrics,
+                        explanation: newExplanationObject
+                      });
+                    };
+
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              }).result.then(function(result) {
+                SkillCreationService.createNewSkill(
+                  result.description, result.rubrics, result.explanation, []);
+              });
+            };
+
+            _initDashboard();
+            $scope.$on(
+              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, _initDashboard);
           };
-
-          _initDashboard();
-          $scope.$on(
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, _initDashboard);
         }
       ]
     };

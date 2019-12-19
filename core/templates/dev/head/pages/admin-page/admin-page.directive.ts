@@ -53,40 +53,40 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
         function($http, $location, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
-          ctrl.userEmail = '';
-          AdminDataService.getDataAsync().then(function(response) {
-            ctrl.userEmail = response.user_email;
-          });
-          ctrl.inDevMode = DEV_MODE;
+          ctrl.$onInit = function() {
+            ctrl.userEmail = '';
+            AdminDataService.getDataAsync().then(function(response) {
+              ctrl.userEmail = response.user_email;
+            });
+            ctrl.inDevMode = DEV_MODE;
+            ctrl.statusMessage = '';
+            ctrl.isActivitiesTabOpen = function() {
+              return AdminRouterService.isActivitiesTabOpen();
+            };
+            ctrl.isJobsTabOpen = function() {
+              return AdminRouterService.isJobsTabOpen();
+            };
+            ctrl.isConfigTabOpen = function() {
+              return AdminRouterService.isConfigTabOpen();
+            };
+            ctrl.isRolesTabOpen = function() {
+              return AdminRouterService.isRolesTabOpen();
+            };
+            ctrl.isMiscTabOpen = function() {
+              return AdminRouterService.isMiscTabOpen();
+            };
 
-          ctrl.statusMessage = '';
-          ctrl.isActivitiesTabOpen = function() {
-            return AdminRouterService.isActivitiesTabOpen();
-          };
-          ctrl.isJobsTabOpen = function() {
-            return AdminRouterService.isJobsTabOpen();
-          };
-          ctrl.isConfigTabOpen = function() {
-            return AdminRouterService.isConfigTabOpen();
-          };
-          ctrl.isRolesTabOpen = function() {
-            return AdminRouterService.isRolesTabOpen();
-          };
-          ctrl.isMiscTabOpen = function() {
-            return AdminRouterService.isMiscTabOpen();
-          };
+            CsrfTokenService.initializeToken();
 
-          CsrfTokenService.initializeToken();
+            ctrl.setStatusMessage = function(statusMessage) {
+              ctrl.statusMessage = statusMessage;
+            };
 
-          ctrl.setStatusMessage = function(statusMessage) {
-            ctrl.statusMessage = statusMessage;
+            $scope.$on('$locationChangeSuccess', function() {
+              AdminRouterService.showTab($location.path().replace('/', '#'));
+            });
           };
-
-          $scope.$on('$locationChangeSuccess', function() {
-            AdminRouterService.showTab($location.path().replace('/', '#'));
-          });
-        }
-      ]
+        }]
     };
   }
 ]);

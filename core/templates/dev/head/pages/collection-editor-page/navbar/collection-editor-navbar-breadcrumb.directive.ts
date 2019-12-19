@@ -45,27 +45,28 @@ angular.module('oppia').directive('collectionEditorNavbarBreadcrumb', [
             RouterService, CollectionEditorStateService,
             FocusManagerService, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
           var ctrl = this;
-          var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
-            main: 'Edit',
-            preview: 'Preview',
-            settings: 'Settings',
-            stats: 'Statistics',
-            improvements: 'Improvements',
-            history: 'History',
-          };
+          ctrl.$onInit = function() {
+            var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
+              main: 'Edit',
+              preview: 'Preview',
+              settings: 'Settings',
+              stats: 'Statistics',
+              improvements: 'Improvements',
+              history: 'History',
+            };
 
-          ctrl.collection = CollectionEditorStateService.getCollection();
+            ctrl.collection = CollectionEditorStateService.getCollection();
 
-          ctrl.getCurrentTabName = function() {
-            return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
-              RouterService.getActiveTabName()];
-          };
+            ctrl.getCurrentTabName = function() {
+              return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
+                RouterService.getActiveTabName()];
+            };
 
-          ctrl.editCollectionTitle = function() {
-            RouterService.navigateToSettingsTab();
-            FocusManagerService.setFocus(COLLECTION_TITLE_INPUT_FOCUS_LABEL);
+            ctrl.editCollectionTitle = function() {
+              RouterService.navigateToSettingsTab();
+              FocusManagerService.setFocus(COLLECTION_TITLE_INPUT_FOCUS_LABEL);
+            };
           };
-        }
-      ]
+        }]
     };
   }]);

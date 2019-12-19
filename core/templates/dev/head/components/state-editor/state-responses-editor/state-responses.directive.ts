@@ -451,6 +451,9 @@ angular.module('oppia').directive('stateResponses', [
               if (result.reopen) {
                 $scope.openAddAnswerGroupModal();
               }
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -511,6 +514,9 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
                   $scope.refreshWarnings()();
                 });
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 

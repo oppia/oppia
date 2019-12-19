@@ -28,9 +28,10 @@ angular.module('oppia').factory('BaseUndoRedoService', [
   '$rootScope', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
   function($rootScope, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
     var BaseUndoRedoService = {};
-
-    this._appliedChanges = [];
-    this._undoneChanges = [];
+    this.$onInit = function() {
+      this._appliedChanges = [];
+      this._undoneChanges = [];
+    };
 
     var _dispatchMutation = function() {
       $rootScope.$broadcast(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);

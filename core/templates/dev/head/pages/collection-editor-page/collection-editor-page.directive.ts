@@ -54,23 +54,25 @@ angular.module('oppia').directive('collectionEditorPage', [
             RouterService, UrlService, EVENT_COLLECTION_INITIALIZED,
             EVENT_COLLECTION_REINITIALIZED) {
           var ctrl = this;
-          ctrl.getActiveTabName = RouterService.getActiveTabName;
-          // Load the collection to be edited.
-          CollectionEditorStateService.loadCollection(
-            UrlService.getCollectionIdFromEditorUrl());
-          var setTitle = function() {
-            var title = (
-              CollectionEditorStateService.getCollection().getTitle());
-            if (title) {
-              PageTitleService.setPageTitle(title + ' - Oppia Editor');
-            } else {
-              PageTitleService.setPageTitle(
-                'Untitled Collection - Oppia Editor');
-            }
-          };
+          ctrl.$onInit = function() {
+            ctrl.getActiveTabName = RouterService.getActiveTabName;
+            // Load the collection to be edited.
+            CollectionEditorStateService.loadCollection(
+              UrlService.getCollectionIdFromEditorUrl());
+            var setTitle = function() {
+              var title = (
+                CollectionEditorStateService.getCollection().getTitle());
+              if (title) {
+                PageTitleService.setPageTitle(title + ' - Oppia Editor');
+              } else {
+                PageTitleService.setPageTitle(
+                  'Untitled Collection - Oppia Editor');
+              }
+            };
 
-          $scope.$on(EVENT_COLLECTION_INITIALIZED, setTitle);
-          $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
+            $scope.$on(EVENT_COLLECTION_INITIALIZED, setTitle);
+            $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
+          };
         }]
     };
   }

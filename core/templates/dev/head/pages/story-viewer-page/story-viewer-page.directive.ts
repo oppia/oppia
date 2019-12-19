@@ -50,31 +50,32 @@ angular.module('oppia').directive('storyViewerPage', [
             PageTitleService, StoryPlaythroughObjectFactory,
             StoryViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
           var ctrl = this;
-          ctrl.checkMobileView = function() {
-            return ($window.innerWidth < 500);
-          };
-          ctrl.storyIsLoaded = false;
-          $rootScope.loadingMessage = 'Loading';
-          var storyId = UrlService.getStoryIdFromViewerUrl();
-          StoryViewerBackendApiService.fetchStoryData(storyId).then(
-            function(storyDataDict) {
-              ctrl.storyIsLoaded = true;
-              ctrl.storyPlaythroughObject =
-                StoryPlaythroughObjectFactory.createFromBackendDict(
-                  storyDataDict);
-              PageTitleService.setPageTitle(
-                storyDataDict.story_title + ' - Oppia');
-              ctrl.storyTitle = storyDataDict.story_title;
-              ctrl.storyDescription = storyDataDict.story_description;
-              $rootScope.loadingMessage = '';
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get dashboard data');
+          ctrl.$onInit = function() {
+            ctrl.checkMobileView = function() {
+              return ($window.innerWidth < 500);
+            };
+            ctrl.storyIsLoaded = false;
+            $rootScope.loadingMessage = 'Loading';
+            var storyId = UrlService.getStoryIdFromViewerUrl();
+            StoryViewerBackendApiService.fetchStoryData(storyId).then(
+              function(storyDataDict) {
+                ctrl.storyIsLoaded = true;
+                ctrl.storyPlaythroughObject =
+                  StoryPlaythroughObjectFactory.createFromBackendDict(
+                    storyDataDict);
+                PageTitleService.setPageTitle(
+                  storyDataDict.story_title + ' - Oppia');
+                ctrl.storyTitle = storyDataDict.story_title;
+                ctrl.storyDescription = storyDataDict.story_description;
+                $rootScope.loadingMessage = '';
+              },
+              function(errorResponse) {
+                if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                  AlertsService.addWarning('Failed to get dashboard data');
+                }
               }
-            }
-          );
-        }
-      ]
+            );
+          };
+        }]
     };
   }]);

@@ -32,17 +32,19 @@ angular.module('oppia').directive('oppiaResponseDragAndDropSortInput', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.chooseItemType = function(index) {
-          if (index === 0) {
-            ctrl.itemtype = 'drag-and-drop-response-item';
-          } else {
-            ctrl.itemtype = 'drag-and-drop-response-subitem';
-          }
-          return true;
-        };
+        ctrl.$onInit = function() {
+          ctrl.chooseItemType = function(index) {
+            if (index === 0) {
+              ctrl.itemtype = 'drag-and-drop-response-item';
+            } else {
+              ctrl.itemtype = 'drag-and-drop-response-subitem';
+            }
+            return true;
+          };
 
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
+          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
+        };
       }]
     };
   }

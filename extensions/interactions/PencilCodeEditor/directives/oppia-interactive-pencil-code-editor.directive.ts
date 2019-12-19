@@ -52,141 +52,146 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             FocusManagerService, PencilCodeEditorRulesService,
             CurrentInteractionService) {
           var ctrl = this;
-          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+          ctrl.$onInit = function() {
+            ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
 
-          ctrl.initialCode = ctrl.interactionIsActive ?
-            HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
-            ctrl.getLastAnswer().code;
+            ctrl.initialCode = ctrl.interactionIsActive ?
+              HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
+              ctrl.getLastAnswer().code;
 
-          var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
-          var pce = new PencilCodeEmbed(iframeDiv);
-          pce.beginLoad(ctrl.initialCode);
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-            pce.hideMiddleButton();
-            pce.hideToggleButton();
-            pce.setReadOnly();
-          });
-          pce.on('load', function() {
-            // Hides the error console at the bottom right, and prevents it
-            // from showing up even if the code has an error. Also, hides the
-            // turtle, and redefines say() to also write the text on the
-            // screen.
-            pce.setupScript([{
-              code: [
-                'window.onerror = function() {',
-                '  return true;',
-                '};',
-                'debug.hide();',
-                'window.removeEventListener("error", debug)',
-                '',
-                'ht();',
-                '',
-                'oldsay = window.say',
-                'say = function(x) {',
-                '  write(x);',
-                '  oldsay(x);',
-                '};'
-              ].join('\n'),
-              type: 'text/javascript'
-            }]);
-
-            pce.showEditor();
-            pce.hideToggleButton();
-            if (ctrl.interactionIsActive) {
-              pce.setEditable();
-            } else {
+            var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
+            var pce = new PencilCodeEmbed(iframeDiv);
+            pce.beginLoad(ctrl.initialCode);
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
               pce.hideMiddleButton();
+              pce.hideToggleButton();
               pce.setReadOnly();
-            }
-
-            // Pencil Code automatically takes the focus on load, so we clear
-            // it.
-            FocusManagerService.clearFocus();
-          });
-
-          ctrl.reset = function() {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/PencilCodeEditor/directives/' +
-                'pencil-code-reset-confirmation.directive.html'),
-              backdrop: 'static',
-              keyboard: false,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss();
-                  };
-
-                  $scope.resetCode = function() {
-                    $uibModalInstance.close();
-                  };
-                }]
-            }).result.then(function() {
-              pce.setCode(ctrl.initialCode);
             });
-          };
+            pce.on('load', function() {
+              // Hides the error console at the bottom right, and prevents it
+              // from showing up even if the code has an error. Also, hides the
+              // turtle, and redefines say() to also write the text on the
+              // screen.
+              pce.setupScript([{
+                code: [
+                  'window.onerror = function() {',
+                  '  return true;',
+                  '};',
+                  'debug.hide();',
+                  'window.removeEventListener("error", debug)',
+                  '',
+                  'ht();',
+                  '',
+                  'oldsay = window.say',
+                  'say = function(x) {',
+                  '  write(x);',
+                  '  oldsay(x);',
+                  '};'
+                ].join('\n'),
+                type: 'text/javascript'
+              }]);
 
-          var getNormalizedCode = function() {
-            // Converts tabs to spaces.
-            return pce.getCode().replace(/\t/g, '  ');
-          };
+              pce.showEditor();
+              pce.hideToggleButton();
+              if (ctrl.interactionIsActive) {
+                pce.setEditable();
+              } else {
+                pce.hideMiddleButton();
+                pce.setReadOnly();
+              }
 
-          var errorIsHappening = false;
-          var hasSubmittedAnswer = false;
+              // Pencil Code automatically takes the focus on load, so we clear
+              // it.
+              FocusManagerService.clearFocus();
+            });
 
-          pce.on('startExecute', function() {
-            hasSubmittedAnswer = false;
-          });
+            ctrl.reset = function() {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/PencilCodeEditor/directives/' +
+                  'pencil-code-reset-confirmation.directive.html'),
+                backdrop: 'static',
+                keyboard: false,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss();
+                    };
 
-          pce.on('execute', function() {
-            if (errorIsHappening || hasSubmittedAnswer) {
-              return;
-            }
+                    $scope.resetCode = function() {
+                      $uibModalInstance.close();
+                    };
+                  }]
+              }).result.then(function() {
+                pce.setCode(ctrl.initialCode);
+              }, function() {
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
+              });
+            };
 
-            pce.eval('document.body.innerHTML', function(pencilCodeHtml) {
+            var getNormalizedCode = function() {
+              // Converts tabs to spaces.
+              return pce.getCode().replace(/\t/g, '  ');
+            };
+
+            var errorIsHappening = false;
+            var hasSubmittedAnswer = false;
+
+            pce.on('startExecute', function() {
+              hasSubmittedAnswer = false;
+            });
+
+            pce.on('execute', function() {
+              if (errorIsHappening || hasSubmittedAnswer) {
+                return;
+              }
+
+              pce.eval('document.body.innerHTML', function(pencilCodeHtml) {
+                var normalizedCode = getNormalizedCode();
+
+                // Get all the divs, and extract their textual content.
+                var output = $.map(
+                  $(pencilCodeHtml).filter('div'), function(elem) {
+                    return $(elem).text();
+                  }).join('\n');
+
+                hasSubmittedAnswer = true;
+                CurrentInteractionService.onSubmit({
+                  code: normalizedCode,
+                  output: output || '',
+                  evaluation: '',
+                  error: ''
+                }, PencilCodeEditorRulesService);
+              }, true);
+            });
+
+            pce.on('error', function(error) {
+              if (hasSubmittedAnswer) {
+                return;
+              }
+
               var normalizedCode = getNormalizedCode();
 
-              // Get all the divs, and extract their textual content.
-              var output = $.map(
-                $(pencilCodeHtml).filter('div'), function(elem) {
-                  return $(elem).text();
-                }).join('\n');
-
+              errorIsHappening = true;
               hasSubmittedAnswer = true;
+
               CurrentInteractionService.onSubmit({
                 code: normalizedCode,
-                output: output || '',
+                output: '',
                 evaluation: '',
-                error: ''
+                error: error.message
               }, PencilCodeEditorRulesService);
-            }, true);
-          });
 
-          pce.on('error', function(error) {
-            if (hasSubmittedAnswer) {
-              return;
-            }
+              $timeout(function() {
+                errorIsHappening = false;
+              }, 1000);
+            });
 
-            var normalizedCode = getNormalizedCode();
-
-            errorIsHappening = true;
-            hasSubmittedAnswer = true;
-
-            CurrentInteractionService.onSubmit({
-              code: normalizedCode,
-              output: '',
-              evaluation: '',
-              error: error.message
-            }, PencilCodeEditorRulesService);
-
-            $timeout(function() {
-              errorIsHappening = false;
-            }, 1000);
-          });
-
-          CurrentInteractionService.registerCurrentInteraction(null, null);
+            CurrentInteractionService.registerCurrentInteraction(null, null);
+          };
         }]
     };
   }

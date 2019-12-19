@@ -40,35 +40,37 @@ angular.module('oppia').directive('conceptCard', [
             $scope, $filter, $rootScope,
             ConceptCardBackendApiService, ConceptCardObjectFactory) {
           var ctrl = this;
-          ctrl.conceptCards = [];
-          ctrl.currentConceptCard = null;
-          ctrl.numberOfWorkedExamplesShown = 0;
-          ctrl.loadingMessage = 'Loading';
-          ConceptCardBackendApiService.loadConceptCards(
-            ctrl.getSkillIds()
-          ).then(function(conceptCardBackendDicts) {
-            conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
-              ctrl.conceptCards.push(
-                ConceptCardObjectFactory.createFromBackendDict(
-                  conceptCardBackendDict));
-            });
-            ctrl.loadingMessage = '';
-            ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
-          });
-
-          ctrl.isLastWorkedExample = function() {
-            return ctrl.numberOfWorkedExamplesShown ===
-              ctrl.currentConceptCard.getWorkedExamples().length;
-          };
-
-          ctrl.showMoreWorkedExamples = function() {
-            ctrl.numberOfWorkedExamplesShown++;
-          };
-
-          $scope.$watch('$ctrl.index', function(newIndex) {
-            ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
+          ctrl.$onInit = function() {
+            ctrl.conceptCards = [];
+            ctrl.currentConceptCard = null;
             ctrl.numberOfWorkedExamplesShown = 0;
-          });
+            ctrl.loadingMessage = 'Loading';
+            ConceptCardBackendApiService.loadConceptCards(
+              ctrl.getSkillIds()
+            ).then(function(conceptCardBackendDicts) {
+              conceptCardBackendDicts.forEach(function(conceptCardBackendDict) {
+                ctrl.conceptCards.push(
+                  ConceptCardObjectFactory.createFromBackendDict(
+                    conceptCardBackendDict));
+              });
+              ctrl.loadingMessage = '';
+              ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
+            });
+
+            ctrl.isLastWorkedExample = function() {
+              return ctrl.numberOfWorkedExamplesShown ===
+                ctrl.currentConceptCard.getWorkedExamples().length;
+            };
+
+            ctrl.showMoreWorkedExamples = function() {
+              ctrl.numberOfWorkedExamplesShown++;
+            };
+
+            $scope.$watch('$ctrl.index', function(newIndex) {
+              ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
+              ctrl.numberOfWorkedExamplesShown = 0;
+            });
+          };
         }
       ]
     };

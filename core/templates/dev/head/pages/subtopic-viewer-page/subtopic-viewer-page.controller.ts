@@ -53,31 +53,31 @@ angular.module('oppia').directive('subtopicViewerPage', [
             SubtopicViewerBackendApiService, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
+          ctrl.$onInit = function() {
+            ctrl.checkMobileView = function() {
+              return (WindowDimensionsService.getWidth() < 500);
+            };
+            ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+            ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
 
-          ctrl.checkMobileView = function() {
-            return (WindowDimensionsService.getWidth() < 500);
-          };
-          ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-          ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
-
-          $rootScope.loadingMessage = 'Loading';
-          SubtopicViewerBackendApiService.fetchSubtopicData(
-            ctrl.topicName, ctrl.subtopicId).then(
-            function(subtopicDataDict) {
-              ctrl.pageContents =
-                SubtitledHtmlObjectFactory.createFromBackendDict(
-                  subtopicDataDict.page_contents.subtitled_html);
-              ctrl.subtopicTitle = subtopicDataDict.subtopic_title;
-              PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
-              $rootScope.loadingMessage = '';
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get subtopic data');
+            $rootScope.loadingMessage = 'Loading';
+            SubtopicViewerBackendApiService.fetchSubtopicData(
+              ctrl.topicName, ctrl.subtopicId).then(
+              function(subtopicDataDict) {
+                ctrl.pageContents =
+                  SubtitledHtmlObjectFactory.createFromBackendDict(
+                    subtopicDataDict.page_contents.subtitled_html);
+                ctrl.subtopicTitle = subtopicDataDict.subtopic_title;
+                PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
+                $rootScope.loadingMessage = '';
+              },
+              function(errorResponse) {
+                if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                  AlertsService.addWarning('Failed to get subtopic data');
+                }
               }
-            }
-          );
-        }
-      ]
+            );
+          };
+        }]
     };
   }]);

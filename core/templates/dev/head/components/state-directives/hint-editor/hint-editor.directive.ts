@@ -44,53 +44,54 @@ angular.module('oppia').directive('hintEditor', [
         '$scope', 'EditabilityService', 'StateHintsService',
         function($scope, EditabilityService, StateHintsService) {
           var ctrl = this;
-          ctrl.isEditable = EditabilityService.isEditable();
-          ctrl.StateHintsService = StateHintsService;
-          ctrl.editHintForm = {};
-          ctrl.hintEditorIsOpen = false;
-
-          ctrl.HINT_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
-          ctrl.hintMemento = null;
-
-          ctrl.openHintEditor = function() {
-            if (ctrl.isEditable) {
-              ctrl.hintMemento = angular.copy(ctrl.hint);
-              ctrl.hintEditorIsOpen = true;
-            }
-          };
-
-          ctrl.saveThisHint = function() {
+          ctrl.$onInit = function() {
+            ctrl.isEditable = EditabilityService.isEditable();
+            ctrl.StateHintsService = StateHintsService;
+            ctrl.editHintForm = {};
             ctrl.hintEditorIsOpen = false;
-            var contentHasChanged = (
-              ctrl.hintMemento.hintContent.getHtml() !==
-              ctrl.hint.hintContent.getHtml());
-            ctrl.hintMemento = null;
-            if (contentHasChanged) {
-              var hintContentId = ctrl.hint.hintContent.getContentId();
-              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
-                hintContentId);
-            }
-            ctrl.getOnSaveFn()();
-          };
 
-          ctrl.cancelThisHintEdit = function() {
-            ctrl.hint.hintContent =
-              angular.copy(ctrl.hintMemento.hintContent);
-            ctrl.hintMemento = null;
-            ctrl.hintEditorIsOpen = false;
-          };
+            ctrl.HINT_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
 
-          $scope.$on('externalSave', function() {
-            if (ctrl.hintEditorIsOpen &&
-                ctrl.editHintForm.$valid) {
-              ctrl.saveThisHint();
-            }
-          });
-        }
-      ]
+            ctrl.hintMemento = null;
+
+            ctrl.openHintEditor = function() {
+              if (ctrl.isEditable) {
+                ctrl.hintMemento = angular.copy(ctrl.hint);
+                ctrl.hintEditorIsOpen = true;
+              }
+            };
+
+            ctrl.saveThisHint = function() {
+              ctrl.hintEditorIsOpen = false;
+              var contentHasChanged = (
+                ctrl.hintMemento.hintContent.getHtml() !==
+                ctrl.hint.hintContent.getHtml());
+              ctrl.hintMemento = null;
+              if (contentHasChanged) {
+                var hintContentId = ctrl.hint.hintContent.getContentId();
+                ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+                  hintContentId);
+              }
+              ctrl.getOnSaveFn()();
+            };
+
+            ctrl.cancelThisHintEdit = function() {
+              ctrl.hint.hintContent =
+                angular.copy(ctrl.hintMemento.hintContent);
+              ctrl.hintMemento = null;
+              ctrl.hintEditorIsOpen = false;
+            };
+
+            $scope.$on('externalSave', function() {
+              if (ctrl.hintEditorIsOpen &&
+                  ctrl.editHintForm.$valid) {
+                ctrl.saveThisHint();
+              }
+            });
+          };
+        }]
     };
   }]);

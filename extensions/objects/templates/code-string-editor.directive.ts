@@ -35,25 +35,27 @@ angular.module('oppia').directive('codeStringEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        ctrl.alwaysEditable = ctrl.getAlwaysEditable();
-        ctrl.getWarningText = function() {
-          if (ctrl.localValue.label.indexOf('\t') !== -1) {
-            return 'Code may not contain tab characters.';
-          }
-          return '';
-        };
-
-        // Reset the component each time the value changes (e.g. if this is part
-        // of an editable list).
-        $scope.$watch('$ctrl.value', function() {
-          ctrl.localValue = {
-            label: ctrl.value || ''
+        ctrl.$onInit = function() {
+          ctrl.alwaysEditable = ctrl.getAlwaysEditable();
+          ctrl.getWarningText = function() {
+            if (ctrl.localValue.label.indexOf('\t') !== -1) {
+              return 'Code may not contain tab characters.';
+            }
+            return '';
           };
-        }, true);
 
-        $scope.$watch('$ctrl.localValue.label', function(newValue) {
-          ctrl.value = newValue;
-        });
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
+          $scope.$watch('$ctrl.value', function() {
+            ctrl.localValue = {
+              label: ctrl.value || ''
+            };
+          }, true);
+
+          $scope.$watch('$ctrl.localValue.label', function(newValue) {
+            ctrl.value = newValue;
+          });
+        };
       }]
     };
   }]);

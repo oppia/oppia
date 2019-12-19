@@ -74,6 +74,9 @@ angular.module('oppia').directive('stateTranslationEditor', [
                   contentId, langaugeCode);
                 ExplorationStatesService.saveRecordedVoiceovers(
                   stateName, recordedVoiceovers);
+              }, function() {
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             }
           };

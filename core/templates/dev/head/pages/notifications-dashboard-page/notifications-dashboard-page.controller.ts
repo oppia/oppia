@@ -35,33 +35,35 @@ angular.module('oppia').directive('notificationsDashboardPage', [
         '$http', '$rootScope', 'DateTimeFormatService',
         function($http, $rootScope, DateTimeFormatService) {
           var ctrl = this;
-          ctrl.getItemUrl = function(activityId, notificationType) {
-            return (
-              '/create/' + activityId + (
-                notificationType === 'feedback_thread' ? '#/feedback' : ''));
-          };
+          ctrl.$onInit = function() {
+            ctrl.getItemUrl = function(activityId, notificationType) {
+              return (
+                '/create/' + activityId + (
+                  notificationType === 'feedback_thread' ? '#/feedback' : ''));
+            };
 
-          ctrl.navigateToProfile = function($event, username) {
-            $event.stopPropagation();
-            window.location.href = '/profile/' + username;
-          };
+            ctrl.navigateToProfile = function($event, username) {
+              $event.stopPropagation();
+              window.location.href = '/profile/' + username;
+            };
 
-          ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
-            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-              millisSinceEpoch);
-          };
+            ctrl.getLocaleAbbreviatedDatetimeString = function(
+                millisSinceEpoch) {
+              return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+                millisSinceEpoch);
+            };
 
-          $rootScope.loadingMessage = 'Loading';
-          $http.get('/notificationsdashboardhandler/data').then(function(
-              response) {
-            var data = response.data;
-            ctrl.recentNotifications = data.recent_notifications;
-            ctrl.jobQueuedMsec = data.job_queued_msec;
-            ctrl.lastSeenMsec = data.last_seen_msec || 0.0;
-            ctrl.currentUsername = data.username;
-            $rootScope.loadingMessage = '';
-          });
-        }
-      ]
+            $rootScope.loadingMessage = 'Loading';
+            $http.get('/notificationsdashboardhandler/data').then(function(
+                response) {
+              var data = response.data;
+              ctrl.recentNotifications = data.recent_notifications;
+              ctrl.jobQueuedMsec = data.job_queued_msec;
+              ctrl.lastSeenMsec = data.last_seen_msec || 0.0;
+              ctrl.currentUsername = data.username;
+              $rootScope.loadingMessage = '';
+            });
+          };
+        }]
     };
   }]);

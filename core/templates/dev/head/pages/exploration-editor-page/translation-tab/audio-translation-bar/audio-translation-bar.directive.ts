@@ -392,6 +392,9 @@ angular.module('oppia').directive('audioTranslationBar', [
                   };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -515,6 +518,9 @@ angular.module('oppia').directive('audioTranslationBar', [
                 $scope.contentId, $scope.languageCode);
               saveRecordedVoiceoversChanges();
               $scope.initAudioBar();
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -617,6 +623,8 @@ angular.module('oppia').directive('audioTranslationBar', [
                 result.fileSizeBytes);
               saveRecordedVoiceoversChanges();
               $scope.initAudioBar();
+            }, function() {
+              // uib-modal promise is handled here.
             });
           };
           $scope.initAudioBar();

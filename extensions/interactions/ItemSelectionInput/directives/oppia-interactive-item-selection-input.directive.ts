@@ -50,68 +50,69 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
             $attrs, WindowDimensionsService,
             UrlService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.choices = HtmlEscaperService.escapedJsonToObj(
-            $attrs.choicesWithValue);
-          ctrl.maxAllowableSelectionCount = (
-            $attrs.maxAllowableSelectionCountWithValue);
-          ctrl.minAllowableSelectionCount = (
-            $attrs.minAllowableSelectionCountWithValue);
+          ctrl.$onInit = function() {
+            ctrl.choices = HtmlEscaperService.escapedJsonToObj(
+              $attrs.choicesWithValue);
+            ctrl.maxAllowableSelectionCount = (
+              $attrs.maxAllowableSelectionCountWithValue);
+            ctrl.minAllowableSelectionCount = (
+              $attrs.minAllowableSelectionCountWithValue);
 
-          // The following is an associative array where the key is a choice
-          // (html) and the value is a boolean value indicating whether the
-          // choice was selected by the user (default is false).
-          ctrl.userSelections = {};
+            // The following is an associative array where the key is a choice
+            // (html) and the value is a boolean value indicating whether the
+            // choice was selected by the user (default is false).
+            ctrl.userSelections = {};
 
-          for (var i = 0; i < ctrl.choices.length; i++) {
-            ctrl.userSelections[ctrl.choices[i]] = false;
-          }
+            for (var i = 0; i < ctrl.choices.length; i++) {
+              ctrl.userSelections[ctrl.choices[i]] = false;
+            }
 
-          ctrl.displayCheckboxes = (ctrl.maxAllowableSelectionCount > 1);
+            ctrl.displayCheckboxes = (ctrl.maxAllowableSelectionCount > 1);
 
-          // The following indicates that the number of answers is more than
-          // maxAllowableSelectionCount.
-          ctrl.preventAdditionalSelections = false;
+            // The following indicates that the number of answers is more than
+            // maxAllowableSelectionCount.
+            ctrl.preventAdditionalSelections = false;
 
-          // The following indicates that the number of answers is less than
-          // minAllowableSelectionCount.
-          ctrl.notEnoughSelections = (ctrl.minAllowableSelectionCount > 0);
+            // The following indicates that the number of answers is less than
+            // minAllowableSelectionCount.
+            ctrl.notEnoughSelections = (ctrl.minAllowableSelectionCount > 0);
 
-          ctrl.onToggleCheckbox = function() {
-            ctrl.newQuestion = false;
-            ctrl.selectionCount = Object.keys(ctrl.userSelections).filter(
-              function(obj) {
-                return ctrl.userSelections[obj];
-              }
-            ).length;
-            ctrl.preventAdditionalSelections = (
-              ctrl.selectionCount >= ctrl.maxAllowableSelectionCount);
-            ctrl.notEnoughSelections = (
-              ctrl.selectionCount < ctrl.minAllowableSelectionCount);
+            ctrl.onToggleCheckbox = function() {
+              ctrl.newQuestion = false;
+              ctrl.selectionCount = Object.keys(ctrl.userSelections).filter(
+                function(obj) {
+                  return ctrl.userSelections[obj];
+                }
+              ).length;
+              ctrl.preventAdditionalSelections = (
+                ctrl.selectionCount >= ctrl.maxAllowableSelectionCount);
+              ctrl.notEnoughSelections = (
+                ctrl.selectionCount < ctrl.minAllowableSelectionCount);
+            };
+
+            ctrl.submitMultipleChoiceAnswer = function(index) {
+              ctrl.userSelections[ctrl.choices[index]] = true;
+              ctrl.submitAnswer(ctrl.userSelections);
+            };
+
+            ctrl.submitAnswer = function() {
+              var answers = Object.keys(ctrl.userSelections).filter(
+                function(obj) {
+                  return ctrl.userSelections[obj];
+                }
+              );
+
+              CurrentInteractionService.onSubmit(
+                answers, ItemSelectionInputRulesService);
+            };
+
+            var validityCheckFn = function() {
+              return !ctrl.notEnoughSelections;
+            };
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitAnswer, validityCheckFn);
           };
-
-          ctrl.submitMultipleChoiceAnswer = function(index) {
-            ctrl.userSelections[ctrl.choices[index]] = true;
-            ctrl.submitAnswer(ctrl.userSelections);
-          };
-
-          ctrl.submitAnswer = function() {
-            var answers = Object.keys(ctrl.userSelections).filter(
-              function(obj) {
-                return ctrl.userSelections[obj];
-              }
-            );
-
-            CurrentInteractionService.onSubmit(
-              answers, ItemSelectionInputRulesService);
-          };
-
-          var validityCheckFn = function() {
-            return !ctrl.notEnoughSelections;
-          };
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitAnswer, validityCheckFn);
-        }
-      ]
+        }]
     };
   }
 ]);

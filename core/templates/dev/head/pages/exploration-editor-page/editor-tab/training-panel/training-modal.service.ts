@@ -177,7 +177,11 @@ angular.module('oppia').factory('TrainingModalService', [
 
               $scope.init();
             }]
+        }).result.then(function() {}, function() {
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
+
         // Save the modified training data externally in state content.
         $rootScope.$broadcast('externalSave');
       }

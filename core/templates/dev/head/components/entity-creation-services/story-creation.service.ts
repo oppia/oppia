@@ -80,6 +80,9 @@ angular.module('oppia').factory('StoryCreationService', [
             }, function() {
               $rootScope.loadingMessage = '';
             });
+        }, function() {
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       }
     };

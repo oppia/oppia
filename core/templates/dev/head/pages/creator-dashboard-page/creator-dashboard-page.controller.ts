@@ -90,7 +90,8 @@ angular.module('oppia').directive('creatorDashboardPage', [
           var ctrl = this;
           var EXP_PUBLISH_TEXTS = {
             defaultText: (
-              'This exploration is private. Publish it to receive statistics.'),
+              'This exploration is private. Publish it to receive ' +
+              'statistics.'),
             smText: 'Publish the exploration to receive statistics.'
           };
 
@@ -148,8 +149,8 @@ angular.module('oppia').directive('creatorDashboardPage', [
               for (var i = 0; i < numberOfCreatedSuggestions; i++) {
                 if (responseData.created_suggestions_list.length !==
                     numberOfCreatedSuggestions) {
-                  $log.error('Number of suggestions does not match number of ' +
-                            'suggestion threads');
+                  $log.error('Number of suggestions does not match number' +
+                            'of suggestion threads');
                 }
                 for (var j = 0; j < numberOfCreatedSuggestions; j++) {
                   var suggestion = SuggestionObjectFactory
@@ -160,7 +161,8 @@ angular.module('oppia').directive('creatorDashboardPage', [
                   if (threadDict.thread_id === suggestion.getThreadId()) {
                     var suggestionThread = (
                       SuggestionThreadObjectFactory.createFromBackendDicts(
-                        threadDict, responseData.created_suggestions_list[j]));
+                        threadDict,
+                        responseData.created_suggestions_list[j]));
                     ctrl.mySuggestionsList.push(suggestionThread);
                   }
                 }
@@ -169,8 +171,8 @@ angular.module('oppia').directive('creatorDashboardPage', [
               for (var i = 0; i < numberOfSuggestionsToReview; i++) {
                 if (responseData.suggestions_to_review_list.length !==
                     numberOfSuggestionsToReview) {
-                  $log.error('Number of suggestions does not match number of ' +
-                            'suggestion threads');
+                  $log.error('Number of suggestions does not match number' +
+                            'of suggestion threads');
                 }
                 for (var j = 0; j < numberOfSuggestionsToReview; j++) {
                   var suggestion = SuggestionObjectFactory
@@ -256,9 +258,9 @@ angular.module('oppia').directive('creatorDashboardPage', [
           };
 
           ctrl.showUsernamePopover = function(subscriberUsername) {
-            // The popover on the subscription card is only shown if the length
-            // of the subscriber username is greater than 10 and the user hovers
-            // over the truncated username.
+            // The popover on the subscription card is only shown if the
+            // length of the subscriber username is greater than 10 and the
+            // user hovers over the truncated username.
             if (subscriberUsername.length > 10) {
               return 'mouseenter';
             } else {
@@ -389,7 +391,6 @@ angular.module('oppia').directive('creatorDashboardPage', [
           ctrl.getCompleteThumbnailIconUrl = function(iconUrl) {
             return UrlInterpolationService.getStaticImageUrl(iconUrl);
           };
-        }
-      ]
+        }]
     };
   }]);

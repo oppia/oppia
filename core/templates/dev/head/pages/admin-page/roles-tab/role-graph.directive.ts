@@ -48,58 +48,59 @@ angular.module('oppia').directive('roleGraph', [
             $element, $timeout, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
-          var getElementDimensions = function() {
-            return {
-              h: $element.height(),
-              w: $element.width()
-            };
-          };
-
-          ctrl.getGraphHeightInPixels = function() {
-            return Math.max(ctrl.GRAPH_HEIGHT, 300);
-          };
-
-          ctrl.drawGraph = function(
-              nodes, originalLinks, initStateId, finalStateIds) {
-            ctrl.finalStateIds = finalStateIds;
-            var links = angular.copy(originalLinks);
-
-            var nodeData = StateGraphLayoutService.computeLayout(
-              nodes, links, initStateId, angular.copy(finalStateIds));
-
-            ctrl.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
-              MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH);
-            ctrl.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
-              nodeData);
-
-            nodeData = StateGraphLayoutService.modifyPositionValues(
-              nodeData, ctrl.GRAPH_WIDTH, ctrl.GRAPH_HEIGHT);
-
-            ctrl.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
-              nodeData, links);
-
-            ctrl.getNodeTitle = function(node) {
-              return node.label;
+          ctrl.$onInit = function() {
+            var getElementDimensions = function() {
+              return {
+                h: $element.height(),
+                w: $element.width()
+              };
             };
 
-            ctrl.getTruncatedLabel = function(nodeLabel) {
-              return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
+            ctrl.getGraphHeightInPixels = function() {
+              return Math.max(ctrl.GRAPH_HEIGHT, 300);
             };
 
-            // creating list of nodes to display.
-            ctrl.nodeList = [];
-            for (var nodeId in nodeData) {
-              ctrl.nodeList.push(nodeData[nodeId]);
+            ctrl.drawGraph = function(
+                nodes, originalLinks, initStateId, finalStateIds) {
+              ctrl.finalStateIds = finalStateIds;
+              var links = angular.copy(originalLinks);
+
+              var nodeData = StateGraphLayoutService.computeLayout(
+                nodes, links, initStateId, angular.copy(finalStateIds));
+
+              ctrl.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
+                MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH);
+              ctrl.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
+                nodeData);
+
+              nodeData = StateGraphLayoutService.modifyPositionValues(
+                nodeData, ctrl.GRAPH_WIDTH, ctrl.GRAPH_HEIGHT);
+
+              ctrl.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
+                nodeData, links);
+
+              ctrl.getNodeTitle = function(node) {
+                return node.label;
+              };
+
+              ctrl.getTruncatedLabel = function(nodeLabel) {
+                return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
+              };
+
+              // creating list of nodes to display.
+              ctrl.nodeList = [];
+              for (var nodeId in nodeData) {
+                ctrl.nodeList.push(nodeData[nodeId]);
+              }
+            };
+
+            if (ctrl.graphDataLoaded) {
+              ctrl.drawGraph(
+                ctrl.graphData.nodes, ctrl.graphData.links,
+                ctrl.graphData.initStateId, ctrl.graphData.finalStateIds
+              );
             }
           };
-
-          if (ctrl.graphDataLoaded) {
-            ctrl.drawGraph(
-              ctrl.graphData.nodes, ctrl.graphData.links,
-              ctrl.graphData.initStateId, ctrl.graphData.finalStateIds
-            );
-          }
-        }
-      ]
+        }]
     };
   }]);

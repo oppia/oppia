@@ -46,44 +46,45 @@ angular.module('oppia').directive('collectionNodeEditor', [
             CollectionEditorStateService, CollectionLinearizerService,
             CollectionUpdateService, AlertsService) {
           var ctrl = this;
-          ctrl.collection = CollectionEditorStateService.getCollection();
+          ctrl.$onInit = function() {
+            ctrl.collection = CollectionEditorStateService.getCollection();
 
-          // Deletes this collection node from the frontend collection
-          // object and also updates the changelist.
-          ctrl.deleteNode = function() {
-            var explorationId = ctrl.getCollectionNode().getExplorationId();
-            if (!CollectionLinearizerService.removeCollectionNode(
-              ctrl.collection, explorationId)) {
-              AlertsService.fatalWarning(
-                'Internal collection editor error. Could not delete ' +
-                'exploration by ID: ' + explorationId);
-            }
-          };
+            // Deletes this collection node from the frontend collection
+            // object and also updates the changelist.
+            ctrl.deleteNode = function() {
+              var explorationId = ctrl.getCollectionNode().getExplorationId();
+              if (!CollectionLinearizerService.removeCollectionNode(
+                ctrl.collection, explorationId)) {
+                AlertsService.fatalWarning(
+                  'Internal collection editor error. Could not delete ' +
+                  'exploration by ID: ' + explorationId);
+              }
+            };
 
-          // Shifts this collection node left in the linearized list of the
-          // collection, if possible.
-          ctrl.shiftNodeLeft = function() {
-            var explorationId = ctrl.getCollectionNode().getExplorationId();
-            if (!CollectionLinearizerService.shiftNodeLeft(
-              ctrl.collection, explorationId)) {
-              AlertsService.fatalWarning(
-                'Internal collection editor error. Could not shift node left ' +
-                'with ID: ' + explorationId);
-            }
-          };
+            // Shifts this collection node left in the linearized list of the
+            // collection, if possible.
+            ctrl.shiftNodeLeft = function() {
+              var explorationId = ctrl.getCollectionNode().getExplorationId();
+              if (!CollectionLinearizerService.shiftNodeLeft(
+                ctrl.collection, explorationId)) {
+                AlertsService.fatalWarning(
+                  'Internal collection editor error. Could not shift ' +
+                  'node left with ID: ' + explorationId);
+              }
+            };
 
-          // Shifts this collection node right in the linearized list of the
-          // collection, if possible.
-          ctrl.shiftNodeRight = function() {
-            var explorationId = ctrl.getCollectionNode().getExplorationId();
-            if (!CollectionLinearizerService.shiftNodeRight(
-              ctrl.collection, explorationId)) {
-              AlertsService.fatalWarning(
-                'Internal collection editor error. Could not shift node ' +
-                'right with ID: ' + explorationId);
-            }
+            // Shifts this collection node right in the linearized list of the
+            // collection, if possible.
+            ctrl.shiftNodeRight = function() {
+              var explorationId = ctrl.getCollectionNode().getExplorationId();
+              if (!CollectionLinearizerService.shiftNodeRight(
+                ctrl.collection, explorationId)) {
+                AlertsService.fatalWarning(
+                  'Internal collection editor error. Could not shift node ' +
+                  'right with ID: ' + explorationId);
+              }
+            };
           };
-        }
-      ]
+        }]
     };
   }]);
