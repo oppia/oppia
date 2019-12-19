@@ -206,9 +206,8 @@ describe('Learner Action Render Service', function() {
           'card "stateName2".');
       });
 
-    fit('should render the table for a Multiple Incorrect Submissions issue.',
+    it('should render the table for a Multiple Incorrect Submissions issue.',
       function() {
-
         // We pass a sample learner actions array just to find out whether
         // the directive rendered is being initialised with the right values.
         var learnerActions = [{key: 'value'}];
