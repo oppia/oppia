@@ -52,8 +52,14 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             'check_call_is_called': False
         }
         self.print_arr = []
-        def mock_check_call(unused_cmd_tokens):
+        def mock_check_call(unused_cmd_tokens,*args,**kwargs):
             self.check_function_calls['check_call_is_called'] = True
+            class ret:
+                def __init__(self):
+                    self.returncode = 0
+                def communicate(self):
+                    return '', ''
+            return ret()
         # pylint: disable=unused-argument
         def mock_print(msg, end=''):
             self.print_arr.append(msg)
