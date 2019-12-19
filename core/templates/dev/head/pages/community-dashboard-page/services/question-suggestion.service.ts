@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service for adding new question suggestions.
+ * @fileoverview A service for handling question suggestions.
  */
 
-angular.module('oppia').factory('AddQuestionSuggestionService', [
+angular.module('oppia').factory('QuestionSuggestionService', [
   '$http', function($http) {
     return {
       addSuggestion: function(question, associatedSkill, topicName) {
