@@ -81,12 +81,14 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
       StateClassifierMappingService.init(returnDict.state_classifier_mapping);
+      returnDict.version = null;
       StatsReportingService.initSession(
-        explorationId, returnDict.exploration.title, version,
+        explorationId, returnDict.exploration.title, returnDict.version,
         returnDict.session_id, UrlService.getCollectionIdFromExplorationUrl());
       PlaythroughService.initSession(
-        explorationId, version, returnDict.record_playthrough_probability);
-      PlaythroughIssuesService.initSession(explorationId, version);
+        explorationId, returnDict.version,
+        returnDict.record_playthrough_probability);
+      PlaythroughIssuesService.initSession(explorationId, returnDict.version);
       PlayerCorrectnessFeedbackEnabledService.init(
         returnDict.correctness_feedback_enabled);
       ExplorationEngineService.init(

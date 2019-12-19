@@ -143,6 +143,10 @@ angular.module('oppia').config([
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
+              var additionalLoggingInfo = warningMessage +
+              '\n URL: ' + rejection.config.url +
+              '\n data: ' + JSON.stringify(rejection.data);
+              throw Error(additionalLoggingInfo);
             }
             return $q.reject(rejection);
           }
