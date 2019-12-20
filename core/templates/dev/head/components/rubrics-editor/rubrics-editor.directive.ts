@@ -59,7 +59,6 @@ angular.module('oppia').directive('rubricsEditor', [
           ctrl.inSkillEditor = (
             ContextService.getPageContext() ===
             PAGE_CONTEXT.SKILL_EDITOR);
-          console.log(ctrl.inCreateSkillModal);
           var explanationMemento = [null, null, null];
 
           ctrl.isEditable = function() {
