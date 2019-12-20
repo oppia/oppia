@@ -246,7 +246,7 @@ angular.module('oppia').factory('PlaythroughService', [
           explorationId,
           explorationVersion,
           playthroughProbability
-        ) {
+    ) {
         isLearnerInSamplePopulation = _determineIfLearnerIsInSamplePopulation(
           playthroughProbability
         );
