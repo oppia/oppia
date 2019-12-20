@@ -71,6 +71,7 @@ angular.module('oppia').directive('roleGraph', [
               MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH);
             ctrl.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
               nodeData);
+
             nodeData = StateGraphLayoutService.modifyPositionValues(
               nodeData, ctrl.GRAPH_WIDTH, ctrl.GRAPH_HEIGHT);
 

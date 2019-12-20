@@ -434,25 +434,6 @@ def check_user_can_review_in_category(user_id, score_category):
     return score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
 
 
-def check_user_can_review_in_type(user_id, suggestion_type):
-    """Checks if user can review suggestions in the given suggestion_type.
-
-    Args:
-        user_id: str. The id of the user.
-        suggestion_type: str. The type of the suggestion.
-
-    Returns:
-        bool. Whether the user can review suggestions for the given suggestion
-        type.
-    """
-    if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
-        return user_services.can_review_translation_suggestions(user_id)
-    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
-        return user_services.can_review_questions(user_id)
-    else:
-        return False
-
-
 def check_if_email_has_been_sent_to_user(user_id, score_category):
     """Checks if user has already received an email.
 

@@ -199,7 +199,6 @@ angular.module('oppia').directive('contributionsAndReview', [
             }
           };
 
-
           UserService.getUserInfoAsync().then(function(userInfo) {
             ctrl.userIsLoggedIn = userInfo.isLoggedIn();
             ctrl.userDeatilsLoading = false;

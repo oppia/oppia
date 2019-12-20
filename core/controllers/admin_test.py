@@ -1042,3 +1042,8 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         self.assertEqual(result_explorations, [])
         result_collections = search_services.search_collections('Welcome', 2)[0]
         self.assertEqual(result_collections, [])
+
+
+class CommunityReviewerTest(test_utils.GenericTestBase):
+    """Tests related to add and check reviewers for community
+    suggestion/application."""
