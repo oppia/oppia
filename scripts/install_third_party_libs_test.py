@@ -73,8 +73,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     """Return user-prefix error as stderr."""
                     return '', 'can\'t combine user with prefix'
             return Ret()
-        def mock_check_exception():
-            self.check_function_calls['check_exception_is_called'] = True
         def mock_print(msg, end=''):
             self.print_arr.append(msg)
         # pylint: enable=unused-argument
@@ -85,8 +83,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             subprocess, 'Popen', mock_check_call)
         self.Popen_error_swap = self.swap(
             subprocess, 'Popen', mock_popen_error_call)
-        self.exception_swap = self.swap(
-            python_utils, 'abort', mock_check_exception)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_tweak_yarn_executable(self):
@@ -133,9 +129,9 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_exception_handling(self):
-        with self.exception_swap:
+        with self.assertRaises(Exception) as context:
             install_third_party_libs.pip_install('package', 'version', 'path')
-        self.assertTrue(self.check_function_calls['check_exception_is_called'])
+        self.assertTrue('Error installing package' in context.exception)
 
     def test_pip_install_with_import_error_and_darwin_os(self):
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
