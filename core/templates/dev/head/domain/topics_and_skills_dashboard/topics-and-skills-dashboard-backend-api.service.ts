@@ -35,8 +35,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
     return this.http.get(
       '/topics_and_skills_dashboard/data', { observe: 'response' }).toPromise();
   }
-
-  _mergeSkills(oldSkillId: string, newSkillId: string): Promise<Object> {
+  // TODO(#7165): Replace any with correct type.
+  _mergeSkills(oldSkillId: any, newSkillId: any): Promise<Object> {
     var mergeSkillsData = {
       old_skill_id: oldSkillId,
       new_skill_id: newSkillId
@@ -50,7 +50,8 @@ export class TopicsAndSkillsDashboardBackendApiService {
     return this._fetchDashboardData();
   }
 
-  mergeSkills(oldSkillId: string, newSkillId: string): Promise<Object> {
+  // TOOD(#7165): Replace any with correct type.
+  mergeSkills(oldSkillId: any, newSkillId: any): Promise<Object> {
     return this._mergeSkills(oldSkillId, newSkillId);
   }
 }
