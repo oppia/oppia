@@ -28,7 +28,7 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(base_models, exploration_models, user_models) = models.Registry.import_models(
+(base_models, exp_models, user_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.exploration, models.NAMES.user])
 
 
@@ -37,7 +37,7 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            exploration_models.ExplorationModel.get_deletion_policy(),
+            exp_models.ExplorationModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
@@ -46,15 +46,15 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
             category='A Category', objective='An Objective')
         exp_services.save_new_exploration('committer_id', exploration)
         self.assertTrue(
-            exploration_models.ExplorationModel
+            exp_models.ExplorationModel
             .has_reference_to_user_id('committer_id'))
         self.assertFalse(
-            exploration_models.ExplorationModel
+            exp_models.ExplorationModel
             .has_reference_to_user_id('x_id'))
 
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
-            exploration_models.ExplorationModel.get_user_id_migration_policy(),
+            exp_models.ExplorationModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_get_exploration_count(self):
@@ -64,9 +64,9 @@ class ExplorationModelUnitTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration('id', exploration)
 
         self.assertEqual(
-            exploration_models.ExplorationModel.get_exploration_count(), 1)
+            exp_models.ExplorationModel.get_exploration_count(), 1)
         saved_exploration = (
-            exploration_models.ExplorationModel.get_all().fetch(limit=1)[0])
+            exp_models.ExplorationModel.get_all().fetch(limit=1)[0])
         self.assertEqual(saved_exploration.title, 'A Title')
         self.assertEqual(saved_exploration.category, 'A Category')
         self.assertEqual(saved_exploration.objective, 'An Objective')
@@ -104,7 +104,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             email='some_other@email.com',
             role=feconf.ROLE_ID_COLLECTION_EDITOR
         ).put()
-        exploration_models.ExplorationRightsModel(
+        exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_1,
             owner_ids=[self.USER_ID_1],
             editor_ids=[self.USER_ID_1],
@@ -117,7 +117,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        exploration_models.ExplorationRightsModel(
+        exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_2,
             owner_ids=[self.USER_ID_1],
             editor_ids=[self.USER_ID_1],
@@ -130,7 +130,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        exploration_models.ExplorationRightsModel(
+        exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_3,
             owner_ids=[self.USER_ID_1],
             editor_ids=[self.USER_ID_1],
@@ -143,7 +143,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         ).save(
             self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        exploration_models.ExplorationRightsModel(
+        exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_4,
             owner_ids=[self.USER_ID_4],
             editor_ids=[self.USER_ID_4],
@@ -159,52 +159,60 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            exploration_models.ExplorationRightsModel.get_deletion_policy(),
+            exp_models.ExplorationRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
             self.assertTrue(
-                exploration_models.ExplorationRightsModel
+                exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_1))
             self.assertTrue(
-                exploration_models.ExplorationRightsModel
+                exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_2))
             self.assertTrue(
-                exploration_models.ExplorationRightsModel
+                exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_4))
             self.assertTrue(
-                exploration_models.ExplorationRightsModel
+                exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_COMMITTER))
             self.assertFalse(
-                exploration_models.ExplorationRightsModel
+                exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
 
             # We remove the USER_ID_4 from the exploration to verify that the
             # USER_ID_4 is still found in ExplorationRightsSnapshotContentModel.
-            exploration_model = (
-                exploration_models.ExplorationRightsModel.get_by_id(
+            exp_model = (
+                exp_models.ExplorationRightsModel.get_by_id(
                     self.EXPLORATION_ID_4))
-            exploration_model.owner_ids = [self.USER_ID_1]
-            exploration_model.editor_ids = [self.USER_ID_1]
-            exploration_model.voice_artist_ids = [self.USER_ID_1]
-            exploration_model.viewer_ids = [self.USER_ID_1]
-            exploration_model.commit(
+            exp_model.owner_ids = [self.USER_ID_1]
+            exp_model.editor_ids = [self.USER_ID_1]
+            exp_model.voice_artist_ids = [self.USER_ID_1]
+            exp_model.viewer_ids = [self.USER_ID_1]
+            exp_model.commit(
                 self.USER_ID_COMMITTER, 'Changed collection rights',
                 [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
 
+            snapshot_id = (
+                exp_models.ExplorationRightsModel._get_snapshot_id(
+                    exp_model.id, 2))
+            exp_snapshot_model = (
+                exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                    snapshot_id))
+            exp_snapshot_model.content['all_viewer_ids'] = ['id1']
+            exp_snapshot_model.put()
             self.assertTrue(
-                exploration_models.ExplorationRightsModel
+                exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_4))
 
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
-            exploration_models.ExplorationRightsModel
+            exp_models.ExplorationRightsModel
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_migrate_model(self):
-        exploration_models.ExplorationRightsModel(
+        exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_1,
             owner_ids=[
                 self.USER_ID_4_OLD, self.USER_ID_5_OLD, self.USER_ID_6_OLD],
@@ -221,7 +229,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         ).save(
             self.USER_ID_COMMITTER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        exploration_models.ExplorationRightsModel(
+        exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_2,
             owner_ids=[self.USER_ID_4_OLD],
             editor_ids=[self.USER_ID_4_OLD],
@@ -234,7 +242,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         ).save(
             self.USER_ID_COMMITTER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        exploration_models.ExplorationRightsModel(
+        exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_3,
             owner_ids=[self.USER_ID_4_OLD, self.USER_ID_5_OLD],
             editor_ids=[self.USER_ID_5_OLD],
@@ -248,14 +256,14 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             self.USER_ID_COMMITTER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
-        exploration_models.ExplorationRightsModel.migrate_model(
+        exp_models.ExplorationRightsModel.migrate_model(
             self.USER_ID_4_OLD, self.USER_ID_4_NEW)
-        exploration_models.ExplorationRightsModel.migrate_model(
+        exp_models.ExplorationRightsModel.migrate_model(
             self.USER_ID_5_OLD, self.USER_ID_5_NEW)
-        exploration_models.ExplorationRightsModel.migrate_model(
+        exp_models.ExplorationRightsModel.migrate_model(
             self.USER_ID_6_OLD, self.USER_ID_6_NEW)
 
-        migrated_model_1 = exploration_models.ExplorationRightsModel.get_by_id(
+        migrated_model_1 = exp_models.ExplorationRightsModel.get_by_id(
             self.EXPLORATION_ID_1)
         self.assertEqual(
             [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
@@ -270,7 +278,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             [self.USER_ID_4_NEW, self.USER_ID_5_NEW, self.USER_ID_6_NEW],
             migrated_model_1.viewer_ids)
 
-        migrated_model_2 = exploration_models.ExplorationRightsModel.get_by_id(
+        migrated_model_2 = exp_models.ExplorationRightsModel.get_by_id(
             self.EXPLORATION_ID_2)
         self.assertEqual([self.USER_ID_4_NEW], migrated_model_2.owner_ids)
         self.assertEqual([self.USER_ID_4_NEW], migrated_model_2.editor_ids)
@@ -278,7 +286,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             [self.USER_ID_5_NEW], migrated_model_2.voice_artist_ids)
         self.assertEqual([self.USER_ID_6_NEW], migrated_model_2.viewer_ids)
 
-        migrated_model_3 = exploration_models.ExplorationRightsModel.get_by_id(
+        migrated_model_3 = exp_models.ExplorationRightsModel.get_by_id(
             self.EXPLORATION_ID_3)
         self.assertEqual(
             [self.USER_ID_4_NEW, self.USER_ID_5_NEW],
@@ -289,7 +297,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual([], migrated_model_3.viewer_ids)
 
     def test_verify_model_user_ids_exist(self):
-        model = exploration_models.ExplorationRightsModel(
+        model = exp_models.ExplorationRightsModel(
             id=self.EXPLORATION_ID_1,
             owner_ids=[self.USER_ID_1, self.USER_ID_2],
             editor_ids=[self.USER_ID_1, self.USER_ID_2],
@@ -321,7 +329,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(model.verify_model_user_ids_exist())
 
     def test_save(self):
-        exploration_models.ExplorationRightsModel(
+        exp_models.ExplorationRightsModel(
             id='id_0',
             owner_ids=['owner_id'],
             editor_ids=['editor_id'],
@@ -334,7 +342,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         ).save(
             'cid', 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        saved_model = exploration_models.ExplorationRightsModel.get('id_0')
+        saved_model = exp_models.ExplorationRightsModel.get('id_0')
         self.assertEqual(saved_model.id, 'id_0')
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
         self.assertEqual(saved_model.voice_artist_ids, ['voice_artist_id'])
@@ -343,7 +351,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     def test_export_data_on_highly_involved_user(self):
         """Test export data on user involved in all datastore explorations."""
         exploration_ids = (
-            exploration_models.ExplorationRightsModel.export_data(
+            exp_models.ExplorationRightsModel.export_data(
                 self.USER_ID_1))
         expected_exploration_ids = {
             'owned_exploration_ids': (
@@ -363,7 +371,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     def test_export_data_on_partially_involved_user(self):
         """Test export data on user involved in some datastore explorations."""
         exploration_ids = (
-            exploration_models.ExplorationRightsModel.export_data(
+            exp_models.ExplorationRightsModel.export_data(
                 self.USER_ID_2))
         expected_exploration_ids = {
             'owned_exploration_ids': [],
@@ -377,7 +385,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     def test_export_data_on_uninvolved_user(self):
         """Test for empty lists when user has no exploration involvement."""
         exploration_ids = (
-            exploration_models.ExplorationRightsModel.export_data(
+            exp_models.ExplorationRightsModel.export_data(
                 self.USER_ID_3))
         expected_exploration_ids = {
             'owned_exploration_ids': [],
@@ -390,7 +398,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
     def test_export_data_on_nonexistent_user(self):
         """Test for empty lists when user has no exploration involvement."""
         exploration_ids = (
-            exploration_models.ExplorationRightsModel.export_data(
+            exp_models.ExplorationRightsModel.export_data(
                 'fake_user'))
         expected_exploration_ids = {
             'owned_exploration_ids': [],
@@ -406,32 +414,32 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            exploration_models.ExplorationCommitLogEntryModel
+            exp_models.ExplorationCommitLogEntryModel
             .get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        commit = exploration_models.ExplorationCommitLogEntryModel.create(
+        commit = exp_models.ExplorationCommitLogEntryModel.create(
             'b', 0, 'committer_id', 'username', 'msg',
             'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         commit.exploration_id = 'b'
         commit.put()
         self.assertTrue(
-            exploration_models.ExplorationCommitLogEntryModel
+            exp_models.ExplorationCommitLogEntryModel
             .has_reference_to_user_id('committer_id'))
         self.assertFalse(
-            exploration_models.ExplorationCommitLogEntryModel
+            exp_models.ExplorationCommitLogEntryModel
             .has_reference_to_user_id('x_id'))
 
     def test_get_all_non_private_commits(self):
         private_commit = (
-            exploration_models.ExplorationCommitLogEntryModel.create(
+            exp_models.ExplorationCommitLogEntryModel.create(
                 'a', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         public_commit = (
-            exploration_models.ExplorationCommitLogEntryModel.create(
+            exp_models.ExplorationCommitLogEntryModel.create(
                 'b', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
@@ -440,7 +448,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         private_commit.put()
         public_commit.put()
         results, _, more = (
-            exploration_models.ExplorationCommitLogEntryModel
+            exp_models.ExplorationCommitLogEntryModel
             .get_all_non_private_commits(2, None, max_age=None))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
@@ -449,24 +457,24 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             Exception,
             'max_age must be a datetime.timedelta instance or None.'):
             results, _, more = (
-                exploration_models.ExplorationCommitLogEntryModel
+                exp_models.ExplorationCommitLogEntryModel
                 .get_all_non_private_commits(2, None, max_age=1))
 
         max_age = datetime.timedelta(hours=1)
         results, _, more = (
-            exploration_models.ExplorationCommitLogEntryModel
+            exp_models.ExplorationCommitLogEntryModel
             .get_all_non_private_commits(2, None, max_age=max_age))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
 
     def test_get_multi(self):
         commit1 = (
-            exploration_models.ExplorationCommitLogEntryModel.create(
+            exp_models.ExplorationCommitLogEntryModel.create(
                 'a', 1, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PRIVATE, False))
         commit2 = (
-            exploration_models.ExplorationCommitLogEntryModel.create(
+            exp_models.ExplorationCommitLogEntryModel.create(
                 'a', 2, 'committer_id', 'username', 'msg',
                 'create', [{}],
                 constants.ACTIVITY_STATUS_PUBLIC, False))
@@ -476,7 +484,7 @@ class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
         commit2.put()
 
         actual_models = (
-            exploration_models.ExplorationCommitLogEntryModel.get_multi(
+            exp_models.ExplorationCommitLogEntryModel.get_multi(
                 'a', [1, 2, 3]))
 
         self.assertEqual(len(actual_models), 3)
@@ -516,11 +524,11 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_deletion_policy(self):
         self.assertEqual(
-            exploration_models.ExpSummaryModel.get_deletion_policy(),
+            exp_models.ExpSummaryModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        exploration_models.ExpSummaryModel(
+        exp_models.ExpSummaryModel(
             id='id0',
             title='title',
             category='category',
@@ -533,28 +541,28 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             contributor_ids=['contributor_id'],
         ).put()
         self.assertTrue(
-            exploration_models.ExpSummaryModel
+            exp_models.ExpSummaryModel
             .has_reference_to_user_id('owner_id'))
         self.assertTrue(
-            exploration_models.ExpSummaryModel
+            exp_models.ExpSummaryModel
             .has_reference_to_user_id('editor_id'))
         self.assertTrue(
-            exploration_models.ExpSummaryModel
+            exp_models.ExpSummaryModel
             .has_reference_to_user_id('viewer_id'))
         self.assertTrue(
-            exploration_models.ExpSummaryModel
+            exp_models.ExpSummaryModel
             .has_reference_to_user_id('contributor_id'))
         self.assertFalse(
-            exploration_models.ExpSummaryModel
+            exp_models.ExpSummaryModel
             .has_reference_to_user_id('x_id'))
 
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
-            exploration_models.ExpSummaryModel.get_user_id_migration_policy(),
+            exp_models.ExpSummaryModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
 
     def test_migrate_model(self):
-        exploration_models.ExpSummaryModel(
+        exp_models.ExpSummaryModel(
             id=self.EXPLORATION_ID_1,
             title='title',
             category='category',
@@ -572,7 +580,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             contributor_ids=[
                 self.USER_ID_1_OLD, self.USER_ID_2_OLD, self.USER_ID_3_OLD],
         ).put()
-        exploration_models.ExpSummaryModel(
+        exp_models.ExpSummaryModel(
             id=self.EXPLORATION_ID_2,
             title='title',
             category='category',
@@ -585,7 +593,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             viewer_ids=[self.USER_ID_2_OLD],
             contributor_ids=[self.USER_ID_3_OLD],
         ).put()
-        exploration_models.ExpSummaryModel(
+        exp_models.ExpSummaryModel(
             id=self.EXPLORATION_ID_3,
             title='title',
             category='category',
@@ -599,14 +607,14 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             contributor_ids=[self.USER_ID_3_OLD],
         ).put()
 
-        exploration_models.ExpSummaryModel.migrate_model(
+        exp_models.ExpSummaryModel.migrate_model(
             self.USER_ID_1_OLD, self.USER_ID_1_NEW)
-        exploration_models.ExpSummaryModel.migrate_model(
+        exp_models.ExpSummaryModel.migrate_model(
             self.USER_ID_2_OLD, self.USER_ID_2_NEW)
-        exploration_models.ExpSummaryModel.migrate_model(
+        exp_models.ExpSummaryModel.migrate_model(
             self.USER_ID_3_OLD, self.USER_ID_3_NEW)
 
-        migrated_model_1 = exploration_models.ExpSummaryModel.get_by_id(
+        migrated_model_1 = exp_models.ExpSummaryModel.get_by_id(
             self.EXPLORATION_ID_1)
         self.assertEqual(
             [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
@@ -624,7 +632,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             [self.USER_ID_1_NEW, self.USER_ID_2_NEW, self.USER_ID_3_NEW],
             migrated_model_1.contributor_ids)
 
-        migrated_model_2 = exploration_models.ExpSummaryModel.get_by_id(
+        migrated_model_2 = exp_models.ExpSummaryModel.get_by_id(
             self.EXPLORATION_ID_2)
         self.assertEqual([self.USER_ID_1_NEW], migrated_model_2.owner_ids)
         self.assertEqual([self.USER_ID_1_NEW], migrated_model_2.editor_ids)
@@ -633,7 +641,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual([self.USER_ID_2_NEW], migrated_model_2.viewer_ids)
         self.assertEqual([self.USER_ID_3_NEW], migrated_model_2.contributor_ids)
 
-        migrated_model_3 = exploration_models.ExpSummaryModel.get_by_id(
+        migrated_model_3 = exp_models.ExpSummaryModel.get_by_id(
             self.EXPLORATION_ID_3)
         self.assertEqual(
             [self.USER_ID_1_NEW, self.USER_ID_2_NEW],
@@ -645,7 +653,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_non_private(self):
         public_exploration_summary_model = (
-            exploration_models.ExpSummaryModel(
+            exp_models.ExpSummaryModel(
                 id='id0',
                 title='title',
                 category='category',
@@ -666,7 +674,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         public_exploration_summary_model.put()
 
         private_exploration_summary_model = (
-            exploration_models.ExpSummaryModel(
+            exp_models.ExpSummaryModel(
                 id='id1',
                 title='title',
                 category='category',
@@ -686,14 +694,14 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             ))
         private_exploration_summary_model.put()
         exploration_summary_models = (
-            exploration_models.ExpSummaryModel.get_non_private())
+            exp_models.ExpSummaryModel.get_non_private())
         self.assertEqual(
             exploration_summary_models,
             [public_exploration_summary_model])
 
     def test_get_top_rated(self):
         good_rating_exploration_summary_model = (
-            exploration_models.ExpSummaryModel(
+            exp_models.ExpSummaryModel(
                 id='id0',
                 title='title',
                 category='category',
@@ -715,7 +723,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         good_rating_exploration_summary_model.put()
 
         bad_rating_exploration_summary_model = (
-            exploration_models.ExpSummaryModel(
+            exp_models.ExpSummaryModel(
                 id='id1',
                 title='title',
                 category='category',
@@ -737,14 +745,14 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         bad_rating_exploration_summary_model.put()
 
         self.assertEqual(
-            exploration_models.ExpSummaryModel.get_top_rated(1),
+            exp_models.ExpSummaryModel.get_top_rated(1),
             [good_rating_exploration_summary_model])
         self.assertEqual(
-            exploration_models.ExpSummaryModel.get_top_rated(2),
+            exp_models.ExpSummaryModel.get_top_rated(2),
             [good_rating_exploration_summary_model,
              bad_rating_exploration_summary_model])
         self.assertEqual(
-            exploration_models.ExpSummaryModel.get_top_rated(3),
+            exp_models.ExpSummaryModel.get_top_rated(3),
             [good_rating_exploration_summary_model,
              bad_rating_exploration_summary_model])
 
@@ -753,12 +761,12 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             constants.ACTIVITY_STATUS_PRIVATE)
         good_rating_exploration_summary_model.put()
         self.assertEqual(
-            exploration_models.ExpSummaryModel.get_top_rated(2),
+            exp_models.ExpSummaryModel.get_top_rated(2),
             [bad_rating_exploration_summary_model])
 
     def test_get_private_at_least_viewable(self):
         viewable_exploration_summary_model = (
-            exploration_models.ExpSummaryModel(
+            exp_models.ExpSummaryModel(
                 id='id0',
                 title='title',
                 category='category',
@@ -779,7 +787,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         viewable_exploration_summary_model.put()
 
         unviewable_exploration_summary_model = (
-            exploration_models.ExpSummaryModel(
+            exp_models.ExpSummaryModel(
                 id='id1',
                 title='title',
                 category='category',
@@ -799,14 +807,14 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
             ))
         unviewable_exploration_summary_model.put()
         exploration_summary_models = (
-            exploration_models.ExpSummaryModel
+            exp_models.ExpSummaryModel
             .get_private_at_least_viewable('a'))
         self.assertEqual(1, len(exploration_summary_models))
         self.assertEqual('id0', exploration_summary_models[0].id)
 
     def test_get_at_least_editable(self):
         editable_collection_summary_model = (
-            exploration_models.ExpSummaryModel(
+            exp_models.ExpSummaryModel(
                 id='id0',
                 title='title',
                 category='category',
@@ -827,7 +835,7 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         editable_collection_summary_model.put()
 
         uneditable_collection_summary_model = (
-            exploration_models.ExpSummaryModel(
+            exp_models.ExpSummaryModel(
                 id='id1',
                 title='title',
                 category='category',
@@ -848,23 +856,23 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         uneditable_collection_summary_model.put()
 
         exploration_summary_models = (
-            exploration_models.ExpSummaryModel
+            exp_models.ExpSummaryModel
             .get_at_least_editable('a'))
         self.assertEqual(1, len(exploration_summary_models))
         self.assertEqual('id0', exploration_summary_models[0].id)
 
         exploration_summary_models = (
-            exploration_models.ExpSummaryModel
+            exp_models.ExpSummaryModel
             .get_at_least_editable('viewer_id'))
         self.assertEqual(0, len(exploration_summary_models))
 
         exploration_summary_models = (
-            exploration_models.ExpSummaryModel
+            exp_models.ExpSummaryModel
             .get_at_least_editable('nonexistent_id'))
         self.assertEqual(0, len(exploration_summary_models))
 
     def test_verify_model_user_ids_exist(self):
-        model = exploration_models.ExpSummaryModel(
+        model = exp_models.ExpSummaryModel(
             id=self.EXPLORATION_ID_1,
             title='title',
             category='category',

@@ -557,7 +557,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
              [self.WRONG_GAE_ID]],
             output)
 
-    def test_migrate_exploration_rights_snapshot_model(self):
+    def test_migrate_exp_rights_snapshot_model(self):
         original_rights_model = exp_models.ExplorationRightsModel(
             id=self.SNAPSHOT_ID,
             owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
@@ -601,7 +601,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             [self.USER_1_USER_ID, self.USER_3_USER_ID],
             migrated_rights_model.viewer_ids)
 
-    def test_migrate_exploration_rights_snapshot_model_wrong_id(self):
+    def test_migrate_exp_rights_snapshot_model_wrong_id(self):
         original_rights_model = exp_models.ExplorationRightsModel(
             id=self.SNAPSHOT_ID,
             owner_ids=[self.WRONG_GAE_ID],
@@ -624,6 +624,55 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             ['FAILURE - ExplorationRightsSnapshotContentModel',
              [self.WRONG_GAE_ID]],
             output)
+    
+    def test_migrate_exp_rights_snapshot_model_wrong_field(self):
+        original_rights_model = exp_models.ExplorationRightsModel(
+            id=self.SNAPSHOT_ID,
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        original_rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.content['all_viewer_ids'] = ['id1']
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output[0],
+            [u'SUCCESS - ExplorationRightsSnapshotContentModel', 1])
+
+        migrated_rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                self.SNAPSHOT_ID))
+        self.assertEqual(
+            original_rights_snapshot_model.last_updated,
+            migrated_rights_snapshot_model.last_updated)
+
+        self.assertNotIn(
+            'all_viewer_ids', migrated_rights_snapshot_model.content)
+
+        migrated_rights_model = exp_models.ExplorationRightsModel(
+            **migrated_rights_snapshot_model.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
+            migrated_rights_model.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model.viewer_ids)
+
 
     def test_migrate_question_rights_snapshot_model(self):
         original_rights_model = question_models.QuestionRightsModel(
