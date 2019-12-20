@@ -69,10 +69,10 @@
 
   <br class="break-in-mobile">
   <span ng-if="$ctrl.getOutcome()">→</span>
-  <span ng-if="$ctrl.isCorrect() && $ctrl.isInQuestionMode()">
+  <span ng-if="$ctrl.isCorrect() && $ctrl.StateEditorService.isInQuestionMode()">
     Correct
   </span>
-  <span ng-if="$ctrl.getOutcome() && !$ctrl.isOutcomeLooping() && !$ctrl.isCreatingNewState() && !$ctrl.isInQuestionMode()"
+  <span ng-if="$ctrl.getOutcome() && !$ctrl.isOutcomeLooping() && !$ctrl.isCreatingNewState() && !$ctrl.StateEditorService.isInQuestionMode()"
         ng-click="$ctrl.navigateToState($ctrl.getOutcome().dest)" class="oppia-nested-link">
     <[$ctrl.getOutcome().dest]>
   </span>
@@ -80,10 +80,10 @@
     <em ng-if="$ctrl.getOutcome().newStateName">(<[$ctrl.getOutcome().newStateName]>)</em>
     <em ng-if="!$ctrl.getOutcome().newStateName">Nowhere yet...</em>
   </span>
-  <span ng-if="$ctrl.getOutcome() && !$ctrl.isInQuestionMode() && $ctrl.isOutcomeLooping()">
+  <span ng-if="$ctrl.getOutcome() && !$ctrl.StateEditorService.isInQuestionMode() && $ctrl.isOutcomeLooping()">
     <em>(try again)</em>
   </span>
-  <span ng-if="$ctrl.getOutcome() && $ctrl.isInQuestionMode() && !$ctrl.isCorrect()">
+  <span ng-if="$ctrl.getOutcome() && $ctrl.StateEditorService.isInQuestionMode() && !$ctrl.isCorrect()">
     <em>Wrong<br> (try again)</em>
   </span>
 </div>

@@ -56,7 +56,7 @@ angular.module('oppia').directive('responseHeader', [
             StateInteractionIdService, INTERACTION_SPECS) {
           var ctrl = this;
           ctrl.EditabilityService = EditabilityService;
-          ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
+          ctrl.StateEditorService = StateEditorService;
 
           ctrl.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;

@@ -178,6 +178,9 @@ angular.module('oppia').directive('outcomeEditor', [
             if (ctrl.savedOutcome.dest === ctrl.outcome.dest) {
               ctrl.savedOutcome.dest = StateEditorService.getActiveStateName();
             }
+            if (StateEditorService.isInQuestionMode()) {
+              ctrl.savedOutcome.dest = null;
+            }
             var feedbackContentId = ctrl.savedOutcome.feedback.getContentId();
             if (fromClickSaveFeedbackButton && contentHasChanged) {
               var contentId = ctrl.savedOutcome.feedback.getContentId();
