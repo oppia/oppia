@@ -18,19 +18,19 @@
   admin-navbar .oppia-navbar-admin {
     top: 0;
   }
-  @media screen and (max-width:710px){
-    .oppia-admin-page-dropdown{
-      display:block;
+  @media screen and (max-width: 710px) {
+    admin-navbar .oppia-admin-page-dropdown {
+      display: block;
     }
-    .tabs-to-hide{
-      display:none;
+    admin-navbar .oppia-tabs-to-hide {
+      display: none;
     }
   }
-  @media screen and (min-width: 711px){
-    .oppia-admin-page-dropdown
-    .oppia-admin-page-dropdown-icon,
-    .oppia-admin-page-dropdown-menu{
-      display:none;
+  @media screen and (min-width: 711px) {
+    admin-navbar .oppia-admin-page-dropdown,
+    admin-navbar .oppia-admin-page-dropdown-icon,
+    admin-navbar .oppia-admin-page-dropdown-menu {
+      display: none;
     }
   }
 </style>
@@ -72,7 +72,7 @@
             </li>
           </ul>
         </ul>
-        <ul class="nav oppia-navbar-tabs-admin tabs-to-hide">
+        <ul class="nav oppia-navbar-tabs-admin oppia-tabs-to-hide">
           <li class="nav-item oppia-clickable-navbar-element float-right">
             <a class="nav-link oppia-navbar-tab"
                ng-href="<[::$ctrl.ADMIN_TAB_URLS.ACTIVITIES]>"
