@@ -15,21 +15,18 @@
 /**
  * @fileoverview Modal and functionality for the create collection button.
  */
-
-require('domain/utilities/url-interpolation.service.ts');
+// eslint-disable-next-line max-len
+require('components/entity-creation-services/collection-creation-backend-api.service.ts');// lint-disable-line no-use-before-define
 require('services/alerts.service.ts');
-require('services/site-analytics.service.ts');
 
 // TODO(bhenning): Refactor this to match the frontend design spec and reduce
 // duplicated code between CollectionCreationService and
 // ExplorationCreationService.
 
 angular.module('oppia').factory('CollectionCreationService', [
-  '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
-  'SiteAnalyticsService', 'UrlInterpolationService',
+  '$rootScope', 'AlertsService', 'CollectionCreationBackendService',
   function(
-      $http, $rootScope, $timeout, $window, AlertsService,
-      SiteAnalyticsService, UrlInterpolationService) {
+      $rootScope, AlertsService, CollectionCreationBackendService) {
     var CREATE_NEW_COLLECTION_URL_TEMPLATE = (
       '/collection_editor/create/<collection_id>');
     var collectionCreationInProgress = false;
@@ -44,20 +41,9 @@ angular.module('oppia').factory('CollectionCreationService', [
         AlertsService.clearWarnings();
 
         $rootScope.loadingMessage = 'Creating collection';
-        $http.post('/collection_editor_handler/create_new', {})
-          .then(function(response) {
-            SiteAnalyticsService.registerCreateNewCollectionEvent(
-              response.data.collectionId);
-            $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                CREATE_NEW_COLLECTION_URL_TEMPLATE, {
-                  collection_id: response.data.collectionId
-                }
-              );
-            }, 150);
-          }, function() {
-            $rootScope.loadingMessage = '';
-          });
+
+        CollectionCreationBackendService.createCollection(
+          CREATE_NEW_COLLECTION_URL_TEMPLATE);
       }
     };
   }

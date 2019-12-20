@@ -42,6 +42,7 @@
 /core/domain/collection*.py @kevinlee12
 /core/storage/collection/ @kevinlee12
 /core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @kevinlee12
+/core/templates/dev/head/components/entity-creation-services/collection-creation-backend-api.service*.ts @kevinlee12
 /core/templates/dev/head/domain/collection/ @kevinlee12
 /core/templates/dev/head/pages/collection-editor-page/ @kevinlee12
 /core/templates/dev/head/pages/collection-player-page/ @kevinlee12
