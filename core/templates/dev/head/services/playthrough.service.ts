@@ -1,13 +1,13 @@
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an 'AS-IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -17,7 +17,7 @@
  */
 
 require('domain/statistics/LearnerActionObjectFactory.ts');
-require('domain/statistics/PlaythroughObjectFactory.ts');
+require('domain/statistics/PlaythroughObjectFactory.ts'); /*  */
 require('domain/utilities/StopwatchObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/exploration-features.service.ts');
@@ -25,25 +25,44 @@ require('services/exploration-features.service.ts');
 require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('PlaythroughService', [
-  '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',
-  'PlaythroughObjectFactory', 'StopwatchObjectFactory',
-  'UrlInterpolationService', 'ACTION_TYPE_ANSWER_SUBMIT',
-  'ACTION_TYPE_EXPLORATION_QUIT', 'ACTION_TYPE_EXPLORATION_START',
-  'CURRENT_ACTION_SCHEMA_VERSION', 'CURRENT_ISSUE_SCHEMA_VERSION',
-  'EARLY_QUIT_THRESHOLD_IN_SECS', 'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
-  'ISSUE_TYPE_EARLY_QUIT', 'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
-  'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
+  '$http',
+  'ExplorationFeaturesService',
+  'LearnerActionObjectFactory',
+  'PlaythroughObjectFactory',
+  'StopwatchObjectFactory',
+  'UrlInterpolationService',
+  'ACTION_TYPE_ANSWER_SUBMIT',
+  'ACTION_TYPE_EXPLORATION_QUIT',
+  'ACTION_TYPE_EXPLORATION_START',
+  'CURRENT_ACTION_SCHEMA_VERSION',
+  'CURRENT_ISSUE_SCHEMA_VERSION',
+  'EARLY_QUIT_THRESHOLD_IN_SECS',
+  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
+  'ISSUE_TYPE_EARLY_QUIT',
+  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
+  'NUM_INCORRECT_ANSWERS_THRESHOLD',
+  'NUM_REPEATED_CYCLES_THRESHOLD',
   'STORE_PLAYTHROUGH_URL',
   function(
-      $http, ExplorationFeaturesService, LearnerActionObjectFactory,
-      PlaythroughObjectFactory, StopwatchObjectFactory,
-      UrlInterpolationService, ACTION_TYPE_ANSWER_SUBMIT,
-      ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START,
-      CURRENT_ACTION_SCHEMA_VERSION, CURRENT_ISSUE_SCHEMA_VERSION,
-      EARLY_QUIT_THRESHOLD_IN_SECS, ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
-      ISSUE_TYPE_EARLY_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
-      NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
-      STORE_PLAYTHROUGH_URL) {
+    $http,
+    ExplorationFeaturesService,
+    LearnerActionObjectFactory,
+    PlaythroughObjectFactory,
+    StopwatchObjectFactory,
+    UrlInterpolationService,
+    ACTION_TYPE_ANSWER_SUBMIT,
+    ACTION_TYPE_EXPLORATION_QUIT,
+    ACTION_TYPE_EXPLORATION_START,
+    CURRENT_ACTION_SCHEMA_VERSION,
+    CURRENT_ISSUE_SCHEMA_VERSION,
+    EARLY_QUIT_THRESHOLD_IN_SECS,
+    ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
+    ISSUE_TYPE_EARLY_QUIT,
+    ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
+    NUM_INCORRECT_ANSWERS_THRESHOLD,
+    NUM_REPEATED_CYCLES_THRESHOLD,
+    STORE_PLAYTHROUGH_URL
+  ) {
     var playthrough = null;
     var expStopwatch = null;
     var isLearnerInSamplePopulation = null;
@@ -105,9 +124,12 @@ angular.module('oppia').factory('PlaythroughService', [
     };
 
     var recordStateTransitionInMultipleIncorrectIssueTracker = function(
-        destStateName) {
-      if (multipleIncorrectStateName.num_times_incorrect <
-        NUM_INCORRECT_ANSWERS_THRESHOLD) {
+      destStateName
+    ) {
+      if (
+        multipleIncorrectStateName.num_times_incorrect <
+        NUM_INCORRECT_ANSWERS_THRESHOLD
+      ) {
         multipleIncorrectStateName.state_name = destStateName;
         multipleIncorrectStateName.num_times_incorrect = 0;
       }
@@ -119,9 +141,9 @@ angular.module('oppia').factory('PlaythroughService', [
           // Cycle identified.
           var cycleStartIndex = visitedStates.indexOf(destStateName);
           visitedStates.push(destStateName);
-          var cycleString = visitedStates.slice(
-            cycleStartIndex, visitedStates.length
-          ).toString();
+          var cycleString = visitedStates
+            .slice(cycleStartIndex, visitedStates.length)
+            .toString();
           if (cycleIdentifier.cycle === cycleString) {
             cycleIdentifier.num_cycles += 1;
           } else {
@@ -136,8 +158,10 @@ angular.module('oppia').factory('PlaythroughService', [
     };
 
     var isMultipleIncorrectSubmissionsIssue = function() {
-      return multipleIncorrectStateName.num_times_incorrect >=
-        NUM_INCORRECT_ANSWERS_THRESHOLD;
+      return (
+        multipleIncorrectStateName.num_times_incorrect >=
+        NUM_INCORRECT_ANSWERS_THRESHOLD
+      );
     };
 
     var isCyclicStateTransitionsIssue = function() {
@@ -176,9 +200,8 @@ angular.module('oppia').factory('PlaythroughService', [
         playthrough.issueCustomizationArgs = {
           state_name: {
             value:
-              playthrough.actions[
-                playthrough.actions.length - 1].actionCustomizationArgs
-                .state_name.value
+              playthrough.actions[playthrough.actions.length - 1]
+                .actionCustomizationArgs.state_name.value
           },
           time_spent_in_exp_in_secs: {
             value: timeSpentInExpInSecs
@@ -212,17 +235,29 @@ angular.module('oppia').factory('PlaythroughService', [
     };
 
     var isPlaythroughDiscarded = function() {
-      return !ExplorationFeaturesService.isPlaythroughRecordingEnabled() ||
-        !isLearnerInSamplePopulation;
+      return (
+        !ExplorationFeaturesService.isPlaythroughRecordingEnabled() ||
+        !isLearnerInSamplePopulation
+      );
     };
 
     return {
       initSession: function(
-          explorationId, explorationVersion, playthroughProbability) {
-        isLearnerInSamplePopulation =
-          _determineIfLearnerIsInSamplePopulation(playthroughProbability);
+        explorationId,
+        explorationVersion,
+        playthroughProbability
+      ) {
+        isLearnerInSamplePopulation = _determineIfLearnerIsInSamplePopulation(
+          playthroughProbability
+        );
         playthrough = PlaythroughObjectFactory.createNew(
-          null, explorationId, explorationVersion, null, {}, []);
+          null,
+          explorationId,
+          explorationVersion,
+          null,
+          {},
+          []
+        );
         expStopwatch = StopwatchObjectFactory.create();
       },
       getPlaythrough: function() {
@@ -239,7 +274,8 @@ angular.module('oppia').factory('PlaythroughService', [
               value: initStateName
             }
           },
-          CURRENT_ACTION_SCHEMA_VERSION);
+          CURRENT_ACTION_SCHEMA_VERSION
+        );
 
         playthrough.actions.unshift(expStartLearnerAction);
 
@@ -250,8 +286,13 @@ angular.module('oppia').factory('PlaythroughService', [
         expStopwatch.reset();
       },
       recordAnswerSubmitAction: function(
-          stateName, destStateName, interactionId, answer, feedback,
-          timeSpentInStateSecs) {
+        stateName,
+        destStateName,
+        interactionId,
+        answer,
+        feedback,
+        timeSpentInStateSecs
+      ) {
         if (isPlaythroughDiscarded()) {
           return;
         }
@@ -261,32 +302,34 @@ angular.module('oppia').factory('PlaythroughService', [
         if (!misTracker) {
           createMultipleIncorrectIssueTracker(stateName);
         }
-        playthrough.actions.push(LearnerActionObjectFactory.createNew(
-          ACTION_TYPE_ANSWER_SUBMIT,
-          {
-            state_name: {
-              value: stateName
+        playthrough.actions.push(
+          LearnerActionObjectFactory.createNew(
+            ACTION_TYPE_ANSWER_SUBMIT,
+            {
+              state_name: {
+                value: stateName
+              },
+              dest_state_name: {
+                value: destStateName
+              },
+              interaction_id: {
+                value: interactionId
+              },
+              submitted_answer: {
+                value: answer
+              },
+              feedback: {
+                value: feedback
+              },
+              time_spent_state_in_msecs: {
+                value: timeSpentInStateSecs
+              }
             },
-            dest_state_name: {
-              value: destStateName
-            },
-            interaction_id: {
-              value: interactionId
-            },
-            submitted_answer: {
-              value: answer
-            },
-            feedback: {
-              value: feedback
-            },
-            time_spent_state_in_msecs: {
-              value: timeSpentInStateSecs
-            }
-          },
-          CURRENT_ACTION_SCHEMA_VERSION
-        ));
+            CURRENT_ACTION_SCHEMA_VERSION
+          )
+        );
 
-        var didNotMoveToNextState = (destStateName === stateName);
+        var didNotMoveToNextState = destStateName === stateName;
         if (didNotMoveToNextState) {
           incrementIncorrectAnswerInMultipleIncorrectIssueTracker();
         } else {
@@ -295,23 +338,24 @@ angular.module('oppia').factory('PlaythroughService', [
           recordStateTransitionInCyclicIssueTracker(destStateName);
         }
       },
-      recordExplorationQuitAction: function(
-          stateName, timeSpentInStateSecs) {
+      recordExplorationQuitAction: function(stateName, timeSpentInStateSecs) {
         if (isPlaythroughDiscarded()) {
           return;
         }
-        playthrough.actions.push(LearnerActionObjectFactory.createNew(
-          ACTION_TYPE_EXPLORATION_QUIT,
-          {
-            state_name: {
-              value: stateName
+        playthrough.actions.push(
+          LearnerActionObjectFactory.createNew(
+            ACTION_TYPE_EXPLORATION_QUIT,
+            {
+              state_name: {
+                value: stateName
+              },
+              time_spent_in_state_in_msecs: {
+                value: timeSpentInStateSecs
+              }
             },
-            time_spent_in_state_in_msecs: {
-              value: timeSpentInStateSecs
-            }
-          },
-          CURRENT_ACTION_SCHEMA_VERSION
-        ));
+            CURRENT_ACTION_SCHEMA_VERSION
+          )
+        );
       },
       recordPlaythrough: function(isExplorationComplete) {
         if (isPlaythroughDiscarded()) {
@@ -340,6 +384,7 @@ angular.module('oppia').factory('PlaythroughService', [
             storePlaythrough(true);
           }
         }
-      },
+      }
     };
-  }]);
+  }
+]);
