@@ -44,24 +44,24 @@ angular.module('oppia').factory('PlaythroughService', [
   'NUM_REPEATED_CYCLES_THRESHOLD',
   'STORE_PLAYTHROUGH_URL',
   function(
-    $http,
-    ExplorationFeaturesService,
-    LearnerActionObjectFactory,
-    PlaythroughObjectFactory,
-    StopwatchObjectFactory,
-    UrlInterpolationService,
-    ACTION_TYPE_ANSWER_SUBMIT,
-    ACTION_TYPE_EXPLORATION_QUIT,
-    ACTION_TYPE_EXPLORATION_START,
-    CURRENT_ACTION_SCHEMA_VERSION,
-    CURRENT_ISSUE_SCHEMA_VERSION,
-    EARLY_QUIT_THRESHOLD_IN_SECS,
-    ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
-    ISSUE_TYPE_EARLY_QUIT,
-    ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
-    NUM_INCORRECT_ANSWERS_THRESHOLD,
-    NUM_REPEATED_CYCLES_THRESHOLD,
-    STORE_PLAYTHROUGH_URL
+      $http,
+      ExplorationFeaturesService,
+      LearnerActionObjectFactory,
+      PlaythroughObjectFactory,
+      StopwatchObjectFactory,
+      UrlInterpolationService,
+      ACTION_TYPE_ANSWER_SUBMIT,
+      ACTION_TYPE_EXPLORATION_QUIT,
+      ACTION_TYPE_EXPLORATION_START,
+      CURRENT_ACTION_SCHEMA_VERSION,
+      CURRENT_ISSUE_SCHEMA_VERSION,
+      EARLY_QUIT_THRESHOLD_IN_SECS,
+      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS,
+      ISSUE_TYPE_EARLY_QUIT,
+      ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
+      NUM_INCORRECT_ANSWERS_THRESHOLD,
+      NUM_REPEATED_CYCLES_THRESHOLD,
+      STORE_PLAYTHROUGH_URL
   ) {
     var playthrough = null;
     var expStopwatch = null;
@@ -124,7 +124,7 @@ angular.module('oppia').factory('PlaythroughService', [
     };
 
     var recordStateTransitionInMultipleIncorrectIssueTracker = function(
-      destStateName
+        destStateName
     ) {
       if (
         multipleIncorrectStateName.num_times_incorrect <
@@ -243,10 +243,10 @@ angular.module('oppia').factory('PlaythroughService', [
 
     return {
       initSession: function(
-        explorationId,
-        explorationVersion,
-        playthroughProbability
-      ) {
+          explorationId,
+          explorationVersion,
+          playthroughProbability
+        ) {
         isLearnerInSamplePopulation = _determineIfLearnerIsInSamplePopulation(
           playthroughProbability
         );
@@ -286,12 +286,12 @@ angular.module('oppia').factory('PlaythroughService', [
         expStopwatch.reset();
       },
       recordAnswerSubmitAction: function(
-        stateName,
-        destStateName,
-        interactionId,
-        answer,
-        feedback,
-        timeSpentInStateSecs
+          stateName,
+          destStateName,
+          interactionId,
+          answer,
+          feedback,
+          timeSpentInStateSecs
       ) {
         if (isPlaythroughDiscarded()) {
           return;
