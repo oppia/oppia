@@ -230,6 +230,14 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             rights_snapshot_model: ExplorationRightsSnapshotContentModel.
                 The model that contains the old user IDs.
         """
+        content = rights_snapshot_model.content
+        # Some old exploration rights snapshot models contain all_viewer_ids
+        # field that is not present in the current version of the
+        # ExplorationRightsModels. We need to remove that field from the
+        # dictionary so that we can recreate the ExplorationRightsModel and
+        # migrate the user ids.
+        if 'all_viewer_ids' in content:
+            del content['all_viewer_ids']
         reconstituted_rights_model = exp_models.ExplorationRightsModel(
             **rights_snapshot_model.content)
         reconstituted_rights_model.owner_ids = (
@@ -494,7 +502,6 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
-
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
             if (ModelsUserIdsHaveUserSettingsVerificationJob

@@ -247,7 +247,15 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
                     base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
             for snapshot_content_model in snapshot_content_models:
-                reconstituted_model = cls(**snapshot_content_model.content)
+                content = snapshot_content_model.content
+                # Some old exploration rights snapshot models contain
+                # all_viewer_ids field that is not present in the current
+                # version of the ExplorationRightsModels. We need to remove that
+                # field from the dictionary so that we can recreate the
+                # ExplorationRightsModel and check the user ids.
+                if 'all_viewer_ids' in content:
+                    del content['all_viewer_ids']
+                reconstituted_model = cls(**content)
                 if any((user_id in reconstituted_model.owner_ids,
                         user_id in reconstituted_model.editor_ids,
                         user_id in reconstituted_model.voice_artist_ids,
