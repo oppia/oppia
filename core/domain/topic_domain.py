@@ -861,7 +861,12 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_name: str. The updated name for the topic.
+
+        Raises:
+            ValidationError: Name should be a string.
         """
+        if not isinstance(new_name, python_utils.BASESTRING):
+            raise utils.ValidationError('Name should be a string.')
         self.name = new_name
         self.canonical_name = new_name.lower()
 
