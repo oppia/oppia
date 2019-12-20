@@ -17,15 +17,16 @@
 Please see original reference here:
 
 https://cloud.google.com/datastore/docs/schedule-export
-
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import httplib
+import http.client
 import json
 import logging
 
-import acl_decorators  # pylint: disable=relative-import
+from export import acl_decorators
 
 from google.appengine.api import app_identity
 from google.appengine.api import urlfetch
@@ -46,9 +47,9 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
         Export data described in request parameters.
 
         Raises:
-            AssertionError: Bucket url exists and doesn't start with 'gs://'
+            AssertionError: Bucket url exists and doesn't start with 'gs://'.
         """
-        GCS_BUCKET_URL_PREFIX = 'gs://'
+        gcs_bucket_url_prefix = 'gs://'
 
         access_token, _ = app_identity.get_access_token(
             'https://www.googleapis.com/auth/datastore')
@@ -64,12 +65,12 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
 
         output_url_prefix = self.request.get('output_url_prefix')
         assert output_url_prefix and output_url_prefix.startswith(
-            GCS_BUCKET_URL_PREFIX)
+            gcs_bucket_url_prefix)
 
         # Look for slash in the portion of the bucket URL that comes
         # after 'gs://'. If not present, then only a bucket name has been
         # provided and we append a trailing slash.
-        if '/' not in output_url_prefix[len(GCS_BUCKET_URL_PREFIX):]:
+        if '/' not in output_url_prefix[len(gcs_bucket_url_prefix):]:
              # Only a bucket name has been provided - no prefix or trailing
              # slash.
             output_url_prefix += '/' + timestamp
@@ -97,7 +98,7 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
                 method=urlfetch.POST,
                 deadline=60,
                 headers=headers)
-            if result.status_code == httplib.OK:
+            if result.status_code == http.client.OK:
                 logging.info(result.content)
             elif result.status_code >= 500:
                 logging.error(result.content)
@@ -106,10 +107,10 @@ class ExportToCloudDatastoreHandler(webapp2.RequestHandler):
             self.response.status_int = result.status_code
         except urlfetch.Error:
             logging.exception('Failed to initiate export.')
-            self.response.status_int = httplib.INTERNAL_SERVER_ERROR
+            self.response.status_int = http.client.INTERNAL_SERVER_ERROR
 
 
-app = webapp2.WSGIApplication(
+app = webapp2.WSGIApplication(  # pylint: disable=invalid-name
     [
         ('/cloud_datastore_export', ExportToCloudDatastoreHandler),
     ], debug=True)

@@ -15,25 +15,58 @@
 # limitations under the License.
 
 """Test for audit models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(audit_models,) = models.Registry.import_models([models.NAMES.audit])
+(audit_models, base_models) = models.Registry.import_models(
+    [models.NAMES.audit, models.NAMES.base_model])
 
 
 class RoleQueryAuditModelUnitTests(test_utils.GenericTestBase):
     """Unit tests for the RoleQueryAuditModel class."""
 
-    def test_create_and_get_model(self):
-        audit_models.RoleQueryAuditModel(
-            id='a', user_id='b', intent=feconf.ROLE_ACTION_UPDATE,
-            role='c', username='d').put()
-        audit_model = audit_models.RoleQueryAuditModel.get('a')
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_ID = 'user_id'
+    ID = 'user_id.111.update.111'
+    USERNAME = 'username'
+    ROLE = 'role'
 
-        self.assertEqual(audit_model.id, 'a')
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(RoleQueryAuditModelUnitTests, self).setUp()
+
+        audit_models.RoleQueryAuditModel(
+            id=self.ID,
+            user_id=self.USER_ID,
+            intent=feconf.ROLE_ACTION_UPDATE,
+            role=self.ROLE,
+            username=self.USERNAME
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            audit_models.RoleQueryAuditModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            audit_models.RoleQueryAuditModel
+            .has_reference_to_user_id(self.USER_ID)
+        )
+        self.assertFalse(
+            audit_models.RoleQueryAuditModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_get_model(self):
+        audit_model = audit_models.RoleQueryAuditModel.get(self.ID)
+
+        self.assertEqual(audit_model.id, self.ID)
         self.assertEqual(audit_model.intent, feconf.ROLE_ACTION_UPDATE)
-        self.assertEqual(audit_model.user_id, 'b')
-        self.assertEqual(audit_model.role, 'c')
-        self.assertEqual(audit_model.username, 'd')
+        self.assertEqual(audit_model.user_id, self.USER_ID)
+        self.assertEqual(audit_model.role, self.ROLE)
+        self.assertEqual(audit_model.username, self.USERNAME)

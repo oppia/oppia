@@ -15,13 +15,15 @@
 # limitations under the License.
 
 """One-off jobs for stories."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
 
-from constants import constants
 from core import jobs
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
 from core.platform import models
 import feconf
@@ -48,15 +50,12 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not constants.ENABLE_NEW_STRUCTURES:
-            return
-
         if item.deleted:
             yield (StoryMigrationOneOffJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the story up to the newest version.
-        story = story_services.get_story_by_id(item.id)
+        story = story_fetchers.get_story_by_id(item.id)
         try:
             story.validate()
         except Exception as e:
@@ -69,15 +68,16 @@ class StoryMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new story into the datastore if it's different from
         # the old version.
-        if item.schema_version <= feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
+        if (item.story_contents_schema_version <=
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
             commit_cmds = [story_domain.StoryChange({
                 'cmd': story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
-                'from_version': item.schema_version,
+                'from_version': item.story_contents_schema_version,
                 'to_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION
             })]
             story_services.update_story(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
-                'Update story schema version to %d.' % (
+                'Update story contents schema version to %d.' % (
                     feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION))
             yield (StoryMigrationOneOffJob._MIGRATED_KEY, 1)
 

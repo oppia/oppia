@@ -12,18 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands that can be used to operate on skills.
-"""
+"""Commands that can be used to operate on skills."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import logging
 
-from core.domain import email_manager
+from core.domain import opportunity_services
 from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 (skill_models, user_models, question_models) = models.Registry.import_models(
     [models.NAMES.skill, models.NAMES.user, models.NAMES.question])
@@ -69,7 +72,7 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
     function to account for that new version.
 
     Args:
-        versioned_misconceptions: A dict with two keys:
+        versioned_misconceptions: dict. A dict with two keys:
           - schema_version: int. The schema version for the misconceptions dict.
           - misconceptions: list(dict). The list of dicts comprising the skill
               misconceptions.
@@ -90,6 +93,37 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
         skill_domain.Skill.update_misconceptions_from_model(
             versioned_misconceptions, misconception_schema_version)
         misconception_schema_version += 1
+
+
+def _migrate_rubrics_to_latest_schema(versioned_rubrics):
+    """Holds the responsibility of performing a step-by-step, sequential update
+    of the rubrics structure based on the schema version of the input
+    rubrics dictionary. If the current rubrics schema changes, a
+    new conversion function must be added and some code appended to this
+    function to account for that new version.
+
+    Args:
+        versioned_rubrics: dict. A dict with two keys:
+          - schema_version: int. The schema version for the rubrics dict.
+          - rubrics: list(dict). The list of dicts comprising the skill
+              rubrics.
+
+    Raises:
+        Exception: The schema version of rubrics is outside of what
+            is supported at present.
+    """
+    rubric_schema_version = versioned_rubrics['schema_version']
+    if not (1 <= rubric_schema_version
+            <= feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d rubric schemas at '
+            'present.' % feconf.CURRENT_RUBRIC_SCHEMA_VERSION)
+
+    while (rubric_schema_version <
+           feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+        skill_domain.Skill.update_rubrics_from_model(
+            versioned_rubrics, rubric_schema_version)
+        rubric_schema_version += 1
 
 
 # Repository GET methods.
@@ -142,6 +176,11 @@ def get_skill_from_model(skill_model):
         'misconceptions': copy.deepcopy(skill_model.misconceptions)
     }
 
+    versioned_rubrics = {
+        'schema_version': skill_model.rubric_schema_version,
+        'rubrics': copy.deepcopy(skill_model.rubrics)
+    }
+
     # Migrate the skill if it is not using the latest schema version.
     if (skill_model.skill_contents_schema_version !=
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
@@ -151,19 +190,28 @@ def get_skill_from_model(skill_model):
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
         _migrate_misconceptions_to_latest_schema(versioned_misconceptions)
 
+    if (skill_model.rubric_schema_version !=
+            feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+        _migrate_rubrics_to_latest_schema(versioned_rubrics)
+
     return skill_domain.Skill(
         skill_model.id, skill_model.description,
         [
             skill_domain.Misconception.from_dict(misconception)
             for misconception in versioned_misconceptions['misconceptions']
+        ], [
+            skill_domain.Rubric.from_dict(rubric)
+            for rubric in versioned_rubrics['rubrics']
         ], skill_domain.SkillContents.from_dict(
             versioned_skill_contents['skill_contents']),
         versioned_misconceptions['schema_version'],
+        versioned_rubrics['schema_version'],
         versioned_skill_contents['schema_version'],
         skill_model.language_code,
         skill_model.version, skill_model.next_misconception_id,
         skill_model.superseding_skill_id, skill_model.all_questions_merged,
-        skill_model.created_on, skill_model.last_updated)
+        skill_model.prerequisite_skill_ids, skill_model.created_on,
+        skill_model.last_updated)
 
 
 def get_all_skill_summaries():
@@ -193,8 +241,83 @@ def get_multi_skill_summaries(skill_ids):
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
     skill_summaries = [
         get_skill_summary_from_model(skill_summary_model)
-        for skill_summary_model in skill_summaries_models]
+        for skill_summary_model in skill_summaries_models
+        if skill_summary_model is not None]
     return skill_summaries
+
+
+def get_multi_skills(skill_ids):
+    """Returns a list of skills matching the skill IDs provided.
+
+    Args:
+        skill_ids: list(str). List of skill IDs to get skills for.
+
+    Returns:
+        list(Skill). The list of skills matching the provided IDs.
+    """
+    local_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    for skill_id, skill_model in python_utils.ZIP(
+            skill_ids, local_skill_models):
+        if skill_model is None:
+            raise Exception('No skill exists for ID %s' % skill_id)
+    skills = [
+        get_skill_from_model(skill_model)
+        for skill_model in local_skill_models
+        if skill_model is not None]
+    return skills
+
+
+def get_rubrics_of_skills(skill_ids):
+    """Returns a list of rubrics corresponding to given skills.
+
+    Args:
+        skill_ids: list(str). The list of skill IDs.
+
+    Returns:
+        dict, list(str). The skill rubrics of skills keyed by their
+            corresponding ids and the list of deleted skill ids, if any.
+    """
+    backend_skill_models = skill_models.SkillModel.get_multi(skill_ids)
+    skill_id_to_rubrics_dict = {}
+
+    for skill_model in backend_skill_models:
+        if skill_model is not None:
+            skill_id_to_rubrics_dict[skill_model.id] = skill_model.rubrics
+
+    deleted_skill_ids = []
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_rubrics_dict:
+            skill_id_to_rubrics_dict[skill_id] = None
+            deleted_skill_ids.append(skill_id)
+
+    return skill_id_to_rubrics_dict, deleted_skill_ids
+
+
+def get_descriptions_of_skills(skill_ids):
+    """Returns a list of skill descriptions corresponding to the given skills.
+
+    Args:
+        skill_ids: list(str). The list of skill ids.
+
+    Returns:
+        dict, list(str). The skill descriptions of skills keyed by their
+            corresponding ids and the list of deleted skill ids, if any.
+    """
+    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
+    skill_id_to_description_dict = {}
+
+    for skill_summary_model in skill_summary_models:
+        if skill_summary_model is not None:
+            skill_id_to_description_dict[skill_summary_model.id] = (
+                skill_summary_model.description)
+
+    deleted_skill_ids = []
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_description_dict:
+            skill_id_to_description_dict[skill_id] = None
+            deleted_skill_ids.append(skill_id)
+
+    return skill_id_to_description_dict, deleted_skill_ids
 
 
 def get_skill_summary_from_model(skill_summary_model):
@@ -272,45 +395,6 @@ def get_skill_summary_by_id(skill_id, strict=True):
         return None
 
 
-def get_skill_descriptions_by_ids(topic_id, skill_ids):
-    """Returns a list of skill descriptions corresponding to given skill ids.
-
-    Args:
-        topic_id: str. The id of the topic that these skills are a part of.
-        skill_ids: list(str). The list of skill ids.
-
-    Returns:
-        dict. The skill descriptions of skills keyed by their corresponding ids.
-    """
-    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
-    skill_id_to_description_dict = {}
-
-    for skill_summary_model in skill_summary_models:
-        if skill_summary_model is not None:
-            skill_id_to_description_dict[skill_summary_model.id] = (
-                skill_summary_model.description)
-
-    deleted_skill_ids = []
-    for skill_id in skill_ids:
-        if skill_id not in skill_id_to_description_dict:
-            skill_id_to_description_dict[skill_id] = None
-            deleted_skill_ids.append(skill_id)
-
-    if deleted_skill_ids:
-        deleted_skills_string = ', '.join(deleted_skill_ids)
-        logging.error(
-            'The deleted skills: %s are still present in topic with id %s'
-            % (deleted_skills_string, topic_id)
-        )
-        if feconf.CAN_SEND_EMAILS:
-            email_manager.send_mail_to_admin(
-                'Deleted skills present in topic',
-                'The deleted skills: %s are still present in topic with id %s'
-                % (deleted_skills_string, topic_id))
-
-    return skill_id_to_description_dict
-
-
 def get_new_skill_id():
     """Returns a new skill id.
 
@@ -330,6 +414,7 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         commit_cmds: list(SkillChange). A list of change commands made to the
             given skill.
     """
+    skill.validate()
     create_new_skill_rights(skill.id, committer_id)
     model = skill_models.SkillModel(
         id=skill.id,
@@ -339,17 +424,26 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
             misconception.to_dict()
             for misconception in skill.misconceptions
         ],
+        rubrics=[
+            rubric.to_dict()
+            for rubric in skill.rubrics
+        ],
         skill_contents=skill.skill_contents.to_dict(),
         next_misconception_id=skill.next_misconception_id,
         misconceptions_schema_version=skill.misconceptions_schema_version,
+        rubric_schema_version=skill.rubric_schema_version,
         skill_contents_schema_version=skill.skill_contents_schema_version,
         superseding_skill_id=skill.superseding_skill_id,
-        all_questions_merged=skill.all_questions_merged
+        all_questions_merged=skill.all_questions_merged,
+        prerequisite_skill_ids=skill.prerequisite_skill_ids
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
     skill.version += 1
     create_skill_summary(skill.id)
+    opportunity_services.create_skill_opportunity(
+        skill_id=skill.id,
+        skill_description=skill.description)
 
 
 def save_new_skill(committer_id, skill):
@@ -391,6 +485,9 @@ def apply_change_list(skill_id, change_list, committer_id):
                             'The user does not have enough rights to edit the '
                             'skill description.')
                     skill.update_description(change.new_value)
+                    (opportunity_services
+                     .update_skill_opportunity_skill_description(
+                         skill.id, change.new_value))
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)
@@ -400,21 +497,27 @@ def apply_change_list(skill_id, change_list, committer_id):
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
                     skill.record_that_all_questions_are_merged(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
                     skill.update_explanation(change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
-                    skill.update_worked_examples(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
+                    worked_examples_list = [
+                        state_domain.SubtitledHtml.from_dict(worked_example)
+                        for worked_example in change.new_value]
+                    skill.update_worked_examples(worked_examples_list)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
-                skill.add_misconception(change.new_value)
+                skill.add_misconception(change.new_misconception_dict)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
+            elif change.cmd == skill_domain.CMD_ADD_PREREQUISITE_SKILL:
+                skill.add_prerequisite_skill(change.skill_id)
+            elif change.cmd == skill_domain.CMD_DELETE_PREREQUISITE_SKILL:
+                skill.delete_prerequisite_skill(change.skill_id)
+            elif change.cmd == skill_domain.CMD_UPDATE_RUBRICS:
+                skill.update_rubric(
+                    change.difficulty, change.explanation)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==
@@ -429,19 +532,24 @@ def apply_change_list(skill_id, change_list, committer_id):
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED): # pylint: disable=line-too-long
+                    skill.update_misconception_must_be_addressed(
+                        change.misconception_id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
             elif (change.cmd ==
                   skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
                   or change.cmd ==
-                  skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION): # pylint: disable=line-too-long
+                  skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION # pylint: disable=line-too-long
+                  or change.cmd ==
+                  skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION):
                 # Loading the skill model from the datastore into a
                 # skill domain object automatically converts it to use the
                 # latest schema version. As a result, simply resaving the
                 # skill is sufficient to apply the schema migration.
                 continue
-            else:
-                raise Exception('Invalid change dict.')
+
         return skill
 
     except Exception as e:
@@ -472,34 +580,41 @@ def _save_skill(committer_id, skill, commit_message, change_list):
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save skill %s: %s' % (skill.id, change_list))
+    skill.validate()
 
+    # Skill model cannot be None as skill is passed as parameter here and that
+    # is only possible if a skill model with that skill id exists.
     skill_model = skill_models.SkillModel.get(
         skill.id, strict=False)
-    if skill_model is None:
-        skill_model = skill_models.SkillModel(id=skill.id)
-    else:
-        if skill.version > skill_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of skill '
-                'from version %s. Please reload the page and try again.'
-                % (skill_model.version, skill.version))
-        elif skill.version < skill_model.version:
-            raise Exception(
-                'Trying to update version %s of skill from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (skill_model.version, skill.version))
+
+    if skill.version > skill_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of skill '
+            'from version %s. Please reload the page and try again.'
+            % (skill_model.version, skill.version))
+    elif skill.version < skill_model.version:
+        raise Exception(
+            'Trying to update version %s of skill from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (skill_model.version, skill.version))
 
     skill_model.description = skill.description
     skill_model.language_code = skill.language_code
     skill_model.superseding_skill_id = skill.superseding_skill_id
     skill_model.all_questions_merged = skill.all_questions_merged
+    skill_model.prerequisite_skill_ids = skill.prerequisite_skill_ids
     skill_model.misconceptions_schema_version = (
         skill.misconceptions_schema_version)
+    skill_model.rubric_schema_version = (
+        skill.rubric_schema_version)
     skill_model.skill_contents_schema_version = (
         skill.skill_contents_schema_version)
     skill_model.skill_contents = skill.skill_contents.to_dict()
     skill_model.misconceptions = [
         misconception.to_dict() for misconception in skill.misconceptions
+    ]
+    skill_model.rubrics = [
+        rubric.to_dict() for rubric in skill.rubrics
     ]
     skill_model.next_misconception_id = skill.next_misconception_id
     change_dicts = [change.to_dict() for change in change_list]
@@ -512,14 +627,14 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     """Updates a skill. Commits changes.
 
     Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - skill_id: str. The skill id.
-    - change_list: list(SkillChange). These changes are applied in sequence to
-        produce the resulting skill.
-    - commit_message: str or None. A description of changes made to the
-        skill. For published skills, this must be present; for
-        unpublished skills, it may be equal to None.
+        committer_id: str. The id of the user who is performing the update
+            action.
+        skill_id: str. The skill id.
+        change_list: list(SkillChange). These changes are applied in sequence to
+            produce the resulting skill.
+        commit_message: str or None. A description of changes made to the
+            skill. For published skills, this must be present; for
+            unpublished skills, it may be equal to None.
 
     Raises:
         ValueError: No commit message was provided.
@@ -612,6 +727,7 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
     # Delete the summary of the skill (regardless of whether
     # force_deletion is True or not).
     delete_skill_summary(skill_id)
+    opportunity_services.delete_skill_opportunity(skill_id)
 
 
 def delete_skill_summary(skill_id):
@@ -741,6 +857,25 @@ def get_skill_rights(skill_id, strict=True):
     return get_skill_rights_from_model(model)
 
 
+def get_multi_skill_rights(skill_ids):
+    """Retrieves the rights objects for the given skills.
+
+    Args:
+        skill_ids: list(str). Skill IDs of the skills for which rights are
+            requested.
+
+    Returns:
+        list(SkillRights). The list of skill rights objects.
+    """
+
+    skill_rights_models = skill_models.SkillRightsModel.get_multi(skill_ids)
+    skill_rights_list = [
+        get_skill_rights_from_model(skill_rights_model)
+        if skill_rights_model else None
+        for skill_rights_model in skill_rights_models]
+    return skill_rights_list
+
+
 def get_unpublished_skill_rights_by_creator(user_id):
     """Retrives the rights objects that are private and were created by the
     user with the provided user ID.
@@ -804,7 +939,27 @@ def save_user_skill_mastery(user_skill_mastery):
     user_skill_mastery_model.put()
 
 
-def get_skill_mastery(user_id, skill_id):
+def create_multi_user_skill_mastery(user_id, degrees_of_mastery):
+    """Creates the mastery of a user in multiple skills.
+
+    Args:
+        user_id: str. The user ID of the user.
+        degrees_of_mastery: dict(str, float). The keys are the requested
+            skill IDs. The values are the corresponding mastery degree of
+            the user.
+    """
+    user_skill_mastery_models = []
+
+    for skill_id, degree_of_mastery in degrees_of_mastery.items():
+        user_skill_mastery_models.append(user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                user_id, skill_id),
+            user_id=user_id, skill_id=skill_id,
+            degree_of_mastery=degree_of_mastery))
+    user_models.UserSkillMasteryModel.put_multi(user_skill_mastery_models)
+
+
+def get_user_skill_mastery(user_id, skill_id):
     """Fetches the mastery of user in a particular skill.
 
     Args:
@@ -813,18 +968,21 @@ def get_skill_mastery(user_id, skill_id):
             requested.
 
     Returns:
-        degree_of_mastery: float. Mastery degree of the user for the
-            requested skill.
+        degree_of_mastery: float or None. Mastery degree of the user for the
+            requested skill, or None if UserSkillMasteryModel does not exist
+            for the skill.
     """
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
         user_id, skill_id)
-    degree_of_mastery = user_models.UserSkillMasteryModel.get(
-        model_id).degree_of_mastery
+    user_skill_mastery_model = user_models.UserSkillMasteryModel.get(
+        model_id, strict=False)
 
-    return degree_of_mastery
+    if not user_skill_mastery_model:
+        return None
+    return user_skill_mastery_model.degree_of_mastery
 
 
-def get_multi_skill_mastery(user_id, skill_ids):
+def get_multi_user_skill_mastery(user_id, skill_ids):
     """Fetches the mastery of user in multiple skills.
 
     Args:
@@ -833,10 +991,12 @@ def get_multi_skill_mastery(user_id, skill_ids):
             requested.
 
     Returns:
-        degree_of_mastery: list(float). Mastery degree of the user for requested
-            skills.
+        degrees_of_mastery: dict(str, float|None). The keys are the requested
+            skill IDs. The values are the corresponding mastery degree of
+            the user or None if UserSkillMasteryModel does not exist for the
+            skill.
     """
-    degrees_of_mastery = []
+    degrees_of_mastery = {}
     model_ids = []
 
     for skill_id in skill_ids:
@@ -846,8 +1006,12 @@ def get_multi_skill_mastery(user_id, skill_ids):
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
 
-    for skill_mastery_model in skill_mastery_models:
-        degrees_of_mastery.append(skill_mastery_model.degree_of_mastery)
+    for skill_id, skill_mastery_model in python_utils.ZIP(
+            skill_ids, skill_mastery_models):
+        if skill_mastery_model is None:
+            degrees_of_mastery[skill_id] = None
+        else:
+            degrees_of_mastery[skill_id] = skill_mastery_model.degree_of_mastery
 
     return degrees_of_mastery
 

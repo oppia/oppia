@@ -15,13 +15,23 @@
 # limitations under the License.
 
 """One-off jobs for activities."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import search_services
 from core.platform import models
 
-(exp_models, collection_models,) = models.Registry.import_models([
-    models.NAMES.exploration, models.NAMES.collection])
+(
+    collection_models, config_models,
+    exp_models, question_models,
+    skill_models, story_models,
+    topic_models) = (
+        models.Registry.import_models([
+            models.NAMES.collection, models.NAMES.config,
+            models.NAMES.exploration, models.NAMES.question,
+            models.NAMES.skill, models.NAMES.story,
+            models.NAMES.topic]))
 
 
 class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):

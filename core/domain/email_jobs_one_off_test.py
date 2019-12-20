@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for Email-related jobs."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import types
@@ -45,6 +47,18 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
         # pylint: disable=unused-argument
         def _generate_hash_for_tests(
                 cls, recipient_id, email_subject, email_body):
+            """Generates hash for tests.
+
+            Args:
+                recipient_id: str. ID of the recipient.
+                email_subject: str. Subject of the email.
+                email_body: str. Body of the email.
+
+            Returns:
+                str. Empty if recipient_id is 'recipient_id2', None if
+                    'recipient_id1' and 'Email Hash' otherwise.
+            """
+
             if recipient_id == 'recipient_id1':
                 return None
             elif recipient_id == 'recipient_id2':

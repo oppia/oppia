@@ -20,12 +20,16 @@ Domain objects capture domain-specific logic and are agnostic of how the
 objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 import string
 
 from constants import constants
+from core.domain import change_domain
 import feconf
+import python_utils
 import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
@@ -41,6 +45,8 @@ COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
 COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
 COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 
+# This takes additional 'title' and 'category' parameters.
+CMD_CREATE_NEW = 'create_new'
 # This takes an additional 'exploration_id' parameter.
 CMD_ADD_COLLECTION_NODE = 'add_collection_node'
 # This takes an additional 'exploration_id' parameter.
@@ -72,151 +78,83 @@ CMD_REMOVE_QUESTION_ID_FROM_SKILL = 'remove_question_id_from_skill'
 _SKILL_ID_PREFIX = 'skill'
 
 
-class CollectionChange(object):
+class CollectionChange(change_domain.BaseChange):
     """Domain object class for a change to a collection.
 
     IMPORTANT: Ensure that all changes to this class (and how these cmds are
     interpreted in general) preserve backward-compatibility with the
     collection snapshots in the datastore. Do not modify the definitions of
     cmd keys that already exist.
+
+    The allowed commands, together with the attributes:
+        - 'add_collection_node' (with exploration_id)
+        - 'delete_collection_node' (with exploration_id)
+        - 'edit_collection_node_property' (with exploration_id,
+            property_name, new_value and, optionally, old_value)
+        - 'edit_collection_property' (with property_name, new_value
+            and, optionally, old_value)
+        - 'migrate_schema' (with from_version and to_version)
+    For a collection, property_name must be one of
+    COLLECTION_PROPERTIES.
     """
 
+    # The allowed list of collection properties which can be used in
+    # edit_collection_property command.
     COLLECTION_PROPERTIES = (
         COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
         COLLECTION_PROPERTY_OBJECTIVE, COLLECTION_PROPERTY_LANGUAGE_CODE,
         COLLECTION_PROPERTY_TAGS)
 
-    def __init__(self, change_dict):
-        """Initializes a CollectionChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                    - 'add_collection_node' (with exploration_id)
-                    - 'delete_collection_node' (with exploration_id)
-                    - 'edit_collection_node_property' (with exploration_id,
-                        property_name, new_value and, optionally, old_value)
-                    - 'edit_collection_property' (with property_name, new_value
-                        and, optionally, old_value)
-                    - 'migrate_schema' (with from_version and to_version)
-            For a collection node, property_name must be one of
-            COLLECTION_NODE_PROPERTIES. For a collection, property_name must be
-            one of COLLECTION_PROPERTIES.
-
-        Raises:
-            Exception: The given change_dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_ADD_COLLECTION_NODE:
-            self.exploration_id = change_dict['exploration_id']
-        elif self.cmd == CMD_DELETE_COLLECTION_NODE:
-            self.exploration_id = change_dict['exploration_id']
-        elif self.cmd == CMD_SWAP_COLLECTION_NODES:
-            self.first_index = change_dict['first_index']
-            self.second_index = change_dict['second_index']
-        elif self.cmd == CMD_EDIT_COLLECTION_NODE_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.COLLECTION_NODE_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.exploration_id = change_dict['exploration_id']
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_EDIT_COLLECTION_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.COLLECTION_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        elif self.cmd == CMD_ADD_COLLECTION_SKILL:
-            self.name = change_dict['name']
-        elif self.cmd == CMD_ADD_QUESTION_ID_TO_SKILL:
-            self.skill_id = change_dict['skill_id']
-            self.question_id = change_dict['question_id']
-        elif self.cmd == CMD_REMOVE_QUESTION_ID_FROM_SKILL:
-            self.skill_id = change_dict['skill_id']
-            self.question_id = change_dict['question_id']
-        elif self.cmd == CMD_DELETE_COLLECTION_SKILL:
-            self.skill_id = change_dict['skill_id']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['category', 'title'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_COLLECTION_NODE,
+        'required_attribute_names': ['exploration_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_COLLECTION_NODE,
+        'required_attribute_names': ['exploration_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_SWAP_COLLECTION_NODES,
+        'required_attribute_names': ['first_index', 'second_index'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_EDIT_COLLECTION_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value'],
+        'optional_attribute_names': ['old_value'],
+        'allowed_values': {'property_name': COLLECTION_PROPERTIES}
+    }, {
+        'name': CMD_EDIT_COLLECTION_NODE_PROPERTY,
+        'required_attribute_names': [
+            'exploration_id', 'property_name', 'new_value'],
+        'optional_attribute_names': ['old_value']
+    }, {
+        'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_COLLECTION_SKILL,
+        'required_attribute_names': ['name'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_COLLECTION_SKILL,
+        'required_attribute_names': ['skill_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_QUESTION_ID_TO_SKILL,
+        'required_attribute_names': ['question_id', 'skill_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_REMOVE_QUESTION_ID_FROM_SKILL,
+        'required_attribute_names': ['question_id', 'skill_id'],
+        'optional_attribute_names': []
+    }]
 
 
-class CollectionCommitLogEntry(object):
-    """Value object representing a commit to an collection."""
-
-    def __init__(
-            self, created_on, last_updated, user_id, username, collection_id,
-            commit_type, commit_message, commit_cmds, version,
-            post_commit_status, post_commit_community_owned,
-            post_commit_is_private):
-        """Initializes a CollectionCommitLogEntry domain object.
-
-        Args:
-            created_on: datetime.datetime. Date and time when the collection
-                commits was created.
-            last_updated: datetime.datetime. Date and time when the collection
-                commits was last updated.
-            user_id: str. User id of the user who has made the commit.
-            username: str. Username of the user who has made the commit.
-            collection_id: str. Id of the collection.
-            commit_type: str. The type of commit.
-            commit_message: str. A description of changes made to the
-                collection.
-            commit_cmds: list(dict). A list of change commands made to the
-                given collection.
-            version: int. The version of the collection.
-            post_commit_status: str. The new collection status after the
-                commit.
-            post_commit_community_owned: bool. Whether the collection is
-                community-owned after the edit event.
-            post_commit_is_private: bool. Whether the collection is private
-                after the edit event.
-        """
-        self.created_on = created_on
-        self.last_updated = last_updated
-        self.user_id = user_id
-        self.username = username
-        self.collection_id = collection_id
-        self.commit_type = commit_type
-        self.commit_message = commit_message
-        self.commit_cmds = commit_cmds
-        self.version = version
-        self.post_commit_status = post_commit_status
-        self.post_commit_community_owned = post_commit_community_owned
-        self.post_commit_is_private = post_commit_is_private
-
-    def to_dict(self):
-        """Returns a dict representing this CollectionCommitLogEntry domain
-            object. This omits created_on, user_id and (for now) commit_cmds.
-
-        Returns:
-            A dict, mapping all fields of CollectionCommitLogEntry instance,
-            except created_on, user_id and (for now) commit_cmds field.
-        """
-        return {
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'username': self.username,
-            'collection_id': self.collection_id,
-            'commit_type': self.commit_type,
-            'commit_message': self.commit_message,
-            'version': self.version,
-            'post_commit_status': self.post_commit_status,
-            'post_commit_community_owned': self.post_commit_community_owned,
-            'post_commit_is_private': self.post_commit_is_private,
-        }
-
-
-class CollectionNode(object):
+class CollectionNode(python_utils.OBJECT):
     """Domain object describing a node in the exploration graph of a
     collection. The node contains the reference to
     its exploration (its ID).
@@ -261,7 +199,7 @@ class CollectionNode(object):
             ValidationError: One or more attributes of the collection node are
             invalid.
         """
-        if not isinstance(self.exploration_id, basestring):
+        if not isinstance(self.exploration_id, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected exploration ID to be a string, received %s' %
                 self.exploration_id)
@@ -280,7 +218,7 @@ class CollectionNode(object):
         return cls(exploration_id)
 
 
-class Collection(object):
+class Collection(python_utils.OBJECT):
     """Domain object for an Oppia collection."""
 
     def __init__(
@@ -417,7 +355,7 @@ class Collection(object):
         # YAML representation.
         del collection_dict['id']
 
-        return utils.yaml_from_dict(collection_dict)
+        return python_utils.yaml_from_dict(collection_dict)
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, collection_dict):
@@ -615,7 +553,7 @@ class Collection(object):
             skill_names.update(node['acquired_skills'])
             skill_names.update(node['prerequisite_skills'])
         skill_names_to_ids = {
-            name: _SKILL_ID_PREFIX + str(index)
+            name: _SKILL_ID_PREFIX + python_utils.UNICODE(index)
             for index, name in enumerate(sorted(skill_names))
         }
 
@@ -634,7 +572,7 @@ class Collection(object):
                 'name': skill_name,
                 'question_ids': []
             }
-            for skill_name, skill_id in skill_names_to_ids.iteritems()
+            for skill_name, skill_id in skill_names_to_ids.items()
         }
 
         collection_contents['next_skill_id'] = len(skill_names)
@@ -775,7 +713,7 @@ class Collection(object):
         """
         exploration_just_unlocked = None
 
-        for index in range(0, len(self.nodes) - 1):
+        for index in python_utils.RANGE(0, len(self.nodes) - 1):
             if self.nodes[index].exploration_id == current_exploration_id:
                 exploration_just_unlocked = self.nodes[index + 1].exploration_id
                 break
@@ -937,25 +875,25 @@ class Collection(object):
         # NOTE TO DEVELOPERS: Please ensure that this validation logic is the
         # same as that in the frontend CollectionValidatorService.
 
-        if not isinstance(self.title, basestring):
+        if not isinstance(self.title, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected title to be a string, received %s' % self.title)
         utils.require_valid_name(
             self.title, 'the collection title', allow_empty=True)
 
-        if not isinstance(self.category, basestring):
+        if not isinstance(self.category, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected category to be a string, received %s'
                 % self.category)
         utils.require_valid_name(
             self.category, 'the collection category', allow_empty=True)
 
-        if not isinstance(self.objective, basestring):
+        if not isinstance(self.objective, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
-        if not isinstance(self.language_code, basestring):
+        if not isinstance(self.language_code, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
@@ -968,13 +906,6 @@ class Collection(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        # TODO(sll): Remove this check once App Engine supports 3-letter
-        # language codes in search.
-        if len(self.language_code) != 2:
-            raise utils.ValidationError(
-                'Invalid language_code, it should have exactly 2 letters: %s' %
-                self.language_code)
-
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
                 'Expected tags to be a list, received %s' % self.tags)
@@ -984,14 +915,14 @@ class Collection(object):
                 'Expected tags to be unique, but found duplicates')
 
         for tag in self.tags:
-            if not isinstance(tag, basestring):
+            if not isinstance(tag, python_utils.BASESTRING):
                 raise utils.ValidationError(
                     'Expected each tag to be a string, received \'%s\'' % tag)
 
             if not tag:
                 raise utils.ValidationError('Tags should be non-empty.')
 
-            if not re.match(feconf.TAG_REGEX, tag):
+            if not re.match(constants.TAG_REGEX, tag):
                 raise utils.ValidationError(
                     'Tags should only contain lowercase letters and spaces, '
                     'received \'%s\'' % tag)
@@ -1050,13 +981,8 @@ class Collection(object):
                     'Expected to have at least 1 exploration in the '
                     'collection.')
 
-            # Ensure the collection may be started.
-            if not self.first_exploration_id:
-                raise utils.ValidationError(
-                    'Expected to have at least 1 exploration.')
 
-
-class CollectionSummary(object):
+class CollectionSummary(python_utils.OBJECT):
     """Domain object for an Oppia collection summary."""
 
     def __init__(
@@ -1135,6 +1061,127 @@ class CollectionSummary(object):
             'collection_model_created_on': self.collection_model_created_on,
             'collection_model_last_updated': self.collection_model_last_updated
         }
+
+    def validate(self):
+        """Validates various properties of the CollectionSummary.
+
+        Raises:
+            ValidationError: One or more attributes of the CollectionSummary
+                are invalid.
+        """
+        if not isinstance(self.title, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected title to be a string, received %s' % self.title)
+        utils.require_valid_name(
+            self.title, 'the collection title', allow_empty=True)
+
+        if not isinstance(self.category, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected category to be a string, received %s'
+                % self.category)
+        utils.require_valid_name(
+            self.category, 'the collection category', allow_empty=True)
+
+        if not isinstance(self.objective, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected objective to be a string, received %s' %
+                self.objective)
+
+        if not self.language_code:
+            raise utils.ValidationError(
+                'A language must be specified (in the \'Settings\' tab).')
+
+        if not isinstance(self.language_code, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+
+        if not utils.is_valid_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.tags, list):
+            raise utils.ValidationError(
+                'Expected tags to be a list, received %s' % self.tags)
+
+        for tag in self.tags:
+            if not isinstance(tag, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each tag to be a string, received \'%s\'' % tag)
+
+            if not tag:
+                raise utils.ValidationError('Tags should be non-empty.')
+
+            if not re.match(constants.TAG_REGEX, tag):
+                raise utils.ValidationError(
+                    'Tags should only contain lowercase letters and spaces, '
+                    'received \'%s\'' % tag)
+
+            if (tag[0] not in string.ascii_lowercase or
+                    tag[-1] not in string.ascii_lowercase):
+                raise utils.ValidationError(
+                    'Tags should not start or end with whitespace, received '
+                    '\'%s\'' % tag)
+
+            if re.search(r'\s\s+', tag):
+                raise utils.ValidationError(
+                    'Adjacent whitespace in tags should be collapsed, '
+                    'received \'%s\'' % tag)
+
+        if len(set(self.tags)) < len(self.tags):
+            raise utils.ValidationError(
+                'Expected tags to be unique, but found duplicates')
+
+        if not isinstance(self.status, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected status to be string, received %s' % self.status)
+
+        if not isinstance(self.community_owned, bool):
+            raise utils.ValidationError(
+                'Expected community_owned to be bool, received %s' % (
+                    self.community_owned))
+
+        if not isinstance(self.owner_ids, list):
+            raise utils.ValidationError(
+                'Expected owner_ids to be list, received %s' % self.owner_ids)
+        for owner_id in self.owner_ids:
+            if not isinstance(owner_id, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each id in owner_ids to '
+                    'be string, received %s' % owner_id)
+
+        if not isinstance(self.editor_ids, list):
+            raise utils.ValidationError(
+                'Expected editor_ids to be list, received %s' % self.editor_ids)
+        for editor_id in self.editor_ids:
+            if not isinstance(editor_id, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each id in editor_ids to '
+                    'be string, received %s' % editor_id)
+
+        if not isinstance(self.viewer_ids, list):
+            raise utils.ValidationError(
+                'Expected viewer_ids to be list, received %s' % self.viewer_ids)
+        for viewer_id in self.viewer_ids:
+            if not isinstance(viewer_id, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each id in viewer_ids to '
+                    'be string, received %s' % viewer_id)
+
+        if not isinstance(self.contributor_ids, list):
+            raise utils.ValidationError(
+                'Expected contributor_ids to be list, received %s' % (
+                    self.contributor_ids))
+        for contributor_id in self.contributor_ids:
+            if not isinstance(contributor_id, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected each id in contributor_ids to '
+                    'be string, received %s' % contributor_id)
+
+        if not isinstance(self.contributors_summary, dict):
+            raise utils.ValidationError(
+                'Expected contributors_summary to be dict, received %s' % (
+                    self.contributors_summary))
 
     def is_editable_by(self, user_id=None):
         """Checks if a given user may edit the collection.

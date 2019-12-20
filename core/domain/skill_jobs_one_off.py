@@ -15,11 +15,12 @@
 # limitations under the License.
 
 """One-off jobs for skills."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
 
-from constants import constants
 from core import jobs
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -48,9 +49,6 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not constants.ENABLE_NEW_STRUCTURES:
-            return
-
         if item.deleted:
             yield (SkillMigrationOneOffJob._DELETED_KEY, 1)
             return
@@ -86,14 +84,24 @@ class SkillMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 'from_version': item.misconceptions_schema_version,
                 'to_version': feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION
             }))
+        if (
+                item.rubric_schema_version <=
+                feconf.CURRENT_RUBRIC_SCHEMA_VERSION):
+            commit_cmds.append(skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
+                'from_version': item.rubric_schema_version,
+                'to_version': feconf.CURRENT_RUBRIC_SCHEMA_VERSION
+            }))
 
         if commit_cmds:
             skill_services.update_skill(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update skill content schema version to %d and '
-                'skill misconceptions schema version to %d.' % (
+                'skill misconceptions schema version to %d and '
+                'skill rubrics schema version to %d.' % (
                     feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-                    feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION))
+                    feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+                    feconf.CURRENT_RUBRIC_SCHEMA_VERSION))
             yield (SkillMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod

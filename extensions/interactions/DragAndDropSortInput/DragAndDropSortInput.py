@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Python configuration for DragAndDropSortInput interaction."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from extensions.interactions import base
 
@@ -61,6 +63,13 @@ class DragAndDropSortInput(base.BaseInteraction):
             }
         },
         'default_value': [''],
+    }, {
+        'name': 'allowMultipleItemsInSamePosition',
+        'description': 'Allow multiple sort items in the same position',
+        'schema': {
+            'type': 'bool'
+        },
+        'default_value': False
     }]
 
     _answer_visualization_specs = []

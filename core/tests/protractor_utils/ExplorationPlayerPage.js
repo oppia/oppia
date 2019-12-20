@@ -26,6 +26,8 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-conversation-input'));
   var suggestionDescriptionInput = element(
     by.css('.protractor-test-suggestion-description-input'));
+  var closeSuggestionModalButton = element(
+    by.css('.protractor-test-exploration-close-suggestion-modal-btn'));
   var conversationContent = element.all(
     by.css('.protractor-test-conversation-content'));
   var conversationFeedback = element.all(
@@ -41,11 +43,15 @@ var ExplorationPlayerPage = function() {
   var waitingForResponseElem = element(by.css(
     '.protractor-test-input-response-loading-dots'));
   var ratingStars = element.all(by.css('.protractor-test-rating-star'));
+  var answerDetailsTextArea = element(
+    by.css('.protractor-test-answer-details-text-area'));
 
   var suggestionSubmitButton = element(
     by.css('.protractor-test-suggestion-submit-btn'));
   var feedbackCloseButton = element(
     by.css('.protractor-test-exploration-feedback-close-button'));
+  var reportExplorationButton = element(
+    by.css('.protractor-test-report-exploration-button'));
   var feedbackSubmitButton = element(
     by.css('.protractor-test-exploration-feedback-submit-btn'));
   var explorationInfoIcon = element(
@@ -63,6 +69,10 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-cancel-redirection-button'));
   var returnToParentButton = element(
     by.css('.protractor-test-return-to-parent-button'));
+  var answerDetailsSubmitButton = element(
+    by.css('.protractor-test-answer-details-submit-button'));
+  var correctFeedbackElement = element(
+    by.css('.protractor-test-correct-feedback'));
 
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
@@ -73,6 +83,52 @@ var ExplorationPlayerPage = function() {
     waitFor.elementToBeClickable(
       nextCardButton, '"Next Card" button takes too long to be clickable');
     nextCardButton.click();
+  };
+
+  this.clickSuggestChangesButton = function() {
+    waitFor.elementToBeClickable(suggestionPopupLink,
+      'Suggest changes button taking too long to appear');
+    suggestionPopupLink.click();
+  };
+
+  this.fillAndSubmitSuggestion = function(
+      suggestionTitle, suggestionDescription) {
+    var suggestionModal = element(
+      by.css('.protractor-test-exploration-suggestion-modal'));
+    waitFor.visibilityOf(suggestionModal,
+      'Suggestion Modal is taking too long to appear.');
+    var suggestionHeader = element(by.css('.oppia-rte'));
+    suggestionHeader.click();
+    suggestionHeader.sendKeys(suggestionTitle);
+    var suggestionModalDescription = element(
+      by.css('.protractor-test-suggestion-description-input'));
+    suggestionModalDescription.click();
+    suggestionModalDescription.sendKeys(suggestionDescription);
+    var submitSuggestionBtn = element(
+      by.css('.protractor-test-suggestion-submit-btn'));
+
+    submitSuggestionBtn.click();
+    var AFTER_SUBMIT_RESPONSE_STRING =
+        'Your suggestion has been forwarded to the ' +
+        'exploration author for review.';
+    var afterSubmitModalText = element(by.tagName('p')).getText();
+    expect(afterSubmitModalText).toMatch(AFTER_SUBMIT_RESPONSE_STRING);
+  };
+
+  this.reportExploration = function() {
+    waitFor.elementToBeClickable(reportExplorationButton,
+      'Report Exploration Button takes too long to be clickable');
+    reportExplorationButton.click();
+    let radioButton = element.all(by.tagName('input')).get(0);
+    waitFor.visibilityOf(radioButton, 'Radio Buttons takes too long to appear');
+    radioButton.click();
+    let textArea = element(by.tagName('textarea'));
+    textArea.sendKeys('Reporting this exploration');
+    let submitButton = element.all(by.tagName('button')).get(1);
+    submitButton.click();
+    let afterSubmitText = element(by.tagName('p')).getText();
+    expect(afterSubmitText).toMatch(
+      'Your report has been forwarded to the moderators for review.');
   };
 
   this.viewHint = function() {
@@ -122,6 +178,14 @@ var ExplorationPlayerPage = function() {
       returnToParentButton,
       '"Return to Parent" button takes too long to be clickable');
     returnToParentButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.clickOnCloseSuggestionModalButton = function() {
+    waitFor.elementToBeClickable(
+      closeSuggestionModalButton,
+      '"Close suggestion modal" button takes too long to be clickable');
+    closeSuggestionModalButton.click();
     waitFor.pageToFullyLoad();
   };
 
@@ -208,6 +272,14 @@ var ExplorationPlayerPage = function() {
       waitingForResponseElem, 'Response takes too long to appear');
   };
 
+  this.submitAnswerDetails = function(answerDetails) {
+    answerDetailsTextArea.sendKeys(answerDetails);
+    waitFor.elementToBeClickable(
+      answerDetailsSubmitButton,
+      'Answer details submit button takes too long to be clickable');
+    answerDetailsSubmitButton.click();
+  };
+
   this.submitFeedback = function(feedback) {
     waitFor.elementToBeClickable(
       feedbackPopupLink, 'Feedback Popup link takes too long to be clickable');
@@ -233,6 +305,12 @@ var ExplorationPlayerPage = function() {
     suggestionSubmitButton.click();
     waitFor.invisibilityOf(
       suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
+  };
+
+  this.expectCorrectFeedback = function() {
+    waitFor.visibilityOf(
+      correctFeedbackElement,
+      'Correct feedback footer takes too long to appear');
   };
 };
 

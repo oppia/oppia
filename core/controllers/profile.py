@@ -13,9 +13,14 @@
 # limitations under the License.
 
 """Controllers for the profile page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import re
+
+from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import email_manager
 from core.domain import role_services
 from core.domain import subscription_services
@@ -40,11 +45,7 @@ class ProfilePage(base.BaseHandler):
         if not user_settings:
             raise self.PageNotFoundException
 
-        self.values.update({
-            'nav_mode': feconf.NAV_MODE_PROFILE,
-            'PROFILE_USERNAME': user_settings.username,
-        })
-        self.render_template('pages/profile/profile.html')
+        self.render_template('profile-page.mainpage.html')
 
 
 class ProfileHandler(base.BaseHandler):
@@ -104,14 +105,7 @@ class PreferencesPage(base.BaseHandler):
     @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.PREFERENCES_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_PROFILE,
-            'LANGUAGE_CODES_AND_NAMES': (
-                utils.get_all_language_codes_and_names()),
-        })
-        self.render_template(
-            'pages/preferences/preferences.html', redirect_url_on_logout='/')
+        self.render_template('preferences-page.mainpage.html')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -168,7 +162,7 @@ class PreferencesHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_own_profile
     def put(self):
-        """Handles POST requests."""
+        """Handles PUT requests."""
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
 
@@ -223,8 +217,8 @@ class ProfilePictureHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ProfilePictureHandlerByUsername(base.BaseHandler):
-    """ Provides the dataURI of the profile picture of the specified user,
+class ProfilePictureHandlerByUsernameHandler(base.BaseHandler):
+    """Provides the dataURI of the profile picture of the specified user,
     or None if no user picture is uploaded for the user with that ID.
     """
 
@@ -252,18 +246,15 @@ class SignupPage(base.BaseHandler):
     @acl_decorators.require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
-        return_url = str(self.request.get('return_url', self.request.uri))
-
+        return_url = self.request.get('return_url', self.request.uri)
+        # Validating return_url for no external redirections.
+        if re.match('^/[^//]', return_url) is None:
+            return_url = '/'
         if user_services.has_fully_registered(self.user_id):
             self.redirect(return_url)
             return
 
-        self.values.update({
-            'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_SIGNUP,
-            'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
-        })
-        self.render_template('pages/signup/signup.html')
+        self.render_template('signup-page.mainpage.html')
 
 
 class SignupHandler(base.BaseHandler):
@@ -278,7 +269,8 @@ class SignupHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.render_json({
-            'has_agreed_to_latest_terms': (
+            'can_send_emails': feconf.CAN_SEND_EMAILS,
+            'has_agreed_to_latest_terms': bool(
                 user_settings.last_agreed_to_terms and
                 user_settings.last_agreed_to_terms >=
                 feconf.REGISTRATION_PAGE_LAST_UPDATED_UTC),
@@ -338,6 +330,17 @@ class SignupHandler(base.BaseHandler):
         self.render_json({})
 
 
+class DeleteAccountPage(base.BaseHandler):
+    """The delete account page."""
+
+    @acl_decorators.can_manage_own_profile
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+        self.render_template('delete-account-page.mainpage.html')
+
+
 class UsernameCheckHandler(base.BaseHandler):
     """Checks whether a username has already been taken."""
 
@@ -371,27 +374,62 @@ class SiteLanguageHandler(base.BaseHandler):
 
 
 class UserInfoHandler(base.BaseHandler):
-    """Provides info about user."""
+    """Provides info about user. If user is not logged in,
+    return dict containing false as logged in status.
+    """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.require_user_id
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
+        if self.username:
+            user_actions = user_services.UserActionsInfo(self.user_id).actions
+            user_settings = user_services.get_user_settings(
+                self.user_id, strict=False)
+            self.render_json({
+                'is_moderator': (
+                    user_services.is_at_least_moderator(self.user_id)),
+                'is_admin': user_services.is_admin(self.user_id),
+                'is_super_admin': (
+                    current_user_services.is_current_user_super_admin()),
+                'is_topic_manager': (
+                    user_services.is_topic_manager(self.user_id)),
+                'can_create_collections': bool(
+                    role_services.ACTION_CREATE_COLLECTION in user_actions),
+                'preferred_site_language_code': (
+                    user_settings.preferred_site_language_code),
+                'username': user_settings.username,
+                'email': user_services.get_email_from_username(
+                    user_settings.username),
+                'user_is_logged_in': True
+            })
+        else:
+            self.render_json({
+                'user_is_logged_in': False
+            })
 
-        user_actions = user_services.UserActionsInfo(self.user_id).actions
-        user_settings = user_services.get_user_settings(
-            self.user_id, strict=False)
-        self.render_json({
-            'is_moderator': (
-                user_services.is_at_least_moderator(self.user_id)),
-            'is_admin': user_services.is_admin(self.user_id),
-            'is_super_admin': (
-                current_user_services.is_current_user_super_admin()),
-            'can_create_collections': bool(
-                role_services.ACTION_CREATE_COLLECTION in user_actions),
-            'preferred_site_language_code': (
-                user_settings.preferred_site_language_code),
-            'username': user_settings.username,
-            'user_is_logged_in': True
-        })
+
+class UrlHandler(base.BaseHandler):
+    """The handler for generating login URL."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self):
+        login_url = None
+        if self.user_id:
+            self.render_json({'login_url': None})
+        else:
+            if self.request and self.request.get('current_url'):
+                target_url = (
+                    '/' if self.request.get('current_url').endswith(
+                        feconf.SPLASH_URL)
+                    else self.request.get('current_url'))
+                login_url = (
+                    current_user_services.create_login_url(target_url))
+                self.render_json({'login_url': login_url})
+            else:
+                raise self.InvalidInputException(
+                    'Incomplete or empty GET parameters passed'
+                )

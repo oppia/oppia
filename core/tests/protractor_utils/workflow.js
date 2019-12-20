@@ -18,10 +18,34 @@
  */
 
 var forms = require('./forms.js');
+var users = require('./users.js');
 var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
+var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
+
+// check if the save roles button is clickable
+var canAddRolesToUsers = function() {
+  return element(by.css('.protractor-test-save-role')).isEnabled();
+};
+
+// check if the warning message is visible when the title is ''
+var checkForAddTitleWarning = function() {
+  return element(by.className('protractor-test-title-warning')).isDisplayed();
+};
+
+// trigger onblur event for title
+var triggerTitleOnBlurEvent = function() {
+  element(by.css('.protractor-test-exploration-title-input')).click();
+  element(by.css('.protractor-test-exploration-objective-input')).click();
+};
+
+// open edit roles
+var openEditRolesForm = function() {
+  element(by.css('.protractor-test-edit-roles')).click();
+  element(by.css('.protractor-test-role-username')).sendKeys('Chuck Norris');
+};
 
 // Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = function() {
@@ -33,17 +57,32 @@ var createExploration = function() {
 
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = function() {
-  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  creatorDashboardPage.clickCreateActivityButton();
+  users.isAdmin().then(function(isAdmin) {
+    creatorDashboardPage.clickCreateActivityButton();
+    if (isAdmin) {
+      var activityCreationModal = element(
+        by.css('.protractor-test-creation-modal'));
+      waitFor.visibilityOf(
+        activityCreationModal,
+        'ActivityCreationModal takes too long to be visible.');
+      var createExplorationButton = element(
+        by.css('.protractor-test-create-exploration'));
+      waitFor.elementToBeClickable(
+        createExplorationButton,
+        'createExplorationButton takes too long to be clickable.');
+      createExplorationButton.click();
+    }
+  });
 };
 
 /**
  * Only Admin users can create collections.
  */
 var createCollectionAsAdmin = function() {
-  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   creatorDashboardPage.get();
   creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(
@@ -57,7 +96,7 @@ var createCollectionAsAdmin = function() {
  * Creating exploration for Admin users.
  */
 var createExplorationAsAdmin = function() {
-  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   creatorDashboardPage.get();
   creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(
@@ -117,6 +156,45 @@ var createAndPublishExploration = function(
   publishExploration();
 };
 
+var createAddExpDetailsAndPublishExp = function(
+    title, category, objective, language, tags) {
+  createExploration();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
+  explorationEditorMainTab.setInteraction('EndExploration');
+  explorationEditorPage.saveChanges('Save the changes');
+  explorationEditorPage.publishCardExploration(
+    title, objective, category, language, tags);
+};
+
+// Creates and publishes a exploration with two cards
+var createAndPublishTwoCardExploration = function(
+    title, category, objective, language) {
+  createExploration();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.setContent(forms.toRichText('card 1'));
+  explorationEditorMainTab.setInteraction('Continue');
+  explorationEditorMainTab.getResponseEditor('default').setDestination(
+    'second card', true, null
+  );
+  explorationEditorMainTab.moveToState('second card');
+  explorationEditorMainTab.setContent(forms.toRichText('card 2'));
+  explorationEditorMainTab.setInteraction('EndExploration');
+
+  var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  explorationEditorPage.navigateToSettingsTab();
+  explorationEditorSettingsTab.setTitle(title);
+  explorationEditorSettingsTab.setCategory(category);
+  explorationEditorSettingsTab.setObjective(objective);
+  if (language) {
+    explorationEditorSettingsTab.setLanguage(language);
+  }
+  explorationEditorPage.saveChanges();
+  publishExploration();
+};
+
 // Role management (state editor settings tab)
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
@@ -136,8 +214,8 @@ var addExplorationCollaborator = function(username) {
   _addExplorationRole('Collaborator', username);
 };
 
-var addExplorationTranslator = function(username) {
-  _addExplorationRole('Translator', username);
+var addExplorationVoiceArtist = function(username) {
+  _addExplorationRole('Voice Artist', username);
 };
 
 var addExplorationPlaytester = function(username) {
@@ -149,7 +227,8 @@ var _getExplorationRoles = function(roleName) {
   var itemName = roleName + 'Name';
   var listName = roleName + 'Names';
   return element.all(by.repeater(
-    itemName + ' in ExplorationRightsService.' + listName + ' track by $index'
+    itemName + ' in $ctrl.ExplorationRightsService.' + listName +
+    ' track by $index'
   )).map(function(elem) {
     return elem.getText();
   });
@@ -163,12 +242,26 @@ var getExplorationCollaborators = function() {
   return _getExplorationRoles('editor');
 };
 
-var getExplorationTranslators = function() {
-  return _getExplorationRoles('translator');
+var getExplorationVoiceArtists = function() {
+  return _getExplorationRoles('voiceArtist');
 };
 
 var getExplorationPlaytesters = function() {
   return _getExplorationRoles('viewer');
+};
+
+var createSkillAndAssignTopic = function(
+    skillDescription, material, topicName) {
+  var topicsAndSkillsDashboardPage =
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+  topicsAndSkillsDashboardPage.get();
+  topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+    skillDescription, material);
+  topicsAndSkillsDashboardPage.get();
+  topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+  topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
+  topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+    0, topicName);
 };
 
 exports.createExploration = createExploration;
@@ -177,12 +270,19 @@ exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
+exports.createAndPublishTwoCardExploration = createAndPublishTwoCardExploration;
 
+exports.canAddRolesToUsers = canAddRolesToUsers;
+exports.checkForAddTitleWarning = checkForAddTitleWarning;
+exports.triggerTitleOnBlurEvent = triggerTitleOnBlurEvent;
+exports.openEditRolesForm = openEditRolesForm;
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
-exports.addExplorationTranslator = addExplorationTranslator;
+exports.addExplorationVoiceArtist = addExplorationVoiceArtist;
 exports.addExplorationPlaytester = addExplorationPlaytester;
 exports.getExplorationManagers = getExplorationManagers;
 exports.getExplorationCollaborators = getExplorationCollaborators;
-exports.getExplorationTranslators = getExplorationTranslators;
+exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
+exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
+exports.createSkillAndAssignTopic = createSkillAndAssignTopic;

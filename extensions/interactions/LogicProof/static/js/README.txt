@@ -4,30 +4,32 @@ The code is contained in the following files:
  to static/js/tools/input_to_PEG.txt and then paste the contents of this file
  into http://pegjs.majda.cz/online. Call the parser variable 'logicProofParser'
  and check "use results cache". Then download the code and paste it into the
- generatedParser.js file.
- - shared.js: this contains code used by both the teacher and student parts of
+ generatedParser.ts file. Take note of the `export default generatedParser`
+ at the end of the file as it should not be removed.
+ - shared.ts: this contains code used by both the teacher and student parts of
  the website. The most important functions are parseLine() and
  assignTypesToExpression().
- - teacher.js: this contains various functions that will take strings from the
+ - teacher.ts: this contains various functions that will take strings from the
  teacher and use them to build the customization_args for the interaction in
  question. The four top-level functions are buildQuestion(),
  buildLineTemplateTable(), buildMistakeSection() and
  buildControlFunctionTable().
- - student.js: this has three top-level functions, buildInstance(), buildProof()
+ - student.ts: this has three top-level functions, buildInstance(), buildProof()
  and checkProof(). The first takes the data from the YAML file for this state
  (together with LOGIC_PROOF_DEFAULT_QUESTION_DATA) and builds a questionData
  object representing this instance of the LogicProof interaction. The second
  takes a string written by the student and converts it into a Proof object (or
  reports an error the student has made) and the third checks the proof to see
  whether the student has made any mistakes.
-  - conversion.js. Used to convert symbols into unicode logic symbols as users
+  - conversion.ts. Used to convert symbols into unicode logic symbols as users
  type.
 
-In order to update generatedDefaultData.js:
-1. Make the desired changes in tools/strings.js.
+In order to update generatedDefaultData.ts:
+1. Make the desired changes in tools/strings.ts.
 2. Open tools/demonstration.html and check everything has succeeded.
 3. Click "Request javascript" at the bottom of the page.
-4. Paste the result into generatedDefaultData.js.
+4. Paste the result into generatedDefaultData.js (below the import
+   statement and above the export statement).
 5. Run karma tests.
 
  More information about the program flow, together with specifications for all the
@@ -41,12 +43,3 @@ In order to update generatedDefaultData.js:
   - ∃ (exists) \u2203
   - ∈ (membership) \u2208
 Note that ^ is currently being automatically converted into ∧; this will have to stop if ^ starts being used for actual exponentiation.
-
-The LogicProof interaction adds the following objects to the global javascript
-namespace, which should not be overwritten:
- - logicProofParser
- - logicProofShared
- - logicProofStudent
- - logicProofData
- - logicProofConversion
- - LOGIC_PROOF_DEFAULT_QUESTION_DATA

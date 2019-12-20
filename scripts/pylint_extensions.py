@@ -17,14 +17,41 @@
 """Implements additional custom Pylint checkers to be used as part of
 presubmit checks.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import astroid
-import docstrings_checker  # pylint: disable=relative-import
+import os
+import re
+import sys
 
-from pylint import checkers
-from pylint import interfaces
-from pylint.checkers import typecheck
-from pylint.checkers import utils as checker_utils
+import python_utils
+from . import docstrings_checker
+
+_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
+sys.path.insert(0, _PYLINT_PATH)
+
+# pylint: disable=wrong-import-order
+# pylint: disable=wrong-import-position
+import astroid  # isort:skip
+from pylint import checkers  # isort:skip
+from pylint import interfaces  # isort:skip
+from pylint.checkers import typecheck  # isort:skip
+from pylint.checkers import utils as checker_utils  # isort:skip
+# pylint: enable=wrong-import-position
+# pylint: enable=wrong-import-order
+
+
+def read_from_node(node):
+    """Returns the data read from the ast node in unicode form.
+
+    Args:
+        node: astroid.scoped_nodes.Function. Node to access module content.
+
+    Returns:
+        list(str). The data read from the ast node.
+    """
+    return list(node.stream().readlines())
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
@@ -47,7 +74,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         """Visits each function call in a lint check.
 
         Args:
-            node. Call. The current function call node.
+            node: Call. The current function call node.
         """
         called = checker_utils.safe_infer(node.func)
 
@@ -68,9 +95,6 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
 
         # Build the set of keyword arguments and count the positional arguments.
         call_site = astroid.arguments.CallSite.from_call(node)
-        if call_site.has_invalid_arguments() or (
-                call_site.has_invalid_keywords()):
-            return
 
         num_positional_args = len(call_site.positional_arguments)
         keyword_args = list(call_site.keyword_arguments.keys())
@@ -106,10 +130,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         # been called explicitly.
         for [(name, defval), _] in parameters:
             if defval:
-                if name is None:
-                    display_name = '<tuple>'
-                else:
-                    display_name = repr(name)
+                display_name = repr(name)
 
                 if name not in keyword_args and (
                         num_positional_args_unused > (
@@ -121,10 +142,7 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                     try:
                         func_name = node.func.attrname
                     except AttributeError:
-                        try:
-                            func_name = node.func.name
-                        except AttributeError:
-                            func_name = node.func
+                        func_name = node.func.name
 
                     self.add_message(
                         'non-explicit-keyword-args', node=node,
@@ -161,32 +179,33 @@ class HangingIndentChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-        file_content = node.stream().readlines()
+        file_content = read_from_node(node)
         file_length = len(file_content)
         exclude = False
-        for line_num in xrange(file_length):
+        for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].lstrip().rstrip()
-            if line.startswith('"""') and not line.endswith('"""'):
+            # The source files are read as bytes, hence the b' prefix.
+            if line.startswith(b'"""') and not line.endswith(b'"""'):
                 exclude = True
-            if line.endswith('"""'):
+            if line.endswith(b'"""'):
                 exclude = False
-            if line.startswith('#') or exclude:
+            if line.startswith(b'#') or exclude:
                 continue
             line_length = len(line)
             bracket_count = 0
-            for char_num in xrange(line_length):
+            for char_num in python_utils.RANGE(line_length):
                 char = line[char_num]
-                if char == '(':
+                if char == b'(':
                     if bracket_count == 0:
                         position = char_num
                     bracket_count += 1
-                elif char == ')' and bracket_count > 0:
+                elif char == b')' and bracket_count > 0:
                     bracket_count -= 1
             if bracket_count > 0 and position + 1 < line_length:
                 content = line[position + 1:]
-                if not len(content) or not ',' in content:
+                if not len(content) or not b',' in content:
                     continue
-                split_list = content.split(', ')
+                split_list = content.split(b', ')
                 if len(split_list) == 1 and not any(
                         char.isalpha() for char in split_list[0]):
                     continue
@@ -442,8 +461,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
             return
 
         func_node = node.frame()
-        if not isinstance(func_node, astroid.FunctionDef):
-            return
 
         doc = docstrings_checker.docstringify(func_node.doc)
         if not doc.is_valid() and self.config.accept_no_return_doc:
@@ -474,19 +491,13 @@ class DocstringParameterChecker(checkers.BaseChecker):
                 method definition in the AST.
         """
         func_node = node.frame()
-        if not isinstance(func_node, astroid.FunctionDef):
-            return
 
         doc = docstrings_checker.docstringify(func_node.doc)
         if not doc.is_valid() and self.config.accept_no_yields_doc:
             return
 
-        if doc.supports_yields:
-            doc_has_yields = doc.has_yields()
-            doc_has_yields_type = doc.has_yields_type()
-        else:
-            doc_has_yields = doc.has_returns()
-            doc_has_yields_type = doc.has_rtype()
+        doc_has_yields = doc.has_yields()
+        doc_has_yields_type = doc.has_yields_type()
 
         if not doc_has_yields:
             self.add_message(
@@ -628,7 +639,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
         """Checks whether a class and corresponding  init() method are
         documented. If both of them are documented, it adds an error message.
 
-
         Args:
             class_doc: Docstring. Pylint docstring class instance representing
                 a class's docstring.
@@ -696,8 +706,8 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         modules are imported. It then adds a message accordingly.
 
         Args:
-            node. astroid.scoped_nodes.Function. Node for a function or method
-                definition in AST
+            node: astroid.node_classes.ImportFrom. Node for a import-from
+                statement in the AST.
         """
 
         try:
@@ -721,8 +731,537 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
                     node=node,
                     args=(name, modname),
                 )
-            except astroid.AstroidBuildingException:
-                pass
+
+
+class BackslashContinuationChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks that backslash is not used
+    for continuation.
+    """
+    __implements__ = interfaces.IRawChecker
+
+    name = 'backslash-continuation'
+    priority = -1
+    msgs = {
+        'C0004': (
+            (
+                'Backslash should not be used to break continuation lines. '
+                'Use braces to break long lines.'),
+            'backslash-continuation',
+            'Use braces to break long lines instead of backslash.'
+        ),
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            if line.rstrip(b'\r\n').endswith(b'\\'):
+                self.add_message(
+                    'backslash-continuation', line=line_num + 1)
+
+
+class FunctionArgsOrderChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks the order of arguments in function
+    definition.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+    name = 'function-args-order'
+    priority = -1
+    msgs = {
+        'C0005': (
+            'Wrong order of arguments in function definition '
+            '\'self\' should come first.',
+            'function-args-order-self',
+            '\'self\' should come first',),
+        'C0006': (
+            'Wrong order of arguments in function definition '
+            '\'cls\' should come first.',
+            'function-args-order-cls',
+            '\'cls\' should come first'),
+    }
+
+    def visit_functiondef(self, node):
+        """Visits every function definition in the python file and check the
+        function arguments order. It then adds a message accordingly.
+
+        Args:
+         node: astroid.scoped_nodes.Function. Node for a function or method
+                definition in the AST.
+        """
+
+        args_list = [args.name for args in node.args.args]
+        if 'self' in args_list and args_list[0] != 'self':
+            self.add_message('function-args-order-self', node=node)
+        elif 'cls' in args_list and args_list[0] != 'cls':
+            self.add_message('function-args-order-cls', node=node)
+
+
+class RestrictedImportChecker(checkers.BaseChecker):
+    """Custom pylint checker which checks layers importing modules
+    from their respective restricted layers.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+    name = 'invalid-import'
+    priority = -1
+    msgs = {
+        'C0009': (
+            'Importing %s layer in %s layer is prohibited.',
+            'invalid-import',
+            'Storage layer and domain layer must not import'
+            'domain layer and controller layer respectively.'),
+    }
+
+    def visit_import(self, node):
+        """Visits every import statement in the file.
+
+        Args:
+         node: astroid.node_classes.Import. Node for a import statement
+                 in the AST.
+        """
+
+        modnode = node.root()
+        names = [name for name, _ in node.names]
+        # Checks import of domain layer in storage layer.
+        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
+            if any('core.domain' in name for name in names):
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('domain', 'storage'),
+                )
+        # Checks import of controller layer in domain layer.
+        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
+            if any('core.controllers' in name for name in names):
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('controller', 'domain'),
+                )
+
+    def visit_importfrom(self, node):
+        """Visits all import-from statements in a python file and checks that
+        modules are imported. It then adds a message accordingly.
+
+        Args:
+            node: astroid.node_classes.ImportFrom. Node for a import-from
+                statement in the AST.
+        """
+
+        modnode = node.root()
+        if 'oppia.core.storage' in modnode.name and not '_test' in modnode.name:
+            if 'core.domain' in node.modname:
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('domain', 'storage'),
+                )
+        if 'oppia.core.domain' in modnode.name and not '_test' in modnode.name:
+            if 'core.controllers' in node.modname:
+                self.add_message(
+                    'invalid-import',
+                    node=node,
+                    args=('controller', 'domain'),
+                )
+
+
+class SingleCharAndNewlineAtEOFChecker(checkers.BaseChecker):
+    """Checker for single character files and newline at EOF."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'newline-at-eof'
+    priority = -1
+    msgs = {
+        'C0007': (
+            'Files should end in a single newline character.',
+            'newline-at-eof',
+            'Please enter a single newline at the end of the file.'),
+        'C0008': (
+            'Only one character in file',
+            'only-one-character',
+            'Files with only one character are not allowed.'),
+    }
+
+    def process_module(self, node):
+        """Process a module.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        if file_length == 1 and len(file_content[0]) == 1:
+            self.add_message('only-one-character', line=file_length)
+        if file_length >= 2 and not re.search(r'[^\n]\n', file_content[-1]):
+            self.add_message('newline-at-eof', line=file_length)
+
+
+class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
+    """Checks if only one space is used after a yield statement
+    when applicable ('yield' is acceptable).
+    """
+    __implements__ = interfaces.IRawChecker
+
+    name = 'single-space-after-yield'
+    priority = -1
+    msgs = {
+        'C0010': (
+            'Not using \'yield\' or a single space after yield statement.',
+            'single-space-after-yield',
+            'Ensure a single space is used after yield statement.',
+        ),
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that yield keywords are followed by
+        exactly one space, so matching 'yield *' where * is not a
+        whitespace character. Note that 'yield' is also acceptable in
+        cases where the user wants to yield nothing.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module
+                content.
+        """
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        for (line_num, line) in enumerate(file_content):
+            bare_line = line.strip()
+
+            # Single multi-line comment, ignore it.
+            if bare_line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in bare_line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            # Whitespace to right of yield keyword is important for regex.
+            # Allows alphabet characters and underscore for cases where 'yield'
+            # is used at the start of a variable name.
+            source_line = line.lstrip()
+            if (source_line.startswith(b'yield') and
+                    not re.search(br'^(yield)( \S|$|\w)', source_line)):
+                self.add_message('single-space-after-yield', line=line_num + 1)
+
+
+class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
+    """Checks if there are excessive newlines between method definitions."""
+    __implements__ = interfaces.IRawChecker
+
+    name = 'excessive-new-lines'
+    priority = -1
+    msgs = {
+        'C0011': (
+            'Excessive new lines between function definations.',
+            'excessive-new-lines',
+            'Remove extra newlines.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that method definitions are not seperated
+        by more than two blank lines.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        blank_line_counter = 0
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            if file_content[line_num] == b'\n':
+                blank_line_counter += 1
+            else:
+                blank_line_counter = 0
+
+            if line_num + 1 < file_length and blank_line_counter > 2:
+                line = file_content[line_num + 1].strip()
+                if line.startswith(b'def') or line.startswith(b'@'):
+                    self.add_message('excessive-new-lines', line=line_num + 1)
+
+
+class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
+    """Checker for single space above args in python doc string."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'single-space-above-args-raises-returns'
+    priority = -1
+    msgs = {
+        'C0012': (
+            'Files must have a single newline above args in doc string.',
+            'single-space-above-args',
+            'Please enter a single newline above args in doc string.'
+        ),
+        'C0013': (
+            'Files must have a single newline above returns in doc string.',
+            'single-space-above-returns',
+            'Please enter a single newline above returns in doc string.'
+        ),
+        'C0014': (
+            'Files must have a single newline above raises in doc string.',
+            'single-space-above-raises',
+            'Please enter a single newline above raises in doc string.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that there is a single newline above args,
+        raises, returns in python doc string.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        blank_line_counter = 0
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            if file_content[line_num] == b'\n':
+                blank_line_counter += 1
+            else:
+                blank_line_counter = 0
+
+            if (line_num + 1 < file_length and (
+                    blank_line_counter == 0 or blank_line_counter > 1)):
+                line = file_content[line_num + 1].strip()
+                if line == b'Args:':
+                    self.add_message(
+                        'single-space-above-args', line=line_num + 1)
+                elif line == b'Returns:':
+                    self.add_message(
+                        'single-space-above-returns', line=line_num + 1)
+                elif line == b'Raises:':
+                    self.add_message(
+                        'single-space-above-raises', line=line_num + 1)
+
+
+class DivisionOperatorChecker(checkers.BaseChecker):
+    """Checks if division operator is used."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'division-operator-used'
+    priority = -1
+    msgs = {
+        'C0015': (
+            'Division Operator is used.',
+            'division-operator-used',
+            'Please use python_utils.divide() instead of the "/" operator'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that the division operator('/') is not
+        used and python_utils.divide() is used instead.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        string_indicator = b'\''
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single line comment, ignore it.
+            if line.startswith(b'#'):
+                continue
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            # Ignore anything inside a string.
+            if line.count(string_indicator) >= 2:
+                continue
+
+            if re.search(br'[^/]/[^/]', line):
+                self.add_message(
+                    'division-operator-used', line=line_num + 1)
+
+
+class SingleLineCommentChecker(checkers.BaseChecker):
+    """Checks if comments follow correct style."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'incorrectly_styled_comment'
+    priority = -1
+    msgs = {
+        'C0016': (
+            'Invalid punctuation is used.',
+            'invalid-punctuation-used',
+            'Please use valid punctuation.'
+        ),
+        'C0017': (
+            'No space is used at beginning of comment.',
+            'no-space-at-beginning',
+            'Please use single space at the beginning of comment.'
+        ),
+        'C0018': (
+            'No capital letter is used at the beginning of comment.',
+            'no-capital-letter-at-beginning',
+            'Please use capital letter to begin the content of comment.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that comments follow correct style.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        allowed_terminating_punctuations = ['.', '?', '}', ']', ')']
+        excluded_phrases = [
+            'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+        data_types = ['int', 'str', 'float', 'bool']
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multiline comment.
+            if in_multi_line_comment:
+                continue
+
+            next_line = ''
+            previous_line = ''
+            if line_num + 1 < file_length:
+                next_line = file_content[line_num + 1].strip()
+            if line_num > 0:
+                previous_line = file_content[line_num - 1].strip()
+
+            if line.startswith(b'#'):
+                # Check if comment contains any excluded phrase.
+                word_is_present_in_excluded_phrases = any(
+                    word in line for word in excluded_phrases)
+
+                # Check if variable name is used.
+                underscore_is_present = any('_' in word for word in line)
+
+                if word_is_present_in_excluded_phrases or underscore_is_present:
+                    continue
+
+            if line.startswith(b'#') and not next_line.startswith(b'#'):
+                # Check that the comment ends with the proper
+                # punctuation.
+                last_char_is_invalid = line[-1] not in (
+                    allowed_terminating_punctuations)
+                if last_char_is_invalid:
+                    self.add_message(
+                        'invalid-punctuation-used', line=line_num + 1)
+
+            # Check that comment starts with a space and is not a
+            # shebang expression at the start of a bash script which
+            # loses function when a space is added.
+            if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
+                self.add_message(
+                    'no-space-at-beginning', line=line_num + 1)
+
+            # Check if comment contains version info or data type.
+            if not previous_line.startswith(b'#'):
+                data_type_is_present = any(word in line for word in data_types)
+                if data_type_is_present or re.search(br'^# v[0-9]+ .*$', line):
+                    continue
+
+            # Check that comment starts with a capital letter.
+            if not previous_line.startswith(b'#') and (
+                    re.search(br'^# [a-z][A-Za-z]*.*$', line)):
+                self.add_message(
+                    'no-capital-letter-at-beginning', line=line_num + 1)
 
 
 def register(linter):
@@ -735,3 +1274,12 @@ def register(linter):
     linter.register_checker(HangingIndentChecker(linter))
     linter.register_checker(DocstringParameterChecker(linter))
     linter.register_checker(ImportOnlyModulesChecker(linter))
+    linter.register_checker(BackslashContinuationChecker(linter))
+    linter.register_checker(FunctionArgsOrderChecker(linter))
+    linter.register_checker(RestrictedImportChecker(linter))
+    linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
+    linter.register_checker(SingleSpaceAfterYieldChecker(linter))
+    linter.register_checker(ExcessiveEmptyLinesChecker(linter))
+    linter.register_checker(SingleNewlineAboveArgsChecker(linter))
+    linter.register_checker(DivisionOperatorChecker(linter))
+    linter.register_checker(SingleLineCommentChecker(linter))

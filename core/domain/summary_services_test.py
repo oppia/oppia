@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.summary_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from constants import constants
 from core.domain import activity_domain
 from core.domain import activity_services
@@ -22,7 +26,6 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import exp_services_test
-from core.domain import html_validation_service
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import summary_services
@@ -30,11 +33,6 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
-
-
-def mock_get_filename_with_dimensions(filename, unused_exp_id):
-    return html_validation_service.regenerate_image_filename_using_dimensions(
-        filename, 490, 120)
 
 
 class ExplorationDisplayableSummariesTest(
@@ -85,10 +83,11 @@ class ExplorationDisplayableSummariesTest(
 
         super(ExplorationDisplayableSummariesTest, self).setUp()
 
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         self.albert = user_services.UserActionsInfo(self.albert_id)
         self.bob = user_services.UserActionsInfo(self.bob_id)
@@ -130,11 +129,10 @@ class ExplorationDisplayableSummariesTest(
         self.save_new_valid_exploration(self.EXP_ID_3, self.albert_id)
         rights_manager.publish_exploration(self.albert, self.EXP_ID_3)
         exp_services.delete_exploration(self.albert_id, self.EXP_ID_3)
-
-        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
-        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
         self.signup(self.USER_C_EMAIL, self.USER_C_NAME)
         self.signup(self.USER_D_EMAIL, self.USER_D_NAME)
+        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+        self.user_d_id = self.get_user_id_from_email(self.USER_D_EMAIL)
         user_services.update_profile_picture_data_url(
             self.user_c_id, self.USER_C_PROFILE_PICTURE)
 
@@ -207,6 +205,13 @@ class ExplorationDisplayableSummariesTest(
         self.assertDictContainsSubset(
             expected_summary, displayable_summaries[0])
 
+    def test_get_displayable_exp_summary_dicts_matching_ids_with_invalid_exp_id(
+            self):
+        displayable_summaries = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                ['invalid_exp_id']))
+        self.assertEqual(displayable_summaries, [])
+
     def test_get_public_and_filtered_private_summary_dicts_for_creator(self):
         # If a new exploration is created by another user (Bob) and not public,
         # then Albert cannot see it when querying for explorations.
@@ -256,19 +261,14 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
 
         super(LibraryGroupsTest, self).setUp()
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.testapp.get('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
-        with self.swap(
-            html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
-
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'reload_exploration',
-                    'exploration_id': '2'
-                }, csrf_token=csrf_token)
-            self.logout()
+        self.post_json(
+            '/adminhandler', {
+                'action': 'reload_exploration',
+                'exploration_id': '2'
+            }, csrf_token=csrf_token)
+        self.logout()
 
     def test_get_library_groups(self):
         """The exploration with id '2' is an exploration in the Mathematics
@@ -331,10 +331,10 @@ class FeaturedExplorationDisplayableSummariesTest(
 
         super(FeaturedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(
@@ -435,14 +435,12 @@ class CollectionLearnerDictTests(test_utils.GenericTestBase):
     def setUp(self):
         super(CollectionLearnerDictTests, self).setUp()
 
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
-        user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.owner = user_services.UserActionsInfo(self.owner_id)
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
@@ -584,15 +582,16 @@ class TopRatedExplorationDisplayableSummariesTest(
 
         super(TopRatedExplorationDisplayableSummariesTest, self).setUp()
 
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
+
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.alice_id = self.get_user_id_from_email(self.ALICE_EMAIL)
         self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.signup(self.ALICE_EMAIL, self.ALICE_NAME)
-        self.signup(self.BOB_EMAIL, self.BOB_NAME)
         self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
@@ -742,10 +741,10 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         super(
             RecentlyPublishedExplorationDisplayableSummariesTest, self).setUp()
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.albert = user_services.UserActionsInfo(self.albert_id)
 
         self.save_new_valid_exploration(
@@ -912,10 +911,10 @@ class CollectionNodeMetadataDictsTest(
     def setUp(self):
         super(CollectionNodeMetadataDictsTest, self).setUp()
 
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.bob_id = self.get_user_id_from_email(self.BOB_EMAIL)
 
         self.albert = user_services.UserActionsInfo(self.albert_id)
         self.bob = user_services.UserActionsInfo(self.bob_id)
@@ -972,6 +971,12 @@ class CollectionNodeMetadataDictsTest(
             'title': u'Exploration 3 Albert title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_get_exploration_metadata_dicts_with_invalid_exploration_id(self):
+        metadata_dicts = (summary_services.get_exploration_metadata_dicts(
+            ['invalid_exp_id'], self.albert))
+
+        self.assertEqual(metadata_dicts, [])
 
     def test_private_exps_of_another_user_are_not_returned(self):
         metadata_dicts = (summary_services.get_exploration_metadata_dicts(
@@ -1042,3 +1047,28 @@ class CollectionNodeMetadataDictsTest(
             'title': u'Exploration 3 Albert title',
         }]
         self.assertEqual(expected_metadata_dicts, metadata_dicts)
+
+    def test_guest_can_fetch_public_exploration_metadata_dicts(self):
+        new_guest_user = user_services.UserActionsInfo()
+        metadata_dicts = summary_services.get_exploration_metadata_dicts(
+            [self.EXP_ID3, self.EXP_ID4], new_guest_user)
+
+        expected_metadata_dicts = [{
+            'id': self.EXP_ID3,
+            'objective': u'An objective 3',
+            'title': u'Exploration 3 Albert title',
+        }, {
+            'id': self.EXP_ID4,
+            'objective': u'An objective 4',
+            'title': u'Exploration 4 Bob title',
+        }]
+
+        self.assertEqual(metadata_dicts, expected_metadata_dicts)
+
+    def test_guest_cannot_fetch_private_exploration_metadata_dicts(self):
+        new_guest_user = user_services.UserActionsInfo()
+        self.save_new_valid_exploration('exp_id', self.albert_id)
+        metadata_dicts = summary_services.get_exploration_metadata_dicts(
+            ['exp_id'], new_guest_user)
+
+        self.assertEqual(metadata_dicts, [])

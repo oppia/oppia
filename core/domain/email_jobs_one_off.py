@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Jobs for Sent Email Model."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
 from core.platform import models
@@ -35,7 +37,8 @@ class EmailHashRegenerationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(email_model):
         email_model.put()
+        yield ('SUCCESS', 1)
 
     @staticmethod
-    def reduce(email_model_id, value):
-        pass
+    def reduce(key, values):
+        yield (key, len(values))

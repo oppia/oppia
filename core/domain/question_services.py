@@ -13,11 +13,16 @@
 # limitations under the License.
 
 """Services for questions data model."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import logging
 
+from core.domain import opportunity_services
 from core.domain import question_domain
+from core.domain import question_fetchers
+from core.domain import skill_services
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -26,42 +31,7 @@ import feconf
     [models.NAMES.question, models.NAMES.skill])
 
 
-def _migrate_state_schema(versioned_question_state):
-    """Holds the responsibility of performing a step-by-step, sequential update
-    of the state structure based on the schema version of the input
-    state dictionary. If the current State schema changes, a new
-    conversion function must be added and some code appended to this function
-    to account for that new version.
-
-    Args:
-        versioned_question_state: dict. A dict with two keys:
-            state_schema_version: int. the state schema version for the
-                question.
-            state: The State domain object representing the question
-                state data.
-
-    Raises:
-        Exception: The given state_schema_version is invalid.
-    """
-    state_schema_version = versioned_question_state[
-        'state_schema_version']
-    if state_schema_version is None or state_schema_version < 1:
-        state_schema_version = 0
-
-    if not (25 <= state_schema_version
-            <= feconf.CURRENT_STATES_SCHEMA_VERSION):
-        raise Exception(
-            'Sorry, we can only process v25-v%d state schemas at present.' %
-            feconf.CURRENT_STATE_SCHEMA_VERSION)
-
-    while (state_schema_version <
-           feconf.CURRENT_STATE_SCHEMA_VERSION):
-        question_domain.Question.update_state_from_model(
-            versioned_question_state, state_schema_version)
-        state_schema_version += 1
-
-
-def _create_new_question(committer_id, question, commit_message):
+def create_new_question(committer_id, question, commit_message):
     """Creates a new question.
 
     Args:
@@ -76,62 +46,202 @@ def _create_new_question(committer_id, question, commit_message):
         question_state_data=question.question_state_data.to_dict(),
         language_code=question.language_code,
         version=question.version,
-        question_state_schema_version=question.question_state_schema_version
+        linked_skill_ids=question.linked_skill_ids,
+        question_state_data_schema_version=(
+            question.question_state_data_schema_version)
     )
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
     question.version += 1
     create_question_summary(question.id, committer_id)
+    opportunity_services.increment_question_counts(question.linked_skill_ids, 1)
 
 
-def create_new_question_skill_link(question_id, skill_id):
-    """Creates a new QuestionSkillLink model.
+def link_multiple_skills_for_question(
+        user_id, question_id, skill_ids, skill_difficulties):
+    """Links multiple skill IDs to a question. To do that, it creates multiple
+    new QuestionSkillLink models. It also adds the skill ids to the
+    linked_skill_ids of the Question.
 
     Args:
+        user_id: str. ID of the creator.
+        question_id: str. ID of the question linked to the skills.
+        skill_ids: list(str). ID of the skills to which the question is linked.
+        skill_difficulties: list(float). The difficulty of the question with
+            respect to a skill, represented by a float between
+            0 and 1 (inclusive).
+
+    Raises:
+        Exception. The lengths of the skill_ids and skill_difficulties
+        lists are different.
+    """
+    if len(skill_ids) != len(skill_difficulties):
+        raise Exception(
+            'Skill difficulties and skill ids should match. The lengths of the '
+            'two lists are different.')
+    question = get_question_by_id(question_id)
+
+    new_question_skill_link_models = []
+    for index, skill_id in enumerate(skill_ids):
+        new_question_skill_link_models.append(
+            question_models.QuestionSkillLinkModel.create(
+                question_id, skill_id, skill_difficulties[index]))
+
+    new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
+    new_linked_skill_ids.extend(skill_ids)
+
+    _update_linked_skill_ids_of_question(
+        user_id, question_id, list(set(new_linked_skill_ids)),
+        question.linked_skill_ids)
+    question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+        new_question_skill_link_models)
+
+
+def create_new_question_skill_link(
+        user_id, question_id, skill_id, skill_difficulty):
+    """Creates a new QuestionSkillLink model and adds the skill id
+    to the linked skill ids for the Question model.
+
+    Args:
+        user_id: str. ID of the creator.
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
+        skill_difficulty: float. The difficulty between [0, 1] of the skill.
     """
+    question = get_question_by_id(question_id)
+
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
-        question_id, skill_id)
+        question_id, skill_id, skill_difficulty)
     question_skill_link_model.put()
 
+    if skill_id not in question.linked_skill_ids:
+        new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
+        new_linked_skill_ids.append(skill_id)
+        _update_linked_skill_ids_of_question(
+            user_id, question_id, new_linked_skill_ids,
+            question.linked_skill_ids)
 
-def delete_question_skill_link(question_id, skill_id):
-    """Deleted a QuestionSkillLink model.
+
+def update_question_skill_link_difficulty(
+        question_id, skill_id, new_difficulty):
+    """Updates the difficulty value of question skill link.
 
     Args:
-        question_id: str. ID of the question linked to the skill.
-        skill_id: str. ID of the skill to which the question is linked.
+        question_id: str. ID of the question.
+        skill_id: str. ID of the skill.
+        new_difficulty: float. New difficulty value.
+
+    Raises:
+        Exception. Given question and skill are not linked.
     """
     question_skill_link_id = (
         question_models.QuestionSkillLinkModel.get_model_id(
             question_id, skill_id))
     question_skill_link_model = question_models.QuestionSkillLinkModel.get(
+        question_skill_link_id, strict=False)
+
+    if question_skill_link_model is None:
+        raise Exception('The given question and skill are not linked.')
+    question_skill_link_model.skill_difficulty = new_difficulty
+    question_skill_link_model.put()
+
+
+def _update_linked_skill_ids_of_question(
+        user_id, question_id, new_linked_skill_ids, old_linked_skill_ids):
+    """Updates the question linked_skill ids in the Question model.
+
+    Args:
+        user_id: str. ID of the creator.
+        question_id: str. ID of the question linked to the skill.
+        new_linked_skill_ids: list(str). New linked skill IDs of the question.
+        old_linked_skill_ids: list(str). Current linked skill IDs of the
+        question.
+    """
+    change_dict = {
+        'cmd': 'update_question_property',
+        'property_name': 'linked_skill_ids',
+        'new_value': new_linked_skill_ids,
+        'old_value': old_linked_skill_ids
+    }
+    change_list = [question_domain.QuestionChange(change_dict)]
+    update_question(
+        user_id, question_id, change_list, 'updated linked skill ids')
+    (opportunity_services
+     .update_skill_opportunities_on_question_linked_skills_change(
+         old_linked_skill_ids, new_linked_skill_ids))
+
+
+def delete_question_skill_link(user_id, question_id, skill_id):
+    """Deleted a QuestionSkillLink model and removes the linked skill id
+    from the Question model of question_id.
+
+    Args:
+        user_id: str. ID of the creator.
+        question_id: str. ID of the question linked to the skill.
+        skill_id: str. ID of the skill to which the question is linked.
+    """
+    question = get_question_by_id(question_id)
+
+    new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
+    new_linked_skill_ids.remove(skill_id)
+    question_skill_link_id = (
+        question_models.QuestionSkillLinkModel.get_model_id(
+            question_id, skill_id))
+    question_skill_link_model = question_models.QuestionSkillLinkModel.get(
         question_skill_link_id)
+
+    if new_linked_skill_ids:
+        _update_linked_skill_ids_of_question(
+            user_id, question_id,
+            new_linked_skill_ids, question.linked_skill_ids)
+    else:
+        delete_question(user_id, question_id)
+
     question_skill_link_model.delete()
 
 
-def get_questions_by_skill_ids(question_count, skill_ids, start_cursor):
-    """Returns the questions linked to the given skill ids.
+def get_questions_by_skill_ids(
+        total_question_count, skill_ids, fetch_by_difficulty):
+    """Returns constant number of questions linked to each given skill id.
 
     Args:
-        question_count: int. The number of questions to return.
-        skill_ids: list(str). The ID of the skills to which the questions are
-            linked.
-        start_cursor: str. The starting point from which the batch of
-            questions are to be returned. This value should be urlsafe.
+        total_question_count: int. The total number of questions to return.
+        skill_ids: list(str). The IDs of the skills to which the questions
+            should be linked.
+        fetch_by_difficulty: bool. Indicates whether the returned questions
+            should be fetched by skill difficulty.
 
     Returns:
-        list(Question), str. The list of questions which are linked to the given
-            skill ids and the next cursor value to be used for the next
-            batch of questions (or None if no more pages are left). The returned
-            next cursor value is urlsafe.
+        list(Question). The list containing an expected number of
+            total_question_count questions linked to each given skill id.
+            question count per skill will be total_question_count divided by
+            length of skill_ids, and it will be rounded up if not evenly
+            divisible. If not enough questions for one skill, simply return
+            all questions linked to it. The order of questions will follow the
+            order of given skill ids, and the order of questions for the same
+            skill is random when fetch_by_difficulty is false, otherwise the
+            order is sorted by absolute value of the difference between skill
+            difficulty and the medium difficulty.
     """
-    question_ids, next_cursor = (
-        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
-            question_count, skill_ids, start_cursor))
 
-    return get_questions_by_ids(question_ids), next_cursor
+    if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
+        raise Exception(
+            'Question count is too high, please limit the question count to '
+            '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+
+    if fetch_by_difficulty:
+        question_skill_link_models = (
+            question_models.QuestionSkillLinkModel.get_question_skill_links_based_on_difficulty_equidistributed_by_skill( #pylint: disable=line-too-long
+                total_question_count, skill_ids,
+                feconf.MEDIUM_SKILL_DIFFICULTY))
+    else:
+        question_skill_link_models = (
+            question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
+                total_question_count, skill_ids))
+
+    question_ids = [model.question_id for model in question_skill_link_models]
+    questions = question_fetchers.get_questions_by_ids(question_ids)
+    return questions
 
 
 def get_new_question_id():
@@ -151,7 +261,7 @@ def add_question(committer_id, question):
         question: Question. Question to be saved.
     """
     commit_message = 'New question created'
-    _create_new_question(committer_id, question, commit_message)
+    create_new_question(committer_id, question, commit_message)
 
 
 def delete_question(
@@ -171,37 +281,35 @@ def delete_question(
     question_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
         force_deletion=force_deletion)
+    question_rights_model = question_models.QuestionRightsModel.get(
+        question_id)
+    question_rights_model.delete(
+        committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
+        force_deletion=force_deletion)
+
+    question_models.QuestionSummaryModel.get(question_id).delete()
+    opportunity_services.increment_question_counts(
+        question_model.linked_skill_ids, -1)
 
 
-def get_question_from_model(question_model):
-    """Returns domain object representing the given question model.
+def get_question_skill_link_from_model(
+        question_skill_link_model, skill_description):
+    """Returns domain object representing the given question skill link model.
 
     Args:
-        question_model: QuestionModel. The question model loaded from the
-            datastore.
+        question_skill_link_model: QuestionSkillLinkModel. The question skill
+            link model loaded from the datastore.
+        skill_description: str. The description of skill linked to question.
 
     Returns:
-        Question. The domain object representing the question model.
+        QuestionSkillLink. The domain object representing the question skill
+            link model.
     """
 
-    # Ensure the original question model does not get altered.
-    versioned_question_state = {
-        'state_schema_version': question_model.question_state_schema_version,
-        'state': copy.deepcopy(
-            question_model.question_state_data)
-    }
-
-    # Migrate the question if it is not using the latest schema version.
-    if (question_model.question_state_schema_version !=
-            feconf.CURRENT_STATES_SCHEMA_VERSION):
-        _migrate_state_schema(versioned_question_state)
-
-    return question_domain.Question(
-        question_model.id,
-        state_domain.State.from_dict(versioned_question_state['state']),
-        versioned_question_state['state_schema_version'],
-        question_model.language_code, question_model.version,
-        question_model.created_on, question_model.last_updated)
+    return question_domain.QuestionSkillLink(
+        question_skill_link_model.question_id,
+        question_skill_link_model.skill_id, skill_description,
+        question_skill_link_model.skill_difficulty)
 
 
 def get_question_by_id(question_id, strict=True):
@@ -219,60 +327,94 @@ def get_question_by_id(question_id, strict=True):
     question_model = question_models.QuestionModel.get(
         question_id, strict=strict)
     if question_model:
-        question = get_question_from_model(question_model)
+        question = question_fetchers.get_question_from_model(question_model)
         return question
     else:
         return None
 
 
-def get_question_skill_links_of_skill(skill_id):
-    """Returns a list of QuestionSkillLinkModels of
+def get_question_skill_links_of_skill(skill_id, skill_description):
+    """Returns a list of QuestionSkillLinks of
     a particular skill ID.
 
     Args:
         skill_id: str. ID of the skill.
+        skill_description: str. Description of the skill.
 
     Returns:
-        list(QuestionSkillLinkModel). The list of question skill link
+        list(QuestionSkillLink). The list of question skill link
         domain objects that are linked to the skill ID or an empty list
-         if the skill does not exist.
+        if the skill does not exist.
     """
 
-    question_skill_link_models = (
+    question_skill_links = [
+        get_question_skill_link_from_model(
+            model, skill_description) for model in
         question_models.QuestionSkillLinkModel.get_models_by_skill_id(
-            skill_id)
-    )
-    return question_skill_link_models
+            skill_id)]
+    return question_skill_links
 
 
-def update_skill_ids_of_questions(curr_skill_id, new_skill_id):
+def get_skills_linked_to_question(question_id):
+    """Returns a list of skills linked to a particular question.
+
+    Args:
+        question_id: str. ID of the question.
+
+    Returns:
+        list(Skill). The list of skills that are linked to the question.
+    """
+    question = get_question_by_id(question_id)
+    skills = skill_services.get_multi_skills(question.linked_skill_ids)
+    return skills
+
+
+def replace_skill_id_for_all_questions(
+        curr_skill_id, curr_skill_description, new_skill_id):
     """Updates the skill ID of QuestionSkillLinkModels to the superseding
     skill ID.
 
     Args:
         curr_skill_id: str. ID of the current skill.
+        curr_skill_description: str. Description of the current skill.
         new_skill_id: str. ID of the superseding skill.
     """
-    old_question_skill_links = get_question_skill_links_of_skill(curr_skill_id)
-    new_question_skill_links = []
+    old_question_skill_link_models = (
+        question_models.QuestionSkillLinkModel.get_models_by_skill_id(
+            curr_skill_id))
+    old_question_skill_links = get_question_skill_links_of_skill(
+        curr_skill_id, curr_skill_description)
+    new_question_skill_link_models = []
+    question_ids = set()
     for question_skill_link in old_question_skill_links:
-        new_question_skill_links.append(
+        question_ids.add(question_skill_link.question_id)
+        new_question_skill_link_models.append(
             question_models.QuestionSkillLinkModel.create(
-                question_skill_link.question_id, new_skill_id)
+                question_skill_link.question_id, new_skill_id,
+                question_skill_link.skill_difficulty)
             )
     question_models.QuestionSkillLinkModel.delete_multi_question_skill_links(
-        old_question_skill_links)
+        old_question_skill_link_models)
     question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
-        new_question_skill_links)
+        new_question_skill_link_models)
+
+    old_questions = question_models.QuestionModel.get_multi(list(question_ids))
+    new_questions = []
+    for question in old_questions:
+        new_question = copy.deepcopy(question)
+        new_question.linked_skill_ids.remove(curr_skill_id)
+        new_question.linked_skill_ids.append(new_skill_id)
+        new_questions.append(new_question)
+    question_models.QuestionModel.put_multi_questions(new_questions)
 
 
-def get_question_summaries_linked_to_skills(
+def get_displayable_question_skill_link_details(
         question_count, skill_ids, start_cursor):
-    """Returns the list of question summaries linked to all the skills given by
-    skill_ids.
+    """Returns the list of question summaries and corresponding skill
+    descriptions linked to all the skills given by skill_ids.
 
     Args:
-        question_count: int. The number of question summaries to return.
+        question_count: int. The number of questions to fetch.
         skill_ids: list(str). The ids of skills for which the linked questions
             are to be retrieved.
         start_cursor: str. The starting point from which the batch of
@@ -283,45 +425,50 @@ def get_question_summaries_linked_to_skills(
         a time is not supported currently.
 
     Returns:
-        list(QuestionSummary), str|None. The list of question summaries linked
-            to the given skill_ids and the next cursor value to be used for the
-            next page (or None if no more pages are left). The returned next
-            cursor value is urlsafe.
+        list(QuestionSummary), list(MergedQuestionSkillLink), str|None.
+            The list of questions linked to the given skill ids, the list of
+            MergedQuestionSkillLink objects, keyed by question ID and the next
+            cursor value to be used for the next batch of questions (or None if
+            no more pages are left). The returned next cursor value is urlsafe.
     """
     if len(skill_ids) == 0:
-        return [], None
+        return [], [], None
 
     if len(skill_ids) > 3:
         raise Exception(
             'Querying linked question summaries for more than 3 skills at a '
             'time is not supported currently.')
-    question_ids, next_cursor = (
-        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
-            question_count, skill_ids, start_cursor)
-    )
+    question_skill_link_models, next_cursor = (
+        question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
+            question_count, skill_ids, start_cursor))
+
+    # Deduplicate question_ids and group skill_descriptions that are linked to
+    # the same question.
+    question_ids = []
+    grouped_skill_ids = []
+    grouped_difficulties = []
+    for question_skill_link in question_skill_link_models:
+        if question_skill_link.question_id not in question_ids:
+            question_ids.append(question_skill_link.question_id)
+            grouped_skill_ids.append([question_skill_link.skill_id])
+            grouped_difficulties.append([question_skill_link.skill_difficulty])
+        else:
+            grouped_skill_ids[-1].append(question_skill_link.skill_id)
+            grouped_difficulties[-1].append(
+                question_skill_link.skill_difficulty)
+
+    merged_question_skill_links = []
+    for ind, skill_ids_list in enumerate(grouped_skill_ids):
+        skills = skill_models.SkillModel.get_multi(skill_ids_list)
+        merged_question_skill_links.append(
+            question_domain.MergedQuestionSkillLink(
+                question_ids[ind], skill_ids_list,
+                [skill.description if skill else None for skill in skills],
+                grouped_difficulties[ind]))
 
     question_summaries = get_question_summaries_by_ids(question_ids)
-    return question_summaries, next_cursor
-
-
-def get_questions_by_ids(question_ids):
-    """Returns a list of domain objects representing questions.
-
-    Args:
-        question_ids: list(str). List of question ids.
-
-    Returns:
-        list(Question|None). A list of domain objects representing questions
-        with the given ids or None when the id is not valid.
-    """
-    question_model_list = question_models.QuestionModel.get_multi(question_ids)
-    questions = []
-    for question_model in question_model_list:
-        if question_model is not None:
-            questions.append(get_question_from_model(question_model))
-        else:
-            questions.append(None)
-    return questions
+    return (
+        question_summaries, merged_question_skill_links, next_cursor)
 
 
 def get_question_summaries_by_ids(question_ids):
@@ -365,9 +512,14 @@ def apply_change_list(question_id, change_list):
                 if (change.property_name ==
                         question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
                     question.update_language_code(change.new_value)
-                elif (change.cmd ==
+                elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
-                    question.update_question_data(change.new_value)
+                    state_domain_object = state_domain.State.from_dict(
+                        change.new_value)
+                    question.update_question_state_data(state_domain_object)
+                elif (change.property_name ==
+                      question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
+                    question.update_linked_skill_ids(change.new_value)
 
         return question
 
@@ -404,8 +556,9 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model = question_models.QuestionModel.get(question.id)
     question_model.question_state_data = question.question_state_data.to_dict()
     question_model.language_code = question.language_code
-    question_model.question_state_schema_version = (
-        question.question_state_schema_version)
+    question_model.question_state_data_schema_version = (
+        question.question_state_data_schema_version)
+    question_model.linked_skill_ids = question.linked_skill_ids
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1
@@ -431,7 +584,6 @@ def update_question(
     if not commit_message:
         raise ValueError(
             'Expected a commit message, received none.')
-
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)
@@ -490,7 +642,7 @@ def save_question_summary(question_summary):
 
 def get_question_summary_from_model(question_summary_model):
     """Returns a domain object for an Oppia question summary given a
-    questioin summary model.
+    question summary model.
 
     Args:
         question_summary_model: QuestionSummaryModel.
@@ -519,26 +671,12 @@ def get_question_summaries_by_creator_id(creator_id):
     question_summary_models = (
         question_models.QuestionSummaryModel.get_by_creator_id(creator_id))
 
-    for question_summary_model in question_summary_models:
-        question_summaries = [
-            get_question_summary_from_model(question_summary_model)]
+    question_summaries = [
+        get_question_summary_from_model(question_summary_model)
+        for question_summary_model in question_summary_models
+    ]
 
     return question_summaries
-
-
-def get_question_summary_by_question_id(question_id, strict=False):
-    """Gets question summary of question by ID of the question.
-
-    Args:
-        question_id: str. The ID of the question.
-        strict: bool. Whether to fail noisily if no question summary for the
-            given question id exists in the datastore.
-
-    Returns:
-        QuestionSummaryModel. The QuestionSummaryModel for the given question.
-    """
-    return get_question_summary_from_model(
-        question_models.QuestionSummaryModel.get(question_id, strict=strict))
 
 
 def get_question_rights_from_model(question_rights_model):
@@ -598,3 +736,21 @@ def get_question_rights(question_id, strict=True):
         return None
 
     return get_question_rights_from_model(model)
+
+
+def get_interaction_id_for_question(question_id):
+    """Returns the interaction id for the given question.
+
+    Args:
+        question_id: str. ID of the question.
+
+    Returns:
+        str. The ID of the interaction of the question.
+
+    Raises:
+        Exception. The question does not exists of the ID question_id.
+    """
+    question = get_question_by_id(question_id, strict=False)
+    if question is None:
+        raise Exception('No questions exists with the given question id.')
+    return question.question_state_data.interaction.id

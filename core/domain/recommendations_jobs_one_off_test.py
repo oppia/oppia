@@ -15,8 +15,11 @@
 # limitations under the License.
 
 """Tests for recommendations_jobs_one_off."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs_registry
+from core.domain import exp_services
 from core.domain import recommendations_jobs_one_off
 from core.domain import recommendations_services
 from core.domain import recommendations_services_test
@@ -24,8 +27,8 @@ from core.domain import rights_manager
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 
-(recommendations_models,) = models.Registry.import_models([
-    models.NAMES.recommendations])
+(exp_models, recommendations_models) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.recommendations])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -97,3 +100,32 @@ class ExplorationRecommendationsOneOffJobUnitTests(
                 recommendations_services.get_exploration_recommendations(
                     'exp_id_1'))
             self.assertEqual(recommendations, ['exp_id_2', 'exp_id_3'])
+
+    def test_recommendations_with_invalid_exploration_summaries_would_be_empty(
+            self):
+        def _mock_get_non_private_exploration_summaries():
+            """Return an invalid exploration summary dict."""
+            return {'new_exp_id': 'new_exploration_summary'}
+
+        with self.swap(
+            jobs_registry, 'ONE_OFF_JOB_MANAGERS',
+            self.ONE_OFF_JOB_MANAGERS_FOR_TESTS
+            ):
+            # We need to swap here to make the recommendations an empty list
+            # (since 'get_exploration_recommendations()' returns a list of ids
+            # of at most 10 recommended explorations to play after completing
+            # the exploration).
+            with self.swap(
+                exp_services, 'get_non_private_exploration_summaries',
+                _mock_get_non_private_exploration_summaries):
+                self.job_class.enqueue(self.job_class.create_new())
+                self.assertEqual(
+                    self.count_jobs_in_taskqueue(
+                        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+                self.process_and_flush_pending_tasks()
+
+                recommendations = (
+                    recommendations_services.get_exploration_recommendations(
+                        'exp_id_1'))
+                self.assertEqual(
+                    recommendations, [])

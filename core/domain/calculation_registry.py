@@ -15,13 +15,16 @@
 # limitations under the License.
 
 """Registry for calculations."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
 from extensions.answer_summarizers import models
+import python_utils
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all calculations for summarizing answers."""
 
     # Dict mapping calculation class names to their classes.
@@ -29,6 +32,7 @@ class Registry(object):
 
     @classmethod
     def _refresh_registry(cls):
+        """Refreshes the registry to add new visualization instances."""
         cls._calculations_dict.clear()
 
         # Add new visualization instances to the registry.

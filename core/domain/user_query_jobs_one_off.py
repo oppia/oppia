@@ -15,7 +15,9 @@
 # limitations under the License.
 
 """Jobs to execute and get result of a query."""
-import ast
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 import datetime
 
 from core import jobs
@@ -23,6 +25,7 @@ from core.domain import email_manager
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 
 (user_models, exp_models, job_models) = (
     models.Registry.import_models(
@@ -98,13 +101,13 @@ class UserQueryOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     query_model.edited_fewer_than_n_exps):
                 return
 
-        yield(query_id, user_id)
+        yield (query_id, user_id)
 
     @staticmethod
     def reduce(query_model_id, stringified_user_ids):
         query_model = user_models.UserQueryModel.get(query_model_id)
-        user_ids = [ast.literal_eval(v) for v in stringified_user_ids]
-        query_model.user_ids = [str(user_id) for user_id in user_ids]
+        query_model.user_ids = [
+            python_utils.UNICODE(user_id) for user_id in stringified_user_ids]
         query_model.put()
 
     @classmethod

@@ -15,12 +15,15 @@
 # limitations under the License.
 
 """Provides search services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
 import logging
 import numbers
 
 import feconf
+import python_utils
 
 from google.appengine.api import search as gae_search
 
@@ -66,7 +69,7 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
         document, none will be inserted.
       - ValueError: raised when invalid values are given.
     """
-    if not isinstance(index, basestring):
+    if not isinstance(index, python_utils.BASESTRING):
         raise ValueError(
             'Index must be the unicode/str name of an index, got %s'
             % type(index))
@@ -98,6 +101,18 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
 
 
 def _dict_to_search_document(d):
+    """Returns and converts the document dict into objects.
+
+    Args:
+        d: dict(str, str). A dict containing field names as keys and
+            corresponding field values as values.
+
+    Returns:
+        Document. The document containing fields.
+
+    Raises:
+        ValueError: The given document is not in the dict format.
+    """
     if not isinstance(d, dict):
         raise ValueError('document should be a dictionary, got %s' % type(d))
 
@@ -108,7 +123,7 @@ def _dict_to_search_document(d):
     language_code = d.get('language_code')
 
     fields = []
-    for key, value in d.iteritems():
+    for key, value in d.items():
         if key not in ['id', 'rank']:
             fields += _make_fields(key, value)
 
@@ -118,11 +133,25 @@ def _dict_to_search_document(d):
 
 
 def _make_fields(key, value):
+    """Returns the fields corresponding to the key value pair according to the
+    type of value.
+
+    Args:
+        key: str. The name of the field.
+        value: *. The field value.
+
+    Returns:
+        list(*). A list of fields.
+
+    Raises:
+        ValueError: The type of field value is not list, str, Number or
+            datetime.
+    """
     if isinstance(value, list):
         _validate_list(key, value)
         return [_make_fields(key, v)[0] for v in value]
 
-    if isinstance(value, basestring):
+    if isinstance(value, python_utils.BASESTRING):
         return [gae_search.TextField(name=key, value=value)]
 
     if isinstance(value, numbers.Number):
@@ -144,7 +173,8 @@ def _validate_list(key, value):
 
     for ind, element in enumerate(value):
         if not isinstance(element, (
-                basestring, datetime.date, datetime.datetime, numbers.Number)):
+                python_utils.BASESTRING, datetime.date, datetime.datetime,
+                numbers.Number)):
             raise ValueError(
                 'All values of a multi-valued field must be numbers, strings, '
                 'date or datetime instances, The %dth value for field %s has'
@@ -165,13 +195,13 @@ def delete_documents_from_index(
       - SearchFailureError: raised when the deletion fails. If it fails for any
         document, none will be deleted.
     """
-    if not isinstance(index, basestring):
+    if not isinstance(index, python_utils.BASESTRING):
         raise ValueError(
             'Index must be the unicode/str name of an index, got %s'
             % type(index))
 
     for ind, doc_id in enumerate(doc_ids):
-        if not isinstance(doc_id, basestring):
+        if not isinstance(doc_id, python_utils.BASESTRING):
             raise ValueError('all doc_ids must be string, got %s at index %d' %
                              (type(doc_id), ind))
 
@@ -203,7 +233,7 @@ def clear_index(index_name):
     there are too many entries in the index.
 
     Args:
-      - index: the name of the index to delete the document from, a string.
+      - index_name: the name of the index to delete the document from, a string.
     """
     index = gae_search.Index(index_name)
 
@@ -229,12 +259,12 @@ def search(query_string, index, cursor=None,
       - cursor: a cursor string, as returned by this function. Pass this in to
           get the next 'page' of results. Leave as None to start at the
           beginning.
+      - limit: the maximum number of documents to return.
       - sort: a string indicating how to sort results. This should be a string
           of space separated values. Each value should start with a '+' or a
           '-' character indicating whether to sort in ascending or descending
           order respectively. This character should be followed by a field name
           to sort on.
-      - limit: the maximum number of documents to return.
       - ids_only: whether to only return document ids.
       - retries: the number of times to retry searching the index.
 
@@ -305,6 +335,18 @@ def search(query_string, index, cursor=None,
 
 
 def _string_to_sort_expressions(input_string):
+    """Returns the sorted expression of the input string.
+
+    Args:
+        input_string: str. The input string to be sorted.
+
+    Returns:
+        list(SortExpression). A list of sorted expressions.
+
+    Raises:
+        ValueError: Fields in the sort expression do not start with '+' or '-'
+            to indicate sort direction.
+    """
     sort_expressions = []
     s_tokens = input_string.split()
     for expression in s_tokens:
@@ -338,6 +380,14 @@ def get_document_from_index(doc_id, index):
 
 
 def _search_document_to_dict(doc):
+    """Converts and returns the search document into a dict format.
+
+    Args:
+        doc: Document. The document to be converted into dict format.
+
+    Returns:
+        dict(str, str). The document in dict format.
+    """
     d = {'id': doc.doc_id, 'language_code': doc.language, 'rank': doc.rank}
 
     for field in doc.fields:

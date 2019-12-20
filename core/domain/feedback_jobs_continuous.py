@@ -15,11 +15,14 @@
 # limitations under the License.
 
 """Continuous computation jobs for feedback system."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import feedback_domain
 from core.platform import models
 import feconf
+import python_utils
 
 from google.appengine.ext import ndb
 
@@ -89,6 +92,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
         exp_id = args[0]
 
         def _increment_open_threads_count():
+            """Increments count of open threads by one."""
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
@@ -103,6 +107,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         def _increment_total_threads_count():
+            """Increments count of total threads by one."""
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
@@ -117,6 +122,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 model.put()
 
         def _decrement_open_threads_count():
+            """Decrements count of open threads by one."""
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
@@ -184,7 +190,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
              if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_total_threads
              if feedback_thread_analytics_models[i] is not None else 0)
-        ) for i in range(len(exploration_ids))]
+        ) for i in python_utils.RANGE(len(exploration_ids))]
 
     @classmethod
     def get_thread_analytics(cls, exploration_id):
@@ -215,10 +221,22 @@ class FeedbackAnalyticsMRJobManager(
 
     @classmethod
     def _get_continuous_computation_class(cls):
+        """Get class for continuous computaion that computes analytics
+        for feedback threads of explorations.
+
+        Returns:
+            type. Class for continuous computaion of analytics.
+        """
         return FeedbackAnalyticsAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
+        """Get the list of classes that this class maps over
+
+        Returns:
+            list(GeneralFeedbackThreadModel). List of classes of feedback
+            thread models.
+        """
         return [feedback_models.GeneralFeedbackThreadModel]
 
     @staticmethod
@@ -226,17 +244,15 @@ class FeedbackAnalyticsMRJobManager(
         """Map function.
 
         Args:
-            item: FeedbackThreadModel. A feedback thread model instance.
+            item: GeneralFeedbackThreadModel. A general feedback thread model
+                instance.
 
         Yields:
             A tuple of two elements:
               - str. The exploration id associated to the feedback thread.
               - str. The feedback thread's status.
         """
-        if isinstance(item, feedback_models.GeneralFeedbackThreadModel):
-            yield (item.entity_id, item.status)
-        else:
-            yield (item.exploration_id, item.status)
+        yield (item.entity_id, item.status)
 
     @staticmethod
     def reduce(key, stringified_values):

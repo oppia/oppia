@@ -28,8 +28,12 @@ var ExplorationEditorSettingsTab = function() {
     by.css('.protractor-test-exploration-edit-param-changes'));
   var explorationCategoryInput = element(
     by.css('.protractor-test-exploration-category-input'));
+  var explorationLanguageInput = element(
+    by.css('.protractor-test-exploration-language-select'));
   var explorationObjectiveInput = element(
     by.css('.protractor-test-exploration-objective-input'));
+  var explorationObjectiveWarning = element(
+    by.css('.protractor-test-exploration-objective-warning'));
   var explorationSummaryTile = element(
     by.css('.protractor-test-exploration-summary-tile'));
   var explorationTitleInput = element(
@@ -57,6 +61,8 @@ var ExplorationEditorSettingsTab = function() {
     by.css('.protractor-test-delete-exploration-button'));
   var confirmDeleteExplorationButton = element(
     by.css('.protractor-test-really-delete-exploration-button'));
+  var enableCorrectnessFeedbackButton = element(
+    by.css('.protractor-test-enable-mark-correctness-feedback'));
 
   /*
    * Workflows
@@ -101,6 +107,13 @@ var ExplorationEditorSettingsTab = function() {
     enableParametersSwitch.click();
   };
 
+  this.enableCorrectnessFeedback = function() {
+    expect(enableCorrectnessFeedbackButton.isDisplayed()).toBe(true);
+    waitFor.elementToBeClickable(enableCorrectnessFeedbackButton,
+      'Enable correctness feedback button is not clickable.');
+    enableCorrectnessFeedbackButton.click();
+  };
+
   this.expectAvailableFirstStatesToBe = function(names) {
     initialStateSelect.all(by.tagName('option')).map(function(elem) {
       return elem.getText();
@@ -142,6 +155,36 @@ var ExplorationEditorSettingsTab = function() {
   this.setTitle = function(title) {
     explorationTitleInput.clear();
     explorationTitleInput.sendKeys(title);
+  };
+
+  this.expectCategoryToBe = function(category) {
+    expect(explorationCategoryInput.$('option:checked').getText()).
+      toEqual(category);
+  };
+
+  this.expectFirstStateToBe = function(firstState) {
+    expect(initialStateSelect.$('option:checked').getText()).
+      toEqual(firstState);
+  };
+
+  this.expectLanguageToBe = function(language) {
+    expect(explorationLanguageInput.$('option:checked').getText()).
+      toEqual(language);
+  };
+
+  this.expectObjectiveToBe = function(objective) {
+    expect(explorationObjectiveInput.getAttribute('value')).
+      toEqual(objective);
+  };
+
+  this.expectTitleToBe = function(title) {
+    expect(explorationTitleInput.getAttribute('value')).
+      toEqual(title);
+  };
+
+  this.expectWarningsColorToBe = function(color) {
+    expect(explorationObjectiveWarning.getCssValue('color')).
+      toEqual(color);
   };
 };
 

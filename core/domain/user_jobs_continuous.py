@@ -13,16 +13,19 @@
 # limitations under the License.
 
 """Jobs for queries personalized to individual users."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
 
 from core import jobs
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import stats_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 from google.appengine.ext import ndb
@@ -66,10 +69,6 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     @classmethod
     def _get_batch_job_manager_class(cls):
         return RecentUpdatesMRJobManager
-
-    @classmethod
-    def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        pass
 
     # Public query methods.
     @classmethod
@@ -309,10 +308,6 @@ class RecentUpdatesMRJobManager(
                 - 'subject': str. The commit message or message indicating a
                     feedback update.
         """
-        if '@' not in key:
-            logging.error(
-                'Invalid reducer key for RecentUpdatesMRJob: %s' % key)
-
         user_id = key[:key.find('@')]
         job_queued_msec = float(key[key.find('@') + 1:])
 
@@ -387,6 +382,14 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         exp_id = args[0]
 
         def _refresh_average_ratings(user_id, rating, old_rating):
+            """Refreshes the average ratings in the given realtime layer.
+
+            Args:
+                user_id: str. The id of the user.
+                rating: int. The new rating of the exploration.
+                old_rating: int. The old rating of the exploration before
+                    refreshing.
+            """
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -406,13 +409,20 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     if old_rating is not None:
                         sum_of_ratings -= old_rating
                         num_ratings -= 1
-                    model.average_ratings = sum_of_ratings / (num_ratings * 1.0)
+                    model.average_ratings = python_utils.divide(
+                        sum_of_ratings, (num_ratings * 1.0))
                 else:
                     model.average_ratings = rating
                 model.num_ratings = num_ratings
                 model.put()
 
         def _increment_total_plays_count(user_id):
+            """Increments the total plays count of the exploration in the
+            realtime layer.
+
+            Args:
+                user_id: str. The id of the user.
+            """
             realtime_class = cls._get_realtime_datastore_class()
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, user_id)
@@ -426,7 +436,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 model.total_plays += 1
                 model.put()
 
-        exp_summary = exp_services.get_exploration_summary_by_id(exp_id)
+        exp_summary = exp_fetchers.get_exploration_summary_by_id(exp_id)
         if exp_summary:
             for user_id in exp_summary.owner_ids:
                 if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
@@ -481,7 +491,8 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     realtime_model.average_ratings * realtime_model.num_ratings)
 
         if num_ratings > 0:
-            average_ratings = sum_of_ratings / float(num_ratings)
+            average_ratings = python_utils.divide(
+                sum_of_ratings, float(num_ratings))
 
         return {
             'total_plays': total_plays,
@@ -541,7 +552,7 @@ class UserStatsMRJobManager(
         if item.deleted:
             return
 
-        exponent = 2.0 / 3
+        exponent = python_utils.divide(2.0, 3)
 
         # This is set to False only when the exploration impact score is not
         # valid to be calculated.
@@ -551,10 +562,10 @@ class UserStatsMRJobManager(
         total_rating = 0
         for ratings_value in item.ratings:
             total_rating += item.ratings[ratings_value] * int(ratings_value)
-        sum_of_ratings = sum(item.ratings.itervalues())
+        sum_of_ratings = sum(item.ratings.values())
 
-        average_rating = ((total_rating / sum_of_ratings) if sum_of_ratings
-                          else None)
+        average_rating = python_utils.divide(
+            total_rating, sum_of_ratings) if sum_of_ratings else None
 
         if average_rating is not None:
             value_per_user = average_rating - 2
@@ -575,10 +586,10 @@ class UserStatsMRJobManager(
         # Turn answer count into reach.
         reach = answer_count**exponent
 
-        exploration_summary = exp_services.get_exploration_summary_by_id(
+        exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             item.id)
         contributors = exploration_summary.contributors_summary
-        total_commits = sum(contributors.itervalues())
+        total_commits = sum(contributors.values())
         if total_commits == 0:
             calculate_exploration_impact_score = False
 
@@ -591,7 +602,8 @@ class UserStatsMRJobManager(
             if calculate_exploration_impact_score:
                 # Find fractional contribution for each contributor.
                 contribution = (
-                    contributors[contrib_id] / float(total_commits))
+                    python_utils.divide(
+                        contributors[contrib_id], float(total_commits)))
 
                 # Find score for this specific exploration.
                 exploration_data.update({
@@ -654,10 +666,10 @@ class UserStatsMRJobManager(
                     all explorations owned by the user.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
-        exponent = 2.0 / 3
+        exponent = python_utils.divide(2.0, 3)
 
         # Find the final score and round to a whole number.
-        user_impact_score = int(round(sum(
+        user_impact_score = int(python_utils.ROUND(sum(
             value['exploration_impact_score'] for value in values
             if value.get('exploration_impact_score')) ** exponent))
 
@@ -682,6 +694,7 @@ class UserStatsMRJobManager(
         mr_model.total_plays = total_plays
         mr_model.num_ratings = num_ratings
         if sum_of_ratings != 0:
-            average_ratings = (sum_of_ratings / float(num_ratings))
+            average_ratings = python_utils.divide(
+                sum_of_ratings, float(num_ratings))
             mr_model.average_ratings = average_ratings
         mr_model.put()

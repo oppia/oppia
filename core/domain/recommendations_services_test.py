@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Unit tests for recommendations_services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_services
 from core.domain import recommendations_services
@@ -96,7 +98,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
     # pylint: enable=line-too-long
 
     def test_validate_default_similarities(self):
-        recommendations_services._validate_topic_similarities(  # pylint: disable=protected-access
+        recommendations_services.validate_topic_similarities(
             recommendations_services.DEFAULT_TOPIC_SIMILARITIES_STRING)
 
     def test_update_topic_similarities(self):
@@ -107,8 +109,9 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             '0.1,0.8,1.0')
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Length of topic similarities columns does not match topic list.'
+            Exception, (
+                'Length of topic similarities columns: 2 does not match '
+                'length of topic list: 3.')
             ):
             recommendations_services.update_topic_similarities(
                 'Art,Biology,Chemistry\n'
@@ -116,8 +119,9 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,0.8')
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Length of topic similarities rows does not match topic list.'
+            Exception, (
+                'Length of topic similarities rows: 2 does not match '
+                'length of topic list: 3.')
             ):
             recommendations_services.update_topic_similarities(
                 'Art,Biology,Chemistry\n'
@@ -236,11 +240,10 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         """
         super(RecommendationsServicesUnitTests, self).setUp()
 
-        for name, user in self.USER_DATA.iteritems():
+        for name, user in self.USER_DATA.items():
+            self.signup(user['email'], name)
             user['id'] = self.get_user_id_from_email(
                 user['email'])
-            user_services.create_new_user(user['id'], user['email'])
-            self.signup(user['email'], name)
             self.USER_DATA[name]['id'] = user['id']
 
         self.EXP_DATA['exp_id_1']['owner_id'] = self.USER_DATA['alice']['id']
@@ -248,15 +251,14 @@ class RecommendationsServicesUnitTests(test_utils.GenericTestBase):
         self.EXP_DATA['exp_id_3']['owner_id'] = self.USER_DATA['bob']['id']
         self.EXP_DATA['exp_id_4']['owner_id'] = self.USER_DATA['charlie']['id']
 
-        for exp_id, exp in self.EXP_DATA.iteritems():
+        for exp_id, exp in self.EXP_DATA.items():
             self.save_new_valid_exploration(
                 exp_id, exp['owner_id'], category=exp['category'])
             owner = user_services.UserActionsInfo(exp['owner_id'])
             rights_manager.publish_exploration(owner, exp_id)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        user_services.create_new_user(self.admin_id, self.ADMIN_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
 

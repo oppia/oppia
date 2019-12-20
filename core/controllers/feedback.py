@@ -13,10 +13,11 @@
 # limitations under the License.
 
 """Controllers for the feedback thread page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.platform import models
@@ -60,13 +61,13 @@ class ThreadListHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class ThreadListHandlerForTopics(base.BaseHandler):
+class ThreadListHandlerForTopicsHandler(base.BaseHandler):
     """Handles listing of suggestions threads linked to topics."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
-        if not constants.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
         self.values.update({
             'suggestion_thread_dicts': (
                 [t.to_dict() for t in feedback_services.get_all_threads(

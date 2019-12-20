@@ -46,9 +46,9 @@ describe('Embedding', function() {
     explorationEditorMainTab.setInteraction('NumericInput');
     explorationEditorMainTab.addResponse(
       'NumericInput', null, 'correct but why', true, 'Equals', 6);
-    explorationEditorMainTab.addResponse('NumericInput', forms.toRichText(
-      'Describe solution!!')
-      , null, false, 'IsLessThanOrEqualTo', 0);
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('Describe solution!!'),
+      null, false, 'IsLessThanOrEqualTo', 0);
     var defaultResponseEditor = explorationEditorMainTab
       .getResponseEditor('default');
     defaultResponseEditor.setDestination(
@@ -60,12 +60,15 @@ describe('Embedding', function() {
       forms.toRichText('Right! Why do you think it is 6?'));
     explorationEditorMainTab.setInteraction(
       'TextInput', 'Type your answer here.', 5);
-    explorationEditorMainTab.addResponse('TextInput', forms.toRichText(
-      'Yes, 3! = 3 x 2 x 1. That\'s 3 x 2 = 6 ways.')
-      , 'END', true, 'Contains', 'permutation');
-    explorationEditorMainTab.addResponse('TextInput', forms.toRichText(
-      'Yes, 3 factorial, or 3 x 2 x 1. That\'s 3 x 2 = 6 ways.')
-      , 'END', false, 'Contains', 'factorial');
+    explorationEditorMainTab.addResponse(
+      'TextInput',
+      forms.toRichText('Yes, 3! = 3 x 2 x 1. That\'s 3 x 2 = 6 ways.'),
+      'END', true, 'Contains', 'permutation');
+    explorationEditorMainTab.addResponse(
+      'TextInput',
+      forms.toRichText(
+        'Yes, 3 factorial, or 3 x 2 x 1. That\'s 3 x 2 = 6 ways.'),
+      'END', false, 'Contains', 'factorial');
     explorationEditorMainTab.getResponseEditor('default').setFeedback(
       forms.toRichText('Figure out what the answer for 4 balls is!'));
 
@@ -85,9 +88,9 @@ describe('Embedding', function() {
     explorationEditorMainTab.setInteraction('EndExploration');
 
     // Save changes.
-    title = 'Protractor Test';
-    category = 'Mathematics';
-    objective = 'learn how to count permutations' +
+    var title = 'Protractor Test';
+    var category = 'Mathematics';
+    var objective = 'learn how to count permutations' +
       ' accurately and systematically';
     explorationEditorPage.navigateToSettingsTab();
 
@@ -254,6 +257,13 @@ describe('Embedding', function() {
       browser.switchTo().frame(driver.findElement(
         by.css('.protractor-test-embedded-exploration > iframe')));
       waitFor.pageToFullyLoad();
+
+      // TODO(#7622): Remove this sleep. Remove the todo in
+      // scripts/pre_commit_linter.py pointing to the same issue This sleep was
+      // placed here as a temporary measure because the wait in the line above
+      // does not wait for the iframe to load fully.
+      browser.sleep(6000);
+
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
         .getAttribute('placeholder')).toBe(expectedPlaceholder);
       browser.switchTo().defaultContent();
@@ -283,9 +293,9 @@ describe('Embedding', function() {
       explorationEditorMainTab.setInteraction('EndExploration');
 
       // Save changes.
-      title = 'Language Test';
-      category = 'Languages';
-      objective = 'This is a Language Test for valid and invalid.';
+      var title = 'Language Test';
+      var category = 'Languages';
+      var objective = 'This is a Language Test for valid and invalid.';
       explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setTitle(title);
       explorationEditorSettingsTab.setCategory(category);

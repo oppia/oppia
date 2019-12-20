@@ -15,9 +15,13 @@
 # limitations under the License.
 
 """Domain objects for configuration properties."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+from core.domain import change_domain
 from core.platform import models
 import feconf
+import python_utils
 import schema_utils
 
 (config_models,) = models.Registry.import_models([models.NAMES.config])
@@ -33,6 +37,30 @@ SET_OF_STRINGS_SCHEMA = {
     'validators': [{
         'id': 'is_uniquified',
     }],
+}
+
+SET_OF_CLASSROOM_DICTS_SCHEMA = {
+    'type': 'list',
+    'items': {
+        'type': 'dict',
+        'properties': [{
+            'name': 'name',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'topic_ids',
+            'schema': {
+                'type': 'list',
+                'items': {
+                    'type': 'unicode',
+                },
+                'validators': [{
+                    'id': 'is_uniquified',
+                }]
+            }
+        }]
+    }
 }
 
 VMID_SHARED_SECRET_KEY_SCHEMA = {
@@ -66,7 +94,21 @@ FLOAT_SCHEMA = {
 }
 
 
-class ConfigProperty(object):
+class ConfigPropertyChange(change_domain.BaseChange):
+    """Domain object for changes made to a config property object.
+
+    The allowed commands, together with the attributes:
+        - 'change_property_value' (with new_value)
+    """
+
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CHANGE_PROPERTY_VALUE,
+        'required_attribute_names': ['new_value'],
+        'optional_attribute_names': []
+    }]
+
+
+class ConfigProperty(python_utils.OBJECT):
     """A property with a name and a default value.
 
     NOTE TO DEVELOPERS: These config properties are deprecated. Do not reuse
@@ -79,10 +121,12 @@ class ConfigProperty(object):
     - banned_usernames.
     - banner_alt_text.
     - before_end_body_tag_hook.
+    - before_end_head_tag_hook.
     - carousel_slides_config.
     - collection_editor_whitelist.
     - contact_email_address.
     - contribute_gallery_page_announcement.
+    - default_twitter_share_message_editor.
     - disabled_explorations.
     - editor_page_announcement.
     - editor_prerequisites_agreement.
@@ -103,11 +147,6 @@ class ConfigProperty(object):
     - ssl_challenge_responses.
     - whitelisted_email_senders.
     """
-
-    def refresh_default_value(self, default_value):
-        """Refreshes the configuration property to the default value."""
-
-        pass
 
     def __init__(self, name, schema, description, default_value):
         if Registry.get_config_property(name):
@@ -198,7 +237,7 @@ class ConfigProperty(object):
         return schema_utils.normalize_against_schema(value, self._schema)
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all configuration properties."""
 
     # The keys of _config_registry are the property names, and the values are
@@ -238,7 +277,7 @@ class Registry(object):
         """
         schemas_dict = {}
 
-        for (property_name, instance) in cls._config_registry.iteritems():
+        for (property_name, instance) in cls._config_registry.items():
             schemas_dict[property_name] = {
                 'schema': instance.schema,
                 'description': instance.description,
@@ -246,6 +285,15 @@ class Registry(object):
             }
 
         return schemas_dict
+
+    @classmethod
+    def get_all_config_property_names(cls):
+        """Return a list of all the config property names.
+
+        Returns:
+            list. The list of all config property names.
+        """
+        return list(cls._config_registry)
 
 
 PROMO_BAR_ENABLED = ConfigProperty(
@@ -266,11 +314,29 @@ VMID_SHARED_SECRET_KEY_MAPPING = ConfigProperty(
 WHITELISTED_EXPLORATION_IDS_FOR_PLAYTHROUGHS = ConfigProperty(
     'whitelisted_exploration_ids_for_playthroughs',
     SET_OF_STRINGS_SCHEMA,
-    'The set of exploration IDs for recording issues and playthroughs', [
+    'The set of exploration IDs for recording playthrough issues', [
         'umPkwp0L1M0-', 'MjZzEVOG47_1', '9trAQhj6uUC2', 'rfX8jNkPnA-1',
         '0FBWxCE5egOw', '670bU6d9JGBh', 'aHikhPlxYgOH', '-tMgcP1i_4au',
         'zW39GLG_BdN2', 'Xa3B_io-2WI5', '6Q6IyIDkjpYC', 'osw1m5Q3jK41'])
 
+TOPIC_IDS_FOR_CLASSROOM_PAGES = ConfigProperty(
+    'topic_ids_for_classroom_pages', SET_OF_CLASSROOM_DICTS_SCHEMA,
+    'The set of topic IDs for each classroom page.', [{
+        'name': 'Math',
+        'topic_ids': []
+    }]
+)
+
 RECORD_PLAYTHROUGH_PROBABILITY = ConfigProperty(
     'record_playthrough_probability', FLOAT_SCHEMA,
     'The probability of recording playthroughs', 0.2)
+
+IS_IMPROVEMENTS_TAB_ENABLED = ConfigProperty(
+    'is_improvements_tab_enabled', BOOL_SCHEMA,
+    'Exposes the Improvements Tab for creators in the exploration editor.',
+    True)
+
+ALWAYS_ASK_LEARNERS_FOR_ANSWER_DETAILS = ConfigProperty(
+    'always_ask_learners_for_answer_details', BOOL_SCHEMA,
+    'Always ask learners for answer details. For testing -- do not use',
+    False)

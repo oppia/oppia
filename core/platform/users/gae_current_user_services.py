@@ -15,10 +15,13 @@
 # limitations under the License.
 
 """Provides a seam for user-related services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
 import feconf
+import python_utils
 import utils
 
 from google.appengine.api import users
@@ -26,16 +29,29 @@ from google.appengine.ext import ndb
 
 
 def create_login_url(slug):
-    """Creates a login url."""
+    """Creates a login url.
+
+    Args:
+        slug: str. The URL to redirect to after login.
+
+    Returns:
+        str. The correct login URL that includes the page to redirect to.
+    """
     return users.create_login_url(
         dest_url=utils.set_url_query_parameter(
             feconf.SIGNUP_URL, 'return_url', slug))
 
 
-def create_logout_url(slug):
-    """Creates a logout url."""
-    logout_url = utils.set_url_query_parameter('/logout', 'return_url', slug)
-    return logout_url
+def create_logout_url(url_to_redirect):
+    """Creates a logout url.
+
+    Args:
+        url_to_redirect: str. The URL to redirect to after logout.
+
+    Returns:
+        str. The correct logout URL that includes the page to redirect to.
+    """
+    return users.create_logout_url(url_to_redirect)
 
 
 def get_current_user():
@@ -48,12 +64,13 @@ def is_current_user_super_admin():
     return users.is_current_user_admin()
 
 
-def get_user_id_from_email(email):
-    """Given an email address, returns a user id.
+def get_gae_id_from_email(email):
+    """Given an email address, returns a gae id.
 
     Returns None if the email address does not correspond to a valid user id.
     """
     class _FakeUser(ndb.Model):
+        """A fake user class."""
         _use_memcache = False
         _use_cache = False
         user = ndb.UserProperty(required=True)
@@ -68,11 +85,13 @@ def get_user_id_from_email(email):
 
     key = _FakeUser(id=email, user=fake_user).put()
     obj = _FakeUser.get_by_id(key.id())
-    user_id = obj.user.user_id()
-    return unicode(user_id) if user_id else None
+    # GAE uses the naming 'user_id' internally, we call the GAE user_id just a
+    # gae_id in our code.
+    gae_id = obj.user.user_id()
+    return python_utils.convert_to_bytes(gae_id) if gae_id else None
 
 
-def get_current_user_id():
+def get_current_gae_id():
     """Gets the user_id of current user.
 
     Returns:

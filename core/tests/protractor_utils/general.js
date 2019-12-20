@@ -33,6 +33,15 @@ var checkForConsoleErrors = function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   browser.manage().logs().get('browser').then(function(browserLogs) {
     var fatalErrors = [];
+    // The mobile tests run on the latest version of Chrome.
+    // The newer versions report 'Slow Network' as a console error.
+    // This causes the tests to fail, therefore, we remove such logs.
+    if (browser.isMobile) {
+      browserLogs = browserLogs.filter(function(browserLog) {
+        return !(browserLog.message.includes(' Slow network is detected.'));
+      });
+    }
+
     for (var i = 0; i < browserLogs.length; i++) {
       if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
         var errorFatal = true;
@@ -51,10 +60,7 @@ var checkForConsoleErrors = function(errorsToIgnore) {
 };
 
 var isInDevMode = function() {
-  browser.get('/library');
-  waitFor.pageToFullyLoad();
-  var devModeElement = element(by.css('.oppia-dev-mode'));
-  return devModeElement.isPresent();
+  return browser.params.devMode === 'true';
 };
 
 var SERVER_URL_PREFIX = 'http://localhost:9001';
@@ -135,7 +141,7 @@ var ensurePageHasNoTranslationIds = function() {
       var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
       var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
       var REGEX_NG_TOP_NAV_VISIBILITY =
-        new RegExp('ng-show="navElementsVisibilityStatus.I18N_', 'g');
+        new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g');
       expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
         .replace(REGEX_NG_VARIABLE, '')
         .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
@@ -179,6 +185,12 @@ var checkConsoleErrorsExist = function(expectedErrors) {
   });
 };
 
+var goToHomePage = function() {
+  var oppiaMainLogo = element(by.css('.protractor-test-oppia-main-logo'));
+  oppiaMainLogo.click();
+  return waitFor.pageToFullyLoad();
+};
+
 exports.acceptAlert = acceptAlert;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
@@ -203,3 +215,5 @@ exports.expect404Error = expect404Error;
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
 
 exports.checkConsoleErrorsExist = checkConsoleErrorsExist;
+
+exports.goToHomePage = goToHomePage;

@@ -15,13 +15,14 @@
 # limitations under the License.
 
 """Tests for object schema definitions."""
-
-# pylint: disable=relative-import
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
 from core.domain import email_manager
 from core.tests import test_utils
+import python_utils
 import schema_utils
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
@@ -57,7 +58,7 @@ ALLOWED_SCHEMA_TYPES = [
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
-    'ListOfTabs']
+    'ListOfTabs', 'SkillSelector']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not
@@ -170,7 +171,7 @@ def _validate_ui_config(obj_type, ui_config):
     """Validates the value of a UI configuration."""
     reference_dict = UI_CONFIG_SPECS[obj_type]
     assert set(ui_config.keys()) <= set(reference_dict.keys())
-    for key, value in ui_config.iteritems():
+    for key, value in ui_config.items():
         schema_utils.normalize_against_schema(
             value, reference_dict[key])
 
@@ -180,7 +181,7 @@ def _validate_validator(obj_type, validator):
     reference_dict = VALIDATOR_SPECS[obj_type]
     assert 'id' in validator and validator['id'] in reference_dict
 
-    customization_keys = validator.keys()
+    customization_keys = list(validator.keys())
     customization_keys.remove('id')
     assert (set(customization_keys) ==
             set(reference_dict[validator['id']].keys()))
@@ -193,7 +194,7 @@ def _validate_validator(obj_type, validator):
             raise AssertionError(e)
 
     # Check that the id corresponds to a valid normalizer function.
-    validator_fn = schema_utils._Validators.get(validator['id'])  # pylint: disable=protected-access
+    validator_fn = schema_utils.get_validator(validator['id'])
     assert set(inspect.getargspec(validator_fn).args) == set(
         customization_keys + ['obj'])
 
@@ -262,21 +263,17 @@ def validate_schema(schema):
                 prop,
                 [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
                 [SCHEMA_KEY_DESCRIPTION])
-            assert isinstance(prop[SCHEMA_KEY_NAME], basestring)
+            assert isinstance(prop[SCHEMA_KEY_NAME], python_utils.BASESTRING)
             validate_schema(prop[SCHEMA_KEY_SCHEMA])
             if SCHEMA_KEY_DESCRIPTION in prop:
-                assert isinstance(prop[SCHEMA_KEY_DESCRIPTION], basestring)
+                assert isinstance(
+                    prop[SCHEMA_KEY_DESCRIPTION], python_utils.BASESTRING)
     else:
         _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
 
     if SCHEMA_KEY_UI_CONFIG in schema:
         _validate_ui_config(
             schema[SCHEMA_KEY_TYPE], schema[SCHEMA_KEY_UI_CONFIG])
-
-    if SCHEMA_KEY_CHOICES in schema and SCHEMA_KEY_POST_NORMALIZERS in schema:
-        raise AssertionError(
-            'Schema cannot contain both a \'choices\' and a '
-            '\'post_normalizers\' key.')
 
     if SCHEMA_KEY_POST_NORMALIZERS in schema:
         assert isinstance(schema[SCHEMA_KEY_POST_NORMALIZERS], list)
@@ -433,6 +430,49 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             with self.assertRaises((AssertionError, KeyError)):
                 validate_schema(schema)
 
+    def test_normalize_against_schema_raises_exception(self):
+        """Tests if normalize against schema raises exception
+        for invalid key.
+        """
+        with self.assertRaises(Exception):
+            schema = {SCHEMA_KEY_TYPE: 'invalid'}
+            schema_utils.normalize_against_schema('obj', schema)
+
+    def test_is_nonempty_validator(self):
+        """Tests if static method is_nonempty returns true iff obj
+        is not an empty str.
+        """
+        is_nonempty = schema_utils.get_validator('is_nonempty')
+        self.assertTrue(is_nonempty('non-empty string'))
+        self.assertTrue(is_nonempty(' '))
+        self.assertTrue(is_nonempty('    '))
+        self.assertFalse(is_nonempty(''))
+
+    def test_is_at_most_validator(self):
+        """Tests if static method is_at_most returns true iff obj
+        is at most a value.
+        """
+        is_at_most = schema_utils.get_validator('is_at_most')
+        self.assertTrue(is_at_most(2, 3))
+        self.assertTrue(is_at_most(2, 2)) # boundary
+        self.assertFalse(is_at_most(2, 1))
+
+    def test_has_length_at_least_validator(self):
+        """Tests if static method has_length_at_least returns true iff
+        given list has length of at least the given value.
+        """
+        has_len_at_least = schema_utils.get_validator('has_length_at_least')
+        self.assertTrue(has_len_at_least(['elem'], 0))
+        self.assertTrue(has_len_at_least(['elem'], 1)) # boundary
+        self.assertFalse(has_len_at_least(['elem'], 2))
+
+    def test_get_raises_invalid_validator_id(self):
+        """Tests if class method 'get' in _Validator raises exception
+        for invalid validator id.
+        """
+        with self.assertRaises(Exception):
+            schema_utils.get_validator('some invalid validator method name')
+
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     """Test schema-based normalization of objects."""
@@ -479,6 +519,43 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
             (['adaA13', '13'], ['adaA13', '13'])]
         invalid_vals = [['1', 13], {'a': 'b'}, {}, None, 123, 'abc', ['c'], []]
         self.check_normalization(schema, mappings, invalid_vals)
+
+    def test_html_schema(self):
+        """Tests for valid html schema, an html string. Note that
+        html.cleaner() is called in normalize_against_schema.
+        """
+        schema = {
+            'type': schema_utils.SCHEMA_TYPE_HTML,
+        }
+        mappings = [
+            ('<script></script>', ''),
+            ('<a class="webLink" href="https'
+             '://www.oppia.com/"><img src="images/oppia.png"></a>',
+             '<a href="https://www.oppia.com/"></a>')]
+        invalid_vals = [['<script></script>', '<script></script>']]
+        self.check_normalization(schema, mappings, invalid_vals)
+
+    def test_schema_key_post_normalizers(self):
+        """Test post normalizers in schema using basic html schema."""
+        schema_1 = {
+            'type': schema_utils.SCHEMA_TYPE_HTML,
+            'post_normalizers': [
+                {'id': 'normalize_spaces'},  # html strings with no extra spaces
+            ]
+        }
+        obj_1 = 'a     a'
+        normalize_obj_1 = schema_utils.normalize_against_schema(obj_1, schema_1)
+        self.assertEqual(u'a a', normalize_obj_1)
+
+        schema_2 = {
+            'type': schema_utils.SCHEMA_TYPE_HTML,
+            'post_normalizers': [
+                {'id': 'sanitize_url'}
+            ]
+        }
+        obj_2 = 'http://www.oppia.org/splash/<script>'
+        normalize_obj_2 = schema_utils.normalize_against_schema(obj_2, schema_2)
+        self.assertEqual(u'http://www.oppia.org/splash/', normalize_obj_2)
 
     def test_list_schema(self):
         schema = {
@@ -573,11 +650,82 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_notification_email_list_validator(self):
         schema = email_manager.NOTIFICATION_EMAIL_LIST_SCHEMA
-        valid_email_list = [u'user{}@oppia.com'.format(i) for i in xrange(0, 5)]
-        big_email_list = [u'user{}@oppia.com'.format(i) for i in xrange(0, 7)]
+        valid_email_list = [
+            u'user{}@oppia.com'.format(i) for i in python_utils.RANGE(0, 5)]
+        big_email_list = [
+            u'user{}@oppia.com'.format(i) for i in python_utils.RANGE(0, 7)]
         mappings = [
             ([u'admin@oppia.com'], [u'admin@oppia.com']),
             (valid_email_list, valid_email_list)]
         invalid_vals = [[u'admin@oppia'], big_email_list,
                         [u'admin@oppia.commmm'], [u'a@.com']]
         self.check_normalization(schema, mappings, invalid_vals)
+
+    def test_normalize_spaces(self):
+        """Test static method normalize_spaces; should collapse multiple
+        spaces.
+        """
+        normalize_spaces = schema_utils.Normalizers.get('normalize_spaces')
+        self.assertEqual('dog cat', normalize_spaces('dog     cat'))
+        self.assertEqual('dog cat', normalize_spaces('  dog cat'))
+        self.assertEqual('dog cat', normalize_spaces(' dog   cat   '))
+        self.assertNotEqual('dog cat', normalize_spaces('dogcat'))
+
+    def test_normalizer_get(self):
+        """Tests the class method 'get' of Normalizers, should return the
+        normalizer method corresponding to the given normalizer id.
+        """
+        normalize_spaces = schema_utils.Normalizers.get('normalize_spaces')
+        self.assertEqual('normalize_spaces', normalize_spaces.__name__)
+
+    def test_normalizer_get_raises_exception_for_invalid_id(self):
+        """Tests if class method get of Normalizers raises exception when given
+        an invalid normalizer id.
+        """
+        with self.assertRaises(Exception):
+            schema_utils.Normalizers.get('some invalid normalizer method name')
+
+        with self.assertRaises(Exception):
+            # Test substring of an actual id.
+            schema_utils.Normalizers.get('normalize_space')
+
+    def test_normalizer_sanitize_url(self):
+        """Tests if static method sanitize_url of Normalizers correctly
+        sanitizes a URL when given its string representation and raises
+        error for invalid URLs.
+        """
+        sanitize_url = schema_utils.Normalizers.get('sanitize_url')
+        self.assertEqual(
+            'https://www.oppia.org/splash/',
+            sanitize_url('https://www.oppia.org/splash/'))
+
+        self.assertEqual(
+            'http://www.oppia.org/splash/',
+            sanitize_url('http://www.oppia.org/splash/'))
+
+        self.assertEqual(
+            sanitize_url('http://example.com/~path;parameters?q=arg#fragment'),
+            'http://example.com/%7Epath%3Bparameters?q%3Darg#fragment')
+
+        self.assertEqual(
+            'https://www.web.com/%3Cscript%20type%3D%22text/javascript%22%'
+            '3Ealert%28%27rm%20-rf%27%29%3B%3C/script%3E',
+            sanitize_url(
+                'https://www.web.com/<script type="text/javascript">alert(\'rm'
+                ' -rf\');</script>'))
+
+        self.assertEqual('', sanitize_url(''))
+
+        # Raise AssertionError if string does not start with http:// or
+        # https://.
+        with self.assertRaisesRegexp(
+            AssertionError,
+            'Invalid URL: Sanitized URL should start with \'http://\' or'
+            ' \'https://\'; received oppia.org'):
+            sanitize_url('oppia.org')
+
+        with self.assertRaisesRegexp(
+            AssertionError,
+            'Invalid URL: Sanitized URL should start with \'http://\' or'
+            ' \'https://\'; received www.oppia.org'):
+            sanitize_url('www.oppia.org')

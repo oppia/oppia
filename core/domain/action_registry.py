@@ -15,17 +15,20 @@
 # limitations under the License.
 
 """Registry for actions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import pkgutil
 
 from core.platform import models
 import feconf
+import python_utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all actions."""
 
     # Dict mapping action IDs to instances of the actions.
@@ -74,7 +77,7 @@ class Registry(object):
         """
         if len(cls._actions) == 0:
             cls._refresh()
-        return cls._actions.values()
+        return list(cls._actions.values())
 
     @classmethod
     def get_action_by_type(cls, action_type):

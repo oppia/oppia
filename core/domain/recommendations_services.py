@@ -15,8 +15,9 @@
 # limitations under the License.
 
 """System for computing recommendations for explorations and users."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import StringIO
 import csv
 import datetime
 import json
@@ -24,6 +25,7 @@ import json
 from core.domain import rights_manager
 from core.platform import models
 import feconf
+import python_utils
 
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
@@ -178,20 +180,20 @@ def get_topic_similarities_as_csv():
     The first line is a list of the current topics. The next lines are an
     adjacency matrix of similarities.
     """
-    output = StringIO.StringIO()
+    output = python_utils.string_io()
     writer = csv.writer(output)
     writer.writerow(RECOMMENDATION_CATEGORIES)
 
     topic_similarities = get_topic_similarities_dict()
     for topic in RECOMMENDATION_CATEGORIES:
         topic_similarities_row = [value for _, value in sorted(
-            topic_similarities[topic].iteritems())]
+            topic_similarities[topic].items())]
         writer.writerow(topic_similarities_row)
 
     return output.getvalue()
 
 
-def _validate_topic_similarities(data):
+def validate_topic_similarities(data):
     """Validates topic similarities given by data, which should be a string
     of comma-separated values.
 
@@ -210,7 +212,9 @@ def _validate_topic_similarities(data):
 
     if len(topic_similarities_values) != topics_length:
         raise Exception(
-            'Length of topic similarities columns does not match topic list.')
+            'Length of topic similarities columns: %s '
+            'does not match length of topic list: %s.' % (
+                len(topic_similarities_values), topics_length))
 
     for topic in topics_list:
         if topic not in RECOMMENDATION_CATEGORIES:
@@ -219,10 +223,12 @@ def _validate_topic_similarities(data):
     for index, topic in enumerate(topics_list):
         if len(topic_similarities_values[index]) != topics_length:
             raise Exception(
-                'Length of topic similarities rows does not match topic list.')
+                'Length of topic similarities rows: %s '
+                'does not match length of topic list: %s.' % (
+                    len(topic_similarities_values[index]), topics_length))
 
-    for row_ind in range(topics_length):
-        for col_ind in range(topics_length):
+    for row_ind in python_utils.RANGE(topics_length):
+        for col_ind in python_utils.RANGE(topics_length):
             similarity = topic_similarities_values[row_ind][col_ind]
             try:
                 similarity = float(similarity)
@@ -234,8 +240,8 @@ def _validate_topic_similarities(data):
                 raise ValueError('Expected similarity to be between 0.0 and '
                                  '1.0, received %s' % similarity)
 
-    for row_ind in range(topics_length):
-        for col_ind in range(topics_length):
+    for row_ind in python_utils.RANGE(topics_length):
+        for col_ind in python_utils.RANGE(topics_length):
             if (topic_similarities_values[row_ind][col_ind] !=
                     topic_similarities_values[col_ind][row_ind]):
                 raise Exception('Expected topic similarities to be symmetric.')
@@ -254,7 +260,7 @@ def update_topic_similarities(data):
     similarities remain as the previous value or the default.
     """
 
-    _validate_topic_similarities(data)
+    validate_topic_similarities(data)
 
     data = data.splitlines()
     data = list(csv.reader(data))

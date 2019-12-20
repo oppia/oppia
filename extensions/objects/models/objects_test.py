@@ -15,36 +15,41 @@
 # limitations under the License.
 
 """Tests for typed object classes (mostly normalization)."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
 from core.tests import test_utils
 from extensions.objects.models import objects
+import python_utils
 import schema_utils_test
 
 
 class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     """Tests normalization of typed objects."""
 
-    def check_normalization(self, cls, mappings, invalid_items):
+    def check_normalization(self, object_class, mappings, invalid_items):
         """Test that values are normalized correctly.
 
         Args:
-          cls: the class whose normalize() method is to be tested.
+          object_class: the class whose normalize() method is to be tested.
           mappings: a list of 2-element tuples. The first element of
             each item is expected to be normalized to the second.
           invalid_items: a list of values. Each of these is expected to raise
             a TypeError when normalized.
         """
         for item in mappings:
-            assert cls.normalize(item[0]) == item[1], (
+            assert object_class.normalize(item[0]) == item[1], (
                 'Expected %s when normalizing %s as a %s, got %s' %
-                (item[1], item[0], cls.__name__, cls.normalize(item[0]))
+                (
+                    item[1], item[0],
+                    object_class.__name__, object_class.normalize(item[0]))
             )
 
         for item in invalid_items:
             with self.assertRaises(Exception):
-                cls.normalize(item)
+                object_class.normalize(item)
 
     def test_boolean_validation(self):
         """Tests objects of type Boolean."""
@@ -213,6 +218,16 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.check_normalization(
             objects.MathLatexString, mappings, invalid_vals)
+
+    def test_skill_id_string_validation(self):
+        """Tests objects of type SkillSelector."""
+        mappings = [
+            ('skill_id', u'skill_id'), (u'abcdef123_', u'abcdef123_'),
+        ]
+        invalid_vals = [3.0, {'a': 1}, [1, 2, 1], None]
+
+        self.check_normalization(
+            objects.SkillSelector, mappings, invalid_vals)
 
     def test_sanitized_url_validation(self):
         mappings = [
@@ -440,6 +455,17 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def _create_fraction_dict(
             self, is_negative, whole_number, numerator, denominator):
+        """Returns the fraction object in the dict format.
+
+        Args:
+            is_negative: bool. Whether the given fraction is negative.
+            whole_number: int. The whole number of the fraction.
+            numerator: int. The numerator part of the fraction.
+            denominator: int. The denominator part of the fraction.
+
+        Returns:
+            dict(str, *). The fraction object.
+        """
         return {
             'isNegative': is_negative,
             'wholeNumber': whole_number,
@@ -458,7 +484,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEqual(count, 38)
+        self.assertEqual(count, 39)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):
@@ -476,12 +502,36 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                 type_error_message = (
                     'Mismatched default value types for object class %s' %
                     member.__name__)
-                if isinstance(member.default_value, basestring):
+                if isinstance(member.default_value, python_utils.BASESTRING):
                     self.assertIsInstance(
-                        member.normalize(member.default_value), basestring,
+                        member.normalize(member.default_value),
+                        python_utils.BASESTRING,
                         msg=type_error_message)
                 else:
                     self.assertIsInstance(
                         member.normalize(member.default_value),
                         type(member.default_value),
                         msg=type_error_message)
+
+
+class NormalizedRectangleTests(test_utils.GenericTestBase):
+
+    def test_normalize(self):
+        normalized_rectangle = objects.NormalizedRectangle2D()
+        self.assertEqual(normalized_rectangle.normalize(
+            [[0, 1], [1, 0]]), [[0.0, 0.0], [0.0, 0.0]])
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Cannot convert to Normalized Rectangle '):
+            normalized_rectangle.normalize('')
+
+
+class CodeStringTests(test_utils.GenericTestBase):
+
+    def test_normalize(self):
+        code_string = objects.CodeString()
+        self.assertEqual(code_string.normalize(code_string.default_value), '')
+
+        with self.assertRaisesRegexp(
+            TypeError, 'Unexpected tab characters in code string: \t'):
+            code_string.normalize('\t')

@@ -174,7 +174,7 @@ states:
           value:
           - "<oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
             \ filepath-with-value=\"&amp;quot;A_height_24_width_24.png&amp;quot;\"\
-            ></oppia-noninteractive-image><p>\_</p>"
+            \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p>"
           - <p>Option B<br></p>
           - <p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math><br></p>
       default_outcome:

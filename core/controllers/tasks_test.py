@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Tests for Tasks Email Handler."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import feedback_services
@@ -22,6 +24,7 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
@@ -48,6 +51,8 @@ class TasksTests(test_utils.GenericTestBase):
         self.user_id_b = self.get_user_id_from_email(self.USER_B_EMAIL)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.set_user_role(
+            self.EDITOR_USERNAME, feconf.ROLE_ID_EXPLORATION_EDITOR)
         self.exploration = self.save_new_default_exploration(
             'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
@@ -74,25 +79,20 @@ class TasksTests(test_utils.GenericTestBase):
             messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages), 2)
 
-            # Telling tasks.py to send email to User 'A'.
-            payload = {
-                'user_id': self.user_id_a}
-            taskqueue_services.enqueue_email_task(
-                feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, payload, 0)
-
-            # Check that there are no feedback emails sent to User 'A'.
-            messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+            # Check that there are no feedback emails sent to Editor.
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             self.assertEqual(len(messages), 0)
 
-            # Send task and subsequent email to User 'A'.
+            # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
             expected_message = (
-                'Hi userA,\n\nNew update to thread "a subject"'
-                ' on Title:\n- userB: user b message\n(You received'
-                ' this message because you are a participant in this thread.)'
-                '\n\nBest wishes,\nThe Oppia team\n\nYou can change your email'
-                ' preferences via the Preferences page.')
+                'Hi editor,\n\nYou\'ve received 2 new messages on your'
+                ' Oppia explorations:\n- Title:\n- some text\n- user b message'
+                '\nYou can view and reply to your messages from your dashboard.'
+                '\n\nThanks, and happy teaching!\n\nBest wishes,\nThe Oppia'
+                ' Team\n\nYou can change your email preferences via the '
+                'Preferences page.')
 
             # Assert that the message is correct.
             self.assertEqual(len(messages), 1)
@@ -107,46 +107,39 @@ class TasksTests(test_utils.GenericTestBase):
             messages = feedback_services.get_messages(thread_id)
             self.assertEqual(len(messages), 3)
 
-            # Telling tasks.py to send email to User 'A'.
-            payload = {
-                'user_id': self.user_id_a}
-            taskqueue_services.enqueue_email_task(
-                feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS, payload, 0)
-
-            # Check that there is one feedback email sent to User 'A'.
-            messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
-            self.assertEqual(len(messages), 1)
-
-            # Send task and subsequent email to User 'A'.
+            # Send task and subsequent email to Editor.
             self.process_and_flush_pending_tasks()
-            messages = self.mail_stub.get_sent_messages(to=self.USER_A_EMAIL)
+            messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
 
             # What is expected in the email body.
             expected_message = (
-                'Hi userA,\n\nNew update to thread "a subject"'
-                ' on Title:\n- userB:' + 'B' * 200 + '...' + ' e\n(You received'
-                ' this message because you are a participant in this thread.)'
-                '\n\nBest wishes,\nThe Oppia team\n\nYou can change your email'
-                ' preferences via the Preferences page.')
+                'Hi editor,\n\nYou\'ve received a new message on your Oppia'
+                ' explorations:\n- Title:\n- ' + 'B' * 200 + '...' + '\nYou can'
+                ' view and reply to your messages from your dashboard.\n\nThank'
+                's, and happy teaching!\n\nBest wishes,\nThe Oppia Team\n\nYou'
+                ' can change your email preferences via the Preferences page.')
 
-            # Check that greater than 200 word message is sent.
+            # Check that greater than 200 word message is sent
+            # and has correct message.
+
             self.assertEqual(len(messages), 2)
+            self.assertEqual(messages[1].body.decode(), expected_message)
 
     def test_email_is_sent_when_suggestion_created(self):
         """Tests SuggestionEmailHandler functionality."""
-        class FakeActivityRights(object):
 
+        class MockActivityRights(python_utils.OBJECT):
             def __init__(
-                    self, exploration_id, owner_ids, editor_ids, translator_ids,
-                    viewer_ids, community_owned=False, cloned_from=None,
-                    status=True, viewable_if_private=False,
+                    self, exploration_id, owner_ids, editor_ids,
+                    voice_artist_ids, viewer_ids, community_owned=False,
+                    cloned_from=None, status=True, viewable_if_private=False,
                     first_published_msec=None):
                 # User B ID hardcoded into owner_ids to get email_manager
                 # to send email to user B to test functionality.
                 self.id = exploration_id
                 self.getLintToShutUp = owner_ids
                 self.editor_ids = editor_ids
-                self.translator_ids = translator_ids
+                self.voice_artist_ids = voice_artist_ids
                 self.viewer_ids = viewer_ids
                 self.community_owned = community_owned
                 self.cloned_from = cloned_from
@@ -156,8 +149,7 @@ class TasksTests(test_utils.GenericTestBase):
                 self.owner_ids = ['121121523518511814218']
 
         email_user_b = self.swap(
-            rights_manager, 'ActivityRights',
-            FakeActivityRights)
+            rights_manager, 'ActivityRights', MockActivityRights)
         with email_user_b, self.can_send_feedback_email_ctx:
             with self.can_send_emails_ctx:
                 change = {

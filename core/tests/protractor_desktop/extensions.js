@@ -30,6 +30,7 @@ var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('rich-text components', function() {
   var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {
@@ -47,7 +48,7 @@ describe('rich-text components', function() {
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
       richTextEditor.appendPlainText(' ');
-      // TODO (Jacob) add test for image RTE component
+      // TODO(Jacob): add test for image RTE component
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
       richTextEditor.addRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
@@ -87,13 +88,13 @@ describe('rich-text components', function() {
     users.logout();
   });
 
-  // TODO (Jacob): Add in a test for the use of rich text inside collapsibles
+  // TODO(Jacob): Add in a test for the use of rich text inside collapsibles
   // and tabs. Previous attempts at such a test intermittently fail with the
   // rich-text checker unable to read the formatted text.
 
   afterEach(function() {
     general.checkForConsoleErrors([
-      // TODO (@pranavsid98) This error is caused by the upgrade from Chrome 60
+      // TODO(pranavsid98): This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
     ]);
@@ -133,7 +134,7 @@ describe('Interactions', function() {
         explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
-        explorationEditorMainTab.addResponse.apply(null, [
+        explorationEditorMainTab.addResponse.apply(explorationEditorMainTab, [
           interactionId, forms.toRichText('yes'), null, false
         ].concat(test.ruleArguments));
 
@@ -188,17 +189,17 @@ describe('Interactions', function() {
     explorationEditorMainTab.setStateName('Graph');
     explorationEditorMainTab.setContent(forms.toRichText(
       'Draw a complete graph with the given vertices.'));
-    var graphDict = {
+    var graphDictForInput = {
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
-    explorationEditorMainTab.setInteraction('GraphInput', graphDict);
-    graphDict = {
+    explorationEditorMainTab.setInteraction('GraphInput', graphDictForInput);
+    var graphDictForResponse = {
       edges: [[0, 1], [1, 2], [0, 2]],
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
     explorationEditorMainTab.addResponse(
       'GraphInput', forms.toRichText('Good job!'), 'MathExp',
-      true, 'IsIsomorphicTo', graphDict);
+      true, 'IsIsomorphicTo', graphDictForResponse);
     var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setFeedback(forms.toRichText(
       'A complete graph is a graph in which each pair of graph vertices is ' +
@@ -244,10 +245,10 @@ describe('Interactions', function() {
     // Play Graph Input interaction.
     explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'Draw a complete graph with the given vertices.'));
-    graphDict = {
+    var graphDictForAnswer = {
       edges: [[1, 2], [1, 0], [0, 2]]
     };
-    explorationPlayerPage.submitAnswer('GraphInput', graphDict);
+    explorationPlayerPage.submitAnswer('GraphInput', graphDictForAnswer);
     explorationPlayerPage.expectLatestFeedbackToMatch(
       forms.toRichText('Good job!'));
     explorationPlayerPage.clickThroughToNextCard();

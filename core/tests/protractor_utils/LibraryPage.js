@@ -20,7 +20,7 @@
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
 
-var LibraryPage = function(){
+var LibraryPage = function() {
   var LIBRARY_URL_SUFFIX = '/library';
   var allCollectionSummaryTile = element.all(
     by.css('.protractor-test-collection-summary-tile'));
@@ -38,6 +38,8 @@ var LibraryPage = function(){
   var categorySelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-category-selector'))
   );
+  var explorationObjective = element(
+    by.css('.protractor-test-exp-summary-tile-objective'));
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
@@ -77,6 +79,19 @@ var LibraryPage = function(){
   this.get = function() {
     browser.get(LIBRARY_URL_SUFFIX);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.addSelectedExplorationToPlaylist = function() {
+    var addToPlaylistButton = element(by.css(
+      '.protractor-test-add-to-playlist-btn')
+    );
+
+    browser.actions().mouseMove(element(by.css(
+      '.protractor-test-exp-summary-tile-title'))).perform();
+
+    waitFor.elementToBeClickable(
+      addToPlaylistButton, 'Add to playlist Icon taking too long to load');
+    addToPlaylistButton.click();
   };
 
   this.selectLanguages = function(languages) {
@@ -162,9 +177,16 @@ var LibraryPage = function(){
     });
   };
 
-  this.clickCreateActivity = function(){
+  this.clickCreateActivity = function() {
     createActivityButton.click();
     waitFor.pageToFullyLoad();
+  };
+
+  this.clickExplorationObjective = function() {
+    waitFor.elementToBeClickable(
+      explorationObjective,
+      'Exploration Objective takes too long to be clickable');
+    explorationObjective.click();
   };
 
   this.findExploration = function(explorationTitle) {

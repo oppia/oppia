@@ -15,12 +15,13 @@
 """Funtions to create, accept, reject, update and perform other operations on
 suggestions.
 """
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import email_manager
-from core.domain import exp_services
+from core.domain import exp_fetchers
 from core.domain import feedback_services
 from core.domain import suggestion_registry
-from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -63,17 +64,27 @@ def create_suggestion(
     status = suggestion_models.STATUS_IN_REVIEW
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-        exploration = exp_services.get_exploration_by_id(target_id)
+        exploration = exp_fetchers.get_exploration_by_id(target_id)
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        score_category = (
+            suggestion_models.SCORE_TYPE_TRANSLATION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+        content_html = exploration.get_content_html(
+            change['state_name'], change['content_id'])
+        if content_html != change['content_html']:
+            raise Exception(
+                'The given content_html does not match the content of the '
+                'exploration.')
     elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
         score_category = (
             suggestion_models.SCORE_TYPE_QUESTION +
             suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
     else:
-        raise Exception('Invalid suggestion type')
+        raise Exception('Invalid suggestion type %s' % suggestion_type)
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
@@ -244,7 +255,7 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
                     suggestion.score_category in scores and
                     scores[suggestion.score_category] >=
                     feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW):
-                if check_if_email_has_been_sent_to_user(
+                if not check_if_email_has_been_sent_to_user(
                         suggestion.author_id, suggestion.score_category):
                     email_manager.send_mail_to_onboard_new_reviewers(
                         suggestion.author_id, suggestion.score_category)
@@ -334,22 +345,44 @@ def get_all_suggestions_that_can_be_reviewed_by_user(user_id):
              score_categories, user_id)])
 
 
-def get_user_contribution_scoring_from_model(userContributionScoringModel):
-    """Returns the UserContributionScoring domain object corresponding to the
-    UserContributionScoringModel
+def get_reviewable_suggestions(user_id, suggestion_type):
+    """Returns a list of suggestions of given suggestion_type which the user
+    can review.
 
     Args:
-        userContributionScoringModel: UserContributionScoringModel. The model
-            instance.
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of the suggestion.
 
     Returns:
-        UserContributionScoring. The corresponding domain object.
+        list(Suggestion). A list of suggestions which the given user is allowed
+            to review.
     """
-    return user_domain.UserContributionScoring(
-        userContributionScoringModel.user_id,
-        userContributionScoringModel.score_category,
-        userContributionScoringModel.score,
-        userContributionScoringModel.has_email_been_sent)
+    return ([
+        get_suggestion_from_model(s) for s in (
+            suggestion_models.GeneralSuggestionModel
+            .get_in_review_suggestions_of_suggestion_type(
+                suggestion_type, user_id))
+    ])
+
+
+def get_submitted_suggestions(user_id, suggestion_type):
+    """Returns a list of suggestions of given suggestion_type which the user
+    has submitted.
+
+    Args:
+        user_id: str. The ID of the user.
+        suggestion_type: str. The type of the suggestion.
+
+    Returns:
+        list(Suggestion). A list of suggestions which the given user has
+        submitted.
+    """
+    return ([
+        get_suggestion_from_model(s) for s in (
+            suggestion_models.GeneralSuggestionModel
+            .get_user_created_suggestions_of_suggestion_type(
+                suggestion_type, user_id))
+    ])
 
 
 def get_all_scores_of_user(user_id):
@@ -382,7 +415,7 @@ def check_user_can_review_in_category(user_id, score_category):
 
     Returns:
         bool. Whether the user can review suggestions under category
-            score_category
+            score_category.
     """
     score = (
         user_models.UserContributionScoringModel.get_score_of_user_for_category(
@@ -471,63 +504,6 @@ def create_new_user_contribution_scoring_model(user_id, score_category, score):
         user_id, score_category, score)
 
 
-def get_next_user_in_rotation(score_category):
-    """Gets the id of the next user in the reviewer rotation for the given
-    score_category. The order is alphabetical, and the next user in the
-    alphabetical order is returned.
-
-    Args:
-        score_category: str. The score category.
-
-    Returns:
-        str|None. The user id of the next user in the reviewer rotation, if
-            there are reviewers for the given category. Else None.
-    """
-    reviewer_ids = get_all_user_ids_who_are_allowed_to_review(score_category)
-    reviewer_ids.sort()
-
-    if len(reviewer_ids) == 0:
-        # No reviewers available for the given category.
-        return None
-
-    position_tracking_model = (
-        suggestion_models.ReviewerRotationTrackingModel.get_by_id(
-            score_category))
-
-    next_user_id = None
-    if position_tracking_model is None:
-        # No rotation has started yet, start rotation at index 0.
-        next_user_id = reviewer_ids[0]
-    else:
-        current_position_user_id = (
-            position_tracking_model.current_position_in_rotation)
-
-        for reviewer_id in reviewer_ids:
-            if reviewer_id > current_position_user_id:
-                next_user_id = reviewer_id
-                break
-
-        if next_user_id is None:
-            # All names are lexicographically smaller than or equal to the
-            # current position username. Hence, Rotating back to the front.
-            next_user_id = reviewer_ids[0]
-
-    update_position_in_rotation(score_category, next_user_id)
-    return next_user_id
-
-
-def update_position_in_rotation(score_category, user_id):
-    """Updates the current position in the rotation to the given user_id.
-
-    Args:
-        score_category: str. The score category.
-        user_id: str. The ID of the user who completed their turn in the
-            rotation for the given category.
-    """
-    suggestion_models.ReviewerRotationTrackingModel.update_position_in_rotation(
-        score_category, user_id)
-
-
 def check_can_resubmit_suggestion(suggestion_id, user_id):
     """Checks whether the given user can resubmit the suggestion.
 
@@ -542,3 +518,52 @@ def check_can_resubmit_suggestion(suggestion_id, user_id):
     suggestion = get_suggestion_by_id(suggestion_id)
 
     return suggestion.author_id == user_id
+
+
+def _get_voiceover_application_class(target_type):
+    """Returns the voiceover application class for a given target type.
+
+    Args:
+        target_type: str. The target type of the voiceover application.
+
+    Returns:
+        class. The voiceover application class for the given target type.
+
+    Raises:
+        Exception: The voiceover application target type is invalid.
+    """
+    target_type_to_classes = (
+        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
+    if target_type in target_type_to_classes:
+        return target_type_to_classes[target_type]
+    else:
+        raise Exception(
+            'Invalid target type for voiceover application: %s' % target_type)
+
+
+def get_voiceover_application(voiceover_application_id):
+    """Returns the BaseVoiceoverApplication object for the give
+    voiceover application model object.
+
+    Args:
+        voiceover_application_id: str. The ID of the voiceover application.
+
+    Returns:
+        BaseVoiceoverApplication. The domain object out of the given voiceover
+        application model object.
+    """
+    voiceover_application_model = (
+        suggestion_models.GeneralVoiceoverApplicationModel.get_by_id(
+            voiceover_application_id))
+    voiceover_application_class = _get_voiceover_application_class(
+        voiceover_application_model.target_type)
+    return voiceover_application_class(
+        voiceover_application_model.id,
+        voiceover_application_model.target_id,
+        voiceover_application_model.status,
+        voiceover_application_model.author_id,
+        voiceover_application_model.final_reviewer_id,
+        voiceover_application_model.language_code,
+        voiceover_application_model.filename,
+        voiceover_application_model.content,
+        voiceover_application_model.rejection_message)

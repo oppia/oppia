@@ -13,13 +13,16 @@
 # limitations under the License.
 
 """Controllers for the story editor."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
+from core.domain import skill_services
 from core.domain import story_domain
+from core.domain import story_fetchers
 from core.domain import story_services
-from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
 import utils
@@ -29,35 +32,16 @@ class StoryEditorPage(base.BaseHandler):
     """The editor page for a single story."""
 
     @acl_decorators.can_edit_story
-    def get(self, topic_id, story_id):
+    def get(self, _):
         """Handles GET requests."""
 
-        if not constants.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        story = story_services.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
-
-        self.values.update({
-            'story_id': story.id,
-            'story_title': story.title,
-            'nav_mode': feconf.NAV_MODE_STORY_EDITOR
-        })
-
-        self.render_template(
-            'pages/story_editor/story_editor.html', redirect_url_on_logout='/')
+        self.render_template('story-editor-page.mainpage.html')
 
 
 class EditableStoryDataHandler(base.BaseHandler):
     """A data handler for stories which support writing."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     def _require_valid_version(self, version_from_payload, story_version):
         """Check that the payload version matches the given story
@@ -74,44 +58,32 @@ class EditableStoryDataHandler(base.BaseHandler):
                 % (story_version, version_from_payload))
 
     @acl_decorators.can_edit_story
-    def get(self, topic_id, story_id):
+    def get(self, story_id):
         """Populates the data on the individual story page."""
-        if not constants.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        topic_id = story.corresponding_topic_id
+        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
+        skill_ids = topic.get_all_skill_ids()
+        skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
+        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
 
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        story = story_services.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
+        for story_reference in topic.canonical_story_references:
+            if story_reference.story_id == story_id:
+                story_is_published = story_reference.story_is_published
 
         self.values.update({
             'story': story.to_dict(),
-            'topic_name': topic.name
+            'topic_name': topic.name,
+            'story_is_published': story_is_published,
+            'skill_summaries': skill_summary_dicts
         })
 
         self.render_json(self.values)
 
     @acl_decorators.can_edit_story
-    def put(self, topic_id, story_id):
+    def put(self, story_id):
         """Updates properties of the given story."""
-        if not constants.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-        story = story_services.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
-            raise self.PageNotFoundException
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
 
         version = self.payload.get('version')
         self._require_valid_version(version, story.version)
@@ -128,7 +100,7 @@ class EditableStoryDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        story_dict = story_services.get_story_by_id(story_id).to_dict()
+        story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
 
         self.values.update({
             'story': story_dict
@@ -137,27 +109,31 @@ class EditableStoryDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_story
-    def delete(self, topic_id, story_id):
+    def delete(self, story_id):
         """Handles Delete requests."""
-        if not constants.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
-        story_domain.Story.require_valid_story_id(story_id)
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        story = story_services.get_story_by_id(story_id, strict=False)
-        if story is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
-
         story_services.delete_story(self.user_id, story_id)
+        self.render_json(self.values)
+
+
+class StoryPublishHandler(base.BaseHandler):
+    """A data handler for publishing and unpublishing stories."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_story
+    def put(self, story_id):
+        """Published/unpublished given story."""
+        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        topic_id = story.corresponding_topic_id
+
+        new_story_status_is_public = self.payload.get(
+            'new_story_status_is_public')
+        if not isinstance(new_story_status_is_public, bool):
+            raise self.InvalidInputException
+
+        if new_story_status_is_public:
+            topic_services.publish_story(topic_id, story_id, self.user_id)
+        else:
+            topic_services.unpublish_story(topic_id, story_id, self.user_id)
 
         self.render_json(self.values)

@@ -14,24 +14,20 @@
 
 """Installation script for Oppia third-party libraries."""
 
-import StringIO
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import argparse
 import contextlib
 import json
 import os
-import shutil
 import sys
 import tarfile
-import urllib
-import urllib2
 import zipfile
 
-import common  # pylint: disable=relative-import
+import python_utils
 
-# These two lines prevent a "IOError: [Errno socket error]
-# [Errno -2] Name or service not known" error
-# in urllib.urlretrieve, if the user is behind a proxy.
-if 'VAGRANT' in os.environ:
-    os.environ['http_proxy'] = ''
+from . import common
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -75,6 +71,10 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     }
 }
 
+_PARSER = argparse.ArgumentParser(description="""
+Installation script for Oppia third-party libraries.
+""")
+
 
 def download_files(source_url_root, target_dir, source_filenames):
     """Downloads a group of files and saves them to a given directory.
@@ -93,12 +93,13 @@ def download_files(source_url_root, target_dir, source_filenames):
     common.ensure_directory_exists(target_dir)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
-            print 'Downloading file %s to %s ...' % (filename, target_dir)
-            urllib.urlretrieve(
+            python_utils.PRINT(
+                'Downloading file %s to %s ...' % (filename, target_dir))
+            python_utils.url_retrieve(
                 '%s/%s' % (source_url_root, filename),
                 filename=os.path.join(target_dir, filename))
 
-            print 'Download of %s succeeded.' % filename
+            python_utils.PRINT('Download of %s succeeded.' % filename)
 
 
 def download_and_unzip_files(
@@ -119,11 +120,11 @@ def download_and_unzip_files(
         in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print 'Downloading and unzipping file %s to %s ...' % (
-            zip_root_name, target_parent_dir)
+        python_utils.PRINT('Downloading and unzipping file %s to %s ...' % (
+            zip_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
@@ -134,11 +135,12 @@ def download_and_unzip_files(
                 os.remove(TMP_UNZIP_PATH)
 
             # Some downloads (like jqueryui-themes) may require a user-agent.
-            req = urllib2.Request(source_url)
+            req = python_utils.url_request(source_url, None, {})
             req.add_header('User-agent', 'python')
             # This is needed to get a seekable filestream that can be used
             # by zipfile.ZipFile.
-            file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
+            file_stream = python_utils.string_io(
+                buffer_value=python_utils.url_open(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
                 zfile.extractall(path=target_parent_dir)
 
@@ -147,7 +149,7 @@ def download_and_unzip_files(
             os.path.join(target_parent_dir, zip_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
-        print 'Download of %s succeeded.' % zip_root_name
+        python_utils.PRINT('Download of %s succeeded.' % zip_root_name)
 
 
 def download_and_untar_files(
@@ -168,11 +170,11 @@ def download_and_untar_files(
         in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print 'Downloading and untarring file %s to %s ...' % (
-            tar_root_name, target_parent_dir)
+        python_utils.PRINT('Downloading and untarring file %s to %s ...' % (
+            tar_root_name, target_parent_dir))
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        python_utils.url_retrieve(source_url, filename=TMP_UNZIP_PATH)
         with contextlib.closing(tarfile.open(
             name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
@@ -183,12 +185,12 @@ def download_and_untar_files(
             os.path.join(target_parent_dir, tar_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
-        print 'Download of %s succeeded.' % tar_root_name
+        python_utils.PRINT('Download of %s succeeded.' % tar_root_name)
 
 
 def get_file_contents(filepath, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
-    with open(filepath, mode) as f:
+    with python_utils.open_file(filepath, mode) as f:
         return f.read().decode('utf-8')
 
 
@@ -211,7 +213,7 @@ def test_manifest_syntax(dependency_type, dependency_dict):
       dependency_type: str. Dependency download format.
       dependency_dict: dict. manifest.json dependency dict.
     """
-    keys = dependency_dict.keys()
+    keys = list(dependency_dict.keys())
     mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['mandatory_keys']
     # Optional keys requires exactly one member of the pair
@@ -220,24 +222,24 @@ def test_manifest_syntax(dependency_type, dependency_dict):
         dependency_type]['optional_key_pairs']
     for key in mandatory_keys:
         if key not in keys:
-            print '------------------------------------------'
-            print 'There is syntax error in this dependency'
-            print dependency_dict
-            print 'This key is missing or misspelled: "%s".' % key
-            print 'Exiting'
+            python_utils.PRINT('------------------------------------------')
+            python_utils.PRINT('There is syntax error in this dependency')
+            python_utils.PRINT(dependency_dict)
+            python_utils.PRINT('This key is missing or misspelled: "%s".' % key)
+            python_utils.PRINT('Exiting')
             sys.exit(1)
     if optional_key_pairs:
         for optional_keys in optional_key_pairs:
             optional_keys_in_dict = [
                 key for key in optional_keys if key in keys]
             if len(optional_keys_in_dict) != 1:
-                print '------------------------------------------'
-                print 'There is syntax error in this dependency'
-                print dependency_dict
-                print (
+                python_utils.PRINT('------------------------------------------')
+                python_utils.PRINT('There is syntax error in this dependency')
+                python_utils.PRINT(dependency_dict)
+                python_utils.PRINT(
                     'Only one of these keys pair must be used: "%s".'
-                    % str(optional_keys))
-                print 'Exiting'
+                    % ', '.join(optional_keys))
+                python_utils.PRINT('Exiting')
                 sys.exit(1)
 
     # Checks the validity of the URL corresponding to the file format.
@@ -250,12 +252,12 @@ def test_manifest_syntax(dependency_type, dependency_dict):
             is_zip_file_format and not dependency_url.endswith('.zip') or
             dependency_url.endswith('.tar.gz') and not is_tar_file_format or
             is_tar_file_format and not dependency_url.endswith('.tar.gz')):
-        print '------------------------------------------'
-        print 'There is syntax error in this dependency'
-        print dependency_dict
-        print 'This url  %s is invalid for %s file format.' % (
-            dependency_url, dependency_type)
-        print 'Exiting.'
+        python_utils.PRINT('------------------------------------------')
+        python_utils.PRINT('There is syntax error in this dependency')
+        python_utils.PRINT(dependency_dict)
+        python_utils.PRINT('This url %s is invalid for %s file format.' % (
+            dependency_url, dependency_type))
+        python_utils.PRINT('Exiting.')
         sys.exit(1)
 
 
@@ -324,27 +326,13 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-MATHJAX_REV = '2.6.0'
-MATHJAX_ROOT_NAME = 'MathJax-%s' % MATHJAX_REV
-MATHJAX_TARGET_ROOT_NAME = MATHJAX_ROOT_NAME
-MATHJAX_DIR_PREFIX = os.path.join(
-    THIRD_PARTY_STATIC_DIR, MATHJAX_TARGET_ROOT_NAME)
-MATHJAX_SUBDIRS_TO_REMOVE = [
-    'unpacked', os.path.join('fonts', 'HTML-CSS', 'TeX', 'png')]
-
-
-def _install_third_party_libs():
+def main(args=None):
+    """Installs all the third party libraries."""
+    unused_parsed_args = _PARSER.parse_args(args=args)
     download_manifest_files(MANIFEST_FILE_PATH)
 
-    # MathJax is too big. Remove many unneeded files by following these
-    # instructions:
-    # https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation pylint: disable=line-too-long
-    for subdir in MATHJAX_SUBDIRS_TO_REMOVE:
-        full_dir = os.path.join(MATHJAX_DIR_PREFIX, subdir)
-        if os.path.isdir(full_dir):
-            print 'Removing unnecessary MathJax directory \'%s\'' % subdir
-            shutil.rmtree(full_dir)
 
-
-if __name__ == '__main__':
-    _install_third_party_libs()
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when install_third_party.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
+    main()

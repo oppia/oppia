@@ -1,17 +1,29 @@
 {
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module"
+  },
   "extends": [
-    "eslint:recommended",
+    "eslint:recommended"
   ],
   "plugins": [
     "angular",
-    "html"
+    "html",
+    "@typescript-eslint"
   ],
+  "overrides": [{
+    // We exclude test files from dependency injection format checks because
+    // they are never minified.
+    "files": ["*Spec.js", "*Spec.ts"],
+    "rules": {
+      "angular/di": "off"
+    }
+  }],
   "rules": {
     "angular/di": [
       "error",
       "array",
-      ],
-    "angular/di-order": "error",
+    ],
     "angular/di-unused": "error",
     "angular/directive-restrict": [
       "error",
@@ -64,6 +76,18 @@
       "error",
       "always"
     ],
+    "no-restricted-globals": [
+      "error", "addEventListener", "blur", "close", "closed", "confirm",
+      "defaultStatus", "event", "external", "defaultstatus", "find", "focus",
+      "frameElement", "frames", "history", "innerHeight", "innerWidth",
+      "length", "location", "locationbar", "menubar", "moveBy", "moveTo",
+      "name", "onblur", "onerror", "onfocus", "onload", "onresize", "onunload",
+      "open", "opener", "opera", "outerHeight", "outerWidth", "pageXOffset",
+      "pageYOffset", "parent", "print", "removeEventListener", "resizeBy",
+      "resizeTo", "screen", "screenLeft", "screenTop", "screenX", "screenY",
+      "scroll", "scrollbars", "scrollBy", "scrollTo", "scrollX", "scrollY",
+      "self", "sessionStorage", "status", "statusbar", "stop",
+      "toolbar", "top"],
     "func-style": [
       "error",
       "expression"
@@ -95,8 +119,10 @@
     ],
     "max-len": [
       "error",
-      "code": 80,
-      "ignoreUrls": true
+      {
+        "code": 80,
+        "ignoreUrls": true
+      }
     ],
     "no-compare-neg": "off",
     "no-console": [
@@ -123,6 +149,7 @@
     "no-multi-str": [
       "error"
     ],
+    "no-prototype-builtins": "off",
     "no-redeclare": [
       "off"
     ],
@@ -163,7 +190,10 @@
         "keywords": true
       }
     ],
-    "semi": [
+    // The following must be off so that we can enable
+    // "@typescript-eslint/semi", which checks semicolons in TS files.
+    "semi": "off",
+    "space-before-blocks": [
       "error",
       "always"
     ],
@@ -189,6 +219,14 @@
         "nonwords": false,
       }
     ],
+    "switch-colon-spacing": [
+      "error",
+      {
+        "after": true,
+        "before": false
+      }
+    ],
+    "@typescript-eslint/semi": ["error"],
     "wrap-iife": [
       "error",
       "any"

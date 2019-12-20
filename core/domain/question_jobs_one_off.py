@@ -15,11 +15,12 @@
 # limitations under the License.
 
 """One-off jobs for questions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
 
-from constants import constants
 from core import jobs
 from core.domain import question_domain
 from core.domain import question_services
@@ -48,9 +49,6 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not constants.ENABLE_NEW_STRUCTURES:
-            return
-
         if item.deleted:
             yield (QuestionMigrationOneOffJob._DELETED_KEY, 1)
             return
@@ -69,17 +67,17 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         # Write the new question into the datastore if it's different from
         # the old version.
-        if (item.question_state_schema_version <=
-                feconf.CURRENT_STATES_SCHEMA_VERSION):
+        if (item.question_state_data_schema_version <=
+                feconf.CURRENT_STATE_SCHEMA_VERSION):
             commit_cmds = [question_domain.QuestionChange({
                 'cmd': question_domain.CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION, # pylint: disable=line-too-long
-                'from_version': item.question_state_schema_version,
-                'to_version': feconf.CURRENT_STATES_SCHEMA_VERSION
+                'from_version': item.question_state_data_schema_version,
+                'to_version': feconf.CURRENT_STATE_SCHEMA_VERSION
             })]
             question_services.update_question(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update question state schema version to %d.' % (
-                    feconf.CURRENT_STATES_SCHEMA_VERSION))
+                    feconf.CURRENT_STATE_SCHEMA_VERSION))
             yield (QuestionMigrationOneOffJob._MIGRATED_KEY, 1)
 
     @staticmethod

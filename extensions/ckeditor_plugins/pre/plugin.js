@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Adds pre plugin to CKEditor RTE.
+/**
+ * @fileoverview Adds pre plugin to CKEditor RTE.
+ */
+
 CKEDITOR.plugins.add('pre', {
   icons: 'pre',
 
   init: function(editor) {
     var tag = 'pre';
-    var style = new CKEDITOR.style({element: 'pre'});
+    var style = new CKEDITOR.style({element: 'pre'}, null);
 
-    editor.addCommand('pre', new CKEDITOR.styleCommand(style));
+    editor.addCommand(
+      'pre', new CKEDITOR.styleCommand(style));
 
     // This part will provide toolbar button highlighting in editor.
     editor.attachStyleStateChange(style, function(state) {

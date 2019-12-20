@@ -85,7 +85,7 @@ var GraphEditor = function(graphInputContainer) {
         by.css('.protractor-test-Delete-button'));
       deleteButton.click();
       // Sample graph comes with 3 vertices.
-      for (i = 2; i >= 0; i--) {
+      for (var i = 2; i >= 0; i--) {
         vertexElement(i).click();
       }
     },
@@ -125,10 +125,10 @@ var ListEditor = function(elem) {
   // by calling setValue() on it). Clients should ensure the given objectType
   // corresponds to the type of elements in the list.
   // If objectType is not specified, this function returns nothing.
-  var addItem = function(objectType) {
+  var addItem = function(objectType = null) {
     var listLength = _getLength();
     elem.element(by.css('.protractor-test-add-list-entry')).click();
-    if (objectType) {
+    if (objectType !== null) {
       return getEditor(objectType)(
         elem.element(
           by.repeater('item in localValue track by $index').row(listLength)));
@@ -157,8 +157,8 @@ var ListEditor = function(elem) {
           for (var i = startingLength; i < desiredLength; i++) {
             addItem();
           }
-          for (var i = startingLength - 1; i >= desiredLength; i--) {
-            deleteItem(i);
+          for (var j = startingLength - 1; j >= desiredLength; j--) {
+            deleteItem(j);
           }
         }
       );
@@ -549,7 +549,7 @@ var toRichText = function(text) {
  * CodeMirror loads a part of the text at once, and scrolling in the element
  * loads more divs.
  */
-var CodeMirrorChecker = function(elem) {
+var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
   // The number of pixels to scroll between reading different sections of
   // CodeMirror's text. 400 pixels is about 15 lines, which will work if
   // codemirror's buffer (viewportMargin) is set to at least 10 (the default).
@@ -560,6 +560,8 @@ var CodeMirrorChecker = function(elem) {
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
    * codemirror should scroll to,
+   * codeMirrorPaneToScroll specifies the CodeMirror's left or right pane
+   * which is to be scrolled.
    * compareDict is an object whose keys are line numbers and whose values are
    * objects corresponding to that line with the following key-value pairs:
    *  - 'text': the exact string of text expected on that line
@@ -568,12 +570,12 @@ var CodeMirrorChecker = function(elem) {
    */
   var _compareTextAndHighlightingFromLine = function(
       currentLineNumber, scrollTo, compareDict) {
-    // This is used to scroll the text in codemirror to a point scrollTo pixels
-    // from the top of the text or the bottom of the text if scrollTo is too
-    // large.
+    // This is used to match and scroll the text in codemirror to a point
+    // scrollTo pixels from the top of the text or the bottom of the text
+    // if scrollTo is too large.
     browser.executeScript(
-      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
-      ');');
+      '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
+      '().scrollTop(' + String(scrollTo) + ');');
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
         .then(function(lineNumber) {
@@ -618,6 +620,8 @@ var CodeMirrorChecker = function(elem) {
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
    * codemirror should scroll to,
+   * codeMirrorPaneToScroll specifies the CodeMirror's left or right pane
+   * which is to be scrolled.
    * compareDict is an object whose keys are line numbers and whose values are
    * objects corresponding to that line with the following key-value pairs:
    *  - 'text': the exact string of text expected on that line
@@ -625,14 +629,22 @@ var CodeMirrorChecker = function(elem) {
    */
   var _compareTextFromLine = function(
       currentLineNumber, scrollTo, compareDict) {
+    // This is used to match and scroll the text in codemirror to a point
+    // scrollTo pixels from the top of the text or the bottom of the text
+    // if scrollTo is too large.
     browser.executeScript(
-      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
-      ');');
+      '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
+      '().scrollTop(' + String(scrollTo) + ');');
     elem.getText().then(function(text) {
       // The 'text' arg is a string 2n lines long representing n lines of text
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
+      // We have an empty line in the codemirror panes which is retrived as NULL
+      // in codemirror5's getText() method. Therefore, we need to add an empty
+      // string at the end of the textArray to match with compareDict.
+
+      textArray[textArray.length] = '';
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i];
         var lineText = textArray[i + 1];
@@ -649,10 +661,11 @@ var CodeMirrorChecker = function(elem) {
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
           compareDict);
       } else {
-        for (var lineNumber in compareDict) {
-          if (compareDict[lineNumber].checked !== true) {
+        for (var dictLineNumber in compareDict) {
+          if (compareDict[dictLineNumber].checked !== true) {
             throw Error('Expected line ' + lineNumber + ': \'' +
-              compareDict[lineNumber].text + '\' to be found in CodeMirror');
+              compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
+            );
           }
         }
       }

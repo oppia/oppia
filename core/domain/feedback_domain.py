@@ -13,16 +13,19 @@
 # limitations under the License.
 
 """Domain objects for feedback models."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import user_services
+import python_utils
 import utils
 
 
-class FeedbackThread(object):
+class FeedbackThread(python_utils.OBJECT):
     """Domain object for a feedback thread.
 
     Attributes:
-        thread_id: str. The feedback thread ID.
+        id: str. The feedback thread ID.
         entity_type: str. The type of entity the feedback thread is linked to.
         entity_id: str. The id of the entity.
         state_name: str. The name of the state associated with
@@ -34,16 +37,24 @@ class FeedbackThread(object):
         summary: str. A summary of the feedback thread.
         has_suggestion: bool. Whether the feedback thread includes a
             suggestion.
+        message_count: int. The number of messages posted onto the thread.
         created_on: datetime.datetime. The time when the feedback thread was
             created.
         last_updated: datetime.datetime. The time when the feedback thread
             was last updated.
+        last_nonempty_message_text: str|None. Cached text of the last message in
+            the thread with non-empty content, or None if there is no such
+            message.
+        last_nonempty_message_author_id: str|None. Cached ID for the user of the
+            last message in the thread with non-empty content, or None if the
+            message was made anonymously or if there is no such message.
     """
 
     def __init__(
             self, thread_id, entity_type, entity_id, state_name,
             original_author_id, status, subject, summary, has_suggestion,
-            message_count, created_on, last_updated):
+            message_count, created_on, last_updated, last_nonempty_message_text,
+            last_nonempty_message_author_id):
         """Initializes a FeedbackThread object."""
 
         self.id = thread_id
@@ -59,6 +70,8 @@ class FeedbackThread(object):
 
         self.created_on = created_on
         self.last_updated = last_updated
+        self.last_nonempty_message_text = last_nonempty_message_text
+        self.last_nonempty_message_author_id = last_nonempty_message_author_id
 
     def to_dict(self):
         """Returns a dict representation of this FeedbackThread object.
@@ -68,17 +81,22 @@ class FeedbackThread(object):
         """
         return {
             'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'original_author_username': user_services.get_username(
-                self.original_author_id) if self.original_author_id else None,
+            'original_author_username': (
+                user_services.get_username(self.original_author_id)
+                if self.original_author_id else None),
             'state_name': self.state_name,
             'status': self.status,
             'subject': self.subject,
             'summary': self.summary,
             'thread_id': self.id,
-            'message_count': self.message_count
+            'message_count': self.message_count,
+            'last_nonempty_message_text': self.last_nonempty_message_text,
+            'last_nonempty_message_author': (
+                user_services.get_username(self.last_nonempty_message_author_id)
+                if self.last_nonempty_message_author_id else None),
         }
 
-    def get_full_message_id(self, message_id):
+    def _get_full_message_id(self, message_id):
         """Returns the full id of the message.
 
         Args:
@@ -88,7 +106,7 @@ class FeedbackThread(object):
         Returns:
             str. The full id corresponding to the given message id.
         """
-        return '.'.join([self.id, str(message_id)])
+        return '.'.join([self.id, python_utils.UNICODE(message_id)])
 
     def get_last_two_message_ids(self):
         """Returns the full message ids of the last two messages of the thread.
@@ -99,18 +117,14 @@ class FeedbackThread(object):
             list(str|None). The ids of the last two messages of the thread. If
                 the message does not exist, None is returned.
         """
-        message_ids = []
-        last_message_id = self.message_count - 1
-        message_ids.append(self.get_full_message_id(last_message_id))
-        if self.message_count > 1:
-            second_last_message_id = self.message_count - 2
-            message_ids.append(self.get_full_message_id(second_last_message_id))
-        else:
-            message_ids.append(None)
-        return message_ids
+        return [
+            self._get_full_message_id(i) if i >= 0 else None
+            for i in python_utils.RANGE(
+                self.message_count - 1, self.message_count - 3, -1)
+        ]
 
 
-class FeedbackMessage(object):
+class FeedbackMessage(python_utils.OBJECT):
     """Domain object for a feedback message.
 
     Attributes:
@@ -184,7 +198,7 @@ class FeedbackMessage(object):
         }
 
 
-class FeedbackAnalytics(object):
+class FeedbackAnalytics(python_utils.OBJECT):
     """Domain object representing feedback analytics for a specific entity.
 
     Attributes:
@@ -218,7 +232,7 @@ class FeedbackAnalytics(object):
         }
 
 
-class FeedbackMessageReference(object):
+class FeedbackMessageReference(python_utils.OBJECT):
     """Domain object for feedback message references.
 
     Attributes:

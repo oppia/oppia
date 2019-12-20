@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for user query services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import user_query_services
 from core.platform import models
@@ -23,7 +25,7 @@ from core.tests import test_utils
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
 
-class UserQueryServicesTest(test_utils.GenericTestBase):
+class UserQueryServicesTests(test_utils.GenericTestBase):
     def test_save_new_query_model(self):
         submitter_id = 'submitter'
         inactive_in_last_n_days = 10

@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.activity_jobs_one_off."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.domain import activity_jobs_one_off
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -25,14 +29,26 @@ from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
+import python_utils
 
 gae_search_services = models.Registry.import_search_services()
 
+(
+    collection_models, config_models,
+    exp_models, question_models,
+    skill_models, story_models,
+    topic_models) = (
+        models.Registry.import_models([
+            models.NAMES.collection, models.NAMES.config,
+            models.NAMES.exploration, models.NAMES.question,
+            models.NAMES.skill, models.NAMES.story,
+            models.NAMES.topic]))
 
-class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
+
+class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(OneOffReindexActivitiesJobTest, self).setUp()
+        super(OneOffReindexActivitiesJobTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -42,7 +58,7 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i
-        ) for i in xrange(3)]
+        ) for i in python_utils.RANGE(3)]
 
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
@@ -52,7 +68,7 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i
-        ) for i in xrange(3, 6)]
+        ) for i in python_utils.RANGE(3, 6)]
 
         for collection in collections:
             collection_services.save_new_collection(self.owner_id, collection)
@@ -71,13 +87,14 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
 
         indexed_docs = []
 
-        def add_docs_mock(docs, index):
+        def mock_add_documents_to_index(docs, index):
             indexed_docs.extend(docs)
             self.assertIn(index, (search_services.SEARCH_INDEX_EXPLORATIONS,
                                   search_services.SEARCH_INDEX_COLLECTIONS))
 
         add_docs_swap = self.swap(
-            gae_search_services, 'add_documents_to_index', add_docs_mock)
+            gae_search_services, 'add_documents_to_index',
+            mock_add_documents_to_index)
 
         with add_docs_swap:
             self.process_and_flush_pending_tasks()
@@ -86,7 +103,11 @@ class OneOffReindexActivitiesJobTest(test_utils.GenericTestBase):
         titles = [doc['title'] for doc in indexed_docs]
         categories = [doc['category'] for doc in indexed_docs]
 
-        for index in xrange(5):
+        for index in python_utils.RANGE(5):
             self.assertIn('%s' % index, ids)
             self.assertIn('title %d' % index, titles)
             self.assertIn('category%d' % index, categories)
+
+        self.assertIsNone(
+            activity_jobs_one_off.IndexAllActivitiesJobManager.reduce(
+                'key', 'value'))

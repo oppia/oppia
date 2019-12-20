@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """HTML validation service."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
@@ -25,6 +27,7 @@ from core.domain import fs_services
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
+import python_utils
 
 gae_image_services = models.Registry.import_gae_image_services()
 
@@ -39,7 +42,7 @@ def escape_html(unescaped_html_data):
         str. Escaped HTML string.
     """
     # Replace list to escape html strings.
-    REPLACE_LIST_FOR_ESCAPING = [
+    replace_list_for_escaping = [
         ('&', '&amp;'),
         ('"', '&quot;'),
         ('\'', '&#39;'),
@@ -47,7 +50,7 @@ def escape_html(unescaped_html_data):
         ('>', '&gt;')
     ]
     escaped_html_data = unescaped_html_data
-    for replace_tuple in REPLACE_LIST_FOR_ESCAPING:
+    for replace_tuple in replace_list_for_escaping:
         escaped_html_data = escaped_html_data.replace(
             replace_tuple[0], replace_tuple[1])
 
@@ -64,7 +67,7 @@ def unescape_html(escaped_html_data):
         str. Unescaped HTML string.
     """
     # Replace list to unescape html strings.
-    REPLACE_LIST_FOR_UNESCAPING = [
+    replace_list_for_unescaping = [
         ('&quot;', '"'),
         ('&#39;', '\''),
         ('&lt;', '<'),
@@ -72,7 +75,7 @@ def unescape_html(escaped_html_data):
         ('&amp;', '&')
     ]
     unescaped_html_data = escaped_html_data
-    for replace_tuple in REPLACE_LIST_FOR_UNESCAPING:
+    for replace_tuple in replace_list_for_unescaping:
         unescaped_html_data = unescaped_html_data.replace(
             replace_tuple[0], replace_tuple[1])
 
@@ -250,7 +253,7 @@ def convert_to_textangular(html_data):
     # and not wrapped in any tag. This part recombines the continuous
     # parts not wrapped in any tag.
     soup = bs4.BeautifulSoup(
-        unicode(soup).encode(encoding='utf-8'), 'html.parser')
+        python_utils.convert_to_bytes(soup), 'html.parser')
 
     # Ensure that blockquote tag is wrapped in an allowed parent.
     for blockquote in soup.findAll(name='blockquote'):
@@ -346,7 +349,7 @@ def convert_to_textangular(html_data):
     # html strings they are stored as <br>. Since both of these
     # should match and <br> and <br/> have same working,
     # so the tag has to be replaced in this way.
-    return unicode(soup).replace('<br/>', '<br>')
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
 def convert_to_ckeditor(html_data):
@@ -387,11 +390,11 @@ def convert_to_ckeditor(html_data):
         while li.parent.name in ['li', 'p']:
             li.parent.unwrap()
 
-    LIST_TAGS = ['ol', 'ul']
+    list_tags = ['ol', 'ul']
 
     # Ensure li is wrapped in ol/ul.
     for li in soup.findAll(name='li'):
-        if li.parent.name not in LIST_TAGS:
+        if li.parent.name not in list_tags:
             new_parent = soup.new_tag('ul')
             next_sib = list(li.next_siblings)
             li.wrap(new_parent)
@@ -402,10 +405,25 @@ def convert_to_ckeditor(html_data):
                     break
 
     # Ensure that the children of ol/ul are li/pre.
-    for tag_name in LIST_TAGS:
+    for tag_name in list_tags:
         for tag in soup.findAll(name=tag_name):
             for child in tag.children:
-                if child.name not in ['li', 'pre', 'ol', 'ul']:
+                # The html formed after inserting a list element is:
+                # <ul>
+                #  <li> Item1 </li>
+                #  <li> Item2 </li>
+                # </ul>
+                # The new line is being treated as a tag child by beautifulSoup
+                # and so there is an extra li being produced which is not
+                # required. So, we remove the extra new lines here since
+                # they are added due to html being stored as a string.
+                # CKEditor adds margin between list elements and the \n
+                # character is of no significance therefore. Further if
+                # user enters any newline it will be stored as <li>&nbsp;</li>
+                # so removing the \n will not affect these lines.
+                if child == '\n':
+                    child.replaceWith('')
+                elif child.name not in ['li', 'pre', 'ol', 'ul']:
                     new_parent = soup.new_tag('li')
                     next_sib = list(child.next_siblings)
                     child.wrap(new_parent)
@@ -415,13 +433,10 @@ def convert_to_ckeditor(html_data):
                         else:
                             break
 
-    # This block wraps p tag in li tag if the parent of p is ol/ul tag. Also,
-    # if the parent of p tag is pre tag, it unwraps the p tag.
+    # This block unwraps the p tag, if the parent of p tag is pre tag.
     for p in soup.findAll(name='p'):
         if p.parent.name == 'pre':
             p.unwrap()
-        elif p.parent.name in LIST_TAGS:
-            p.wrap(soup.new_tag('li'))
 
     # This block ensures that ol/ul tag is not a direct child of another ul/ol
     # tag. The conversion works as follows:
@@ -430,9 +445,9 @@ def convert_to_ckeditor(html_data):
     # i.e. if any ol/ul has parent as ol/ul and a previous sibling as li
     # it is wrapped in its previous sibling. If there is no previous sibling,
     # the tag is unwrapped.
-    for tag_name in LIST_TAGS:
+    for tag_name in list_tags:
         for tag in soup.findAll(name=tag_name):
-            if tag.parent.name in LIST_TAGS:
+            if tag.parent.name in list_tags:
                 prev_sib = tag.previous_sibling
                 if prev_sib and prev_sib.name == 'li':
                     prev_sib.append(tag)
@@ -479,7 +494,33 @@ def convert_to_ckeditor(html_data):
             br.insert_after('\n')
             br.unwrap()
 
-    return unicode(soup).replace('<br/>', '<br>')
+    # Ensure that any html string is always wrapped in a tag.
+    # We are doing this since in CKEditor every string should
+    # be wrapped in some tag. CKEditor will not produce any
+    # error if we have a string without any tag but it cannot
+    # be generated directly by typing some content in rte.
+    # (It may be generated by copy paste).
+    for content in soup.contents:
+        if not content.name:
+            # When user enters a string and then presses enter, a new paragraph
+            # is created by ckeditor by default. This complete html data is
+            # stored as:
+            # <p>Para1</p>
+            # <p>Para2</p>
+            # The extra newline here is just in the storage representation but
+            # is not useful as ckeditor adds a margin between two paragraphs
+            # by default. On the other hand if user themselves enters a new line
+            # by pressing enter, it will be stored as <p>&nbsp;</p> instead of
+            # just a \n character. So, removing \n will not remove the new lines
+            # inserted by user. Also we are not replacing \n with <p>&nbsp;</p>
+            # since this is not entered by user. It is just due to the html
+            # being stored as a string.
+            if content == '\n':
+                content.replaceWith('')
+            else:
+                content.wrap(soup.new_tag('p'))
+
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
 def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
@@ -521,7 +562,7 @@ def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
         tabs['tab_contents-with-value'] = escape_html(
             json.dumps(tab_content_list))
 
-    return unicode(soup)
+    return python_utils.UNICODE(soup)
 
 
 def validate_rte_format(html_list, rte_format, run_migration=False):
@@ -561,7 +602,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
         soup = bs4.BeautifulSoup(
             soup_data.replace('<br>', '<br/>'), 'html.parser')
 
-        is_invalid = _validate_soup_for_rte(soup, rte_format, err_dict)
+        is_invalid = validate_soup_for_rte(soup, rte_format, err_dict)
 
         if is_invalid:
             err_dict['strings'].append(html_data)
@@ -576,7 +617,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
                     unescape_html(collapsible['content-with-value']))
                 soup_for_collapsible = bs4.BeautifulSoup(
                     content_html.replace('<br>', '<br/>'), 'html.parser')
-                is_invalid = _validate_soup_for_rte(
+                is_invalid = validate_soup_for_rte(
                     soup_for_collapsible, rte_format, err_dict)
             if is_invalid:
                 err_dict['strings'].append(html_data)
@@ -588,7 +629,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
                 content_html = tab_content['content']
                 soup_for_tabs = bs4.BeautifulSoup(
                     content_html.replace('<br>', '<br/>'), 'html.parser')
-                is_invalid = _validate_soup_for_rte(
+                is_invalid = validate_soup_for_rte(
                     soup_for_tabs, rte_format, err_dict)
                 if is_invalid:
                     err_dict['strings'].append(html_data)
@@ -599,7 +640,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
     return err_dict
 
 
-def _validate_soup_for_rte(soup, rte_format, err_dict):
+def validate_soup_for_rte(soup, rte_format, err_dict):
     """Validate content in given soup for given RTE format.
 
     Args:
@@ -612,12 +653,12 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
         bool. Boolean indicating whether a html string is valid for given RTE.
     """
     if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
-        RTE_TYPE = 'RTE_TYPE_TEXTANGULAR'
+        rte_type = 'RTE_TYPE_TEXTANGULAR'
     else:
-        RTE_TYPE = 'RTE_TYPE_CKEDITOR'
+        rte_type = 'RTE_TYPE_CKEDITOR'
     allowed_parent_list = feconf.RTE_CONTENT_SPEC[
-        RTE_TYPE]['ALLOWED_PARENT_LIST']
-    allowed_tag_list = feconf.RTE_CONTENT_SPEC[RTE_TYPE]['ALLOWED_TAG_LIST']
+        rte_type]['ALLOWED_PARENT_LIST']
+    allowed_tag_list = feconf.RTE_CONTENT_SPEC[rte_type]['ALLOWED_TAG_LIST']
 
     is_invalid = False
 
@@ -652,7 +693,7 @@ def add_caption_attr_to_image(html_string):
     """Adds caption attribute to all oppia-noninteractive-image tags.
 
     Args:
-        html_string. str: HTML string in which the caption attribute is to be
+        html_string: str. HTML string in which the caption attribute is to be
             added.
 
     Returns:
@@ -667,7 +708,7 @@ def add_caption_attr_to_image(html_string):
         if 'caption-with-value' not in attrs:
             image['caption-with-value'] = escape_html(json.dumps(''))
 
-    return unicode(soup)
+    return python_utils.UNICODE(soup)
 
 
 def validate_customization_args(html_list):
@@ -684,7 +725,7 @@ def validate_customization_args(html_list):
     # Dictionary to hold html strings in which customization arguments
     # are invalid.
     err_dict = {}
-    RICH_TEXT_COMPONENT_TAG_NAMES = (
+    rich_text_component_tag_names = (
         INLINE_COMPONENT_TAG_NAMES + BLOCK_COMPONENT_TAG_NAMES)
 
     tags_to_original_html_strings = {}
@@ -692,13 +733,13 @@ def validate_customization_args(html_list):
         soup = bs4.BeautifulSoup(
             html_string.encode(encoding='utf-8'), 'html.parser')
 
-        for tag_name in RICH_TEXT_COMPONENT_TAG_NAMES:
+        for tag_name in rich_text_component_tag_names:
             for tag in soup.findAll(name=tag_name):
                 tags_to_original_html_strings[tag] = html_string
 
     for tag in tags_to_original_html_strings:
         html_string = tags_to_original_html_strings[tag]
-        err_msg_list = list(_validate_customization_args_in_tag(tag))
+        err_msg_list = list(validate_customization_args_in_tag(tag))
         for err_msg in err_msg_list:
             if err_msg:
                 if err_msg not in err_dict:
@@ -709,7 +750,7 @@ def validate_customization_args(html_list):
     return err_dict
 
 
-def _validate_customization_args_in_tag(tag):
+def validate_customization_args_in_tag(tag):
     """Validates customization arguments of Rich Text Components in a soup.
 
     Args:
@@ -719,8 +760,8 @@ def _validate_customization_args_in_tag(tag):
         Error message if the attributes of tag are invalid.
     """
 
-    COMPONENT_TYPES_TO_COMPONENT_CLASSES = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long
-    SIMPLE_COMPONENT_TAG_NAMES = (
+    component_types_to_component_classes = rte_component_registry.Registry.get_component_types_to_component_classes() # pylint: disable=line-too-long
+    simple_component_tag_names = (
         rte_component_registry.Registry.get_simple_component_tag_names())
     tag_name = tag.name
     value_dict = {}
@@ -730,15 +771,15 @@ def _validate_customization_args_in_tag(tag):
         value_dict[attr] = json.loads(unescape_html(attrs[attr]))
 
     try:
-        COMPONENT_TYPES_TO_COMPONENT_CLASSES[tag_name].validate(value_dict)
+        component_types_to_component_classes[tag_name].validate(value_dict)
         if tag_name == 'oppia-noninteractive-collapsible':
             content_html = value_dict['content-with-value']
             soup_for_collapsible = bs4.BeautifulSoup(
                 content_html, 'html.parser')
-            for component_name in SIMPLE_COMPONENT_TAG_NAMES:
+            for component_name in simple_component_tag_names:
                 for component_tag in soup_for_collapsible.findAll(
                         name=component_name):
-                    for err_msg in _validate_customization_args_in_tag(
+                    for err_msg in validate_customization_args_in_tag(
                             component_tag):
                         yield err_msg
 
@@ -748,13 +789,14 @@ def _validate_customization_args_in_tag(tag):
                 content_html = tab_content['content']
                 soup_for_tabs = bs4.BeautifulSoup(
                     content_html, 'html.parser')
-                for component_name in SIMPLE_COMPONENT_TAG_NAMES:
-                    for component_tag in soup_for_tabs.findAll(name=tag_name):
-                        for err_msg in _validate_customization_args_in_tag(
+                for component_name in simple_component_tag_names:
+                    for component_tag in soup_for_tabs.findAll(
+                            name=component_name):
+                        for err_msg in validate_customization_args_in_tag(
                                 component_tag):
                             yield err_msg
     except Exception as e:
-        yield str(e)
+        yield python_utils.UNICODE(e)
 
 
 def regenerate_image_filename_using_dimensions(filename, height, width):
@@ -770,7 +812,8 @@ def regenerate_image_filename_using_dimensions(filename, height, width):
     """
     filename_wo_filetype = filename[:filename.rfind('.')]
     filetype = filename[filename.rfind('.') + 1:]
-    dimensions_suffix = '_height_%s_width_%s' % (str(height), str(width))
+    dimensions_suffix = '_height_%s_width_%s' % (
+        python_utils.UNICODE(height), python_utils.UNICODE(width))
     new_filename = '%s%s.%s' % (
         filename_wo_filetype, dimensions_suffix, filetype)
     return new_filename
@@ -781,8 +824,8 @@ def add_dimensions_to_image_tags(exp_id, html_string):
     tags that have no filepath.
 
     Args:
-        html_string: str. HTML string to modify.
         exp_id: str. Exploration id.
+        html_string: str. HTML string to modify.
 
     Returns:
         str. Updated HTML string with the dimensions for all
@@ -804,7 +847,7 @@ def add_dimensions_to_image_tags(exp_id, html_string):
                 'Exploration %s failed to load image: %s' %
                 (exp_id, image['filepath-with-value'].encode('utf-8')))
             raise e
-    return unicode(soup).replace('<br/>', '<br>')
+    return python_utils.UNICODE(soup).replace('<br/>', '<br>')
 
 
 def get_filename_with_dimensions(old_filename, exp_id):
@@ -818,9 +861,9 @@ def get_filename_with_dimensions(old_filename, exp_id):
     Returns:
         str. The new filename of the image file.
     """
-    file_system_class = fs_services.get_exploration_file_system_class()
+    file_system_class = fs_services.get_entity_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
-        'exploration/%s' % exp_id))
+        feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     filepath = 'image/%s' % old_filename
     try:
         content = fs.get(filepath.encode('utf-8'))

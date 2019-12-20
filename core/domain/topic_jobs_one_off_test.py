@@ -15,10 +15,14 @@
 # limitations under the License.
 
 """Tests for Topic-related one-off jobs."""
-import ast
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-from constants import constants
+import ast
+import logging
+
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_jobs_one_off
 from core.domain import topic_services
 from core.platform import models
@@ -28,7 +32,7 @@ import feconf
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
-class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
+class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -36,13 +40,10 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
     TOPIC_ID = 'topic_id'
 
     def setUp(self):
-        super(TopicMigrationOneOffJobTest, self).setUp()
-
-        self.swap(constants, 'ENABLE_NEW_STRUCTURES', True)
-
+        super(TopicMigrationOneOffJobTests, self).setUp()
         # Setup user who will own the test topics.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_topic(self):
@@ -52,7 +53,7 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
         # Create a new topic that should not be affected by the
         # job.
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name')
+            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
         topic.add_subtopic(1, title='A subtitle')
         topic_services.save_new_topic(self.albert_id, topic)
         self.assertEqual(
@@ -60,22 +61,21 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            job_id = (
-                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the topic is exactly the same after migration.
         updated_topic = (
-            topic_services.get_topic_by_id(self.TOPIC_ID))
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
         self.assertEqual(topic.subtopics[0].to_dict(),
                          updated_topic.subtopics[0].to_dict())
 
-        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
         expected = [[u'topic_migrated',
                      [u'1 topics successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
@@ -85,7 +85,7 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         topic = topic_domain.Topic.create_default_topic(
-            self.TOPIC_ID, name='A name')
+            self.TOPIC_ID, name='A name', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.albert_id, topic)
 
         # Delete the topic before migration occurs.
@@ -94,21 +94,20 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
 
         # Ensure the topic is deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            topic_services.get_topic_by_id(self.TOPIC_ID)
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
         # Start migration job on sample topic.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            job_id = (
-                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
 
-            # This running without errors indicates the deleted topic is
-            # being ignored.
-            self.process_and_flush_pending_tasks()
+        # This running without errors indicates the deleted topic is
+        # being ignored.
+        self.process_and_flush_pending_tasks()
 
         # Ensure the topic is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
-            topic_services.get_topic_by_id(self.TOPIC_ID)
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID)
 
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'topic_deleted',
@@ -122,22 +121,21 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
         """
         # Generate topic with old(v1) subtopic data.
         self.save_new_topic_with_subtopic_schema_v1(
-            self.TOPIC_ID, self.albert_id, 'A name', 'a name', '',
-            [], [], [], 2)
+            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
+            'a name', '', [], [], [], 2)
         topic = (
-            topic_services.get_topic_by_id(self.TOPIC_ID))
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
         self.assertEqual(topic.subtopic_schema_version, 1)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURES', True):
-            job_id = (
-                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the topic migrates correctly.
         updated_topic = (
-            topic_services.get_topic_by_id(self.TOPIC_ID))
+            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
@@ -145,4 +143,33 @@ class TopicMigrationOneOffJobTest(test_utils.GenericTestBase):
         output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id) # pylint: disable=line-too-long
         expected = [[u'topic_migrated',
                      [u'1 topics successfully migrated.']]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_migration_job_fails_with_invalid_topic(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg)
+
+        # The topic model created will be invalid due to invalid language code.
+        self.save_new_topic_with_subtopic_schema_v1(
+            self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
+            'a name', '', [], [], [], 2, language_code='invalid_language_code')
+
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Topic topic_id failed validation: Invalid language code: '
+             'invalid_language_code'])
+
+        output = topic_jobs_one_off.TopicMigrationOneOffJob.get_output(job_id)
+        expected = [[u'validation_error',
+                     [u'Topic topic_id failed validation: '
+                      'Invalid language code: invalid_language_code']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])

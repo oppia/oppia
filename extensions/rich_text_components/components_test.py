@@ -15,6 +15,8 @@
 # limitations under the License.
 
 """Tests for rich text components."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 import os
@@ -26,29 +28,23 @@ from extensions.rich_text_components import components
 class ComponentValidationUnitTests(test_utils.GenericTestBase):
     """Tests validation of rich text components."""
 
-    def check_validation(self, cls, valid_items, invalid_items):
+    def check_validation(self, rte_component_class, valid_items, invalid_items):
         """Test that values are validated correctly.
 
         Args:
-          cls: the class whose validate() method is to be tested.
+          rte_component_class: the class whose validate() method
+            is to be tested.
           valid_items: a list of values. Each of these items is expected to
             be validated without any Exception.
           invalid_items: a list of values. Each of these is expected to raise
             a TypeError when validated.
         """
         for item in valid_items:
-            try:
-                cls.validate(item)
-            except Exception as e:
-                self.fail(
-                    msg=(
-                        'Unexpected exception %s raised during '
-                        'validation of %s' % (
-                            str(e), str(item))))
+            rte_component_class.validate(item)
 
         for item in invalid_items:
             with self.assertRaises(Exception):
-                cls.validate(item)
+                rte_component_class.validate(item)
 
     def test_collapsible_validation(self):
         """Tests collapsible component validation."""
@@ -74,6 +70,21 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
 
         self.check_validation(
             components.Collapsible, valid_items, invalid_items)
+
+    def test_concept_card_validation(self):
+        """Tests concept card component validation."""
+        valid_items = [{
+            'skill_summary-with-value':
+                '{\'id\': \'skill_id\', \'description\': '
+                '\'skill_description\'}',
+        }]
+        invalid_items = [{
+            'skill_summary-with-value': 'javascript:alert(5);',
+            'text-with-value': 'Hello'
+        }]
+
+        self.check_validation(
+            components.Concept, valid_items, invalid_items)
 
     def test_image_validation(self):
         """Tests collapsible component validation."""

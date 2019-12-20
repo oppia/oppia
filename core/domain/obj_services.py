@@ -13,6 +13,8 @@
 # limitations under the License.
 
 """Service methods for typed instances."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import copy
 import inspect
@@ -20,10 +22,11 @@ import json
 
 from extensions.objects.models import objects
 import feconf
+import python_utils
 import utils
 
 
-class Registry(object):
+class Registry(python_utils.OBJECT):
     """Registry of all objects."""
 
     # Dict mapping object class names to their classes.
@@ -31,6 +34,9 @@ class Registry(object):
 
     @classmethod
     def _refresh_registry(cls):
+        """Refreshes the registry by adding new object instances to the
+        registry.
+        """
         cls.objects_dict.clear()
 
         # Add new object instances to the registry.
@@ -41,9 +47,8 @@ class Registry(object):
 
             ancestor_names = [
                 base_class.__name__ for base_class in inspect.getmro(clazz)]
-            if 'BaseObject' not in ancestor_names:
-                continue
 
+            assert 'BaseObject' in ancestor_names
             cls.objects_dict[clazz.__name__] = clazz
 
     @classmethod

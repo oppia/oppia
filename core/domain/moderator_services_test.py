@@ -14,16 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.moderator services."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
 from core.domain import moderator_services
 from core.tests import test_utils
 import feconf
 
 
-class FlagExplorationEmailEnqueueTaskTest(test_utils.GenericTestBase):
+class FlagExplorationEmailEnqueueTaskTests(test_utils.GenericTestBase):
     """Test that flag-exploration-email-tasks works as expected."""
 
     def setUp(self):
-        super(FlagExplorationEmailEnqueueTaskTest, self).setUp()
+        super(FlagExplorationEmailEnqueueTaskTests, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)

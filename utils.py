@@ -13,8 +13,9 @@
 # limitations under the License.
 
 """Common utility functions."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import StringIO
 import base64
 import collections
 import datetime
@@ -25,16 +26,18 @@ import os
 import random
 import re
 import string
+import sys
 import time
 import unicodedata
-import urllib
-import urlparse
-import zipfile
 
-from constants import constants  # pylint: disable=relative-import
-import feconf  # pylint: disable=relative-import
+from constants import constants
+import feconf
+import python_utils
 
-import yaml
+_YAML_PATH = os.path.join(os.getcwd(), '..', 'oppia_tools', 'pyyaml-5.1.2')
+sys.path.insert(0, _YAML_PATH)
+
+import yaml  # isort:skip  #pylint: disable=wrong-import-position
 
 
 class InvalidInputException(Exception):
@@ -64,8 +67,8 @@ def create_enum(*sequential, **names):
     Returns:
         dict. Dictionary containing the enumerated constants.
     """
-    enums = dict(zip(sequential, sequential), **names)
-    return type('Enum', (), enums)
+    enums = dict(python_utils.ZIP(sequential, sequential), **names)
+    return type(b'Enum', (), enums)
 
 
 def get_file_contents(filepath, raw_bytes=False, mode='r'):
@@ -107,8 +110,8 @@ def get_exploration_components_from_dir(dir_path):
         dir_path_array = dir_path_array[:-1]
     dir_path_length = len(dir_path_array)
 
-    for root, dirs, files in os.walk(dir_path):
-        for directory in dirs:
+    for root, directories, files in os.walk(dir_path):
+        for directory in directories:
             if root == dir_path and directory != 'assets':
                 raise Exception(
                     'The only directory in %s should be assets/' % dir_path)
@@ -116,21 +119,20 @@ def get_exploration_components_from_dir(dir_path):
         for filename in files:
             filepath = os.path.join(root, filename)
             if root == dir_path:
-                if filepath.endswith('.DS_Store'):
-                    # These files are added automatically by Mac OS Xsystems.
-                    # We ignore them.
-                    continue
-
-                if yaml_content is not None:
-                    raise Exception('More than one non-asset file specified '
-                                    'for %s' % dir_path)
-                elif not filepath.endswith('.yaml'):
-                    raise Exception('Found invalid non-asset file %s. There '
-                                    'should only be a single non-asset file, '
-                                    'and it should have a .yaml suffix.' %
-                                    filepath)
-                else:
-                    yaml_content = get_file_contents(filepath)
+                # These files are added automatically by Mac OS Xsystems.
+                # We ignore them.
+                if not filepath.endswith('.DS_Store'):
+                    if yaml_content is not None:
+                        raise Exception(
+                            'More than one non-asset file specified '
+                            'for %s' % dir_path)
+                    elif not filepath.endswith('.yaml'):
+                        raise Exception(
+                            'Found invalid non-asset file %s. There '
+                            'should only be a single non-asset file, '
+                            'and it should have a .yaml suffix.' % filepath)
+                    else:
+                        yaml_content = get_file_contents(filepath)
             else:
                 filepath_array = filepath.split('/')
                 # The additional offset is to remove the 'assets/' prefix.
@@ -140,50 +142,6 @@ def get_exploration_components_from_dir(dir_path):
 
     if yaml_content is None:
         raise Exception('No yaml file specifed for %s' % dir_path)
-
-    return yaml_content, assets_list
-
-
-def get_exploration_components_from_zip(zip_file_contents):
-    """Gets the (yaml, assets) from the contents of an exploration zip file.
-
-    Args:
-        zip_file_contents: a string of raw bytes representing the contents of
-            a zip file that comprises the exploration.
-
-    Returns:
-        a 2-tuple, the first element of which is a yaml string, and the second
-        element of which is a list of (filepath, content) 2-tuples. The filepath
-        does not include the assets/ prefix.
-
-    Raises:
-        Exception: if the following condition doesn't hold: "There is exactly
-            one file not in assets/, and this file has a .yaml suffix".
-    """
-    memfile = StringIO.StringIO()
-    memfile.write(zip_file_contents)
-
-    zf = zipfile.ZipFile(memfile, 'r')
-    yaml_content = None
-    assets_list = []
-    for filepath in zf.namelist():
-        if filepath.startswith('assets/'):
-            assets_list.append('/'.join(filepath.split('/')[1:]),
-                               zf.read(filepath))
-        else:
-            if yaml_content is not None:
-                raise Exception(
-                    'More than one non-asset file specified for zip file')
-            elif not filepath.endswith('.yaml'):
-                raise Exception('Found invalid non-asset file %s. There '
-                                'should only be a single file not in assets/, '
-                                'and it should have a .yaml suffix.' %
-                                filepath)
-            else:
-                yaml_content = zf.read(filepath)
-
-    if yaml_content is None:
-        raise Exception('No yaml file specified in zip file contents')
 
     return yaml_content, assets_list
 
@@ -217,21 +175,7 @@ def to_ascii(input_string):
         str. String containing the ascii representation of the input string.
     """
     return unicodedata.normalize(
-        'NFKD', unicode(input_string)).encode('ascii', 'ignore')
-
-
-def yaml_from_dict(dictionary, width=80):
-    """Gets the YAML representation of a dict.
-
-    Args:
-        dictionary: dict. Dictionary for conversion into yaml.
-        width: int. Width for the yaml representation, default value
-            is set to be of 80.
-
-    Returns:
-        str. Converted yaml of the passed dictionary.
-    """
-    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
+        'NFKD', python_utils.UNICODE(input_string)).encode('ascii', 'ignore')
 
 
 def dict_from_yaml(yaml_str):
@@ -315,20 +259,27 @@ def convert_png_binary_to_data_url(content):
         content: str. PNG binary file content.
 
     Returns:
-        *. Data url created from the binary content of the PNG.
+        str. Data url created from the binary content of the PNG.
 
     Raises:
         Exception: If the given binary string is not of a PNG image.
     """
     if imghdr.what(None, h=content) == 'png':
-        return 'data:image/png;base64,%s' % urllib.quote(
-            content.encode('base64'))
+        return 'data:image/png;base64,%s' % python_utils.url_quote(
+            base64.b64encode(content))
     else:
         raise Exception('The given string does not represent a PNG image.')
 
 
 def convert_png_to_data_url(filepath):
-    """Converts the png file at filepath to a data URL."""
+    """Converts the png file at filepath to a data URL.
+
+    Args:
+        filepath: str. A full path to the file.
+
+    Returns:
+        str. Data url created from the filepath of the PNG.
+    """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
     return convert_png_binary_to_data_url(file_contents)
 
@@ -374,18 +325,18 @@ def set_url_query_parameter(url, param_name, param_value):
         Exception: If the query parameter sent is not of string type,
             them this exception is raised.
     """
-    if not isinstance(param_name, basestring):
+    if not isinstance(param_name, python_utils.BASESTRING):
         raise Exception(
             'URL query parameter name must be a string, received %s'
             % param_name)
 
-    scheme, netloc, path, query_string, fragment = urlparse.urlsplit(url)
-    query_params = urlparse.parse_qs(query_string)
+    scheme, netloc, path, query_string, fragment = python_utils.url_split(url)
+    query_params = python_utils.parse_query_string(query_string)
 
     query_params[param_name] = [param_value]
-    new_query_string = urllib.urlencode(query_params, doseq=True)
+    new_query_string = python_utils.url_encode(query_params, doseq=True)
 
-    return urlparse.urlunsplit(
+    return python_utils.url_unsplit(
         (scheme, netloc, path, new_query_string, fragment))
 
 
@@ -416,16 +367,21 @@ def convert_to_hash(input_string, max_length):
             specified length.
 
     Raises:
-        Exception: If the input string is not the instance of the basestring,
+        Exception: If the input string is not the instance of the str,
             them this exception is raised.
     """
-    if not isinstance(input_string, basestring):
+    if not isinstance(input_string, python_utils.BASESTRING):
         raise Exception(
             'Expected string, received %s of type %s' %
             (input_string, type(input_string)))
 
-    encoded_string = base64.urlsafe_b64encode(
-        hashlib.sha1(input_string.encode('utf-8')).digest())
+    # Encodes strings using the character set [A-Za-z0-9].
+    # Prefixing altchars with b' to ensure that all characters in encoded_string
+    # remain encoded (otherwise encoded_string would be of type unicode).
+    encoded_string = base64.b64encode(
+        hashlib.sha1(python_utils.convert_to_bytes(input_string)).digest(),
+        altchars=b'ab'
+    ).replace('=', 'c')
 
     return encoded_string[:max_length]
 
@@ -449,27 +405,46 @@ def get_time_in_millisecs(datetime_obj):
         datetime_obj: datetime. An object of type datetime.datetime.
 
     Returns:
-        float. This returns the time in the millisecond since the Epoch.
+        float. The time in milliseconds since the Epoch.
     """
-    seconds = time.mktime(datetime_obj.timetuple()) * 1000
-    return seconds + datetime_obj.microsecond / 1000.0
+    seconds = time.mktime(datetime_obj.utctimetuple()) * 1000
+    return seconds + python_utils.divide(datetime_obj.microsecond, 1000.0)
 
 
 def get_current_time_in_millisecs():
-    """Returns time in milliseconds since the Epoch."""
+    """Returns time in milliseconds since the Epoch.
+
+    Returns:
+        float. The time in milliseconds since the Epoch.
+    """
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
 def get_human_readable_time_string(time_msec):
     """Given a time in milliseconds since the epoch, get a human-readable
     time string for the admin dashboard.
+
+    Args:
+        time_msec: float. Time in milliseconds since the Epoch.
+
+    Returns:
+        str. A string representing the time.
     """
-    return time.strftime('%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
+    return time.strftime(
+        '%B %d %H:%M:%S', time.gmtime(python_utils.divide(time_msec, 1000.0)))
 
 
 def are_datetimes_close(later_datetime, earlier_datetime):
     """Given two datetimes, determines whether they are separated by less than
     feconf.PROXIMAL_TIMEDELTA_SECS seconds.
+
+    Args:
+        later_datetime: datetime. The later datetime.
+        earlier_datetime: datetime. The earlier datetime.
+
+    Returns:
+        bool. True if difference between two datetimes is less than
+            feconf.PROXIMAL_TIMEDELTA_SECS seconds otherwise false.
     """
     difference_in_secs = (later_datetime - earlier_datetime).total_seconds()
     return difference_in_secs < feconf.PROXIMAL_TIMEDELTA_SECS
@@ -484,7 +459,7 @@ def generate_random_string(length):
     Returns:
         str. Random string of specified length.
     """
-    return base64.urlsafe_b64encode(os.urandom(length))
+    return base64.urlsafe_b64encode(os.urandom(length))[:length]
 
 
 def generate_new_session_id():
@@ -497,7 +472,15 @@ def generate_new_session_id():
 
 
 def vfs_construct_path(base_path, *path_components):
-    """Mimics behavior of os.path.join on Posix machines."""
+    """Mimics behavior of os.path.join on Posix machines.
+
+    Args:
+        base_path: str. The initial path upon which components would be added.
+        path_components: list(str). Components that would be added to the path.
+
+    Returns:
+        str. The path that is obtained after adding the components.
+    """
     path = base_path
     for component in path_components:
         if component.startswith('/'):
@@ -510,9 +493,17 @@ def vfs_construct_path(base_path, *path_components):
 
 
 def vfs_normpath(path):
-    """Normalize path from posixpath.py, eliminating double slashes, etc."""
+    """Normalize path from posixpath.py, eliminating double slashes, etc.
+
+    Args:
+        path: str. Path that is to be normalized.
+
+    Returns:
+        str. Path if it is not null else a dot string.
+    """
     # Preserve unicode (if path is unicode).
-    slash, dot = (u'/', u'.') if isinstance(path, unicode) else ('/', '.')
+    slash, dot = (u'/', u'.') if isinstance(path, python_utils.UNICODE) else (
+        '/', '.')
     if path == '':
         return dot
     initial_slashes = path.startswith('/')
@@ -547,9 +538,17 @@ def require_valid_name(name, name_type, allow_empty=False):
         name_type: str. A human-readable string, like 'the exploration title' or
             'a state name'. This will be shown in error messages.
         allow_empty: bool. If True, empty strings are allowed.
+
+    Raises:
+        Exception: Name isn't a string.
+        Exception: The length of the name_type isn't between
+            1 and 50.
+        Exception: Name starts or ends with whitespace.
+        Exception: Adjacent whitespace in name_type isn't collapsed.
+        Exception: Invalid character is present in name.
     """
-    if not isinstance(name, basestring):
-        raise ValidationError('%s must be a string.' % name_type)
+    if not isinstance(name, python_utils.BASESTRING):
+        raise ValidationError('%s must be a string.' % name)
 
     if allow_empty and name == '':
         return
@@ -626,6 +625,19 @@ def get_thumbnail_icon_url_for_category(category):
     return '/subjects/%s.svg' % (icon_name.replace(' ', ''))
 
 
+def is_supported_audio_language_code(language_code):
+    """Checks if the given language code is a supported audio language code.
+
+    Args:
+        language_code: str. The language code.
+
+    Returns:
+        bool. Whether the language code is supported audio language code or not.
+    """
+    language_codes = [lc['id'] for lc in constants.SUPPORTED_AUDIO_LANGUAGES]
+    return language_code in language_codes
+
+
 def is_valid_language_code(language_code):
     """Checks if the given language code is a valid language code.
 
@@ -635,70 +647,56 @@ def is_valid_language_code(language_code):
     Returns:
         bool. Whether the language code is valid or not.
     """
-    language_codes = [lc['code'] for lc in constants.ALL_LANGUAGE_CODES]
+    language_codes = [
+        lc['code'] for lc in constants.SUPPORTED_CONTENT_LANGUAGES]
     return language_code in language_codes
 
 
-def _get_short_language_description(full_language_description):
-    """Given one of the descriptions in constants.ALL_LANGUAGE_CODES, generates
-    the corresponding short description.
+def get_supported_audio_language_description(language_code):
+    """Returns the language description for the given language code.
 
     Args:
-        full_language_description: str. Short description of the language.
+        language_code: str. The language code for which the description is
+            required.
 
     Returns:
-        str. Short description of the language.
+        str. The language description for the given language code.
+
+    Raises:
+        Exception: If the given language code is unsupported.
     """
-    if ' (' not in full_language_description:
-        return full_language_description
-    else:
-        ind = full_language_description.find(' (')
-        return full_language_description[:ind]
-
-
-def get_all_language_codes_and_names():
-    """It parses the list of language codes and their corresponding names,
-    defined in the app constants.
-
-    Returns:
-        list(dict(str, str)). List of dictionary containing language code and
-            name mapped to their corresponding value.
-    """
-    return [{
-        'code': lc['code'],
-        'name': _get_short_language_description(lc['description']),
-    } for lc in constants.ALL_LANGUAGE_CODES]
+    for language in constants.SUPPORTED_AUDIO_LANGUAGES:
+        if language['id'] == language_code:
+            return language['description']
+    raise Exception('Unsupported audio language code: %s' % language_code)
 
 
 def unescape_encoded_uri_component(escaped_string):
-    """Unescape a string that is encoded with encodeURIComponent."""
-    return urllib.unquote(escaped_string).decode('utf-8')
+    """Unescape a string that is encoded with encodeURIComponent.
+
+    Args:
+        escaped_string: str. String that is encoded with encodeURIComponent.
+
+    Returns:
+        str. Decoded string that was initially encoded with
+            encodeURIComponent.
+    """
+    return python_utils.urllib_unquote(escaped_string).decode('utf-8')
 
 
 def get_asset_dir_prefix():
     """Returns prefix for asset directory depending whether dev or prod.
     It is used as a prefix in urls for images, css and script files.
+
+    Returns:
+        str. Prefix '/build' if constants.DEV_MODE is false, otherwise
+            null string.
     """
     asset_dir_prefix = ''
     if not constants.DEV_MODE:
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
-
-
-def convert_to_str(string_to_convert):
-    """Converts the given unicode string to a string. If the string is not
-    unicode, we return the string.
-
-    Args:
-        string_to_convert: unicode|str.
-
-    Returns:
-        str. The encoded string.
-    """
-    if isinstance(string_to_convert, unicode):
-        return string_to_convert.encode('utf-8')
-    return string_to_convert
 
 
 def get_hashable_value(value):
@@ -723,7 +721,7 @@ def get_hashable_value(value):
     elif isinstance(value, dict):
         return tuple(sorted(
             # Dict keys are already hashable, only values need converting.
-            (k, get_hashable_value(v)) for k, v in value.iteritems()))
+            (k, get_hashable_value(v)) for k, v in value.items()))
     else:
         return value
 

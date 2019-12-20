@@ -13,9 +13,14 @@
 # limitations under the License.
 
 """Base model class."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
+
+import datetime
 
 from constants import constants
 from core.platform import models
+import python_utils
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -28,6 +33,21 @@ transaction_services = models.Registry.import_transaction_services()
 # method to find the location of this delimiter.
 _VERSION_DELIMITER = '-'
 
+# Types of deletion policies. The pragma comment is needed because Enums are
+# evaluated as classes in Python and they should use PascalCase, but using
+# UPPER_CASE seems more appropriate here.
+DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
+    'KEEP',
+    'DELETE',
+    'ANONYMIZE',
+    'LOCALLY_PSEUDONYMIZE',
+    'KEEP_IF_PUBLIC',
+    'NOT_APPLICABLE'
+)
+
+# Constant used when retrieving big number of models.
+FETCH_BATCH_SIZE = 1000
+
 # Constants used for generating ids.
 MAX_RETRIES = 10
 RAND_RANGE = (1 << 30) - 1
@@ -39,9 +59,9 @@ class BaseModel(ndb.Model):
 
     # When this entity was first created. This can be overwritten and
     # set explicitly.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
+    created_on = ndb.DateTimeProperty(indexed=True, required=True)
     # When this entity was last updated. This cannot be set directly.
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
+    last_updated = ndb.DateTimeProperty(indexed=True, required=True)
     # Whether the current version of the model instance is deleted.
     deleted = ndb.BooleanProperty(indexed=True, default=False)
 
@@ -60,6 +80,42 @@ class BaseModel(ndb.Model):
     class EntityNotFoundError(Exception):
         """Raised when no entity for a given id exists in the datastore."""
         pass
+
+    @staticmethod
+    def get_deletion_policy():
+        """This method should be implemented by subclasses.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """This method should be implemented by subclasses.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def export_data(user_id):
+        """This method should be implemented by subclasses.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
 
     @classmethod
     def get(cls, entity_id, strict=True):
@@ -117,18 +173,45 @@ class BaseModel(ndb.Model):
             entities.insert(index, None)
 
         if not include_deleted:
-            for i in xrange(len(entities)):
+            for i in python_utils.RANGE(len(entities)):
                 if entities[i] and entities[i].deleted:
                     entities[i] = None
         return entities
 
+    def put(self, update_last_updated_time=True):
+        """Stores the given ndb.Model instance to the datastore.
+
+        Args:
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the model.
+
+        Returns:
+            Model. The entity that was stored.
+        """
+        if self.created_on is None:
+            self.created_on = datetime.datetime.utcnow()
+
+        if update_last_updated_time or self.last_updated is None:
+            self.last_updated = datetime.datetime.utcnow()
+
+        return super(BaseModel, self).put()
+
     @classmethod
-    def put_multi(cls, entities):
+    def put_multi(cls, entities, update_last_updated_time=True):
         """Stores the given ndb.Model instances.
 
         Args:
             entities: list(ndb.Model).
+            update_last_updated_time: bool. Whether to update the
+                last_updated_field of the entities.
         """
+        for entity in entities:
+            if entity.created_on is None:
+                entity.created_on = datetime.datetime.utcnow()
+
+            if update_last_updated_time or entity.last_updated is None:
+                entity.last_updated = datetime.datetime.utcnow()
+
         ndb.put_multi(entities)
 
     @classmethod
@@ -179,12 +262,7 @@ class BaseModel(ndb.Model):
             Exception: An ID cannot be generated within a reasonable number
                 of attempts.
         """
-        try:
-            entity_name = unicode(entity_name).encode(encoding='utf-8')
-        except Exception:
-            entity_name = ''
-
-        for _ in range(MAX_RETRIES):
+        for _ in python_utils.RANGE(MAX_RETRIES):
             new_id = utils.convert_to_hash(
                 '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
                 ID_LENGTH)
@@ -232,7 +310,8 @@ class BaseModel(ndb.Model):
 
 
 class BaseCommitLogEntryModel(BaseModel):
-    """Base Model for the models that store the log of commits to a construct.
+    """Base Model for the models that store the log of commits to a
+    construct.
     """
     # Update superclass model to make these properties indexed.
     created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
@@ -259,6 +338,18 @@ class BaseCommitLogEntryModel(BaseModel):
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = ndb.IntegerProperty()
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionCommitLogEntryModel references user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
 
     @classmethod
     def create(
@@ -411,6 +502,9 @@ class VersionedModel(BaseModel):
     # The command string for a revert commit.
     CMD_REVERT_COMMIT = '%s_revert_version_number' % _AUTOGENERATED_PREFIX
 
+    # The command string for a delete commit.
+    CMD_DELETE_COMMIT = '%s_mark_deleted' % _AUTOGENERATED_PREFIX
+
     # The current version number of this instance. In each PUT operation,
     # this number is incremented and a snapshot of the modified instance is
     # stored in the snapshot metadata and content models. The snapshot
@@ -420,6 +514,7 @@ class VersionedModel(BaseModel):
     version = ndb.IntegerProperty(default=0)
 
     def _require_not_marked_deleted(self):
+        """Checks whether the model instance is deleted."""
         if self.deleted:
             raise Exception('This model instance has been deleted.')
 
@@ -428,6 +523,16 @@ class VersionedModel(BaseModel):
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
     def _reconstitute(self, snapshot_dict):
+        """Populates the model instance with the snapshot.
+
+        Args:
+            snapshot_dict: dict(str, *). The snapshot with the model
+                property values.
+
+        Returns:
+            VersionedModel. The instance of the VersionedModel class populated
+                with the the snapshot.
+        """
         self.populate(**snapshot_dict)
         return self
 
@@ -501,11 +606,6 @@ class VersionedModel(BaseModel):
             raise Exception(
                 'Expected commit_cmds to be a list of dicts, received %s'
                 % commit_cmds)
-        for item in commit_cmds:
-            if not isinstance(item, dict):
-                raise Exception(
-                    'Expected commit_cmds to be a list of dicts, received %s'
-                    % commit_cmds)
 
         self.version += 1
 
@@ -519,7 +619,7 @@ class VersionedModel(BaseModel):
             id=snapshot_id, content=snapshot)
 
         transaction_services.run_in_transaction(
-            ndb.put_multi,
+            BaseModel.put_multi,
             [snapshot_metadata_instance, snapshot_content_instance, self])
 
     def delete(self, committer_id, commit_message, force_deletion=False):
@@ -538,7 +638,9 @@ class VersionedModel(BaseModel):
         if force_deletion:
             current_version = self.version
 
-            version_numbers = [str(num + 1) for num in range(current_version)]
+            version_numbers = [
+                python_utils.UNICODE(num + 1) for num in python_utils.RANGE(
+                    current_version)]
             snapshot_ids = [
                 self._get_snapshot_id(self.id, version_number)
                 for version_number in version_numbers]
@@ -559,7 +661,7 @@ class VersionedModel(BaseModel):
             self.deleted = True
 
             commit_cmds = [{
-                'cmd': '%s_mark_deleted' % self._AUTOGENERATED_PREFIX
+                'cmd': self.CMD_DELETE_COMMIT
             }]
 
             self._trusted_commit(
@@ -591,6 +693,12 @@ class VersionedModel(BaseModel):
         """
         self._require_not_marked_deleted()
 
+        for item in commit_cmds:
+            if not isinstance(item, dict):
+                raise Exception(
+                    'Expected commit_cmds to be a list of dicts, received %s'
+                    % commit_cmds)
+
         for commit_cmd in commit_cmds:
             if 'cmd' not in commit_cmd:
                 raise Exception(
@@ -598,7 +706,7 @@ class VersionedModel(BaseModel):
                     % commit_cmd)
             if commit_cmd['cmd'].startswith(self._AUTOGENERATED_PREFIX):
                 raise Exception(
-                    'Invalid change list command: ' % commit_cmd['cmd'])
+                    'Invalid change list command: %s' % commit_cmd['cmd'])
 
         commit_type = (
             self._COMMIT_TYPE_CREATE if self.version == 0 else
@@ -625,7 +733,7 @@ class VersionedModel(BaseModel):
 
         if not model.ALLOW_REVERT:
             raise Exception(
-                'Reverting of objects of type %s is not allowed.'
+                'Reverting objects of type %s is not allowed.'
                 % model.__class__.__name__)
 
         commit_cmds = [{
@@ -677,8 +785,10 @@ class VersionedModel(BaseModel):
         cls.get(entity_id)._require_not_marked_deleted()
 
         snapshot_id = cls._get_snapshot_id(entity_id, version_number)
-        return cls(id=entity_id)._reconstitute_from_snapshot_id(
-            snapshot_id)
+
+        return cls(
+            id=entity_id,
+            version=version_number)._reconstitute_from_snapshot_id(snapshot_id)
         # pylint: enable=protected-access
 
     @classmethod
@@ -827,7 +937,7 @@ class BaseSnapshotMetadataModel(BaseModel):
     """
 
     # The id of the user who committed this revision.
-    committer_id = ndb.StringProperty(required=True)
+    committer_id = ndb.StringProperty(required=True, indexed=True)
     # The type of the commit associated with this snapshot.
     commit_type = ndb.StringProperty(
         required=True, choices=VersionedModel.COMMIT_TYPE_CHOICES)
@@ -836,6 +946,18 @@ class BaseSnapshotMetadataModel(BaseModel):
     # A sequence of commands that can be used to describe this commit.
     # Represented as a list of dicts.
     commit_cmds = ndb.JsonProperty(indexed=False)
+
+    @classmethod
+    def exists_for_user_id(cls, user_id):
+        """Check whether BaseSnapshotMetadataModel references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.committer_id == user_id).get() is not None
 
     def get_unversioned_instance_id(self):
         """Gets the instance id from the snapshot id.

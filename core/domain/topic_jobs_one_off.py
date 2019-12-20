@@ -15,13 +15,15 @@
 # limitations under the License.
 
 """One-off jobs for topics."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
 import logging
 
-from constants import constants
 from core import jobs
 from core.domain import topic_domain
+from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.platform import models
 import feconf
@@ -48,15 +50,12 @@ class TopicMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not constants.ENABLE_NEW_STRUCTURES:
-            return
-
         if item.deleted:
             yield (TopicMigrationOneOffJob._DELETED_KEY, 1)
             return
 
         # Note: the read will bring the topic up to the newest version.
-        topic = topic_services.get_topic_by_id(item.id)
+        topic = topic_fetchers.get_topic_by_id(item.id)
         try:
             topic.validate()
         except Exception as e:

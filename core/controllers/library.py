@@ -13,20 +13,23 @@
 # limitations under the License.
 
 """Controllers for the library page."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 import logging
 import string
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
-from core.domain import acl_decorators
 from core.domain import collection_services
 from core.domain import exp_services
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import python_utils
 import utils
 
 (base_models, exp_models,) = models.Registry.import_models([
@@ -74,27 +77,7 @@ class LibraryPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        search_mode = 'search' in self.request.url
-
-        if search_mode:
-            page_mode = feconf.LIBRARY_PAGE_MODE_SEARCH
-        else:
-            page_mode = feconf.LIBRARY_PAGE_MODE_INDEX
-
-        self.values.update({
-            'meta_description': (
-                feconf.SEARCH_PAGE_DESCRIPTION if search_mode
-                else feconf.LIBRARY_PAGE_DESCRIPTION),
-            'nav_mode': feconf.NAV_MODE_LIBRARY,
-            'has_fully_registered': bool(
-                self.user_id and
-                user_services.has_fully_registered(self.user_id)),
-            'LANGUAGE_CODES_AND_NAMES': (
-                utils.get_all_language_codes_and_names()),
-            'page_mode': page_mode,
-            'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
-        })
-        self.render_template('pages/library/library.html')
+        self.render_template('library-page.mainpage.html')
 
 
 class LibraryIndexHandler(base.BaseHandler):
@@ -163,20 +146,17 @@ class LibraryGroupPage(base.BaseHandler):
         self.values.update({
             'meta_description': (
                 feconf.LIBRARY_GROUP_PAGE_DESCRIPTION),
-            'nav_mode': feconf.NAV_MODE_LIBRARY,
             'has_fully_registered': bool(
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
-            'LANGUAGE_CODES_AND_NAMES': (
-                utils.get_all_language_codes_and_names()),
-            'page_mode': feconf.LIBRARY_PAGE_MODE_GROUP,
-            'SEARCH_DROPDOWN_CATEGORIES': feconf.SEARCH_DROPDOWN_CATEGORIES,
         })
-        self.render_template('pages/library/library.html')
+        self.render_template('library-page.mainpage.html')
 
 
 class LibraryGroupIndexHandler(base.BaseHandler):
     """Provides data for categories such as top rated and recently published."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
     def get(self):
@@ -204,7 +184,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                 header_i18n_id = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
 
         else:
-            return self.PageNotFoundException
+            raise self.PageNotFoundException
 
         preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
@@ -289,7 +269,8 @@ class ExplorationSummariesHandler(base.BaseHandler):
             include_private_exps = False
 
         if (not isinstance(exp_ids, list) or not all([
-                isinstance(exp_id, basestring) for exp_id in exp_ids])):
+                isinstance(
+                    exp_id, python_utils.BASESTRING) for exp_id in exp_ids])):
             raise self.PageNotFoundException
 
         if include_private_exps:

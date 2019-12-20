@@ -13,18 +13,19 @@
 # limitations under the License.
 
 """Base constants and handlers."""
+from __future__ import absolute_import  # pylint: disable=import-only-modules
+from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import Cookie
 import base64
 import datetime
 import hmac
+import http.cookies
 import json
 import logging
 import os
 import sys
 import time
 import traceback
-import urlparse
 
 from constants import constants
 from core.domain import config_domain
@@ -34,13 +35,11 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import jinja_utils
+import python_utils
 import utils
 
-from google.appengine.api import users
-import jinja2
 import webapp2
 
-app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -50,30 +49,26 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
-BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
-    'before_end_head_tag_hook', {
-        'type': 'unicode',
-        'ui_config': {
-            'rows': 7,
-        },
-    },
-    'Code to insert just before the closing </head> tag in all pages.', '')
-
 
 def _clear_login_cookies(response_headers):
-    """Clears login cookies from the given response headers."""
+    """Clears login cookies from the given response headers.
 
+    Args:
+        response_headers: webapp2.ResponseHeaders.
+            Response headers are used to give a more detailed
+            context of the response.
+    """
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
-    cookie = Cookie.SimpleCookie()
-    for cookie_name in ['ACSID', 'SACSID']:
-        cookie = Cookie.SimpleCookie()
+    cookie = http.cookies.SimpleCookie()
+    for cookie_name in [b'ACSID', b'SACSID']:
+        cookie = http.cookies.SimpleCookie()
         cookie[cookie_name] = ''
         cookie[cookie_name]['expires'] = (
             datetime.datetime.utcnow() +
             datetime.timedelta(seconds=ONE_DAY_AGO_IN_SECS)
         ).strftime('%a, %d %b %Y %H:%M:%S GMT')
-        response_headers.add_header(*cookie.output().split(': ', 1))
+        response_headers.add_header(*cookie.output().split(b': ', 1))
 
 
 class LogoutPage(webapp2.RequestHandler):
@@ -84,19 +79,17 @@ class LogoutPage(webapp2.RequestHandler):
         page (or the home page if no follow-up page is specified).
         """
 
-        # The str conversion is needed, otherwise an InvalidResponseError
-        # asking for the 'Location' header value to be str instead of
-        # 'unicode' will result.
-        url_to_redirect_to = str(self.request.get('return_url') or '/')
         _clear_login_cookies(self.response.headers)
+        url_to_redirect_to = '/'
 
         if constants.DEV_MODE:
-            self.redirect(users.create_logout_url(url_to_redirect_to))
+            self.redirect(
+                current_user_services.create_logout_url(url_to_redirect_to))
         else:
             self.redirect(url_to_redirect_to)
 
 
-class UserFacingExceptions(object):
+class UserFacingExceptions(python_utils.OBJECT):
     """This class contains all the exception class definitions used."""
 
     class NotLoggedInException(Exception):
@@ -151,30 +144,28 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user_id = current_user_services.get_current_user_id()
+        self.gae_id = current_user_services.get_current_gae_id()
+        self.user_id = None
         self.username = None
-        self.has_seen_editor_tutorial = False
         self.partially_logged_in = False
 
-        if self.user_id:
-            user_settings = user_services.get_user_settings(
-                self.user_id, strict=False)
+        if self.gae_id:
+            user_settings = user_services.get_user_settings_by_gae_id(
+                self.gae_id, strict=False)
             if user_settings is None:
                 email = current_user_services.get_current_user_email()
                 user_settings = user_services.create_new_user(
-                    self.user_id, email)
+                    self.gae_id, email)
             self.values['user_email'] = user_settings.email
+            self.user_id = user_settings.user_id
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                    user_services.has_fully_registered(self.user_id)):
+                    user_services.has_fully_registered(user_settings.user_id)):
                 _clear_login_cookies(self.response.headers)
                 self.partially_logged_in = True
-                self.user_id = None
             else:
                 self.username = user_settings.username
                 self.values['username'] = self.username
-                if user_settings.last_started_state_editor_tutorial:
-                    self.has_seen_editor_tutorial = True
                 # In order to avoid too many datastore writes, we do not bother
                 # recording a log-in if the current time is sufficiently close
                 # to the last log-in time.
@@ -192,7 +183,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
-        self.values['additional_angular_modules'] = []
         self.values['iframed'] = False
         self.values['is_moderator'] = user_services.is_at_least_moderator(
             self.user_id)
@@ -216,20 +206,31 @@ class BaseHandler(webapp2.RequestHandler):
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            self.redirect('https://oppiatestserver.appspot.com', permanent=True)
+            self.redirect(
+                b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
         # In DEV_MODE, clearing cookies does not log out the user, so we
         # force-clear them by redirecting to the logout URL.
         if constants.DEV_MODE and self.partially_logged_in:
-            self.redirect(users.create_logout_url(self.request.uri))
+            self.redirect(
+                current_user_services.create_logout_url(self.request.uri))
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
+                # If user opens a new tab during signup process, the user_id
+                # parameter is set to None and this causes the signup session
+                # to expire. The code here checks if user is on the signup
+                # page and the user_id is None, if that is the case an exception
+                # is raised which is handled by the frontend by showing a
+                # continue to registration modal.
+                if 'signup' in self.request.uri and not self.user_id:
+                    raise self.UnauthorizedUserException(
+                        'Registration session expired.')
                 csrf_token = self.request.get('csrf_token')
                 if not csrf_token:
-                    raise Exception(
+                    raise self.UnauthorizedUserException(
                         'Missing CSRF token. Changes were not saved. '
                         'Please report this bug.')
 
@@ -249,19 +250,35 @@ class BaseHandler(webapp2.RequestHandler):
         super(BaseHandler, self).dispatch()
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """Base method to handle GET requests."""
+        """Base method to handle GET requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def post(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle POST requests."""
+        """Base method to handle POST requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def put(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle PUT requests."""
+        """Base method to handle PUT requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def delete(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle DELETE requests."""
+        """Base method to handle DELETE requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def render_json(self, values):
@@ -270,32 +287,33 @@ class BaseHandler(webapp2.RequestHandler):
         Args:
             values: dict. The key-value pairs to encode in the JSON response.
         """
-        self.response.content_type = 'application/json; charset=utf-8'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename="oppia-attachment.txt"')
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains')
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
+        self.response.content_type = b'application/json; charset=utf-8'
+        self.response.headers[b'Content-Disposition'] = (
+            b'attachment; filename="oppia-attachment.txt"')
+        self.response.headers[b'Strict-Transport-Security'] = (
+            b'max-age=31536000; includeSubDomains')
+        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
+        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
 
         json_output = json.dumps(values, cls=utils.JSONEncoderForHTML)
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
-    def _get_logout_url(self, redirect_url_on_logout):
-        """Prepares and returns logout url which will be handled
-        by LogoutPage handler.
+    def render_downloadable_file(self, values, filename, content_type):
+        """Prepares downloadable content to be sent to the client.
 
         Args:
-            redirect_url_on_logout: str. URL to redirect to on logout.
-
-        Returns:
-            str. Logout URL to be handled by LogoutPage handler.
+            values: dict. The key-value pairs to include in the response.
+            filename: str. The name of the file to be rendered.
+            content_type: str. The type of file to be rendered.
         """
-        return current_user_services.create_logout_url(redirect_url_on_logout)
+        self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
+            content_type)
+        self.response.headers[
+            b'Content-Disposition'] = python_utils.convert_to_bytes(
+                'attachment; filename=%s' % filename)
+        self.response.write(values)
 
-    def render_template(
-            self, filepath, iframe_restriction='DENY',
-            redirect_url_on_logout=None):
+    def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.
 
         Args:
@@ -306,39 +324,20 @@ class BaseHandler(webapp2.RequestHandler):
                 DENY: Strictly prevents the template to load in an iframe.
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
-            redirect_url_on_logout: str or None. URL to redirect to on logout.
         """
         values = self.values
 
-        scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
+        scheme, netloc, path, _, _ = python_utils.url_split(self.request.uri)
 
         values.update({
-            'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
-                BEFORE_END_HEAD_TAG_HOOK.value),
             'DEV_MODE': constants.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
             'ACTIVITY_STATUS_PUBLIC': (
                 rights_manager.ACTIVITY_STATUS_PUBLIC),
-            'GCS_RESOURCE_BUCKET_NAME': (
-                app_identity_services.get_gcs_resource_bucket_name()),
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
-            'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
-            'user_is_logged_in': user_services.has_fully_registered(
-                self.user_id),
-            'allow_yaml_file_upload': feconf.ALLOW_YAML_FILE_UPLOAD
-        })
-        if feconf.ENABLE_PROMO_BAR:
-            promo_bar_enabled = config_domain.PROMO_BAR_ENABLED.value
-            promo_bar_message = config_domain.PROMO_BAR_MESSAGE.value
-        else:
-            promo_bar_enabled = False
-            promo_bar_message = ''
-        values.update({
-            'promo_bar_enabled': promo_bar_enabled,
-            'promo_bar_message': promo_bar_message,
         })
 
         if 'status_code' not in values:
@@ -352,46 +351,22 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
-        # nav_mode is used as part of the GLOBALS object in the frontend, but
-        # not every backend handler declares a nav_mode. Thus, the following
-        # code is a failsafe to ensure that the nav_mode key is added to all
-        # page requests.
-        if 'nav_mode' not in values:
-            values['nav_mode'] = ''
-
-        if redirect_url_on_logout is None:
-            redirect_url_on_logout = self.request.uri
-
-        if self.user_id:
-            values['login_url'] = None
-            values['logout_url'] = self._get_logout_url(redirect_url_on_logout)
-        else:
-            target_url = (
-                '/' if self.request.uri.endswith(feconf.SPLASH_URL)
-                else self.request.uri)
-            values['login_url'] = (
-                current_user_services.create_login_url(target_url))
-            values['logout_url'] = None
-
         # Create a new csrf token for inclusion in HTML responses. This assumes
         # that tokens generated in one handler will be sent back to a handler
         # with the same page name.
-        values['csrf_token'] = ''
-
-        if self.REQUIRE_PAYLOAD_CSRF_CHECK:
-            values['csrf_token'] = CsrfTokenManager.create_csrf_token(
-                self.user_id)
 
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains')
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
+        self.response.headers[b'Strict-Transport-Security'] = (
+            b'max-age=31536000; includeSubDomains')
+        self.response.headers[b'X-Content-Type-Options'] = b'nosniff'
+        self.response.headers[b'X-Xss-Protection'] = b'1; mode=block'
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = iframe_restriction
+                self.response.headers[
+                    b'X-Frame-Options'] = python_utils.convert_to_bytes(
+                        iframe_restriction)
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
@@ -410,18 +385,23 @@ class BaseHandler(webapp2.RequestHandler):
             values: dict. The key-value pairs to include in the response.
         """
 
-        if return_type == feconf.HANDLER_TYPE_JSON:
-            self.render_json(values)
-        elif return_type == feconf.HANDLER_TYPE_HTML:
+        method = self.request.environ['REQUEST_METHOD']
+
+        if return_type == feconf.HANDLER_TYPE_HTML and (
+                method == 'GET'):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
-                    'pages/error/error_iframed.html', iframe_restriction=None)
+                    'error-iframed.mainpage.html',
+                    iframe_restriction=None)
             else:
-                self.render_template('pages/error/error.html')
+                self.render_template(
+                    'error-page-%s.mainpage.html' % values['status_code'])
         else:
-            logging.warning('Not a recognized return type: '
-                            'defaulting to render JSON.')
+            if return_type != feconf.HANDLER_TYPE_JSON and (
+                    return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
+                logging.warning('Not a recognized return type: '
+                                'defaulting to render JSON.')
             self.render_json(values)
 
     def _render_exception(self, error_code, values):
@@ -432,6 +412,8 @@ class BaseHandler(webapp2.RequestHandler):
                 400, 401, 404 or 500).
             values: dict. The key-value pairs to include in the response.
         """
+        # The error codes here should be in sync with the error pages
+        # generated via webpack.common.config.ts.
         assert error_code in [400, 401, 404, 500]
         values['status_code'] = error_code
         method = self.request.environ['REQUEST_METHOD']
@@ -470,13 +452,16 @@ class BaseHandler(webapp2.RequestHandler):
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
                     feconf.HANDLER_TYPE_JSON):
                 self.error(401)
-                self._render_exception(401, {'error': unicode(exception)})
+                self._render_exception(
+                    401, {
+                        'error': (
+                            'You must be logged in to access this resource.')})
             else:
                 self.redirect(
                     current_user_services.create_login_url(self.request.uri))
             return
 
-        logging.info(''.join(traceback.format_exception(*sys.exc_info())))
+        logging.info(b''.join(traceback.format_exception(*sys.exc_info())))
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -490,21 +475,25 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': unicode(exception)})
+            self._render_exception(401, {'error': python_utils.convert_to_bytes(
+                exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': unicode(exception)})
+            self._render_exception(400, {'error': python_utils.convert_to_bytes(
+                exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': unicode(exception)})
+            self._render_exception(500, {'error': python_utils.convert_to_bytes(
+                exception)})
             return
 
         self.error(500)
-        self._render_exception(500, {'error': unicode(exception)})
+        self._render_exception(
+            500, {'error': python_utils.convert_to_bytes(exception)})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
@@ -516,10 +505,10 @@ class BaseHandler(webapp2.RequestHandler):
 class Error404Handler(BaseHandler):
     """Handles 404 errors."""
 
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
+    pass
 
 
-class CsrfTokenManager(object):
+class CsrfTokenManager(python_utils.OBJECT):
     """Manages page/user tokens in memcache to protect against CSRF."""
 
     # Max age of the token (48 hours).
@@ -545,7 +534,7 @@ class CsrfTokenManager(object):
         """Creates a new CSRF token.
 
         Args:
-            user_id: str. The user_id for which the token is generated.
+            user_id: str|None. The user_id for which the token is generated.
             issued_on: float. The timestamp at which the token was issued.
 
         Returns:
@@ -560,12 +549,12 @@ class CsrfTokenManager(object):
             user_id = cls._USER_ID_DEFAULT
 
         # Round time to seconds.
-        issued_on = long(issued_on)
+        issued_on = int(issued_on)
 
-        digester = hmac.new(str(CSRF_SECRET.value))
-        digester.update(str(user_id))
+        digester = hmac.new(python_utils.convert_to_bytes(CSRF_SECRET.value))
+        digester.update(python_utils.convert_to_bytes(user_id))
         digester.update(':')
-        digester.update(str(issued_on))
+        digester.update(python_utils.convert_to_bytes(issued_on))
 
         digest = digester.digest()
         token = '%s/%s' % (issued_on, base64.urlsafe_b64encode(digest))
@@ -586,7 +575,7 @@ class CsrfTokenManager(object):
         """Creates a CSRF token for the given user_id.
 
         Args:
-            user_id: str. The user_id for whom the token is generated.
+            user_id: str|None. The user_id for whom the token is generated.
 
         Returns:
             str. The generated CSRF token.
@@ -598,7 +587,7 @@ class CsrfTokenManager(object):
         """Validates a given CSRF token.
 
         Args:
-            user_id: str. The user_id to validate the CSRF token against.
+            user_id: str|None. The user_id to validate the CSRF token against.
             token: str. The CSRF token to validate.
 
         Returns:
@@ -609,7 +598,7 @@ class CsrfTokenManager(object):
             if len(parts) != 2:
                 return False
 
-            issued_on = long(parts[0])
+            issued_on = int(parts[0])
             age = cls._get_current_time() - issued_on
             if age > cls._CSRF_TOKEN_AGE_SECS:
                 return False
@@ -621,3 +610,17 @@ class CsrfTokenManager(object):
             return False
         except Exception:
             return False
+
+
+class CsrfTokenHandler(BaseHandler):
+    """Handles sending CSRF tokens to the frontend."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    REDIRECT_UNFINISHED_SIGNUPS = False
+
+    def get(self):
+        csrf_token = CsrfTokenManager.create_csrf_token(
+            self.user_id)
+        self.render_json({
+            'token': csrf_token,
+        })

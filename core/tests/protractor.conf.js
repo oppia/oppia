@@ -1,4 +1,134 @@
-var ScreenShotReporter = require('protractor-screenshot-reporter');
+var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
+var glob = require('glob')
+var path = require('path')
+
+var suites = {
+    // The tests on Travis are run individually to parallelize
+    // them. Therefore, we mention the complete directory
+    // in 'full'.
+    full: [
+      'protractor/*.js',
+      'protractor_desktop/*.js'
+    ],
+
+    // Unfortunately, adding more than one file to a test suite results in
+    // severe instability as of Chromedriver 2.38 (Chrome 66).
+    accessibility: [
+      'protractor/accessibility.js'
+    ],
+
+    additionalEditorFeatures: [
+      'protractor_desktop/additionalEditorFeatures.js'
+    ],
+
+    additionalPlayerFeatures: [
+      'protractor_desktop/additionalPlayerFeatures.js'
+    ],
+
+    adminPage: [
+      'protractor_desktop/adminTabFeatures.js'
+    ],
+
+    collections: [
+      'protractor_desktop/collections.js'
+    ],
+
+    communityDashboard: [
+      'protractor_desktop/communityDashboard.js'
+    ],
+
+    coreEditorAndPlayerFeatures: [
+      'protractor_desktop/coreEditorAndPlayerFeatures.js'
+    ],
+
+    creatorDashboard: [
+      'protractor_desktop/creatorDashboard.js'
+    ],
+
+    embedding: [
+      'protractor_desktop/embedding.js'
+    ],
+
+    explorationFeedbackTab: [
+      'protractor_desktop/explorationFeedbackTab.js'
+    ],
+
+    explorationHistoryTab: [
+      'protractor_desktop/explorationHistoryTab.js'
+    ],
+
+    explorationImprovementsTab: [
+      'protractor_desktop/explorationImprovementsTab.js'
+    ],
+
+    explorationStatisticsTab: [
+      'protractor_desktop/explorationStatisticsTab.js'
+    ],
+
+    explorationTranslationTab: [
+      'protractor_desktop/explorationTranslationTab.js'
+    ],
+
+    extensions: [
+      'protractor_desktop/extensions.js'
+    ],
+
+    fileUploadFeatures: [
+      'protractor_desktop/voiceoverUploadFeatures.js'
+    ],
+
+    learnerDashboard: [
+      'protractor_desktop/learnerDashboard.js'
+    ],
+
+    learner: [
+      'protractor/learnerFlow.js'
+    ],
+
+    library: [
+      'protractor/libraryFlow.js'
+    ],
+
+    navigation: [
+      'protractor_desktop/navigation.js'
+    ],
+
+    preferences: [
+      'protractor_desktop/preferences.js'
+    ],
+
+    profileFeatures: [
+      'protractor_desktop/profileFeatures.js'
+    ],
+
+    profileMenu: [
+      'protractor/profileMenuFlow.js'
+    ],
+
+    publication: [
+      'protractor_desktop/publicationAndLibrary.js'
+    ],
+
+    subscriptions: [
+      'protractor/subscriptionsFlow.js'
+    ],
+
+    topicAndStoryEditor: [
+      'protractor_desktop/topicAndStoryEditor.js'
+    ],
+
+    topicsAndSkillsDashboard: [
+      'protractor_desktop/topicsAndSkillsDashboard.js'
+    ],
+
+    skillEditor: [
+      'protractor_desktop/skillEditor.js'
+    ],
+
+    users: [
+      'protractor_desktop/userJourneys.js',
+    ],
+  };
 
 // A reference configuration file.
 exports.config = {
@@ -36,7 +166,25 @@ exports.config = {
   // if you need to change the browser timeout, use
   // seleniumArgs: ['-browserTimeout=60'],
   seleniumArgs: [],
-
+  beforeLaunch: function() {
+    Object.keys(suites).forEach(function(key) {
+      var patterns = suites[key];
+      for (var pattern of patterns) {
+        var fullPattern = path.resolve(__dirname, pattern);
+        var files = glob.sync(fullPattern);
+        if (files.length == 0) {
+          var errorMessage = '';
+          if (glob.hasMagic(pattern)) {
+            errorMessage = 'There are no files with the following pattern: ' + (
+              pattern);
+          } else {
+            errorMessage = pattern + ' does not exist.';
+          }
+          throw Error(errorMessage)
+        }
+      }
+    });
+  },
   // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
   // The tests will be run remotely using SauceLabs.
   sauceUser: null,
@@ -56,73 +204,7 @@ exports.config = {
   //
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
-  suites: {
-    // The tests on Travis are run individually to parallelize
-    // them. Therefore, we mention the complete directory
-    // in 'full'.
-    full: [
-      'protractor/*.js',
-      'protractor_desktop/*.js'
-    ],
-
-    // Unfortunately, adding more than one file to a test suite results in
-    // severe instability as of Chromedriver 2.38 (Chrome 66).
-    accessibility: [
-      'protractor/accessibility.js'
-    ],
-
-    collections: [
-      'protractor_desktop/collections.js'
-    ],
-
-    editorAndPlayer: [
-      'protractor_desktop/editorAndPlayer.js',
-    ],
-
-    editorFeatures: [
-      'protractor_desktop/editorFeatures.js'
-    ],
-
-    embedding: [
-      'protractor_desktop/embedding.js'
-    ],
-
-    extensions: [
-      'protractor_desktop/extensions.js'
-    ],
-
-    learnerDashboardSubscriptionsAndFeedbackThreads: [
-      'protractor_desktop/learnerDashboardSubscriptionsAndFeedbackThreads.js'
-    ],
-
-    learner: [
-      'protractor/learnerFlow.js'
-    ],
-
-    library: [
-      'protractor/libraryFlow.js'
-    ],
-
-    profileMenu: [
-      'protractor/profileMenuFlow.js'
-    ],
-
-    publication: [
-      'protractor_desktop/publicationAndLibrary.js'
-    ],
-
-    stateEditor: [
-      'protractor_desktop/stateEditor.js',
-    ],
-
-    subscriptions: [
-      'protractor/subscriptionsFlow.js'
-    ],
-
-    users: [
-      'protractor_desktop/userJourneys.js',
-    ],
-  },
+  suites: suites,
 
   // ----- Capabilities to be passed to the webdriver instance ----
   //
@@ -181,15 +263,15 @@ exports.config = {
 
     if (_ADD_SCREENSHOT_REPORTER) {
       // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-screenshot-reporter
-      jasmine.getEnv().addReporter(new ScreenShotReporter({
+      // https://www.npmjs.com/package/protractor-jasmine2-screenshot-reporter
+      jasmine.getEnv().addReporter(new HtmlScreenshotReporter({
         // Directory for screenshots
-        baseDirectory: '../protractor-screenshots',
+        dest: '../protractor-screenshots',
         // Function to build filenames of screenshots
-        pathBuilder: function(spec, descriptions, results, capabilities) {
+        filename: function(spec, descriptions, results, capabilities) {
           return descriptions[1] + ' ' + descriptions[0];
         },
-        takeScreenShotsOnlyForFailedSpecs: true
+        captureOnlyFailedSpecs: true
       }));
     }
 
