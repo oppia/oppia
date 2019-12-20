@@ -175,11 +175,6 @@ class FileMetadataModel(base_models.VersionedModel):
         super(FileMetadataModel, self).commit(
             committer_id, '', commit_cmds)
 
-    @staticmethod
-    def get_export_policy():
-        """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
 
 class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file snapshot commit history."""
