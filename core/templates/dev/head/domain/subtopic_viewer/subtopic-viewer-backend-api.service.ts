@@ -21,8 +21,8 @@ require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ajs.ts');
 
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtopicDataObjectFactory } from
-  'domain/subtopic_viewer/SubtopicDataObjectFactory';
+import { ReadOnlySubtopicPageObjectFactory } from
+  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicPageContentsObjectFactory } from
@@ -36,7 +36,7 @@ angular.module('oppia').factory('SubtopicViewerBackendApiService', [
   function($http, $q, UrlInterpolationService,
       SUBTOPIC_DATA_URL_TEMPLATE) {
     var subtopicDataObject = null;
-    var subtopicDataObjectFactory = new SubtopicDataObjectFactory(
+    var subtopicDataObjectFactory = new ReadOnlySubtopicPageObjectFactory(
       new SubtopicPageContentsObjectFactory(
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
         new SubtitledHtmlObjectFactory()

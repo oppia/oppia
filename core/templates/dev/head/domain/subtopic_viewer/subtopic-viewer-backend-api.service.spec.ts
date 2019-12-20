@@ -23,8 +23,8 @@ import { UpgradedServices } from 'services/UpgradedServices';
 import { TestBed } from '@angular/core/testing';
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 
-import { SubtopicDataObjectFactory } from
-  'domain/subtopic_viewer/SubtopicDataObjectFactory.ts';
+import { ReadOnlySubtopicPageObjectFactory } from
+  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 
 describe('Subtopic viewer backend API service', function() {
   var SubtopicViewerBackendApiService = null;
@@ -34,7 +34,7 @@ describe('Subtopic viewer backend API service', function() {
   var $httpBackend = null;
   var UndoRedoService = null;
   var sampleDataResultsObjects = null;
-  let subtopicDataObjectFactory: SubtopicDataObjectFactory =
+  let readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory =
     null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -51,8 +51,8 @@ describe('Subtopic viewer backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
-    subtopicDataObjectFactory = TestBed.get(
-      SubtopicDataObjectFactory);
+    readOnlySubtopicPageObjectFactory = TestBed.get(
+      ReadOnlySubtopicPageObjectFactory);
 
     // Sample subtopic page contents object returnable from the backend
     sampleDataResults = {
@@ -76,8 +76,8 @@ describe('Subtopic viewer backend API service', function() {
       }
     };
 
-    sampleDataResultsObjects = subtopicDataObjectFactory.createFromBackendDict(
-      sampleDataResults);
+    sampleDataResultsObjects = readOnlySubtopicPageObjectFactory.
+      createFromBackendDict(sampleDataResults);
   }));
 
   afterEach(function() {

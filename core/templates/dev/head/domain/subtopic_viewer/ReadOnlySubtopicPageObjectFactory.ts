@@ -23,7 +23,7 @@ import { Injectable } from '@angular/core';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
 
-export class SubtopicData {
+export class ReadOnlySubtopicPageData {
   subtopicTitle;
   pageContents;
 
@@ -44,7 +44,7 @@ export class SubtopicData {
 @Injectable({
   providedIn: 'root'
 })
-export class SubtopicDataObjectFactory {
+export class ReadOnlySubtopicPageObjectFactory {
   constructor(
     private subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory
   ) {}
@@ -52,8 +52,9 @@ export class SubtopicDataObjectFactory {
   // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  createFromBackendDict(subtopicDataBackendDict: any): SubtopicData {
-    return new SubtopicData(
+  createFromBackendDict(subtopicDataBackendDict: any):
+    ReadOnlySubtopicPageData {
+    return new ReadOnlySubtopicPageData(
       subtopicDataBackendDict.subtopic_title,
       this.subtopicPageContentsObjectFactory.createFromBackendDict(
         subtopicDataBackendDict.page_contents
@@ -63,5 +64,5 @@ export class SubtopicDataObjectFactory {
 }
 
 angular.module('oppia').factory(
-  'SubtopicDataObjectFactory',
-  downgradeInjectable(SubtopicDataObjectFactory));
+  'ReadOnlySubtopicPageObjectFactory',
+  downgradeInjectable(ReadOnlySubtopicPageObjectFactory));

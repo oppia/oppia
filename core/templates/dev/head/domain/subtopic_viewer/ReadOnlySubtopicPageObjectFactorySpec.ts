@@ -21,19 +21,21 @@ import { TestBed } from '@angular/core/testing';
 import { SubtopicPageContentsObjectFactory } from
   'domain/topic/SubtopicPageContentsObjectFactory';
 
-import { SubtopicDataObjectFactory } from
-  'domain/subtopic_viewer/SubtopicDataObjectFactory.ts';
+import { ReadOnlySubtopicPageObjectFactory } from
+  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 
 describe('Subtopic data object factory', () => {
   describe('subtopic data object factory', () => {
     var _sampleSubtopicData = null;
-    let subtopicDataObjectFactory: SubtopicDataObjectFactory = (
-      null);
+    let readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory =
+      (null);
     let subtopicPageContentsObjectFactory: SubtopicPageContentsObjectFactory =
       null;
 
     beforeEach(() => {
-      subtopicDataObjectFactory = TestBed.get(SubtopicDataObjectFactory);
+      readOnlySubtopicPageObjectFactory = TestBed.get(
+        ReadOnlySubtopicPageObjectFactory
+      );
       subtopicPageContentsObjectFactory = TestBed.get(
         SubtopicPageContentsObjectFactory);
 
@@ -58,8 +60,8 @@ describe('Subtopic data object factory', () => {
         }
       };
 
-      _sampleSubtopicData = subtopicDataObjectFactory.createFromBackendDict(
-        sampleSubtopicDataBackendDict);
+      _sampleSubtopicData = readOnlySubtopicPageObjectFactory.
+        createFromBackendDict(sampleSubtopicDataBackendDict);
     });
 
     it('should be able to get all the values', function() {
