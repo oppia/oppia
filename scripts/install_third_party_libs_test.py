@@ -50,7 +50,6 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
 
         self.check_function_calls = {
             'check_call_is_called': False,
-            'check_exception_is_called': False
         }
         self.print_arr = []
         # pylint: disable=unused-argument
