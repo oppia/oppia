@@ -674,6 +674,8 @@ class AddReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid assignment: %s' % user_allowed_to_review)
 
+        self.render_json({})
+
 
 class CommunityReviewersHandler(base.BaseHandler):
     """Handler to show the existing reviewers."""

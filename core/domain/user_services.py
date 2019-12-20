@@ -1799,7 +1799,7 @@ def can_review_voiceover_applications(user_id, language_code=None):
         return True if reviewable_language_codes else None
 
 
-def can_review_questions(user_id):
+def can_review_question_suggestions(user_id):
     """Checks whether the user can review question suggestion.
 
     Args:

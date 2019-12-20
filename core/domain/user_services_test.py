@@ -1464,12 +1464,12 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
 
     def test_assign_user_review_question_suggestion(self):
         self.assertFalse(
-            user_services.can_review_questions(self.voice_artist_id))
+            user_services.can_review_question_suggestions(self.voice_artist_id))
 
         user_services.allow_user_review_question(self.voice_artist_id)
 
         self.assertTrue(
-            user_services.can_review_questions(self.voice_artist_id))
+            user_services.can_review_question_suggestions(self.voice_artist_id))
 
     def test_get_all_community_reviewers(self):
         self.assertEqual(user_services.get_all_community_reviewers(), [])

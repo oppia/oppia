@@ -23,6 +23,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -397,3 +398,34 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
         }
 
         self.assertEqual(output, expected_output)
+
+
+class UserCommunityRightsDataHandlerTest(test_utils.GenericTestBase):
+    """Test for the UserCommunityRightsDataHandler."""
+
+    def test_guest_user_check_community_rights(self):
+        response = self.get_json('/usercommunityrightsdatahandler')
+
+        self.assertEqual(response, {})
+
+    def test_user_check_community_rights(self):
+        user_email = 'user@example.com'
+        self.signup(user_email, 'user')
+        user_id = self.get_user_id_from_email(user_email)
+        self.login(user_email)
+
+        response = self.get_json('/usercommunityrightsdatahandler')
+        self.assertEqual(response, {
+            'can_review_translation_in_languages': [],
+            'can_review_voiceover_in_languages': [],
+            'can_review_questions': False
+        })
+
+        user_services.allow_user_review_question(user_id)
+
+        response = self.get_json('/usercommunityrightsdatahandler')
+        self.assertEqual(response, {
+            'can_review_translation_in_languages': [],
+            'can_review_voiceover_in_languages': [],
+            'can_review_questions': True
+        })

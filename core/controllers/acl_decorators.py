@@ -2532,7 +2532,7 @@ def get_decorator_for_accepting_suggestion(decorator):
                     return handler(self, target_id, suggestion_id, **kwargs)
             elif suggestion.suggestion_type == (
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-                if user_services.can_review_questions(self.user_id):
+                if user_services.can_review_question_suggestions(self.user_id):
                     return handler(self, target_id, suggestion_id, **kwargs)
 
             return decorator(handler)(self, target_id, suggestion_id, **kwargs)
@@ -2576,7 +2576,7 @@ def can_view_reviewable_suggestions(handler):
                 return handler(self, target_type, suggestion_type, **kwargs)
         elif suggestion_type == (
                 suggestion_models.SUGGESTION_TYPE_ADD_QUESTION):
-            if user_services.can_review_questions(self.user_id):
+            if user_services.can_review_question_suggestions(self.user_id):
                 return handler(self, target_type, suggestion_type, **kwargs)
         else:
             raise self.PageNotFoundException
