@@ -56,8 +56,8 @@ angular.module('oppia').directive('rubricsEditor', [
           var ctrl = this;
           ctrl.activeRubricIndex = 0;
           ctrl.explanationEditorIsOpen = [false, false, false];
-          ctrl.inSkillEditor = (
-            ContextService.getPageContext() ===
+          ctrl.newSkillBeingCreated = (
+            ContextService.getPageContext() !==
             PAGE_CONTEXT.SKILL_EDITOR);
           var explanationMemento = [null, null, null];
 
