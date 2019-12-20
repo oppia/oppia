@@ -143,8 +143,10 @@ angular.module('oppia').config([
               }
               AlertsService.addWarning(warningMessage);
             }
+            var rejectionUrl = typeof rejection.config !== 'undefined' ? (
+              rejection.config.url) : '';
             var additionalLoggingInfo = warningMessage +
-              '\n URL: ' + rejection.config.url +
+              '\n URL: ' + rejectionUrl +
               '\n data: ' + JSON.stringify(rejection.data);
             $exceptionHandler(new Error(additionalLoggingInfo));
             return $q.reject(rejection);
