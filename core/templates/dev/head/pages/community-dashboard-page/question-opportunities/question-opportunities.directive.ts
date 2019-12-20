@@ -109,7 +109,7 @@ angular.module('oppia').directive('questionOpportunities', [
             }
           };
 
-          ctrl.onClickButton = function(skillId) {
+          ctrl.onClickSuggestQuestionButton = function(skillId) {
             var opportunity = getOpportunity(skillId);
             var question =
               QuestionObjectFactory.createDefaultQuestion([skillId]);
@@ -165,7 +165,7 @@ angular.module('oppia').directive('questionOpportunities', [
                         'correspond to a correct answer';
                       return;
                     }
-                    QuestionSuggestionService.addSuggestion($scope.question,
+                    QuestionSuggestionService.submitSuggestion($scope.question,
                       $scope.associatedSkill, opportunity.heading);
                     $uibModalInstance.close();
                   };
