@@ -15,7 +15,6 @@
 /**
  * @fileoverview Directive for the rubric editor for skills.
  */
-
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');
@@ -31,6 +30,8 @@ require('objects/objectComponentsRequires.ts');
 
 require('directives/angular-html-bind.directive.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
+require('services/context.service.ts');
+require('services/services.constants.ts');
 
 angular.module('oppia').directive('rubricsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -47,14 +48,18 @@ angular.module('oppia').directive('rubricsEditor', [
         '/components/rubrics-editor/rubrics-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
-        'RubricObjectFactory', 'EVENT_SKILL_REINITIALIZED',
+        '$scope', '$filter', '$uibModal', '$rootScope', 'ContextService',
+        'RubricObjectFactory', 'EVENT_SKILL_REINITIALIZED', 'PAGE_CONTEXT',
         function(
-            $scope, $filter, $uibModal, $rootScope,
-            RubricObjectFactory, EVENT_SKILL_REINITIALIZED) {
+            $scope, $filter, $uibModal, $rootScope, ContextService,
+            RubricObjectFactory, EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT) {
           var ctrl = this;
           ctrl.activeRubricIndex = 0;
           ctrl.explanationEditorIsOpen = [false, false, false];
+          ctrl.inSkillEditor = (
+            ContextService.getPageContext() ===
+            PAGE_CONTEXT.SKILL_EDITOR);
+          console.log(ctrl.inCreateSkillModal);
           var explanationMemento = [null, null, null];
 
           ctrl.isEditable = function() {
