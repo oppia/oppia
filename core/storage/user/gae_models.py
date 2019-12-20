@@ -1464,11 +1464,6 @@ class UserQueryModel(base_models.BaseModel):
         next_cursor = next_cursor.urlsafe() if (next_cursor and more) else None
         return query_models, next_cursor, more
 
-    @staticmethod
-    def get_export_policy():
-        """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
 
 class UserBulkEmailsModel(base_models.BaseModel):
     """Model to store IDs BulkEmailModel sent to a user.
@@ -1737,8 +1732,3 @@ class UserContributionScoringModel(base_models.BaseModel):
         else:
             model.score += increment_by
             model.put()
-
-    @staticmethod
-    def get_export_policy():
-        """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE

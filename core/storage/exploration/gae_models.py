@@ -406,7 +406,6 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
-
     @classmethod
     def get_multi(cls, exp_id, exp_versions):
         """Gets the ExplorationCommitLogEntryModels for the given exploration
@@ -478,11 +477,6 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
-
-    @staticmethod
-    def get_export_policy():
-        """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class ExpSummaryModel(base_models.BaseModel):
