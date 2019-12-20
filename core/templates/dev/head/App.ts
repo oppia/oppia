@@ -130,7 +130,6 @@ angular.module('oppia').config([
             return config;
           },
           responseError: function(rejection) {
-            var warningMessage = 'Error communicating with server.';
             // A rejection status of -1 seems to indicate (it's hard to find
             // documentation) that the response has not completed,
             // which can occur if the user navigates away from the page
@@ -138,17 +137,24 @@ angular.module('oppia').config([
             // an error.
             if (rejection.status !== -1) {
               $log.error(rejection.data);
+              var warningMessage = 'Error communicating with server.';
               if (rejection.data && rejection.data.error) {
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
+              // rejection.config is an optional parameter.
+              // see https://docs.angularjs.org/api/ng/service/$http
+              var rejectionUrl = typeof rejection.config !== 'undefined' ? (
+                rejection.config.url) : '';
+              var additionalLoggingInfo = warningMessage +
+                '\n URL: ' + rejectionUrl +
+                '\n data: ' + JSON.stringify(rejection.data);
+              // $exceptionHandler is called directly instead of
+              // throwing an error to invoke it because the return
+              // statement below must execute. There are tests
+              // that rely on this.
+              $exceptionHandler(new Error(additionalLoggingInfo));
             }
-            var rejectionUrl = typeof rejection.config !== 'undefined' ? (
-              rejection.config.url) : '';
-            var additionalLoggingInfo = warningMessage +
-              '\n URL: ' + rejectionUrl +
-              '\n data: ' + JSON.stringify(rejection.data);
-            $exceptionHandler(new Error(additionalLoggingInfo));
             return $q.reject(rejection);
           }
         };
