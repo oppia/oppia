@@ -3297,7 +3297,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New title'
-            })], 'Changes.')
+            })], 'Changes.', for_testing=True)
 
         expected_output = [
             u'[u\'fully-validated ExplorationModel\', 3]']
@@ -3355,7 +3355,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New title'
-            })], 'Changes.')
+            })], 'Changes.', for_testing=True)
         exp_models.ExplorationCommitLogEntryModel.get_by_id(
             'exploration-0-1').delete()
 
@@ -3468,7 +3468,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New title'
-            })], 'Changes.')
+            })], 'Changes.', for_testing=True)
         expected_output = [
             u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 4]']
         run_job_and_check_output(self, expected_output)
@@ -3624,7 +3624,7 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New title'
-            })], 'Changes.')
+            })], 'Changes.', for_testing=True)
         expected_output = [
             u'[u\'fully-validated ExplorationSnapshotContentModel\', 4]']
         run_job_and_check_output(self, expected_output)
@@ -4206,7 +4206,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New title'
-            })], 'Changes.')
+            })], 'Changes.', for_testing=True)
         expected_output = [
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 5]']
         run_job_and_check_output(self, expected_output)
@@ -4444,7 +4444,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New title'
-            })], 'Changes.')
+            })], 'Changes.', for_testing=True)
 
         rights_manager.assign_role_for_exploration(
             self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
@@ -4466,7 +4466,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New title'
-            })], 'Changes.')
+            })], 'Changes.', for_testing=True)
         expected_output = [
             u'[u\'fully-validated ExpSummaryModel\', 3]']
         run_job_and_check_output(self, expected_output)
@@ -14002,13 +14002,13 @@ class UserContributionsModelValidatorTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
         exp_services.update_exploration(
             self.owner_id, 'exp0', [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'The objective'
-            })], 'Test edit 2')
+            })], 'Test edit 2', for_testing=True)
         rights_manager.publish_exploration(self.owner, 'exp0')
         rights_manager.publish_exploration(self.owner, 'exp1')
 

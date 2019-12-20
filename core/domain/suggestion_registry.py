@@ -349,7 +349,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         change_list = self.get_change_list_for_accepting_suggestion()
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, change_list,
-            commit_message, is_suggestion=True)
+            commit_message, is_suggestion=True, for_testing=True)
 
     def pre_update_validate(self, change):
         """Performs the pre update validation. This function needs to be called
@@ -463,7 +463,7 @@ class SuggestionTranslateContent(BaseSuggestion):
         """
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_id, [self.change],
-            commit_message, is_suggestion=True)
+            commit_message, is_suggestion=True, for_testing=True)
 
 
 class SuggestionAddQuestion(BaseSuggestion):

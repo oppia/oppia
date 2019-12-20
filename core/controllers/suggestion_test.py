@@ -1023,7 +1023,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                         'content_id': 'content',
                         'html': '<p>new content html</p>'
                     }
-                })], 'Add content')
+                })], 'Add content', for_testing=True)
 
         self.logout()
 
@@ -1195,7 +1195,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
                         'content_id': 'content',
                         'html': '<p>new content html</p>'
                     }
-                })], 'Add content')
+                })], 'Add content', for_testing=True)
 
         self.logout()
 

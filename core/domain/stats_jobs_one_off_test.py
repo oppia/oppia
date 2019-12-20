@@ -204,7 +204,8 @@ class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
                 {'cmd': 'add_state', 'state_name': 'New state'})]
         # v2 version does not have ExplorationStatsModel.
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '',
+            for_testing=True)
         self.exp1 = exp_fetchers.get_exploration_by_id(self.exp1.id)
 
     def test_stats_models_regeneration_works(self):
@@ -248,7 +249,8 @@ class RegenerateMissingV1StatsModelsOneOffJobTests(OneOffJobTestBase):
             'new_state_name': 'Another state'
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '',
+            for_testing=True)
 
         model_id = '%s.3' % self.EXP_ID
         model1 = stats_models.ExplorationStatsModel.get(model_id)
@@ -282,7 +284,8 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
 
         change_list = []
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -291,7 +294,8 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         stats_models.StateCompleteEventLogEntryModel(
             id='id0',
@@ -398,7 +402,8 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         job_output = self.run_one_off_job()
         self.assertEqual(job_output, [])
@@ -419,7 +424,8 @@ class RecomputeStateCompleteStatisticsTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         job_output = self.run_one_off_job()
         self.assertEqual(job_output, [])
@@ -452,7 +458,8 @@ class RecomputeAnswerSubmittedStatisticsTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         stats_models.AnswerSubmittedEventLogEntryModel(
             id='id1',
@@ -558,7 +565,8 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
 
         change_list = []
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -567,7 +575,8 @@ class RecomputeStateHitStatisticsTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         stats_models.StateHitEventLogEntryModel(
             id='id1',
@@ -714,7 +723,8 @@ class RecomputeSolutionHitStatisticsTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         stats_models.SolutionHitEventLogEntryModel(
             id='id1',
@@ -818,9 +828,11 @@ class RecomputeActualStartStatisticsTests(OneOffJobTestBase):
         change_list = []
         # Update exploration to version 3.
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id1',
@@ -965,7 +977,8 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
 
         change_list = []
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         stats_models.CompleteExplorationEventLogEntryModel(
             id='id1',
@@ -1413,7 +1426,8 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
 
         change_list = []
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -1422,7 +1436,8 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         exp_services.revert_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, 3, 2)
@@ -1435,7 +1450,8 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
     def test_job_successfully_regenerates_deleted_model(self):
         self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)

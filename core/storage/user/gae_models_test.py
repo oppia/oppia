@@ -515,7 +515,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_b_id, end_state_name='End')
@@ -525,7 +525,7 @@ class UserContributionsModelTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
         user_models.UserContributionsModel(
             id=self.USER_C_ID,

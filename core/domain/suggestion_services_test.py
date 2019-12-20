@@ -209,7 +209,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     def mock_update_exploration(
             self, unused_user_id, unused_exploration_id, unused_change_list,
-            commit_message, is_suggestion):
+            commit_message, is_suggestion, for_testing=False):
         self.assertTrue(is_suggestion)
         self.assertEqual(
             commit_message, 'Accepted suggestion by %s: %s' % (
@@ -277,7 +277,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'state_name': 'state 1',
         })]
         exp_services.update_exploration(
-            self.author_id, self.target_id, change_list, 'Add state.')
+            self.author_id, self.target_id, change_list, 'Add state.',
+            for_testing=True)
 
         new_suggestion_content = state_domain.SubtitledHtml(
             'content', '<p>new suggestion content html</p>').to_dict()

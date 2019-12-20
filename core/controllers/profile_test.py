@@ -191,7 +191,7 @@ class UserContributionsTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_B)

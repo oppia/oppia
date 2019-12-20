@@ -65,7 +65,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
 
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
-            'Changed exploration title.')
+            'Changed exploration title.', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
@@ -75,7 +75,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     def test_try_upgrade_failure_due_to_unsupported_commit_type(self):
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.OTHER_CHANGE_LIST,
-            'Changed exploration title.')
+            'Changed exploration title.', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
@@ -85,7 +85,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     def test_try_upgrade_failure_due_to_unimplemented_upgrade_methods(self):
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
-            'Ran Exploration Migration job.')
+            'Ran Exploration Migration job.', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
@@ -95,7 +95,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
     def test_try_upgrade_success(self):
         exp_services.update_exploration(
             self.USER_ID, self.EXP_ID, self.EXP_MIGRATION_CHANGE_LIST,
-            'Ran Exploration Migration job.')
+            'Ran Exploration Migration job.', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         draft_upgrade_services.DraftUpgradeUtil._convert_states_v0_dict_to_v1_dict = (  # pylint: disable=protected-access,line-too-long
             classmethod(lambda cls, changelist: changelist))

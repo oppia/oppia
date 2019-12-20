@@ -113,7 +113,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_d_id, end_state_name='End')
@@ -123,7 +123,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
         self.save_new_valid_exploration(
             self.EXP_ID_3, self.user_e_id, end_state_name='End')

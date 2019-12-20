@@ -365,7 +365,7 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                         'content_id': 'content',
                         'html': '<p>The new content to voiceover</p>'
                     }
-                })], 'Adds new content to init state')
+                })], 'Adds new content to init state', for_testing=True)
 
         content = voiceover_services.get_text_to_create_voiceover_application(
             suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'en')
@@ -390,7 +390,8 @@ class VoiceoverApplicationServicesUnitTests(test_utils.GenericTestBase):
                     'language_code': 'hi',
                     'content_html': '<p>The new content to voiceover</p>',
                     'translation_html': '<p>Translation in Hindi</p>'
-                })], 'Adds new content to init state and its translation')
+                })], 'Adds new content to init state and its translation',
+                for_testing=True)
 
         content = voiceover_services.get_text_to_create_voiceover_application(
             suggestion_models.TARGET_TYPE_EXPLORATION, '0', 'hi')

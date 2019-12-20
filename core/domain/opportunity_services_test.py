@@ -374,7 +374,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION),
                     'state_name': 'Introduction',
                     'new_value': solution_dict
-                })], 'Add state name')
+                })], 'Add state name', for_testing=True)
         translation_opportunities, _, _ = (
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertEqual(len(translation_opportunities), 1)

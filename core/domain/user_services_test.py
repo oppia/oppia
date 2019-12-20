@@ -643,7 +643,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
-            })], 'commit')
+            })], 'commit', for_testing=True)
 
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
@@ -666,7 +666,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
-            })], '')
+            })], '', for_testing=True)
         self.assertIsNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
 
@@ -679,7 +679,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
                 'cmd': 'rename_state',
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
                 'new_state_name': u'¡Hola! αβγ',
-            })], '')
+            })], '', for_testing=True)
         self.assertIsNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
@@ -1102,7 +1102,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNotNone(editor_settings.last_edited_an_exploration)
@@ -1113,7 +1113,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
         # Decrease last exploration edited time by 13 hours.
         user_settings = user_services.get_user_settings(self.editor_id)
@@ -1134,7 +1134,7 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'new objective'
-            })], 'Test edit 2')
+            })], 'Test edit 2', for_testing=True)
 
         # Make sure last exploration edited time gets updated.
         editor_settings = user_services.get_user_settings(self.editor_id)

@@ -253,7 +253,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'category',
                 'new_value': 'edited category'
-            })], 'Change title and category')
+            })], 'Change title and category', for_testing=True)
 
         # Since user has edited one exploration created by another user,
         # going to '/' should redirect to the dashboard page.

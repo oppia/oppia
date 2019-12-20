@@ -157,7 +157,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
         # Setup for ExplorationUserDataModel.
         user_models.ExplorationUserDataModel(

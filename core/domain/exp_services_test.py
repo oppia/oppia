@@ -141,7 +141,8 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
                     exp_services.update_exploration(
-                        self.owner_id, self.EXP_ID, change_list, '')
+                        self.owner_id, self.EXP_ID, change_list, '',
+                        for_testing=True)
 
         exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         job = classifier_services.get_classifier_training_jobs(
@@ -158,7 +159,8 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
                     exp_services.update_exploration(
-                        self.owner_id, self.EXP_ID, change_list, '')
+                        self.owner_id, self.EXP_ID, change_list, '',
+                        for_testing=True)
 
                     exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
                     # Revert exploration to previous version.
@@ -224,7 +226,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 'Introduction', exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                'MultipleChoiceInput'), '', for_testing=True)
         self.assertEqual(exp_services.get_interaction_id_for_state(
             self.EXP_ID, 'Introduction'), 'MultipleChoiceInput')
         with self.assertRaisesRegexp(
@@ -608,7 +610,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                         param_domain.ParamSpec('UnicodeString').to_dict()
                 }
             })],
-            '')
+            '', for_testing=True)
 
         retrieved_exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(retrieved_exploration.title, 'A title')
@@ -630,7 +632,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'theParameter':
                         param_domain.ParamSpec('UnicodeString').to_dict()
                 }
-            })], '')
+            })], '', for_testing=True)
 
         # Change title and category.
         exp_services.update_exploration(
@@ -642,7 +644,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'category',
                 'new_value': 'A new category'
-            })], 'Change title and category')
+            })], 'Change title and category', for_testing=True)
 
         retrieved_exp_summary = exp_fetchers.get_exploration_summary_by_id(
             self.EXP_ID)
@@ -662,7 +664,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'cmd': 'edit_exploration_property',
                     'property_name': 'title',
                     'new_value': 'New title'
-                })], 'Did migration.')
+                })], 'Did migration.', for_testing=True)
 
     def test_update_exploration_by_migration_bot_not_updates_contribution_model(
             self):
@@ -684,7 +686,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'cmd': 'edit_exploration_property',
                     'property_name': 'title',
                     'new_value': 'New title'
-                })], 'Did migration.')
+                })], 'Did migration.', for_testing=True)
 
         migration_bot_contributions_model = (
             user_services.get_user_contributions(feconf.MIGRATION_BOT_USER_ID))
@@ -704,7 +706,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'cmd': 'edit_exploration_property',
                     'property_name': 'title',
                     'new_value': 'New title'
-                })], 'Did migration.')
+                })], 'Did migration.', for_testing=True)
 
         migration_bot_settings_model = (
             user_services.get_user_settings_from_username(
@@ -1660,7 +1662,7 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
-                })], 'Add state name')
+                })], 'Add state name', for_testing=True)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
         zf = zipfile.ZipFile(python_utils.string_io(
@@ -1695,7 +1697,7 @@ title: A title
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
-                })], 'Add state name')
+                })], 'Add state name', for_testing=True)
 
         with python_utils.open_file(
             os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
@@ -1748,7 +1750,7 @@ title: A title
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
-            self.owner_id, exploration.id, change_list, '')
+            self.owner_id, exploration.id, change_list, '', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
 
@@ -1758,7 +1760,7 @@ title: A title
             'new_state_name': 'Renamed state'
         })]
         exp_services.update_exploration(
-            self.owner_id, exploration.id, change_list, '')
+            self.owner_id, exploration.id, change_list, '', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 3)
 
@@ -1923,7 +1925,7 @@ written_translations:
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'state_name': 'New state',
                     'new_value': 'TextInput'
-                })], 'Add state name')
+                })], 'Add state name', for_testing=True)
 
         dict_output = exp_services.export_states_to_yaml(self.EXP_ID, width=50)
 
@@ -1963,7 +1965,7 @@ written_translations:
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
-            self.owner_id, exploration.id, change_list, '')
+            self.owner_id, exploration.id, change_list, '', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
 
@@ -1973,7 +1975,7 @@ written_translations:
             'new_state_name': 'Renamed state'
         })]
         exp_services.update_exploration(
-            self.owner_id, exploration.id, change_list, '')
+            self.owner_id, exploration.id, change_list, '', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 3)
 
@@ -2058,7 +2060,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'new state',
-            })], 'Add state name')
+            })], 'Add state name', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertIn('new state', exploration.states)
@@ -2074,7 +2076,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
                 'new_state_name': 'state',
-            })], 'Change state name')
+            })], 'Change state name', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertIn('state', exploration.states)
@@ -2092,7 +2094,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
                 'new_state_name': u'¡Hola! αβγ',
-            })], 'Change state name')
+            })], 'Change state name', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertIn(u'¡Hola! αβγ', exploration.states)
@@ -2106,7 +2108,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'new state',
-            })], 'Add state name')
+            })], 'Add state name', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
@@ -2116,7 +2118,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_DELETE_STATE,
                 'state_name': 'new state',
-            })], 'delete state')
+            })], 'delete state', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertNotIn('new state', exploration.states)
@@ -2129,7 +2131,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services.save_exploration(self.owner_id, exploration, '', [])
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'param_changes', self.param_changes), '')
+                self.init_state_name, 'param_changes', self.param_changes), '',
+                for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         param_changes = exploration.init_state.param_changes[0]
@@ -2148,7 +2151,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),
-                '')
+                '', for_testing=True)
 
     def test_update_reserved_param_changes(self):
         param_changes = [{
@@ -2165,7 +2168,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, _get_change_list(
                     self.init_state_name, 'param_changes', param_changes),
-                '')
+                '', for_testing=True)
 
     def test_update_invalid_generator(self):
         """Test for check that the generator_id in param_changes exists."""
@@ -2182,14 +2185,14 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.owner_id, self.EXP_ID,
                 _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),
-                '')
+                '', for_testing=True)
 
     def test_update_interaction_id(self):
         """Test updating of interaction_id."""
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                'MultipleChoiceInput'), '', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
@@ -2206,7 +2209,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
                 {'choices': {'value': ['Option A', 'Option B']}}),
-            '')
+            '', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
@@ -2224,7 +2227,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'TextInput'),
-            'Add state name')
+            'Add state name', for_testing=True)
 
         self.interaction_default_outcome['dest'] = 'State 2'
         with self.assertRaisesRegexp(
@@ -2241,7 +2244,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
                     self.interaction_answer_groups),
-                '')
+                '', for_testing=True)
 
     def test_update_interaction_answer_groups(self):
         """Test updating of interaction_answer_groups."""
@@ -2256,7 +2259,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'State 2',
                 exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'TextInput'),
-            'Add state name')
+            'Add state name', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.interaction_default_outcome['dest'] = 'State 2'
@@ -2273,7 +2276,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
                 self.interaction_default_outcome),
-            '')
+            '', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         init_state = exploration.init_state
@@ -2307,7 +2310,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
                     self.interaction_default_outcome),
-                '')
+                '', for_testing=True)
 
     def test_update_state_missing_keys(self):
         """Test that missing keys in interaction_answer_groups produce an
@@ -2328,7 +2331,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
                     self.interaction_default_outcome),
-                '')
+                '', for_testing=True)
 
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
@@ -2351,7 +2354,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
                     self.interaction_default_outcome),
-                '')
+                '', for_testing=True)
 
     def test_update_content(self):
         """Test updating of content."""
@@ -2361,7 +2364,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
                 }),
-            '')
+            '', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
@@ -2389,7 +2392,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'translation_html': '<p>Translated text</p>'
         }))
         exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, change_list, '')
+            self.owner_id, self.EXP_ID, change_list, '', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
 
@@ -2407,7 +2410,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
                 True),
-            '')
+            '', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, True)
@@ -2425,7 +2428,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
                     'abc'),
-                '')
+                '', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
@@ -2438,7 +2441,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name, 'content', {
                         'html': '<b>Test content</b>',
                     }),
-                '')
+                '', for_testing=True)
 
     def test_update_written_translations(self):
         """Test update content translations."""
@@ -2456,7 +2459,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'written_translations',
-                written_translations_dict), 'Added text translations.')
+                written_translations_dict), 'Added text translations.',
+                for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exploration.init_state.written_translations.to_dict(),
@@ -2469,7 +2473,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, _get_change_list(
                     self.init_state_name, 'written_translations',
-                    [1, 2]), 'Added fake text translations.')
+                    [1, 2]), 'Added fake text translations.', for_testing=True)
 
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
@@ -2489,7 +2493,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_STICKY,
-                False), 'A message')
+                False), 'A message', for_testing=True)
 
         self.assertEqual(
             exp_services.get_exploration_snapshots_metadata(
@@ -2508,7 +2512,8 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, _get_change_list(
                     self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False), '')
+                    exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False), '',
+                    for_testing=True)
 
     def test_unpublished_explorations_can_accept_commit_message(self):
         """Test unpublished explorations can accept optional commit messages."""
@@ -2516,19 +2521,19 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False
-            ), 'A message')
+            ), 'A message', for_testing=True)
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_STICKY, True
-            ), '')
+            ), '', for_testing=True)
 
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_STICKY, True
-            ), None)
+            ), None, for_testing=True)
 
 
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
@@ -2550,7 +2555,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
                     'new_value': 'New title'
-                })], 'Did migration.')
+                })], 'Did migration.', for_testing=True)
 
         self.assertLess(
             original_timestamp,
@@ -2612,7 +2617,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         })]
         change_list_dict = [change.to_dict() for change in change_list]
         exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, change_list, 'Changed title.')
+            self.owner_id, self.EXP_ID, change_list, 'Changed title.',
+            for_testing=True)
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_ID)
@@ -2656,7 +2662,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             second_committer_id, self.EXP_ID, new_change_list,
-            'Second commit.')
+            'Second commit.', for_testing=True)
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
             self.EXP_ID)
@@ -2720,7 +2726,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         })]
         exp_services.update_exploration(
             'second_committer_id', exploration.id, change_list,
-            'Added new state')
+            'Added new state', for_testing=True)
 
         commit_dict_3 = {
             'committer_id': 'second_committer_id',
@@ -2750,7 +2756,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         })]
         exp_services.update_exploration(
             'committer_id_3', exploration.id, change_list,
-            'Deleted state: New state')
+            'Deleted state: New state', for_testing=True)
 
         commit_dict_4 = {
             'committer_id': 'committer_id_3',
@@ -2794,7 +2800,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'new_value': 'TextInput'
         })]
         exp_services.update_exploration(
-            'committer_id_v3', exploration.id, change_list, 'Added new state')
+            'committer_id_v3', exploration.id, change_list, 'Added new state',
+            for_testing=True)
 
         # It is not possible to revert from anything other than the most
         # current version.
@@ -3104,7 +3111,8 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
                     exp_domain.ExplorationChange({
                         'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                         'property_name': 'category',
-                        'new_value': 'cat1'})], 'update category')
+                        'new_value': 'cat1'})], 'update category',
+                        for_testing=True)
             self.assertEqual(actual_docs, [updated_exp_doc])
             self.assertEqual(add_docs_counter.times_called, 3)
 
@@ -3245,7 +3253,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
-            })], 'Changed title.')
+            })], 'Changed title.', for_testing=True)
         # Have Bob revert Albert's update.
         exp_services.revert_exploration(bob_id, self.EXP_ID_1, 2, 1)
 
@@ -3287,7 +3295,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
-            })], 'Changed title.')
+            })], 'Changed title.', for_testing=True)
         self._check_contributors_summary(
             self.EXP_ID_1, {albert_id: 1, bob_id: 1})
         # Have Bob update that exploration. Version 3.
@@ -3296,7 +3304,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
-            })], 'Changed title.')
+            })], 'Changed title.', for_testing=True)
         self._check_contributors_summary(
             self.EXP_ID_1, {albert_id: 1, bob_id: 2})
 
@@ -3306,7 +3314,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
-            })], 'Changed title.')
+            })], 'Changed title.', for_testing=True)
         self._check_contributors_summary(
             self.EXP_ID_1, {albert_id: 2, bob_id: 2})
 
@@ -3368,7 +3376,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
-            })], 'Changed title.')
+            })], 'Changed title.', for_testing=True)
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
@@ -3377,14 +3385,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
-            })], 'Changed title to Albert1 title.')
+            })], 'Changed title to Albert1 title.', for_testing=True)
 
         exp_services.update_exploration(
             self.albert_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 2 Albert title'
-            })], 'Changed title to Albert2 title.')
+            })], 'Changed title to Albert2 title.', for_testing=True)
 
         exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
@@ -3615,7 +3623,7 @@ title: Old Title
         self.assertEqual(exploration.language_code, 'en')
 
         exp_services.update_exploration(
-            'user_id', 'exp_id', None, 'empty commit')
+            'user_id', 'exp_id', None, 'empty commit', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id('exp_id')
 
@@ -3640,7 +3648,7 @@ title: Old Title
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
                     'new_value': 'new title'
-                })], 'changed title')
+                })], 'changed title', for_testing=True)
 
     def test_update_exploration_as_suggestion_with_invalid_commit_message(self):
         self.save_new_valid_exploration('exp_id', 'user_id')
@@ -3655,7 +3663,7 @@ title: Old Title
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
                     'new_value': 'new title'
-                })], '', is_suggestion=True)
+                })], '', is_suggestion=True, for_testing=True)
 
     def test_update_exploration_with_invalid_commit_message(self):
         self.save_new_valid_exploration('exp_id', 'user_id')
@@ -3671,7 +3679,8 @@ title: Old Title
                     'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                     'property_name': 'title',
                     'new_value': 'new title'
-                })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
+                })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX,
+                for_testing=True)
 
     def test_update_language_code(self):
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
@@ -3681,7 +3690,7 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'language_code',
                 'new_value': 'bn'
-            })], 'Changed language code.')
+            })], 'Changed language code.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.language_code, 'bn')
@@ -3694,7 +3703,7 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'tags',
                 'new_value': ['test']
-            })], 'Changed tags.')
+            })], 'Changed tags.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.tags, ['test'])
@@ -3707,7 +3716,7 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'author_notes',
                 'new_value': 'author_notes'
-            })], 'Changed author_notes.')
+            })], 'Changed author_notes.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.author_notes, 'author_notes')
@@ -3720,7 +3729,7 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'blurb',
                 'new_value': 'blurb'
-            })], 'Changed blurb.')
+            })], 'Changed blurb.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.blurb, 'blurb')
@@ -3746,7 +3755,7 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'param_changes',
                 'new_value': param_changes
-            })], 'Changed param_changes.')
+            })], 'Changed param_changes.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
@@ -3761,7 +3770,7 @@ title: Old Title
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_ADD_STATE,
                 'state_name': 'State'
-            })], 'Added new state.')
+            })], 'Added new state.', for_testing=True)
 
         self.assertEqual(
             exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME)
@@ -3771,7 +3780,7 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'init_state_name',
                 'new_value': 'State'
-            })], 'Changed init_state_name.')
+            })], 'Changed init_state_name.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.init_state_name, 'State')
@@ -3784,7 +3793,7 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'auto_tts_enabled',
                 'new_value': False
-            })], 'Changed auto_tts_enabled.')
+            })], 'Changed auto_tts_enabled.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.auto_tts_enabled, False)
@@ -3797,7 +3806,7 @@ title: Old Title
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'correctness_feedback_enabled',
                 'new_value': True
-            })], 'Changed correctness_feedback_enabled.')
+            })], 'Changed correctness_feedback_enabled.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(exploration.correctness_feedback_enabled, True)
@@ -3814,7 +3823,7 @@ title: Old Title
                 'property_name': exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
                 'state_name': exploration.init_state_name,
                 'new_value': ['test']
-            })], 'Changed confirmed_unclassified_answers.')
+            })], 'Changed confirmed_unclassified_answers.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
@@ -3845,7 +3854,7 @@ title: Old Title
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
                 'state_name': exploration.init_state_name,
                 'new_value': hint_list
-            })], 'Changed hints.')
+            })], 'Changed hints.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
 
@@ -3886,7 +3895,7 @@ title: Old Title
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
                 'state_name': exploration.init_state_name,
                 'new_value': hint_list
-            })], 'Changed hints.')
+            })], 'Changed hints.', for_testing=True)
 
         exp_services.update_exploration(
             self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
@@ -3894,7 +3903,7 @@ title: Old Title
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
                 'state_name': exploration.init_state_name,
                 'new_value': solution
-            })], 'Changed interaction_solutions.')
+            })], 'Changed interaction_solutions.', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
         self.assertEqual(
@@ -3913,7 +3922,7 @@ title: Old Title
                         exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
                     'state_name': exploration.init_state_name,
                     'new_value': 'invalid_recorded_voiceovers'
-                })], 'Changed recorded_voiceovers.')
+                })], 'Changed recorded_voiceovers.', for_testing=True)
 
     def test_revert_exploration_with_mismatch_of_versions_raises_error(self):
         self.save_new_valid_exploration('exp_id', 'user_id')
@@ -3995,7 +4004,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def test_draft_cleared_after_change_list_applied(self):
         exp_services.update_exploration(
-            self.USER_ID, self.EXP_ID1, self.draft_change_list, '')
+            self.USER_ID, self.EXP_ID1, self.draft_change_list, '',
+            for_testing=True)
         exp_user_data = user_models.ExplorationUserDataModel.get_by_id(
             '%s.%s' % (self.USER_ID, self.EXP_ID1))
         self.assertIsNone(exp_user_data.draft_change_list)

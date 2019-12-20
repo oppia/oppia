@@ -451,7 +451,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
                 })
-            ], 'Added state')
+            ], 'Added state', for_testing=True)
         suggestion.change.state_name = 'State A'
 
         suggestion.pre_accept_validate()
@@ -963,7 +963,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                     },
                     'state_name': 'State A',
                 })
-            ], 'Added state')
+            ], 'Added state', for_testing=True)
         suggestion.change.state_name = 'State A'
 
         suggestion.pre_accept_validate()
@@ -999,7 +999,7 @@ class SuggestionTranslateContentUnitTests(test_utils.GenericTestBase):
                     },
                     'state_name': 'State A',
                 })
-            ], 'Added state')
+            ], 'Added state', for_testing=True)
         suggestion.change.state_name = 'State A'
 
         suggestion.pre_accept_validate()

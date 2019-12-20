@@ -519,7 +519,7 @@ written_translations:
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'State 3',
-                })], 'changes')
+                })], 'changes', for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         response = self.get_html_response('/create/%s' % exp_id)
 
@@ -724,7 +724,7 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
-                })], 'Addes state')
+                })], 'Addes state', for_testing=True)
 
         snapshots = exp_services.get_exploration_snapshots_metadata(exp_id)
 
@@ -779,7 +779,7 @@ class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'State A',
-                })], 'Addes state')
+                })], 'Addes state', for_testing=True)
 
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_stats = stats_services.get_exploration_stats(
@@ -1146,7 +1146,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                     'content_id': 'content',
                     'html': '<p>ABC</p>'
                 },
-            })], 'Change objective and init state content')
+            })], 'Change objective and init state content', for_testing=True)
 
     def test_get_with_disabled_exploration_id_raises_error(self):
         self.get_html_response(

@@ -101,7 +101,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '',
+                for_testing=True)
 
         # There should be two jobs and two mappings in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
@@ -119,7 +120,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '',
+                for_testing=True)
 
         # There should be two jobs and three mappings in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
@@ -140,7 +142,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '',
+                for_testing=True)
 
         # There should still be only two jobs and four mappings in the data
         # store now.
@@ -186,7 +189,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '',
+                for_testing=True)
 
         # There should be two jobs and two mappings in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
@@ -204,7 +208,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', False):
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '',
+                for_testing=True)
 
         # There should be two jobs and two mappings in the data store now.
         # Since ML functionality was turned off, no new mapping should be
@@ -224,7 +229,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '',
+                for_testing=True)
 
         # There should be three jobs and three mappings in the data store now.
         # Since ML functionality was turned on, new job and mapping should be

@@ -70,7 +70,8 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'state_name': 'New state',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         # Update exploration to version 3.
         change_list = [exp_domain.ExplorationChange({
@@ -78,7 +79,8 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'state_name': 'New state 2',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         exploration_latest = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         latest_version = exploration_latest.version
@@ -100,7 +102,8 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'state_name': 'New state',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         # Update exploration to version 3.
         change_list = [exp_domain.ExplorationChange({
@@ -108,7 +111,8 @@ class ExplorationRetrievalTests(test_utils.GenericTestBase):
             'state_name': 'New state 2',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '',
+            for_testing=True)
 
         with self.assertRaisesRegexp(
             ValueError,
@@ -412,7 +416,8 @@ title: Old Title
         # Ensure that if a converted, then reverted, then converted exploration
         # is saved, it will be the up-to-date version within the datastore.
         exp_services.update_exploration(
-            self.albert_id, exp_id, [], 'Resave after reversion')
+            self.albert_id, exp_id, [], 'Resave after reversion',
+            for_testing=True)
         exploration_model = exp_models.ExplorationModel.get(
             exp_id, strict=True, version=None)
         exploration = exp_fetchers.get_exploration_from_model(

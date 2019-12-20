@@ -111,7 +111,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
                 'property_name': 'category',
                 'new_value': 'A new category'
             })],
-            'Change title and category')
+            'Change title and category', for_testing=True)
 
         # Load the search results with an empty query.
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)

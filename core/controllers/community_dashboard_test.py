@@ -380,7 +380,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
                     'content_id': 'content',
                     'html': '<p>A content to translate.</p>'
                 }
-            })], 'Changes content.')
+            })], 'Changes content.', for_testing=True)
 
         output = self.get_json('/gettranslatabletexthandler', params={
             'language_code': 'hi',

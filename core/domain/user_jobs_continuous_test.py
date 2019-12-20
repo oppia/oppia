@@ -193,7 +193,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # Another user makes a commit; this one should now show up in the
             # original user's dashboard.
             exp_services.update_exploration(
-                ANOTHER_USER_ID, EXP_ID, [], 'Update exploration')
+                ANOTHER_USER_ID, EXP_ID, [], 'Update exploration',
+                for_testing=True)
             v3_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
@@ -227,7 +228,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # Another user makes a commit; this, too, shows up in the
             # original user's dashboard.
             exp_services.update_exploration(
-                ANOTHER_USER_ID, EXP_ID, [], 'Update exploration')
+                ANOTHER_USER_ID, EXP_ID, [], 'Update exploration',
+                for_testing=True)
             expected_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
@@ -756,7 +758,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # Give this exploration an average rating of 4.
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
-        exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [], '')
+        exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [], '',
+        for_testing=True)
 
         # The expected answer count is the sum of the first hit counts in the
         # statistics defined in _get_mock_statistics() method above.

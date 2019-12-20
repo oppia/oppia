@@ -94,7 +94,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
-                })], 'Add new state')
+                })], 'Add new state', for_testing=True)
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
@@ -190,7 +190,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': first_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
-                })], 'Update interaction type')
+                })], 'Update interaction type', for_testing=True)
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
@@ -254,7 +254,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
-                })], 'Add new state')
+                })], 'Add new state', for_testing=True)
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
@@ -313,7 +313,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'third state',
-                })], 'Adding yet another state')
+                })], 'Adding yet another state', for_testing=True)
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             self.assertNotEqual(exp.version, exp_version)
 
@@ -422,7 +422,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'NumericInput',
-                })], 'Change to NumericInput')
+                })], 'Change to NumericInput', for_testing=True)
 
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             self.assertEqual(exp.version, 2)
@@ -521,7 +521,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                         'content_id': 'content',
                         'html': '<p>New content</p>'
                     },
-                })], 'Change state content')
+                })], 'Change state content', for_testing=True)
 
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             self.assertEqual(exp.version, 2)
@@ -606,7 +606,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'NumericInput',
-                })], 'Change to NumericInput')
+                })], 'Change to NumericInput', for_testing=True)
 
             # Submit an answer to the numeric interaction.
             event_services.AnswerSubmissionEventHandler.record(
@@ -621,7 +621,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'TextInput',
-                })], 'Change to TextInput')
+                })], 'Change to TextInput', for_testing=True)
 
             # Submit another number-like answer.
             event_services.AnswerSubmissionEventHandler.record(
@@ -639,7 +639,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                         'content_id': 'content',
                         'html': '<p>New content description</p>'
                     }
-                })], 'Change content description')
+                })], 'Change content description', for_testing=True)
 
             # Submit some more answers to the latest exploration version.
             event_services.AnswerSubmissionEventHandler.record(
@@ -741,7 +741,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'SetInput',
-                })], 'Add new state')
+                })], 'Add new state', for_testing=True)
             exp = exp_fetchers.get_exploration_by_id(exp_id)
             exp_version = exp.version
 

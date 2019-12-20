@@ -92,7 +92,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_d_id, end_state_name='End')
@@ -102,7 +102,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
 
     def test_null_case(self):
         """Tests the case where user has no created or edited explorations."""
@@ -531,7 +531,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self.user_a, self.EXP_ID_1)
             # User C edits the exploration.
             exp_services.update_exploration(
-                self.user_c_id, self.EXP_ID_1, [], 'Update exploration')
+                self.user_c_id, self.EXP_ID_1, [], 'Update exploration',
+                for_testing=True)
 
         self._run_one_off_job()
 
@@ -1083,7 +1084,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
-            })], 'commit')
+            })], 'commit', for_testing=True)
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
@@ -1244,7 +1245,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
         self.logout()
 
         user_models.UserSettingsModel(
@@ -1274,7 +1275,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            })], 'Test edit')
+            })], 'Test edit', for_testing=True)
         self.logout()
         self.login(self.EDITOR_EMAIL)
         exp_services.update_exploration(
@@ -1282,7 +1283,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'new objective'
-            })], 'Test edit new')
+            })], 'Test edit new', for_testing=True)
         self.logout()
 
         user_models.UserSettingsModel(

@@ -399,7 +399,8 @@ class ExpSummariesContributorsOneOffJobTests(test_utils.GenericTestBase):
             'new_value': 'New title'
         })]
         exp_services.update_exploration(
-            self.user_a_id, self.EXP_ID, change_list, 'Changed title.')
+            self.user_a_id, self.EXP_ID, change_list, 'Changed title.',
+            for_testing=True)
 
         # Have the second user revert version 2 to version 1.
         exp_services.revert_exploration(self.user_b_id, self.EXP_ID, 2, 1)
@@ -501,14 +502,14 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
-            })], 'Changed title.')
+            })], 'Changed title.', for_testing=True)
 
         exp_services.update_exploration(
             self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
-            })], 'Changed Objective.')
+            })], 'Changed Objective.', for_testing=True)
 
         # Run the job to compute contributors summary.
         job_id = (
@@ -538,13 +539,13 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
-            })], 'Changed title.')
+            })], 'Changed title.', for_testing=True)
         exp_services.update_exploration(
             self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
-            })], 'Changed Objective.')
+            })], 'Changed Objective.', for_testing=True)
 
         # Let the second user revert version 3 to version 2.
         exp_services.revert_exploration(self.user_b_id, self.EXP_ID, 3, 2)
@@ -585,13 +586,13 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
-            })], 'Changed title.')
+            })], 'Changed title.', for_testing=True)
         exp_services.update_exploration(
             self.user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
-            })], 'Changed Objective.')
+            })], 'Changed Objective.', for_testing=True)
 
         # Let USER A revert version 3 to version 2.
         exp_services.revert_exploration(self.user_a_id, self.EXP_ID, 3, 2)
@@ -624,7 +625,7 @@ class ExplorationContributorsSummaryOneOffJobTests(test_utils.GenericTestBase):
                     'cmd': 'edit_exploration_property',
                     'property_name': 'title',
                     'new_value': 'Title changed by %s' % system_id
-                })], 'Changed title.')
+                })], 'Changed title.', for_testing=True)
 
         # Run the job to compute the contributor summary.
         job_id = (

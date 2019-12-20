@@ -158,7 +158,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             stats_services, 'get_stats_for_new_exp_version',
             stats_for_new_exp_version_log):
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '',
+                for_testing=True)
 
         # Now, the stats creation for new explorations method will be called
         # once and stats creation for new exploration version will also be
@@ -192,7 +193,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'state_name': 'New state'
         })]
         exp_services.update_exploration(
-            'committer_id_v3', exploration.id, change_list, 'Added new state')
+            'committer_id_v3', exploration.id, change_list, 'Added new state',
+                for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
         self.assertEqual(exp_issues.exp_version, exploration.version)
@@ -240,7 +242,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
             'state_name': 'New state'
         })]
         exp_services.update_exploration(
-            'committer_id_v3', exploration.id, change_list, 'Deleted a state')
+            'committer_id_v3', exploration.id, change_list, 'Deleted a state',
+                for_testing=True)
         exploration = exp_fetchers.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
         self.assertEqual(exp_issues.exp_version, exploration.version)
@@ -335,7 +338,8 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
 
         # Update exploration to next version 2 and its stats.
         exp_services.update_exploration(
-            'committer_id_v2', exploration.id, [], 'Updated')
+            'committer_id_v2', exploration.id, [], 'Updated',
+                for_testing=True)
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exp_id, 2)
         exploration_stats.num_starts_v2 = 4
@@ -1191,7 +1195,7 @@ class AnswerEventTests(test_utils.GenericTestBase):
                 'state_name': third_state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': 'Continue',
-            })], 'Add new state')
+            })], 'Add new state', for_testing=True)
         exp = exp_fetchers.get_exploration_by_id('eid')
 
         exp_version = exp.version
@@ -1817,7 +1821,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 'cmd': exp_domain.CMD_RENAME_STATE,
                 'old_state_name': state_name,
                 'new_state_name': new_state_name
-            })], 'Update state name')
+            })], 'Update state name', for_testing=True)
 
     def _change_state_interaction_id(
             self, interaction_id, exp_id=TEXT_INPUT_EXP_ID,
@@ -1831,7 +1835,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 'state_name': state_name,
                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                 'new_value': interaction_id
-            })], 'Update state interaction ID')
+            })], 'Update state interaction ID', for_testing=True)
 
     def _change_state_content(
             self, new_content, exp_id=TEXT_INPUT_EXP_ID,
@@ -1848,7 +1852,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                     'content_id': 'content',
                     'html': new_content
                 }
-            })], 'Change content description')
+            })], 'Change content description', for_testing=True)
 
     def setUp(self):
         super(AnswerVisualizationsTests, self).setUp()
