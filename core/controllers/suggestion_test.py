@@ -1128,10 +1128,13 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(ReviewableSuggestionsHandlerTest, self).setUp()
         self.AUTHOR_EMAIL = 'author@example.com'
+        self.REVIEWER_EMAIL = 'reviewer@example.com'
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
+        self.signup(self.REVIEWER_EMAIL, 'reviewer')
+
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.TOPIC_ID = 'topic'
@@ -1174,11 +1177,14 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.reviewer_id = self.editor_id
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
+        user_services.allow_user_review_question(self.reviewer_id)
+        user_services.allow_user_review_translation_in_language(
+            self.reviewer_id, 'hi')
         # Login and create exploration and suggestions.
         self.login(self.EDITOR_EMAIL)
         self.save_new_linear_exp_with_state_names_and_interactions(
@@ -1250,7 +1256,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_exploration_handler_returns_data(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.REVIEWER_EMAIL)
 
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content')
@@ -1261,7 +1267,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response, {})
 
     def test_skill_handler_returns_data(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.REVIEWER_EMAIL)
 
         response = self.get_json(
             '/getreviewablesuggestions/skill/add_question')
@@ -1272,7 +1278,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response, {})
 
     def test_handler_with_invalid_suggestion_type_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.REVIEWER_EMAIL)
 
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content')
@@ -1280,10 +1286,10 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
 
         self.get_json(
             '/getreviewablesuggestions/exploration/invalid_suggestion_type',
-            expected_status_int=400)
+            expected_status_int=404)
 
     def test_handler_with_invalid_target_type_raise_error(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.REVIEWER_EMAIL)
 
         response = self.get_json(
             '/getreviewablesuggestions/exploration/translate_content')

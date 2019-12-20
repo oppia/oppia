@@ -193,23 +193,23 @@ angular.module('oppia').directive('adminRolesTab', [
             response.data.reviewers.forEach(function(reviewer) {
               reviewer.can_review_translation_in_languages.forEach(
                 function(languageCode) {
-                  langauge = LanguageUtilService.getAudioLanguageDescription(
+                  var language = LanguageUtilService.getAudioLanguageDescription(
                     languageCode);
-                  if (ctrl.translationReviewers.hasOwnProperty(langauge)) {
+                  if (ctrl.translationReviewers.hasOwnProperty(language)) {
                     ctrl.translationReviewers.push(reviewer.username);
                   } else {
-                    ctrl.translationReviewers[langauge] = [reviewer.username];
+                    ctrl.translationReviewers[language] = [reviewer.username];
                   }
                 });
 
               reviewer.can_review_voiceover_in_languages.forEach(
                 function(languageCode) {
-                  langauge = LanguageUtilService.getAudioLanguageDescription(
+                  var language = LanguageUtilService.getAudioLanguageDescription(
                     languageCode);
-                  if (ctrl.voiceoverReviewers.hasOwnProperty(langauge)) {
+                  if (ctrl.voiceoverReviewers.hasOwnProperty(language)) {
                     ctrl.voiceoverReviewers.push(reviewer.username);
                   } else {
-                    ctrl.voiceoverReviewers[langauge] = [reviewer.username];
+                    ctrl.voiceoverReviewers[language] = [reviewer.username];
                   }
                 });
 

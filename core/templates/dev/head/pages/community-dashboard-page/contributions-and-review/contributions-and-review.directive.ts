@@ -57,7 +57,7 @@ angular.module('oppia').directive('contributionsAndReview', [
           };
           var ctrl = this;
           var username = null;
-          userCanReviewTranslationSuggestionsInLanguages = [];
+          var userCanReviewTranslationSuggestionsInLanguages = [];
           ctrl.userDeatilsLoading = true;
           ctrl.userIsLoggedIn = false;
           ctrl.contributions = {};
@@ -215,7 +215,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                     ctrl.reviewTabActive = false;
                     ctrl.switchToReviewTab();
                   } else {
-                    canReviewTranslation = false;
+                    ctrl.canReviewTranslation = false;
                     ctrl.reviewTabActive = true;
                     ctrl.switchToContributionsTab();
                   }
