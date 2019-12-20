@@ -1,20 +1,6 @@
-# coding: utf-8
-#
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
-"""Job registries."""
+
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -41,11 +27,8 @@ import python_utils
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
-    # activity_jobs_one_off.SnapshotMetadataModelsIndexesJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
-    email_jobs_one_off.EmailModelsIndexesOneOffJob,
-    email_jobs_one_off.GeneralFeedbackEmailReplyToIdOneOffJob,
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
     exp_jobs_one_off.ExpSummariesCreationOneOffJob,
     exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob,
@@ -55,13 +38,27 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.HintsAuditOneOffJob,
     exp_jobs_one_off.ItemSelectionInteractionOneOffJob,
     exp_jobs_one_off.ViewableExplorationsAuditJob,
-    exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
+    exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,# coding: utf-8
+#
+# Copyright 2014 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
+    feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
-    feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
-    question_jobs_one_off.QuestionSummaryModelIndexesOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
     stats_jobs_one_off.PlaythroughAudit,
@@ -81,8 +78,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    user_jobs_one_off.UserGaeIdOneOffJob
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
