@@ -230,8 +230,8 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
         classes which listen to events of that type.
 
 
-        Args:
-   event_type : type of event that is passed.
+        Arg:
+   event_type: type of event that is passed.
     args: Positional arguments to pass to the method.
     kwargs: Keyword arguments to pass to the method.
         """
