@@ -63,6 +63,15 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
                     """Return required meathod."""
                     return '', ''
             return Ret()
+        def mock_popen_error_call(unused_cmd_tokens, *args, **kwargs):
+            class Ret(python_utils.OBJECT):
+                """Return object that gives user-prefix error."""
+                def __init__(self):
+                    self.returncode = 1
+                def communicate(self):
+                    """Return user-prefix error as stderr."""
+                    return '', 'can\'t combine user with prefix'
+            return Ret()
         def mock_print(msg, end=''):
             self.print_arr.append(msg)
         # pylint: enable=unused-argument
@@ -71,6 +80,8 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
             subprocess, 'check_call', mock_check_call)
         self.Popen_swap = self.swap(
             subprocess, 'Popen', mock_check_call)
+        self.Popen_error_swap = self.swap(
+            subprocess, 'Popen', mock_popen_error_call)
         self.print_swap = self.swap(python_utils, 'PRINT', mock_print)
 
     def test_tweak_yarn_executable(self):
@@ -108,6 +119,12 @@ class InstallThirdPartyLibsTests(test_utils.GenericTestBase):
     def test_pip_install_without_import_error(self):
         with self.Popen_swap:
             install_third_party_libs.pip_install('package', 'version', 'path')
+        self.assertTrue(self.check_function_calls['check_call_is_called'])
+
+    def test_pip_install_with_user_prefix_error(self):
+        with self.Popen_error_swap:
+            with self.check_call_swap:
+                install_third_party_libs.pip_install('package', 'version', 'path')
         self.assertTrue(self.check_function_calls['check_call_is_called'])
 
     def test_pip_install_with_import_error_and_darwin_os(self):
