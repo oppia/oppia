@@ -36,7 +36,8 @@ angular.module('oppia').factory('SubtopicViewerBackendApiService', [
   function($http, $q, UrlInterpolationService,
       SUBTOPIC_DATA_URL_TEMPLATE) {
     var subtopicDataObject = null;
-    var subtopicDataObjectFactory = new ReadOnlySubtopicPageObjectFactory(
+    var readOnlySubtopicPageObjectFactory =
+    new ReadOnlySubtopicPageObjectFactory(
       new SubtopicPageContentsObjectFactory(
         new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
         new SubtitledHtmlObjectFactory()
@@ -51,7 +52,7 @@ angular.module('oppia').factory('SubtopicViewerBackendApiService', [
         });
 
       $http.get(subtopicDataUrl).then(function(response) {
-        subtopicDataObject = subtopicDataObjectFactory.createFromBackendDict(
+        subtopicDataObject = readOnlySubtopicPageObjectFactory.createFromBackendDict(
           angular.copy(response.data)
         );
         if (successCallback) {
