@@ -75,7 +75,7 @@ describe('Learner answer details service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  describe('.fetchLearnerAnswerInfoData', function() {
+  describe('when .fetchLearnerAnswerInfoData is called', function() {
     beforeEach(function() {
       sampleDataResults = {
         learner_answer_info_data: [{
