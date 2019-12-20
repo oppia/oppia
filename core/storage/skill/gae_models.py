@@ -40,6 +40,7 @@ class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+
 class SkillModel(base_models.VersionedModel):
     """Model for storing Skills.
 
