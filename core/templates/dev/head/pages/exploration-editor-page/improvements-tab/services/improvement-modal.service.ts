@@ -248,6 +248,12 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }).then($uibModalInstance.close);
               };
+
+              $scope.onClickReviewSuggestion = function() {
+                $scope.messageSendingInProgress = true;
+                openSuggestionReviewer($scope.activeThread);
+              }
+
               $scope.close = function() {
                 $uibModalInstance.close();
               };

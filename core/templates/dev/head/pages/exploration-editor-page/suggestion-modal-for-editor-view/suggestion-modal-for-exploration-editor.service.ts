@@ -168,6 +168,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
+            window.location.reload();
           },
           function() {
             $log.error('Error resolving suggestion');
