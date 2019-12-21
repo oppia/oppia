@@ -52,7 +52,8 @@ angular.module('oppia').factory('SubtopicViewerBackendApiService', [
         });
 
       $http.get(subtopicDataUrl).then(function(response) {
-        subtopicDataObject = readOnlySubtopicPageObjectFactory.createFromBackendDict(
+        subtopicDataObject =
+        readOnlySubtopicPageObjectFactory.createFromBackendDict(
           angular.copy(response.data)
         );
         if (successCallback) {
