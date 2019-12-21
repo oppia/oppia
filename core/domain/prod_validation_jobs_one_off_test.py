@@ -32,6 +32,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import fs_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
@@ -496,20 +497,23 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         next_scheduled_check_time = datetime.datetime.utcnow()
+        classifier_data = {'classifier_data': 'data'}
         id0 = classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', '0', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'StateTest0', feconf.TRAINING_JOB_STATUS_NEW,
-            None, 1)
+            'StateTest0', feconf.TRAINING_JOB_STATUS_NEW, 1)
+        fs_services.save_classifier_data(
+            'TextClassifier', id0, classifier_data)
         self.model_instance_0 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id0))
         id1 = classifier_models.ClassifierTrainingJobModel.create(
             'CodeClassifier', 'CodeRepl', '1', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'StateTest1', feconf.TRAINING_JOB_STATUS_NEW,
-            None, 1)
+            'StateTest1', feconf.TRAINING_JOB_STATUS_NEW, 1)
+        fs_services.save_classifier_data(
+            'CodeClassifier', id1, classifier_data)
         self.model_instance_1 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id1))
 

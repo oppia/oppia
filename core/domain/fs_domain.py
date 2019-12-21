@@ -207,16 +207,16 @@ class DiskBackedFileSystem(GeneralFileSystem):
             feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path,
             filepath)
 
-    def _save_file(self, filepath, raw_bytes):
+    def _save_file(self, filepath, content):
         """Create or update a file.
 
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
-            raw_bytes: str. The content to be stored in file.
+            content: str. The content to be stored in file.
         """
-        file_obj = python_utils.open_file(self._get_file_path(filepath), 'wb+')
-        file_obj.write(raw_bytes)
+        file_obj = python_utils.open_file(self._get_file_path(filepath), 'w')
+        file_obj.write(content.decode('utf-8'))
         file_obj.close()
 
     def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
@@ -243,25 +243,25 @@ class DiskBackedFileSystem(GeneralFileSystem):
             logging.error('File %s not found.' % (filepath))
             return None
 
-        file_obj = python_utils.open_file(self._get_file_path(filepath))
+        file_obj = python_utils.open_file(self._get_file_path(filepath), 'r')
         data = file_obj.read()
         file_obj.close()
 
         return FileStreamWithMetadata(data, None, None)
 
-    def commit(self, filepath, raw_bytes, unused_mimetype):
+    def commit(self, filepath, content, unused_mimetype):
         """Saves a raw bytestring as a file in the database.
 
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
-            raw_bytes: str. The content to be stored in the file.
+            content: str. The content to be stored in the file.
             unused_mimetype: str. Unused argument.
         """
         dir_path = utils.vfs_get_directory_path_from_filepath(filepath)
         if dir_path and not os.path.exists(self._get_file_path(dir_path)):
             os.makedirs(self._get_file_path(dir_path))
-        self._save_file(filepath, raw_bytes)
+        self._save_file(filepath, content)
 
     def delete(self, filepath):
         """Marks the current version of a file as deleted.

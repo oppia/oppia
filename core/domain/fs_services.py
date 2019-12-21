@@ -97,7 +97,8 @@ def save_classifier_data(exp_id, job_id, classifier_data):
     fs = fs_domain.AbstractFileSystem(file_system_class(
         feconf.ENTITY_TYPE_EXPLORATION, exp_id))
     fs.commit(
-        filepath, json.dumps(classifier_data), mimetype='application/json')
+        filepath, json.dumps(classifier_data),
+        mimetype='application/json')
 
 
 def read_classifier_data(exp_id, job_id):
