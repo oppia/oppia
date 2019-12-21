@@ -76,16 +76,10 @@ class SkillOpportunityModelRegenerationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(skill_model):
         if skill_model.deleted:
             return
-        try:
-            opportunity_services.create_skill_opportunity(
-                skill_model.id, skill_model.description)
-            yield ('SUCCESS', skill_model.id)
-        except Exception as e:
-            yield ('FAILED', e)
+        opportunity_services.create_skill_opportunity(
+            skill_model.id, skill_model.description)
+        yield ('SUCCESS', skill_model.id)
 
     @staticmethod
     def reduce(key, values):
-        if key == 'SUCCESS':
-            yield (key, len(values))
-        else:
-            yield ('%s (%s)' % (key, len(values)), values)
+        yield (key, len(values))
