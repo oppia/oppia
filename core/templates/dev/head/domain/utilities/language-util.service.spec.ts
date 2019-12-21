@@ -118,7 +118,12 @@ describe('Language util service', function() {
       // Chrome loads voices asynchronously.
       // https://stackoverflow.com/questions/21513706/
       // Chrome also calls this multiple times and not all languages are
-      // populated the first time.
+      // populated the first time, see
+      // https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis
+      // for more details. In the case where all languages are loaded
+      // the first time, the test will complete in one pass successfully.
+      // During testing, it was found that the browser calls the following
+      // at most two times.
       window.speechSynthesis.onvoiceschanged = () => {
         tryCount++;
 
