@@ -2232,7 +2232,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
+            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -2663,7 +2663,9 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
         self.config_model.commit(self.admin_id, [])
 
         user_models.UserSettingsModel(
-            id=feconf.SYSTEM_COMMITTER_ID, email='system@committer.com').put()
+            id=feconf.SYSTEM_COMMITTER_ID,
+            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
+            email='system@committer.com').put()
         self.model_instance = (
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
                 'config_model-1'))
@@ -2798,7 +2800,9 @@ class ConfigPropertySnapshotContentModelValidatorTests(
         self.config_model.commit(self.admin_id, [])
 
         user_models.UserSettingsModel(
-            id=feconf.SYSTEM_COMMITTER_ID, email='system@committer.com').put()
+            id=feconf.SYSTEM_COMMITTER_ID,
+            gae_id='gae_' + feconf.SYSTEM_COMMITTER_ID,
+            email='system@committer.com').put()
         self.model_instance = (
             config_models.ConfigPropertySnapshotContentModel.get_by_id(
                 'config_model-1'))
@@ -2898,13 +2902,17 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         self.sender_email = 'sender@email.com'
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id, email=self.sender_email)
+            id=self.sender_id,
+            gae_id='gae_' + self.sender_id,
+            email=self.sender_email)
         self.sender_model.put()
 
         self.recipient_email = 'recipient@email.com'
         self.recipient_id = 'recipient'
         self.recipient_model = user_models.UserSettingsModel(
-            id=self.recipient_id, email=self.recipient_email)
+            id=self.recipient_id,
+            gae_id='gae_' + self.recipient_id,
+            email=self.recipient_email)
         self.recipient_model.put()
 
         with self.swap(
@@ -3042,15 +3050,21 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         self.sender_email = 'sender@email.com'
         self.sender_id = 'sender'
         self.sender_model = user_models.UserSettingsModel(
-            id=self.sender_id, email=self.sender_email)
+            id=self.sender_id,
+            gae_id='gae_' + self.sender_id,
+            email=self.sender_email)
         self.sender_model.put()
 
         self.recipient_ids = ['recipient1', 'recipient2']
         self.recipient_model_1 = user_models.UserSettingsModel(
-            id=self.recipient_ids[0], email='recipient1@email.com')
+            id=self.recipient_ids[0],
+            gae_id='gae_' + self.recipient_ids[0],
+            email='recipient1@email.com')
         self.recipient_model_1.put()
         self.recipient_model_2 = user_models.UserSettingsModel(
-            id=self.recipient_ids[1], email='recipient2@email.com')
+            id=self.recipient_ids[1],
+            gae_id='gae_' + self.recipient_ids[1],
+            email='recipient2@email.com')
         self.recipient_model_2.put()
 
         self.model_id = 'bulkemailid1'
@@ -9391,7 +9405,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic')
+            topic_id='0', name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         language_codes = ['ar', 'en', 'en']
@@ -9594,7 +9608,7 @@ class StorySnapshotMetadataModelValidatorTests(
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic')
+            topic_id='0', name='topic', abbreviated_name='abbrev')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -9760,7 +9774,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic')
+            topic_id='0', name='topic', abbreviated_name='abbrev')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -9878,7 +9892,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic')
+            topic_id='0', name='topic', abbreviated_name='abbrev')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -10102,7 +10116,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic')
+            topic_id='0', name='topic', abbreviated_name='abbrev')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -10532,8 +10546,9 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='Topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='Topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -10809,6 +10824,40 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             ), u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_model_with_abbreviated_name_is_empty(self):
+        self.model_instance_0.abbreviated_name = None
+        self.model_instance_0.commit(self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for abbreviated name check '
+                'of TopicModel\', '
+                '[u\'Entity id 0: Expected nonempty abbreviated name '
+                'received None.\']]'
+            ), (
+                u'[u\'failed validation check for domain object check '
+                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
+                'validation with the error Abbreviated name should be a '
+                'string.\']]'
+            ), u'[u\'fully-validated TopicModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_abbreviated_name_is_empty_string(self):
+        self.model_instance_0.abbreviated_name = ''
+        self.model_instance_0.commit(self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for abbreviated name check '
+                'of TopicModel\', '
+                '[u\'Entity id 0: Expected nonempty abbreviated name '
+                'received .\']]'
+            ), (
+                u'[u\'failed validation check for domain object check '
+                'of TopicModel\', [u\'Entity id 0: Entity fails domain '
+                'validation with the error Abbreviated name field should '
+                'not be empty.\']]'
+            ), u'[u\'fully-validated TopicModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
 
 class TopicSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
@@ -10826,8 +10875,9 @@ class TopicSnapshotMetadataModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -11018,8 +11068,9 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -11178,8 +11229,9 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
         self.manager2 = user_services.UserActionsInfo(self.manager2_id)
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -11353,8 +11405,9 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -11557,8 +11610,9 @@ class TopicRightsSnapshotContentModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -11715,8 +11769,9 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -11997,8 +12052,9 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -12220,8 +12276,9 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -12431,8 +12488,9 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -12637,8 +12695,9 @@ class SubtopicPageSnapshotContentModelValidatorTests(
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -12804,8 +12863,9 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in python_utils.RANGE(
-                3)]
+            topic_id='%s' % i,
+            name='topic%s' % i,
+            abbreviated_name='abbrev%s' % i) for i in python_utils.RANGE(3)]
         rubrics = [
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
@@ -15036,7 +15096,7 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             rights_manager.publish_exploration(self.owner, exp.id)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic')
+            topic_id='0', name='topic', abbreviated_name='abbrev')
 
         story = story_domain.Story.create_default_story(
             'story',

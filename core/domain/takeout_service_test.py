@@ -39,6 +39,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     """Tests for the takeout service."""
 
     USER_ID_1 = 'user_1'
+    USER_GAE_ID_1 = 'gae_1'
     THREAD_ID_1 = 'thread_id_1'
     THREAD_ID_2 = 'thread_id_2'
     USER_1_REPLY_TO_ID_1 = 'user_1_reply_to_id_thread_1'
@@ -251,6 +252,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         # Setup for UserSettingsModel.
         user_models.UserSettingsModel(
             id=self.USER_ID_1,
+            gae_id=self.USER_GAE_ID_1,
             email=self.USER_1_EMAIL,
             role=self.USER_1_ROLE,
             username=self.GENERIC_USERNAME,
@@ -292,7 +294,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         """Setup for trivial test of export_data functionality."""
         super(TakeoutServiceUnitTests, self).setUp()
         user_models.UserSettingsModel(
-            id=self.USER_ID_1, email=self.USER_1_EMAIL, role=self.USER_1_ROLE
+            id=self.USER_ID_1,
+            gae_id=self.USER_GAE_ID_1,
+            email=self.USER_1_EMAIL,
+            role=self.USER_1_ROLE
         ).put()
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
