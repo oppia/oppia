@@ -368,7 +368,6 @@ describe('Suggestions Improvements', function() {
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
-    improvementsTab.closeModal();
 
     var taskToReject = improvementsTab.getSuggestionTask(
       suggestionDescription2);
@@ -376,7 +375,6 @@ describe('Suggestions Improvements', function() {
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
-    improvementsTab.closeModal();
 
     improvementsTab.setShowOnlyOpenTasks(false);
     var acceptedTask = improvementsTab.getSuggestionTask(

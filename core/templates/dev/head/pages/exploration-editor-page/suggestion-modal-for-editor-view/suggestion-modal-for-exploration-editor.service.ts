@@ -26,11 +26,11 @@ require('services/editability.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
-  '$log', '$rootScope', '$uibModal',
+  '$log', '$rootScope', '$uibModal', '$window',
   'ExplorationDataService', 'ExplorationStatesService',
   'StateObjectFactory', 'SuggestionModalService',
   'ThreadDataService', 'UrlInterpolationService',
-  function($log, $rootScope, $uibModal,
+  function($log, $rootScope, $uibModal, $window,
       ExplorationDataService, ExplorationStatesService,
       StateObjectFactory, SuggestionModalService,
       ThreadDataService, UrlInterpolationService) {
@@ -168,7 +168,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
-            window.location.reload();
+            $window.location.reload();
           },
           function() {
             $log.error('Error resolving suggestion');

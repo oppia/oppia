@@ -212,7 +212,6 @@ angular.module('oppia').factory('ImprovementModalService', [
               $scope.getLocaleAbbreviatedDatetimeString = (
                 DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
               $scope.EditabilityService = EditabilityService;
-              $scope.openSuggestionReviewer = openSuggestionReviewer;
 
               // Initial load of the thread list on page load.
               $scope.tmpMessage = {
@@ -251,7 +250,7 @@ angular.module('oppia').factory('ImprovementModalService', [
 
               $scope.onClickReviewSuggestion = function() {
                 $scope.messageSendingInProgress = true;
-                openSuggestionReviewer($scope.activeThread);
+                openSuggestionReviewModal($scope.activeThread);
               };
 
               $scope.close = function() {
@@ -264,7 +263,7 @@ angular.module('oppia').factory('ImprovementModalService', [
         });
       },
 
-      openSuggestionReviewer: function(suggestionThread) {
+      openSuggestionReviewModal: function(suggestionThread) {
         return SuggestionModalForExplorationEditorService.showSuggestionModal(
           suggestionThread.suggestion.suggestionType, {
             activeThread: suggestionThread,

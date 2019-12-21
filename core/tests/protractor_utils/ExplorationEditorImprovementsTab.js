@@ -189,6 +189,7 @@ var ExplorationEditorImprovementsTab = function() {
       acceptSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     acceptSuggestionButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.rejectSuggestion = () => {
@@ -202,6 +203,7 @@ var ExplorationEditorImprovementsTab = function() {
       rejectSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     rejectSuggestionButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.setShowOnlyOpenTasks = (choice = true) => {
