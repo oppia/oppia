@@ -20,8 +20,8 @@ require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
-  function(ContextService, RteHelperService, PAGE_CONTEXT) {
+  '$rootScope', 'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
+  function($rootScope, ContextService, RteHelperService, PAGE_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -239,6 +239,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
               break;
             }
           }
+          var data = elt.html();
+          $rootScope.$broadcast('changed', data);
           ngModel.$setViewValue(elt.html());
         });
 

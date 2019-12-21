@@ -50,27 +50,10 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             var stateName = PlayerPositionService.getCurrentStateName();
             var displayedCard = PlayerTranscriptService.getCard(
               PlayerPositionService.getDisplayedCardIndex());
-            var componentRe = (
-              /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
-            );
-            var wrapComponents = function(html) {
-              if (html === undefined) {
-                return html;
-              }
-              return html.replace(componentRe, function(match, p1, p2, p3) {
-                var inlineComponents = ['link', 'math'];
-                if (!(inlineComponents.indexOf(p3) !== -1)) {
-                  return '\n<div class="oppia-rte-component-container"' +
-                  ' type="oppia-noninteractive-' + p3 + '"' +
-                     '>' + match +
-                     '</div>\n';
-                } else {
-                  return match;
-                }
-              });
-            };
+
             $scope.originalHtml = displayedCard.getContentHtml();
             $scope.description = '';
+            $scope.ifContentChanged = false;
             // ng-model needs to bind to a property of an object on
             // the scope (the property cannot sit directly on the scope)
             // Reference https://stackoverflow.com/q/12618342
@@ -80,18 +63,29 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             $timeout(function() {
               $scope.showEditor = true;
             }, 500);
-            $scope.detectChange = function(e) {
-              var compare = wrapComponents($scope.originalHtml);
-              var compare2 = $scope.suggestionData.suggestionHtml;
-              compare2 = compare2.replace(/^\s*[\r\n]/gm, '').trim();
-              compare = compare.replace(/^\s*[\r\n]/gm, '').trim();
-              if (compare === compare2) {
-                return true;
-              }
-            };
             $scope.cancelSuggestion = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
+            $scope.$on('changed', function(evt, data) {
+              var compare2 = data;
+              var compare = $scope.originalHtml;
+              var undoRegExp = new RegExp(['<div class="oppia-rte-component',
+                '-container" type="oppia-noninteractive-.+?\\b[^>]*>']
+                .join(''), 'gm');
+              compare2 = compare2.replace(undoRegExp, '');
+              compare2 = compare2.replace(/<\/div>/gm, '');
+              compare2 = compare2.replace(/^\s*[\r\n]/gm, '').trim();
+              compare = compare.replace(/^\s*[\r\n]/gm, '').trim();
+              if (compare === compare2) {
+                $scope.$apply(function() {
+                  $scope.ifContentChanged = false;
+                });
+              } else {
+                $scope.$apply(function() {
+                  $scope.ifContentChanged = true;
+                });
+              }
+            });
 
             $scope.submitSuggestion = function() {
               var data = {
