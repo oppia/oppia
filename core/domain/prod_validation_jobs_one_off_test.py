@@ -10832,7 +10832,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for abbreviated name check '
                 'of TopicModel\', '
                 '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name received None.\']]'
+                'abbreviated name, but received None.\']]'
             ), (
                 u'[u\'failed validation check for domain object check '
                 'of TopicModel\', [u\'Entity id 0: Entity fails domain '
@@ -10849,7 +10849,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for abbreviated name check '
                 'of TopicModel\', '
                 '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
-                'abbreviated name received .\']]'
+                'abbreviated name, but received .\']]'
             ), (
                 u'[u\'failed validation check for domain object check '
                 'of TopicModel\', [u\'Entity id 0: Entity fails domain '
