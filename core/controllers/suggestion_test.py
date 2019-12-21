@@ -1071,7 +1071,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
+            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -1246,7 +1246,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
+            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
