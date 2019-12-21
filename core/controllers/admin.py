@@ -650,29 +650,49 @@ class AddReviewerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Invalid username: %s' % new_reviewer_username)
 
-        user_allowed_to_review = self.payload.get('review')
+        review_item = self.payload.get('review_item')
 
-        if user_allowed_to_review == 'translation':
+        if review_item == constants.REVIEWABLE_ITEM_TRANSLATION:
             language_code = self.payload.get('language_code')
             if utils.is_supported_audio_language_code(language_code):
-                user_services.allow_user_review_translation_in_language(
-                    new_reviewer_user_id, language_code)
+                if user_services.can_review_translation_suggestions(
+                        new_reviewer_user_id, language_code=language_code):
+                    raise self.InvalidInputException(
+                        'User %s already has rights to review translation in '
+                        'language code %s' % (
+                            new_reviewer_username, language_code))
+                else:
+                    user_services.allow_user_review_translation_in_language(
+                        new_reviewer_user_id, language_code)
             else:
                 raise self.InvalidInputException(
                     'Invalid language_code: %s' % language_code)
-        elif user_allowed_to_review == 'voiceover':
+        elif review_item == constants.REVIEWABLE_ITEM_VOICEOVER:
             language_code = self.payload.get('language_code')
             if utils.is_supported_audio_language_code(language_code):
-                user_services.allow_user_review_voiceover_in_language(
-                    new_reviewer_user_id, language_code)
+                if user_services.can_review_voiceover_applications(
+                        new_reviewer_user_id, language_code=language_code):
+                    raise self.InvalidInputException(
+                        'User %s already has rights to review voiceover in '
+                        'language code %s' % (
+                            new_reviewer_username, language_code))
+                else:
+                    user_services.allow_user_review_voiceover_in_language(
+                        new_reviewer_user_id, language_code)
             else:
                 raise self.InvalidInputException(
                     'Invalid language_code: %s' % language_code)
-        elif user_allowed_to_review == 'question':
-            user_services.allow_user_review_question(new_reviewer_user_id)
+        elif review_item == constants.REVIEWABLE_ITEM_QUESTION:
+            if user_services.can_review_question_suggestions(
+                    new_reviewer_user_id):
+                raise self.InvalidInputException(
+                    'User %s already has rights to review question.' % (
+                        new_reviewer_username))
+            else:
+                user_services.allow_user_review_question(new_reviewer_user_id)
         else:
             raise self.InvalidInputException(
-                'Invalid assignment: %s' % user_allowed_to_review)
+                'Invalid assignment: %s' % review_item)
 
         self.render_json({})
 

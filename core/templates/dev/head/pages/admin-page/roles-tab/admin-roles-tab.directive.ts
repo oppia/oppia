@@ -28,11 +28,13 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 angular.module('oppia').directive('adminRolesTab', [
   '$http', 'AdminDataService', 'AdminTaskManagerService', 'LanguageUtilService',
   'UrlInterpolationService', 'ADMIN_ADD_REVIEWER_HANDLER_URL',
-  'ADMIN_ROLE_HANDLER_URL',
+  'ADMIN_ROLE_HANDLER_URL', 'REVIEWABLE_ITEM_QUESTION',
+  'REVIEWABLE_ITEM_TRANSLATION', 'REVIEWABLE_ITEM_VOICEOVER',
   function(
       $http, AdminDataService, AdminTaskManagerService, LanguageUtilService,
       UrlInterpolationService, ADMIN_ADD_REVIEWER_HANDLER_URL,
-      ADMIN_ROLE_HANDLER_URL) {
+      ADMIN_ROLE_HANDLER_URL, REVIEWABLE_ITEM_QUESTION,
+      REVIEWABLE_ITEM_TRANSLATION, REVIEWABLE_ITEM_VOICEOVER) {
     return {
       restrict: 'E',
       scope: {},
@@ -55,9 +57,9 @@ angular.module('oppia').directive('adminRolesTab', [
 
         ctrl.UPDATABLE_ROLES = {};
         ctrl.REVIEWABLE_ITEMS = {
-          TRANSLATION: 'translation',
-          VOICEOVER: 'voiceover',
-          QUESTION: 'question'
+          TRANSLATION: REVIEWABLE_ITEM_TRANSLATION,
+          VOICEOVER: REVIEWABLE_ITEM_VOICEOVER,
+          QUESTION: REVIEWABLE_ITEM_QUESTION
         };
         ctrl.languageCodesAndDescriptions = (
           LanguageUtilService.getAllVoiceoverLanguageCodes().map(
@@ -168,7 +170,7 @@ angular.module('oppia').directive('adminRolesTab', [
           ctrl.setStatusMessage('Add new reviewer');
           AdminTaskManagerService.startTask();
           $http.post(ADMIN_ADD_REVIEWER_HANDLER_URL, {
-            review: values.allowReviewing,
+            review_item: values.allowReviewing,
             username: values.username,
             language_code: values.languageCode
           }).then(function() {
@@ -197,7 +199,7 @@ angular.module('oppia').directive('adminRolesTab', [
                     LanguageUtilService.getAudioLanguageDescription(
                       languageCode));
                   if (ctrl.translationReviewers.hasOwnProperty(language)) {
-                    ctrl.translationReviewers.push(reviewer.username);
+                    ctrl.translationReviewers[language].push(reviewer.username);
                   } else {
                     ctrl.translationReviewers[language] = [reviewer.username];
                   }

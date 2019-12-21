@@ -305,6 +305,12 @@ class UserCommunityRights(python_utils.OBJECT):
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError('Invalid language_code: %s' % (
                     language_code))
+        if len(self.can_review_translation_in_languages) != len(set(
+                self.can_review_translation_in_languages)):
+            raise utils.ValidationError(
+                'Expected can_review_translation_in_languages list not to have '
+                'duplicate values, found: %s' % (
+                    self.can_review_translation_in_languages))
 
         if not isinstance(self.can_review_voiceover_in_languages, list):
             raise utils.ValidationError(
@@ -314,6 +320,12 @@ class UserCommunityRights(python_utils.OBJECT):
             if not utils.is_supported_audio_language_code(language_code):
                 raise utils.ValidationError('Invalid language_code: %s' % (
                     language_code))
+        if len(self.can_review_voiceover_in_languages) != len(set(
+                self.can_review_voiceover_in_languages)):
+            raise utils.ValidationError(
+                'Expected can_review_voiceover_in_languages list not to have '
+                'duplicate values, found: %s' % (
+                    self.can_review_voiceover_in_languages))
 
         if not isinstance(self.can_review_questions, bool):
             raise utils.ValidationError(

@@ -518,6 +518,10 @@ export = {
     ]
   }],
 
+  "REVIEWABLE_ITEM_TRANSLATION": "translation",
+  "REVIEWABLE_ITEM_VOICEOVER": "voiceover",
+  "REVIEWABLE_ITEM_QUESTION": "question",
+
   // Interaction IDs for which answer details cannot be solicited.
   "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
 

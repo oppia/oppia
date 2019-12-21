@@ -1821,8 +1821,10 @@ def allow_user_review_translation_in_language(user_id, language_code):
         language_code: str. The code of the language.
     """
     user_community_rights = get_user_community_rights(user_id)
-    user_community_rights.can_review_translation_in_languages.append(
-        language_code)
+    language_list = user_community_rights.can_review_translation_in_languages
+    language_list.append(language_code)
+    user_community_rights.can_review_translation_in_languages = sorted(
+        language_list)
     _save_user_community_rights(user_community_rights)
 
 
@@ -1835,8 +1837,10 @@ def allow_user_review_voiceover_in_language(user_id, language_code):
         language_code: str. The code of the language.
     """
     user_community_rights = get_user_community_rights(user_id)
-    user_community_rights.can_review_voiceover_in_languages.append(
-        language_code)
+    language_list = user_community_rights.can_review_voiceover_in_languages
+    language_list.append(language_code)
+    user_community_rights.can_review_voiceover_in_languages = sorted(
+        language_list)
     _save_user_community_rights(user_community_rights)
 
 

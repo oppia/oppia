@@ -1636,9 +1636,6 @@ class UserCommunityRightsModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
-    # User id used to identify user by GAE. Is not required for now because we
-    # need to perform migration to fill this for existing users.
-    gae_id = ndb.StringProperty(required=False, indexed=True)
     can_review_translation_in_languages = ndb.StringProperty(
         repeated=True, indexed=True)
     can_review_voiceover_in_languages = ndb.StringProperty(

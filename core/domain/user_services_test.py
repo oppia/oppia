@@ -1452,6 +1452,22 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
             user_services.can_review_translation_suggestions(
                 self.translator_id, language_code='hi'))
 
+    def test_translation_review_assignement_adds_language_in_sorted_order(self):
+        user_services.allow_user_review_translation_in_language(
+            self.translator_id, 'hi')
+        user_community_rights = user_services.get_user_community_rights(
+            self.translator_id)
+        self.assertTrue(
+            user_community_rights.can_review_translation_in_languages, ['hi'])
+
+        user_services.allow_user_review_translation_in_language(
+            self.translator_id, 'en')
+        user_community_rights = user_services.get_user_community_rights(
+            self.translator_id)
+        self.assertTrue(
+            user_community_rights.can_review_translation_in_languages,
+            ['en', 'hi'])
+
     def test_assign_user_review_voiceover_application_in_language(self):
         self.assertFalse(
             user_services.can_review_voiceover_applications(
@@ -1463,6 +1479,22 @@ class UserContributionReviewRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             user_services.can_review_voiceover_applications(
                 self.voice_artist_id, language_code='hi'))
+
+    def test_voiceover_review_assignement_adds_language_in_sorted_order(self):
+        user_services.allow_user_review_voiceover_in_language(
+            self.voice_artist_id, 'hi')
+        user_community_rights = user_services.get_user_community_rights(
+            self.voice_artist_id)
+        self.assertTrue(
+            user_community_rights.can_review_voiceover_in_languages, ['hi'])
+
+        user_services.allow_user_review_voiceover_in_language(
+            self.voice_artist_id, 'en')
+        user_community_rights = user_services.get_user_community_rights(
+            self.voice_artist_id)
+        self.assertTrue(
+            user_community_rights.can_review_voiceover_in_languages,
+            ['en', 'hi'])
 
     def test_assign_user_review_question_suggestion(self):
         self.assertFalse(

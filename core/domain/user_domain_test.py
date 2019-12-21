@@ -454,6 +454,30 @@ class UserCommunityRightsTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Invalid language_code: invalid_lang_code'):
             self.user_community_rights.validate()
 
+    def test_can_review_voiceover_in_languages_with_duplicate_values(self):
+        self.user_community_rights.can_review_voiceover_in_languages = ['hi']
+        self.user_community_rights.validate()
+
+        self.user_community_rights.can_review_voiceover_in_languages = [
+            'hi', 'hi']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_voiceover_in_languages list not to have '
+            'duplicate values'):
+            self.user_community_rights.validate()
+
+    def test_can_review_translation_in_languages_with_duplicate_values(self):
+        self.user_community_rights.can_review_translation_in_languages = ['hi']
+        self.user_community_rights.validate()
+
+        self.user_community_rights.can_review_translation_in_languages = [
+            'hi', 'hi']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected can_review_translation_in_languages list not to have '
+            'duplicate values'):
+            self.user_community_rights.validate()
+
     def test_incorrect_type_for_can_review_questions_raise_error(self):
         self.user_community_rights.can_review_questions = 5
         with self.assertRaisesRegexp(
