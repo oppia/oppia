@@ -97,7 +97,7 @@ FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts', '.DS_Store')
 # /extensions.)
 JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
-GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
+GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 
 JS_FILEPATHS_NOT_TO_BUILD = (
     os.path.join(
