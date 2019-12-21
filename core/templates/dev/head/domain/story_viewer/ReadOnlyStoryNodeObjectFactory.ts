@@ -20,22 +20,27 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-export class StoryNode {
-  id: String;
-  title: String;
-  destinationNodeIds: Array<String>;
-  prerequisiteSkillIds: Array<String>;
-  acquiredSkillIds: Array<String>;
-  outline: String;
-  outlineIsFinalized: Boolean;
-  explorationId: String;
-  explorationSummary: Object;
-  completed: Boolean;
+export interface ExplorationSummary {
+  title: string,
+  status: string
+}
 
-  constructor(id: String, title: String, destinationNodeIds: Array<String>,
-      prerequisiteSkillIds: Array<String>, acquiredSkillIds: Array<String>,
-      outline: String, outlineIsFinalized: Boolean, explorationId: String,
-      explorationSummary: Object, completed: Boolean) {
+export class StoryNode {
+  id: string;
+  title: string;
+  destinationNodeIds: Array<string>;
+  prerequisiteSkillIds: Array<string>;
+  acquiredSkillIds: Array<string>;
+  outline: string;
+  outlineIsFinalized: boolean;
+  explorationId: string;
+  explorationSummary: ExplorationSummary;
+  completed: boolean;
+
+  constructor(id: string, title: string, destinationNodeIds: Array<string>,
+      prerequisiteSkillIds: Array<string>, acquiredSkillIds: Array<string>,
+      outline: string, outlineIsFinalized: boolean, explorationId: string,
+      explorationSummary: ExplorationSummary, completed: boolean) {
     this.id = id;
     this.title = title;
     this.destinationNodeIds = destinationNodeIds;
@@ -48,31 +53,31 @@ export class StoryNode {
     this.completed = completed;
   }
 
-  getId(): String {
+  getId(): string {
     return this.id;
   }
 
-  getTitle(): String {
+  getTitle(): string {
     return this.title;
   }
 
-  getExplorationId(): String {
+  getExplorationId(): string {
     return this.explorationId;
   }
 
-  isCompleted(): Boolean {
+  isCompleted(): boolean {
     return this.completed;
   }
 
-  getExplorationSummaryObject(): Object {
+  getExplorationSummaryObject(): ExplorationSummary {
     return this.explorationSummary;
   }
 
-  getOutline(): String {
+  getOutline(): string {
     return this.outline;
   }
 
-  getOutlineStatus(): Boolean {
+  getOutlineStatus(): boolean {
     return this.outlineIsFinalized;
   }
 }

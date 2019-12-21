@@ -43,11 +43,11 @@ export class StoryPlaythrough {
     return this.nodes;
   }
 
-  hasFinishedStory(): Boolean {
+  hasFinishedStory(): boolean {
     return this.nodes.slice(-1)[0].isCompleted();
   }
 
-  getNextPendingNodeId(): String {
+  getNextPendingNodeId(): string {
     for (var i = 0; i < this.nodes.length; i++) {
       if (!this.nodes[i].isCompleted()) {
         return this.nodes[i].getId();
@@ -55,7 +55,7 @@ export class StoryPlaythrough {
     }
   }
 
-  hasStartedStory(): Boolean {
+  hasStartedStory(): boolean {
     return this.nodes[0].isCompleted();
   }
 }
