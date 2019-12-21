@@ -95,6 +95,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
           'bulletedList', 'pre', 'indent', 'outdent'];
 
         // Add external plugins.
+        // prevents ckeditor from filtering content.
+        CKEDITOR.config.allowedContent = true;
         CKEDITOR.plugins.addExternal(
           'sharedspace',
           '/third_party/static/ckeditor-4.12.1/plugins/sharedspace/',

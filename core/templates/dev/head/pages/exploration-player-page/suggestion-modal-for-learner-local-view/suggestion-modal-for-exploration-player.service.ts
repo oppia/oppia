@@ -50,6 +50,25 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             var stateName = PlayerPositionService.getCurrentStateName();
             var displayedCard = PlayerTranscriptService.getCard(
               PlayerPositionService.getDisplayedCardIndex());
+            var componentRe = (
+              /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
+            );
+            var wrapComponents = function(html) {
+              if (html === undefined) {
+                return html;
+              }
+              return html.replace(componentRe, function(match, p1, p2, p3) {
+                var inlineComponents = ['link', 'math'];
+                if (!(inlineComponents.indexOf(p3) !== -1)) {
+                  return '\n<div class="oppia-rte-component-container"' +
+                  ' type="oppia-noninteractive-' + p3 + '"' +
+                     '>' + match +
+                     '</div>\n';
+                } else {
+                  return match;
+                }
+              });
+            };
             $scope.originalHtml = displayedCard.getContentHtml();
             $scope.description = '';
             // ng-model needs to bind to a property of an object on
@@ -61,7 +80,15 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             $timeout(function() {
               $scope.showEditor = true;
             }, 500);
-
+            $scope.detectChange = function(e) {
+              var compare = wrapComponents($scope.originalHtml);
+              var compare2 = $scope.suggestionData.suggestionHtml;
+              compare2 = compare2.replace(/^\s*[\r\n]/gm, '').trim();
+              compare = compare.replace(/^\s*[\r\n]/gm, '').trim();
+              if (compare === compare2) {
+                return true;
+              }
+            };
             $scope.cancelSuggestion = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
