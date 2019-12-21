@@ -111,7 +111,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
 
             fs_services.save_original_and_compressed_versions_of_image(
                 self.FILENAME, 'exploration', self.EXPLORATION_ID,
-                original_image_content, 'image)
+                original_image_content, 'image')
 
             self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
             self.assertTrue(
