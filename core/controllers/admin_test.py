@@ -1158,7 +1158,7 @@ class CommunityReviewerTest(test_utils.GenericTestBase):
             self.voiceover_reviewer_id, language_code='hi'))
         self.logout()
 
-    def test_add_translation_reviewer_in_invalid_langauge(self):
+    def test_add_voiceover_reviewer_in_invalid_langauge(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         csrf_token = self.get_new_csrf_token()
