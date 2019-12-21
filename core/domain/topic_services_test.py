@@ -474,6 +474,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.name, 'New Name')
+        self.assertEqual(topic.canonical_name, 'new name')
         self.assertEqual(topic.version, 4)
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 4)
