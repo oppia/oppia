@@ -3540,8 +3540,9 @@ class TopicModelValidator(BaseModelValidator):
         """
         if not item.abbreviated_name:
             cls.errors['abbreviated name check'].append(
-                'Entity id %s: Expected nonempty abbreviated name '
-                'received %s.' % (item.id, item.abbreviated_name))
+                'Entity id %s : Topic name %s: Expected nonempty '
+                'abbreviated name received %s.' % (
+                    item.id, item.name, item.abbreviated_name))
 
     @classmethod
     def _get_custom_validation_functions(cls):
