@@ -195,7 +195,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
             snapshot_id = (
                 exp_models.ExplorationRightsModel._get_snapshot_id(
-                    exp_model.id, 2))
+                    exp_model.id, 1))
             exp_snapshot_model = (
                 exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
                     snapshot_id))

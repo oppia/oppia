@@ -85,7 +85,6 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             old_user_id: str. The old (GAE) ID of the user being migrated.
             new_user_id: str. The newly generated ID of the user being migrated.
         """
-
         old_models = model_class.query(
             model_class.get_user_id_migration_field() == old_user_id).fetch()
         new_models = []
@@ -205,7 +204,6 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             rights_snapshot_model: CollectionRightsSnapshotContentModel.
                 The model that contains the old user IDs.
         """
-
         reconstituted_rights_model = collection_models.CollectionRightsModel(
             **rights_snapshot_model.content)
         reconstituted_rights_model.owner_ids = (
@@ -453,9 +451,11 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             True if UserSettingsModel with id as user_id in model exists or
             user_id is SYSTEM_COMMITTER_ID, False otherwise.
         """
+        if user_id is None:
+            return True
         if user_id not in model_id:
             return False
-        if user_id is None or user_id == feconf.SYSTEM_COMMITTER_ID:
+        if user_id == feconf.SYSTEM_COMMITTER_ID:
             return True
         return user_models.UserSettingsModel.get_by_id(user_id) is not None
 

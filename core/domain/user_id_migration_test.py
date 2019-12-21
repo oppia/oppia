@@ -1022,6 +1022,11 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]).put()
+        feedback_models.GeneralFeedbackThreadModel(
+            id='type.id.generated',
+            entity_type='type',
+            entity_id='id',
+            subject='subject').put()
         topic_models.TopicRightsModel.put_multi([
             topic_models.TopicRightsModel(
                 id='topic_1_id',
@@ -1036,8 +1041,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             ['FAILURE - CompletedActivitiesModel', [self.USER_1_GAE_ID]],
             output)
         self.assertIn(
-            ['SUCCESS - CompletedActivitiesModel', 1],
-            output)
+            ['SUCCESS - CompletedActivitiesModel', 1], output)
         self.assertIn(
             ['FAILURE - ExpUserLastPlaythroughModel',
              ['%s.%s' % (self.USER_2_GAE_ID, 'exp_id')]],
@@ -1053,13 +1057,10 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             ['FAILURE - ExplorationSnapshotMetadataModel', ['exp_1_id']],
             output)
         self.assertIn(
-            ['SUCCESS - ExplorationSnapshotMetadataModel', 1],
-            output)
+            ['SUCCESS - ExplorationSnapshotMetadataModel', 1], output)
         self.assertIn(
-            ['FAILURE - TopicRightsModel', ['topic_1_id']],
-            output)
+            ['SUCCESS - GeneralFeedbackThreadModel', 1], output)
         self.assertIn(
-            ['SUCCESS - TopicRightsModel', 1],
-            output)
-        self.assertIn(
-            ['SUCCESS - UserSettingsModel', 3], output)
+            ['FAILURE - TopicRightsModel', ['topic_1_id']], output)
+        self.assertIn(['SUCCESS - TopicRightsModel', 1], output)
+        self.assertIn(['SUCCESS - UserSettingsModel', 3], output)
