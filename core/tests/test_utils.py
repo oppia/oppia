@@ -1923,7 +1923,8 @@ class AppEngineTestBase(TestBase):
         self.testbed.deactivate()
 
         # Remove the local directory used for file system.
-        shutil.rmtree(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
+        if os.path.exists(feconf.DISK_BACKED_FILE_SYSTEM_PATH):
+            shutil.rmtree(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
 
     def _get_all_queue_names(self):
         """Returns all the queue names.
