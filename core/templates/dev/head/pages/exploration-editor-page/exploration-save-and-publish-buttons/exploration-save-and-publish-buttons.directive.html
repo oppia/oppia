@@ -17,7 +17,7 @@
                   ng-disabled="isExplorationLockedForEditing() || countWarnings()"
                   style="border-color: black;">
             <span ng-if="!publishIsInProcess">
-              <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+              <i class="material-icons md-18 oppia-save-publish-button-icon"
                  alt="Publish to Oppia Library">
                 &#xE2C3;
               </i>
@@ -43,7 +43,7 @@
           <button class="btn btn-light oppia-save-draft-button protractor-test-save-changes-for-small-screens" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()" style="border-color: black;">
             <span ng-if="!saveIsInProcess">
               <span class="oppia-draft-label-container" ng-if="isPrivate()">
-                <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+                <i class="material-icons md-18 oppia-save-publish-button-icon"
                    alt="Save Draft">
                   &#xE161;
                 </i>
@@ -51,7 +51,7 @@
                 <span class="d-none d-md-block" ng-if="getChangeListLength()" style="opacity: 0.5;margin-left: 2px;">(<[getChangeListLength()]>)</span>
               </span>
               <span class="oppia-publish-label-container" ng-if="!isPrivate()" title="Publish Changes">
-                <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+                <i class="material-icons md-18 oppia-save-publish-button-icon"
                    alt="Publish Changes">
                   &#xE2C3;
                 </i>
@@ -92,7 +92,7 @@
               ng-click="showPublishExplorationModal()"
               ng-disabled="isExplorationLockedForEditing() || countWarnings()">
         <span ng-if="!publishIsInProcess">
-          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+          <i class="material-icons md-18 oppia-save-publish-button-icon"
              alt="Publish to Oppia Library">
             &#xE2C3;
           </i>
@@ -115,10 +115,13 @@
   <li class="nav-item d-none d-sm-block" ng-if="isEditableOutsideTutorialMode()">
     <div uib-dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;"
          title="<[getSaveButtonTooltip()]>" ng-class="{'disable-save-button': !isExplorationSaveable()}">
-      <button id="tutorialSaveButton" class="btn btn-light oppia-save-draft-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()" style="width: fit-content">
+      <button id="tutorialSaveButton"
+              class="btn btn-light oppia-save-draft-button protractor-test-save-changes"
+              ng-class="{'btn-success': isExplorationSaveable()}"
+              ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
         <span ng-if="!saveIsInProcess">
           <span class="oppia-draft-label-container" ng-if="isPrivate()">
-            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+            <i class="material-icons md-18 oppia-save-publish-button-icon"
                alt="Save Draft">
               &#xE161;
             </i>
@@ -126,7 +129,7 @@
             <span class="d-none d-md-block" ng-if="getChangeListLength()" style="opacity: 0.5;margin-left: 2px;">(<[getChangeListLength()]>)</span>
           </span>
           <span class="oppia-publish-label-container" ng-if="!isPrivate()" title="Publish Changes">
-            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+            <i class="material-icons md-18 oppia-save-publish-button-icon"
                alt="Publish Changes">
               &#xE2C3;
             </i>
@@ -166,9 +169,6 @@
   .oppia-publish-label-container {
     display: flex;
     flex-direction: row;
-  }
-  .oppia-save-publish-button-label {
-    width: fit-content;
   }
   .oppia-save-publish-dropdown {
     border: 0;
