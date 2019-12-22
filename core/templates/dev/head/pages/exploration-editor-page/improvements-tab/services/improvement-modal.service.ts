@@ -188,7 +188,7 @@ angular.module('oppia').factory('ImprovementModalService', [
       },
 
       openSuggestionThread: function(thread) {
-        var openSuggestionReviewer = this.openSuggestionReviewer;
+        var openSuggestionReviewModal = this.openSuggestionReviewModal;
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/improvements-tab/templates/' +
