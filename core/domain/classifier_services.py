@@ -445,6 +445,10 @@ def store_classifier_data(job_id, classifier_data):
         raise Exception(
             'The ClassifierTrainingJobModel corresponding to the job_id of the '
             'ClassifierTrainingJob does not exist.')
+    classifier_training_job = get_classifier_training_job_from_model(
+        classifier_training_job_model)
+    classifier_training_job.update_classifier_data(classifier_data)
+    classifier_training_job.validate()
     fs_services.save_classifier_data(
         classifier_training_job_model.exp_id, job_id, classifier_data)
 

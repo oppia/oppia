@@ -42,61 +42,20 @@ ALLOWED_ENTITY_NAMES = [
     feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_VOICEOVER_APPLICATION]
 
 
-class FileMetadataChange(change_domain.BaseChange):
-    """Domain object for changes made to a file metadata object."""
-    pass
-
-
-class FileChange(change_domain.BaseChange):
-    """Domain object for changes made to a file object."""
-    pass
-
-
-class FileMetadata(python_utils.OBJECT):
-    """A class representing the metadata of a file.
-
-    Attributes:
-        size: int. The size of the file, in bytes.
-    """
-
-    def __init__(self, metadata):
-        """Constructs a FileMetadata object.
-
-        Args:
-            metadata: FileMetadataModel. The file metadata model instance.
-        """
-        self._size = metadata.size if (metadata is not None) else None
-
-    @property
-    def size(self):
-        """Returns the size of the file, in bytes.
-
-        Returns:
-            int. The size of the file, in bytes.
-        """
-        return self._size
-
-
-class FileStreamWithMetadata(python_utils.OBJECT):
+class FileStream(python_utils.OBJECT):
     """A class that wraps a file stream, but adds extra attributes to it.
 
     Attributes:
         content: str. The content of the file snapshot.
-        version: int. The version number of the file.
-        metadata: FileMetadata. The file metadata domain instance.
     """
 
-    def __init__(self, content, version, metadata):
-        """Constructs a FileStreamWithMetadata object.
+    def __init__(self, content):
+        """Constructs a FileStream object.
 
         Args:
             content: str. The content of the file snapshots.
-            version: int. The version number of the file.
-            metadata: FileMetadataModel. The file metadata model instance.
         """
         self._content = content
-        self._version = version
-        self._metadata = FileMetadata(metadata)
 
     def read(self):
         """Emulates stream.read(). Returns all bytes and emulates EOF.
@@ -107,24 +66,6 @@ class FileStreamWithMetadata(python_utils.OBJECT):
         content = self._content
         self._content = ''
         return content
-
-    @property
-    def metadata(self):
-        """Returns the file metadata model instance.
-
-        Returns:
-            FileMetadataModel. The file metadata model instance.
-        """
-        return self._metadata
-
-    @property
-    def version(self):
-        """Returns the version number of the file.
-
-        Returns:
-            int. The version number of the file.
-        """
-        return self._version
 
 
 class GeneralFileSystem(python_utils.OBJECT):
@@ -237,7 +178,7 @@ class DiskBackedFileSystem(GeneralFileSystem):
             mode: str. Unused argument.
 
         Returns:
-            FileStreamWithMetadata or None. It returns FileStreamWithMetadata
+            FileStream or None. It returns FileStream
                 domain object if the file exists. Otherwise, it returns None.
         """
         if not os.path.exists(self._get_complete_path(filepath)):
@@ -249,7 +190,7 @@ class DiskBackedFileSystem(GeneralFileSystem):
         data = file_obj.read()
         file_obj.close()
 
-        return FileStreamWithMetadata(data, None, None)
+        return FileStream(data)
 
     def commit(self, filepath, content, unused_mimetype):
         """Saves a raw bytestring as a file in the database.
@@ -362,7 +303,7 @@ class GcsFileSystem(GeneralFileSystem):
             mode: str. Unused argument.
 
         Returns:
-            FileStreamWithMetadata or None. It returns FileStreamWithMetadata
+            FileStream or None. It returns FileStream
                 domain object if the file exists. Otherwise, it returns None.
         """
         if self.isfile(filepath):
@@ -373,7 +314,7 @@ class GcsFileSystem(GeneralFileSystem):
             gcs_file = cloudstorage.open(gcs_file_url)
             data = gcs_file.read()
             gcs_file.close()
-            return FileStreamWithMetadata(data, None, None)
+            return FileStream(data)
         else:
             return None
 
@@ -505,7 +446,7 @@ class AbstractFileSystem(python_utils.OBJECT):
             mode: str. The mode with which to open the file.
 
         Returns:
-            FileStreamWithMetadata. The file stream domain object.
+            FileStream. The file stream domain object.
         """
         self._check_filepath(filepath)
         return self._impl.get(filepath, version=version, mode=mode)
@@ -521,7 +462,7 @@ class AbstractFileSystem(python_utils.OBJECT):
             mode: str. The mode with which to open the file.
 
         Returns:
-            FileStreamWithMetadata. The file stream domain object.
+            FileStream. The file stream domain object.
 
         Raises:
             IOError: The given (or latest) version of this file stream does not
