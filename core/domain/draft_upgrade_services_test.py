@@ -128,7 +128,8 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                 'new_value': 'new value'
             })]
         self.assertEqual(
-            draft_upgrade_services.DraftUpgradeUtil._convert_states_v30_dict_to_v31_dict(  # pylint: disable=protected-access,line-too-long
+            draft_upgrade_services.DraftUpgradeUtil # pylint: disable=protected-access
+            ._convert_states_v30_dict_to_v31_dict(
                 draft_change_list)[0].to_dict(),
             draft_change_list[0].to_dict())
 

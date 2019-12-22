@@ -698,7 +698,7 @@ class Voiceover(python_utils.OBJECT):
         self.file_size_bytes = file_size_bytes
         # bool. Whether audio is marked for needing review.
         self.needs_update = needs_update
-        # int. The duration in seconds for the voiceover recording.
+        # float. The duration in seconds for the voiceover recording.
         self.duration = duration
 
     def validate(self):
