@@ -15,8 +15,9 @@
 /**
  * @fileoverview Modal and functionality for the create collection button.
  */
+
 // eslint-disable-next-line max-len
-require('components/entity-creation-services/collection-creation-backend-api.service.ts');// lint-disable-line no-use-before-define
+require('components/entity-creation-services/collection-creation-backend-api.service.ts');
 require('services/alerts.service.ts');
 
 // TODO(bhenning): Refactor this to match the frontend design spec and reduce

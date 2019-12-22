@@ -31,7 +31,7 @@ angular.module('oppia').factory('CollectionCreationBackendService', [
           SiteAnalyticsService.registerCreateNewCollectionEvent(
             response.data.collectionId);
           $timeout(function() {
-            $window.location = UrlInterpolationService.interpolateURL(
+            $window.location = UrlInterpolationService.interpolateUrl(
               CREATE_NEW_COLLECTION_URL_TEMPLATE, {
                 collection_id: response.data.collectionId
               }
