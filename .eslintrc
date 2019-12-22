@@ -22,7 +22,7 @@
   "rules": {
     "angular/di": [
       "error",
-      "array",
+      "array"
     ],
     "angular/di-unused": "error",
     "angular/directive-restrict": [
@@ -76,18 +76,6 @@
       "error",
       "always"
     ],
-    "no-restricted-globals": [
-      "error", "addEventListener", "blur", "close", "closed", "confirm",
-      "defaultStatus", "event", "external", "defaultstatus", "find", "focus",
-      "frameElement", "frames", "history", "innerHeight", "innerWidth",
-      "length", "location", "locationbar", "menubar", "moveBy", "moveTo",
-      "name", "onblur", "onerror", "onfocus", "onload", "onresize", "onunload",
-      "open", "opener", "opera", "outerHeight", "outerWidth", "pageXOffset",
-      "pageYOffset", "parent", "print", "removeEventListener", "resizeBy",
-      "resizeTo", "screen", "screenLeft", "screenTop", "screenX", "screenY",
-      "scroll", "scrollbars", "scrollBy", "scrollTo", "scrollX", "scrollY",
-      "self", "sessionStorage", "status", "statusbar", "stop",
-      "toolbar", "top"],
     "func-style": [
       "error",
       "expression"
@@ -153,6 +141,18 @@
     "no-redeclare": [
       "off"
     ],
+    "no-restricted-globals": [
+      "error", "addEventListener", "blur", "close", "closed", "confirm",
+      "defaultStatus", "event", "external", "defaultstatus", "find", "focus",
+      "frameElement", "frames", "history", "innerHeight", "innerWidth",
+      "length", "location", "locationbar", "menubar", "moveBy", "moveTo",
+      "name", "onblur", "onerror", "onfocus", "onload", "onresize", "onunload",
+      "open", "opener", "opera", "outerHeight", "outerWidth", "pageXOffset",
+      "pageYOffset", "parent", "print", "removeEventListener", "resizeBy",
+      "resizeTo", "screen", "screenLeft", "screenTop", "screenX", "screenY",
+      "scroll", "scrollbars", "scrollBy", "scrollTo", "scrollX", "scrollY",
+      "self", "sessionStorage", "status", "statusbar", "stop",
+      "toolbar", "top"],
     "no-tabs": "error",
     "no-useless-escape": "off",
     "no-whitespace-before-property": "error",
@@ -202,7 +202,7 @@
       {
         "anonymous": "never",
         "asyncArrow": "never",
-        "named": "never",
+        "named": "never"
       }
     ],
     "spaced-comment": [
@@ -216,7 +216,7 @@
       "error",
       {
         "words": true,
-        "nonwords": false,
+        "nonwords": false
       }
     ],
     "switch-colon-spacing": [
