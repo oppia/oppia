@@ -31,8 +31,6 @@ import python_utils
 import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
-(file_models,) = models.Registry.import_models(
-    [models.NAMES.file])
 
 
 class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):

@@ -30,9 +30,6 @@ import utils
 import cloudstorage
 
 app_identity_services = models.Registry.import_app_identity_services()
-(file_models,) = models.Registry.import_models([
-    models.NAMES.file
-])
 
 CHANGE_LIST_SAVE = [{'cmd': 'save'}]
 

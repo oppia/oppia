@@ -34,7 +34,6 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
@@ -64,7 +63,7 @@ import utils
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, file_models, job_models,
+    feedback_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
@@ -73,7 +72,7 @@ import utils
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
+            models.NAMES.feedback, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
@@ -90,7 +89,6 @@ IMAGE_PATH_REGEX = (
 AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
-FILE_MODELS_REGEX = '(%s|%s)' % (IMAGE_PATH_REGEX, AUDIO_PATH_REGEX)
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'FeedbackAnalyticsAggregator',
     'InteractionAnswerSummariesAggregator',
