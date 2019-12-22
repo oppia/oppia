@@ -17,5 +17,5 @@
  */
 
 export class NavigationBarConstants {
-    public static NOTIFICATIONS_HANDLER_URL = '/notificationshandler';
-  }
+  public static NOTIFICATIONS_HANDLER_URL = '/notificationshandler';
+}

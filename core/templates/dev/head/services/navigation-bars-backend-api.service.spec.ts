@@ -20,9 +20,9 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-require("services/navigation-bars-backend-api.service.ts");
+require('services/navigation-bars-backend-api.service.ts');
 
-describe('Navigation bars backend API service', function () {
+describe('Navigation bars backend API service', function() {
   var NavigationBarsBackendApiService = null;
   var sampleDataResults = null;
   var $rootScope = null;
@@ -31,14 +31,14 @@ describe('Navigation bars backend API service', function () {
   var UndoRedoService = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function ($provide) {
+  beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(angular.mock.inject(function ($injector) {
+  beforeEach(angular.mock.inject(function($injector) {
     NavigationBarsBackendApiService = $injector.get(
       'NavigationBarsBackendApiService');
     $rootScope = $injector.get('$rootScope');
@@ -46,45 +46,47 @@ describe('Navigation bars backend API service', function () {
     $httpBackend = $injector.get('$httpBackend');
 
     sampleDataResults = {
-        num_unseen_notifications: 0
+      num_unseen_notifications: 0;
     }
   }));
 
-  afterEach(function () {
+  afterEach(function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
   });
 
   it('should successfully fetch notifications from the backend',
-    function () {
+    function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect('GET', '/notificationshandler').respond(
         sampleDataResults);
-        NavigationBarsBackendApiService.fetchNotificationHandler().then(
+      NavigationBarsBackendApiService.fetchNotificationHandler().then(
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining({data: sampleDataResults}));
+      expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining(
+        {data: sampleDataResults}));
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
 
   it('should use the rejection handler if the backend request failed',
-    function () {
+    function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
         'GET', '/notificationshandler').respond(
-          500, 'Error getting notifications.');
-        NavigationBarsBackendApiService.fetchNotificationHandler().then(
+        500, 'Error getting notifications.');
+      NavigationBarsBackendApiService.fetchNotificationHandler().then(
         successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(jasmine.objectContaining({data: 'Error getting notifications.'}));
+      expect(failHandler).toHaveBeenCalledWith(jasmine.objectContaining(
+        {data: 'Error getting notifications.'}));
     }
   );
 });

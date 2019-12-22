@@ -26,7 +26,7 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 require('services/contextual/device-info.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/navigation-bars-backend-api.service.ts')
+require('services/navigation-bars-backend-api.service.ts');
 
 angular.module('oppia').directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -40,13 +40,13 @@ angular.module('oppia').directive('topNavigationBar', [
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
-        'SiteAnalyticsService', 'NavigationService', 'NavigationBarsBackendApiService', 'WindowDimensionsService',
-        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
+        'SiteAnalyticsService', 'NavigationService', 'NavigationBarsBackendApiService', 
+        'WindowDimensionsService','DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
-            SiteAnalyticsService, NavigationService, NavigationBarsBackendApiService, WindowDimensionsService,
-            DebouncerService, DeviceInfoService, LOGOUT_URL) {
+            SiteAnalyticsService, NavigationService, NavigationBarsBackendApiService,
+            WindowDimensionsService, DebouncerService, DeviceInfoService, LOGOUT_URL) {
           var ctrl = this;
           ctrl.isModerator = null;
           ctrl.isAdmin = null;
@@ -74,7 +74,8 @@ angular.module('oppia').directive('topNavigationBar', [
             if (ctrl.userIsLoggedIn) {
               // Show the number of unseen notifications in the navbar and page
               // title, unless the user is already on the dashboard page.
-              NavigationBarsBackendApiService.fetchNotificationHandler().then(function(response) {
+              NavigationBarsBackendApiService.fetchNotificationHandler()
+              .then(function(response) {
                 var data = response.data;
                 if ($window.location.pathname !== '/') {
                   ctrl.numUnseenNotifications = data.num_unseen_notifications;

@@ -13,17 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to retrieve notifications from the 
+ * @fileoverview Service to retrieve notifications from the
  * backend.
  */
 
 require('components/common-layout-directives/navigation-bars/navigation-bars.constants.ajs.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').factory('NavigationBarsBackendApiService', [
-  '$http', 'UrlInterpolationService', 'NOTIFICATIONS_HANDLER_URL', function ($http, UrlInterpolationService, NOTIFICATIONS_HANDLER_URL) {
-    var _fetchNotificationHandler = function () {
+  '$http', 'NOTIFICATIONS_HANDLER_URL',
+  function($http, NOTIFICATIONS_HANDLER_URL) {
+    var _fetchNotificationHandler = function() {
       return $http.get(NOTIFICATIONS_HANDLER_URL);
     };
 
