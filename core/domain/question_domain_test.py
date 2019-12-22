@@ -22,6 +22,7 @@ from core.domain import question_domain
 from core.domain import state_domain
 from core.tests import test_utils
 import feconf
+import python_utils
 import utils
 
 
@@ -249,6 +250,29 @@ class QuestionRightsChangeTest(test_utils.GenericTestBase):
 
         self.assertEqual('create_new', observed_object.cmd)
 
+
+class QuestionMigrationMethodsUnitTest(test_utils.GenericTestBase):
+    """Tests the presence of appropriate schema migration methods in the
+    Question domain object class.
+    """
+
+    def test_correct_states_schema_conversion_methods_exist(self):
+        """Test that the right states schema conversion methods exist."""
+        current_states_schema_version = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
+        # The schema conversion methods begin at v27 for Question Domain.
+        for version_num in python_utils.RANGE(
+                27, current_states_schema_version):
+            self.assertTrue(hasattr(
+                question_domain.Question,
+                '_convert_state_v%s_dict_to_v%s_dict' % (
+                    version_num, version_num + 1)))
+
+        self.assertFalse(hasattr(
+            question_domain.Question,
+            '_convert_state_v%s_dict_to_v%s_dict' % (
+                current_states_schema_version,
+                current_states_schema_version + 1)))
 
 
 class QuestionDomainTest(test_utils.GenericTestBase):
