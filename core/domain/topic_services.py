@@ -420,6 +420,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
 
     topic_model.description = topic.description
     topic_model.name = topic.name
+    topic_model.canonical_name = topic.canonical_name
     topic_model.abbreviated_name = topic.abbreviated_name
     topic_model.thumbnail_filename = topic.thumbnail_filename
     topic_model.canonical_story_references = [

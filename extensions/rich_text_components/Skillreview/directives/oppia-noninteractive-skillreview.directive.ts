@@ -21,7 +21,7 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
-angular.module('oppia').directive('oppiaNoninteractiveConcept', [
+angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
@@ -29,7 +29,8 @@ angular.module('oppia').directive('oppiaNoninteractiveConcept', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Concept/directives/concept.directive.html'),
+        '/rich_text_components/Skillreview/directives/' +
+        'skillreview.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$uibModal', 'ContextService', 'ENTITY_TYPE',

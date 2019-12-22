@@ -71,21 +71,6 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         self.check_validation(
             components.Collapsible, valid_items, invalid_items)
 
-    def test_concept_card_validation(self):
-        """Tests concept card component validation."""
-        valid_items = [{
-            'skill_summary-with-value':
-                '{\'id\': \'skill_id\', \'description\': '
-                '\'skill_description\'}',
-        }]
-        invalid_items = [{
-            'skill_summary-with-value': 'javascript:alert(5);',
-            'text-with-value': 'Hello'
-        }]
-
-        self.check_validation(
-            components.Concept, valid_items, invalid_items)
-
     def test_image_validation(self):
         """Tests collapsible component validation."""
         valid_items = [{
@@ -144,6 +129,21 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
 
         self.check_validation(
             components.Math, valid_items, invalid_items)
+
+    def test_skillreview_validation(self):
+        """Tests skillreview component validation."""
+        valid_items = [{
+            'skill_summary-with-value':
+                '{\'id\': \'skill_id\', \'description\': '
+                '\'skill_description\'}',
+        }]
+        invalid_items = [{
+            'skill_summary-with-value': 'javascript:alert(5);',
+            'text-with-value': 'Hello'
+        }]
+
+        self.check_validation(
+            components.Skillreview, valid_items, invalid_items)
 
     def test_tabs_validation(self):
         """Tests collapsible component validation."""

@@ -43,27 +43,6 @@ export = {
       "default_value": "You have opened the collapsible block."
     }]
   },
-  "Concept": {
-    "backend_id": "concept",
-    "category": "Basic Input",
-    "description": "A link to the concept card of the linked skill.",
-    "frontend_id": "concept",
-    "tooltip": "Insert Concept Card Link",
-    "icon_data_url": "/rich_text_components/Concept/Concept.png",
-    "is_complex": false,
-    "requires_fs": false,
-    "is_lesson_related": true,
-    "is_block_element": false,
-    "customization_arg_specs": [{
-      "name": "skill_summary",
-      "description": "Click on skill to view concept card.",
-      "schema": {
-        "type": "custom",
-        "obj_type": "SkillSelector"
-      },
-      "default_value": ""
-    }]
-  },
   "Image": {
     "backend_id": "Image",
     "category": "Basic Input",
@@ -150,6 +129,27 @@ export = {
       "schema": {
         "type": "custom",
         "obj_type": "MathLatexString"
+      },
+      "default_value": ""
+    }]
+  },
+  "Skillreview": {
+    "backend_id": "skillreview",
+    "category": "Basic Input",
+    "description": "A link to the concept card of the linked skill.",
+    "frontend_id": "skillreview",
+    "tooltip": "Insert Concept Card Link",
+    "icon_data_url": "/rich_text_components/Skillreview/Skillreview.png",
+    "is_complex": false,
+    "requires_fs": false,
+    "is_lesson_related": true,
+    "is_block_element": false,
+    "customization_arg_specs": [{
+      "name": "skill_summary",
+      "description": "Click on skill to view concept card.",
+      "schema": {
+        "type": "custom",
+        "obj_type": "SkillSelector"
       },
       "default_value": ""
     }]
