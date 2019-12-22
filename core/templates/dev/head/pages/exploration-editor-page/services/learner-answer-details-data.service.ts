@@ -64,8 +64,8 @@ angular.module('oppia').factory('LearnerAnswerDetailsDataService', [
       },
       fetchLearnerAnswerInfoData: function() {
         return _fetchLearnerAnswerInfoData().then(function(response) {
-          learnerAnswerInfoData = angular.copy(
-            response.data.learner_answer_info_data);
+          learnerAnswerInfoData =
+            response.data.learner_answer_info_data;
           for (var i = 0; i < learnerAnswerInfoData.length; i++) {
             var stateName = learnerAnswerInfoData[i].state_name;
             var interactionId = learnerAnswerInfoData[i].interaction_id;
