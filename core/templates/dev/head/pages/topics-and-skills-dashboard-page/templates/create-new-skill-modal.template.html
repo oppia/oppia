@@ -20,14 +20,15 @@
       <strong>Add Skill Rubrics</strong>
     </div>
     <rubrics-editor rubrics="rubrics"
-                    on-save-rubric="onSaveRubric">
+                    on-save-rubric="onSaveRubric"
+                    new-skill-being-created="true">
     </rubrics-editor>
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-success protractor-test-confirm-skill-creation-button"
             type="submit"
-            ng-disabled="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0 || !allRubricsAdded">
+            ng-disabled="bindableDict.displayedConceptCardExplanation.length === 0 || newSkillDescription.length === 0">
             Save
     </button>
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
