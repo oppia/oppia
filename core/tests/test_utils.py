@@ -34,6 +34,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
@@ -1910,21 +1911,26 @@ class AppEngineTestBase(TestBase):
 
         self.signup_superadmin_user()
 
-        # Set up local directory for file system. Remove the folder if it
-        # already exists otherwise the makedirs function will cause tests to
-        # fail.
-        if os.path.exists(feconf.DISK_BACKED_FILE_SYSTEM_PATH):
-            shutil.rmtree(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
-        os.makedirs(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
+        # Set up local directory for file system. This local directory must be
+        # specific to current set of unit tests and should not intersect with
+        # local directories of other unit tests otherwise tests may fail as 
+        # unit test in other module can override the file written in current
+        # tests. 
+        self.vfs_nested_dir = '%s_%s' % (
+            self.__module__, self.__class__.__name__)
+        fs_domain.DiskBackedFileSystem.root_dir_suffix = self.vfs_nested_dir
 
     def tearDown(self):
         self.logout()
         self._delete_all_models()
         self.testbed.deactivate()
 
-        # Remove the local directory used for file system.
-        if os.path.exists(feconf.DISK_BACKED_FILE_SYSTEM_PATH):
-            shutil.rmtree(feconf.DISK_BACKED_FILE_SYSTEM_PATH)
+        # Clear the disk backed local file system. This must be done after each
+        # test case otherwise test cases may fail.
+        disk_backed_local_fs_path = utils.vfs_construct_path(
+            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self.vfs_nested_dir)
+        if os.path.exists(disk_backed_local_fs_path):
+            shutil.rmtree(disk_backed_local_fs_path)
 
     def _get_all_queue_names(self):
         """Returns all the queue names.

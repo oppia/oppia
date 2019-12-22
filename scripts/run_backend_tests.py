@@ -50,6 +50,7 @@ import inspect
 import multiprocessing
 import os
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -403,6 +404,13 @@ def main(args=None):
             test_path=parsed_args.test_path,
             include_load_tests=include_load_tests)
 
+    # Setup local directory for disk backed file system.
+    disk_backed_file_system_dir = '.local'
+    disk_backed_file_system_path = os.path.join(
+        '.', disk_backed_file_system_dir)
+    if not os.path.exists(disk_backed_file_system_path):
+        os.makedirs(disk_backed_file_system_path)
+
     # Prepare tasks.
     concurrent_count = min(multiprocessing.cpu_count(), MAX_CONCURRENT_RUNS)
     semaphore = threading.Semaphore(concurrent_count)
@@ -426,6 +434,8 @@ def main(args=None):
     for task in tasks:
         if task.exception:
             log(python_utils.convert_to_bytes(task.exception.args[0]))
+
+    shutil.rmtree(disk_backed_file_system_path)
 
     python_utils.PRINT('')
     python_utils.PRINT('+------------------+')

@@ -258,7 +258,7 @@ def export_to_zip_file(exploration_id, version=None):
         zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
@@ -1191,9 +1191,9 @@ def save_new_exploration_from_yaml_and_assets(
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
-        fs.commit(committer_id, asset_filename, asset_content)
+        fs.commit(asset_filename, asset_content)
 
     if (exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):

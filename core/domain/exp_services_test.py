@@ -1041,7 +1041,7 @@ title: Title
             self.owner_id, self.SAMPLE_YAML_CONTENT, self.EXP_ID, [test_asset])
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertEqual(
             fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
@@ -1702,9 +1702,9 @@ title: A title
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
-        fs.commit(self.owner_id, 'abc.png', raw_image)
+        fs.commit('abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
         zf = zipfile.ZipFile(python_utils.string_io(
@@ -1744,9 +1744,9 @@ title: A title
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
-        fs.commit(self.owner_id, 'abc.png', raw_image)
+        fs.commit('abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -1959,9 +1959,9 @@ written_translations:
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
-        fs.commit(self.owner_id, 'abc.png', raw_image)
+        fs.commit('abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)

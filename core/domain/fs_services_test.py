@@ -70,7 +70,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             encoding=None) as f:
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
         self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
         self.assertEqual(

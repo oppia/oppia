@@ -104,7 +104,7 @@ class AssetDevHandler(base.BaseHandler):
                 entity_id = page_identifier
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))
+                fs_domain.DiskBackedFileSystem(entity_type, entity_id))
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None

@@ -35,142 +35,6 @@ app_identity_services = models.Registry.import_app_identity_services()
     [models.NAMES.file])
 
 
-class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
-    """Tests for the datastore-backed exploration file system."""
-
-    def setUp(self):
-        super(DatastoreBackedFileSystemUnitTests, self).setUp()
-        self.USER_EMAIL = 'abc@example.com'
-        self.signup(self.USER_EMAIL, 'username')
-        self.user_id = self.get_user_id_from_email(self.USER_EMAIL)
-        self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
-
-    def test_get_and_save(self):
-        self.fs.commit('abc.png', 'file_contents')
-        self.assertEqual(self.fs.get('abc.png'), 'file_contents')
-
-    def test_validate_entity_parameters(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid entity_id received: 1'):
-            fs_domain.DatastoreBackedFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 1)
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Entity id cannot be empty'):
-            fs_domain.DatastoreBackedFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, '')
-
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid entity_name received: '
-            'invalid_name.'):
-            fs_domain.DatastoreBackedFileSystem('invalid_name', 'exp_id')
-
-    def test_get_raises_error_when_file_size_is_more_than_1_mb(self):
-        self.fs.commit('abc.png', 'file_contents')
-
-        with python_utils.open_file(
-            os.path.join(
-                feconf.TESTS_DATA_DIR, 'cafe-over-five-minutes.mp3'),
-            'rb', encoding=None) as f:
-            raw_bytes = f.read()
-
-        with self.assertRaisesRegexp(
-            Exception, 'The maximum allowed file size is 1 MB.'):
-            self.fs.commit('large_file.png', raw_bytes)
-
-    def test_get_save_raises_error_when_metadata_and_data_are_not_in_sync(self):
-        observed_log_messages = []
-
-        def mock_logging_function(msg, *_):
-            observed_log_messages.append(msg)
-
-        with self.swap(logging, 'error', mock_logging_function):
-            self.fs.commit('abc.png', 'file_contents')
-
-            data = file_models.FileModel.get_model(
-                'exploration/eid', 'assets/abc.png')
-            data.delete(feconf.SYSTEM_COMMITTER_ID, '', True)
-
-            with self.assertRaisesRegexp(
-                IOError, r'File abc\.png .* not found'):
-                self.fs.get('abc.png')
-
-            self.assertEqual(len(observed_log_messages), 1)
-            self.assertEqual(
-                observed_log_messages[0],
-                (
-                    'Metadata and data for file abc.png (version None) are '
-                    'out of sync.'
-                )
-            )
-
-    def test_delete(self):
-        self.assertFalse(self.fs.isfile('abc.png'))
-        self.fs.commit('abc.png', 'file_contents')
-        self.assertTrue(self.fs.isfile('abc.png'))
-
-        self.fs.delete('abc.png')
-        self.assertFalse(self.fs.isfile('abc.png'))
-        with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
-            self.fs.get('abc.png')
-
-        # Nothing happens when one tries to delete a file that does not exist.
-        self.fs.delete('fake_file.png')
-
-    def test_listdir(self):
-        self.fs.commit('abc.png', 'file_contents')
-        self.fs.commit('abcd.png', 'file_contents_2')
-        self.fs.commit('abc/abcd.png', 'file_contents_3')
-        self.fs.commit('bcd/bcde.png', 'file_contents_4')
-
-        self.assertEqual(self.fs.listdir(''), [
-            'abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png'])
-
-        self.assertEqual(self.fs.listdir('abc'), ['abc/abcd.png'])
-
-        with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
-            self.fs.listdir('/abc')
-
-        self.assertEqual(self.fs.listdir('fake_dir'), [])
-
-        new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
-        self.assertEqual(new_fs.listdir('assets'), [])
-
-    def test_versioning(self):
-        self.fs.commit('abc.png', 'file_contents')
-        self.assertEqual(self.fs.get('abc.png'), 'file_contents')
-        file_stream = self.fs.open('abc.png')
-        self.assertEqual(file_stream.version, 1)
-        self.assertEqual(file_stream.metadata.size, len('file_contents'))
-
-        self.fs.commit('abc.png', 'file_contents_2_abcdefg')
-        self.assertEqual(self.fs.get('abc.png'), 'file_contents_2_abcdefg')
-        file_stream = self.fs.open('abc.png')
-        self.assertEqual(file_stream.version, 2)
-        self.assertEqual(
-            file_stream.metadata.size, len('file_contents_2_abcdefg'))
-
-        self.assertEqual(
-            self.fs.get('abc.png', version=1), 'file_contents')
-        old_file_stream = self.fs.open('abc.png', version=1)
-        self.assertEqual(old_file_stream.version, 1)
-        self.assertEqual(old_file_stream.metadata.size, len('file_contents'))
-
-    def test_independence_of_file_systems(self):
-        self.fs.commit('abc.png', 'file_contents')
-        self.assertEqual(self.fs.get('abc.png'), 'file_contents')
-
-        fs2 = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
-                feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
-        with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
-            fs2.get('abc.png')
-
-
 class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
     """Tests for the disk-backed exploration file system."""
 
@@ -191,18 +55,18 @@ class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
     def test_validate_entity_parameters(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid entity_id received: 1'):
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, 1)
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Entity id cannot be empty'):
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, '')
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid entity_name received: '
             'invalid_name.'):
-            fs_domain.DatastoreBackedFileSystem('invalid_name', 'exp_id')
+            fs_domain.DiskBackedFileSystem('invalid_name', 'exp_id')
 
     def test_save_file_size_is_more_than_1_mb(self):
         with python_utils.open_file(
@@ -244,7 +108,7 @@ class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.listdir('fake_dir'), [])
 
         new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
 
@@ -253,7 +117,7 @@ class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.get('abc.png'), self.image_content)
 
         fs2 = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
         with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
             fs2.get('abc.png')
@@ -360,7 +224,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
 
     def test_invalid_filepaths_are_caught(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
 
         invalid_filepaths = [

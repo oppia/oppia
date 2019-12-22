@@ -128,28 +128,23 @@ class FileStreamWithMetadata(python_utils.OBJECT):
 
 
 class GeneralFileSystem(python_utils.OBJECT):
-    """The parent class which is inherited by both DatastoreBackedFileSystem
+    """The parent class which is inherited by both DiskBackedFileSystem
     and GcsFileSystem as the member variables in both classes are the same.
 
     Attributes:
         entity_name: str. The name of the entity (eg: exploration, topic etc).
         entity_id: str. The ID of the corresponding entity.
     """
-
-    def __init__(
-            self, entity_name, entity_id):
+    def __init__(self, entity_name, entity_id):
         """Constructs a GeneralFileSystem object.
 
         Args:
             entity_name: str. The name of the entity
                 (eg: exploration, topic etc).
             entity_id: str. The ID of the corresponding entity.
-            user_id: str. The ID of the user on behalf of whom the file system
-                manages objects.
         """
         self._validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
-        self._user_id = feconf.SYSTEM_COMMITTER_ID
 
     def _validate_entity_parameters(self, entity_name, entity_id):
         """Checks whether the entity_id and entity_name passed in are valid.
@@ -187,6 +182,10 @@ class DiskBackedFileSystem(GeneralFileSystem):
     This file system stores all necessary assets of an entity on the local
     hard disk on which the development server is running.
     """
+    # The suffix that should be attached to root directory before it is used
+    # to store files.
+    root_dir_suffix = ''
+    
     def __init__(self, entity_name, entity_id):
         """Constructs a DiskBackedFileSystem object.
 
@@ -197,15 +196,16 @@ class DiskBackedFileSystem(GeneralFileSystem):
         """
         super(DiskBackedFileSystem, self).__init__(entity_name, entity_id)
         assets_dir = utils.vfs_construct_path(
-            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path)
+            feconf.DISK_BACKED_FILE_SYSTEM_PATH,
+            self.root_dir_suffix, self._assets_path)
         if not os.path.exists(os.path.join(assets_dir)):
             os.makedirs(assets_dir)
 
-    def _get_file_path(self, filepath):
+    def _get_complete_path(self, filepath):
         """Generate the path where file will be stored in local disk system."""
         return utils.vfs_construct_path(
-            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path,
-            filepath)
+            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self.root_dir_suffix,
+            self._assets_path, filepath)
 
     def _save_file(self, filepath, content):
         """Create or update a file.
@@ -215,8 +215,9 @@ class DiskBackedFileSystem(GeneralFileSystem):
                 assets folder.
             content: str. The content to be stored in file.
         """
-        file_obj = python_utils.open_file(self._get_file_path(filepath), 'w')
-        file_obj.write(content.decode('utf-8'))
+        file_obj = python_utils.open_file(
+            self._get_complete_path(filepath), 'wb', encoding=None)
+        file_obj.write(content)
         file_obj.close()
 
     def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
@@ -239,11 +240,12 @@ class DiskBackedFileSystem(GeneralFileSystem):
             FileStreamWithMetadata or None. It returns FileStreamWithMetadata
                 domain object if the file exists. Otherwise, it returns None.
         """
-        if not os.path.exists(self._get_file_path(filepath)):
+        if not os.path.exists(self._get_complete_path(filepath)):
             logging.error('File %s not found.' % (filepath))
             return None
 
-        file_obj = python_utils.open_file(self._get_file_path(filepath), 'r')
+        file_obj = python_utils.open_file(
+            self._get_complete_path(filepath), 'rb', encoding=None)
         data = file_obj.read()
         file_obj.close()
 
@@ -259,8 +261,8 @@ class DiskBackedFileSystem(GeneralFileSystem):
             unused_mimetype: str. Unused argument.
         """
         dir_path = utils.vfs_get_directory_path_from_filepath(filepath)
-        if dir_path and not os.path.exists(self._get_file_path(dir_path)):
-            os.makedirs(self._get_file_path(dir_path))
+        if dir_path and not os.path.exists(self._get_complete_path(dir_path)):
+            os.makedirs(self._get_complete_path(dir_path))
         self._save_file(filepath, content)
 
     def delete(self, filepath):
@@ -271,7 +273,7 @@ class DiskBackedFileSystem(GeneralFileSystem):
                 assets folder.
         """
         if self.isfile(filepath):
-            os.remove(self._get_file_path(filepath))
+            os.remove(self._get_complete_path(filepath))
 
     def isfile(self, filepath):
         """Checks the existence of a file.
@@ -283,7 +285,7 @@ class DiskBackedFileSystem(GeneralFileSystem):
         Returns:
             bool. Whether the file exists.
         """
-        return os.path.isfile(self._get_file_path(filepath))
+        return os.path.isfile(self._get_complete_path(filepath))
 
     def listdir(self, dir_name):
         """Lists all files in a directory.
@@ -296,11 +298,11 @@ class DiskBackedFileSystem(GeneralFileSystem):
             list(str). A lexicographically-sorted list of filenames,
                 each of which is prefixed with dir_name.
         """
-        prefix = '%s' % utils.vfs_construct_path(
-            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path, dir_name)
+        prefix = self._get_complete_path(dir_name)
 
         assets_prefix = utils.vfs_construct_path(
-            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self._assets_path)
+            feconf.DISK_BACKED_FILE_SYSTEM_PATH, self.root_dir_suffix,
+            self._assets_path)
         if not assets_prefix.endswith('/'):
             assets_prefix += '/'
 
@@ -314,203 +316,6 @@ class DiskBackedFileSystem(GeneralFileSystem):
         result = [
             filename.replace(assets_prefix, '') for filename in entity_files]
         return sorted(result)
-
-
-class DatastoreBackedFileSystem(GeneralFileSystem):
-    """A datastore-backed read-write file system for a single entity.
-
-    The conceptual intention is for each entity type to have its own parent
-    folder. In this, each individual entity will have its own folder with the
-    corresponding ID as the folder name. These folders will then have the assets
-    folder inside which stores images, audio etc (example path:
-    story/story_id/assets/). An asset has no meaning outside its entity, so the
-    assets in these asset folders should therefore not be edited directly. They
-    should only be modified as side-effects of some other operation on their
-    corresponding entity (such as adding an image to that entity).
-
-    In general, assets should be retrieved only within the context of the
-    entity that contains them, and should not be retrieved outside this
-    context.
-    """
-
-    _DEFAULT_VERSION_NUMBER = 1
-
-    def _get_file_metadata(self, filepath, version):
-        """Return the desired file metadata.
-
-        Returns None if the file does not exist.
-
-        Args:
-            filepath: str. The path to the relevant file within the entity's
-                assets folder.
-            version: int. The version number of the file whose metadata is to be
-                returned.
-
-        Returns:
-            FileMetadataModel or None. The model instance representing the file
-                metadata with the given assets_path, filepath, and version,
-                or None if the file does not exist.
-        """
-        if version is None:
-            return file_models.FileMetadataModel.get_model(
-                self._assets_path, filepath)
-        else:
-            return file_models.FileMetadataModel.get_version(
-                self._assets_path, filepath, version)
-
-    def _get_file_data(self, filepath, version):
-        """Return the desired file content.
-
-        Returns None if the file does not exist.
-
-        Args:
-            filepath: str. The path to the relevant file within the entity's
-                assets folder.
-            version: int. The version number of the file to be returned.
-
-        Returns:
-            FileModel or None. The model instance representing the file with the
-                given assets_path, filepath, and version; or None if the file
-                does not exist.
-        """
-        if version is None:
-            return file_models.FileModel.get_model(
-                self._assets_path, filepath)
-        else:
-            return file_models.FileModel.get_version(
-                self._assets_path, filepath, version)
-
-    def _save_file(self, filepath, raw_bytes):
-        """Create or update a file.
-
-        Args:
-            filepath: str. The path to the relevant file within the entity's
-                assets folder.
-            raw_bytes: str. The content to be stored in file.
-
-        Raises:
-            Exception: The maximum allowed file size is 1MB.
-        """
-        if len(raw_bytes) > feconf.MAX_FILE_SIZE_BYTES:
-            raise Exception('The maximum allowed file size is 1 MB.')
-
-        metadata = self._get_file_metadata(filepath, None)
-        if not metadata:
-            metadata = file_models.FileMetadataModel.create(
-                self._assets_path, filepath)
-        metadata.size = len(raw_bytes)
-
-        data = self._get_file_data(filepath, None)
-        if not data:
-            data = file_models.FileModel.create(
-                self._assets_path, filepath)
-        data.content = raw_bytes
-
-        data.commit(self._user_id, CHANGE_LIST_SAVE)
-        metadata.commit(self._user_id, CHANGE_LIST_SAVE)
-
-    def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
-        """Gets a file as an unencoded stream of raw bytes.
-
-        If `version` is not supplied, the latest version is retrieved. If the
-        file does not exist, None is returned.
-
-        The 'mode' argument is unused. It is included so that this method
-        signature matches that of other file systems.
-
-        Args:
-            filepath: str. The path to the relevant file within the entity's
-                assets folder.
-            version: int or None. The version number of the file. None indicates
-                the latest version of the file.
-            mode: str. Unused argument.
-
-        Returns:
-            FileStreamWithMetadata or None. It returns FileStreamWithMetadata
-                domain object if the file exists. Otherwise, it returns None.
-        """
-        metadata = self._get_file_metadata(filepath, version)
-        if metadata:
-            data = self._get_file_data(filepath, version)
-            if data:
-                if version is None:
-                    version = data.version
-                return FileStreamWithMetadata(data.content, version, metadata)
-            else:
-                logging.error(
-                    'Metadata and data for file %s (version %s) are out of '
-                    'sync.' % (filepath, version))
-                return None
-        else:
-            return None
-
-    def commit(self, filepath, raw_bytes, unused_mimetype):
-        """Saves a raw bytestring as a file in the database.
-
-        Args:
-            filepath: str. The path to the relevant file within the entity's
-                assets folder.
-            raw_bytes: str. The content to be stored in the file.
-            unused_mimetype: str. Unused argument.
-        """
-        self._save_file(filepath, raw_bytes)
-
-    def delete(self, filepath):
-        """Marks the current version of a file as deleted.
-
-        Args:
-            filepath: str. The path to the relevant file within the entity's
-                assets folder.
-        """
-
-        metadata = self._get_file_metadata(filepath, None)
-        if metadata:
-            metadata.delete(self._user_id, '')
-
-        data = self._get_file_data(filepath, None)
-        if data:
-            data.delete(self._user_id, '')
-
-    def isfile(self, filepath):
-        """Checks the existence of a file.
-
-        Args:
-            filepath: str. The path to the relevant file within the entity's
-                assets folder.
-
-        Returns:
-            bool. Whether the file exists.
-        """
-        metadata = self._get_file_metadata(filepath, None)
-        return bool(metadata)
-
-    def listdir(self, dir_name):
-        """Lists all files in a directory.
-
-        Args:
-            dir_name: str. The directory whose files should be listed. This
-                should not start with '/' or end with '/'.
-
-        Returns:
-            list(str). A lexicographically-sorted list of filenames,
-                each of which is prefixed with dir_name.
-        """
-        # The trailing slash is necessary to prevent non-identical directory
-        # names with the same prefix from matching, e.g. /abcd/123.png should
-        # not match a query for files under /abc/.
-        prefix = '%s' % utils.vfs_construct_path(
-            '/', self._assets_path, dir_name)
-        if not prefix.endswith('/'):
-            prefix += '/'
-
-        result = set()
-        metadata_models = file_models.FileMetadataModel.get_undeleted()
-        for metadata_model in metadata_models:
-            filepath = metadata_model.id
-            if filepath.startswith(prefix):
-                # Because the path is /<entity>/<entity_id>/assets/abc.png.
-                result.add('/'.join(filepath.split('/')[4:]))
-        return sorted(list(result))
 
 
 class GcsFileSystem(GeneralFileSystem):
