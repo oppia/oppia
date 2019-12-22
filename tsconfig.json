@@ -7,6 +7,8 @@
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es5",
+    "inlineSourceMap": true,
+    "sourceMap": false,
     "typeRoots": ["./node_modules/@types"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

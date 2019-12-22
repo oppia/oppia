@@ -125,9 +125,25 @@ def pip_install(package, version, install_path):
 
     # The call to python -m is used to ensure that Python and Pip versions are
     # compatible.
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', '%s==%s' % (package, version),
-        '--target', install_path])
+    command = [
+        sys.executable, '-m', 'pip', 'install', '%s==%s'
+        % (package, version), '--target', install_path]
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+    elif 'can\'t combine user with prefix' in stderr:
+        python_utils.PRINT('Trying by setting --user and --prefix flags.')
+        subprocess.check_call([
+            sys.executable, '-m', 'pip', 'install',
+            '%s==%s' % (package, version), '--target', install_path,
+            '--user', '--prefix=', '--system'])
+    else:
+        python_utils.PRINT(stderr)
+        python_utils.PRINT(
+            'Refer to https://github.com/oppia/oppia/wiki/Troubleshooting')
+        raise Exception('Error installing package')
 
 
 def install_skulpt(parsed_args):
@@ -250,7 +266,6 @@ def main(args=None):
         ('browsermob-proxy', '0.8.0', common.OPPIA_TOOLS_DIR),
         ('selenium', '3.13.0', common.OPPIA_TOOLS_DIR),
         ('PyGithub', '1.43.7', common.OPPIA_TOOLS_DIR),
-        ('pygsheets', '2.0.2', common.OPPIA_TOOLS_DIR),
     ]
 
     for package, version, path in pip_dependencies:
