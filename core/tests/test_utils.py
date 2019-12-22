@@ -1915,7 +1915,7 @@ class AppEngineTestBase(TestBase):
         # specific to current set of unit tests and should not intersect with
         # local directories of other unit tests otherwise tests may fail as 
         # unit test in other module can override the file written in current
-        # tests. 
+        # tests because all unit tests are executed concurrently.
         self.vfs_nested_dir = '%s_%s' % (
             self.__module__, self.__class__.__name__)
         fs_domain.DiskBackedFileSystem.root_dir_suffix = self.vfs_nested_dir

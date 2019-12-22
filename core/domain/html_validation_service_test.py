@@ -1458,8 +1458,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DiskBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/img.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+        fs.commit('image/img.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
