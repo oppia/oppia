@@ -24,7 +24,8 @@ from core import jobs
 from core.domain import opportunity_services
 from core.platform import models
 
-(topic_models,) = (models.Registry.import_models([models.NAMES.topic]))
+(topic_models, skill_models,) = (models.Registry.import_models(
+    [models.NAMES.topic, models.NAMES.skill]))
 
 
 class ExplorationOpportunitySummaryModelRegenerationJob(
@@ -58,3 +59,27 @@ class ExplorationOpportunitySummaryModelRegenerationJob(
             yield (key, sum(values))
         else:
             yield ('%s (%s)' % (key, len(values)), values)
+
+
+class SkillOpportunityModelRegenerationJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for regenerating SkillOpportunityModel."""
+
+    @classmethod
+    def _pre_start_hook(cls, job_id):
+        opportunity_services.delete_all_skill_opportunity_models()
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillModel]
+
+    @staticmethod
+    def map(skill_model):
+        if skill_model.deleted:
+            return
+        opportunity_services.create_skill_opportunity(
+            skill_model.id, skill_model.description)
+        yield ('SUCCESS', skill_model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))

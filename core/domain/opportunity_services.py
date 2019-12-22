@@ -763,3 +763,8 @@ def regenerate_opportunities_related_to_topic(
 def delete_all_exploration_opportunity_summary_models():
     """Deletes all of the ExplorationOpportunitySummaryModel."""
     opportunity_models.ExplorationOpportunitySummaryModel.delete_all()
+
+
+def delete_all_skill_opportunity_models():
+    """Deletes all of the SkillOpportunityModels from the datastore."""
+    opportunity_models.SkillOpportunityModel.delete_all()
