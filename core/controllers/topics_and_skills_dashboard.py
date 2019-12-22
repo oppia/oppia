@@ -132,10 +132,12 @@ class NewTopicHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         name = self.payload.get('name')
-
+        abbreviated_name = self.payload.get('abbreviated_name')
         topic_domain.Topic.require_valid_name(name)
+        topic_domain.Topic.require_valid_abbreviated_name(abbreviated_name)
         new_topic_id = topic_services.get_new_topic_id()
-        topic = topic_domain.Topic.create_default_topic(new_topic_id, name)
+        topic = topic_domain.Topic.create_default_topic(
+            new_topic_id, name, abbreviated_name)
         topic_services.save_new_topic(self.user_id, topic)
 
         self.render_json({
