@@ -41,11 +41,10 @@
     <button class="btn btn-secondary oppia-save-draft-button protractor-test-save-draft-button"
             ng-class="{'btn-success': $ctrl.isCollectionSaveable()}"
             ng-click="$ctrl.saveChanges()"
-            ng-disabled="!$ctrl.isCollectionSaveable()"
-            style="width: fit-content;">
+            ng-disabled="!$ctrl.isCollectionSaveable()">
       <span ng-if="!$ctrl.isSaveInProgress()">
         <span ng-if="$ctrl.collectionRights.isPrivate()">
-          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+          <i class="material-icons md-18 oppia-save-publish-button-icon"
              alt="Save Collection">
             &#xE161;
           </i>
@@ -56,7 +55,7 @@
           </span>
         </span>
         <span ng-if="$ctrl.collectionRights.isPublic()" title="Publish Changes">
-          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+          <i class="material-icons md-18 oppia-save-publish-button-icon"
              alt="Publish Changes">
             &#xE2C3;
           </i>
@@ -76,7 +75,7 @@
             ng-class="{'btn-success': $ctrl.isCollectionPublishable()}"
             ng-click="$ctrl.publishCollection()"
             ng-disabled="!$ctrl.isCollectionPublishable()">
-      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+      <i class="material-icons md-18 oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
         &#xE2C3;
       </i>

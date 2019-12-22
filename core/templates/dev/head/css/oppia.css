@@ -1554,16 +1554,10 @@ md-card.oppia-dashboard-tile {
 }
 
 @media(max-width: 1099px) {
-  .oppia-editor-publish-button {
-    padding-bottom: 3px;
-  }
-  .oppia-save-draft-button {
-    padding-bottom: 3px;
-    width: 40px;
-  }
+  .oppia-editor-publish-button,
+  .oppia-save-draft-button,
   .oppia-save-changes-button {
     padding-bottom: 3px;
-    width: 55px;
   }
 }
 
@@ -1573,16 +1567,10 @@ md-card.oppia-dashboard-tile {
     display: none;
   }
 
-  .oppia-editor-publish-button {
-    padding-bottom: 6px;
-  }
-  .oppia-save-draft-button {
-    padding-bottom: 6px;
-    width: 125px;
-  }
+  .oppia-editor-publish-button,
+  .oppia-save-draft-button,
   .oppia-save-changes-button {
     padding-bottom: 6px;
-    width: 136px;
   }
 }
 
