@@ -191,12 +191,12 @@ class UtilsTests(test_utils.GenericTestBase):
         p = utils.vfs_normpath('//foo//bar//baz//')
         self.assertEqual(p, '//foo/bar/baz')
     
-    def vfs_get_directory_path_from_filepath(self):
-        p = utils.vfs_normpath('foo/image.png')
+    def test_vfs_get_directory_path_from_filepath(self):
+        p = utils.vfs_get_directory_path_from_filepath('foo/image.png')
         self.assertEqual(p, 'foo')
-        p = utils.vfs_normpath('image.png')
+        p = utils.vfs_get_directory_path_from_filepath('image.png')
         self.assertEqual(p, '')
-        p = utils.vfs_normpath('foo/bar/image.png')
+        p = utils.vfs_get_directory_path_from_filepath('foo/bar/image.png')
         self.assertEqual(p, 'foo/bar')
 
     def test_capitalize_string(self):
