@@ -34,6 +34,7 @@ import utils
 
 class ExplorationStatsTests(test_utils.GenericTestBase):
     """Tests the ExplorationStats domain object."""
+
     def setUp(self):
         super(ExplorationStatsTests, self).setUp()
 
@@ -203,6 +204,7 @@ class ExplorationStatsTests(test_utils.GenericTestBase):
 
 class StateStatsTests(test_utils.GenericTestBase):
     """Tests the StateStats domain object."""
+
     def setUp(self):
         super(StateStatsTests, self).setUp()
 
@@ -338,6 +340,7 @@ class StateStatsTests(test_utils.GenericTestBase):
 
 class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
+
     def setUp(self):
         super(ExplorationIssuesTests, self).setUp()
 
@@ -451,6 +454,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
 class PlaythroughTests(test_utils.GenericTestBase):
     """Tests the Playthrough domain object."""
+
     def setUp(self):
         super(PlaythroughTests, self).setUp()
 
@@ -524,6 +528,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 }])
 
     def test_from_dict(self):
+        """Test the from_dict() method."""
         playthrough_dict = {
             'exp_id': 'exp_id1',
             'exp_version': 1,
@@ -573,8 +578,8 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 'schema_version': 1
             })
 
-    def test_from_backend_dict(self):
-        """Test the from_backend_dict() method."""
+    def test_from_dict_raises_exception_when_miss_exp_id(self):
+        """Test the from_dict() method."""
         # Test that a playthrough dict without 'exp_id' key raises exception.
         playthrough_dict = {
             'exp_version': 1,
@@ -585,7 +590,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'exp_id not in playthrough data dict.'):
-            stats_domain.Playthrough.from_backend_dict(playthrough_dict)
+            stats_domain.Playthrough.from_dict(playthrough_dict)
 
     def test_validate_with_string_exp_version(self):
         self.playthrough.exp_version = '1'
@@ -645,6 +650,9 @@ class PlaythroughTests(test_utils.GenericTestBase):
 
 class ExplorationIssueTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssue domain object."""
+
+    DUMMY_TIME_SPENT_IN_MSECS = 1000.0
+
     def setUp(self):
         super(ExplorationIssueTests, self).setUp()
 
@@ -652,11 +660,13 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'EarlyQuit', {}, [], 1, True)
 
     def _dummy_convert_issue_v1_dict_to_v2_dict(self, issue_dict):
-        """A test implementation of schema conversion function."""
+        """A test implementation of schema conversion function. It sets all the
+        "time spent" fields for EarlyQuit issues to DUMMY_TIME_SPENT_IN_MSECS.
+        """
         issue_dict['schema_version'] = 2
         if issue_dict['issue_type'] == 'EarlyQuit':
-            issue_dict['issue_type'] = 'EarlyQuit1'
-            issue_dict['issue_customization_args']['new_key'] = 5
+            issue_dict['issue_customization_args'][
+                'time_spent_in_exp_in_msecs'] = self.DUMMY_TIME_SPENT_IN_MSECS
 
         return issue_dict
 
@@ -680,8 +690,34 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 'is_valid': True
             })
 
-    def test_from_backend_dict(self):
-        """Test the from_backend_dict() method."""
+    def test_from_dict(self):
+        expected_customization_args = {
+            'time_spent_in_exp_in_msecs': {
+                'value': 0
+            },
+            'state_name': {
+                'value': ''
+            }
+        }
+        exp_issue = stats_domain.ExplorationIssue.from_dict({
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': expected_customization_args,
+            'playthrough_ids': [],
+            'schema_version': 1,
+            'is_valid': True
+        })
+        exp_issue_dict = exp_issue.to_dict()
+        self.assertEqual(
+            exp_issue_dict, {
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': expected_customization_args,
+                'playthrough_ids': [],
+                'schema_version': 1,
+                'is_valid': True
+            })
+
+    def test_from_dict_raises_exception(self):
+        """Test the from_dict() method."""
         # Test that an exploration issue dict without 'issue_type' key raises
         # exception.
         exp_issue_dict = {
@@ -693,7 +729,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError,
             'issue_type not in exploration issue dict.'):
-            stats_domain.ExplorationIssue.from_backend_dict(exp_issue_dict)
+            stats_domain.ExplorationIssue.from_dict(exp_issue_dict)
 
     def test_update_exp_issue_from_model(self):
         """Test the migration of exploration issue domain objects."""
@@ -717,10 +753,11 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 exp_issues_model)
 
         self.assertEqual(
-            exp_issue_from_model.unresolved_issues[0].issue_type, 'EarlyQuit1')
+            exp_issue_from_model.unresolved_issues[0].issue_type, 'EarlyQuit')
         self.assertEqual(
             exp_issue_from_model.unresolved_issues[0].issue_customization_args[
-                'new_key'], 5)
+                'time_spent_in_exp_in_msecs'
+            ], self.DUMMY_TIME_SPENT_IN_MSECS)
 
         # For other issue types, no changes happen during migration.
         exp_issue1 = stats_domain.ExplorationIssue(
@@ -822,6 +859,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
 class LearnerActionTests(test_utils.GenericTestBase):
     """Tests the LearnerAction domain object."""
+
     def setUp(self):
         super(LearnerActionTests, self).setUp()
 

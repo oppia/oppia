@@ -31,6 +31,8 @@
 #         sharding.
 #   --prod_env Run the tests in prod mode. Static resources are served from
 #         build directory and use cache slugs.
+#   --community_dashboard_enabled Run the test after enabling the community
+#         dashboard page.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (fit or fdescribe).
 #   --suite=suite_name Performs test for different suites, here suites are the
@@ -104,7 +106,7 @@ export OPPIA_DIR=`pwd`
 # as $PYTHONPATH).
 export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
 export TOOLS_DIR=$COMMON_DIR/oppia_tools
-export NODE_PATH=$TOOLS_DIR/node-10.15.3
+export NODE_PATH=$TOOLS_DIR/node-10.18.0
 export PATH=$NODE_PATH/bin:$PATH
 
 # Forces the cleanup function to run on exit.
@@ -115,11 +117,19 @@ trap cleanup EXIT
 # Argument passed to feconf.py to help choose production templates folder.
 DEV_MODE=true
 RUN_ON_BROWSERSTACK=False
+
+# Currently, the community dashboard page is disabled.
+community_dashboard_status_variable="COMMUNITY_DASHBOARD_ENABLED = False"
 for arg in "$@"; do
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
     DEV_MODE=false
     echo "  Generating files for production mode..."
+  fi
+
+  # Used to enable the community dashboard page.
+  if [ "$arg" == "--community_dashboard_enabled" ]; then
+    community_dashboard_status_variable="COMMUNITY_DASHBOARD_ENABLED = True"
   fi
 
   # Used to run the e2e tests on browserstack.
@@ -128,6 +138,10 @@ for arg in "$@"; do
     echo "  Running the tests on browserstack..."
   fi
 done
+
+# Update the community dashboard status in feconf.py file.
+sed -i.bak -e s/"COMMUNITY_DASHBOARD_ENABLED = .*"/"$community_dashboard_status_variable"/ feconf.py
+
 
 if [[ "$DEV_MODE" == "true" ]]; then
   constants_env_variable="\"DEV_MODE\": true"
@@ -205,6 +219,10 @@ for j in "$@"; do
     ;;
 
     --browserstack*)
+    shift
+    ;;
+
+    --community_dashboard_enabled*)
     shift
     ;;
 

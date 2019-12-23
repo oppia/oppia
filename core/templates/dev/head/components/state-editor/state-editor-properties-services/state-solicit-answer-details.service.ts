@@ -15,15 +15,25 @@
 /**
  * @fileoverview A data service that stores the solicit answer details value.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-property.service.ts');
+import { AlertsService } from 'services/alerts.service';
+import { StatePropertyService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-property.service';
+import { UtilsService } from 'services/utils.service';
 
-angular.module('oppia').factory('StateSolicitAnswerDetailsService', [
-  'StatePropertyService', function(StatePropertyService) {
-    var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveSolicitAnswerDetails';
-    return child;
+@Injectable({
+  providedIn: 'root'
+})
+export class StateSolicitAnswerDetailsService extends StatePropertyService {
+  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+    super(alertsService, utilsService);
+    this.setterMethodKey = 'saveSolicitAnswerDetails';
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'StateSolicitAnswerDetailsService', downgradeInjectable(
+    StateSolicitAnswerDetailsService));

@@ -253,7 +253,7 @@ def execute_branch_cut():
     # The release coordinator should verify that tests are passing on develop
     # before checking out the release branch.
     common.open_new_tab_in_browser_if_possible(
-        'https://github.com/oppia/oppia#oppia---')
+        'https://github.com/oppia/oppia#oppia----')
     while True:
         if not hotfix_number:
             branch_to_check = 'develop'
@@ -301,6 +301,16 @@ def execute_branch_cut():
         'New %s branch successfully cut. You are now on branch %s' % (
             new_branch_type, new_branch_name))
     python_utils.PRINT('Done!')
+
+    common.ask_user_to_confirm(
+        'Ask Sean (or Ben, if Sean isn\'t available) to create '
+        'a new branch protection rule by:\n'
+        '1. Going to this page: https://github.com/oppia/oppia/'
+        'settings/branch_protection_rules/new.\n'
+        '2. Typing in the full branch name %s.\n'
+        '3. Checking the box: Restrict who can push to matching '
+        'branches (then add the oppia/release-coordinators team)\n' % (
+            new_branch_name))
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

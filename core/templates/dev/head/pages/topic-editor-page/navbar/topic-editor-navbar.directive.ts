@@ -49,6 +49,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
           $scope.topic = TopicEditorStateService.getTopic();
           $scope.topicSkillIds = $scope.topic.getSkillIds();
           $scope.validationIssues = [];
+          $scope.prepublishValidationIssues = [];
           $scope.topicRights = TopicEditorStateService.getTopicRights();
           $scope.isSaveInProgress = TopicEditorStateService.isSavingTopic;
           $scope.getActiveTabName = TopicEditorRoutingService.getActiveTabName;
@@ -60,6 +61,8 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           var _validateTopic = function() {
             $scope.validationIssues = $scope.topic.validate();
+            $scope.prepublishValidationIssues = (
+              $scope.topic.prepublishValidate());
           };
 
           $scope.publishTopic = function() {
@@ -128,6 +131,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           $scope.getWarningsCount = function() {
             return $scope.validationIssues.length;
+          };
+
+          $scope.getTotalWarningsCount = function() {
+            var validationIssuesCount = $scope.validationIssues.length;
+            var prepublishValidationIssuesCount = (
+              $scope.prepublishValidationIssues.length);
+            return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
           $scope.saveChanges = function() {
