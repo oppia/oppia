@@ -21,9 +21,14 @@
   }
 
   correctness-footer .inner-container-alignment {
+    left: 50%;
     padding-left: 87px;
-    padding-right: 30px;
+    position: fixed;
+    transform: translate(-50%, 0);
+    width: 100%;
+    z-index: 16;
   }
+
   correctness-footer .tick-symbol {
     font-size: 50px;
   }
@@ -32,29 +37,38 @@
     padding-left: 8px;
   }
 
-  .inner-container {
-    opacity: 0;
-    -webkit-animation-name: fadein;
+  correctness-footer .inner-container-alignment {
+    bottom: -20px;
+    -webkit-animation-delay: 1s;
+    -webkit-animation-direction: alternate;
     -webkit-animation-duration: 2s;
-    -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: 1;
-    -webkit-animation-direction: normal;
-    -webkit-animation-delay: 0.5s;
-    -webkit-animation-play-state: running;
     -webkit-animation-fill-mode: forwards;
+    -webkit-animation-iteration-count: 2;
+    -webkit-animation-name: slide-in-out;
+    -webkit-animation-play-state: running;
+    -webkit-animation-timing-function: ease-out;
 
-    -ms-animation-name: fadein;
+    -ms-animation-delay: 1s;
+    -ms-animation-direction: alternate;
     -ms-animation-duration: 2s;
-    -ms-animation-timing-function: linear;
-    -ms-animation-iteration-count: 1;
-    -ms-animation-direction: normal;
-    -ms-animation-delay: 0.5s;
-    -ms-animation-play-state: running;
     -ms-animation-fill-mode: forwards;
+    -ms-animation-iteration-count: 2;
+    -ms-animation-name:  slide-in-out;
+    -ms-animation-play-state: running;
+    -ms-animation-timing-function: ease-out;
   }
 
-  .inner-container-fade-out {
-    animation: fadeout 5s 1;
+
+  @keyframes  slide-in-out {
+    0% {bottom: -20px;}
+    80% {bottom: 40px;}
+    100% {bottom: 40px;}
+  }
+
+  @-webkit-keyframes  slide-in-out {
+    0% {bottom: -20px;}
+    80% {bottom: 40px;}
+    100% {bottom: 40px;}
   }
 
   correctness-footer .sprinkle-dot {
@@ -172,14 +186,6 @@
     -webkit-animation: flashri 2s 1;
   }
 
-  @keyframes fadeout {
-    50%  {opacity: 1;}
-    100% {opacity: 0;}
-  }
-  @-webkit-keyframes fadeout {
-    50%  {opacity: 1;}
-    100% {opacity: 0;}
-  }
   @keyframes flasha {
     0% {opacity:0;}
     49% {opacity:0;}
@@ -415,8 +421,8 @@
   }
 
 </style>
-<div class="inner-container-alignment">
-  <div class="inner-container inner-container-fade-out">
+<div class="inner-container-alignment inner-container-alignment-slidedown">
+  <div class="inner-container">
     <div class="sprinkle-dot dot1"></div>
     <div class="sprinkle-dot dot2"></div>
     <div class="sprinkle-dot dot3"></div>
