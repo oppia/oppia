@@ -86,7 +86,7 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             new_user_id: str. The newly generated ID of the user being migrated.
         """
         old_models = model_class.query(
-            model_class.get_user_id_migration_field() == old_user_id).fetch()
+            model_class.user_id == old_user_id).fetch()
         new_models = []
         for old_model in old_models:
             model_values = old_model.to_dict()

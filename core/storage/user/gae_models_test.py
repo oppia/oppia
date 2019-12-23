@@ -404,16 +404,6 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                user_models.ExpUserLastPlaythroughModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                user_models.ExpUserLastPlaythroughModel.user_id))
-
     def test_create_success(self):
         user_models.ExpUserLastPlaythroughModel.create(
             self.USER_ID_1, self.EXP_ID_1).put()
@@ -1058,16 +1048,6 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             user_models.ExplorationUserDataModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                user_models.ExplorationUserDataModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                user_models.ExplorationUserDataModel.user_id))
-
     def test_create_success(self):
         user_models.ExplorationUserDataModel.create(
             self.USER_1_ID, self.EXP_ID_TWO).put()
@@ -1254,16 +1234,6 @@ class CollectionProgressModelTests(test_utils.GenericTestBase):
             user_models.CollectionProgressModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                user_models.CollectionProgressModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                user_models.CollectionProgressModel.user_id))
-
     def test_export_data_on_nonexistent_user(self):
         """Test export data on nonexistent user."""
         user_data = user_models.CollectionProgressModel.export_data(
@@ -1358,15 +1328,6 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             user_models.StoryProgressModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                user_models.StoryProgressModel.get_user_id_migration_field()),
-            python_utils.UNICODE(
-                user_models.StoryProgressModel.user_id))
 
     def test_export_data_on_nonexistent_user(self):
         user_data = user_models.StoryProgressModel.export_data(
@@ -1669,15 +1630,6 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
             user_models.UserSkillMasteryModel.get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                user_models.UserSkillMasteryModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(user_models.UserSkillMasteryModel.user_id))
-
     def test_construct_model_id(self):
         constructed_model_id = (
             user_models.UserSkillMasteryModel.construct_model_id(
@@ -1795,16 +1747,6 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             user_models.UserContributionScoringModel
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                user_models.UserContributionScoringModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                user_models.UserContributionScoringModel.user_id))
 
     def test_create_model(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
