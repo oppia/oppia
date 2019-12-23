@@ -1,0 +1,64 @@
+version: "2"
+checks:
+  argument-count:
+    enabled: false
+  complex-logic:
+    enabled: false
+  file-lines:
+    enabled: false
+  method-complexity:
+    enabled: false
+  method-count:
+    enabled: false
+  method-lines:
+    enabled: false
+  nested-control-flow:
+    enabled: false
+  return-statements:
+    enabled: false
+  similar-code:
+    enabled: false
+  identical-code:
+    enabled: false
+
+engines:
+  pylint:
+    enabled: true
+    channel: "beta"  
+
+plugins:
+  eslint:
+    enabled: true
+    channel: "eslint-6"
+
+  stylelint:
+    enabled: true
+
+exclude_patterns:
+- "third_party/*"
+- "build/*"
+- ".git/*"
+- "*.pyc"
+- "CHANGELOG"
+- "integrations/*"
+- "integrations_dev/*"
+- "*.svg"
+- "*.gif"
+- "*.png"
+- "*.zip"
+- "*.ico"
+- "*.jpg"
+- "*.min.js"
+- "backend_prod_files/*"
+- "assets/scripts/*"
+- "core/tests/data/*"
+- "core/tests/build_sources/*"
+- "*.mp3"
+- "*.mp4"
+- "node_modules/*"
+- "typings/*"
+- "local_compiled_js/*"
+- "webpack_bundles/*"
+- "core/tests/services_sources/*"
+- "core/tests/release_sources/tmp_unzip.zip"
+- "core/tests/release_sources/tmp_unzip.tar.gz"
