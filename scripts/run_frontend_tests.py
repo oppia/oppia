@@ -64,7 +64,6 @@ def main(args=None):
         'on your filesystem.',
         'Running test in development environment'])
 
-    build.main(args=[])
 
     if parsed_args.run_minified_tests:
         python_utils.PRINT('Running test in production environment')
@@ -76,6 +75,8 @@ def main(args=None):
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
             '--prodEnv'])
     else:
+        build.main(args=[])
+
         cmd = [
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts')]
