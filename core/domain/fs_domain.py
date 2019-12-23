@@ -235,10 +235,14 @@ class GcsFileSystem(GeneralFileSystem):
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         # The path entered should be of the form, /bucket_name/prefix.
         path = '/%s%s' % (bucket_name, prefix)
+
+        # Remove the asset path from the prefix of filename.
+        path_prefix = '/%s/' % utils.vfs_construct_path(
+            bucket_name, self._assets_path)
         stats = cloudstorage.listbucket(path)
         files_in_dir = []
         for stat in stats:
-            files_in_dir.append(stat.filename)
+            files_in_dir.append(stat.filename.replace(path_prefix, ''))
         return files_in_dir
 
 

@@ -86,22 +86,12 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             self.fs.commit('abc/abcd.png', 'file_contents_3')
             self.fs.commit('bcd/bcde.png', 'file_contents_4')
 
-            bucket_name = app_identity_services.get_gcs_resource_bucket_name()
-            gcs_file_dir = (
-                '/%s/%s/assets/' % (
-                    bucket_name, 'exploration/eid'))
-
             file_names = ['abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png']
-            file_list = []
 
-            for file_name in file_names:
-                file_list.append(os.path.join(gcs_file_dir, file_name))
-
-            self.assertEqual(self.fs.listdir(''), file_list)
+            self.assertEqual(self.fs.listdir(''), file_names)
 
             self.assertEqual(
-                self.fs.listdir('abc'), [os.path.join(
-                    gcs_file_dir, 'abc/abcd.png')])
+                self.fs.listdir('abc'), ['abc/abcd.png'])
 
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
                 self.fs.listdir('/abc')
