@@ -806,6 +806,9 @@ class BaseMapReduceJobManagerForContinuousComputationsTests(
                 'BaseMapReduceJobManagerForContinuousComputations must '
                 'implement the _get_continuous_computation_class() method.')):
             (
+                # Access of private attribute OK because it is testing structure by seeing
+                # whether or not the base class raises a NotImplementedError for a specific
+                # method that cannot be called otherwise.
                 jobs.BaseMapReduceJobManagerForContinuousComputations.  # pylint: disable=protected-access
                 _get_continuous_computation_class()
             )
