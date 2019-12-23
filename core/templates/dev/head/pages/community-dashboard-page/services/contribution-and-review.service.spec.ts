@@ -79,11 +79,12 @@ describe('ContributionAndReviewService', function() {
   }));
 
   afterEach(function() {
-    $httpBackend.flush();
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
   });
 
   describe('getUserCreatedQuestionSuggestions', function() {
-    it('should return available question suggestions and opportunity details',
+    fit('should return available question suggestions and opportunity details',
       function() {
         $httpBackend.expect(
           'GET', '/getsubmittedsuggestions/skill/add_question').respond(
@@ -94,11 +95,12 @@ describe('ContributionAndReviewService', function() {
           expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
             expectedSuggestionDict);
         });
+        $httpBackend.flush();
       });
   });
 
   describe('getReviewableQuestionSuggestions', function() {
-    it('should return available question suggestions and opportunity details',
+    fit('should return available question suggestions and opportunity details',
       function() {
         $httpBackend.expect(
           'GET', '/getreviewablesuggestions/skill/add_question').respond(
@@ -109,6 +111,7 @@ describe('ContributionAndReviewService', function() {
           expect(suggestionIdToSuggestions.suggestion_id_1).toEqual(
             expectedSuggestionDict);
         });
+        $httpBackend.flush();
       });
   });
 });
