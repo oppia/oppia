@@ -26,10 +26,6 @@ plugins:
     enabled: true
     channel: "eslint-6"
 
-  pylint:
-    enabled: true
-    channel: "beta"
-
   stylelint:
     enabled: true
 
