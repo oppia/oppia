@@ -306,6 +306,8 @@
 /core/templates/dev/head/components/button-directives/create-activity-button.directive.html @nithusha21
 /core/templates/dev/head/components/common-layout-directives/navigation-bars/ @nithusha21
 /core/templates/dev/head/services/navigation.service*.ts @nithusha21
+/core/templates/dev/head/services/navigation-bars-backend-api.service.spec.ts @cdrebin
+/core/templates/dev/head/services/navigation-bars-backend-api.service.ts @cdrebin
 
 
 # New structures team.

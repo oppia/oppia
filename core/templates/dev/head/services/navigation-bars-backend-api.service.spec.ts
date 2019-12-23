@@ -46,8 +46,8 @@ describe('Navigation bars backend API service', function() {
     $httpBackend = $injector.get('$httpBackend');
 
     sampleDataResults = {
-      num_unseen_notifications: 0;
-    }
+      num_unseen_notifications: 0,
+    };
   }));
 
   afterEach(function() {

@@ -40,13 +40,15 @@ angular.module('oppia').directive('topNavigationBar', [
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
-        'SiteAnalyticsService', 'NavigationService', 'NavigationBarsBackendApiService', 
-        'WindowDimensionsService','DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
+        'SiteAnalyticsService', 'NavigationService',
+        'NavigationBarsBackendApiService', 'WindowDimensionsService',
+        'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
-            SiteAnalyticsService, NavigationService, NavigationBarsBackendApiService,
-            WindowDimensionsService, DebouncerService, DeviceInfoService, LOGOUT_URL) {
+            SiteAnalyticsService, NavigationService,
+            NavigationBarsBackendApiService, WindowDimensionsService,
+            DebouncerService, DeviceInfoService, LOGOUT_URL) {
           var ctrl = this;
           ctrl.isModerator = null;
           ctrl.isAdmin = null;
@@ -75,17 +77,17 @@ angular.module('oppia').directive('topNavigationBar', [
               // Show the number of unseen notifications in the navbar and page
               // title, unless the user is already on the dashboard page.
               NavigationBarsBackendApiService.fetchNotificationHandler()
-              .then(function(response) {
-                var data = response.data;
-                if ($window.location.pathname !== '/') {
-                  ctrl.numUnseenNotifications = data.num_unseen_notifications;
-                  if (ctrl.numUnseenNotifications > 0) {
-                    $window.document.title = (
-                      '(' + ctrl.numUnseenNotifications + ') ' +
-                      $window.document.title);
+                .then(function(response) {
+                  var data = response.data;
+                  if ($window.location.pathname !== '/') {
+                    ctrl.numUnseenNotifications = data.num_unseen_notifications;
+                    if (ctrl.numUnseenNotifications > 0) {
+                      $window.document.title = (
+                        '(' + ctrl.numUnseenNotifications + ') ' +
+                        $window.document.title);
+                    }
                   }
-                }
-              });
+                });
             }
           });
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {

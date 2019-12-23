@@ -17,6 +17,7 @@
  * backend.
  */
 
+// eslint-disable-next-line max-len
 require('components/common-layout-directives/navigation-bars/navigation-bars.constants.ajs.ts');
 
 angular.module('oppia').factory('NavigationBarsBackendApiService', [
