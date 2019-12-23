@@ -200,8 +200,8 @@ fully_covered_filenames = [
     'underscores-to-camel-case.filter.ts',
     'undo-redo.service.ts',
     'user-exploration-permissions.service.ts',
-    'wrap-text-with-ellipsis.filter.ts',
     'valueGeneratorsRequires.ts',
+    'wrap-text-with-ellipsis.filter.ts',
 ]
 
 
