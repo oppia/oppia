@@ -21,7 +21,6 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-
 import { TopicsAndSkillsDashboardDomainConstants } from
   // eslint-disable-next-line max-len
   'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants';
@@ -35,12 +34,13 @@ export class TopicsAndSkillsDashboardBackendApiService {
     return this.http.get(
       '/topics_and_skills_dashboard/data', { observe: 'response' }).toPromise();
   }
-  // TODO(#7165): Replace any with correct type.
-  _mergeSkills(oldSkillId: any, newSkillId: any): Promise<Object> {
+
+  _mergeSkills(oldSkillId: string, newSkillId: string): Promise<Object> {
     var mergeSkillsData = {
       old_skill_id: oldSkillId,
       new_skill_id: newSkillId
     };
+
     return this.http.post(
       TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL,
       mergeSkillsData).toPromise();
@@ -50,8 +50,7 @@ export class TopicsAndSkillsDashboardBackendApiService {
     return this._fetchDashboardData();
   }
 
-  // TOOD(#7165): Replace any with correct type.
-  mergeSkills(oldSkillId: any, newSkillId: any): Promise<Object> {
+  mergeSkills(oldSkillId: string, newSkillId: string): Promise<Object> {
     return this._mergeSkills(oldSkillId, newSkillId);
   }
 }
