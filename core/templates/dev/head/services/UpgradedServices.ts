@@ -51,6 +51,8 @@ import { CodeReplPredictionService } from
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ConceptCardObjectFactory } from
+  'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -388,6 +390,9 @@ export class UpgradedServices {
     upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
       upgradedServices['NormalizeWhitespacePipe'],
       upgradedServices['CodeNormalizerService']);
+    upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
+      upgradedServices['SubtitledHtmlObjectFactory'],
+      upgradedServices['RecordedVoiceoversObjectFactory']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
