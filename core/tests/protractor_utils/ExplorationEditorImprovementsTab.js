@@ -189,9 +189,6 @@ var ExplorationEditorImprovementsTab = function() {
       acceptSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     acceptSuggestionButton.click();
-    waitFor.elementToBeClickable(
-      onlyOpenInput,
-      'show only open tasks checkbox takes too long to become clickable');
   };
 
   this.rejectSuggestion = () => {
@@ -205,9 +202,6 @@ var ExplorationEditorImprovementsTab = function() {
       rejectSuggestionButton,
       'Accept Suggestion button takes too long to become clickable');
     rejectSuggestionButton.click();
-    waitFor.elementToBeClickable(
-      onlyOpenInput,
-      'show only open tasks checkbox takes too long to become clickable');
   };
 
   this.setShowOnlyOpenTasks = (choice = true) => {
