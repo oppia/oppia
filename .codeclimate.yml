@@ -29,6 +29,96 @@ plugins:
   stylelint:
     enabled: true
 
+  grep:
+    enabled: true
+    config:
+      patterns:
+        no-author-tag:
+          pattern: __author__
+          annotation: "Please remove author tags from this file."
+          categories: Style
+
+        datetime-now:
+          pattern: datetime.datetime.now()
+          annotation: "Please use datetime.datetime.utcnow()"
+          categories: Style
+          content: >
+            Please use datetime.datetime.utcnow() instead of
+            datetime.datetime.now().
+
+        lf-endings:
+          pattern: \r
+          annotation: "Please do not use CRLF endings."
+          categories: Style
+          content: >
+            Please make sure all files only have LF endings (no CRLF).
+
+        merge-conflict:
+          pattern: <<<<<<<
+          annotation: "Please fully resolve existing merge conflicts."
+
+        merge-conflicts:
+          pattern: >>>>>>>
+          annotation: "Please fully resolve existing merge conflicts."
+
+        no-glyphicon:
+          pattern: glyphicon
+          annotation: "Please do not use glyphicons."
+          content: >
+            Please use equivalent material-icons instead of glyphicons.
+
+        invalid-todo:
+          pattern: TODO[^\(]*[^\)][^:]*[^\w]*$
+          annotation: "Please use correct format for TODO"
+          categories: Style
+          content: >
+            Please assign TODO comments to a user in the format
+            TODO(username): XXX
+
+        no-browser-explore:
+          pattern: \b(browser.explore)\(
+          annotation: "In tests, please do not use browser.explore()."
+
+        no-browser-pause:
+          pattern: \b(browser.pause)\(
+          annotation: "In tests, please do not use browser.pause()"
+
+        no-browser-sleep:
+          pattern: \b(browser.sleep)\(
+          annotation: "In tests, please do not use browser.sleep()."
+
+        no-browser-waitForAngular:
+          pattern: \b(browser.waitForAngular)\(
+          annotation: "In tests, please do not use browser.waitForAngular()."
+
+        use-describe:
+          pattern: \b(ddescribe|fdescribe)\(
+          annotation: "Please use 'describe'"
+          content: >
+            In tests, please use 'describe' instead of
+            'ddescribe' or 'fdescribe'.
+
+        use-it:
+          pattern: \b(iit|fit)\(
+          annotation: "In tests, please use 'it' instead of 'iit' or 'fit'"
+
+        no-inject:
+          pattern: \b(beforeEach\(inject\(function)\(
+          annotation: "Please do not use 'inject'"
+          content: >
+            In tests, please use 'angular.mock.inject' instead of 'inject'.
+
+        no-parent:
+          pattern: \$parent
+          annotation: "Please do not use $parent."
+          content: >
+            Please do not access parent properties using $parent.
+            Use the scope object for this purpose.
+
+        no-trailing-whitespaces:
+          pattern: [ \t]+$
+          annotation: "There should not be any trailing whitespaces."
+            
 exclude_patterns:
 - "third_party/*"
 - "build/*"
