@@ -90,7 +90,7 @@ module.exports = function(config) {
       }
     },
     autoWatch: true,
-    browsers: ['Chrome_Headless'],
+    browsers: ['CI_Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
     browserConsoleLogOptions: {
@@ -102,8 +102,12 @@ module.exports = function(config) {
     // Continue running in the background after running tests.
     singleRun: true,
     customLaunchers: {
-      Chrome_Headless: {
-        base: 'ChromeHeadless',
+      CI_Chrome: {
+        // Chrome cannot be run in headless mode as the language tests would
+        // break. See https://github.com/puppeteer/puppeteer/issues/2141 and
+        // https://github.com/puppeteer/examples/blob/master/speech.js#L40
+        // for details.
+        base: 'Chrome',
         // Discussion of the necessity of extra flags can be found here:
         // https://github.com/karma-runner/karma-chrome-launcher/issues/154
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
