@@ -156,7 +156,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 function($scope, $uibModalInstance) {
                   $scope.newSkillDescription = '';
                   $scope.rubrics = rubrics;
-                  $scope.allRubricsAdded = true;
                   $scope.bindableDict = {
                     displayedConceptCardExplanation: ''
                   };
@@ -166,16 +165,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                     $scope.rubrics[1].setExplanation(
                       '<p>' + $scope.newSkillDescription + '</p>');
                   });
-
-                  var areAllRubricsPresent = function() {
-                    for (var idx in $scope.rubrics) {
-                      if ($scope.rubrics[idx].getExplanation() === '') {
-                        $scope.allRubricsAdded = false;
-                        return;
-                      }
-                    }
-                    $scope.allRubricsAdded = true;
-                  };
 
                   $scope.onSaveExplanation = function(explanationObject) {
                     newExplanationObject = explanationObject.toBackendDict();
@@ -189,7 +178,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                         $scope.rubrics[idx].setExplanation(explanation);
                       }
                     }
-                    areAllRubricsPresent();
                   };
 
                   $scope.createNewSkill = function() {
