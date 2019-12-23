@@ -357,17 +357,7 @@ class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
         self.assertEqual(
             feedback_models.GeneralFeedbackThreadUserModel
             .get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackThreadUserModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                feedback_models.GeneralFeedbackThreadUserModel.user_id))
+            base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
     def test_put_function(self):
         feedback_thread_model = feedback_models.GeneralFeedbackThreadUserModel(
