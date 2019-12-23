@@ -81,6 +81,9 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
     var initializeExplorationServices = function(
         returnDict, arePretestsAvailable, callback) {
       StateClassifierMappingService.init(returnDict.state_classifier_mapping);
+      // For some cases, version is set only after
+      // ReadOnlyExplorationBackendApiService.loadExploration() has completed.
+      // Use returnDict.version for non-null version value.
       StatsReportingService.initSession(
         explorationId, returnDict.exploration.title, returnDict.version,
         returnDict.session_id, UrlService.getCollectionIdFromExplorationUrl());
