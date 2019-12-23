@@ -117,12 +117,12 @@ CONFIG_FILE_PATHS = (
 BAD_PATTERNS = {
     '__author__': {
         'message': 'Please remove author tags from this file.',
-        'excluded_files': (),
+        'excluded_files': ('.codeclimate.yml'),
         'excluded_dirs': ()},
     'datetime.datetime.now()': {
         'message': 'Please use datetime.datetime.utcnow() instead of'
                    'datetime.datetime.now().',
-        'excluded_files': (),
+        'excluded_files': ('.codeclimate.yml'),
         'excluded_dirs': ()},
     '\t': {
         'message': 'Please use spaces instead of tabs.',
@@ -135,16 +135,16 @@ BAD_PATTERNS = {
         'excluded_dirs': ()},
     '<<<<<<<': {
         'message': 'Please fully resolve existing merge conflicts.',
-        'excluded_files': (),
+        'excluded_files': ('.codeclimate.yml'),
         'excluded_dirs': ()},
     '>>>>>>>': {
         'message': 'Please fully resolve existing merge conflicts.',
-        'excluded_files': (),
+        'excluded_files': ('.codeclimate.yml'),
         'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
                    'instead of glyphicons.',
-        'excluded_files': (),
+        'excluded_files': ('.codeclimate.yml'),
         'excluded_dirs': ()}
 }
 
@@ -153,7 +153,7 @@ BAD_PATTERNS_REGEXP = [
         'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^\w]*$'),
         'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
-        'excluded_files': (),
+        'excluded_files': ('.codeclimate.yml'),
         'excluded_dirs': ()
     }
 ]

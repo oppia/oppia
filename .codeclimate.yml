@@ -118,7 +118,7 @@ plugins:
         no-trailing-whitespaces:
           pattern: [ \t]+$
           annotation: "There should not be any trailing whitespaces."
-            
+
 exclude_patterns:
 - "third_party/*"
 - "build/*"
