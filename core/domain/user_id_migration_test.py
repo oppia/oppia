@@ -1027,6 +1027,9 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             entity_type='type',
             entity_id='id',
             subject='subject').put()
+        feedback_models.GeneralFeedbackThreadUserModel(
+            id='None.thread_id',
+            thread_id='thread_id').put()
         topic_models.TopicRightsModel.put_multi([
             topic_models.TopicRightsModel(
                 id='topic_1_id',
@@ -1059,7 +1062,9 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
         self.assertIn(
             ['SUCCESS - ExplorationSnapshotMetadataModel', 1], output)
         self.assertIn(
-            ['SUCCESS - GeneralFeedbackThreadModel', 1], output)
+            ['SUCCESS_NONE - GeneralFeedbackThreadModel', 1], output)
+        self.assertIn(
+            ['SUCCESS_NONE - GeneralFeedbackThreadUserModel', 1], output)
         self.assertIn(
             ['FAILURE - TopicRightsModel', ['topic_1_id']], output)
         self.assertIn(['SUCCESS - TopicRightsModel', 1], output)

@@ -451,30 +451,9 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             True if UserSettingsModel with id as user_id in model exists or
             user_id is SYSTEM_COMMITTER_ID, False otherwise.
         """
-        if user_id is None:
-            return True
         if user_id not in model_id:
             return False
         if user_id == feconf.SYSTEM_COMMITTER_ID:
-            return True
-        return user_models.UserSettingsModel.get_by_id(user_id) is not None
-
-    @staticmethod
-    def _check_one_field_exists(model):
-        """Check if UserSettingsModel exists for one field or that field is
-        SYSTEM_COMMITTER_ID.
-
-        Args:
-            model: BaseModel. Model being checked.
-
-        Returns:
-            True if UserSettingsModel with id as user ID field in model exists
-            or user ID field is SYSTEM_COMMITTER_ID, False otherwise.
-        """
-        model_class = model.__class__
-        model_values = model.to_dict()
-        user_id = model_values[model_class.get_user_id_migration_field()._name]  # pylint: disable=protected-access
-        if user_id is None or user_id == feconf.SYSTEM_COMMITTER_ID:
             return True
         return user_models.UserSettingsModel.get_by_id(user_id) is not None
 
@@ -499,15 +478,22 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD):
-            if (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_id_and_user_id_exist(model.id, model.user_id)):
+            user_id = model.user_id
+            if user_id is None:
+                yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
+            elif (ModelsUserIdsHaveUserSettingsVerificationJob
+                    ._check_id_and_user_id_exist(model.id, user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
-            if (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_one_field_exists(model)):
+            user_id = model.to_dict()[
+                model_class.get_user_id_migration_field()._name]  # pylint: disable=protected-access
+            if user_id is None:
+                yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
+            elif (ModelsUserIdsHaveUserSettingsVerificationJob
+                    ._does_user_settings_model_exist(user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
