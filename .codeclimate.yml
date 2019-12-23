@@ -54,11 +54,11 @@ plugins:
             Please make sure all files only have LF endings (no CRLF).
 
         merge-conflict:
-          pattern: <<<<<<<
+          pattern: \<\<\<\<\<\<\<
           annotation: "Please fully resolve existing merge conflicts."
 
         merge-conflicts:
-          pattern: >>>>>>>
+          pattern: \>\>\>\>\>\>\>
           annotation: "Please fully resolve existing merge conflicts."
 
         no-glyphicon:
@@ -116,8 +116,8 @@ plugins:
             Use the scope object for this purpose.
 
         no-trailing-whitespaces:
-          pattern: [ \t]+$
-          annotation: "There should not be any trailing whitespaces."
+          pattern: ( \t)+$
+          annotation: 'There should not be any trailing whitespaces.'
 
 exclude_patterns:
 - "third_party/*"
