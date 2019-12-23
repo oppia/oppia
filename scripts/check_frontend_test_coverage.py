@@ -26,8 +26,15 @@ import sys
 import python_utils
 
 LCOV_FILE_PATH = os.path.join(os.pardir, 'karma_coverage_reports', 'lcov.info')
-PR_LCOV_FILE_PATH = os.path.join(os.curdir, 'tmp', 'pr-lcov.info')
-fully_covered_tests = [
+
+# Contains the name of all files that reached up to 100% of coverage.
+# The changes must be done manually and it will be done only if the script
+# warns any required changes. Please keep it in on alphabetic order.
+# The changes can be:
+# - Insertion of new file
+# - Deletion of a file
+# - Renaming of a file (remove the old name and insert the new name)
+fully_covered_filenames = [
     'AnswerDetailsImprovementTaskObjectFactory.ts',
     'CodeRepl.ts',
     'Continue.ts',
@@ -193,12 +200,81 @@ fully_covered_tests = [
     'underscores-to-camel-case.filter.ts',
     'undo-redo.service.ts',
     'user-exploration-permissions.service.ts',
-    'valueGeneratorsRequires.ts',
     'wrap-text-with-ellipsis.filter.ts',
+    'valueGeneratorsRequires.ts',
 ]
 
+
+class LcovStanzaRelevantLines:
+    """Provides relevant data of a lcov stanza in order to calc any frontend
+    test coverage decreasement.
+    """
+
+    def __init__(self):
+        self.file_name = ''
+        self.total_lines = 0
+        self.covered_lines = 0
+
+
+    def get_file_name(self):
+        return self.file_name
+
+
+    def get_total_lines(self):
+        return self.total_lines
+    
+
+    def get_covered_lines(self):
+        return self.covered_lines
+
+
+    def set_file_name(self, file_path):
+        """Sets the file_name property.
+        
+        Raises:
+            Exception: If the file_path is empty.
+        """
+        if not file_path:
+            raise Exception(
+                'The test path is empty or null. '
+                'It\'s not possible to diff the test coverage correctly.')
+
+        _, file_name = os.path.split(file_path)
+        self.file_name = file_name
+
+
+    def set_total_lines(self, total_lines_line):
+        """Sets the file_name property.
+        
+        Raises:
+            Exception: If total lines number is not found.
+        """
+        match = re.search('LF:(\d+)', total_lines_line)
+        if match == None:
+            raise Exception(
+                'It wasn\'t possible to get the total lines of {} file.'
+                'It\'s not possible to diff the test coverage correctly.'
+                .format(self.get_file_name()))
+        self.total_lines = int(match.group(1))
+
+
+    def set_covered_lines(self, covered_lines_line):
+        """Sets the file_name property.
+        
+        Raises:
+            Exception: If covered lines number is not found.
+        """
+        match = re.search('LH:(\d+)', covered_lines_line)
+        if match == None:
+            raise Exception(
+                'It wasn\'t possible to get the covered lines of {} file.'
+                'It\'s not possible to diff the test coverage correctly.'
+                .format(self.get_file_name()))
+        self.covered_lines = int(match.group(1))
+
+
 def run_frontend_tests_script():
-    """Run the frontend tests script using subprocess. If any test fail then
+    """Run the frontend tests script using subprocess. If any test fails then
     the coverage check won't happen.
     """
 
@@ -209,19 +285,7 @@ def run_frontend_tests_script():
         sys.exit(1)
 
 
-def create_tmp_folder():
-    """Creates a temporary folder."""
-    if not os.path.exists('./tmp'):
-        os.mkdir('./tmp')
-
-
-def delete_tmp_folder():
-    """Delete the temporary folder."""
-    if os.path.exists('./tmp'):
-        shutil.rmtree('./tmp')
-
-
-def filter_lines(line):
+def filter_relevant_lines(line):
     """Check if the line has file path (SF) or total lines (LF) or covered
     lines (LH) of the test.
 
@@ -232,32 +296,14 @@ def filter_lines(line):
         Boolean. If the line has the file path or total lines or covered lines
         of the test.
     """
-    return (line.startswith('SF') or line.startswith('LH')
+    return (
+        line.startswith('SF') or line.startswith('LH')
         or line.startswith('LF'))
 
 
-def get_test_file_name(test_path):
-    """Get the file name from the absolute path.
-
-    Args:
-        test_path: str. The file's absolute path.
-
-    Returns:
-        Str. It returns the file name of the test path.
-    """
-    if not test_path:
-        sys.stderr.write(
-            'The test path is empty or null.'
-            'It\'s not possible to diff the test coverage correctly.')
-        sys.exit(1)
-
-    _, file_name = os.path.split(test_path)
-    return file_name
-
-
-def get_stanzas_from_lcov_file(file_path):
-    """Get all stanzas from a lcov file. Each stanza has the following
-    structure:
+def get_stanzas_from_lcov_file():
+    """Get all stanzas from a lcov file. The lcov file gather all the frontend
+    files that has tests and each one has the following structure:
     TN: test name
     SF: file path
     FNF: total functions
@@ -268,67 +314,47 @@ def get_stanzas_from_lcov_file(file_path):
     BRH: branches covered
     end_of_record
 
-    This function filters each stanza to return only:
-    - File path (SF)
-    - File total lines (LF)
-    - File covered lines (LH)
-
-    Args:
-        file_path: str. The path of lcov file.
-
     Returns:
-        list(str). A list with all stanzas filtered.
+        list(Stanza). A list with all stanzas.
     """
-    f = python_utils.open_file(file_path, 'r')
-    stanzas_array = f.read().split('end_of_record')
-    stanzas_array_filtered = []
 
-    for stanza in stanzas_array:
-        lines = [line for line in stanza.splitlines() if filter_lines(line)]
-        if len(lines) > 0:
-            stanzas_array_filtered.append(lines)
+    f = python_utils.open_file(LCOV_FILE_PATH, 'r')
+    lcov_items_list = f.read().split('end_of_record')
+    stanzas_list = []
 
-    return stanzas_array_filtered
+    for item in lcov_items_list:
+        relevant_lines = [line for line in item.splitlines() if 
+            filter_relevant_lines(line)]
 
+        if len(relevant_lines) > 0:
+            stanza = LcovStanzaRelevantLines()
 
-def get_coverage_dict():
-    """Build a dict with all covered files from the current branch.
+            stanza.set_file_name(relevant_lines[0])
+            stanza.set_total_lines(relevant_lines[1])
+            stanza.set_covered_lines(relevant_lines[2])
 
-    Returns:
-        Dictionary. A dict containing file path, total lines and covered lines
-        of each tested file.
+            stanzas_list.append(stanza)
 
-    Raises:
-        Exception: If DEV_LCOV_FILE_PATH doesn't exist.
-    """
-    coverage_dict = {}
-
-    if not os.path.exists(PR_LCOV_FILE_PATH):
-        raise Exception(
-            'File at path {} doesn\'t exist'.format(PR_LCOV_FILE_PATH))
-
-    stanzas = get_stanzas_from_lcov_file(PR_LCOV_FILE_PATH)
-    for stanza in stanzas:
-        total_lines = re.match('(\d+)', stanza[1].split(':')[1]).group(1)
-        covered_lines = re.match('(\d+)', stanza[2].split(':')[1]).group(1)
-
-        test_name = get_test_file_name(stanza[0])
-        coverage_dict[test_name] = [
-            int(total_lines),
-            int(covered_lines)
-        ]
-
-    return coverage_dict        
+    return stanzas_list      
 
 
-def remove_item_from_whitelist(test_name):
-    """Remove an item from whitelist list.
+def remove_item_from_whitelist(whitelist, test_name):
+    """Remove an item from the whitelist.
     
     Args:
-      test_name: str. The test to be removed from whitelist.
+        whitelist: list(str). The whitelist including only fully covered tests.
+        test_name: str. The test to be removed from whitelist.
     """
-    index = fully_covered_tests.index(test_name)
-    fully_covered_tests.pop(index)
+    index = whitelist.index(test_name)
+    whitelist.pop(index)
+
+
+def check_fully_covered_filenames_sorting():
+    if fully_covered_filenames != sorted(fully_covered_filenames):
+        python_utils.PRINT(
+            'The \033[1mfully_covered_filenames\033[0m list must be kept'
+            ' in alphabetic order.')
+        sys.exit(1)
 
 
 def check_coverage_changes():
@@ -338,42 +364,43 @@ def check_coverage_changes():
     - File deletion
 
     Raises:
-        Exception: If PR_LCOV_FILE_PATH doesn't exist.
+        Exception: If LCOV_FILE_PATH doesn't exist.
     """
-    if not os.path.exists(PR_LCOV_FILE_PATH):
+    if not os.path.exists(LCOV_FILE_PATH):
         raise Exception('File at path {} doesn\'t exist'.format(
-            PR_LCOV_FILE_PATH))
+            LCOV_FILE_PATH))
 
-    covered_tests = get_coverage_dict()
+    stanzas = get_stanzas_from_lcov_file()
+    whitelist = list(fully_covered_filenames)
     errors = ''
 
-    for test_name in covered_tests:
-        total_lines = covered_tests[test_name][0]
-        covered_lines = covered_tests[test_name][1]
+    for stanza in stanzas:
+        file_name = stanza.get_file_name()
+        total_lines = stanza.get_total_lines()
+        covered_lines = stanza.get_covered_lines()
 
-        if test_name in fully_covered_tests:
+        if file_name in whitelist:
             if total_lines != covered_lines:
                 errors += ('\033[1m{}\033[0m file is in the whitelist but its'
                 ' coverage decreased. Make sure it is fully covered'
-                ' again.\n'.format(test_name))
+                ' again.\n'.format(file_name))
 
-            remove_item_from_whitelist(test_name)
+            remove_item_from_whitelist(whitelist, file_name)
         else:
             if total_lines == covered_lines:
                 errors += ('\033[1m{}\033[0m file is fully covered and it\'s'
                 ' not included in the whitelist. Please add the file name in'
-                ' the whilelist in file scripts/check_frontend_test_coverage.py.\n'
-                .format(test_name))
+                ' the whitelist in the file'
+                ' scripts/check_frontend_test_coverage.py.\n'
+                .format(file_name))
 
-    if len(fully_covered_tests) > 0:
-        for test_name in fully_covered_tests:
+    if len(whitelist) > 0:
+        for test_name in whitelist:
             errors += ('\033[1m{}\033[0m is in the whitelist but it doesn\'t'
             ' exist anymore. If you have renamed it, please make sure to'
             ' remove the old file name and add the new file name in the'
-            ' whitelist in file scripts/check_frontend_test_coverage.py.\n'
+            ' whitelist in the file scripts/check_frontend_test_coverage.py.\n'
             .format(test_name))
-
-    delete_tmp_folder()
 
     if errors:
         python_utils.PRINT('------------------------------------')
@@ -386,6 +413,8 @@ def check_coverage_changes():
         python_utils.PRINT('All Frontend Coverage Checks Passed.')
         python_utils.PRINT('------------------------------------')
 
+    check_fully_covered_filenames_sorting()
+
 
 def main():
     """Runs all the steps for checking if there is any decrease of 100% covered
@@ -393,12 +422,6 @@ def main():
     """
 
     run_frontend_tests_script()
-
-    create_tmp_folder()
-
-    shutil.copyfile(
-        LCOV_FILE_PATH,
-        PR_LCOV_FILE_PATH)
 
     check_coverage_changes()
 
