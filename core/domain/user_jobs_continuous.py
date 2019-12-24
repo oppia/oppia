@@ -185,9 +185,8 @@ class RecentUpdatesMRJobManager(
                 'author_id': metadata_obj['committer_id'],
                 'last_updated_ms': metadata_obj['created_on_ms'],
                 'subject': (
-                    delete_commit_message
-                    if activity_model.deleted
-                    else metadata_obj['commit_message']
+                    delete_commit_message if activity_model.deleted else
+                    metadata_obj['commit_message']
                 ),
             })
 
@@ -487,7 +486,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         return {
             'total_plays': total_plays,
             'num_ratings': num_ratings,
-            'average_ratings': average_ratings
+            'average_ratings': average_ratings,
         }
 
 
@@ -598,7 +597,7 @@ class UserStatsMRJobManager(
                 # Find score for this specific exploration.
                 exploration_data.update({
                     'exploration_impact_score': (
-                        value_per_user * reach * contribution)
+                        value_per_user * reach * contribution),
                 })
 
             # If the user is an owner for the exploration, then update dict with
@@ -613,7 +612,7 @@ class UserStatsMRJobManager(
                 if average_rating is not None:
                     exploration_data.update({
                         'average_rating_for_owned_exp': average_rating,
-                        'num_ratings_for_owned_exp': sum_of_ratings
+                        'num_ratings_for_owned_exp': sum_of_ratings,
                     })
             yield (contrib_id, exploration_data)
 
@@ -628,7 +627,7 @@ class UserStatsMRJobManager(
                 if average_rating is not None:
                     exploration_data.update({
                         'average_rating_for_owned_exp': average_rating,
-                        'num_ratings_for_owned_exp': sum_of_ratings
+                        'num_ratings_for_owned_exp': sum_of_ratings,
                     })
                 yield (owner_id, exploration_data)
 
