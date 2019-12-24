@@ -76,7 +76,7 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
         """Gets a list of recent notifications to show on the user's dashboard.
 
         Args:
-            user_id: str. The unique ID of the user.
+            user_id: str. The unique id of the user.
 
         Returns:
             tuple(job_queued_msec, notifications), where:
@@ -88,13 +88,13 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
                     keys:
                         type: str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT
                             or feconf.UPDATE_TYPE_FEEDBACK_MESSAGE.
-                        activity_id: str. The ID of the exploration being
+                        activity_id: str. The id of the exploration being
                             committed to or to which the feedback thread
                             belongs.
                         activity_title: str. The title of the activity.
                         last_updated_ms: float. The time when the update was
                             made, in milliseconds since the Epoch.
-                        author_id: str. The ID of the author who made the
+                        author_id: str. The id of the author who made the
                             update.
                         subject: str. A brief description of the notification.
         """
@@ -119,7 +119,7 @@ class RecentUpdatesMRJobManager(
             activity_model_cls, activity_ids_list, activity_type, commit_type,
             delete_commit_message):
         """Gets and returns a list of dicts representing the most recent commits
-        made for each activity represented by each ID provided in the
+        made for each activity represented by each id provided in the
         activity_ids_list parameter. These are the latest commits made by users
         to each activity (that is, it will skip over any automated commits such
         as those from the Oppia migration bot).
@@ -128,8 +128,8 @@ class RecentUpdatesMRJobManager(
             activity_model_cls: ExplorationModel|CollectionModel. The storage
                 layer object for an activity, such as
                 exp_models.ExplorationModel.
-            activity_ids_list: list(str). A list of activity IDs (such as
-                exploration IDs) for which the latest commits will be retrieved.
+            activity_ids_list: list(str). A list of activity ids (such as
+                exploration ids) for which the latest commits will be retrieved.
             activity_type: str. The type of activity being referenced, such as
                 'exploration' or 'collection'.
             commit_type: str. This represents the activity update commit type,
@@ -144,10 +144,10 @@ class RecentUpdatesMRJobManager(
                     every activity in activity_ids_list. Each dict in this list
                     has the following keys:
                         type: str. The value of the commit_type argument.
-                        activity_id: str. The ID of the activity for this
+                        activity_id: str. The id of the activity for this
                             commit.
                         activity_title: str. The title of the activity.
-                        author_id: str. The ID of the author who made the
+                        author_id: str. The id of the author who made the
                             commit.
                         last_update_ms: float. The time when the commit was
                             created, in milliseconds since Epoch.
@@ -225,12 +225,12 @@ class RecentUpdatesMRJobManager(
                 recent_activity_commits: dict. Contains the following keys:
                     type: str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
                         feconf.UPDATE_TYPE_FEEDBACK_MESSAGE.
-                    activity_id: str. The ID of the exploration being committed
+                    activity_id: str. The id of the exploration being committed
                         to or to which the feedback thread belongs.
                     activity_title: str. The title of the activity.
                     last_updated_ms: float. The time when the update was made,
                         in milliseconds since the Epoch.
-                    author_id: str. The ID of the author who made the update.
+                    author_id: str. The id of the author who made the update.
                     subject: str. A brief description of the recent updates.
         """
         user_id = item.id
@@ -299,12 +299,12 @@ class RecentUpdatesMRJobManager(
                 entry is a stringified dict with the following keys:
                     type: str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
                         feconf.UPDATE_TYPE_FEEDBACK_MESSAGE.
-                    activity_id: str. The ID of the exploration being committed
+                    activity_id: str. The id of the exploration being committed
                         to or to which the feedback thread belongs.
                     activity_title: str. The title of the activity.
                     last_updated_ms: float. The time when the update was made,
                         in milliseconds since the Epoch.
-                    author_id: str. The ID of the author who made the update.
+                    author_id: str. The id of the author who made the update.
                     subject: str. A brief description of the recent updates.
         """
         user_id = key[:key.find('@')]
@@ -369,10 +369,10 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 average rating of the realtime model is refreshed.
             *args: tuple(*). If event_type is 'start', then this is a 1-element
                 tuple containing:
-                    str. The ID of the exploration currently being played.
+                    str. The id of the exploration currently being played.
                 If event_type is 'rate_exploration', then this is a 3-element
                 tuple containing:
-                    str. The ID of the exploration currently being played.
+                    str. The id of the exploration currently being played.
                     float. The rating given by user to the exploration.
                     float. The old rating of the exploration, before it is
                         refreshed.
@@ -453,7 +453,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         """Returns the dashboard stats associated with the given user_id.
 
         Args:
-            user_id: str. The ID of the user.
+            user_id: str. The id of the user.
 
         Returns:
             dict. Contains the following keys:
@@ -536,7 +536,7 @@ class UserStatsMRJobManager(
 
         Yields:
             tuple(owner_id, exploration_data), where:
-                owner_id: str. The unique ID of the user.
+                owner_id: str. The unique id of the user.
                 exploration_data: dict. A dict that includes entries for all the
                     explorations that this user contributes to or owns. Each
                     entry has the following keys:
@@ -652,7 +652,7 @@ class UserStatsMRJobManager(
         rating.
 
         Args:
-            key: str. The unique ID of the user.
+            key: str. The unique id of the user.
             stringified_values: list(str). A list of information regarding all
                 the explorations that this user contributes to or owns. Each
                 entry is a stringified dict having the following keys:

@@ -376,7 +376,7 @@ def get_multiple_threads(thread_ids):
     """Gets multiple feedback threads.
 
     Args:
-        thread_ids: list(str). The list of thread IDs.
+        thread_ids: list(str). The list of thread ids.
 
     Returns:
         list(FeedbackThread). The list of feedback threads.
@@ -899,9 +899,9 @@ def _add_message_to_email_buffer(
     has changed, notify the recipients as well.
 
     Args:
-        author_id: str. ID of author of message.
-        thread_id: str. ID of thread that received new message.
-        message_id: int. ID of new message.
+        author_id: str. The id of author of message.
+        thread_id: str. The id of thread that received new message.
+        message_id: int. The id of new message.
         message_length: int. Length of the feedback message to be sent.
         old_status: str. One of STATUS_CHOICES. Value of old thread status.
         new_status: str. One of STATUS_CHOICES. Value of new thread status.
