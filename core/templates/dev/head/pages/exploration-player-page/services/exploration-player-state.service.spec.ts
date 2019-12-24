@@ -219,9 +219,9 @@ describe('Exploration Player State Service', function() {
     $httpBackend.expect('GET', '/dummyurl/3').respond({
       version: 1
     });
-    var deferred = $q.defer();
-    deferred.resolve({});
-    spyOn($q, 'all').and.returnValue(deferred.promise);
+    // var deferred = $q.defer();
+    // deferred.resolve({});
+    // spyOn($q, 'all').and.returnValue(deferred.promise);
     ExplorationPlayerStateService.initializePlayer();
     $httpBackend.flush();
     $rootScope.$apply();
