@@ -13,22 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TopicViewerBackendApiService.
+ * @fileoverview Unit tests for ClassroomBackendApiService.
  */
 
-require('domain/classroom/classroom-backend-api.service.ts');
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
+import { TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+require('domain/classroom/classroom-backend-api.service.ts');
+
 describe('Classroom backend API service', function() {
   var ClassroomBackendApiService = null;
-  var sampleDataResults = null;
+  var responseDictionaries = null;
+  var sampleDataResultsObjects = null;
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
   var UndoRedoService = null;
+  var topicSummaryObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -45,9 +50,10 @@ describe('Classroom backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    topicSummaryObjectFactory = $injector.get('TopicSummaryObjectFactory');
 
     // Sample topic object returnable from the backend
-    sampleDataResults = {
+    responseDictionaries = {
       topic_summary_dicts: [{
         name: 'Topic name',
         description: 'Topic description',
@@ -64,6 +70,16 @@ describe('Classroom backend API service', function() {
         uncategorized_skill_count: 3
       }]
     };
+
+    // Sample topic object returnable from the backend
+    sampleDataResultsObjects = {
+      topic_summary_objects: [
+        topicSummaryObjectFactory.createFromBackendDict(
+          responseDictionaries.topic_summary_dicts[0]),
+        topicSummaryObjectFactory.createFromBackendDict(
+          responseDictionaries.topic_summary_dicts[1])
+      ]
+    };
   }));
 
   afterEach(function() {
@@ -77,13 +93,13 @@ describe('Classroom backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect('GET', '/classroom_data_handler/0').respond(
-        sampleDataResults);
+        responseDictionaries);
       ClassroomBackendApiService.fetchClassroomData('0').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResults.topic_summary_dicts);
+        sampleDataResultsObjects.topic_summary_objects);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

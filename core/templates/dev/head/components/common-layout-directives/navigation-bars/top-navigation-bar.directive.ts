@@ -33,9 +33,8 @@ angular.module('oppia').directive('topNavigationBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/navigation-bars/' +
-        'top-navigation-bar.directive.html'),
+      template: require(
+        '!html-loader!./top-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
@@ -97,7 +96,9 @@ angular.module('oppia').directive('topNavigationBar', [
             'story_editor'];
           ctrl.currentUrl = window.location.pathname.split('/')[1];
           ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
-          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
           ctrl.logoutUrl = LOGOUT_URL;
           ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
           ctrl.standardNavIsShown = (

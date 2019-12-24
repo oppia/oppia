@@ -272,6 +272,10 @@ export = {
     "description": "English",
     "relatedLanguages": ["en"]
   }, {
+    "id": "ak",
+    "description": "Akan",
+    "relatedLanguages": ["ak"]
+  }, {
     "id": "ar",
     "description": "Arabic",
     "relatedLanguages": ["ar"]
@@ -331,6 +335,10 @@ export = {
     "id": "el",
     "description": "Greek",
     "relatedLanguages": ["el"]
+  }, {
+    "id": "gaa",
+    "description": "Ga",
+    "relatedLanguages": ["gaa"]
   }, {
     "id": "he",
     "description": "Hebrew",
@@ -540,6 +548,8 @@ export = {
 
   "DEFAULT_SKILL_DIFFICULTY": 0.3,
 
+  "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
+
   "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
 
   "ENABLE_PREREQUISITE_SKILLS": false,
@@ -632,6 +642,9 @@ export = {
   // The bucket name is set to None-resources to enable it to be used
   // in prod mode when the resource bucket name is not allowed to be null.
   "GCS_RESOURCE_BUCKET_NAME": "None-resources",
+
+  // Used to disable account removal until it is fully implemented.
+  "ENABLE_ACCOUNT_DELETION": false,
 
   "DEV_MODE": true
 };

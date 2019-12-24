@@ -2,7 +2,6 @@ var argv = require('yargs').argv;
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
-const isDocker = require('is-docker')();
 if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
@@ -91,7 +90,7 @@ module.exports = function(config) {
       }
     },
     autoWatch: true,
-    browsers: ['Chrome_Travis'],
+    browsers: ['CI_Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
     browserConsoleLogOptions: {
@@ -103,17 +102,20 @@ module.exports = function(config) {
     // Continue running in the background after running tests.
     singleRun: true,
     customLaunchers: {
-      Chrome_Travis: {
-        // Karma can only connect to ChromeHeadless when inside Docker.
-        base: isDocker ? 'ChromeHeadless' : 'Chrome',
+      CI_Chrome: {
+        // Chrome cannot be run in headless mode as the language tests would
+        // break. See https://github.com/puppeteer/puppeteer/issues/2141 and
+        // https://github.com/puppeteer/examples/blob/master/speech.js#L40
+        // for details.
+        base: 'Chrome',
         // Discussion of the necessity of extra flags can be found here:
         // https://github.com/karma-runner/karma-chrome-launcher/issues/154
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
-        flags: isDocker ? [
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=737678
+        flags: [
           '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-web-security'
-        ] : ['--no-sandbox']
+          '--disable-gpu'
+        ]
       }
     },
 
@@ -154,9 +156,17 @@ module.exports = function(config) {
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
-      devtool: 'inline-source-map',
       module: {
         rules: [
+          {
+            // Exclude all the spec files from the report.
+            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
+            enforce: 'post',
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              options: { esModules: true }
+            }
+          },
           {
             test: /\.ts$/,
             use: [
@@ -174,14 +184,6 @@ module.exports = function(config) {
           {
             test: /\.html$/,
             loader: 'underscore-template-loader'
-          },
-          {
-            test: /\.ts$/,
-            enforce: 'post',
-            use: {
-              loader: 'istanbul-instrumenter-loader',
-              options: { esModules: true }
-            }
           },
           {
             test: /\.css$/,

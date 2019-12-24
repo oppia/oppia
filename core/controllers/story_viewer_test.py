@@ -106,8 +106,8 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         story.story_contents.next_node_id = 'node_4'
         story_services.save_new_story(self.admin_id, story)
         self.save_new_topic(
-            self.TOPIC_ID, 'user', 'Topic', 'A new topic', [story.id],
-            [], [], [], 0)
+            self.TOPIC_ID, 'user', 'Topic', 'abbrev', None,
+            'A new topic', [story.id], [], [], [], 0)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
         topic_services.publish_story(
             self.TOPIC_ID, self.STORY_ID_1, self.admin_id)
@@ -123,6 +123,29 @@ class StoryPageTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
                 '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
+
+    def test_accessibility_of_unpublished_story_viewer_page(self):
+        topic_services.unpublish_story(
+            self.TOPIC_ID, self.STORY_ID_1, self.admin_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1),
+                expected_status_int=404)
+            self.login(self.ADMIN_EMAIL)
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
+            self.logout()
+
+    def test_accessibility_of_story_viewer_in_unpublished_topic(self):
+        topic_services.unpublish_topic(self.TOPIC_ID, self.admin_id)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1),
+                expected_status_int=404)
+            self.login(self.ADMIN_EMAIL)
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
+            self.logout()
 
     def test_get_fails_when_new_structures_not_enabled(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
@@ -146,8 +169,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
     def test_can_not_access_story_viewer_page_with_unpublished_topic(self):
         new_story_id = 'new_story_id'
         self.save_new_topic(
-            'topic_id_1', 'user', 'Topic 2', 'A new topic', [new_story_id],
-            [], [], [], 0)
+            'topic_id_1', 'user', 'Topic 2', 'abbrev', None,
+            'A new topic', [new_story_id], [], [], [], 0)
         story = story_domain.Story.create_default_story(
             new_story_id, 'Title', 'topic_id_1')
         story_services.save_new_story(self.admin_id, story)

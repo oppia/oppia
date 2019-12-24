@@ -52,7 +52,12 @@ class AssetDevHandler(base.BaseHandler):
     image and audio files are served from GCS).
     """
 
-    _SUPPORTED_TYPES = ['image', 'audio']
+    _SUPPORTED_TYPES = ['image', 'audio', 'thumbnail']
+    _SUPPORTED_PAGE_CONTEXTS = [
+        feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_SKILL,
+        feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_STORY,
+        feconf.ENTITY_TYPE_QUESTION, feconf.ENTITY_TYPE_SUBTOPIC
+    ]
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
@@ -87,19 +92,16 @@ class AssetDevHandler(base.BaseHandler):
                 b'Content-Type'] = python_utils.convert_to_bytes(
                     '%s/%s' % (asset_type, file_format))
 
+            if page_context not in self._SUPPORTED_PAGE_CONTEXTS:
+                raise self.InvalidInputException
+
             if page_context == feconf.ENTITY_TYPE_SUBTOPIC:
                 entity_type = feconf.ENTITY_TYPE_TOPIC
                 topic = topic_fetchers.get_topic_by_name(page_identifier)
                 entity_id = topic.id
-            elif (
-                    page_context == feconf.ENTITY_TYPE_EXPLORATION or
-                    page_context == feconf.ENTITY_TYPE_SKILL or
-                    page_context == feconf.ENTITY_TYPE_TOPIC or
-                    page_context == feconf.ENTITY_TYPE_STORY):
+            else:
                 entity_type = page_context
                 entity_id = page_identifier
-            else:
-                raise self.InvalidInputException
 
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))

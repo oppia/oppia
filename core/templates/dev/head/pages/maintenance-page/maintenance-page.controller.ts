@@ -26,7 +26,9 @@ angular.module('oppia').controller('Maintenance', [
       UrlInterpolationService, DEV_MODE) {
     $scope.currentLang = 'en';
     $rootScope.DEV_MODE = DEV_MODE;
-    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+    $scope.getStaticImageUrl = function(imagePath) {
+      return UrlInterpolationService.getStaticImageUrl(imagePath);
+    };
 
     DocumentAttributeCustomizationService.addAttribute(
       'lang', $scope.currentLang);

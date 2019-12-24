@@ -16,50 +16,52 @@
  * @fileoverview Service that provides information about how to display the
  * tasks and data in the improvements tab of the exploration editor.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+import { ExplorationEditorPageConstants } from
+  'pages/exploration-editor-page/exploration-editor-page.constants';
 
-angular.module('oppia').factory('ImprovementsDisplayService', [
-  'STATUS_COMPLIMENT', 'STATUS_FIXED', 'STATUS_IGNORED',
-  'STATUS_NOT_ACTIONABLE', 'STATUS_OPEN',
-  function(
-      STATUS_COMPLIMENT, STATUS_FIXED, STATUS_IGNORED,
-      STATUS_NOT_ACTIONABLE, STATUS_OPEN) {
-    var STATUS_CHOICES = {
-      [STATUS_COMPLIMENT]: {
-        text: 'Compliment',
-        cssClass: 'badge badge-success',
-      },
-      [STATUS_FIXED]: {
-        text: 'Fixed',
-        cssClass: 'badge badge-default',
-      },
-      [STATUS_IGNORED]: {
-        text: 'Ignored',
-        cssClass: 'badge badge-default',
-      },
-      [STATUS_NOT_ACTIONABLE]: {
-        text: 'Not Actionable',
-        cssClass: 'badge badge-default',
-      },
-      [STATUS_OPEN]: {
-        text: 'Open',
-        cssClass: 'badge badge-info',
-      },
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class ImprovementsDisplayService {
+  STATUS_CHOICES = {
+    [ExplorationEditorPageConstants.STATUS_COMPLIMENT]: {
+      text: 'Compliment',
+      cssClass: 'badge badge-success',
+    },
+    [ExplorationEditorPageConstants.STATUS_FIXED]: {
+      text: 'Fixed',
+      cssClass: 'badge badge-default',
+    },
+    [ExplorationEditorPageConstants.STATUS_IGNORED]: {
+      text: 'Ignored',
+      cssClass: 'badge badge-default',
+    },
+    [ExplorationEditorPageConstants.STATUS_NOT_ACTIONABLE]: {
+      text: 'Not Actionable',
+      cssClass: 'badge badge-default',
+    },
+    [ExplorationEditorPageConstants.STATUS_OPEN]: {
+      text: 'Open',
+      cssClass: 'badge badge-info',
+    },
+  };
 
-    return {
-      isOpen: function(status) {
-        return status === STATUS_OPEN;
-      },
-      getStatusCssClass: function(status) {
-        return STATUS_CHOICES.hasOwnProperty(status) ?
-          STATUS_CHOICES[status].cssClass : 'badge badge-default';
-      },
-      getHumanReadableStatus: function(status) {
-        return STATUS_CHOICES.hasOwnProperty(status) ?
-          STATUS_CHOICES[status].text : '';
-      },
-    };
+  isOpen(status: string): boolean {
+    return status === ExplorationEditorPageConstants.STATUS_OPEN;
   }
-]);
+  getStatusCssClass(status: string): string {
+    return this.STATUS_CHOICES.hasOwnProperty(status) ?
+      this.STATUS_CHOICES[status].cssClass : 'badge badge-default';
+  }
+  getHumanReadableStatus(status: string): string {
+    return this.STATUS_CHOICES.hasOwnProperty(status) ?
+      this.STATUS_CHOICES[status].text : '';
+  }
+}
+
+angular.module('oppia').factory(
+  'ImprovementsDisplayService', downgradeInjectable(
+    ImprovementsDisplayService));

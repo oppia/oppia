@@ -31,13 +31,13 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import os
-import platform
 import shutil
 import subprocess
 import sys
 
 sys.path.append(os.getcwd())
 import python_utils  # isort:skip  # pylint: disable=wrong-import-position
+from scripts import common  # isort:skip # pylint: disable=wrong-import-position
 
 FECONF_FILEPATH = os.path.join('.', 'feconf.py')
 CONSTANTS_FILEPATH = os.path.join('.', 'assets', 'constants.ts')
@@ -79,7 +79,7 @@ def install_hook():
             python_utils.PRINT('Copied file to .git/hooks directory')
 
     python_utils.PRINT('Making pre-commit hook file executable ...')
-    if platform.uname()[0] != 'Windows':
+    if not common.is_windows_os():
         _, err_chmod_cmd = start_subprocess_for_result(chmod_cmd)
 
         if not err_chmod_cmd:

@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import datetime
 
 from core.domain import feedback_domain
-from core.domain import user_services
 from core.tests import test_utils
 import feconf
 import utils
@@ -32,9 +31,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(FeedbackThreadDomainUnitTests, self).setUp()
 
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-        user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_to_dict(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
@@ -46,39 +44,41 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
             'original_author_username': self.VIEWER_USERNAME,
             'message_count': 1,
             'subject': u'a subject',
-            'last_updated': utils.get_time_in_millisecs(fake_date)
+            'last_updated': utils.get_time_in_millisecs(fake_date),
+            'last_nonempty_message_text': 'last message',
+            'last_nonempty_message_author': self.VIEWER_USERNAME,
         }
         observed_thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             expected_thread_dict['state_name'], self.viewer_id,
             expected_thread_dict['status'], expected_thread_dict['subject'],
-            expected_thread_dict['summary'], False, 1, fake_date, fake_date)
+            expected_thread_dict['summary'], False, 1, fake_date, fake_date,
+            'last message', self.viewer_id)
         self.assertDictEqual(
             expected_thread_dict, observed_thread.to_dict())
 
-    def test_get_last_two_message_ids(self):
+    def test_get_last_two_message_ids_from_thread_with_many_messages(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
-        thread_1 = feedback_domain.FeedbackThread(
+        thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            5, fake_date, fake_date)
+            5, # This value decides the number of messages.
+            fake_date, fake_date, 'last message', self.VIEWER_USERNAME)
 
-        last_two_message_ids = thread_1.get_last_two_message_ids()
         self.assertEqual(
-            last_two_message_ids,
-            [thread_1.get_full_message_id(4), thread_1.get_full_message_id(3)])
+            thread.get_last_two_message_ids(),
+            ['exp0.thread0.4', 'exp0.thread0.3'])
 
-        # Check what happens in case the thread has only one message.
-        thread_1 = feedback_domain.FeedbackThread(
+    def test_get_last_two_message_ids_from_thread_with_only_one_message(self):
+        fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
+        thread = feedback_domain.FeedbackThread(
             self.THREAD_ID, feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID,
             u'a_state_name', self.viewer_id, u'open', u'a subject', None, False,
-            1, fake_date, fake_date)
+            1, # This value decides the number of messages.
+            fake_date, fake_date, 'last message', self.VIEWER_USERNAME)
 
-        last_two_message_ids = thread_1.get_last_two_message_ids()
-        # The second last message should be given an id of -1 as it doesn't
-        # exist.
         self.assertEqual(
-            last_two_message_ids, [thread_1.get_full_message_id(0), None])
+            thread.get_last_two_message_ids(), ['exp0.thread0.0', None])
 
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
@@ -89,9 +89,8 @@ class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(FeedbackMessageDomainUnitTests, self).setUp()
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
     def test_to_dict(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
