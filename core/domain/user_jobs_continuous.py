@@ -399,7 +399,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                         sum_of_ratings -= old_rating
                         num_ratings -= 1
                     model.average_ratings = python_utils.divide(
-                        sum_of_ratings, (num_ratings * 1.0))
+                        sum_of_ratings, float(num_ratings))
                 else:
                     model.average_ratings = rating
                 model.num_ratings = num_ratings
@@ -574,7 +574,7 @@ class UserStatsMRJobManager(
         num_starts = exploration_stats.num_starts
 
         # Turn answer count into reach.
-        reach = answer_count**exponent
+        reach = answer_count ** exponent
 
         exploration_summary = exp_fetchers.get_exploration_summary_by_id(
             item.id)
