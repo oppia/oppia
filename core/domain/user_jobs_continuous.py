@@ -553,8 +553,9 @@ class UserStatsMRJobManager(
             total_rating += item.ratings[ratings_value] * int(ratings_value)
         sum_of_ratings = sum(item.ratings.values())
 
-        average_rating = python_utils.divide(
-            total_rating, sum_of_ratings) if sum_of_ratings else None
+        average_rating = (
+            python_utils.divide(total_rating, sum_of_ratings)
+            if sum_of_ratings else None)
 
         if average_rating is not None:
             value_per_user = average_rating - 2
