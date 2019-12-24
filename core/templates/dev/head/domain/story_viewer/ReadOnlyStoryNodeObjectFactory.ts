@@ -25,60 +25,60 @@ export interface ExplorationSummary {
   status: string
 }
 
-export class StoryNode {
-  id: string;
-  title: string;
-  destinationNodeIds: Array<string>;
-  prerequisiteSkillIds: Array<string>;
-  acquiredSkillIds: Array<string>;
-  outline: string;
-  outlineIsFinalized: boolean;
-  explorationId: string;
-  explorationSummary: ExplorationSummary;
-  completed: boolean;
+export class ReadOnlyStoryNode {
+  _id: string;
+  _title: string;
+  _destinationNodeIds: Array<string>;
+  _prerequisiteSkillIds: Array<string>;
+  _acquiredSkillIds: Array<string>;
+  _outline: string;
+  _outlineIsFinalized: boolean;
+  _explorationId: string;
+  _explorationSummary: ExplorationSummary;
+  _completed: boolean;
 
   constructor(id: string, title: string, destinationNodeIds: Array<string>,
       prerequisiteSkillIds: Array<string>, acquiredSkillIds: Array<string>,
       outline: string, outlineIsFinalized: boolean, explorationId: string,
       explorationSummary: ExplorationSummary, completed: boolean) {
-    this.id = id;
-    this.title = title;
-    this.destinationNodeIds = destinationNodeIds;
-    this.prerequisiteSkillIds = prerequisiteSkillIds;
-    this.acquiredSkillIds = acquiredSkillIds;
-    this.outline = outline;
-    this.outlineIsFinalized = outlineIsFinalized;
-    this.explorationId = explorationId;
-    this.explorationSummary = explorationSummary;
-    this.completed = completed;
+    this._id = id;
+    this._title = title;
+    this._destinationNodeIds = destinationNodeIds;
+    this._prerequisiteSkillIds = prerequisiteSkillIds;
+    this._acquiredSkillIds = acquiredSkillIds;
+    this._outline = outline;
+    this._outlineIsFinalized = outlineIsFinalized;
+    this._explorationId = explorationId;
+    this._explorationSummary = explorationSummary;
+    this._completed = completed;
   }
 
   getId(): string {
-    return this.id;
+    return this._id;
   }
 
   getTitle(): string {
-    return this.title;
+    return this._title;
   }
 
   getExplorationId(): string {
-    return this.explorationId;
+    return this._explorationId;
   }
 
   isCompleted(): boolean {
-    return this.completed;
+    return this._completed;
   }
 
   getExplorationSummaryObject(): ExplorationSummary {
-    return this.explorationSummary;
+    return this._explorationSummary;
   }
 
   getOutline(): string {
-    return this.outline;
+    return this._outline;
   }
 
   getOutlineStatus(): boolean {
-    return this.outlineIsFinalized;
+    return this._outlineIsFinalized;
   }
 }
 
@@ -90,8 +90,9 @@ export class ReadOnlyStoryNodeObjectFactory {
   // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  createFromBackendDict(storyNodeBackendDict: any): StoryNode {
-    return new StoryNode(storyNodeBackendDict.id, storyNodeBackendDict.title,
+  createFromBackendDict(storyNodeBackendDict: any): ReadOnlyStoryNode {
+    return new ReadOnlyStoryNode(storyNodeBackendDict.id,
+      storyNodeBackendDict.title,
       storyNodeBackendDict.destination_node_ids,
       storyNodeBackendDict.prerequisite_skill_ids,
       storyNodeBackendDict.acquired_skill_ids,

@@ -20,43 +20,42 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { ReadOnlyStoryNodeObjectFactory } from
+import { ReadOnlyStoryNodeObjectFactory, ReadOnlyStoryNode } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
-import { StoryNode } from 'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 
 export class StoryPlaythrough {
-  nodes: Array<StoryNode>;
+  _nodes: Array<ReadOnlyStoryNode>;
 
-  constructor(nodes: Array<StoryNode>) {
-    this.nodes = nodes;
+  constructor(nodes: Array<ReadOnlyStoryNode>) {
+    this._nodes = nodes;
   }
 
-  getInitialNode(): StoryNode {
-    return this.nodes[0];
+  getInitialNode(): ReadOnlyStoryNode {
+    return this._nodes[0];
   }
 
   getStoryNodeCount(): Number {
-    return this.nodes.length;
+    return this._nodes.length;
   }
 
-  getStoryNodes(): Array<StoryNode> {
-    return this.nodes;
+  getStoryNodes(): Array<ReadOnlyStoryNode> {
+    return this._nodes;
   }
 
   hasFinishedStory(): boolean {
-    return this.nodes.slice(-1)[0].isCompleted();
+    return this._nodes.slice(-1)[0].isCompleted();
   }
 
   getNextPendingNodeId(): string {
-    for (var i = 0; i < this.nodes.length; i++) {
-      if (!this.nodes[i].isCompleted()) {
-        return this.nodes[i].getId();
+    for (var i = 0; i < this._nodes.length; i++) {
+      if (!this._nodes[i].isCompleted()) {
+        return this._nodes[i].getId();
       }
     }
   }
 
   hasStartedStory(): boolean {
-    return this.nodes[0].isCompleted();
+    return this._nodes[0].isCompleted();
   }
 }
 
