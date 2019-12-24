@@ -17,18 +17,18 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
 import { AppConstants } from 'app.constants';
-import { NormalizeWhitespacePipe } from
-  'filters/string-utility-filters/normalize-whitespace.pipe';
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { AlertsService } from 'services/alerts.service';
 import { ValidatorsService } from 'services/validators.service';
+
 
 describe('Validators service', () => {
   let vs: ValidatorsService = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [NormalizeWhitespacePipe]
+      providers: [AlertsService, NormalizeWhitespacePipe]
     });
     vs = TestBed.get(ValidatorsService);
     /* eslint-disable dot-notation */
@@ -42,11 +42,12 @@ describe('Validators service', () => {
     expect(vs.isValidEntityName('   b', null, null)).toBe(true);
     expect(vs.isValidEntityName('bd', null, null)).toBe(true);
 
-    expect(vs.isValidEntityName('', null, null)).toBe(false);
+    expect(vs.isValidEntityName('', true, null)).toBe(false);
     expect(vs.isValidEntityName('   ', null, null)).toBe(false);
     expect(vs.isValidEntityName('x', null, null)).toBe(false);
     expect(vs.isValidEntityName('y', null, null)).toBe(false);
-    expect(vs.isValidEntityName('bx', null, null)).toBe(false);
+    expect(vs.isValidEntityName('bx', true, null)).toBe(false);
+    expect(vs.alerts.warnings.length).toBe(2);
   });
 
   it('should correctly validate exploration titles', () => {
@@ -59,8 +60,9 @@ describe('Validators service', () => {
     expect(vs.isValidExplorationTitle(
       'A title with invalid characters #', null)).toBe(false);
     expect(vs.isValidExplorationTitle(
-      'A title that is toooooooooooooooooooooooooo too long.', null)).toBe(
+      'A title that is toooooooooooooooooooooooooo too long.', true)).toBe(
       false);
+    expect(vs.alerts.warnings.length).toBe(1);
   });
 
   it('should correctly validate non-emptiness', () => {
@@ -69,7 +71,8 @@ describe('Validators service', () => {
 
     expect(vs.isNonempty('', null)).toBe(false);
     expect(vs.isNonempty(null, null)).toBe(false);
-    expect(vs.isNonempty(undefined, null)).toBe(false);
+    expect(vs.isNonempty(undefined, true)).toBe(false);
+    expect(vs.alerts.warnings.length).toBe(1);
   });
 
   it('should correctly validate exploration IDs', () => {
@@ -79,6 +82,19 @@ describe('Validators service', () => {
 
     expect(vs.isValidExplorationId('abc def', null)).toBe(false);
     expect(vs.isValidExplorationId('', null)).toBe(false);
-    expect(vs.isValidExplorationId('abcd;', null)).toBe(false);
+    expect(vs.isValidExplorationId('abcd;', true)).toBe(false);
+    expect(vs.alerts.warnings.length).toBe(1);
+  });
+
+  it('should correctly validate state name', () => {
+    expect(vs.isValidStateName('abc def', null)).toBe(true);
+
+    expect(vs.isValidStateName('', null)).toBe(false);
+    expect(vs.isValidStateName(
+      'A state name with invalid character x', null)).toBe(false);
+    expect(vs.isValidStateName(
+      'A state name that is toooooooooooooooooooooooo long', true))
+      .toBe(false)
+    expect(vs.alerts.warnings.length).toBe(1);
   });
 });
