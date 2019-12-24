@@ -422,7 +422,7 @@ def get_thread_summaries(user_id, thread_ids):
 
     Returns:
         tuple(thread_summaries, number_of_unread_threads), where:
-            thread_summaries: list(dict). Each dict has the following keys:
+            thread_summaries: list(dict). Has the keys:
                 status: str. The status of the thread.
                 original_author_id: str. The id of the original author of the
                     thread.
