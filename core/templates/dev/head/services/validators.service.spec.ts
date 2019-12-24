@@ -15,13 +15,12 @@
 /**
  * @fileoverview Unit tests for Validators Service.
  */
-
 import { TestBed } from '@angular/core/testing';
 import { AppConstants } from 'app.constants';
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 import { AlertsService } from 'services/alerts.service';
 import { ValidatorsService } from 'services/validators.service';
-
 
 describe('Validators service', () => {
   let vs: ValidatorsService = null;
@@ -94,7 +93,7 @@ describe('Validators service', () => {
       'A state name with invalid character x', null)).toBe(false);
     expect(vs.isValidStateName(
       'A state name that is toooooooooooooooooooooooo long', true))
-      .toBe(false)
+      .toBe(false);
     expect(vs.alerts.warnings.length).toBe(1);
   });
 });
