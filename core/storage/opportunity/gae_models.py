@@ -227,3 +227,9 @@ class SkillOpportunityModel(base_models.BaseModel):
         results, cursor, more = cls.get_all().order(
             cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
+
+    @classmethod
+    def delete_all(cls):
+        """Deletes all entities of this class."""
+        keys = cls.query().fetch(keys_only=True)
+        ndb.delete_multi(keys)
