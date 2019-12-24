@@ -98,7 +98,7 @@ module.exports = function(config) {
       format: '%b %T: %m',
       terminal: true
     },
-    browserNoActivityTimeout: 60000,
+    browserNoActivityTimeout: 100000,
     // Continue running in the background after running tests.
     singleRun: true,
     customLaunchers: {
