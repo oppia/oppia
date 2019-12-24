@@ -19,6 +19,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+import itertools
 
 from core.domain import email_manager
 from core.domain import feedback_domain
@@ -203,7 +204,7 @@ def create_message(
 
     if (user_services.is_user_registered(author_id) and
             feconf.CAN_SEND_EMAILS and feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
-            # Send feedback message email if user is registered.
+        # Send feedback message email if user is registered.
         _add_message_to_email_buffer(
             author_id, thread_id, message_id, len(text), old_status, new_status)
 
@@ -223,12 +224,10 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
             the user.
     """
     feedback_thread_user_model = (
-        feedback_models.GeneralFeedbackThreadUserModel.get(user_id, thread_id))
-
-    if not feedback_thread_user_model:
-        feedback_thread_user_model = (
-            feedback_models.GeneralFeedbackThreadUserModel.create(
-                user_id, thread_id))
+        feedback_models.GeneralFeedbackThreadUserModel.get(
+            user_id, thread_id) or
+        feedback_models.GeneralFeedbackThreadUserModel.create(
+            user_id, thread_id))
 
     feedback_thread_user_model.message_ids_read_by_user = message_ids
     feedback_thread_user_model.put()
@@ -243,12 +242,10 @@ def add_message_id_to_read_by_list(thread_id, user_id, message_id):
         message_id: int. The id of the message.
     """
     feedback_thread_user_model = (
-        feedback_models.GeneralFeedbackThreadUserModel.get(user_id, thread_id))
-
-    if not feedback_thread_user_model:
-        feedback_thread_user_model = (
-            feedback_models.GeneralFeedbackThreadUserModel.create(
-                user_id, thread_id))
+        feedback_models.GeneralFeedbackThreadUserModel.get(
+            user_id, thread_id) or
+        feedback_models.GeneralFeedbackThreadUserModel.create(
+            user_id, thread_id))
 
     feedback_thread_user_model.message_ids_read_by_user.append(message_id)
     feedback_thread_user_model.put()
@@ -448,86 +445,68 @@ def get_thread_summaries(user_id, thread_ids):
                 exploration belongs.
         int. The number of threads not read by the user.
     """
-    feedback_thread_user_model_ids = [
+    thread_user_model_ids = [
         feedback_models.GeneralFeedbackThreadUserModel.generate_full_id(
             user_id, thread_id) for thread_id in thread_ids
     ]
-    exploration_ids = [thread_id.split('.')[1] for thread_id in thread_ids]
-    multiple_models = (
+    exploration_ids = [
+        get_exp_id_from_thread_id(thread_id) for thread_id in thread_ids
+    ]
+    thread_models, thread_user_models, explorations = (
         datastore_services.fetch_multiple_entities_by_ids_and_models([
             ('GeneralFeedbackThreadModel', thread_ids),
-            ('GeneralFeedbackThreadUserModel', feedback_thread_user_model_ids),
+            ('GeneralFeedbackThreadUserModel', thread_user_model_ids),
             ('ExplorationModel', exploration_ids),
         ]))
 
-    thread_models = multiple_models[0]
-    feedback_thread_user_models = multiple_models[1]
-    explorations = multiple_models[2]
-
-    threads = [
-        _get_thread_from_model(thread_model) for thread_model in thread_models]
-
-    last_two_messages_ids = []
-    for thread in threads:
-        last_two_messages_ids += thread.get_last_two_message_ids()
-
+    threads = [_get_thread_from_model(m) for m in thread_models]
     messages = feedback_models.GeneralFeedbackMessageModel.get_multi(
-        last_two_messages_ids)
+        itertools.chain.from_iterable(
+            t.get_last_two_message_ids() for t in threads))
 
-    last_two_messages = [
+    last_two_messages_of_threads = [
         messages[i:i + 2] for i in python_utils.RANGE(0, len(messages), 2)]
-    last_message_is_read = False
 
     thread_summaries = []
     number_of_unread_threads = 0
-    for index, thread in enumerate(threads):
-        feedback_thread_user_model_exists = (
-            feedback_thread_user_models[index] is not None)
-        if feedback_thread_user_model_exists:
-            last_message_is_read = (
-                last_two_messages[index][0].message_id
-                in feedback_thread_user_models[index].message_ids_read_by_user)
+    for thread, last_two_messages, thread_user_model, exploration in zip(
+            threads, last_two_messages_of_threads, thread_user_models,
+            explorations):
+        message_ids_read_by_user = (
+            () if thread_user_model is None else
+            thread_user_model.message_ids_read_by_user)
 
-        if last_two_messages[index][0].author_id is None:
-            author_last_message = None
-        else:
-            author_last_message = user_services.get_username(
-                last_two_messages[index][0].author_id)
+        last_message, second_last_message = last_two_messages
 
-        second_last_message_is_read = False
-        author_second_last_message = None
+        author_last_message = (
+            last_message.author_id and
+            user_services.get_username(last_message.author_id))
+        last_message_is_read = (
+            last_message.message_id in message_ids_read_by_user)
 
-        does_second_message_exist = (last_two_messages[index][1] is not None)
-        if does_second_message_exist:
-            if feedback_thread_user_model_exists:
-                second_last_message_is_read = (
-                    last_two_messages[index][1].message_id
-                    in feedback_thread_user_models[index].message_ids_read_by_user) # pylint: disable=line-too-long
+        author_second_last_message = (
+            second_last_message and second_last_message.author_id and
+            user_services.get_username(second_last_message.author_id))
+        second_last_message_is_read = (
+            second_last_message is not None and
+            second_last_message.message_id in message_ids_read_by_user)
 
-            if last_two_messages[index][1].author_id is not None:
-                author_second_last_message = user_services.get_username(
-                    last_two_messages[index][1].author_id)
         if not last_message_is_read:
             number_of_unread_threads += 1
-
-        total_message_count = thread.message_count
-
-        thread_summary = {
+        thread_summaries.append({
             'status': thread.status,
             'original_author_id': thread.original_author_id,
             'last_updated': utils.get_time_in_millisecs(thread.last_updated),
-            'last_message_text': last_two_messages[index][0].text,
-            'total_message_count': total_message_count,
+            'last_message_text': last_message.text,
+            'total_message_count': thread.message_count,
             'last_message_is_read': last_message_is_read,
             'second_last_message_is_read': second_last_message_is_read,
             'author_last_message': author_last_message,
             'author_second_last_message': author_second_last_message,
-            'exploration_title': explorations[index].title,
-            'exploration_id': exploration_ids[index],
-            'thread_id': thread_ids[index]
-        }
-
-        thread_summaries.append(thread_summary)
+            'exploration_title': exploration.title,
+            'exploration_id': exploration.id,
+            'thread_id': thread.id,
+        })
     return thread_summaries, number_of_unread_threads
 
 
@@ -543,7 +522,7 @@ def get_threads(entity_type, entity_id):
     """
     thread_models = feedback_models.GeneralFeedbackThreadModel.get_threads(
         entity_type, entity_id)
-    return [_get_thread_from_model(model) for model in thread_models]
+    return [_get_thread_from_model(m) for m in thread_models]
 
 
 def get_thread(thread_id):
@@ -555,8 +534,8 @@ def get_thread(thread_id):
     Returns:
         FeedbackThread. The resulting FeedbackThread domain object.
     """
-    model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
-    return _get_thread_from_model(model)
+    return _get_thread_from_model(
+        feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id))
 
 
 def get_thread_subject(thread_id):
@@ -583,13 +562,11 @@ def get_closed_threads(entity_type, entity_id, has_suggestion):
     Returns:
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
-    threads = get_threads(entity_type, entity_id)
-    closed_threads = []
-    for thread in threads:
+    return [
+        thread for thread in get_threads(entity_type, entity_id)
         if (thread.has_suggestion == has_suggestion and
-                thread.status != feedback_models.STATUS_CHOICES_OPEN):
-            closed_threads.append(thread)
-    return closed_threads
+            thread.status != feedback_models.STATUS_CHOICES_OPEN)
+    ]
 
 
 def get_all_threads(entity_type, entity_id, has_suggestion):
@@ -606,12 +583,10 @@ def get_all_threads(entity_type, entity_id, has_suggestion):
     Returns:
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
-    threads = get_threads(entity_type, entity_id)
-    all_threads = []
-    for thread in threads:
-        if thread.has_suggestion == has_suggestion:
-            all_threads.append(thread)
-    return all_threads
+    return [
+        thread for thread in get_threads(entity_type, entity_id)
+        if thread.has_suggestion == has_suggestion
+    ]
 
 
 def get_all_thread_participants(thread_id):
@@ -623,8 +598,10 @@ def get_all_thread_participants(thread_id):
     Returns:
         set(str). A set containing all author_ids of participants in the thread.
     """
-    return set([m.author_id for m in get_messages(thread_id)
-                if user_services.is_user_registered(m.author_id)])
+    return {
+        message.author_id for message in get_messages(thread_id)
+        if user_services.is_user_registered(message.author_id)
+    }
 
 
 def enqueue_feedback_message_batch_email_task(user_id):
