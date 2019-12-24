@@ -337,8 +337,8 @@ def get_thread_analytics_multi(exploration_ids):
         exploration_ids: list(str). A list of exploration ids.
 
     Returns:
-        list(FeedbackAnalytics). It's in the the same order as the input list.
-            If the exploration id is invalid, the number of threads in the
+        list(FeedbackAnalytics). Analytics in the the same order as the input
+            list. If an exploration id is invalid, the number of threads in the
             corresponding FeedbackAnalytics object will be zero.
     """
     return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics_multi( # pylint: disable=line-too-long
@@ -422,31 +422,28 @@ def get_thread_summaries(user_id, thread_ids):
 
     Returns:
         tuple(thread_summaries, number_of_unread_threads), where:
-            thread_summaries: list(dict). A list of dictionaries containing the
-                summaries of the threads given to it. Each dict has the
-                following keys:
-                    status: str. The status of the thread.
-                    original_author_id: str. The id of the original author of
-                        the thread.
-                    last_updated: datetime.datetime. When was the thread last
-                        updated.
-                    last_message_text: str. The text of the last message.
-                    total_message_count: int. The total number of messages in
-                        the thread.
-                    last_message_is_read: bool. Whether the last message is read
-                        by the user.
-                    second_last_message_is_read: bool. Whether the second last
-                        message is read by the user,
-                    author_last_message: str. The name of the author of the last
-                        message.
-                    author_second_last_message: str. The name of the author of
-                        the second last message.
-                    exploration_title: str. The title of the exploration to
-                        which exploration belongs.
-                    exploration_id: str. The id of the exploration associated to
-                        the thread.
-                    thread_id: str. The id of the thread this dict is
-                        describing.
+            thread_summaries: list(dict). Each dict has the following keys:
+                status: str. The status of the thread.
+                original_author_id: str. The id of the original author of the
+                    thread.
+                last_updated: datetime.datetime. When was the thread last
+                    updated.
+                last_message_text: str. The text of the last message.
+                total_message_count: int. The total number of messages in the
+                    thread.
+                last_message_is_read: bool. Whether the last message is read by
+                    the user.
+                second_last_message_is_read: bool. Whether the second last
+                    message is read by the user,
+                author_last_message: str. The name of the author of the last
+                    message.
+                author_second_last_message: str. The name of the author of the
+                    second last message.
+                exploration_title: str. The title of the exploration to which
+                    exploration belongs.
+                exploration_id: str. The id of the exploration associated to the
+                    thread.
+                thread_id: str. The id of the thread this dict is describing.
             number_of_unread_threads: int. The number of threads not read by the
                 user.
     """
@@ -923,8 +920,8 @@ def _add_message_to_email_buffer(
             new_status, exploration_id, has_suggestion)
 
     if message_length:
-        # Send feedback message email only if message text is non empty.
-        # It can be empty in the case when only status is changed.
+        # Send feedback message email only if message text is non empty. It can
+        # be empty in the case when only status is changed.
         _send_batch_emails(
             batch_recipient_ids, feedback_message_reference, exploration_id,
             has_suggestion)
