@@ -41,8 +41,8 @@ angular.module('oppia').directive('subtopicViewerNavbarBreadcrumb', [
           };
           SubtopicViewerBackendApiService.fetchSubtopicData(
             $scope.topicName, UrlService.getSubtopicIdFromUrl()).then(
-            function(subtopicDataDict) {
-              $scope.subtopicTitle = subtopicDataDict.subtopic_title;
+            function(subtopicDataObject) {
+              $scope.subtopicTitle = subtopicDataObject.getSubtopicTitle();
             });
         }
       ]
