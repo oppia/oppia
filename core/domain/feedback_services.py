@@ -46,15 +46,16 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 def get_exp_id_from_thread_id(thread_id):
     """Returns the exploration_id part of the thread_id.
 
+    TODO(nithesh): Once feedback threads are generalized, this function needs to
+    be edited to get id of a general entity. For the moment, the function will
+    return the exploration_id from a thread_id.
+
     Args:
         thread_id: str. The id of the thread.
 
     Returns:
         str. The exploration id part of the thread_id.
     """
-    # TODO(nithesh): Once feedback threads are generalized, this function needs
-    # to be edited to get id of a general entity. For the moment, the function
-    # will return the exploration_id from a thread_id.
     return thread_id.split('.')[1]
 
 
