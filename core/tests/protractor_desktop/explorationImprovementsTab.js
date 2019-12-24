@@ -22,6 +22,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -323,13 +324,13 @@ describe('Suggestions Improvements', function() {
     users.createAndLoginAdminUser(
       'user4@ExplorationSuggestions.com',
       'configExplorationSuggestions');
-    // TODO(#7569): Remove redundant set after feedback tab is phased out.
+    TODO(#7569): Remove redundant set after feedback tab is phased out.
     adminPage.editConfigProperty(
       'Exposes the Improvements Tab for creators in the exploration editor.',
       'Boolean', (element) => element.setValue(true));
   });
 
-  it('accepts & rejects a suggestion on a published exploration', function() {
+  fit('accepts & rejects a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
@@ -368,6 +369,7 @@ describe('Suggestions Improvements', function() {
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
+    waitFor.pageToFullyLoad();
 
     var taskToReject = improvementsTab.getSuggestionTask(
       suggestionDescription2);
@@ -375,6 +377,7 @@ describe('Suggestions Improvements', function() {
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
+    waitFor.pageToFullyLoad();
 
     improvementsTab.setShowOnlyOpenTasks(false);
     var acceptedTask = improvementsTab.getSuggestionTask(
