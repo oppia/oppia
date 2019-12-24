@@ -104,7 +104,7 @@ ALL_ERRORS = []
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
-MAX_CONCURRENT_RUNS = 24
+MAX_CONCURRENT_RUNS = 30
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
