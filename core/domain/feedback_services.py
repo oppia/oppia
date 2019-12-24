@@ -254,8 +254,8 @@ def _get_message_from_model(message_model):
     """Converts the FeedbackMessageModel to a FeedbackMessage.
 
     Args:
-        message_model: FeedbackMessageModel. The FeedbackMessageModel to
-            be converted.
+        message_model: FeedbackMessageModel. The FeedbackMessageModel to be
+            converted.
 
     Returns:
         FeedbackMessage. The resulting FeedbackMessage domain object.
@@ -329,9 +329,9 @@ def get_next_page_of_all_feedback_messages(
 def get_thread_analytics_multi(exploration_ids):
     """Fetches all FeedbackAnalytics, for all the given exploration ids.
 
-    A FeedbackAnalytics contains the exploration id the analytics
-    belongs to, how many open threads exist for the exploration,
-    how many total threads exist for the exploration.
+    A FeedbackAnalytics contains the exploration id the analytics belongs to,
+    how many open threads exist for the exploration, how many total threads
+    exist for the exploration.
 
     Args:
         exploration_ids: list(str). A list of exploration ids.
@@ -609,9 +609,12 @@ def enqueue_feedback_message_instant_email_task(user_id, reference):
         reference: FeedbackMessageReference. A reference that contains the data
             needed to identify the feedback message.
     """
+    payload = {
+        'user_id': user_id,
+        'reference_dict': reference.to_dict(),
+    }
     taskqueue_services.enqueue_email_task(
-        feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS,
-        {'user_id': user_id, 'reference_dict': reference.to_dict()}, 0)
+        feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS, payload, 0)
 
 
 def _enqueue_feedback_thread_status_change_email_task(
