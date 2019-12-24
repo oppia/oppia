@@ -48,7 +48,7 @@ def get_exp_id_from_thread_id(thread_id):
 
     TODO(nithesh): Once feedback threads are generalized, this function needs to
     be updated to get the id from any general entity, not just explorations. At
-    the moment, it assumes that the thread id is always associated to an
+    the moment, it still assumes that the thread id is associated to an
     exploration.
 
     Args:
@@ -204,9 +204,8 @@ def create_message(
         if suggestion:
             suggestion.put()
 
-    if (user_services.is_user_registered(author_id) and
-            feconf.CAN_SEND_EMAILS and feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
-        # Send feedback message email if user is registered.
+    if (feconf.CAN_SEND_EMAILS and feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
+            user_services.is_user_registered(author_id)):
         _add_message_to_email_buffer(
             author_id, thread_id, message_id, len(text), old_status, new_status)
 
@@ -370,7 +369,7 @@ def get_total_open_threads(feedback_analytics):
         int. The count of all open threads for the given FeedbackAnalytics
             domain object.
     """
-    return sum(a.num_open_threads for a in feedback_analytics)
+    return sum(feedback.num_open_threads for feedback in feedback_analytics)
 
 
 def get_multiple_threads(thread_ids):
@@ -423,7 +422,7 @@ def get_thread_summaries(user_id, thread_ids):
 
     Returns:
         tuple(thread_summaries, number_of_unread_threads), where:
-            thread_summaries: list(dict). Has the keys:
+            thread_summaries: list(dict). Each dict has the keys:
                 status: str. The status of the thread.
                 original_author_id: str. The id of the original author of the
                     thread.

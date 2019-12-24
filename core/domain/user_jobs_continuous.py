@@ -97,7 +97,7 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
         user_model = (
             user_models.UserRecentChangesBatchModel.get(user_id, strict=False))
         job_queued_msec = user_model and user_model.job_queued_msec
-        recent_notifications = () if user_model is None else user_model.output
+        recent_notifications = [] if user_model is None else user_model.output
         return (job_queued_msec, recent_notifications)
 
 
