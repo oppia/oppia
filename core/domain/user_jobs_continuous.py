@@ -280,8 +280,8 @@ class RecentUpdatesMRJobManager(
                     'author_id': last_message.author_id,
                     'last_updated_ms': utils.get_time_in_millisecs(
                         last_message.created_on),
-                    'subject': feedback_services.get_thread_subject(
-                        last_message.thread_id),
+                    'subject': feedback_services.get_thread(
+                        last_message.thread_id).subject,
                 })
 
     @staticmethod
