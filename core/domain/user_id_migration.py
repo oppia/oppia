@@ -117,6 +117,9 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             migration_field == old_user_id).fetch()
         for model in found_models:
             model_values = model.to_dict()
+            # We need to get the string name of the field here and in order to
+            # make the query for the model (on one of the previous lines) easy
+            # to form the model field needs to be in the object format.
             model_values[migration_field._name] = new_user_id  # pylint: disable=protected-access
             model.populate(**model_values)
             model_class.put_multi([model], update_last_updated_time=False)
@@ -488,6 +491,10 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
+            # We need to get the string name of the field here and because
+            # the get_user_id_migration_field method is primary implemented
+            # for use in the UserIdMigrationJob for forming query it needs
+            # to return the field as an object.
             user_id = model.to_dict()[
                 model_class.get_user_id_migration_field()._name]  # pylint: disable=protected-access
             if user_id is None:
