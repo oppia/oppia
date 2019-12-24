@@ -116,8 +116,8 @@ class RecentUpdatesMRJobManager(
 
     @staticmethod
     def _get_most_recent_activity_commits(
-            activity_model_cls, activity_ids_list,
-            activity_type, commit_type, delete_commit_message):
+            activity_model_cls, activity_ids_list, activity_type, commit_type,
+            delete_commit_message):
         """Gets and returns a list of dicts representing the most recent commits
         made for each activity represented by each ID provided in the
         activity_ids_list parameter. These are the latest commits made by users
@@ -213,8 +213,8 @@ class RecentUpdatesMRJobManager(
 
     @staticmethod
     def map(item):
-        """Implements the map function (generator).
-        Computes most recent activity commits and feedbacks of a specific user.
+        """Implements the map function (generator). Computes most recent
+        activity commits and feedbacks of a specific user.
 
         Args:
             item: UserSubscriptionsModel. An instance of UserSubscriptionsModel.
@@ -323,8 +323,8 @@ class RecentUpdatesMRJobManager(
 class UserStatsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     """Storage class for entities in the realtime layer. See
-    jobs.BaseRealtimeDatastoreClassForContinuousComputations class
-    for more details.
+    jobs.BaseRealtimeDatastoreClassForContinuousComputations class for more
+    details.
     """
     total_plays = ndb.IntegerProperty(default=0)
     num_ratings = ndb.IntegerProperty(default=0)
@@ -336,9 +336,9 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
     dashboard.
 
     This job does not have a working realtime component: the
-    UserStatsRealtimeModel does nothing. There will be a delay in
-    propagating new updates to the view; the length of the
-    delay will be approximately the time it takes a batch job to run.
+    UserStatsRealtimeModel does nothing. There will be a delay in propagating
+    new updates to the view; the length of the delay will be approximately the
+    time it takes a batch job to run.
     """
     @classmethod
     def get_event_types_listened_to(cls):
@@ -367,9 +367,8 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 triggered and the total play count is incremented. If he/she
                 rates an exploration, an event of type `rate` is triggered and
                 average rating of the realtime model is refreshed.
-            *args: tuple(*).
-                If event_type is 'start', then this is a 1-element tuple
-                containing:
+            *args: tuple(*). If event_type is 'start', then this is a 1-element
+                tuple containing:
                     str. The ID of the exploration currently being played.
                 If event_type is 'rate_exploration', then this is a 3-element
                 tuple containing:
@@ -535,20 +534,19 @@ class UserStatsMRJobManager(
             item: ExpSummaryModel. An instance of ExpSummaryModel.
 
         Yields:
-            This function may yield as many times as appropriate 2-tuples in the
-            format (str, dict), where
-            - str. The unique ID of the user.
-            - dict: A dict that includes entries for all the explorations that
-                this user contributes to or owns. Each entry has the following
-                keys:
-                - 'exploration_impact_score': float. The impact score of all the
-                    explorations contributed to by the user.
-                - 'total_plays_for_owned_exp': int. Total plays of all
-                    explorations owned by the user.
-                - 'average_rating_for_owned_exp': float. Average of average
-                    ratings of all explorations owned by the user.
-                - 'num_ratings_for_owned_exp': int. Total number of ratings of
-                    all explorations owned by the user.
+            tuple(owner_id, exploration_data), where:
+                owner_id: str. The unique ID of the user.
+                exploration_data: dict. A dict that includes entries for all the
+                    explorations that this user contributes to or owns. Each
+                    entry has the following keys:
+                        exploration_impact_score: float. The impact score of all
+                            the explorations contributed to by the user.
+                        total_plays_for_owned_exp: int. Total plays of all
+                            explorations owned by the user.
+                        average_rating_for_owned_exp: float. Average of average
+                            ratings of all explorations owned by the user.
+                        num_ratings_for_owned_exp: int. Total number of ratings
+                            of all explorations owned by the user.
         """
         if item.deleted:
             return
@@ -616,7 +614,7 @@ class UserStatsMRJobManager(
             # 'average ratings' and 'total plays' as well.
             if contrib_id in exploration_summary.owner_ids:
                 mapped_owner_ids.append(contrib_id)
-                # Get num starts (total plays) for the exploration.
+                # Get number of starts (total plays) for the exploration.
                 exploration_data.update({
                     'total_plays_for_owned_exp': num_starts,
                 })
@@ -631,7 +629,7 @@ class UserStatsMRJobManager(
         for owner_id in exploration_summary.owner_ids:
             if owner_id not in mapped_owner_ids:
                 mapped_owner_ids.append(owner_id)
-                # Get num starts (total plays) for the exploration.
+                # Get number of starts (total plays) for the exploration.
                 exploration_data = {
                     'total_plays_for_owned_exp': num_starts,
                 }
@@ -657,14 +655,14 @@ class UserStatsMRJobManager(
             stringified_values: list(str). A list of information regarding all
                 the explorations that this user contributes to or owns. Each
                 entry is a stringified dict having the following keys:
-                - 'exploration_impact_score': float. The impact score of all the
-                    explorations contributed to by the user.
-                - 'total_plays_for_owned_exp': int. Total plays of all
-                    explorations owned by the user.
-                - 'average_rating_for_owned_exp': float. Average of average
-                    ratings of all explorations owned by the user.
-                - 'num_ratings_for_owned_exp': int. Total number of ratings of
-                    all explorations owned by the user.
+                    exploration_impact_score: float. The impact score of all the
+                        explorations contributed to by the user.
+                    total_plays_for_owned_exp: int. Total plays of all
+                        explorations owned by the user.
+                    average_rating_for_owned_exp: float. Average of average
+                        ratings of all explorations owned by the user.
+                    num_ratings_for_owned_exp: int. Total number of ratings of
+                        all explorations owned by the user.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
         exponent = python_utils.divide(2.0, 3)
