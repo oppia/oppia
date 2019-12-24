@@ -509,8 +509,9 @@ class UserStatsMRJobManager(
         - Impact score for all explorations contributed to by the user.
 
     The impact of user is defined as `S ** (2 / 3)` where S is the sum over all
-    explorations this user has contributed to determined by the value:
-        `round(per_user * reach * fractional_contribution)`, where:
+    explorations this user has contributed to determined by the value (rounded
+    to nearest integer):
+        `per_user * reach * fractional_contribution`, where:
             per_user: average rating - 2.
             reach: sum(card.answers_given for card in all_cards) ** (2 / 3).
             fractional_contribution: percent of commits by this user.
