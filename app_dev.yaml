@@ -345,7 +345,6 @@ skip_files:
 - third_party/static/ckeditor-4.12.1/plugins/stylesheetparser
 - third_party/static/ckeditor-4.12.1/plugins/table
 - third_party/static/ckeditor-4.12.1/plugins/tableresize
-- third_party/static/ckeditor-4.12.1/plugins/tableselection
 - third_party/static/ckeditor-4.12.1/plugins/tabletools
 - third_party/static/ckeditor-4.12.1/plugins/textmatch
 - third_party/static/ckeditor-4.12.1/plugins/textwatcher
