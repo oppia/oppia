@@ -273,7 +273,7 @@ def get_messages(thread_id):
     """Fetches all messages of the given thread.
 
     Args:
-        thread_id: str.
+        thread_id: str. The id of the thread.
 
     Returns:
         list(FeedbackMessage). Contains all the messages in the thread.
@@ -289,8 +289,8 @@ def get_message(thread_id, message_id):
     """Fetches the message indexed by thread_id and message_id.
 
     Args:
-        thread_id: str.
-        message_id: int.
+        thread_id: str. The id of the thread.
+        message_id: int. The id of the message, relative to the thread.
 
     Returns:
         FeedbackMessage. The fetched message.
@@ -346,13 +346,13 @@ def get_thread_analytics_multi(exploration_ids):
 
 
 def get_thread_analytics(exploration_id):
-    """Fetches the FeedbackAnalytics for the given exploration id.
+    """Fetches the FeedbackAnalytics for the given exploration.
 
     Args:
-        exploration_id: str.
+        exploration_id: str. The id of the exploration.
 
     Returns:
-        FeedbackAnalytics.
+        FeedbackAnalytics. The feedback analytics of the given exploration.
     """
     return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics( # pylint: disable=line-too-long
         exploration_id)
@@ -487,12 +487,15 @@ def get_thread_summaries(user_id, thread_ids):
 
         last_message, second_last_message = last_two_messages
 
+        # The last message is never None because all threads have at least one
+        # message.
         author_last_message = (
             last_message.author_id and
             user_services.get_username(last_message.author_id))
         last_message_is_read = (
             last_message.message_id in message_ids_read_by_user)
 
+        # The second-to-last message, however, can be None.
         author_second_last_message = (
             second_last_message and second_last_message.author_id and
             user_services.get_username(second_last_message.author_id))
@@ -538,7 +541,7 @@ def get_thread(thread_id):
     """Fetches the thread by thread id.
 
     Args:
-        thread_id: str.
+        thread_id: str. The id of the thread.
 
     Returns:
         FeedbackThread. The resulting FeedbackThread domain object.
@@ -599,21 +602,6 @@ def get_all_threads(entity_type, entity_id, has_suggestion):
     ]
 
 
-def get_all_thread_participants(thread_id):
-    """Fetches all participants of the given thread.
-
-    Args:
-        thread_id: str.
-
-    Returns:
-        set(str). A set containing all author_ids of participants in the thread.
-    """
-    return {
-        message.author_id for message in get_messages(thread_id)
-        if user_services.is_user_registered(message.author_id)
-    }
-
-
 def enqueue_feedback_message_batch_email_task(user_id):
     """Adds a 'send feedback email' (batch) task into the task queue.
 
@@ -652,7 +640,7 @@ def _enqueue_feedback_thread_status_change_email_task(
         'user_id': user_id,
         'reference_dict': reference.to_dict(),
         'old_status': old_status,
-        'new_status': new_status
+        'new_status': new_status,
     }
     taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_FEEDBACK_STATUS_EMAILS, payload, 0)
@@ -751,19 +739,19 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
 
     Args:
         user_id: str. The user who created this reference.
-        exploration_id: str.
-        thread_id: str.
+        exploration_id: str. The id of the exploration.
+        thread_id: str. The id of the thread.
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
     if model is None:
         # Model exists only if user has received feedback on exploration.
         return
 
-    updated_references = []
-    for reference in model.feedback_message_references:
+    updated_references = [
+        reference for reference in model.feedback_message_references
         if (reference['entity_id'] != exploration_id or
-                reference['thread_id'] != thread_id):
-            updated_references.append(reference)
+            reference['thread_id'] != thread_id)
+    ]
 
     if not updated_references:
         # Note that any tasks remaining in the email queue will still be
@@ -792,28 +780,30 @@ def _get_all_recipient_ids(exploration_id, thread_id, author_id):
     the other recipients.
 
     Args:
-        exploration_id: str.
-        thread_id: str.
+        exploration_id: str. The id of the exploration.
+        thread_id: str. The id of the thread.
         author_id: str. One author of the given exploration_id.
 
     Returns:
         tuple(batch_recipients, other_recipients), where:
-            batch_recipients: set(str). The user_ids of the authors excluding
+            batch_recipients: list(str). The user_ids of the authors excluding
                 the given author.
-            other_recipients: set(str). The user_ids of the other participants
+            other_recipients: list(str). The user_ids of the other participants
                 in this thread, excluding owners of the exploration and the
                 given author.
     """
     exploration_rights = rights_manager.get_exploration_rights(exploration_id)
 
     owner_ids = set(exploration_rights.owner_ids)
-    participant_ids = get_all_thread_participants(thread_id)
-    sender_id = {author_id}
+    participant_ids = {
+        message.author_id for message in get_messages(thread_id)
+        if user_services.is_user_registered(message.author_id)
+    }
 
-    batch_recipient_ids = owner_ids - sender_id
-    other_recipient_ids = participant_ids - batch_recipient_ids - sender_id
+    batch_recipient_ids = owner_ids - {author_id}
+    other_recipient_ids = participant_ids - batch_recipient_ids - {author_id}
 
-    return (batch_recipient_ids, other_recipient_ids)
+    return (list(batch_recipient_ids), list(other_recipient_ids))
 
 
 def _send_batch_emails(
@@ -832,11 +822,11 @@ def _send_batch_emails(
         has_suggestion: bool. Whether this thread has a related learner
             suggestion.
     """
-    can_users_receive_email = (
-        email_manager.can_users_receive_thread_email(
-            recipient_list, exploration_id, has_suggestion))
-    for index, recipient_id in enumerate(recipient_list):
-        if can_users_receive_email[index]:
+    can_recipients_receive_email = email_manager.can_users_receive_thread_email(
+        recipient_list, exploration_id, has_suggestion)
+    for recipient_id, can_receive_email in python_utils.ZIP(
+            recipient_list, can_recipients_receive_email):
+        if can_receive_email:
             transaction_services.run_in_transaction(
                 _add_feedback_message_reference, recipient_id,
                 feedback_message_reference)
@@ -857,11 +847,11 @@ def _send_instant_emails(
         has_suggestion: bool. Whether this thread has a related learner
             suggestion.
     """
-    can_users_receive_email = (
-        email_manager.can_users_receive_thread_email(
-            recipient_list, exploration_id, has_suggestion))
-    for index, recipient_id in enumerate(recipient_list):
-        if can_users_receive_email[index]:
+    can_recipients_receive_email = email_manager.can_users_receive_thread_email(
+        recipient_list, exploration_id, has_suggestion)
+    for recipient_id, can_receive_email in python_utils.ZIP(
+            recipient_list, can_recipients_receive_email):
+        if can_receive_email:
             transaction_services.run_in_transaction(
                 enqueue_feedback_message_instant_email_task, recipient_id,
                 feedback_message_reference)
@@ -882,11 +872,11 @@ def _send_feedback_thread_status_change_emails(
         has_suggestion: bool. Whether this thread has a related learner
             suggestion.
     """
-    can_users_receive_email = (
-        email_manager.can_users_receive_thread_email(
-            recipient_list, exploration_id, has_suggestion))
-    for index, recipient_id in enumerate(recipient_list):
-        if can_users_receive_email[index]:
+    can_recipients_receive_email = email_manager.can_users_receive_thread_email(
+        recipient_list, exploration_id, has_suggestion)
+    for recipient_id, can_receive_email in python_utils.ZIP(
+            recipient_list, can_recipients_receive_email):
+        if can_receive_email:
             transaction_services.run_in_transaction(
                 _enqueue_feedback_thread_status_change_email_task, recipient_id,
                 feedback_message_reference, old_status, new_status)
