@@ -66,27 +66,6 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             $scope.cancelSuggestion = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
-            $scope.$on('changed', function(evt, data) {
-              var compare2 = data;
-              var compare = $scope.originalHtml;
-              var undoRegExp = new RegExp(['<div class="oppia-rte-component',
-                '-container" type="oppia-noninteractive-.+?\\b[^>]*>']
-                .join(''), 'gm');
-              compare2 = compare2.replace(undoRegExp, '');
-              compare2 = compare2.replace(/<\/div>/gm, '');
-              compare2 = compare2.replace(/^\s*[\r\n]/gm, '').trim();
-              compare = compare.replace(/^\s*[\r\n]/gm, '').trim();
-              if (compare === compare2) {
-                $scope.$apply(function() {
-                  $scope.ifContentChanged = false;
-                });
-              } else {
-                $scope.$apply(function() {
-                  $scope.ifContentChanged = true;
-                });
-              }
-            });
-
             $scope.submitSuggestion = function() {
               var data = {
                 target_id: ExplorationEngineService.getExplorationId(),

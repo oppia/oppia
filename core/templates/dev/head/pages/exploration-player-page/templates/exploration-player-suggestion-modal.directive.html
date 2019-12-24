@@ -12,7 +12,7 @@
 
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancelSuggestion()">Cancel</button>
-  <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="!ifContentChanged || !description">
+  <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(suggestionData.suggestionHtml == originalHtml) || !description">
     Submit Suggestion
   </button>
 </div>

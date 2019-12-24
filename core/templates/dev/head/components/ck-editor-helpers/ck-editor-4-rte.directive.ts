@@ -20,8 +20,8 @@ require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 
 angular.module('oppia').directive('ckEditor4Rte', [
-  '$rootScope', 'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
-  function($rootScope, ContextService, RteHelperService, PAGE_CONTEXT) {
+  'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
+  function(ContextService, RteHelperService, PAGE_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -44,13 +44,16 @@ angular.module('oppia').directive('ckEditor4Rte', [
           ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
+        var contextIsExplorationPlayer = (
+          ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_PLAYER);
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||
             (!canUseFs && componentDefn.requiresFs) ||
-            (!contextIsLessonRelated && componentDefn.isLessonRelated))) {
+            (!contextIsLessonRelated && componentDefn.isLessonRelated)) ||
+            (contextIsExplorationPlayer && componentDefn.id === 'image')) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
@@ -95,8 +98,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
           'bulletedList', 'pre', 'indent', 'outdent'];
 
         // Add external plugins.
-        // prevents ckeditor from filtering content.
-        CKEDITOR.config.allowedContent = true;
         CKEDITOR.plugins.addExternal(
           'sharedspace',
           '/third_party/static/ckeditor-4.12.1/plugins/sharedspace/',
@@ -239,8 +240,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
               break;
             }
           }
-          var data = elt.html();
-          $rootScope.$broadcast('changed', data);
           ngModel.$setViewValue(elt.html());
         });
 
