@@ -384,12 +384,6 @@ describe('Suggestions Improvements', function() {
       suggestionDescription1);
     var rejectedTask = improvementsTab.getSuggestionTask(
       suggestionDescription2);
-    var taskStatusLocator = by.css('.protractor-test-improvements-task-status');
-    console.log(taskStatusLocator);
-    console.log('---------------------------------------------------');
-    console.log(acceptedTask.element(taskStatusLocator));
-    console.log('---------------------------------------------------');
-    console.log(improvementsTab.getTaskStatus(acceptedTask));
 //     expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
 //     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 
