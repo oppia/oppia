@@ -3024,6 +3024,7 @@ class Exploration(python_utils.OBJECT):
     def _convert_v29_dict_to_v30_dict(cls, exp_id, exploration_dict):
         """Converts a v29 exploration dict into a v30 exploration dict.
         Args:
+            exp_id: str. ID of the exploration.
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v29.
         Returns:
