@@ -33,6 +33,7 @@ venv/
 .vagrant/*
 .lock
 yarn-error.log
+.protractor-fail-fast
 
 # Oppia uses cache slugs for various resources and we need separate resource
 # directories for dev and prod. Resource directories for prod are generated
