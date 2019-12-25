@@ -384,8 +384,14 @@ describe('Suggestions Improvements', function() {
       suggestionDescription1);
     var rejectedTask = improvementsTab.getSuggestionTask(
       suggestionDescription2);
-//     expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
-//     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
+    waitFor.visibilityOf(
+      acceptedTask,
+      'Accepted task not visible.');
+    waitFor.visibilityOf(
+      rejectedTask,
+      'Accepted task not visible.');
+    expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
+    expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
