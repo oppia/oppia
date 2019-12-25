@@ -378,15 +378,20 @@ describe('Suggestions Improvements', function() {
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
     waitFor.pageToFullyLoad();
+    console.log('------------------------------------done1');
 
     improvementsTab.setShowOnlyOpenTasks(false);
-    waitFor.pageToFullyLoad();
+    console.log('------------------------------------done2');
     var acceptedTask = improvementsTab.getSuggestionTask(
       suggestionDescription1);
+    console.log('------------------------------------done3');
     var rejectedTask = improvementsTab.getSuggestionTask(
       suggestionDescription2);
+    console.log('------------------------------------done4');
     expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
+    console.log('------------------------------------done5');
     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
+    console.log('------------------------------------done6');
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
