@@ -380,10 +380,10 @@ describe('Suggestions Improvements', function() {
     waitFor.pageToFullyLoad();
 
     improvementsTab.setShowOnlyOpenTasks(false);
-//     var acceptedTask = improvementsTab.getSuggestionTask(
-//       suggestionDescription1);
-//     var rejectedTask = improvementsTab.getSuggestionTask(
-//       suggestionDescription2);
+    var acceptedTask = improvementsTab.getSuggestionTask(
+      suggestionDescription1);
+    var rejectedTask = improvementsTab.getSuggestionTask(
+      suggestionDescription2);
 //     expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
 //     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 
