@@ -330,7 +330,7 @@ describe('Suggestions Improvements', function() {
       'Boolean', (element) => element.setValue(true));
   });
 
-  fit('accepts & rejects a suggestion on a published exploration', function() {
+  it('accepts & rejects a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
@@ -379,17 +379,13 @@ describe('Suggestions Improvements', function() {
     improvementsTab.rejectSuggestion();
     waitFor.pageToFullyLoad();
 
+    browser.driver.navigate().refresh();
+
     improvementsTab.setShowOnlyOpenTasks(false);
     var acceptedTask = improvementsTab.getSuggestionTask(
       suggestionDescription1);
     var rejectedTask = improvementsTab.getSuggestionTask(
       suggestionDescription2);
-    waitFor.visibilityOf(
-      acceptedTask,
-      'Accepted task not visible.');
-    waitFor.visibilityOf(
-      rejectedTask,
-      'Accepted task not visible.');
     expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 
