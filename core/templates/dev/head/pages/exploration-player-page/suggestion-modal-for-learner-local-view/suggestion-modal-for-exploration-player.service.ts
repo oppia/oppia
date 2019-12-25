@@ -50,10 +50,8 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             var stateName = PlayerPositionService.getCurrentStateName();
             var displayedCard = PlayerTranscriptService.getCard(
               PlayerPositionService.getDisplayedCardIndex());
-
             $scope.originalHtml = displayedCard.getContentHtml();
             $scope.description = '';
-            $scope.ifContentChanged = false;
             // ng-model needs to bind to a property of an object on
             // the scope (the property cannot sit directly on the scope)
             // Reference https://stackoverflow.com/q/12618342
