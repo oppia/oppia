@@ -671,9 +671,6 @@ of the failed tests in ../protractor-screenshots/
         def mock_cleanup():
             return
 
-        def mock_tweak_feconf_file(unused_file, unused_arg):
-            return
-
         def mock_build_js_files(unused_arg):
             return
 
@@ -699,7 +696,7 @@ of the failed tests in ../protractor-screenshots/
                 return
             result = MockProcessClass()
             result.communicate = mock_communicate # pylint: disable=attribute-defined-outside-init
-            result.returncode = 0
+            result.returncode = 0 # pylint: disable=attribute-defined-outside-init
             return result
 
         def mock_exit(unused_code):
@@ -718,9 +715,6 @@ of the failed tests in ../protractor-screenshots/
             atexit, 'register', mock_register, expected_args=(mock_cleanup,))
 
         cleanup_swap = self.swap(run_e2e_tests, 'cleanup', mock_cleanup)
-        tweak_feconf_file_swap = self.swap_with_checks(
-            run_e2e_tests, 'tweak_feconf_file', mock_tweak_feconf_file,
-            expected_args=(run_e2e_tests.FECONF_FILE_PATH, False,))
         build_swap = self.swap_with_checks(
             run_e2e_tests, 'build_js_files', mock_build_js_files,
             expected_args=(True,))
