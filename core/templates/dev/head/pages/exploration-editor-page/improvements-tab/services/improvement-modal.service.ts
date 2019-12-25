@@ -188,7 +188,7 @@ angular.module('oppia').factory('ImprovementModalService', [
       },
 
       openSuggestionThread: function(thread) {
-        var openSuggestionReviewer = this.openSuggestionReviewer;
+        var openSuggestionReviewModal = this.openSuggestionReviewModal;
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/improvements-tab/templates/' +
@@ -212,7 +212,6 @@ angular.module('oppia').factory('ImprovementModalService', [
               $scope.getLocaleAbbreviatedDatetimeString = (
                 DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
               $scope.EditabilityService = EditabilityService;
-              $scope.openSuggestionReviewer = openSuggestionReviewer;
 
               // Initial load of the thread list on page load.
               $scope.tmpMessage = {
@@ -248,6 +247,12 @@ angular.module('oppia').factory('ImprovementModalService', [
                     $scope.messageSendingInProgress = false;
                   }).then($uibModalInstance.close);
               };
+
+              $scope.onClickReviewSuggestion = function() {
+                $scope.messageSendingInProgress = true;
+                openSuggestionReviewModal($scope.activeThread);
+              };
+
               $scope.close = function() {
                 $uibModalInstance.close();
               };
@@ -258,7 +263,7 @@ angular.module('oppia').factory('ImprovementModalService', [
         });
       },
 
-      openSuggestionReviewer: function(suggestionThread) {
+      openSuggestionReviewModal: function(suggestionThread) {
         return SuggestionModalForExplorationEditorService.showSuggestionModal(
           suggestionThread.suggestion.suggestionType, {
             activeThread: suggestionThread,
