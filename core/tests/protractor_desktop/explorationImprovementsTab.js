@@ -330,7 +330,7 @@ describe('Suggestions Improvements', function() {
       'Boolean', (element) => element.setValue(true));
   });
 
-  it('accepts & rejects a suggestion on a published exploration', function() {
+  fit('accepts & rejects a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
@@ -362,17 +362,23 @@ describe('Suggestions Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
-
+    try {
     var taskToAccept = improvementsTab.getSuggestionTask(
-      suggestionDescription1);
+      suggestionDescription1);}
+    catch(e) {
+      throw new Error('test1');
+    }
     improvementsTab.clickTaskActionButton(taskToAccept, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
     waitFor.pageToFullyLoad();
-
+    try {
     var taskToReject = improvementsTab.getSuggestionTask(
       suggestionDescription2);
+    } catch(e) {
+      throw new Error('test2');
+    }
     improvementsTab.clickTaskActionButton(taskToReject, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
