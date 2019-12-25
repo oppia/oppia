@@ -66,8 +66,7 @@ class FileStream(python_utils.OBJECT):
 
 
 class GeneralFileSystem(python_utils.OBJECT):
-    """The parent class which is inherited by GcsFileSystem as the member
-    variables in both classes are the same.
+    """The parent class which is inherited by GcsFileSystem.
 
     Attributes:
         entity_name: str. The name of the entity (eg: exploration, topic etc).
@@ -142,7 +141,7 @@ class GcsFileSystem(GeneralFileSystem):
         except cloudstorage.NotFoundError:
             return False
 
-    def get(self, filepath, version=None, mode=None):  # pylint: disable=unused-argument
+    def get(self, filepath, version=None, mode=None):
         """Gets a file as an unencoded stream of raw bytes.
 
         If `version` argument is unused. It is included so that this method
@@ -192,7 +191,7 @@ class GcsFileSystem(GeneralFileSystem):
         gcs_file.write(raw_bytes)
         gcs_file.close()
 
-    def delete(self, filepath):  # pylint: disable=unused-argument
+    def delete(self, filepath):
         """Deletes a file and the metadata associated with it.
 
         Args:

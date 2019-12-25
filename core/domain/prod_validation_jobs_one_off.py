@@ -782,9 +782,6 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        if item:
-            item.classifier_data = fs_services.read_classifier_data(
-                item.exp_id, item.id)
         return classifier_services.get_classifier_training_job_from_model(item)
 
     @classmethod

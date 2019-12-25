@@ -228,6 +228,8 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job: ClassifierTrainingJob. Domain object for the
             classifier training job.
     """
+    classifier_data = fs_services.read_classifier_data(
+        classifier_training_job_model.exp_id, classifier_training_job_model.id)
     return classifier_domain.ClassifierTrainingJob(
         classifier_training_job_model.id,
         classifier_training_job_model.algorithm_id,
@@ -238,53 +240,8 @@ def get_classifier_training_job_from_model(classifier_training_job_model):
         classifier_training_job_model.state_name,
         classifier_training_job_model.status,
         classifier_training_job_model.training_data,
-        classifier_training_job_model.classifier_data,
+        classifier_data,
         classifier_training_job_model.data_schema_version)
-
-
-def _get_classifier_training_job_model_by_id(job_id, strict=True):
-    """Gets a classifier training job by a job_id.
-
-    Args:
-        job_id: str. ID of the classifier training job.
-        strict: bool. Raises Exception if ClassifierTrainingJobModel with
-            id not found and strict is set to True. Logs an error, otherwise.
-    
-    Returns:
-        classifier_training_job: ClassifierTrainingJobModel. NDB instance
-            of classifier training job.
-    
-    Raises:
-        Exception: Entity for class ClassifierTrainingJobModel with id not
-            found.
-    """
-    classifier_training_job_model = (
-        classifier_models.ClassifierTrainingJobModel.get(job_id, strict=strict))
-    if classifier_training_job_model:
-        classifier_training_job_model.classifier_data = (
-            fs_services.read_classifier_data(
-                classifier_training_job_model.exp_id, job_id))
-    return classifier_training_job_model
-
-
-def _get_classifier_training_jobs_model_by_ids(job_ids):
-    """Gets a classifier training job by a job_id.
-
-    Args:
-        job_ids: list(str). IDs of the classifier training job.
-    
-    Returns:
-        classifier_training_jobs: list(ClassifierTrainingJobModel). NDB
-            instances of classifier training jobs.
-    """
-    classifier_training_job_models = (
-        classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
-    
-    for job_model in classifier_training_job_models:
-        if job_model:
-            job_model.classifier_data = fs_services.read_classifier_data(
-                job_model.exp_id, job_model.id)
-    return classifier_training_job_models
 
 
 def get_classifier_training_job_by_id(job_id):
@@ -301,8 +258,8 @@ def get_classifier_training_job_by_id(job_id):
         Exception: Entity for class ClassifierTrainingJobModel with id not
             found.
     """
-    classifier_training_job_model = _get_classifier_training_job_model_by_id(
-        job_id)
+    classifier_training_job_model = (
+        classifier_models.ClassifierTrainingJobModel.get(job_id))
     classifier_training_job = get_classifier_training_job_from_model(
         classifier_training_job_model)
     return classifier_training_job
@@ -321,7 +278,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
             of the ClassifierTrainingJob does not exist.
     """
     classifier_training_job_models = (
-        _get_classifier_training_jobs_model_by_ids(job_ids))
+        classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
     for index in python_utils.RANGE(len(job_ids)):
         if classifier_training_job_models[index] is None:
@@ -377,8 +334,8 @@ def _update_scheduled_check_time_for_new_training_job(job_id):
         job_id: str. ID of the ClassifierTrainingJob.
     """
     classifier_training_job_model = (
-        _get_classifier_training_job_model_by_id(job_id))
-
+        classifier_models.ClassifierTrainingJobModel.get(job_id))
+    
     classifier_training_job_model.next_scheduled_check_time = (
         datetime.datetime.utcnow() + datetime.timedelta(
             minutes=feconf.CLASSIFIER_JOB_TTL_MINS))
@@ -440,7 +397,7 @@ def store_classifier_data(job_id, classifier_data):
             of the ClassifierTrainingJob does not exist.
     """
     classifier_training_job_model = (
-        _get_classifier_training_job_model_by_id(job_id, strict=False))
+        classifier_models.ClassifierTrainingJobModel.get(job_id, strict=False))
     if not classifier_training_job_model:
         raise Exception(
             'The ClassifierTrainingJobModel corresponding to the job_id of the '
@@ -489,7 +446,7 @@ def get_classifier_training_jobs(exp_id, exp_version, state_names):
         job_ids.append(mapping_model.job_id)
 
     classifier_training_job_models = (
-        _get_classifier_training_jobs_model_by_ids(job_ids))
+        classifier_models.ClassifierTrainingJobModel.get_multi(job_ids))
 
     classifier_training_jobs = []
     for job_model in classifier_training_job_models:

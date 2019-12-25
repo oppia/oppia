@@ -266,8 +266,7 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.job_id = classifier_models.ClassifierTrainingJobModel.create(
             self.algorithm_id, interaction_id, self.exp_id, 1,
             datetime.datetime.utcnow(), self.training_data, 'Home',
-            feconf.TRAINING_JOB_STATUS_NEW, 1
-        )
+            feconf.TRAINING_JOB_STATUS_NEW, 1)
         fs_services.save_classifier_data(self.exp_id, self.job_id, {})
 
         self.expected_response = {
