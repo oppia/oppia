@@ -51,7 +51,9 @@ DEFAULT_IDENTICON_DATA_URL = (
 SYSTEM_USERS = {
     feconf.SYSTEM_COMMITTER_ID: feconf.SYSTEM_COMMITTER_ID,
     feconf.MIGRATION_BOT_USER_ID: feconf.MIGRATION_BOT_USERNAME,
-    feconf.SUGGESTION_BOT_USER_ID: feconf.SUGGESTION_BOT_USERNAME
+    feconf.SUGGESTION_BOT_USER_ID: feconf.SUGGESTION_BOT_USERNAME,
+    feconf.VOICEOVER_TASK_ASSIGNOR_BOT_USER_ID: (
+        feconf.VOICEOVER_TASK_ASSIGNOR_BOT_USERNAME)
 }
 
 
@@ -403,6 +405,15 @@ def get_users_settings(user_ids):
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
                 role=feconf.ROLE_ID_ADMIN,
                 username='admin',
+                last_agreed_to_terms=datetime.datetime.utcnow()
+            ))
+        elif user_ids[i] == feconf.VOICEOVER_TASK_ASSIGNOR_BOT_USER_ID:
+            result.append(UserSettings(
+                user_id=feconf.VOICEOVER_TASK_ASSIGNOR_BOT_USER_ID,
+                gae_id=feconf.VOICEOVER_TASK_ASSIGNOR_BOT_USER_ID,
+                email=None,
+                role=feconf.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY,
+                username=feconf.VOICEOVER_TASK_ASSIGNOR_BOT_USERNAME,
                 last_agreed_to_terms=datetime.datetime.utcnow()
             ))
         else:

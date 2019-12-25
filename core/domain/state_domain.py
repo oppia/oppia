@@ -1162,6 +1162,41 @@ class RecordedVoiceovers(python_utils.OBJECT):
         else:
             self.voiceovers_mapping.pop(content_id, None)
 
+    def get_availability_count_in_language(self, language_code):
+        """Returns the count of audio available in a given language.
+
+        Args:
+            language_code: str. The given language code.
+
+        Returns:
+            int. The number of audio available in the given language.
+        """
+        availability_count = 0
+        for language_code_to_voiceover in self.voiceovers_mapping.values():
+            if language_code in language_code_to_voiceover:
+                availability_count += 1
+
+        return availability_count
+
+    def get_needs_update_count_in_language(self, language_code):
+        """Returns the count of audio available in a given language which needs
+        update.
+
+        Args:
+            language_code: str. The language code in which the audio needs
+                update count required.
+
+        Returns:
+            int. The number of audio in the given language which needs update.
+        """
+        needs_update_count = 0
+        for language_code_to_voiceover in self.voiceovers_mapping.values():
+            if language_code in language_code_to_voiceover:
+                if language_code_to_voiceover[language_code].needs_update:
+                    needs_update_count += 1
+
+        return needs_update_count
+
 
 class RuleSpec(python_utils.OBJECT):
     """Value object representing a rule specification."""
@@ -1555,6 +1590,37 @@ class State(python_utils.OBJECT):
             int. The number of distinct content fields available in the state.
         """
         return len(self.written_translations.translations_mapping)
+
+    def get_voiceover_availability_count_in_language(self, language_code):
+        """Returns the count of voiceover audio available in the state in a
+        given language. The count will be the number of available audio
+        irrespective of whether the audio needs update.
+
+        Args:
+            language_code: str. The language code in which the voiceover count
+                required.
+
+        Returns:
+            int. The number of voiceover audio present in the state in the
+            given language code.
+        """
+        return self.recorded_voiceovers.get_availability_count_in_language(
+            language_code)
+
+    def get_voiceover_needs_update_count_in_language(self, language_code):
+        """Returns the count of voiceover audio available in the state in the
+        given language which needs update.
+
+        Args:
+            language_code: str. The language code in which the voiceover needs
+                update count required.
+
+        Returns:
+            int. The number of voiceover audio in the given language which needs
+            update.
+        """
+        return self.recorded_voiceovers.get_needs_update_count_in_language(
+            language_code)
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in assets i.e, other parts of state

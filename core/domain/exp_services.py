@@ -49,6 +49,7 @@ from core.domain import search_services
 from core.domain import state_domain
 from core.domain import stats_services
 from core.domain import user_services
+from core.domain import voiceover_services
 from core.platform import models
 import feconf
 import python_utils
@@ -864,6 +865,8 @@ def update_exploration(
             exploration_id):
         opportunity_services.update_opportunity_with_updated_exploration(
             exploration_id)
+        voiceover_services.update_voiceover_claimed_tasks(
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id)
 
 
 def create_exploration_summary(exploration_id, contributor_id_to_add):

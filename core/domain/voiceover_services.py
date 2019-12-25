@@ -20,12 +20,13 @@ from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import rights_manager
-from core.domain import suggestion_registry
 from core.domain import user_services
+from core.domain import user_domain
 from core.platform import models
 import feconf
 
-(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+(suggestion_models, user_models) = models.Registry.import_models(
+    [models.NAMES.suggestion, models.NAMES.user])
 
 
 def _get_voiceover_application_class(target_type):
@@ -41,7 +42,7 @@ def _get_voiceover_application_class(target_type):
         Exception: The voiceover application target type is invalid.
     """
     target_type_to_classes = (
-        suggestion_registry.VOICEOVER_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
+        user_domain.Voiceover_APPLICATION_TARGET_TYPE_TO_DOMAIN_CLASSES)
     if target_type in target_type_to_classes:
         return target_type_to_classes[target_type]
     else:
@@ -118,6 +119,64 @@ def _save_voiceover_applications(voiceover_applications):
         voiceover_application_models)
 
 
+def _get_voiceover_claimed_task_model(voiceover_claimed_task):
+    """Return the VoiceoverClaimedTaskModel object for the given voiceover
+    claimed task domain object.
+
+    Args:
+        voiceover_claimed_task: VoiceoverClaimedTask. The voiceover claimed task
+        domain object.
+
+    Returns:
+        VoiceoverClaimedTaskModel. The model object for the given voiceover
+        claimed task domain object.
+    """
+    return user_models.VoiceoverClaimedTaskModel(
+        id=voiceover_claimed_task.id,
+        target_type=voiceover_claimed_task.target_type,
+        target_id=voiceover_claimed_task.target_id,
+        user_id=voiceover_claimed_task.user_id,
+        language_code=voiceover_claimed_task.language_code,
+        content_count=voiceover_claimed_task.content_count,
+        voiceover_count=voiceover_claimed_task.voiceover_count,
+        voiceover_needs_update_count=(
+            voiceover_claimed_task.voiceover_needs_update_count),
+        completed=voiceover_claimed_task.completed)
+
+
+def _get_voiceover_claimed_task_from_model(task_model):
+    """Returns VoiceoverClaimedTask for the given VoiceoverClaimedTaskModel
+    object.
+
+    Args:
+        task_model: VoiceoverClaimedTaskModel. The voiceover claimed task model
+            object.
+
+    Returns:
+        VoiceoverClaimedTask. The VoiceoverClaimedTask domain object
+        corresponding to the given voiceover claimed task model.
+    """
+    return user_domain.VoiceoverClaimedTask(
+        task_model.id, task_model.target_type, task_model.target_id,
+        task_model.user_id, task_model.language_code,
+        task_model.content_count, task_model.voicoever_availability_count,
+        task_model.voiceover_needs_update_count, task_model.completed)
+
+
+def _save_voiceover_claimed_task(voiceover_claimed_task):
+    """Save the given VoiceoverClaimedTask object as a VoiceoverClaimedTaskModel
+    in the datastore.
+
+    Args:
+        voiceover_claimed_task: VoiceoverClaimedTask. The voiceover claimed task
+            object which need to be saved.
+    """
+    voiceover_claimed_task.validate()
+    voiceover_claimed_task_model = _get_voiceover_claimed_task_model(
+        voiceover_claimed_task)
+    voiceover_claimed_task_model.put()
+
+
 def get_voiceover_application_by_id(voiceover_application_id):
     """Returns voiceover application model corresponding to give id.
 
@@ -182,52 +241,43 @@ def accept_voiceover_application(voiceover_application_id, reviewer_id):
             need to be accepted.
         reviewer_id: str. The user ID of the reviewer.
     """
-    voiceover_application = get_voiceover_application_by_id(
+    voiceover_application_to_accept = get_voiceover_application_by_id(
         voiceover_application_id)
-    if reviewer_id == voiceover_application.author_id:
+    if reviewer_id == voiceover_application_to_accept.author_id:
         raise Exception(
             'Applicants are not allowed to review their own '
             'voiceover application.')
 
-    reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
+    voiceover_application_to_accept.accept(reviewer_id)
 
-    voiceover_application.accept(reviewer_id)
-
-    _save_voiceover_applications([voiceover_application])
-
-    if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
-        rights_manager.assign_role_for_exploration(
-            reviewer, voiceover_application.target_id,
-            voiceover_application.author_id, rights_manager.ROLE_VOICE_ARTIST)
-        opportunity_services.update_exploration_voiceover_opportunities(
-            voiceover_application.target_id,
-            voiceover_application.language_code)
+    if voiceover_application_to_accept.target_type == (
+            feconf.ENTITY_TYPE_EXPLORATION):
         opportunities = (
             opportunity_services.get_exploration_opportunity_summaries_by_ids([
-                voiceover_application.target_id]))
+                voiceover_application_to_accept.target_id]))
         email_manager.send_accepted_voiceover_application_email(
-            voiceover_application.author_id,
+            voiceover_application_to_accept.author_id,
             opportunities[0].chapter_title,
-            voiceover_application.language_code)
+            voiceover_application_to_accept.language_code)
     # TODO(#7969): Add notification to the user's dashboard for the accepted
     # voiceover application.
 
+    voiceover_applications = [voiceover_application_to_accept]
     voiceover_application_models = (
         suggestion_models.GeneralVoiceoverApplicationModel
         .get_voiceover_applications(
-            voiceover_application.target_type, voiceover_application.target_id,
-            voiceover_application.language_code))
-    rejected_voiceover_applications = []
-    for model in voiceover_application_models:
-        voiceover_application = _get_voiceover_application_from_model(
-            model)
-        if not voiceover_application.is_handled:
-            voiceover_application.reject(
-                reviewer_id, 'We have to reject your application as another '
-                'application for the same opportunity got accepted.')
-            rejected_voiceover_applications.append(voiceover_application)
+            voiceover_application_to_accept.target_type,
+            voiceover_application_to_accept.target_id,
+            voiceover_application_to_accept.language_code))
 
-    _save_voiceover_applications(rejected_voiceover_applications)
+    for model in voiceover_application_models:
+        if model.id != voiceover_application_id:
+            voiceover_application = _get_voiceover_application_from_model(
+                model)
+            voiceover_application.targeted_opportunity_available = False
+            voiceover_applications.append(voiceover_application)
+
+    _save_voiceover_applications(voiceover_applications)
 
 
 def reject_voiceover_application(
@@ -248,9 +298,7 @@ def reject_voiceover_application(
             'Applicants are not allowed to review their own '
             'voiceover application.')
 
-    reviewer = user_services.UserActionsInfo(user_id=reviewer_id)
-
-    voiceover_application.reject(reviewer.user_id, rejection_message)
+    voiceover_application.reject(reviewer_id, rejection_message)
     _save_voiceover_applications([voiceover_application])
 
     if voiceover_application.target_type == feconf.ENTITY_TYPE_EXPLORATION:
@@ -261,7 +309,7 @@ def reject_voiceover_application(
             voiceover_application.author_id,
             opportunities[0].chapter_title,
             voiceover_application.language_code, rejection_message)
-    # TODO(#7969): Add notification to the user's dashboard for the accepted
+    # TODO(#7969): Add notification to the user's dashboard for the rejected
     # voiceover application.
 
 
@@ -312,3 +360,130 @@ def get_text_to_create_voiceover_application(
                 state.content.content_id, language_code)
     else:
         raise Exception('Invalid target type: %s' % target_type)
+
+
+def get_user_claimed_voiceover_tasks(user_id):
+    """Returns a list of voiceover task claimed by the user with the given
+    user_id.
+
+    Args:
+        user_id: str. The ID of the user.
+
+    Returns:
+        list(VoiceoverClaimedTask). A list of VoiceoverClaimedTask objects.
+    """
+    claimed_task_models = (
+        user_models.VoiceoverClaimedTaskModel
+        .get_all_tasks_claimed_by_user(user_id))
+
+    claimed_tasks = [
+        _get_voiceover_claimed_task_from_model(model)
+        for model in claimed_task_models]
+
+    return claimed_tasks
+
+
+def update_voiceover_claimed_tasks(target_type, target_id):
+    """Updates the voiceover claimed task model with the updated targeted
+    entity.
+
+    Args:
+        target_type: str. The type of the targeted entity.
+        target_id: str. The ID of the target entity.
+
+    Raises:
+        Exception: The given target_type is invalid for voiceover claimed task.
+    """
+    if target_type == feconf.ENTITY_TYPE_EXPLORATION:
+        claimed_task_models = (
+            suggestion_models
+            .VoiceoverClaimedTaskModel.get_targeted_task_models(
+                target_type, target_id))
+        if claimed_task_models:
+            exploration = exp_fetchers.get_exploration_by_id(target_id)
+            content_count = exploration.get_content_count()
+            updated_voiceover_claimed_task_models = []
+            for task_model in claimed_task_models:
+                voiceover_claimed_task = _get_voiceover_application_from_model(
+                    task_model)
+                voiceover_claimed_task.content_count = content_count
+                language_code = voiceover_claimed_task.language_code
+                voiceover_claimed_task.voiceover_count = (
+                    exploration.get_voiceover_availability_count_in_language(
+                        language_code))
+                voiceover_claimed_task.voiceover_needs_update_count = (
+                    exploration.get_voiceover_needs_update_count_in_language(
+                        language_code))
+
+                if not voiceover_claimed_task.completed:
+                    if voiceover_claimed_task.can_mark_task_completed():
+                        voiceover_claimed_task.completed = True
+                voiceover_claimed_task.validate()
+                updated_voiceover_claimed_task_models.append(
+                    _get_voiceover_claimed_task_model(voiceover_claimed_task))
+        user_models.VoiceoverClaimedTaskModel.put_multi(
+            updated_voiceover_claimed_task_models)
+    else:
+        raise Exception(
+            'Invalid target_type for claimed voiceover tasks: %s' % target_type)
+
+
+def claim_voiceover_task(user_id, target_type, target_id, language_code):
+    """Marks a user claimed a voiceover task for corresponding to the entity
+    represented by the give target_type and target_id in the give language.
+
+    Args:
+        user_id: str. The ID of the user who has claimed the task.
+        target_type: str. The type of the targeted entity.
+        target_id: str. The ID of the target entity.
+        language_code: str. The language code for the voiceover task
+            claimed.
+
+    Raises:
+        Exception: The given target_type is invalid for claiming voiceover task.
+    """
+    if target_type == feconf.ENTITY_TYPE_EXPLORATION:
+        exploration = exp_fetchers.get_exploration_by_id(target_id)
+        content_count = exploration.get_content_count()
+        voicoever_availability_count = (
+            exploration.get_voiceover_availability_count_in_language(
+                language_code))
+        voiceover_needs_update_count = (
+            exploration.get_voiceover_needs_update_count_in_language(
+                language_code))
+        new_model_id = (
+            user_models.VoiceoverClaimedTaskModel.get_new_id_for_task(
+                target_type, target_id, language_code, user_id))
+        voiceover_claimed_task = user_domain.VoiceoverClaimedTask(
+            new_model_id, target_type, target_id, user_id, language_code,
+            content_count, voicoever_availability_count,
+            voiceover_needs_update_count, False)
+        voiceover_claimed_task.validate()
+
+        task_assignor_bot = user_services.UserActionsInfo(
+            user_id=feconf.VOICEOVER_TASK_ASSIGNOR_BOT_USER_ID)
+
+        rights_manager.assign_role_for_exploration(
+            task_assignor_bot, target_id, user_id,
+            rights_manager.ROLE_VOICE_ARTIST)
+        opportunity_services.update_exploration_voiceover_opportunities(
+            target_id, language_code)
+
+        _save_voiceover_claimed_task(voiceover_claimed_task)
+    else:
+        raise Exception(
+            'Invalid target_type for claiming voiceover task: %s' % target_type)
+
+
+def acknowledge_voiceover_application_acceptance(voiceover_application_id):
+    """Marks the voiceover application corresponding to the given
+    voiceover_application_id has be acknowledged by the user.
+
+    Args:
+        voiceover_application_id: str. The Id of the voiceover application.
+    """
+    voiceover_application = get_voiceover_application_by_id(
+        voiceover_application_id)
+
+    voiceover_application.acknowledged_acceptance = True
+    _save_voiceover_applications([voiceover_application])

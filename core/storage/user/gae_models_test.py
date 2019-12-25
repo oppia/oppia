@@ -1721,3 +1721,35 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+
+class VoiceoverClaimedTaskModelUnitTests(test_utils.GenericTestBase):
+    """Tests for the VoiceoverClaimedTaskModel class."""
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.VoiceoverClaimedTaskModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id_author(self):
+        self.assertFalse(
+            user_models.VoiceoverClaimedTaskModel.has_reference_to_user_id(
+                'user1'))
+
+        user_models.VoiceoverClaimedTaskModel(
+            id='exploration.exp_1.en.user1',
+            target_type='exploration',
+            target_id='exp_1',
+            user_id='user1',
+            language_code='en',
+            content_count=10,
+            voiceover_count=10,
+            voiceover_needs_update_count=2,
+            completed=False).put()
+
+        self.assertTrue(
+            user_models.VoiceoverClaimedTaskModel.has_reference_to_user_id(
+                'user1'))
+        self.assertFalse(
+            user_models.VoiceoverClaimedTaskModel.has_reference_to_user_id(
+                'user2'))

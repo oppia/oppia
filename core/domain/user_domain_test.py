@@ -403,3 +403,78 @@ class UserContributionScoringTests(test_utils.GenericTestBase):
         self.assertEqual(user_contribution_scoring.score_category, 'category0')
         self.assertEqual(user_contribution_scoring.score, 5)
         self.assertEqual(user_contribution_scoring.has_email_been_sent, True)
+
+
+class VoiceoverClaimedTaskUnitTest(test_utils.GenericTestBase):
+    """Tests for the VoiceoverClaimedTask class."""
+
+    def setUp(self):
+        super(VoiceoverClaimedTaskUnitTest, self).setUp()
+        self.signup('author@example.com', 'author')
+        self.author_id = self.get_user_id_from_email('author@example.com')
+
+        self.signup('reviewer@example.com', 'reviewer')
+        self.reviewer_id = self.get_user_id_from_email('reviewer@example.com')
+
+        self.voiceover_claimed_task = user_domain.VoiceoverClaimedTask(
+            'task_id', 'exploration', 'exp_1', 'user_1', 'en',
+            10, 8, 2, False)
+
+    def test_validation_with_invalid_target_type_rasie_exception(self):
+        self.voiceover_claimed_task.validate()
+
+        self.voiceover_claimed_task.target_type = 'invalid_target'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected target_type to be among allowed choices, '
+            'received invalid_target'):
+            self.voiceover_claimed_task.validate()
+
+    def test_validation_with_invalid_target_id_rasie_exception(self):
+        self.voiceover_claimed_task.validate()
+
+        self.voiceover_claimed_task.target_id = 123
+        with self.assertRaisesRegexp(
+            Exception, 'Expected target_id to be a string'):
+            self.voiceover_claimed_task.validate()
+
+    def test_validation_with_invalid_user_id_rasie_exception(self):
+        self.voiceover_claimed_task.validate()
+
+        self.voiceover_claimed_task.user_id = 123
+        with self.assertRaisesRegexp(
+            Exception, 'Expected user_id to be a string'):
+            self.voiceover_claimed_task.validate()
+
+    def test_validation_with_invalid_language_code_type_raise_exception(self):
+        self.assertEqual(self.voiceover_claimed_task.language_code, 'en')
+        self.voiceover_claimed_task.validate()
+
+        self.voiceover_claimed_task.language_code = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected language_code to be a string'):
+            self.voiceover_claimed_task.validate()
+
+    def test_validation_with_invalid_language_code_raise_exception(self):
+        self.assertEqual(self.voiceover_claimed_task.language_code, 'en')
+        self.voiceover_claimed_task.validate()
+
+        self.voiceover_claimed_task.language_code = 'invalid language'
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid language_code: invalid language'):
+            self.voiceover_claimed_task.validate()
+
+    def test_to_dict_returns_correct_dict(self):
+        expected_dict = {
+            'id': self.voiceover_claimed_task.id,
+            'target_type': self.voiceover_claimed_task.target_type,
+            'target_id': self.voiceover_claimed_task.target_id,
+            'user_id': self.voiceover_claimed_task.user_id,
+            'language_code': self.voiceover_claimed_task.language_code,
+            'content_count': self.voiceover_claimed_task.content_count,
+            'voiceover_count': self.voiceover_claimed_task.voiceover_count,
+            'voiceover_needs_update_count': (
+                self.voiceover_claimed_task.voiceover_needs_update_count),
+            'completed': self.voiceover_claimed_task.completed
+        }
+        self.assertEqual(
+            self.voiceover_claimed_task.to_dict(), expected_dict)

@@ -1629,3 +1629,92 @@ class UserContributionScoringModel(base_models.BaseModel):
         else:
             model.score += increment_by
             model.put()
+
+
+class VoiceoverClaimedTaskModel(base_models.BaseModel):
+    """A model to store the voiceover claimed task by a user.
+    The id of the model. This is going to be in the following format:
+    <target_type>.<target_id>.<lang_code>.<user_id>.
+    """
+    # The type of the entity.
+    target_type = ndb.StringProperty(required=True, indexed=True)
+    # The id of the entity.
+    target_id = ndb.StringProperty(required=True, indexed=True)
+    # The language code in which the contributor is going to add voiceover.
+    language_code = ndb.StringProperty(required=True, indexed=True)
+    # The id of the user who has claimed the task.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The number of contents available in the targeted entity.
+    content_count = ndb.IntegerProperty(default=None)
+    # The count of the content which has voiceover in the given language.
+    voiceover_count = ndb.IntegerProperty(default=None)
+    # The count of voiceover which needs update.
+    voiceover_needs_update_count = ndb.IntegerProperty(default=None)
+    # A boolean status to mark the claimed task completed. It will be marked
+    # true once the user has added voiceover for all the content in the target
+    # entity, irrespective of whether the editor adds or updates content in the
+    # lesson in the future.
+    completed = ndb.BooleanProperty(required=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """VoiceoverClaimedTaskModel needs to be deleted for the user."""
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether VoiceoverClaimedTaskModel exists for the user.
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(cls.user_id == user_id).get() is not None
+
+    @classmethod
+    def get_all_tasks_claimed_by_user(cls, user_id):
+        """Returns a list of VoiceoverClaimedTaskModel which are created by the
+        given user.
+
+        Args:
+            user_id: str. The Id of the user.
+
+        Returns:
+            list(VoiceoverClaimedTaskModel). A list of model which represents
+            all the task claimed by the user.
+        """
+        return cls.query(cls.user_id == user_id).fetch()
+
+    @classmethod
+    def get_new_id_for_task(
+            cls, target_type, target_id, language_code, user_id):
+        """Returns a new id for the VoiceoverClaimedTaskModel.
+
+        Args:
+            target_type: str. The type of the targeted entity.
+            target_id: str. The ID of the target entity.
+            language_code: str. The language code for the voiceover task
+                claimed.
+            user_id: str. The ID of the user who has claimed the task.
+
+        Returns:
+            str. A new Id which can be used to create a new model.
+        """
+        return cls.get_new_id(
+            '%s.%s.%s.%s' % (target_type, target_id, language_code, user_id))
+
+    @classmethod
+    def get_targeted_task_models(cls, target_type, target_id):
+        """Returns all the VoiceoverClaimedTaskModel model which targets to the
+        entity with given target_type and target_id.
+
+        Args:
+            target_type: str. The type of the targeted entity.
+            target_id: str. The ID of the target entity.
+
+        Returns:
+            list(VoiceoverClaimedTaskModel). A list of VoiceoverClaimedTaskModel
+            which targets to a given entity.
+        """
+        return cls.query(
+            cls.target_type == target_type, cls.target_id == target_id).fetch()

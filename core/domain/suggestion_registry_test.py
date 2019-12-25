@@ -1488,7 +1488,7 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             suggestion_registry.ExplorationVoiceoverApplication(
                 'application_id', 'exp_id', suggestion_models.STATUS_IN_REVIEW,
                 self.author_id, None, 'en', 'audio_file.mp3', '<p>Content</p>',
-                None))
+                None, True, False))
 
     def test_validation_with_invalid_target_type_rasie_exception(self):
         self.voiceover_application.validate()
@@ -1626,7 +1626,9 @@ class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
             'language_code': 'en',
             'content': '<p>Content</p>',
             'filename': 'audio_file.mp3',
-            'rejection_message': None
+            'rejection_message': None,
+            'targeted_opportunity_available': True,
+            'acknowledged_acceptance': False
         }
         self.assertEqual(
             self.voiceover_application.to_dict(), expected_dict)

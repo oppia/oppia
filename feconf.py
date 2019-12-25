@@ -519,6 +519,14 @@ MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
 SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
 
+# User id and username for the bot who will assign claimed voiceover tasks to
+# users.
+VOICEOVER_TASK_ASSIGNOR_BOT_USER_ID = 'OppiaVoiceoverTaskAssignorBot'
+VOICEOVER_TASK_ASSIGNOR_BOT_USERNAME = 'OppiaVoiceoverTaskAssignorBot'
+
+# Constants defining types of entities to which voiceover task can be claimed.
+VOICEOVER_TASK_TARGET_TYPE_CHOICES = [ENTITY_TYPE_EXPLORATION]
+
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
     'Collapsible': {

@@ -365,6 +365,16 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     # The plain text message submitted by the reviewer while rejecting the
     # application.
     rejection_message = ndb.TextProperty()
+    # A boolean value representing whether the targeted opportunity available.
+    # This will be marked as false once some other voiceover application
+    # targeted to the same opportunity gets accepted and the targeted
+    # opportunity is no more available.
+    targeted_opportunity_available = ndb.BooleanProperty(
+        required=True, indexed=True)
+    # A boolean to indicate whether the user has acknowledged the application
+    # acceptance. This will be false for the application which is in-review,
+    # rejected or accepted but not acknowledged by the author.
+    acknowledged_acceptance = ndb.BooleanProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():

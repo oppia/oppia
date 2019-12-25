@@ -21,6 +21,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core.platform import models
 import feconf
 import python_utils
+import utils
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 
@@ -279,3 +280,118 @@ class UserContributionScoring(python_utils.OBJECT):
         self.score_category = score_category
         self.score = score
         self.has_email_been_sent = has_email_been_sent
+
+
+class VoiceoverClaimedTask(python_utils.OBJECT):
+    """Domain object for the VoiceoverClaimedTaskModel."""
+    def __init__(
+            self, task_id, target_type, target_id, user_id, language_code,
+            content_count, voiceover_count, voiceover_needs_update_count,
+            completed):
+        """Initializes a VoiceoverClaimedTask domain object.
+
+        Args:
+            task_id: str. The ID of the voiceover claimed task.
+            target_type: str. The type of the targeted entity.
+            target_id: str. The ID of the target entity.
+            user_id: str. The ID of the user who has claimed the task.
+            language_code: str. The language code for the voiceover task
+                claimed.
+            content_count: int. The number of contents available in the targeted
+                entity.
+            voiceover_count: int. The count of the content which has voiceover
+                in the given language.
+            voiceover_needs_update_count: int. The count of voiceover which
+                needs update.
+            completed: bool. A boolean status to mark the claimed task
+                completed.
+        """
+        self.id = task_id
+        self.target_type = target_type
+        self.target_id = target_id
+        self.user_id = user_id
+        self.language_code = language_code
+        self.content_count = content_count
+        self.voiceover_count = voiceover_count
+        self.voiceover_needs_update_count = voiceover_needs_update_count
+        self.completed = completed
+
+    def validate(self):
+        """Validates the VoiceoverClaimedTask object.
+
+        Raises:
+            ValidationError: One or more attributes of the
+                VoiceoverClaimedTask object are invalid.
+        """
+
+        if self.target_type not in feconf.VOICEOVER_TASK_TARGET_TYPE_CHOICES:
+            raise utils.ValidationError(
+                'Expected target_type to be among allowed choices, '
+                'received %s' % self.target_type)
+
+        if not isinstance(self.target_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected target_id to be a string, received %s' % type(
+                    self.target_id))
+
+        if not isinstance(self.user_id, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected user_id to be a string, received %s' % type(
+                    self.user_id))
+
+        if not isinstance(self.language_code, python_utils.BASESTRING):
+            raise utils.ValidationError(
+                'Expected language_code to be a string, received %s' %
+                self.language_code)
+        if not utils.is_supported_audio_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language_code: %s' % self.language_code)
+
+        if not isinstance(self.content_count, int):
+            raise utils.ValidationError(
+                'Expected content_count to be an integer, received %s' % (
+                    type(self.content_count)))
+
+        if not isinstance(self.voiceover_count, int):
+            raise utils.ValidationError(
+                'Expected voiceover_count to be an integer, found %s' % type(
+                    self.voiceover_count))
+
+        if not isinstance(self.voiceover_needs_update_count, int):
+            raise utils.ValidationError(
+                'Expected voiceover_needs_update_count to be an integer, '
+                'found %s' % type(self.voiceover_needs_update_count))
+
+        if not isinstance(self.completed, bool):
+            raise utils.ValidationError(
+                'Expected completed to be a boolean value, found: %s' % (
+                    self.completed))
+
+    def to_dict(self):
+        """Returns a dict representation of a voiceover claimed task object.
+
+        Returns:
+            dict. A dict representation of a voiceover claimed task object.
+        """
+        return {
+            'id': self.id,
+            'target_type': self.target_type,
+            'target_id': self.target_id,
+            'user_id': self.user_id,
+            'language_code': self.language_code,
+            'content_count': self.content_count,
+            'voiceover_count': self.voiceover_count,
+            'voiceover_needs_update_count': self.voiceover_needs_update_count,
+            'completed': self.completed
+        }
+
+    def can_mark_task_completed(self):
+        """Returns a boolean value which indicates whether the claimed task can
+        be marked as completed.
+
+        Returns:
+            bool. Whether the claimed task can be marked as completed.
+        """
+        return (
+            self.voiceover_count == self.content_count and (
+                self.voiceover_needs_update_count == 0))

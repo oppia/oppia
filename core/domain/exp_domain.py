@@ -1384,6 +1384,47 @@ class Exploration(python_utils.OBJECT):
 
         return content_count
 
+    def get_voiceover_availability_count_in_language(self, language_code):
+        """Returns the count of voiceover audio available in the exploration
+        in a given language. The count will be the number of available audio
+        irrespective of whether the audio needs update.
+
+        Args:
+            language_code: str. The language code in which the voiceover count
+                required.
+
+        Returns:
+            int. The number of voiceover audio present in the exploration in the
+            given language code.
+        """
+        voiceover_count = 0
+        for state in self.states.values():
+            voiceover_count += (
+                state.get_voiceover_availability_count_in_language(
+                    language_code))
+
+        return voiceover_count
+
+    def get_voiceover_needs_update_count_in_language(self, language_code):
+        """Returns the count of voiceover audio available in the exploration
+        in the given language which needs update.
+
+        Args:
+            language_code: str. The language code in which the voiceover needs
+                update count required.
+
+        Returns:
+            int. The number of voiceover audio in the given language which needs
+                update.
+        """
+        needs_update_count = 0
+        for state in self.states.values():
+            needs_update_count += (
+                state.get_voiceover_needs_update_count_in_language(
+                    language_code))
+
+        return needs_update_count
+
     @classmethod
     def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
         """Converts old states schema to the modern v1 schema. v1 contains the

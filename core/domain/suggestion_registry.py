@@ -661,7 +661,10 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
             'language_code': self.language_code,
             'content': self.content,
             'filename': self.filename,
-            'rejection_message': self.rejection_message
+            'rejection_message': self.rejection_message,
+            'targeted_opportunity_available': (
+                self.targeted_opportunity_available),
+            'acknowledged_acceptance': self.acknowledged_acceptance
         }
 
     def get_author_name(self):
@@ -749,6 +752,25 @@ class BaseVoiceoverApplication(python_utils.OBJECT):
                 'Expected content to be a string, received %s' % type(
                     self.content))
 
+        if not isinstance(self.targeted_opportunity_available, bool):
+            raise utils.ValidationError(
+                'Expected targeted_opportunity_available to be a boolean '
+                'value, received %s' % self.targeted_opportunity_available)
+
+        if not isinstance(self.acknowledged_acceptance, bool):
+            raise utils.ValidationError(
+                'Expected acknowledged_acceptance to be a boolean value, '
+                'received %s' % self.acknowledged_acceptance)
+
+        if self.acknowledged_acceptance:
+            if self.status == suggestion_models.STATUS_REJECTED or (
+                    self.status == suggestion_models.STATUS_IN_REVIEW):
+                raise utils.ValidationError(
+                    'Expected status of the application to be accepted for '
+                    'the application with acknowledged_acceptance, found '
+                    'status %s' % self.status)
+
+
     def accept(self):
         """Accepts the voiceover application. Each subclass must implement this
         function.
@@ -780,7 +802,8 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
     def __init__( # pylint: disable=super-init-not-called
             self, voiceover_application_id, target_id, status, author_id,
             final_reviewer_id, language_code, filename, content,
-            rejection_message):
+            rejection_message, targeted_opportunity_available,
+            acknowledged_acceptance):
         """Initializes a ExplorationVoiceoverApplication domain object.
 
         Args:
@@ -797,6 +820,10 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
                 application.
             rejection_message: str. The plain text message submitted by the
                 reviewer while rejecting the application.
+            targeted_opportunity_available: bool. A boolean value representing
+                whether the targeted opportunity available.
+            acknowledged_acceptance: bool. A boolean to indicate whether the
+                user has acknowledged the application acceptance.
         """
         self.voiceover_application_id = voiceover_application_id
         self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
@@ -808,6 +835,8 @@ class ExplorationVoiceoverApplication(BaseVoiceoverApplication):
         self.filename = filename
         self.content = content
         self.rejection_message = rejection_message
+        self.targeted_opportunity_available = targeted_opportunity_available
+        self.acknowledged_acceptance = acknowledged_acceptance
 
     def accept(self, reviewer_id):
         """Accepts the voiceover application and updates the final_reviewer_id.
