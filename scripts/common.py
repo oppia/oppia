@@ -29,10 +29,10 @@ import sys
 import python_utils
 import release_constants
 
-NODE_VERSION = '10.15.3'
 PSUTIL_VERSION = '5.6.7'
 
 CURRENT_PYTHON_BIN = sys.executable
+NODE_VERSION = '10.18.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = 'v1.21.1'
@@ -449,8 +449,14 @@ def kill_processes_based_on_regex(pattern):
 
 
 def convert_to_posixpath(file_path):
-    """Occassionally the Windows style file path just does not work, so we
-    may want to convert it to posix style.
+    """Converts a Windows style filepath to posixpath format. If the operating
+    system is not Windows, this function does nothing.
+
+    Args:
+        file_path: str. The path to be converted.
+
+    Returns:
+        str. Returns a posixpath version of the file path.
     """
     if not is_windows_os():
         return file_path

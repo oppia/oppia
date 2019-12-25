@@ -92,6 +92,12 @@ class BuildTests(test_utils.GenericTestBase):
         filepath.
         """
         non_existent_filepaths = [INVALID_INPUT_FILEPATH]
+        # Escape the special characters, like '\', in the file paths.
+        # The '\' character is usually seem in Windows style path.
+        # https://docs.python.org/2/library/os.html#os.sep
+        # https://docs.python.org/2/library/re.html#regular-expression-syntax
+        error_message = ('File %s does not exist.') % re.escape(
+            non_existent_filepaths[0])
         # Exception will be raised at first file determined to be non-existent.
         error_message = ('File %s does not exist.') % non_existent_filepaths[0]
         error_message = re.escape(error_message)
@@ -247,9 +253,7 @@ class BuildTests(test_utils.GenericTestBase):
         BASE_HTML_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_DEV_DIR, 'base.html')
         BASE_JS_RELATIVE_PATH = os.path.join('pages', 'Base.js')
-        BASE_JS_FILE_URL = (
-            common.convert_to_posixpath(
-                BASE_JS_RELATIVE_PATH))
+        BASE_JS_FILE_URL = 'pages/Base.js'
         BASE_JS_SOURCE_PATH = os.path.join(
             MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
 
@@ -741,14 +745,17 @@ class BuildTests(test_utils.GenericTestBase):
         with python_utils.open_file(build.TSCONFIG_FILEPATH, 'r') as f:
             config_data = json.load(f)
             out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
+        # Escape the special characters, like '\', in the file paths.
+        # The '\' character is usually seem in Windows style path.
+        # https://docs.python.org/2/library/os.html#os.sep
+        # https://docs.python.org/2/library/re.html#regular-expression-syntax
         error_message = ('COMPILED_JS_DIR: %s does not match the output '
                          'directory in %s: %s' % (
-                             MOCK_COMPILED_JS_DIR, build.TSCONFIG_FILEPATH,
-                             out_dir))
-        error_message = re.escape(error_message)
+                             re.escape(MOCK_COMPILED_JS_DIR),
+                             re.escape(build.TSCONFIG_FILEPATH),
+                             re.escape(out_dir)))
         with self.assertRaisesRegexp(
-            Exception,
-            error_message), self.swap(
+            Exception, error_message), self.swap(
                 build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR):
             build.require_compiled_js_dir_to_be_valid()
 
@@ -988,8 +995,7 @@ class BuildTests(test_utils.GenericTestBase):
                 common.NODE_BIN_PATH, build.WEBPACK_FILE,
                 build.WEBPACK_PROD_CONFIG
             )
-            self.assertEqual(
-                cmd, expected_command)
+            self.assertEqual(cmd, expected_command)
 
         with self.swap(subprocess, 'check_call', mock_check_call):
             build.build_using_webpack()

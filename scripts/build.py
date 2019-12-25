@@ -72,17 +72,18 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
     'out_dir': os.path.join('build', 'webpack_bundles', '')
 }
 
+# This json file contains a json object. The object's keys are file paths and
+# the values are corresponded hash value. The paths need to be in posix style,
+# as it is interpreted by the `url-interpolation` service, which which
+# interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
 
-# This path is only used for java command line. But the Windows style path
-# is causing syntax error. Since Unix style path can also work, we are
-# safe to just use this style.
-YUICOMPRESSOR_DIR = '/'.join([
-    os.pardir, 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar'])
+YUICOMPRESSOR_DIR = os.path.join(
+    os.pardir, 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
@@ -161,9 +162,21 @@ def convert_filepath_to_hashed_url(filepath, hashes):
         hashes: str. The calculated hash for this file.
 
     Returns:
-        Generated url style path.
+        str. Generated url style path with hash inserted.
     """
     return _insert_hash(common.convert_to_posixpath(filepath), hashes)
+
+
+def convert_filepath_to_url(filepath):
+    """Convert the original filepath to url path.
+
+    Args:
+        filepath: str. The original file path.
+
+    Returns:
+        str. Generated url style path.
+    """
+    return common.convert_to_posixpath(filepath)
 
 
 def generate_app_yaml():
@@ -217,13 +230,15 @@ def _minify(source_path, target_path):
     # out-of-memory error.
     # https://circleci.com/blog/how-to-handle-java-oom-errors/
     # Use relative path to avoid java command line parameter parse error on
-    # Windows.
+    # Windows. Convert to posix style path because the java program requires
+    # the filepath arguments to be in posix path style.
     target_path = common.convert_to_posixpath(
         os.path.relpath(target_path))
     source_path = common.convert_to_posixpath(
         os.path.relpath(source_path))
+    yuicompressor_dir = common.convert_to_posixpath(YUICOMPRESSOR_DIR)
     cmd = 'java -Xmx24m -jar %s -o %s %s' % (
-        YUICOMPRESSOR_DIR, target_path, source_path)
+        yuicompressor_dir, target_path, source_path)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -426,25 +441,40 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         # This is because html paths are used by backend and we work with
         # paths without hash part in backend.
         if not filepath.endswith('.html'):
+            # This reconstructs the hashed version of the URL, so that it can
+            # be used to substitute the raw URL in the HTML file stream.
             filepath_with_hash = convert_filepath_to_hashed_url(
                 filepath, file_hash)
             content = content.replace(
+                # This and the following lines, convert the original file paths
+                # to URL paths, so the URLs in HTML files can be replaced.
                 '%s%s' % (
-                    common.convert_to_posixpath(TEMPLATES_DEV_DIR), filepath),
+                    convert_filepath_to_url(TEMPLATES_DEV_DIR),
+                    filepath),
                 '%s%s' % (
-                    TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
+                    convert_filepath_to_url(
+                        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']),
                     filepath_with_hash))
             content = content.replace(
-                '%s%s' % (ASSETS_DEV_DIR, filepath),
-                '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
-            content = content.replace(
-                '%s%s' % (EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'], filepath),
                 '%s%s' % (
-                    EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
+                    convert_filepath_to_url(ASSETS_DEV_DIR), filepath),
+                '%s%s' % (
+                    convert_filepath_to_url(ASSETS_OUT_DIR),
                     filepath_with_hash))
             content = content.replace(
-                '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
-                '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
+                '%s%s' % (
+                    convert_filepath_to_url(
+                        EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir']), filepath),
+                '%s%s' % (
+                    convert_filepath_to_url(
+                        EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']),
+                    filepath_with_hash))
+            content = content.replace(
+                '%s%s' % (convert_filepath_to_url(
+                    THIRD_PARTY_GENERATED_DEV_DIR), filepath),
+                '%s%s' % (
+                    convert_filepath_to_url(
+                        THIRD_PARTY_GENERATED_OUT_DIR), filepath_with_hash))
     content = REMOVE_WS(' ', content)
     write_to_file_stream(target_file_stream, content)
 
@@ -713,6 +743,8 @@ def generate_copy_tasks_to_copy_from_source_to_target(
             if not any(
                     source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 target_path = source_path
+                # The path in hashes.json file is in posix style,
+                # see the comment above HASHES_JSON_FILENAME for details.
                 relative_path = common.convert_to_posixpath(
                     os.path.relpath(source_path, source))
                 if (hash_should_be_inserted(source + relative_path) and
@@ -806,6 +838,8 @@ def get_file_hashes(directory_path):
             filepath = os.path.join(root, filename)
             if should_file_be_built(filepath) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                # The path in hashes.json file is in posix style,
+                # see the comment above HASHES_JSON_FILENAME for details.
                 complete_filepath = common.convert_to_posixpath(
                     os.path.join(root, filename))
                 relative_filepath = common.convert_to_posixpath(os.path.relpath(
@@ -999,6 +1033,9 @@ def generate_delete_tasks_to_remove_deleted_files(
             # Ignore files with certain extensions.
             if not any(
                     target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
+                # On Windows the path is on Windows-Style, while the path in
+                # hashes is in posix style, we need to convert it so the check
+                # can run correctly.
                 relative_path = common.convert_to_posixpath(
                     os.path.relpath(target_path, staging_directory))
                 # Remove file found in staging directory but not in source
@@ -1210,11 +1247,16 @@ def _verify_hashes(output_dirnames, file_hashes):
     hash_final_filename = _insert_hash(
         HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME])
 
+
+    # The path in hashes.json (generated via file_hashes) file is in posix
+    # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
         file_hashes[common.convert_to_posixpath(
             MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
+    # The path in hashes.json (generated via file_hashes) file is in posix
+    # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
         file_hashes[common.convert_to_posixpath(
