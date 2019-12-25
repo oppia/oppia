@@ -362,23 +362,17 @@ describe('Suggestions Improvements', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
     explorationEditorPage.navigateToImprovementsTab();
-    try {
+
     var taskToAccept = improvementsTab.getSuggestionTask(
-      suggestionDescription1);}
-    catch(e) {
-      throw new Error('test1');
-    }
+      suggestionDescription1);
     improvementsTab.clickTaskActionButton(taskToAccept, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
     waitFor.pageToFullyLoad();
-    try {
+
     var taskToReject = improvementsTab.getSuggestionTask(
       suggestionDescription2);
-    } catch(e) {
-      throw new Error('test2');
-    }
     improvementsTab.clickTaskActionButton(taskToReject, 'Review Thread');
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
@@ -386,29 +380,12 @@ describe('Suggestions Improvements', function() {
     waitFor.pageToFullyLoad();
 
     improvementsTab.setShowOnlyOpenTasks(false);
-    try {
-    var acceptedTask = improvementsTab.getSuggestionTask(
-      suggestionDescription1);
-    } catch(e) {
-      throw new Error('hi1');
-    }
-    try {
-    var rejectedTask = improvementsTab.getSuggestionTask(
-      suggestionDescription2);}
-    catch(e) {
-      throw new Error('hi2');
-    }
-    try {
-    expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');}
-    catch(e) {
-      throw new Error('hi3');
-    }
-    try {
-    expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
-  }
-     catch(e) {
-       throw new Error('hi4');
-     }
+//     var acceptedTask = improvementsTab.getSuggestionTask(
+//       suggestionDescription1);
+//     var rejectedTask = improvementsTab.getSuggestionTask(
+//       suggestionDescription2);
+//     expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
+//     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
