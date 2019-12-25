@@ -122,6 +122,9 @@ describe('Language util service', function() {
     // SpeechSynthesisVoice, not a dict. But it doesn't look like it's possible
     // to construct a SpeechSynthesisVoice manually.
     spyOn(window.speechSynthesis, 'getVoices').and.returnValue([{
+      // The quotation marks are needed because "default" is a reserved keyword
+      // in JavaScript.
+      'default': false,
       lang: 'en-GB',
       localService: false,
       name: 'UK English',
