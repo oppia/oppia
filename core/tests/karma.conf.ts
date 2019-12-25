@@ -109,7 +109,7 @@ module.exports = function(config) {
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
         flags: [
           '--no-sandbox',
-          '--disable-setuid-sandbox'
+          '--disable-gpu'
         ]
       }
     },
