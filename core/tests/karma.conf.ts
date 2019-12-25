@@ -103,15 +103,10 @@ module.exports = function(config) {
     singleRun: true,
     customLaunchers: {
       CI_Chrome: {
-        // Chrome cannot be run in headless mode as the language tests would
-        // break. See https://github.com/puppeteer/puppeteer/issues/2141 and
-        // https://github.com/puppeteer/examples/blob/master/speech.js#L40
-        // for details.
-        base: 'Chrome',
+        base: 'ChromeHeadless',
         // Discussion of the necessity of extra flags can be found here:
         // https://github.com/karma-runner/karma-chrome-launcher/issues/154
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
-        // https://bugs.chromium.org/p/chromium/issues/detail?id=737678
         flags: [
           '--no-sandbox',
           '--disable-gpu'
