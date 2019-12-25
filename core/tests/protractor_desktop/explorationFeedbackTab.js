@@ -325,7 +325,7 @@ describe('Suggestions on Explorations', function() {
         expect(threads[0]).toMatch(suggestionDescription2);
       });
     explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription1);
-
+    explorationEditorFeedbackTab.goBackToAllFeedbacks();
     explorationEditorFeedbackTab.rejectSuggestion(suggestionDescription2);
 
     explorationEditorPage.navigateToPreviewTab();

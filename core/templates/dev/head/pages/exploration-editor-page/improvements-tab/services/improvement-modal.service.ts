@@ -249,8 +249,8 @@ angular.module('oppia').factory('ImprovementModalService', [
               };
 
               $scope.onClickReviewSuggestion = function() {
-                $scope.messageSendingInProgress = true;
-                openSuggestionReviewModal($scope.activeThread);
+                openSuggestionReviewModal(
+                  $scope.activeThread, $uibModalInstance);
               };
 
               $scope.close = function() {
@@ -263,7 +263,8 @@ angular.module('oppia').factory('ImprovementModalService', [
         });
       },
 
-      openSuggestionReviewModal: function(suggestionThread) {
+      openSuggestionReviewModal: function(
+          suggestionThread, threadUibModalInstance) {
         return SuggestionModalForExplorationEditorService.showSuggestionModal(
           suggestionThread.suggestion.suggestionType, {
             activeThread: suggestionThread,
@@ -277,7 +278,8 @@ angular.module('oppia').factory('ImprovementModalService', [
               return ExplorationStatesService.hasState(
                 suggestionThread.getSuggestionStateName());
             },
-          }
+          },
+          threadUibModalInstance
         );
       },
       /**

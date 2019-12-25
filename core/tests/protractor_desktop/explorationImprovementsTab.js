@@ -379,8 +379,6 @@ describe('Suggestions Improvements', function() {
     improvementsTab.rejectSuggestion();
     waitFor.pageToFullyLoad();
 
-    browser.driver.navigate().refresh();
-
     improvementsTab.setShowOnlyOpenTasks(false);
     var acceptedTask = improvementsTab.getSuggestionTask(
       suggestionDescription1);

@@ -186,7 +186,7 @@ angular.module('oppia').directive('feedbackTab', [
                 isSuggestionHandled: _isSuggestionHandled,
                 hasUnsavedChanges: _hasUnsavedChanges,
                 isSuggestionValid: _isSuggestionValid
-              }
+              },
             );
           };
 

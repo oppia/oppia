@@ -26,11 +26,11 @@ require('services/editability.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
-  '$log', '$rootScope', '$uibModal', '$window',
+  '$log', '$rootScope', '$uibModal',
   'ExplorationDataService', 'ExplorationStatesService',
   'StateObjectFactory', 'SuggestionModalService',
   'ThreadDataService', 'UrlInterpolationService',
-  function($log, $rootScope, $uibModal, $window,
+  function($log, $rootScope, $uibModal,
       ExplorationDataService, ExplorationStatesService,
       StateObjectFactory, SuggestionModalService,
       ThreadDataService, UrlInterpolationService) {
@@ -41,7 +41,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
 
     var _showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
-        setActiveThread = (threadId) => {}) {
+        setActiveThread = (threadId) => {}, threadUibModalInstance) {
       $uibModal.open({
         templateUrl: _templateUrl,
         backdrop: true,
@@ -109,6 +109,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             $scope.newContent = newContent;
 
             $scope.acceptSuggestion = function() {
+              if (threadUibModalInstance !== null) {
+                threadUibModalInstance.close();
+              }
               SuggestionModalService.acceptSuggestion(
                 $uibModalInstance,
                 {
@@ -126,6 +129,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             };
 
             $scope.rejectSuggestion = function() {
+              if (threadUibModalInstance !== null) {
+                threadUibModalInstance.close();
+              }
               SuggestionModalService.rejectSuggestion(
                 $uibModalInstance,
                 {
@@ -168,7 +174,6 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
-            $window.location.reload();
           },
           function() {
             $log.error('Error resolving suggestion');
@@ -177,14 +182,16 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
     };
 
     return {
-      showSuggestionModal: function(suggestionType, extraParams) {
+      showSuggestionModal: function(
+          suggestionType, extraParams, threadUibModalInstance = null) {
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.activeThread,
             extraParams.isSuggestionHandled,
             extraParams.hasUnsavedChanges,
             extraParams.isSuggestionValid,
-            extraParams.setActiveThread
+            extraParams.setActiveThread,
+            threadUibModalInstance
           );
         }
       }
