@@ -5150,6 +5150,13 @@ jasmine-core@~2.8.0:
   resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-2.8.0.tgz#bcc979ae1f9fd05701e45e52e65d3a5d63f1a24e"
   integrity sha1-vMl5rh+f0FcB5F5S5l06XWPxok4=
 
+jasmine-fail-fast@~2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/jasmine-fail-fast/-/jasmine-fail-fast-2.0.0.tgz#e5d82e6a29a25f662c640e4c3270c2f9a71387e7"
+  integrity sha1-5dguaimiX2YsZA5MMnDC+acTh+c=
+  dependencies:
+    lodash "3.10.0"
+
 jasmine-spec-reporter@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/jasmine-spec-reporter/-/jasmine-spec-reporter-4.2.1.tgz#1d632aec0341670ad324f92ba84b4b32b35e9e22"
@@ -5576,6 +5583,11 @@ lodash.unescape@4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/lodash.unescape/-/lodash.unescape-4.0.1.tgz#bf2249886ce514cda112fae9218cdc065211fc9c"
   integrity sha1-vyJJiGzlFM2hEvrpIYzcBlIR/Jw=
+
+lodash@3.10.0:
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.0.tgz#93d51c672828a4416a12af57220ba8a8737e2fbb"
+  integrity sha1-k9UcZygopEFqEq9XIguoqHN+L7s=
 
 lodash@^4.17.11, lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.4:
   version "4.17.15"
@@ -7018,6 +7030,13 @@ promise@^8.0.3:
   integrity sha512-HeRDUL1RJiLhyA0/grn+PTShlBAcLuh/1BJGtrvjwbvRDCTLLMEz9rOGCV+R3vHY4MixIuoMEd9Yq/XvsTPcjw==
   dependencies:
     asap "~2.0.6"
+
+protractor-fail-fast@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/protractor-fail-fast/-/protractor-fail-fast-3.1.0.tgz#85997c431336038afa0b9b3647b1cdb9e4f8c1bc"
+  integrity sha512-OjuIFmY7hm5R/Msmioyg3aBevySpmpIgtm2TGUvMEqTzviPk/Fqd1HYmMjIQ+NzFMzrK+93LJa4civDvw1+hEg==
+  dependencies:
+    jasmine-fail-fast "~2.0.0"
 
 protractor-jasmine2-screenshot-reporter@^0.5.0:
   version "0.5.0"
