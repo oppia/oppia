@@ -378,20 +378,31 @@ describe('Suggestions Improvements', function() {
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
     waitFor.pageToFullyLoad();
-    console.log('------------------------------------done1');
 
     improvementsTab.setShowOnlyOpenTasks(false);
-    console.log('------------------------------------done2');
+    try {
     var acceptedTask = improvementsTab.getSuggestionTask(
       suggestionDescription1);
-    console.log('------------------------------------done3');
+    } catch(e) {
+      throw new Error('hi1');
+    }
+    try {
     var rejectedTask = improvementsTab.getSuggestionTask(
-      suggestionDescription2);
-    console.log('------------------------------------done4');
-    expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
-    console.log('------------------------------------done5');
+      suggestionDescription2);}
+    catch(e) {
+      throw new Error('hi2');
+    }
+    try {
+    expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');}
+    catch(e) {
+      throw new Error('hi3');
+    }
+    try {
     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
-    console.log('------------------------------------done6');
+  }
+     catch(e) {
+       throw new Error('hi4');
+     }
 
     explorationEditorPage.navigateToPreviewTab();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion1));
