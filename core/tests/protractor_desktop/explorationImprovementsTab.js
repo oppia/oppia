@@ -384,7 +384,7 @@ describe('Suggestions Improvements', function() {
       suggestionDescription1);
     var rejectedTask = improvementsTab.getSuggestionTask(
       suggestionDescription2);
-//     expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
+    expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
 //     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 
     explorationEditorPage.navigateToPreviewTab();
