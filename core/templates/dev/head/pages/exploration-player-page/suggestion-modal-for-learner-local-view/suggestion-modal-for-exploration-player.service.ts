@@ -63,9 +63,11 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             $timeout(function() {
               $scope.showEditor = true;
             }, 500);
+
             $scope.cancelSuggestion = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
+
             $scope.submitSuggestion = function() {
               var data = {
                 target_id: ExplorationEngineService.getExplorationId(),
