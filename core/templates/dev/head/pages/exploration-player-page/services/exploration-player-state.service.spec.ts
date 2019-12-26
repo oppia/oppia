@@ -17,219 +17,157 @@
  */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
-// current-interaction.service.ts is upgraded to Angular 8.
-import { AngularNameService } from
-  'pages/exploration-editor-page/services/angular-name.service';
+// exploration-player-state.service.ts is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-// require('domain/exploration/editable-exploration-backend-api.service.ts');
-// require('domain/exploration/read-only-exploration-backend-api.service.ts');
-// require('domain/question/pretest-question-backend-api.service.ts');
-// require('domain/question/question-backend-api.service.ts');
-// require('pages/exploration-player-page/services/exploration-engine.service.ts');
-// require('pages/exploration-player-page/services/number-attempts.service.ts');
-// require('pages/exploration-player-page/services/player-position.service.ts');
-// require('pages/exploration-player-page/services/player-transcript.service.ts');
-// require(
-//   'pages/exploration-player-page/services/question-player-engine.service.ts');
-// require(
-//   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
-// require('pages/exploration-player-page/services/stats-reporting.service.ts');
-// require('services/context.service.ts');
-// require('services/exploration-features-backend-api.service.ts');
-// require('services/exploration-features.service.ts');
-// require('services/playthrough-issues.service.ts');
-// require('services/playthrough.service.ts');
-// require('services/contextual/url.service.ts');
-
-// require(
-//   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 
-describe('Exploration Player State Service', function() {
-  var EXPLORATION_MODE = null;
-  var ContextService = null;
-  var ExplorationEngineService = null;
-  var ExplorationFeaturesService = null;
-  var ExplorationFeaturesBackendApiService = null;
-  var EditableExplorationBackendApiService = null;
-  var ExplorationPlayerStateService = null;
-  var NumberAttemptsService = null;
-  var PlayerCorrectnessFeedbackEnabledService = null;
-  var PlayerTranscriptService = null;
-  var PlaythroughIssuesService = null;
-  var PlaythroughService = null;
-  var PretestQuestionBackendApiService = null;
-  var ReadOnlyExplorationBackendApiService = null;
-  var QuestionBackendApiService = null;
-  var QuestionPlayerEngineService = null;
-  var StateClassifierMappingService = null;
-  var StatsReportingService = null;
-  var UrlService = null;
-  var $rootScope = null;
-  var $httpBackend = null;
-  var $q = null;
-  var $scope = null;
+describe('Exploration Player State Service', () => {
+  let ExplorationEngineService = null;
+  let ExplorationPlayerStateService = null;
+  let PlaythroughIssuesService = null;
+  let PlaythroughService = null;
+  let StatsReportingService = null;
+  let ReadOnlyExplorationBackendApiService = null;
+  let $rootScope = null;
+  let $q = null;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
+  beforeEach(angular.mock.module('oppia', ($provide) => {
+    let ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
-  beforeEach(function() {
-    angular.mock.module(function($provide) {
-      $provide.value('AngularNameService', new AngularNameService());
+  beforeEach(() => {
+    angular.mock.module(($provide) => {
       $provide.value('UrlService', {
-        getExplorationVersionFromUrl: function() {
+        getCollectionIdFromExplorationUrl: () => {
+          return '';
+        },
+        getExplorationVersionFromUrl: () => {
           return null;
         },
-        getStoryIdInPlayer: function() {
+        getStoryIdInPlayer: () => {
           return '1';
+        },
+        getUrlParams: () => {
+          return {};
         }
       });
-
       $provide.value('ContextService', {
-        isInExplorationEditorPage: function() {
+        isInExplorationEditorPage: () => {
           return false;
         },
-        isInQuestionPlayerMode: function() {
+        isInQuestionPlayerMode: () => {
           return true;
         },
-        getExplorationId: function() {
+        getExplorationId: () => {
           return '123';
         }
       });
-      
       $provide.constant('EXPLORATION_MODE', {
         OTHER: false
       });
       $provide.factory(
-        'ReadOnlyExplorationBackendApiService', ['$http', function($http) {
+        'ReadOnlyExplorationBackendApiService', ['$q', ($q) => {
           return {
-            loadExploration: function() {
-              return $http.get('/dummyurl/1');
+            loadExploration: () => {
+              return $q.resolve();
             },
-            loadLatestExploration: function() {
-              return $http.get('/dummyurl/1');
+            loadLatestExploration: () => {
+              return $q.resolve();
             }
           };
         }]);
-      // $provide.value('ReadOnlyExplorationBackendApiService', {
-      //   loadExploration: $.noop,
-      //   loadLatestExploration: $.noop
-      // });
-      $provide.value('StatsReportingService', {});
-      $provide.value('StateClassifierMappingService', {});
+      $provide.value('StatsReportingService', {
+        initSession: $.noop
+      });
+      $provide.value('StateClassifierMappingService', {
+        init: $.noop
+      });
       $provide.value('QuestionPlayerEngineService', {});
       $provide.value('QuestionBackendApiService', {});
-      $provide.factory(
-        'PretestQuestionBackendApiService', ['$http', function($http) {
-          return {
-            fetchPretestQuestions: function() {
-              return $http.get('/dummyurl/2');
-            }
-          };
-        }]);
-      // $provide.value('PretestQuestionBackendApiService', {
-      //   fetchPretestQuestions: $.noop
-      // });
-      $provide.value('PlaythroughService', {});
+      $provide.value('PretestQuestionBackendApiService', {
+        fetchPretestQuestions: $.noop
+      });
+      $provide.value('PlaythroughService', {
+        initSession: $.noop
+      });
       $provide.value('PlayerTranscriptService', {
         init: $.noop
       });
-      $provide.value('PlaythroughIssuesService', {});
-      $provide.value('PlayerCorrectnessFeedbackEnabledService', {});
+      $provide.value('PlaythroughIssuesService', {
+        initSession: $.noop
+      });
+      $provide.value('PlayerCorrectnessFeedbackEnabledService', {
+        init: $.noop
+      });
       $provide.value('NumberAttemptsService', {});
-      $provide.factory(
-        'ExplorationFeaturesBackendApiService', ['$http', function($http) {
-          return {
-            fetchExplorationFeatures: function() {
-              return $http.get('/dummyurl/3');
-            }
-          };
-        }]);
-      // $provide.value('ExplorationFeaturesBackendApiService', {
-      //   fetchExplorationFeatures: $.noop
-      // });
-      $provide.value('ExplorationFeaturesService', {});
-      $provide.value('ExplorationEngineService', {});
+      $provide.value('ExplorationFeaturesBackendApiService', {
+        fetchExplorationFeatures: $.noop
+      });
+      $provide.value('ExplorationFeaturesService', {
+        init: $.noop
+      });
+      $provide.value('ExplorationEngineService', {
+        init: $.noop
+      });
       $provide.value('EditableExplorationBackendApiService', {});
     });
   });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $httpBackend = $injector.get('$httpBackend');
+  beforeEach(angular.mock.inject((
+      _$rootScope_, _$q_,
+      _ExplorationEngineService_,
+      _ExplorationPlayerStateService_,
+      _PlaythroughIssuesService_,
+      _PlaythroughService_,
+      _ReadOnlyExplorationBackendApiService_,
+      _StatsReportingService_) => {
+    $rootScope = _$rootScope_;
+    $q = _$q_;
+    ExplorationEngineService = _ExplorationEngineService_;
+    StatsReportingService = _StatsReportingService_;
+    PlaythroughIssuesService = _PlaythroughIssuesService_;
+    PlaythroughService = _PlaythroughService_;
+    ReadOnlyExplorationBackendApiService = (
+      _ReadOnlyExplorationBackendApiService_);
+    ExplorationPlayerStateService = _ExplorationPlayerStateService_;
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    $rootScope = $injector.get('$rootScope');
-    $q = $injector.get('$q');
-    // ReadOnlyExplorationBackendApiService = {
-    //   loadExploration: function() {
-    //     var deferred = $q.defer();
-    //     deferred.resolve({});
-    //     return deferred.promise;
-    //   }
-    // };
-    // ReadOnlyExplorationBackendApiService = {
-    //   loadExploration: $.noop,
-    //   loadLatestExploration: $.noop
-    // }
-    // var deferred = $q.defer();
-    // deferred.resolve({});
-
-    // spyOn($q, 'all').and.returnValue(deferred.promise);
-    // spyOn(ReadOnlyExplorationBackendApiService, 'loadLatestExploration').and.returnValue($q.resolve([]));
-    // PretestQuestionBackendApiService = {
-    //   fetchPretestQuestions: function() {
-    //     var deferred = $q.defer();
-    //     deferred.resolve({});
-    //     return deferred.promise;
-    //   }
-    // };
-    // ExplorationFeaturesBackendApiService = {
-    //   fetchExplorationFeatures: function() {
-    //     var deferred = $q.defer();
-    //     deferred.resolve({});
-    //     return deferred.promise;
-    //   }
-    // };
-    // this.deferred = null;
-    // var self = this;
-    // spyOn($q, 'all').and.callFake(function() {
-    //   self.deferred = $q.defer();
-    //   return self.deferred.promise;
-    // });
-    ExplorationPlayerStateService = $injector.get('ExplorationPlayerStateService');
-    this.scope = $rootScope.$new();
-  }));
-
-  fit('should properly initialize player', function() {
-    $httpBackend.expect('GET', '/dummyurl/1').respond({
-      version: 1
-    });
-    $httpBackend.expect('GET', '/dummyurl/2').respond({
-      version: 1
-    });
-    $httpBackend.expect('GET', '/dummyurl/3').respond({
-      version: 1
-    });
-    // var deferred = $q.defer();
-    // deferred.resolve({});
-    // spyOn($q, 'all').and.returnValue(deferred.promise);
-    ExplorationPlayerStateService.initializePlayer();
-    $httpBackend.flush();
+  it('should properly initialize player', (done) => {
+    let deferred = $q.defer();
+    deferred.resolve([{
+      version: 1,
+      exploration: {
+        title: 'exploration title'
+      },
+      session_id: '123'
+    }, {}, {}]);
+    spyOn($q, 'all').and.returnValue(deferred.promise);
+    spyOn(StatsReportingService, 'initSession').and.callFake((
+      explorationId, title, version, sessionId, collectionId) => {
+        expect(version).toEqual(1);
+      });
+    spyOn(PlaythroughService, 'initSession').and.callFake((
+      explorationId, version, recordPlaythroughProbability) => {
+        expect(version).toEqual(1);
+      });
+    spyOn(PlaythroughIssuesService, 'initSession').and.callFake((
+      explorationId, version) => {
+        expect(version).toEqual(1);
+      });
+    spyOn(ExplorationEngineService, 'init').and.callFake((
+      exploration, version, preferredAudioLanguageCode,
+      autoTtsEnabled, callback) => {
+        expect(version).toEqual(1);
+        callback();
+      });
+    ExplorationPlayerStateService.initializePlayer(() => done());
     $rootScope.$apply();
-    // $rootScope.$digest();
-    // this.scope.$digest();
-    // this.deferred.resolve([{}, {}, {}]);
-    // this.scope.$digest();
-    // this.scope.$apply();
-    expect(true).toBe(true);
   });
 });
