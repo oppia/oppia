@@ -43,7 +43,7 @@ transaction_services = models.Registry.import_transaction_services()
 # updated, reverted, deleted, created, rights changed. See TODO(msl): at
 # the top of exp_services_test for more original context.
 
-# pylint: disable=protected-access
+
 def count_at_least_editable_collection_summaries(user_id):
     """Returns the count of collection summaries that are atleast editable."""
     return len(collection_services.get_collection_summary_dicts_from_models(
