@@ -40,11 +40,11 @@ export class SkillOpportunity {
   }
 
   getOpportunityHeading(): string {
-    return this.topicName;
+    return this.skillDescription;
   }
 
   getOpportunitySubheading(): string {
-    return this.skillDescription;
+    return this.topicName;
   }
 
   getQuestionCount(): number {
