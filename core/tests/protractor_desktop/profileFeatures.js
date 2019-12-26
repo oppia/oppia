@@ -60,7 +60,7 @@ describe('Un-customized profile page', function() {
   it('displays no photo, default bio, and no interests when logged out',
     function() {
       profilePage.get(TEST_USERNAME);
-      profilePage.expectOtherUserToNotHaveProfilePhoto();
+      profilePage.expectOtherUserToHaveProfilePhoto();
       profilePage.expectUserToHaveBio(DEFAULT_BIO);
       profilePage.expectUserToHaveNoInterests();
       profilePage.expectUserToHaveInterestPlaceholder(
@@ -106,7 +106,7 @@ describe('Customized profile page for current user', function() {
   it('displays no photo, custom bio, and interests when logged out',
     function() {
       profilePage.get(TEST_USERNAME);
-      profilePage.expectOtherUserToNotHaveProfilePhoto();
+      profilePage.expectOtherUserToHaveProfilePhoto();
       profilePage.expectUserToHaveBio(TEST_BIO);
       profilePage.expectUserToHaveInterests(TEST_INTERESTS);
       profilePage.expectUserToNotHaveInterestPlaceholder();
@@ -142,7 +142,7 @@ describe('Visiting user profile page', function() {
     users.createUser(ANOTHER_EMAIL, ANOTHER_USERNAME);
     users.login(ANOTHER_EMAIL);
 
-    workflow.createAndPublishExploration(
+    workflow.createAndPublishTwoCardExploration(
       EXPLORATION.title,
       EXPLORATION.category,
       EXPLORATION.objective,
@@ -160,11 +160,10 @@ describe('Visiting user profile page', function() {
 
     profilePage.get(ANOTHER_USERNAME);
     profilePage.expectToHaveExplorationCards();
-    profilePage.expectToHaveExplorationCardByName(EXPLORATION.title);
+    profilePage.expectToHaveExplorationCardByName('A new exploration');
   });
 
   it('should show created exploration stats for user', function() {
-    users.createUser(TEST_EMAIL, TEST_USERNAME);
     users.login(TEST_EMAIL);
 
     profilePage.get(ANOTHER_USERNAME);
@@ -201,13 +200,6 @@ describe('Playing the exploration', function() {
   });
 
   it('should change the cards on clicking next and back buttons', function() {
-    workflow.createAndPublishTwoCardExploration(
-      EXPLORATION.title,
-      EXPLORATION.category,
-      EXPLORATION.objective,
-      EXPLORATION.language
-    );
-
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
 
