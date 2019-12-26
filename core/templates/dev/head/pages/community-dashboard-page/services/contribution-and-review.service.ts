@@ -29,12 +29,14 @@ angular.module('oppia').factory('ContributionAndReviewService', [
   '$http', '$q', 'UrlInterpolationService', 'ACTION_ACCEPT_SUGGESTION',
   function(
       $http, $q, UrlInterpolationService, ACTION_ACCEPT_SUGGESTION) {
-    var _SUBMITTED_SUGGESTION_LIST_HANDLER_URL_TEMPLATE = (
+    var _SUBMITTED_SUGGESTION_LIST_HANDLER_URL = (
       '/getsubmittedsuggestions/<target_type>/<suggestion_type>');
-    var _REVIEWABLE_SUGGESTIONS_HANDLER_URL_TEMPLATE = (
+    var _REVIEWABLE_SUGGESTIONS_HANDLER_URL = (
       '/getreviewablesuggestions/<target_type>/<suggestion_type>');
-    var _SUGGESTION_ACTION_HANDLER_URL = (
-      '/suggestionactionhandler/exploration/<exp_id>/<thread_id>');
+    var _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL = (
+      '/suggestionactionhandler/exploration/<exp_id>/<suggestion_id>');
+    var _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL = (
+      '/suggestionactionhandler/skill/<skill_id>/<suggestion_id>');
 
     var _fetchSuggestions = function(url, onSuccess) {
       var suggestionsPromise = $http.get(url);
@@ -53,9 +55,25 @@ angular.module('oppia').factory('ContributionAndReviewService', [
     };
 
     return {
-      getUserCreatedTranslationSuggestions: function(username, onSuccess) {
+      getUserCreatedQuestionSuggestions: function(onSuccess) {
         var url = UrlInterpolationService.interpolateUrl(
-          _SUBMITTED_SUGGESTION_LIST_HANDLER_URL_TEMPLATE, {
+          _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
+            target_type: 'skill',
+            suggestion_type: 'add_question'
+          });
+        return _fetchSuggestions(url, onSuccess);
+      },
+      getReviewableQuestionSuggestions: function(onSuccess) {
+        var url = UrlInterpolationService.interpolateUrl(
+          _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
+            target_type: 'skill',
+            suggestion_type: 'add_question'
+          });
+        return _fetchSuggestions(url, onSuccess);
+      },
+      getUserCreatedTranslationSuggestions: function(onSuccess) {
+        var url = UrlInterpolationService.interpolateUrl(
+          _SUBMITTED_SUGGESTION_LIST_HANDLER_URL, {
             target_type: 'exploration',
             suggestion_type: 'translate_content'
           });
@@ -63,18 +81,19 @@ angular.module('oppia').factory('ContributionAndReviewService', [
       },
       getReviewableTranslationSuggestions: function(onSuccess) {
         var url = UrlInterpolationService.interpolateUrl(
-          _REVIEWABLE_SUGGESTIONS_HANDLER_URL_TEMPLATE, {
+          _REVIEWABLE_SUGGESTIONS_HANDLER_URL, {
             target_type: 'exploration',
             suggestion_type: 'translate_content'
           });
         return _fetchSuggestions(url, onSuccess);
       },
-      resolveSuggestion: function(
-          targetId, threadId, action, reviewMessage, commitMessage, onSuccess) {
+      resolveSuggestiontoExploration: function(
+          targetId, suggestionId, action, reviewMessage, commitMessage,
+          onSuccess) {
         var url = UrlInterpolationService.interpolateUrl(
-          _SUGGESTION_ACTION_HANDLER_URL, {
+          _SUGGESTION_TO_EXPLORATION_ACTION_HANDLER_URL, {
             exp_id: targetId,
-            thread_id: threadId
+            suggestion_id: suggestionId
           });
         return $http.put(url, {
           action: action,
@@ -82,7 +101,24 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           commit_message: (
             action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null)
         }).then(function() {
-          onSuccess(threadId);
+          onSuccess(suggestionId);
+        });
+      },
+      resolveSuggestiontoSkill: function(
+          targetId, suggestionId, action, reviewMessage, commitMessage,
+          onSuccess) {
+        var url = UrlInterpolationService.interpolateUrl(
+          _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
+            skill_id: targetId,
+            suggestion_id: suggestionId
+          });
+        return $http.put(url, {
+          action: action,
+          review_message: reviewMessage,
+          commit_message: (
+            action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null)
+        }).then(function() {
+          onSuccess(suggestionId);
         });
       }
     };

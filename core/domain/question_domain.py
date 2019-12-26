@@ -86,7 +86,7 @@ class QuestionChange(change_domain.BaseChange):
     }, {
         'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
         'required_attribute_names': ['question_dict', 'skill_id'],
-        'optional_attribute_names': []
+        'optional_attribute_names': ['topic_name']
     }, {
         'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],

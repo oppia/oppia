@@ -16,12 +16,34 @@
  * @fileoverview Directive for question opportunities.
  */
 
+require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/question-directives/question-editor/' +
+  'question-editor.directive.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require('directives/angular-html-bind.directive.ts');
+require('directives/mathjax-bind.directive.ts');
+require('domain/editor/undo_redo/question-undo-redo.service.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/skill/editable-skill-backend-api.service.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/SkillObjectFactory.ts');
+require('interactions/codemirrorRequires.ts');
 require(
   'pages/community-dashboard-page/opportunities-list/' +
   'opportunities-list.directive.ts');
 require(
   'pages/community-dashboard-page/services/' +
+  'question-suggestion.service.ts');
+require(
+  'pages/community-dashboard-page/services/' +
   'contribution-opportunities.service.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').directive('questionOpportunities', [
   'UrlInterpolationService', 'MAX_QUESTIONS_PER_SKILL',
@@ -35,12 +57,29 @@ angular.module('oppia').directive('questionOpportunities', [
       'question-opportunities.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'ContributionOpportunitiesService',
-        function(ContributionOpportunitiesService) {
+        '$scope', '$uibModal', 'QuestionSuggestionService', 'AlertsService',
+        'ContributionOpportunitiesService', 'EditableSkillBackendApiService',
+        'MisconceptionObjectFactory', 'QuestionObjectFactory',
+        'QuestionUndoRedoService', 'SkillObjectFactory',
+        function(
+            $scope, $uibModal, QuestionSuggestionService, AlertsService,
+            ContributionOpportunitiesService, EditableSkillBackendApiService,
+            MisconceptionObjectFactory, QuestionObjectFactory,
+            QuestionUndoRedoService, SkillObjectFactory) {
           var ctrl = this;
           ctrl.opportunities = [];
           ctrl.opportunitiesAreLoading = true;
           ctrl.moreOpportunitiesAvailable = true;
+          ctrl.progressBarRequired = true;
+
+          var getOpportunity = function(skillId) {
+            for (var index in ctrl.opportunities) {
+              if (ctrl.opportunities[index].id === skillId) {
+                return ctrl.opportunities[index];
+              }
+            }
+          };
+
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
@@ -50,6 +89,7 @@ angular.module('oppia').directive('questionOpportunities', [
                 (opportunity.getQuestionCount() / MAX_QUESTIONS_PER_SKILL) *
                 100).toFixed(2);
               ctrl.opportunities.push({
+                id: opportunity.id,
                 heading: heading,
                 subheading: subheading,
                 progressPercentage: progressPercentage,
@@ -61,13 +101,112 @@ angular.module('oppia').directive('questionOpportunities', [
           };
 
           ctrl.onLoadMoreOpportunities = function() {
-            if (
-              !ctrl.opportunitiesAreLoading &&
+            if (!ctrl.opportunitiesAreLoading &&
                 ctrl.moreOpportunitiesAvailable) {
               ctrl.opportunitiesAreLoading = true;
               ContributionOpportunitiesService.getMoreSkillOpportunities(
                 updateWithNewOpportunities);
             }
+          };
+
+          ctrl.onClickSuggestQuestionButton = function(skillId) {
+            var opportunity = getOpportunity(skillId);
+            var question =
+              QuestionObjectFactory.createDefaultQuestion([skillId]);
+            var questionId = question.getId();
+            var questionStateData = question.getStateData();
+
+            QuestionUndoRedoService.clearChanges();
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/question-directives/modal-templates/' +
+                'question-editor-modal.directive.html'),
+              backdrop: 'static',
+              keyboard: false,
+              controller: [
+                '$scope', '$uibModalInstance', 'StateEditorService',
+                function(
+                    $scope, $uibModalInstance, StateEditorService) {
+                  $scope.canEditQuestion = true;
+                  $scope.newQuestionIsBeingCreated = true;
+                  $scope.question = question;
+                  $scope.questionStateData = questionStateData;
+                  $scope.questionId = questionId;
+                  EditableSkillBackendApiService.fetchSkill(skillId)
+                    .then(function(backendSkillObject) {
+                      $scope.associatedSkill =
+                        SkillObjectFactory.createFromBackendDict(
+                          backendSkillObject.skill);
+                      $scope.misconceptionsBySkill = {};
+                      $scope.misconceptionsBySkill[$scope.associatedSkill._id] =
+                        $scope.associatedSkill._misconceptions.map(
+                          function(misconceptionsBackendDict) {
+                            return MisconceptionObjectFactory
+                              .createFromBackendDict(misconceptionsBackendDict);
+                          });
+                    }, function(error) {
+                      AlertsService.addWarning();
+                    });
+                  $scope.removeErrors = function() {
+                    $scope.validationError = null;
+                  };
+                  $scope.questionChanged = function() {
+                    $scope.removeErrors();
+                  };
+                  $scope.done = function() {
+                    $scope.validationError = $scope.question.validate(
+                      $scope.misconceptionsBySkill);
+                    if ($scope.validationError) {
+                      return;
+                    }
+                    if (!StateEditorService.isCurrentSolutionValid()) {
+                      $scope.validationError =
+                        'The solution is invalid and does not ' +
+                        'correspond to a correct answer';
+                      return;
+                    }
+                    QuestionSuggestionService.submitSuggestion($scope.question,
+                      $scope.associatedSkill, opportunity.heading);
+                    $uibModalInstance.close();
+                  };
+                  // Checking if Question contains all requirements to enable
+                  // Save and Publish Question
+                  $scope.isSaveButtonDisabled = function() {
+                    return $scope.question.validate(
+                      $scope.misconceptionsBySkill);
+                  };
+
+                  $scope.cancel = function() {
+                    if (QuestionUndoRedoService.hasChanges()) {
+                      var modalInstance = $uibModal.open({
+                        templateUrl:
+                          UrlInterpolationService.getDirectiveTemplateUrl(
+                            '/components/question-directives/modal-templates/' +
+                            'confirm-question-modal-exit-modal.directive.html'),
+                        backdrop: true,
+                        controller: [
+                          '$scope', '$uibModalInstance',
+                          function($scope, $uibModalInstance) {
+                            $scope.cancel = function() {
+                              $uibModalInstance.dismiss('cancel');
+                            };
+
+                            $scope.close = function() {
+                              $uibModalInstance.close();
+                            };
+                          }
+                        ]
+                      });
+                      modalInstance.result.then(function() {
+                        $uibModalInstance.dismiss('cancel');
+                      });
+                    } else {
+                      $uibModalInstance.dismiss('cancel');
+                    }
+                  };
+                }
+              ]
+            });
           };
 
           ContributionOpportunitiesService.getSkillOpportunities(

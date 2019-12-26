@@ -218,7 +218,10 @@ describe('Question object factory', function() {
   });
 
   it('should correctly get backend dict', function() {
-    expect(_sampleQuestion.toBackendDict(true).id).toEqual(null);
+    var newQuestionBackendDict = _sampleQuestion.toBackendDict(true);
+    expect(newQuestionBackendDict.id).toEqual(null);
+    expect(newQuestionBackendDict.linked_skill_ids).not.toBeDefined();
+    expect(newQuestionBackendDict.version).toEqual(1);
     expect(_sampleQuestion.toBackendDict(false).id).toEqual('question_id');
   });
 

@@ -2,20 +2,20 @@
   <div class="oppia-contributions-show-review-side-navbar-container" >
     <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.isAdmin">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Things to do">
-        <div class="oppia-contributions-navbar-item">
+        <div class="oppia-contributions-navbar-item" ng-repeat="tab in $ctrl.reviewTabs">
           <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToReviewTab()"
-                  ng-class="$ctrl.reviewTabActive ? 'oppia-contributions-active-navbar': ''"> Review Translations
+                  ng-click="$ctrl.switchToReviewTab(tab.suggestionType)"
+                  ng-class="$ctrl.activeReviewTab == tab.suggestionType ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>
         </div>
       </div>
     </div>
     <div class="oppia-contributions-side-navbar-part" ng-if="$ctrl.userIsLoggedIn">
       <div class="oppia-contributions-navbar-items-list" navbar-label="Contributions">
-        <div class="oppia-contributions-navbar-item">
+        <div class="oppia-contributions-navbar-item" ng-repeat="tab in $ctrl.contributionTabs">
           <button class="oppia-contributions-navbar-button"
-                  ng-click="$ctrl.switchToContributionsTab()"
-                  ng-class="$ctrl.reviewTabActive ? '' : 'oppia-contributions-active-navbar'">Translations
+                  ng-click="$ctrl.switchToContributionsTab(tab.suggestionType)"
+                  ng-class="$ctrl.activeContributionTab == tab.suggestionType ? 'oppia-contributions-active-navbar' : ''">{{tab.text}}
           </button>
         </div>
       </div>
@@ -29,7 +29,7 @@
       <opportunities-list opportunity-data-is-loading="$ctrl.contributionsDataLoading"
                           opportunities="$ctrl.contributionSummaries"
                           on-click-action-button="$ctrl.onClickViewSuggestion"
-                          label-required="!$ctrl.reviewTabActive">
+                          label-required="!$ctrl.activeReviewTab">
       </opportunities-list>
     </div>
   </div>
@@ -110,7 +110,7 @@
 
   contributions-and-review .oppia-contributions-navbar-items-list::before {
     border-bottom: 1px solid #fff;
-    bottom: 35px;
+    bottom: 58px;
     color: #fff;
     content: attr(navbar-label);
     font-size: 20px;
