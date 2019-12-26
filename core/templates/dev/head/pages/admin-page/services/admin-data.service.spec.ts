@@ -16,55 +16,63 @@
  * @fileoverview Tests for AdminDataService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-require('pages/admin-page/services/admin-data.service.ts');
+import { AdminDataService } from
+  'pages/admin-page/services/admin-data.service';
 
-describe('Admin Data Service', function() {
-  var AdminDataService = null;
-  var $httpBackend = null;
+describe('Admin Data Service', () => {
+  let adminDataService: AdminDataService = null;
+  let httpTestingController: HttpTestingController;
   var sampleAdminData = {
     property: 'value'
   };
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    $httpBackend = $injector.get('$httpBackend');
-    AdminDataService = $injector.get('AdminDataService');
-  }));
-
-  it('should return the correct admin data', function() {
-    $httpBackend.expect('GET', '/adminhandler').respond(
-      200, sampleAdminData);
-
-    AdminDataService.getDataAsync().then(function(response) {
-      expect(response).toEqual(sampleAdminData);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [AdminDataService]
     });
+    adminDataService = TestBed.get(
+      AdminDataService);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
-  it('should cache the response and not make a second request', function() {
-    $httpBackend.expect('GET', '/adminhandler').respond(
-      200, sampleAdminData);
-    AdminDataService.getDataAsync();
-    $httpBackend.flush();
+  afterEach(() => {
+    httpTestingController.verify();
+  });
 
-    $httpBackend.whenGET('/adminhandler').respond(
-      200, {property: 'another value'});
-
-    AdminDataService.getDataAsync().then(function(response) {
+  it('should return the correct admin data', fakeAsync(() => {
+    adminDataService.getDataAsync().then(function(response) {
       expect(response).toEqual(sampleAdminData);
     });
 
-    expect($httpBackend.flush).toThrow();
-  });
+    var req = httpTestingController.expectOne(
+      '/adminhandler');
+    expect(req.request.method).toEqual('GET');
+    req.flush(sampleAdminData);
+
+    flushMicrotasks();
+  }));
+
+  it('should cache the response and not make a second request',
+    fakeAsync(() => {
+      adminDataService.getDataAsync();
+
+      var req = httpTestingController.expectOne(
+        '/adminhandler');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleAdminData);
+
+      flushMicrotasks();
+
+      adminDataService.getDataAsync().then(function(response) {
+        expect(response).toEqual(sampleAdminData);
+      });
+
+      httpTestingController.expectNone('/adminhandler');
+    })
+  );
 });
