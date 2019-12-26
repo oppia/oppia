@@ -45,8 +45,12 @@ def get_gcs_resource_bucket_name():
     This needs to be in sync with deploy.py which adds the bucket name to
     constants.js
 
+    Also, note that app_identity.get_default_gcs_bucket_name() returns None
+    if we try to use it in production mode but the default bucket hasn't been
+    enabled through the project console.
+
     Returns:
-        str or None. The bucket name for the application's GCS resources..
+        str. The bucket name for the application's GCS resources.
     """
     if constants.DEV_MODE:
         return app_identity.get_default_gcs_bucket_name()
