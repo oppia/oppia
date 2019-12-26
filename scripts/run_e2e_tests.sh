@@ -106,7 +106,7 @@ export OPPIA_DIR=`pwd`
 # as $PYTHONPATH).
 export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
 export TOOLS_DIR=$COMMON_DIR/oppia_tools
-export NODE_PATH=$TOOLS_DIR/node-10.15.3
+export NODE_PATH=$TOOLS_DIR/node-10.18.0
 export PATH=$NODE_PATH/bin:$PATH
 
 # Forces the cleanup function to run on exit.
