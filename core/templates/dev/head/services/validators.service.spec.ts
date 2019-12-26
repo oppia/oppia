@@ -46,7 +46,6 @@ describe('Validators service', () => {
     expect(vs.isValidEntityName('x', null, null)).toBe(false);
     expect(vs.isValidEntityName('y', null, null)).toBe(false);
     expect(vs.isValidEntityName('bx', true, null)).toBe(false);
-    expect(vs.alerts.warnings.length).toBe(2);
   });
 
   it('should correctly validate exploration titles', () => {
@@ -61,7 +60,6 @@ describe('Validators service', () => {
     expect(vs.isValidExplorationTitle(
       'A title that is toooooooooooooooooooooooooo too long.', true)).toBe(
       false);
-    expect(vs.alerts.warnings.length).toBe(1);
   });
 
   it('should correctly validate non-emptiness', () => {
@@ -71,7 +69,6 @@ describe('Validators service', () => {
     expect(vs.isNonempty('', null)).toBe(false);
     expect(vs.isNonempty(null, null)).toBe(false);
     expect(vs.isNonempty(undefined, true)).toBe(false);
-    expect(vs.alerts.warnings.length).toBe(1);
   });
 
   it('should correctly validate exploration IDs', () => {
@@ -82,7 +79,6 @@ describe('Validators service', () => {
     expect(vs.isValidExplorationId('abc def', null)).toBe(false);
     expect(vs.isValidExplorationId('', null)).toBe(false);
     expect(vs.isValidExplorationId('abcd;', true)).toBe(false);
-    expect(vs.alerts.warnings.length).toBe(1);
   });
 
   it('should correctly validate state name', () => {
@@ -94,6 +90,5 @@ describe('Validators service', () => {
     expect(vs.isValidStateName(
       'A state name that is toooooooooooooooooooooooo long', true))
       .toBe(false);
-    expect(vs.alerts.warnings.length).toBe(1);
   });
 });
