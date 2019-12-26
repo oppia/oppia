@@ -16,12 +16,10 @@
  * @fileoverview Constants for navigation bars.
  */
 
-/* eslint-disable max-len */
+
 // TODO(#7092): Delete this file once migration is complete and these AngularJS
 // equivalents of the Angular constants are no longer needed.
-import { NavigationBarConstants } from
-  './navigation-bars.constants';
-/* eslint-enable max-len */
+import { NavigationBarConstants } from './navigation-bars.constants';
 
 angular.module('oppia').constant(
   'NOTIFICATIONS_HANDLER_URL',
