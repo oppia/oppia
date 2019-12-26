@@ -128,7 +128,7 @@ jobs:
       - run:
           name: Check frontend test coverage
           command: |
-            python -m scripts.check_frontend_test_coverage
+            python -m scripts.check_frontend_coverage
 
   backend_tests:
     <<: *job_defaults
