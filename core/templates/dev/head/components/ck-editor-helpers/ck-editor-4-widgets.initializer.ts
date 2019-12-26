@@ -20,16 +20,19 @@
 require('rich_text_components/richTextComponentsRequires.ts');
 require('services/html-escaper.service.ts');
 require('services/rte-helper.service.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').run([
   '$timeout', '$compile', '$rootScope', 'RteHelperService',
-  'HtmlEscaperService',
+  'HtmlEscaperService', 'ContextService', 'PAGE_CONTEXT',
   function($timeout, $compile, $rootScope, RteHelperService,
-      HtmlEscaperService) {
+      HtmlEscaperService, ContextService, PAGE_CONTEXT) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
       var ckName = 'oppia' + componentDefn.id;
+      var contextIsExplorationPlayer = (
+        ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_PLAYER);
 
       // Check to ensure that a plugin is not registered more than once.
       if (CKEDITOR.plugins.registered[ckName] !== undefined) {
@@ -61,6 +64,9 @@ angular.module('oppia').run([
             template: componentTemplate,
             draggable: false,
             edit: function() {
+              if (contextIsExplorationPlayer && componentDefn.id === 'image') {
+                return;
+              }
               editor.fire('lockSnapshot', {
                 dontUpdate: true
               });

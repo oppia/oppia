@@ -89,8 +89,10 @@ angular.module('oppia').directive('ckEditor4Rte', [
         }).join(',');
         var buttonNames = [];
         names.forEach(function(name) {
-          buttonNames.push('Oppia' + name);
-          buttonNames.push('-');
+          if (!(contextIsExplorationPlayer && name === 'image')) {
+            buttonNames.push('Oppia' + name);
+            buttonNames.push('-');
+          }
         });
         buttonNames.pop();
         // All icons on the toolbar except the Rich Text components.
