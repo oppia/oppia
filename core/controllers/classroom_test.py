@@ -66,10 +66,10 @@ class ClassroomDataHandlerTests(BaseClassroomControllerTests):
         topic_id_1 = topic_services.get_new_topic_id()
         topic_id_2 = topic_services.get_new_topic_id()
         private_topic = topic_domain.Topic.create_default_topic(
-            topic_id_1, 'private_topic_name')
+            topic_id_1, 'private_topic_name', 'abbrev')
         topic_services.save_new_topic(admin_id, private_topic)
         public_topic = topic_domain.Topic.create_default_topic(
-            topic_id_2, 'public_topic_name')
+            topic_id_2, 'public_topic_name', 'abbrev')
         topic_services.save_new_topic(admin_id, public_topic)
         topic_services.publish_topic(topic_id_2, admin_id)
 

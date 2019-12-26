@@ -1,12 +1,16 @@
 <div class="oppia-concept-card-viewer" ng-if="!$ctrl.loadingMessage">
   <div class="concept-card-explanation">
     <b> Explanation </b>
-    <div style="margin-bottom: 10px"> <[$ctrl.getSkillExplanation()]> </div>
+    <div style="margin-bottom: 10px">
+      <angular-html-bind html-data="$ctrl.currentConceptCard.getExplanation().getHtml()">
+      </angular-html-bind>
+    </div>
   </div>
   <div class="concept-card-worked-examples">
     <b> Worked Examples </b>
-    <div ng-repeat="workedExample in $ctrl.showWorkedExamples()">
-      <div> <[workedExample]> </div>
+    <div ng-repeat="example in $ctrl.currentConceptCard.getWorkedExamples()"
+         ng-if="$index < $ctrl.numberOfWorkedExamplesShown">
+      <angular-html-bind html-data="example.getHtml()"></angular-html-bind>
     </div>
     <button class="btn btn-secondary show-more-worked-examples-button"
             ng-if="!$ctrl.isLastWorkedExample()"
@@ -24,10 +28,6 @@
 </div>
 
 <style>
-  .oppia-concept-card-viewer {
-    background: #E1F2DD;
-  }
-
   .oppia-concept-card-viewer .concept-card-explanation {
     padding: 15px;
   }

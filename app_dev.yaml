@@ -100,9 +100,9 @@ handlers:
   upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
   secure: always
   expiration: "0"
-- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js))$
-  static_files: local_compiled_js/extensions/\1/\2
-  upload: local_compiled_js/extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js))$
+- url: /extensions/ckeditor_plugins/(.*\.(js))$
+  static_files: extensions/ckeditor_plugins/\1
+  upload: extensions/ckeditor_plugins/(.*\.(js))$
   secure: always
   expiration: "0"
 - url: /extensions/visualizations/(.*\.html)
@@ -345,7 +345,6 @@ skip_files:
 - third_party/static/ckeditor-4.12.1/plugins/stylesheetparser
 - third_party/static/ckeditor-4.12.1/plugins/table
 - third_party/static/ckeditor-4.12.1/plugins/tableresize
-- third_party/static/ckeditor-4.12.1/plugins/tableselection
 - third_party/static/ckeditor-4.12.1/plugins/tabletools
 - third_party/static/ckeditor-4.12.1/plugins/textmatch
 - third_party/static/ckeditor-4.12.1/plugins/textwatcher
