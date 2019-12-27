@@ -72,6 +72,7 @@ var ExplorationEditorFeedbackTab = function() {
       acceptSuggestionButton.click();
       waitFor.invisibilityOf(
         acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
+      waitFor.pageToFullyLoad();
     });
   };
 
@@ -133,6 +134,7 @@ var ExplorationEditorFeedbackTab = function() {
       rejectSuggestionButton.click();
       waitFor.invisibilityOf(
         acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
+      waitFor.pageToFullyLoad();
     });
   };
 
