@@ -57,7 +57,7 @@ describe('Un-customized profile page', function() {
     }
   );
 
-  it('displays no photo, default bio, and no interests when logged out',
+  it('displays default photo, default bio, and no interests when logged out',
     function() {
       profilePage.get(TEST_USERNAME);
       profilePage.expectOtherUserToHaveProfilePhoto();
@@ -103,7 +103,7 @@ describe('Customized profile page for current user', function() {
     users.logout();
   });
 
-  it('displays no photo, custom bio, and interests when logged out',
+  it('displays default photo, custom bio, and interests when logged out',
     function() {
       profilePage.get(TEST_USERNAME);
       profilePage.expectOtherUserToHaveProfilePhoto();
@@ -160,7 +160,7 @@ describe('Visiting user profile page', function() {
 
     profilePage.get(ANOTHER_USERNAME);
     profilePage.expectToHaveExplorationCards();
-    profilePage.expectToHaveExplorationCardByName('A new exploration');
+    profilePage.expectToHaveExplorationCardByName(EXPLORATION.title);
   });
 
   it('should show created exploration stats for user', function() {
