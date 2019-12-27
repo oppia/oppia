@@ -139,7 +139,7 @@ describe('Exploration Player State Service', () => {
     ExplorationPlayerStateService = _ExplorationPlayerStateService_;
   }));
 
-  fit('should properly initialize player', (done) => {
+  it('should properly initialize player', (done) => {
     let deferred = $q.defer();
     deferred.resolve([{
       version: 1,
