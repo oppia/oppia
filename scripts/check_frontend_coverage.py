@@ -205,7 +205,7 @@ fully_covered_filenames = [
 class LcovStanzaRelevantLines:
 
     def __init__(self, relevant_lines):
-        """Inicializate the object which provides relevant data of a lcov
+        """Initialize the object which provides relevant data of a lcov
         stanza in order to calculate any decrease in frontend test coverage.
 
         Args:
@@ -242,15 +242,6 @@ class LcovStanzaRelevantLines:
                 'It\'s not possible to diff the test coverage correctly.'
                 .format(file_name))
         self.covered_lines = int(match.group(1))
-
-    def get_file_name(self):
-        return self.file_name
-
-    def get_total_lines(self):
-        return self.total_lines
-
-    def get_covered_lines(self):
-        return self.covered_lines
 
 
 def run_frontend_tests_script():
@@ -297,11 +288,11 @@ def get_stanzas_from_lcov_file():
 
 
 def check_fully_covered_filenames_list_is_sorted():
-    """Check if fully_covered_filenames list is in alphabetic order."""
+    """Check if fully_covered_filenames list is in alphabetical order."""
     if fully_covered_filenames != sorted(fully_covered_filenames):
         python_utils.PRINT(
             'The \033[1mfully_covered_filenames\033[0m list must be kept'
-            ' in alphabetic order.')
+            ' in alphabetical order.')
         sys.exit(1)
 
 
@@ -315,17 +306,17 @@ def check_coverage_changes():
         Exception: LCOV_FILE_PATH doesn't exist.
     """
     if not os.path.exists(LCOV_FILE_PATH):
-        raise Exception('File at path {} doesn\'t exist'.format(
-            LCOV_FILE_PATH))
+        raise Exception('Expected lcov file to be available at {}, but the'
+            ' file does not exist.'.format(LCOV_FILE_PATH))
 
     stanzas = get_stanzas_from_lcov_file()
     whitelist = list(fully_covered_filenames)
     errors = ''
 
     for stanza in stanzas:
-        file_name = stanza.get_file_name()
-        total_lines = stanza.get_total_lines()
-        covered_lines = stanza.get_covered_lines()
+        file_name = stanza.file_name
+        total_lines = stanza.total_lines
+        covered_lines = stanza.covered_lines
 
         if file_name in whitelist:
             if total_lines != covered_lines:
@@ -342,7 +333,7 @@ def check_coverage_changes():
                 ' scripts/check_frontend_test_coverage.py.\n'
                 .format(file_name))
 
-    if len(whitelist) > 0:
+    if whitelist:
         for test_name in whitelist:
             errors += ('\033[1m{}\033[0m is in the frontend test coverage'
             ' whitelist but it doesn\'t exist anymore. If you have renamed it,'
