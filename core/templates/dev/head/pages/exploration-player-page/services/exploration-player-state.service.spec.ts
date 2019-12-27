@@ -139,7 +139,7 @@ describe('Exploration Player State Service', () => {
     ExplorationPlayerStateService = _ExplorationPlayerStateService_;
   }));
 
-  it('should properly initialize player', (done) => {
+  fit('should properly initialize player', (done) => {
     let deferred = $q.defer();
     deferred.resolve([{
       version: 1,
@@ -150,23 +150,23 @@ describe('Exploration Player State Service', () => {
     }, {}, {}]);
     spyOn($q, 'all').and.returnValue(deferred.promise);
     spyOn(StatsReportingService, 'initSession').and.callFake((
-      explorationId, title, version, sessionId, collectionId) => {
-        expect(version).toEqual(1);
-      });
+        explorationId, title, version, sessionId, collectionId) => {
+      expect(version).toEqual(1);
+    });
     spyOn(PlaythroughService, 'initSession').and.callFake((
-      explorationId, version, recordPlaythroughProbability) => {
-        expect(version).toEqual(1);
-      });
+        explorationId, version, recordPlaythroughProbability) => {
+      expect(version).toEqual(1);
+    });
     spyOn(PlaythroughIssuesService, 'initSession').and.callFake((
-      explorationId, version) => {
-        expect(version).toEqual(1);
-      });
+        explorationId, version) => {
+      expect(version).toEqual(1);
+    });
     spyOn(ExplorationEngineService, 'init').and.callFake((
-      exploration, version, preferredAudioLanguageCode,
-      autoTtsEnabled, callback) => {
-        expect(version).toEqual(1);
-        callback();
-      });
+        exploration, version, preferredAudioLanguageCode,
+        autoTtsEnabled, callback) => {
+      expect(version).toEqual(1);
+      callback();
+    });
     ExplorationPlayerStateService.initializePlayer(() => done());
     $rootScope.$apply();
   });
