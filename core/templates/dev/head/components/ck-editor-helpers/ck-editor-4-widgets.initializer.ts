@@ -31,8 +31,6 @@ angular.module('oppia').run([
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
       var ckName = 'oppia' + componentDefn.id;
-      var contextIsExplorationPlayer = (
-        ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_PLAYER);
 
       // Check to ensure that a plugin is not registered more than once.
       if (CKEDITOR.plugins.registered[ckName] !== undefined) {
@@ -64,6 +62,9 @@ angular.module('oppia').run([
             template: componentTemplate,
             draggable: false,
             edit: function() {
+              var contextIsExplorationPlayer = (
+                ContextService.getPageContext() ===
+                PAGE_CONTEXT.EXPLORATION_PLAYER);
               if (contextIsExplorationPlayer) {
                 return;
               }
