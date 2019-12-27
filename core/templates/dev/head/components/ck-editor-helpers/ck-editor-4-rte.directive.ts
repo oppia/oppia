@@ -89,7 +89,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         }).join(',');
         var buttonNames = [];
         names.forEach(function(name) {
-          if (!(contextIsExplorationPlayer && name === 'image')) {
+          if (!(contextIsExplorationPlayer)) {
             buttonNames.push('Oppia' + name);
             buttonNames.push('-');
           }
@@ -146,12 +146,9 @@ angular.module('oppia').directive('ckEditor4Rte', [
                 'Outdent'
               ]
             },
-            (!contextIsExplorationPlayer) ? {
+            {
               name: 'rtecomponents',
               items: buttonNames
-            } : {
-              name: 'rtecomponents',
-              items: []
             },
             {
               name: 'document',
