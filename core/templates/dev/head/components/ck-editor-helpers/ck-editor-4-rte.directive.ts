@@ -146,10 +146,10 @@ angular.module('oppia').directive('ckEditor4Rte', [
                 'Outdent'
               ]
             },
-            {
+            (!contextIsExplorationPlayer) ? {
               name: 'rtecomponents',
               items: buttonNames
-            },
+            } : {},
             {
               name: 'document',
               items: ['Source']

@@ -64,7 +64,7 @@ angular.module('oppia').run([
             template: componentTemplate,
             draggable: false,
             edit: function() {
-              if (contextIsExplorationPlayer && componentDefn.id === 'image') {
+              if (contextIsExplorationPlayer) {
                 return;
               }
               editor.fire('lockSnapshot', {
