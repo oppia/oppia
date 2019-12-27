@@ -110,8 +110,8 @@ angular.module('oppia').config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'AlertsService', 'CsrfTokenService',
-      function($q, $log, AlertsService, CsrfTokenService) {
+      '$exceptionHandler', '$q', '$log', 'AlertsService', 'CsrfTokenService',
+      function($exceptionHandler, $q, $log, AlertsService, CsrfTokenService) {
         return {
           request: function(config) {
             if (config.data) {
@@ -137,12 +137,23 @@ angular.module('oppia').config([
             // an error.
             if (rejection.status !== -1) {
               $log.error(rejection.data);
-
               var warningMessage = 'Error communicating with server.';
               if (rejection.data && rejection.data.error) {
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
+              // rejection.config is an optional parameter.
+              // see https://docs.angularjs.org/api/ng/service/$http
+              var rejectionUrl = typeof rejection.config !== 'undefined' ? (
+                rejection.config.url) : '';
+              var additionalLoggingInfo = warningMessage +
+                '\n URL: ' + rejectionUrl +
+                '\n data: ' + JSON.stringify(rejection.data);
+              // $exceptionHandler is called directly instead of
+              // throwing an error to invoke it because the return
+              // statement below must execute. There are tests
+              // that rely on this.
+              $exceptionHandler(new Error(additionalLoggingInfo));
             }
             return $q.reject(rejection);
           }
