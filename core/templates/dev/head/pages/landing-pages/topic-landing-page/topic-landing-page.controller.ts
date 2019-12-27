@@ -47,6 +47,11 @@ angular.module('oppia').directive('topicLandingPage', [
             SiteAnalyticsService, UrlInterpolationService,
             TOPIC_LANDING_PAGE_DATA) {
           var ctrl = this;
+          var pathArray = $window.location.pathname.split('/');
+          var topic = pathArray[3];
+          var topicData = TOPIC_LANDING_PAGE_DATA[ctrl.subject][topic];
+          var landingPageData = topicData.page_data;
+          var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
           var getImageData = function(index) {
             var imageKey = 'image_' + index;
             if (landingPageData[imageKey]) {
@@ -101,12 +106,7 @@ angular.module('oppia').directive('topicLandingPage', [
             }, 150);
           };
           ctrl.$onInit = function() {
-            var pathArray = $window.location.pathname.split('/');
             ctrl.subject = pathArray[2];
-            var topic = pathArray[3];
-            var topicData = TOPIC_LANDING_PAGE_DATA[ctrl.subject][topic];
-            var landingPageData = topicData.page_data;
-            var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
             ctrl.topicTitle = topicData.topic_title;
             ctrl.lessons = landingPageData.lessons;
             var pageTitle = 'Learn ' + ctrl.topicTitle + ' - Oppia';

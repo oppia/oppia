@@ -46,6 +46,8 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
             $attrs, WindowDimensionsService,
             CurrentInteractionService, ContextService) {
           var ctrl = this;
+          var DEFAULT_BUTTON_TEXT = 'Continue';
+          var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';
           ctrl.submitAnswer = function() {
             // We used to show "(Continue)" to indicate a 'continue' action
             // when the learner browses through the history of the
@@ -63,8 +65,6 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
           ctrl.$onInit = function() {
             ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
               $attrs.buttonTextWithValue);
-            var DEFAULT_BUTTON_TEXT = 'Continue';
-            var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';
 
             ctrl.isInEditorMode = ContextService.isInExplorationEditorMode();
 

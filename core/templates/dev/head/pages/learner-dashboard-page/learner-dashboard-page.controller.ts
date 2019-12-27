@@ -274,6 +274,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               axis: 'y'
             };
           };
+          var threadIndex = null;
           ctrl.onClickThread = function(
               threadStatus, explorationId, threadId, explorationTitle) {
             ctrl.loadingFeedbacks = true;
@@ -589,7 +590,6 @@ angular.module('oppia').directive('learnerDashboardPage', [
             });
 
             ctrl.loadingFeedbacks = false;
-            var threadIndex = null;
 
             ctrl.newMessage = {
               text: ''

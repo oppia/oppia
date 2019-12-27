@@ -109,6 +109,7 @@ angular.module('oppia').directive('libraryPage', [
               ctrl.leftmostCardIndices[i] = index;
             }
           };
+          var isAnyCarouselCurrentlyScrolling = false;
           ctrl.scroll = function(ind, isLeftScroll) {
             if (isAnyCarouselCurrentlyScrolling) {
               return;
@@ -342,8 +343,6 @@ angular.module('oppia').directive('libraryPage', [
               });
             }
             ctrl.tileDisplayCount = 0;
-
-            var isAnyCarouselCurrentlyScrolling = false;
 
             $(window).resize(function() {
               initCarousels();

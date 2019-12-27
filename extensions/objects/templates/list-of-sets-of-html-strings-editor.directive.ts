@@ -32,6 +32,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        var errorMessage = '';
         ctrl.allowedChoices = function() {
           var allowedList = [];
           for (var i = 0; i <= math.min(
@@ -95,8 +96,6 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
           return errorMessage;
         };
         ctrl.$onInit = function() {
-          var errorMessage = '';
-
           if (!ctrl.selectedRank) {
             ctrl.selectedRank = '';
           }

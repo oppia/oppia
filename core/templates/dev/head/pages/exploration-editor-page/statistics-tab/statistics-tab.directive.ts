@@ -131,6 +131,7 @@ angular.module('oppia').directive('statisticsTab', [
               ];
             });
           };
+          var stateStatsModalIsOpen = false;
           ctrl.onClickStateInStatsGraph = function(stateName) {
             if (!stateStatsModalIsOpen) {
               stateStatsModalIsOpen = true;
@@ -294,8 +295,6 @@ angular.module('oppia').directive('statisticsTab', [
             ctrl.hasTabLoaded = false;
 
             ctrl.explorationHasBeenVisited = false;
-
-            var stateStatsModalIsOpen = false;
           };
         }]
     };

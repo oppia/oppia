@@ -57,6 +57,13 @@ angular.module('oppia').directive('graphViz', [
             FocusManagerService, GraphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
           var ctrl = this;
+          var _MODES = {
+            MOVE: 0,
+            ADD_EDGE: 1,
+            ADD_VERTEX: 2,
+            DELETE: 3
+          };
+          var vizContainer = $($element).find('.oppia-graph-viz-svg');
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             ctrl.state.currentMode = null;
           });
@@ -525,12 +532,6 @@ angular.module('oppia').directive('graphViz', [
             ctrl.state.selectedEdge = null;
           };
           ctrl.$onInit = function() {
-            var _MODES = {
-              MOVE: 0,
-              ADD_EDGE: 1,
-              ADD_VERTEX: 2,
-              DELETE: 3
-            };
             // The current state of the UI and stuff like that.
             ctrl.state = {
               currentMode: _MODES.MOVE,
@@ -568,7 +569,6 @@ angular.module('oppia').directive('graphViz', [
               ctrl.isMobile = true;
             }
 
-            var vizContainer = $($element).find('.oppia-graph-viz-svg');
             ctrl.vizWidth = vizContainer.width();
 
             ctrl.graphOptions = [{

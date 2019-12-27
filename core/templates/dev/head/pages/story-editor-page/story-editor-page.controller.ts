@@ -56,6 +56,7 @@ angular.module('oppia').directive('storyEditorPage', [
             UrlInterpolationService, UrlService,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
           var ctrl = this;
+          var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
           ctrl.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
               var modalInstance = $uibModal.open({
@@ -90,7 +91,6 @@ angular.module('oppia').directive('storyEditorPage', [
           $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
           $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
           ctrl.$onInit = function() {
-            var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
             StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
           };
         }]

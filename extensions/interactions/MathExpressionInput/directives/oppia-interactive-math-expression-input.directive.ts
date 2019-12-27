@@ -60,6 +60,38 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
           guppyDivElt.setAttribute(
             'id', 'guppy_' + Math.floor(Math.random() * 100000000));
           var guppyDivId = guppyDivElt.id;
+          var guppyInstance = new Guppy(guppyDivId, {
+            settings: {
+              empty_content: (
+                '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
+              buttons: []
+            },
+            events: {
+              done: function(e) {
+                ctrl.submitAnswer();
+              },
+              change: function(e) {
+                // Need to manually trigger the digest cycle
+                // to make any 'watchers' aware of changes in answer.
+                $scope.$apply();
+              },
+              ready: function() {
+                if (DeviceInfoService.isMobileUserAgent() &&
+                  DeviceInfoService.hasTouchEvents()) {
+                  ctrl.mobileOverlayIsShown = true;
+                  // Wait for the scope change to apply. Since we interact
+                  // with the DOM elements, they need to be added by angular
+                  // before the function is called. Timeout of 0 to wait
+                  // until the end of the current digest cycle,
+                  // false to not start a new digest cycle.
+                  // A new cycle is not needed since no angular variables
+                  // are changed within the function.
+                  $timeout(makeGuppyMobileFriendly, 0, false);
+                }
+              }
+            }
+          });
+
           /**
            * Adds a button overlay and invisible text field used to bring up
            * the keyboard on mobile devices.
@@ -191,38 +223,6 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             Guppy.init({
               symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
                 oppiaSymbolsUrl]});
-            var guppyInstance = new Guppy(guppyDivId, {
-              settings: {
-                empty_content: (
-                  '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
-                buttons: []
-              },
-              events: {
-                done: function(e) {
-                  ctrl.submitAnswer();
-                },
-                change: function(e) {
-                  // Need to manually trigger the digest cycle
-                  // to make any 'watchers' aware of changes in answer.
-                  $scope.$apply();
-                },
-                ready: function() {
-                  if (DeviceInfoService.isMobileUserAgent() &&
-                    DeviceInfoService.hasTouchEvents()) {
-                    ctrl.mobileOverlayIsShown = true;
-                    // Wait for the scope change to apply. Since we interact
-                    // with the DOM elements, they need to be added by angular
-                    // before the function is called. Timeout of 0 to wait
-                    // until the end of the current digest cycle,
-                    // false to not start a new digest cycle.
-                    // A new cycle is not needed since no angular variables
-                    // are changed within the function.
-                    $timeout(makeGuppyMobileFriendly, 0, false);
-                  }
-                }
-              }
-            });
-
             guppyInstance.render();
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, ctrl.isCurrentAnswerValid);

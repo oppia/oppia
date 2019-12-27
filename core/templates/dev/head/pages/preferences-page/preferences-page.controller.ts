@@ -63,7 +63,7 @@ angular.module('oppia').directive('preferencesPage', [
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
-
+          var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
           var _saveDataItem = function(updateType, data) {
             $http.put(_PREFERENCES_DATA_URL, {
               update_type: updateType,
@@ -235,7 +235,6 @@ angular.module('oppia').directive('preferencesPage', [
             });
           };
           ctrl.$onInit = function() {
-            var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
             ctrl.profilePictureDataUrl = '';
             ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
             ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;

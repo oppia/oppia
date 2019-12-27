@@ -90,7 +90,10 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
                 FORM_ERROR_TYPE, true);
             }
           });
-
+          var requireSimplestForm = (
+            $attrs.requireSimplestFormWithValue === 'true');
+          var allowImproperFraction = (
+            $attrs.allowImproperFractionWithValue === 'true');
           ctrl.submitAnswer = function(answer) {
             try {
               var fraction = FractionObjectFactory.fromRawInputString(
@@ -142,11 +145,6 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
           ctrl.$onInit = function() {
             ctrl.answer = '';
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-
-            var requireSimplestForm = (
-              $attrs.requireSimplestFormWithValue === 'true');
-            var allowImproperFraction = (
-              $attrs.allowImproperFractionWithValue === 'true');
             ctrl.allowNonzeroIntegerPart = (
               $attrs.allowNonzeroIntegerPartWithValue === 'true');
             ctrl.customPlaceholder = HtmlEscaperService.escapedJsonToObj(
