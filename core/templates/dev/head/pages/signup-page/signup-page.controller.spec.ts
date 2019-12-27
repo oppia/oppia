@@ -71,6 +71,7 @@ describe('Signup controller', function() {
           };
         }
       });
+      ctrl.$onInit();
     }));
 
     it('should show warning if user has not agreed to terms', function() {

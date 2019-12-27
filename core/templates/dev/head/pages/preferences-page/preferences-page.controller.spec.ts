@@ -71,6 +71,7 @@ describe('Preferences Controller', function() {
         $rootScope: $rootScope,
         AlertsService: mockAlertsService
       });
+      ctrl.$onInit();
     }));
 
     it('should show that editor role notifications checkbox is true by default',

@@ -102,6 +102,7 @@ describe('HistoryTab controller', function() {
     beforeEach(angular.mock.inject(function(_$componentController_) {
       $componentController = _$componentController_;
       historyTabCtrl = $componentController('historyTab', null, {});
+      historyTabCtrl.$onInit();
     }));
 
     it('should get version numbers of revisions to be displayed',

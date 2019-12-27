@@ -115,6 +115,7 @@ describe('Creator dashboard controller', function() {
           AlertsService: null,
           CreatorDashboardBackendApiService: CreatorDashboardBackendApiService
         });
+        ctrl.$onInit();
       }
     ));
 
