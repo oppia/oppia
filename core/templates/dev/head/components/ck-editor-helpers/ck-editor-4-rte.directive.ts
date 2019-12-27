@@ -53,7 +53,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
             componentDefn.isComplex) ||
             (!canUseFs && componentDefn.requiresFs) ||
             (!contextIsLessonRelated && componentDefn.isLessonRelated)) ||
-            (contextIsExplorationPlayer && componentDefn.id === 'image')) {
+            (contextIsExplorationPlayer)) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
