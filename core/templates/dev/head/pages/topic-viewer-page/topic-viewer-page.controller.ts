@@ -51,15 +51,14 @@ angular.module('oppia').directive('topicViewerPage', [
             PageTitleService, TopicViewerBackendApiService,
             UrlService, WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
+          ctrl.setActiveTab = function(newActiveTabName) {
+            ctrl.activeTab = newActiveTabName;
+          };
+          ctrl.checkMobileView = function() {
+            return (WindowDimensionsService.getWidth() < 500);
+          };
           ctrl.$onInit = function() {
-            ctrl.setActiveTab = function(newActiveTabName) {
-              ctrl.activeTab = newActiveTabName;
-            };
             ctrl.setActiveTab('story');
-
-            ctrl.checkMobileView = function() {
-              return (WindowDimensionsService.getWidth() < 500);
-            };
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
             PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');

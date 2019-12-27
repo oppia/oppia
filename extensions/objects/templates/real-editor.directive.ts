@@ -30,17 +30,16 @@ angular.module('oppia').directive('realEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        $scope.$watch('$ctrl.value', function() {
+          if (ctrl.value === '') {
+            // A new rule
+            ctrl.value = 0.0;
+          }
+        });
         ctrl.$onInit = function() {
           ctrl.schema = {
             type: 'float'
           };
-
-          $scope.$watch('$ctrl.value', function() {
-            if (ctrl.value === '') {
-              // A new rule
-              ctrl.value = 0.0;
-            }
-          });
 
           if (ctrl.value === '') {
             ctrl.value = 0.0;

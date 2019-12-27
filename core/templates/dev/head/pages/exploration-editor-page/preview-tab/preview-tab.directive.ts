@@ -77,6 +77,103 @@ angular.module('oppia').directive('previewTab', [
             PlayerCorrectnessFeedbackEnabledService, StateEditorService,
             UrlInterpolationService) {
           var ctrl = this;
+          ctrl.getManualParamChanges = function(initStateNameForPreview) {
+            var deferred = $q.defer();
+
+            var unsetParametersInfo = ParameterMetadataService
+              .getUnsetParametersInfo([initStateNameForPreview]);
+
+            // Construct array to hold required parameter changes
+            var manualParamChanges = [];
+            for (var i = 0; i < unsetParametersInfo.length; i++) {
+              var newParamChange = ParamChangeObjectFactory.createEmpty(
+                unsetParametersInfo[i].paramName);
+              manualParamChanges.push(newParamChange);
+            }
+
+            // Use modal to populate parameter change values
+            if (manualParamChanges.length > 0) {
+              ctrl.showSetParamsModal(manualParamChanges, function() {
+                deferred.resolve(manualParamChanges);
+              });
+            } else {
+              deferred.resolve([]);
+            }
+
+            return deferred.promise;
+          };
+
+          ctrl.showParameterSummary = function() {
+            return (ExplorationFeaturesService.areParametersEnabled() &&
+                    !angular.equals({}, ctrl.allParams));
+          };
+
+          ctrl.showSetParamsModal = function(manualParamChanges, callback) {
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration-editor-page/preview-tab/templates/' +
+                'preview-set-parameters-modal.template.html'),
+              backdrop: 'static',
+              windowClass: 'oppia-preview-set-params-modal',
+              controller: [
+                '$scope', '$uibModalInstance', 'RouterService',
+                function($scope, $uibModalInstance, RouterService) {
+                  $scope.manualParamChanges = manualParamChanges;
+                  $scope.previewParamModalOk = $uibModalInstance.close;
+                  $scope.previewParamModalCancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                    RouterService.navigateToMainTab();
+                  };
+                }
+              ]
+            }).result.then(function() {
+              if (callback) {
+                callback();
+              }
+            });
+          };
+
+          ctrl.loadPreviewState = function(stateName, manualParamChanges) {
+            ExplorationEngineService.initSettingsFromEditor(
+              stateName, manualParamChanges);
+            ctrl.isExplorationPopulated = true;
+          };
+
+          ctrl.resetPreview = function() {
+            if (DebugInfoTrackerService.getSequenceOfActions()) {
+              DebugInfoTrackerService.addAction('Preview Reset');
+            }
+            ctrl.previewWarning = '';
+            ctrl.isExplorationPopulated = false;
+            var initStateNameForPreview = (
+              ExplorationInitStateNameService.savedMemento);
+            $timeout(function() {
+              var explorationId = ContextService.getExplorationId();
+              EditableExplorationBackendApiService.fetchApplyDraftExploration(
+                explorationId).then(function(returnDict) {
+                ExplorationEngineService.init(
+                  returnDict, null, null, null,
+                  function(
+                      unusedInitialStateName, unusedInitHtml,
+                      unusedNewParams) {
+                    ctrl.loadPreviewState(initStateNameForPreview, []);
+                  });
+                PlayerCorrectnessFeedbackEnabledService.init(
+                  returnDict.correctness_feedback_enabled);
+                NumberAttemptsService.reset();
+              });
+            }, 200);
+          };
+
+          // This allows the active state to be kept up-to-date whilst
+          // navigating in preview mode, ensuring that the state does
+          // not change when toggling between editor and preview.
+          $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
+            StateEditorService.setActiveStateName(stateName);
+          });
+          $scope.$on('playerStateChange', function() {
+            ctrl.allParams = LearnerParamsService.getAllParams();
+          });
           ctrl.$onInit = function() {
             ctrl.isExplorationPopulated = false;
             ExplorationDataService.getData().then(function() {
@@ -103,106 +200,7 @@ angular.module('oppia').directive('previewTab', [
                     initStateNameForPreview, manualParamChanges);
                 });
             });
-
-            ctrl.getManualParamChanges = function(initStateNameForPreview) {
-              var deferred = $q.defer();
-
-              var unsetParametersInfo = ParameterMetadataService
-                .getUnsetParametersInfo([initStateNameForPreview]);
-
-              // Construct array to hold required parameter changes
-              var manualParamChanges = [];
-              for (var i = 0; i < unsetParametersInfo.length; i++) {
-                var newParamChange = ParamChangeObjectFactory.createEmpty(
-                  unsetParametersInfo[i].paramName);
-                manualParamChanges.push(newParamChange);
-              }
-
-              // Use modal to populate parameter change values
-              if (manualParamChanges.length > 0) {
-                ctrl.showSetParamsModal(manualParamChanges, function() {
-                  deferred.resolve(manualParamChanges);
-                });
-              } else {
-                deferred.resolve([]);
-              }
-
-              return deferred.promise;
-            };
-
-            ctrl.showParameterSummary = function() {
-              return (ExplorationFeaturesService.areParametersEnabled() &&
-                      !angular.equals({}, ctrl.allParams));
-            };
-
-            ctrl.showSetParamsModal = function(manualParamChanges, callback) {
-              var modalInstance = $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-editor-page/preview-tab/templates/' +
-                  'preview-set-parameters-modal.template.html'),
-                backdrop: 'static',
-                windowClass: 'oppia-preview-set-params-modal',
-                controller: [
-                  '$scope', '$uibModalInstance', 'RouterService',
-                  function($scope, $uibModalInstance, RouterService) {
-                    $scope.manualParamChanges = manualParamChanges;
-                    $scope.previewParamModalOk = $uibModalInstance.close;
-                    $scope.previewParamModalCancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                      RouterService.navigateToMainTab();
-                    };
-                  }
-                ]
-              }).result.then(function() {
-                if (callback) {
-                  callback();
-                }
-              });
-            };
-
-            ctrl.loadPreviewState = function(stateName, manualParamChanges) {
-              ExplorationEngineService.initSettingsFromEditor(
-                stateName, manualParamChanges);
-              ctrl.isExplorationPopulated = true;
-            };
-
-            ctrl.resetPreview = function() {
-              if (DebugInfoTrackerService.getSequenceOfActions()) {
-                DebugInfoTrackerService.addAction('Preview Reset');
-              }
-              ctrl.previewWarning = '';
-              ctrl.isExplorationPopulated = false;
-              var initStateNameForPreview = (
-                ExplorationInitStateNameService.savedMemento);
-              $timeout(function() {
-                var explorationId = ContextService.getExplorationId();
-                EditableExplorationBackendApiService.fetchApplyDraftExploration(
-                  explorationId).then(function(returnDict) {
-                  ExplorationEngineService.init(
-                    returnDict, null, null, null,
-                    function(
-                        unusedInitialStateName, unusedInitHtml,
-                        unusedNewParams) {
-                      ctrl.loadPreviewState(initStateNameForPreview, []);
-                    });
-                  PlayerCorrectnessFeedbackEnabledService.init(
-                    returnDict.correctness_feedback_enabled);
-                  NumberAttemptsService.reset();
-                });
-              }, 200);
-            };
-
-            // This allows the active state to be kept up-to-date whilst
-            // navigating in preview mode, ensuring that the state does
-            // not change when toggling between editor and preview.
-            $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
-              StateEditorService.setActiveStateName(stateName);
-            });
-
             ctrl.allParams = {};
-            $scope.$on('playerStateChange', function() {
-              ctrl.allParams = LearnerParamsService.getAllParams();
-            });
           };
         }
       ]

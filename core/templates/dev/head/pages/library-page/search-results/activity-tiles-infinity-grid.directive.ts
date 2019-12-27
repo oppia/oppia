@@ -34,34 +34,33 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
         '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
         function($scope, $rootScope, SearchService, WindowDimensionsService) {
           var ctrl = this;
+          // Called when the first batch of search results is retrieved from
+          // the server.
+          $scope.$on(
+            'initialSearchResultsLoaded', function(evt, activityList) {
+              ctrl.allActivitiesInOrder = activityList;
+              ctrl.endOfPageIsReached = false;
+            }
+          );
+
+          ctrl.showMoreActivities = function() {
+            if (!$rootScope.loadingMessage && !ctrl.endOfPageIsReached) {
+              ctrl.searchResultsAreLoading = true;
+              SearchService.loadMoreData(function(data, endOfPageIsReached) {
+                ctrl.allActivitiesInOrder =
+                ctrl.allActivitiesInOrder.concat(
+                  data.activity_list);
+                ctrl.endOfPageIsReached = endOfPageIsReached;
+                ctrl.searchResultsAreLoading = false;
+              }, function(endOfPageIsReached) {
+                ctrl.endOfPageIsReached = endOfPageIsReached;
+                ctrl.searchResultsAreLoading = false;
+              });
+            }
+          };
           ctrl.$onInit = function() {
             ctrl.endOfPageIsReached = false;
             ctrl.allActivitiesInOrder = [];
-            // Called when the first batch of search results is retrieved from
-            // the server.
-            $scope.$on(
-              'initialSearchResultsLoaded', function(evt, activityList) {
-                ctrl.allActivitiesInOrder = activityList;
-                ctrl.endOfPageIsReached = false;
-              }
-            );
-
-            ctrl.showMoreActivities = function() {
-              if (!$rootScope.loadingMessage && !ctrl.endOfPageIsReached) {
-                ctrl.searchResultsAreLoading = true;
-                SearchService.loadMoreData(function(data, endOfPageIsReached) {
-                  ctrl.allActivitiesInOrder =
-                  ctrl.allActivitiesInOrder.concat(
-                    data.activity_list);
-                  ctrl.endOfPageIsReached = endOfPageIsReached;
-                  ctrl.searchResultsAreLoading = false;
-                }, function(endOfPageIsReached) {
-                  ctrl.endOfPageIsReached = endOfPageIsReached;
-                  ctrl.searchResultsAreLoading = false;
-                });
-              }
-            };
-
             var libraryWindowCutoffPx = 530;
             ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);

@@ -52,12 +52,158 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             $scope, $attrs, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+            ctrl.interactionIsActive = false;
+          });
+          ctrl.initCodeEditor = function(editor) {
+            editor.setValue(ctrl.code);
+            // Options for the ui-codemirror display.
+            editor.setOption('lineNumbers', true);
+            editor.setOption('indentWithTabs', true);
+            editor.setOption('indentUnit', 4);
+            editor.setOption('mode', 'python');
+            editor.setOption('extraKeys', {
+              Tab: function(cm) {
+                var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                cm.replaceSelection(spaces);
+                // Move the cursor to the end of the selection.
+                var endSelectionPos = cm.getDoc().getCursor('head');
+                cm.getDoc().setCursor(endSelectionPos);
+              }
+            });
+            editor.setOption('theme', 'preview default');
+
+            // NOTE: this is necessary to avoid the textarea being greyed-out.
+            setTimeout(function() {
+              editor.refresh();
+              initMarkers(editor);
+            }, 200);
+
+            editor.on('change', function() {
+              ctrl.code = editor.getValue();
+            });
+
+            // Without this, the editor does not show up correctly on small
+            // screens when the user switches to the supplemental interaction.
+            $scope.$on('showInteraction', function() {
+              setTimeout(function() {
+                editor.refresh();
+                initMarkers(editor);
+              }, 200);
+            });
+
+            ctrl.hasLoaded = true;
+          };
+          ctrl.runAndSubmitCode = function(codeInput) {
+            ctrl.runCode(codeInput, function(evaluation, err) {
+              ctrl.sendResponse(evaluation, err);
+            });
+          };
+
+          var submitAnswer = function() {
+            ctrl.runAndSubmitCode(ctrl.code);
+          };
+
+          ctrl.runCode = function(codeInput, onFinishRunCallback) {
+            ctrl.code = codeInput;
+            ctrl.output = '';
+
+            // Evaluate the program asynchronously using Skulpt.
+            Sk.misceval.asyncToPromise(function() {
+              Sk.importMainWithBody('<stdin>', false, codeInput, true);
+            }).then(function() {
+              // Finished evaluating.
+              ctrl.evaluation = '';
+              ctrl.fullError = '';
+
+              if (onFinishRunCallback) {
+                onFinishRunCallback('', '');
+              }
+            }, function(err) {
+              if (!(err instanceof Sk.builtin.TimeLimitError)) {
+                ctrl.evaluation = '';
+                ctrl.fullError = String(err);
+
+                if (onFinishRunCallback) {
+                  onFinishRunCallback('', String(err));
+                }
+              }
+            });
+          };
+
+          var initMarkers = function(editor) {
+            var doc = editor.getDoc();
+
+            // The -1 here is because prepended code ends with a newline.
+            var preCodeNumLines = ctrl.preCode.split('\n').length - 1;
+            var postCodeNumLines = ctrl.postCode.split('\n').length;
+            var fullCodeNumLines = ctrl.code.split('\n').length;
+            var userCodeNumLines = (
+              fullCodeNumLines - preCodeNumLines - postCodeNumLines);
+
+            // Mark pre- and post- code as uneditable, and give it some
+            // styling.
+            var markOptions = {
+              atomic: false,
+              readOnly: true,
+              inclusiveLeft: true,
+              inclusiveRight: true
+            };
+
+            if (ctrl.preCode.length !== 0) {
+              doc.markText(
+                {
+                  line: 0,
+                  ch: 0
+                },
+                {
+                  line: preCodeNumLines,
+                  ch: 0
+                },
+                angular.extend({}, markOptions, {
+                  inclusiveRight: false
+                }));
+
+              for (var i = 0; i < preCodeNumLines; i++) {
+                editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
+              }
+            }
+
+            if (ctrl.postCode.length !== 0) {
+              doc.markText(
+                {
+                  line: preCodeNumLines + userCodeNumLines,
+                  ch: 0
+                },
+                {
+                  line: fullCodeNumLines,
+                  ch: 0
+                },
+                markOptions);
+
+              for (var i = 0; i < postCodeNumLines; i++) {
+                editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
+                  'text', 'code-repl-noneditable-line');
+              }
+            }
+          };
+
+          ctrl.sendResponse = function(evaluation, err) {
+            CurrentInteractionService.onSubmit({
+              // Replace tabs with 2 spaces.
+              // TODO(sll): Change the default Python indentation to 4 spaces.
+              code: ctrl.code.replace(/\t/g, '  ') || '',
+              output: ctrl.output,
+              evaluation: ctrl.evaluation,
+              error: (err || '')
+            }, CodeReplRulesService);
+
+            // Without this, the error message displayed in the user-facing
+            // console will sometimes not update.
+            $scope.$apply();
+          };
           ctrl.$onInit = function() {
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
-
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-            });
             ctrl.language = HtmlEscaperService.escapedJsonToObj(
               $attrs.languageWithValue);
             ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
@@ -92,46 +238,6 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
               ctrl.output = ctrl.getLastAnswer().output;
             }
 
-            ctrl.initCodeEditor = function(editor) {
-              editor.setValue(ctrl.code);
-              // Options for the ui-codemirror display.
-              editor.setOption('lineNumbers', true);
-              editor.setOption('indentWithTabs', true);
-              editor.setOption('indentUnit', 4);
-              editor.setOption('mode', 'python');
-              editor.setOption('extraKeys', {
-                Tab: function(cm) {
-                  var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
-                  cm.replaceSelection(spaces);
-                  // Move the cursor to the end of the selection.
-                  var endSelectionPos = cm.getDoc().getCursor('head');
-                  cm.getDoc().setCursor(endSelectionPos);
-                }
-              });
-              editor.setOption('theme', 'preview default');
-
-              // NOTE: this is necessary to avoid the textarea being greyed-out.
-              setTimeout(function() {
-                editor.refresh();
-                initMarkers(editor);
-              }, 200);
-
-              editor.on('change', function() {
-                ctrl.code = editor.getValue();
-              });
-
-              // Without this, the editor does not show up correctly on small
-              // screens when the user switches to the supplemental interaction.
-              $scope.$on('showInteraction', function() {
-                setTimeout(function() {
-                  editor.refresh();
-                  initMarkers(editor);
-                }, 200);
-              });
-
-              ctrl.hasLoaded = true;
-            };
-
             // Configure Skulpt.
             Sk.configure({
               output: function(out) {
@@ -153,115 +259,6 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
               },
               execLimit: 10000
             });
-
-            ctrl.runAndSubmitCode = function(codeInput) {
-              ctrl.runCode(codeInput, function(evaluation, err) {
-                ctrl.sendResponse(evaluation, err);
-              });
-            };
-
-            var submitAnswer = function() {
-              ctrl.runAndSubmitCode(ctrl.code);
-            };
-
-            ctrl.runCode = function(codeInput, onFinishRunCallback) {
-              ctrl.code = codeInput;
-              ctrl.output = '';
-
-              // Evaluate the program asynchronously using Skulpt.
-              Sk.misceval.asyncToPromise(function() {
-                Sk.importMainWithBody('<stdin>', false, codeInput, true);
-              }).then(function() {
-                // Finished evaluating.
-                ctrl.evaluation = '';
-                ctrl.fullError = '';
-
-                if (onFinishRunCallback) {
-                  onFinishRunCallback('', '');
-                }
-              }, function(err) {
-                if (!(err instanceof Sk.builtin.TimeLimitError)) {
-                  ctrl.evaluation = '';
-                  ctrl.fullError = String(err);
-
-                  if (onFinishRunCallback) {
-                    onFinishRunCallback('', String(err));
-                  }
-                }
-              });
-            };
-
-            var initMarkers = function(editor) {
-              var doc = editor.getDoc();
-
-              // The -1 here is because prepended code ends with a newline.
-              var preCodeNumLines = ctrl.preCode.split('\n').length - 1;
-              var postCodeNumLines = ctrl.postCode.split('\n').length;
-              var fullCodeNumLines = ctrl.code.split('\n').length;
-              var userCodeNumLines = (
-                fullCodeNumLines - preCodeNumLines - postCodeNumLines);
-
-              // Mark pre- and post- code as uneditable, and give it some
-              // styling.
-              var markOptions = {
-                atomic: false,
-                readOnly: true,
-                inclusiveLeft: true,
-                inclusiveRight: true
-              };
-
-              if (ctrl.preCode.length !== 0) {
-                doc.markText(
-                  {
-                    line: 0,
-                    ch: 0
-                  },
-                  {
-                    line: preCodeNumLines,
-                    ch: 0
-                  },
-                  angular.extend({}, markOptions, {
-                    inclusiveRight: false
-                  }));
-
-                for (var i = 0; i < preCodeNumLines; i++) {
-                  editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
-                }
-              }
-
-              if (ctrl.postCode.length !== 0) {
-                doc.markText(
-                  {
-                    line: preCodeNumLines + userCodeNumLines,
-                    ch: 0
-                  },
-                  {
-                    line: fullCodeNumLines,
-                    ch: 0
-                  },
-                  markOptions);
-
-                for (var i = 0; i < postCodeNumLines; i++) {
-                  editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
-                    'text', 'code-repl-noneditable-line');
-                }
-              }
-            };
-
-            ctrl.sendResponse = function(evaluation, err) {
-              CurrentInteractionService.onSubmit({
-                // Replace tabs with 2 spaces.
-                // TODO(sll): Change the default Python indentation to 4 spaces.
-                code: ctrl.code.replace(/\t/g, '  ') || '',
-                output: ctrl.output,
-                evaluation: ctrl.evaluation,
-                error: (err || '')
-              }, CodeReplRulesService);
-
-              // Without this, the error message displayed in the user-facing
-              // console will sometimes not update.
-              $scope.$apply();
-            };
 
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswer, null);

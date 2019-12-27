@@ -45,17 +45,16 @@ angular.module('oppia').directive('profilePage', [
         function($http, $log, $rootScope, $window, DateTimeFormatService,
             UrlInterpolationService, UrlService, UserService) {
           var ctrl = this;
+          var profileDataUrl = (
+            '/profilehandler/data/' + UrlService.getUsernameFromProfileUrl());
+          var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
+            .getStaticImageUrl('/general/no_profile_picture.png');
+
+          ctrl.getLocaleDateString = function(millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleDateString(
+              millisSinceEpoch);
+          };
           ctrl.$onInit = function() {
-            var profileDataUrl = (
-              '/profilehandler/data/' + UrlService.getUsernameFromProfileUrl());
-            var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
-              .getStaticImageUrl('/general/no_profile_picture.png');
-
-            ctrl.getLocaleDateString = function(millisSinceEpoch) {
-              return DateTimeFormatService.getLocaleDateString(
-                millisSinceEpoch);
-            };
-
             $rootScope.loadingMessage = 'Loading';
             $http.get(profileDataUrl).then(function(response) {
               var data = response.data;

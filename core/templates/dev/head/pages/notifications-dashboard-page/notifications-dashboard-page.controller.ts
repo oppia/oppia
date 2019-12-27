@@ -35,24 +35,23 @@ angular.module('oppia').directive('notificationsDashboardPage', [
         '$http', '$rootScope', 'DateTimeFormatService',
         function($http, $rootScope, DateTimeFormatService) {
           var ctrl = this;
+          ctrl.getItemUrl = function(activityId, notificationType) {
+            return (
+              '/create/' + activityId + (
+                notificationType === 'feedback_thread' ? '#/feedback' : ''));
+          };
+
+          ctrl.navigateToProfile = function($event, username) {
+            $event.stopPropagation();
+            window.location.href = '/profile/' + username;
+          };
+
+          ctrl.getLocaleAbbreviatedDatetimeString = function(
+              millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              millisSinceEpoch);
+          };
           ctrl.$onInit = function() {
-            ctrl.getItemUrl = function(activityId, notificationType) {
-              return (
-                '/create/' + activityId + (
-                  notificationType === 'feedback_thread' ? '#/feedback' : ''));
-            };
-
-            ctrl.navigateToProfile = function($event, username) {
-              $event.stopPropagation();
-              window.location.href = '/profile/' + username;
-            };
-
-            ctrl.getLocaleAbbreviatedDatetimeString = function(
-                millisSinceEpoch) {
-              return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-                millisSinceEpoch);
-            };
-
             $rootScope.loadingMessage = 'Loading';
             $http.get('/notificationsdashboardhandler/data').then(function(
                 response) {

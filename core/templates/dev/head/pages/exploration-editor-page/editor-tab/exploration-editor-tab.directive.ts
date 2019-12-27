@@ -76,11 +76,6 @@ angular.module('oppia').directive('explorationEditorTab', [
             ExplorationWarningsService, GraphDataService, RouterService,
             StateEditorService, UrlInterpolationService) {
           var ctrl = this;
-          ctrl.areParametersEnabled =
-            ExplorationFeaturesService.areParametersEnabled;
-
-          ctrl.interactionIsShown = false;
-
           $scope.$on('refreshStateEditor', function() {
             ctrl.initStateEditor();
           });
@@ -269,6 +264,11 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.navigateToState = function(stateName) {
             RouterService.navigateToMainTab(stateName);
+          };
+          ctrl.$onInit = function() {
+            ctrl.areParametersEnabled =
+              ExplorationFeaturesService.areParametersEnabled;
+            ctrl.interactionIsShown = false;
           };
         }]
     };

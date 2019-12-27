@@ -37,24 +37,42 @@ angular.module('oppia').directive('moderatorPage', [
         '$http', '$rootScope', 'AlertsService', 'DateTimeFormatService',
         function($http, $rootScope, AlertsService, DateTimeFormatService) {
           var ctrl = this;
+          ctrl.getDatetimeAsString = function(millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              millisSinceEpoch);
+          };
+
+          ctrl.getExplorationCreateUrl = function(explorationId) {
+            return '/create/' + explorationId;
+          };
+
+          ctrl.getActivityCreateUrl = function(reference) {
+            return (
+              (reference.type === (
+                'exploration' ? '/create' : '/create_collection')) +
+              '/' + reference.id);
+          };
+          ctrl.isSaveFeaturedActivitiesButtonDisabled = function() {
+            return angular.equals(
+              ctrl.displayedFeaturedActivityReferences,
+              ctrl.lastSavedFeaturedActivityReferences);
+          };
+
+          ctrl.saveFeaturedActivityReferences = function() {
+            AlertsService.clearWarnings();
+
+            var activityReferencesToSave = angular.copy(
+              ctrl.displayedFeaturedActivityReferences);
+            $http.post('/moderatorhandler/featured', {
+              featured_activity_reference_dicts: activityReferencesToSave
+            }).then(function() {
+              ctrl.lastSavedFeaturedActivityReferences = (
+                activityReferencesToSave);
+              AlertsService.addSuccessMessage('Featured activities saved.');
+            });
+          };
           ctrl.$onInit = function() {
             $rootScope.loadingMessage = 'Loading';
-            ctrl.getDatetimeAsString = function(millisSinceEpoch) {
-              return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-                millisSinceEpoch);
-            };
-
-            ctrl.getExplorationCreateUrl = function(explorationId) {
-              return '/create/' + explorationId;
-            };
-
-            ctrl.getActivityCreateUrl = function(reference) {
-              return (
-                (reference.type === (
-                  'exploration' ? '/create' : '/create_collection')) +
-                '/' + reference.id);
-            };
-
             ctrl.allCommits = [];
             ctrl.allFeedbackMessages = [];
             // Map of exploration ids to objects containing a single key: title.
@@ -110,26 +128,6 @@ angular.module('oppia').directive('moderatorPage', [
               ctrl.lastSavedFeaturedActivityReferences = angular.copy(
                 ctrl.displayedFeaturedActivityReferences);
             });
-
-            ctrl.isSaveFeaturedActivitiesButtonDisabled = function() {
-              return angular.equals(
-                ctrl.displayedFeaturedActivityReferences,
-                ctrl.lastSavedFeaturedActivityReferences);
-            };
-
-            ctrl.saveFeaturedActivityReferences = function() {
-              AlertsService.clearWarnings();
-
-              var activityReferencesToSave = angular.copy(
-                ctrl.displayedFeaturedActivityReferences);
-              $http.post('/moderatorhandler/featured', {
-                featured_activity_reference_dicts: activityReferencesToSave
-              }).then(function() {
-                ctrl.lastSavedFeaturedActivityReferences = (
-                  activityReferencesToSave);
-                AlertsService.addSuccessMessage('Featured activities saved.');
-              });
-            };
           };
         }]
     };

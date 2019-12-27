@@ -38,6 +38,33 @@ angular.module('oppia').directive('skillMasteryViewer', [
             $scope, SkillMasteryBackendApiService,
             MASTERY_CUTOFF) {
           var ctrl = this;
+          ctrl.getSkillMasteryPercentage = function() {
+            return Math.round(ctrl.skillMasteryDegree * 100);
+          };
+
+          ctrl.getMasteryChangePercentage = function() {
+            if (ctrl.masteryChange >= 0) {
+              return '+' + Math.round(ctrl.masteryChange * 100);
+            } else {
+              return Math.round(ctrl.masteryChange * 100);
+            }
+          };
+
+          ctrl.getLearningTips = function() {
+            if (ctrl.masteryChange > 0) {
+              if (ctrl.skillMasteryDegree >= MASTERY_CUTOFF.GOOD_CUTOFF) {
+                return 'You have mastered this skill very well! ' +
+                  'You can work on other skills or learn new skills.';
+              } else {
+                return 'You have made progress! You can increase your ' +
+                  'mastery level by doing more practice sessions.';
+              }
+            } else {
+              return 'Looks like your mastery of this skill has dropped. ' +
+                  'To improve it, try reviewing the concept card below and ' +
+                  'then practicing more questions for the skill.';
+            }
+          };
           ctrl.$onInit = function() {
             ctrl.skillMasteryDegree = 0.0;
 
@@ -45,34 +72,6 @@ angular.module('oppia').directive('skillMasteryViewer', [
               [ctrl.skillId]).then(function(degreesOfMastery) {
               ctrl.skillMasteryDegree = degreesOfMastery[ctrl.skillId];
             });
-
-            ctrl.getSkillMasteryPercentage = function() {
-              return Math.round(ctrl.skillMasteryDegree * 100);
-            };
-
-            ctrl.getMasteryChangePercentage = function() {
-              if (ctrl.masteryChange >= 0) {
-                return '+' + Math.round(ctrl.masteryChange * 100);
-              } else {
-                return Math.round(ctrl.masteryChange * 100);
-              }
-            };
-
-            ctrl.getLearningTips = function() {
-              if (ctrl.masteryChange > 0) {
-                if (ctrl.skillMasteryDegree >= MASTERY_CUTOFF.GOOD_CUTOFF) {
-                  return 'You have mastered this skill very well! ' +
-                    'You can work on other skills or learn new skills.';
-                } else {
-                  return 'You have made progress! You can increase your ' +
-                    'mastery level by doing more practice sessions.';
-                }
-              } else {
-                return 'Looks like your mastery of this skill has dropped. ' +
-                    'To improve it, try reviewing the concept card below and ' +
-                    'then practicing more questions for the skill.';
-              }
-            };
           };
         }]
     };

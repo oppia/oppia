@@ -57,55 +57,55 @@ angular.module('oppia').directive('practiceSessionPage', [
             TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS
         ) {
           var ctrl = this;
+          var _fetchSkillDetails = function() {
+            var practiceSessionsDataUrl = UrlInterpolationService
+              .interpolateUrl(
+                PRACTICE_SESSIONS_DATA_URL, {
+                  topic_name: ctrl.topicName
+                });
+            var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
+              PRACTICE_SESSIONS_URL, {
+                topic_name: ctrl.topicName
+              });
+            var topicViewerUrl = UrlInterpolationService.interpolateUrl(
+              TOPIC_VIEWER_PAGE, {
+                topic_name: ctrl.topicName
+              });
+            $http.get(practiceSessionsDataUrl).then(function(result) {
+              var skillList = [];
+              var skillDescriptions = [];
+              for (var skillId in result.data.skill_descriptions) {
+                skillList.push(skillId);
+                skillDescriptions.push(
+                  result.data.skill_descriptions[skillId]);
+              }
+              var questionPlayerConfig = {
+                resultActionButtons: [
+                  {
+                    type: 'BOOST_SCORE',
+                    i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
+                  },
+                  {
+                    type: 'RETRY_SESSION',
+                    i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
+                    url: practiceSessionsUrl
+                  },
+                  {
+                    type: 'DASHBOARD',
+                    i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
+                    url: topicViewerUrl
+                  }
+                ],
+                skillList: skillList,
+                skillDescriptions: skillDescriptions,
+                questionCount: TOTAL_QUESTIONS,
+                questionsSortedByDifficulty: false
+              };
+              ctrl.questionPlayerConfig = questionPlayerConfig;
+            });
+          };
           ctrl.$onInit = function() {
             ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-            var _fetchSkillDetails = function() {
-              var practiceSessionsDataUrl = UrlInterpolationService
-                .interpolateUrl(
-                  PRACTICE_SESSIONS_DATA_URL, {
-                    topic_name: ctrl.topicName
-                  });
-              var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
-                PRACTICE_SESSIONS_URL, {
-                  topic_name: ctrl.topicName
-                });
-              var topicViewerUrl = UrlInterpolationService.interpolateUrl(
-                TOPIC_VIEWER_PAGE, {
-                  topic_name: ctrl.topicName
-                });
-              $http.get(practiceSessionsDataUrl).then(function(result) {
-                var skillList = [];
-                var skillDescriptions = [];
-                for (var skillId in result.data.skill_descriptions) {
-                  skillList.push(skillId);
-                  skillDescriptions.push(
-                    result.data.skill_descriptions[skillId]);
-                }
-                var questionPlayerConfig = {
-                  resultActionButtons: [
-                    {
-                      type: 'BOOST_SCORE',
-                      i18nId: 'I18N_QUESTION_PLAYER_BOOST_SCORE'
-                    },
-                    {
-                      type: 'RETRY_SESSION',
-                      i18nId: 'I18N_QUESTION_PLAYER_NEW_SESSION',
-                      url: practiceSessionsUrl
-                    },
-                    {
-                      type: 'DASHBOARD',
-                      i18nId: 'I18N_QUESTION_PLAYER_MY_DASHBOARD',
-                      url: topicViewerUrl
-                    }
-                  ],
-                  skillList: skillList,
-                  skillDescriptions: skillDescriptions,
-                  questionCount: TOTAL_QUESTIONS,
-                  questionsSortedByDifficulty: false
-                };
-                ctrl.questionPlayerConfig = questionPlayerConfig;
-              });
-            };
             _fetchSkillDetails();
             PageTitleService.setPageTitle(
               'Practice Session: ' + ctrl.topicName + ' - Oppia');

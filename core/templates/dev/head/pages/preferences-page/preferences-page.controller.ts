@@ -60,63 +60,9 @@ angular.module('oppia').directive('preferencesPage', [
             ENABLE_ACCOUNT_DELETION, SUPPORTED_AUDIO_LANGUAGES,
             SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
-          var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
-          ctrl.profilePictureDataUrl = '';
-          ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
-          ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
-
-          ctrl.username = '';
-          $rootScope.loadingMessage = 'Loading';
-          var userInfoPromise = UserService.getUserInfoAsync();
-          userInfoPromise.then(function(userInfo) {
-            ctrl.username = userInfo.getUsername();
-            ctrl.email = userInfo.getEmail();
-          });
-
-          ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
-            function(languageItem) {
-              return {
-                id: languageItem.id,
-                text: languageItem.description
-              };
-            }
-          );
-
-          ctrl.hasPageLoaded = false;
-          var preferencesPromise = $http.get(_PREFERENCES_DATA_URL);
-          preferencesPromise.then(function(response) {
-            var data = response.data;
-            ctrl.userBio = data.user_bio;
-            ctrl.subjectInterests = data.subject_interests;
-            ctrl.preferredLanguageCodes = data.preferred_language_codes;
-            ctrl.profilePictureDataUrl = data.profile_picture_data_url;
-            ctrl.defaultDashboard = data.default_dashboard;
-            ctrl.canReceiveEmailUpdates = data.can_receive_email_updates;
-            ctrl.canReceiveEditorRoleEmail =
-            data.can_receive_editor_role_email;
-            ctrl.canReceiveSubscriptionEmail =
-              data.can_receive_subscription_email;
-            ctrl.canReceiveFeedbackMessageEmail = (
-              data.can_receive_feedback_message_email);
-            ctrl.preferredSiteLanguageCode =
-            data.preferred_site_language_code;
-            ctrl.preferredAudioLanguageCode =
-              data.preferred_audio_language_code;
-            ctrl.subscriptionList = data.subscription_list;
-            ctrl.hasPageLoaded = true;
-            _forceSelect2Refresh();
-          }).then(null, function onError(response) {
-          });
-
-          $q.all([userInfoPromise, preferencesPromise]).then(function() {
-            $rootScope.loadingMessage = '';
-          });
-
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
-
-          ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
 
           var _saveDataItem = function(updateType, data) {
             $http.put(_PREFERENCES_DATA_URL, {
@@ -139,10 +85,6 @@ angular.module('oppia').directive('preferencesPage', [
           ctrl.saveUserBio = function(userBio) {
             _saveDataItem('user_bio', userBio);
           };
-
-          ctrl.subjectInterestsChangedAtLeastOnce = false;
-          ctrl.subjectInterestsWarningText = null;
-          ctrl.TAG_REGEX_STRING = '^[a-z ]+$';
 
           ctrl.updateSubjectInterestsWarning = function(subjectInterests) {
             var TAG_REGEX = new RegExp(ctrl.TAG_REGEX_STRING);
@@ -292,10 +234,66 @@ angular.module('oppia').directive('preferencesPage', [
               // No further action is needed.
             });
           };
+          ctrl.$onInit = function() {
+            var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
+            ctrl.profilePictureDataUrl = '';
+            ctrl.DASHBOARD_TYPE_CREATOR = DASHBOARD_TYPE_CREATOR;
+            ctrl.DASHBOARD_TYPE_LEARNER = DASHBOARD_TYPE_LEARNER;
 
-          ctrl.LANGUAGE_CHOICES =
-          LanguageUtilService.getLanguageIdsAndTexts();
-          ctrl.SITE_LANGUAGE_CHOICES = SUPPORTED_SITE_LANGUAGES;
+            ctrl.username = '';
+            $rootScope.loadingMessage = 'Loading';
+            var userInfoPromise = UserService.getUserInfoAsync();
+            userInfoPromise.then(function(userInfo) {
+              ctrl.username = userInfo.getUsername();
+              ctrl.email = userInfo.getEmail();
+            });
+
+            ctrl.AUDIO_LANGUAGE_CHOICES = SUPPORTED_AUDIO_LANGUAGES.map(
+              function(languageItem) {
+                return {
+                  id: languageItem.id,
+                  text: languageItem.description
+                };
+              }
+            );
+
+            ctrl.hasPageLoaded = false;
+            var preferencesPromise = $http.get(_PREFERENCES_DATA_URL);
+            preferencesPromise.then(function(response) {
+              var data = response.data;
+              ctrl.userBio = data.user_bio;
+              ctrl.subjectInterests = data.subject_interests;
+              ctrl.preferredLanguageCodes = data.preferred_language_codes;
+              ctrl.profilePictureDataUrl = data.profile_picture_data_url;
+              ctrl.defaultDashboard = data.default_dashboard;
+              ctrl.canReceiveEmailUpdates = data.can_receive_email_updates;
+              ctrl.canReceiveEditorRoleEmail =
+              data.can_receive_editor_role_email;
+              ctrl.canReceiveSubscriptionEmail =
+                data.can_receive_subscription_email;
+              ctrl.canReceiveFeedbackMessageEmail = (
+                data.can_receive_feedback_message_email);
+              ctrl.preferredSiteLanguageCode =
+              data.preferred_site_language_code;
+              ctrl.preferredAudioLanguageCode =
+                data.preferred_audio_language_code;
+              ctrl.subscriptionList = data.subscription_list;
+              ctrl.hasPageLoaded = true;
+              _forceSelect2Refresh();
+            }).then(null, function onError(response) {
+            });
+
+            $q.all([userInfoPromise, preferencesPromise]).then(function() {
+              $rootScope.loadingMessage = '';
+            });
+            ctrl.userCanDeleteAccount = ENABLE_ACCOUNT_DELETION;
+            ctrl.subjectInterestsChangedAtLeastOnce = false;
+            ctrl.subjectInterestsWarningText = null;
+            ctrl.TAG_REGEX_STRING = '^[a-z ]+$';
+            ctrl.LANGUAGE_CHOICES =
+            LanguageUtilService.getLanguageIdsAndTexts();
+            ctrl.SITE_LANGUAGE_CHOICES = SUPPORTED_SITE_LANGUAGES;
+          };
         }]
     };
   }]);

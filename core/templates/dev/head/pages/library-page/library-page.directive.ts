@@ -63,10 +63,147 @@ angular.module('oppia').directive('libraryPage', [
             WindowDimensionsService, ALL_CATEGORIES,
             LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES, LIBRARY_TILE_WIDTH_PX) {
           var ctrl = this;
+          var possibleBannerFilenames = [
+            'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+          ctrl.setActiveGroup = function(groupIndex) {
+            ctrl.activeGroupIndex = groupIndex;
+          };
+
+          ctrl.clearActiveGroup = function() {
+            ctrl.activeGroupIndex = null;
+          };
+          // If the value below is changed, the following CSS values in
+          // oppia.css must be changed:
+          // - .oppia-exp-summary-tiles-container: max-width
+          // - .oppia-library-carousel: max-width
+          var MAX_NUM_TILES_PER_ROW = 4;
+          var initCarousels = function() {
+            // This prevents unnecessary execution of this method immediately
+            // after a window resize event is fired.
+            if (!ctrl.libraryGroups) {
+              return;
+            }
+
+            var windowWidth = $(window).width() * 0.85;
+            // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
+            // compensate for padding and margins. 20 is just an arbitrary
+            // number.
+            ctrl.tileDisplayCount = Math.min(
+              Math.floor(windowWidth / (LIBRARY_TILE_WIDTH_PX + 20)),
+              MAX_NUM_TILES_PER_ROW);
+
+            $('.oppia-library-carousel').css({
+              width: (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX) + 'px'
+            });
+
+            // The following determines whether to enable left scroll after
+            // resize.
+            for (var i = 0; i < ctrl.libraryGroups.length; i++) {
+              var carouselJQuerySelector = (
+                '.oppia-library-carousel-tiles:eq(n)'.replace(
+                  'n', <string><any>i));
+              var carouselScrollPositionPx = $(
+                carouselJQuerySelector).scrollLeft();
+              var index = Math.ceil(
+                carouselScrollPositionPx / LIBRARY_TILE_WIDTH_PX);
+              ctrl.leftmostCardIndices[i] = index;
+            }
+          };
+          ctrl.scroll = function(ind, isLeftScroll) {
+            if (isAnyCarouselCurrentlyScrolling) {
+              return;
+            }
+            var carouselJQuerySelector = (
+              '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
+
+            var direction = isLeftScroll ? -1 : 1;
+            var carouselScrollPositionPx = $(
+              carouselJQuerySelector).scrollLeft();
+
+            // Prevent scrolling if there more carousel pixed widths than
+            // there are tile widths.
+            if (ctrl.libraryGroups[ind].activity_summary_dicts.length <=
+                ctrl.tileDisplayCount) {
+              return;
+            }
+
+            carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
+
+            if (isLeftScroll) {
+              ctrl.leftmostCardIndices[ind] = Math.max(
+                0, ctrl.leftmostCardIndices[ind] - ctrl.tileDisplayCount);
+            } else {
+              ctrl.leftmostCardIndices[ind] = Math.min(
+                ctrl.libraryGroups[ind].activity_summary_dicts.length -
+                  ctrl.tileDisplayCount + 1,
+                ctrl.leftmostCardIndices[ind] + ctrl.tileDisplayCount);
+            }
+
+            var newScrollPositionPx = carouselScrollPositionPx +
+              (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX * direction);
+
+            $(carouselJQuerySelector).animate({
+              scrollLeft: newScrollPositionPx
+            }, {
+              duration: 800,
+              queue: false,
+              start: function() {
+                isAnyCarouselCurrentlyScrolling = true;
+              },
+              complete: function() {
+                isAnyCarouselCurrentlyScrolling = false;
+              }
+            });
+          };
+
+          // The carousels do not work when the width is 1 card long, so we
+          // need to handle this case discretely and also prevent swiping
+          // past the first and last card.
+          ctrl.incrementLeftmostCardIndex = function(ind) {
+            var lastItem = ((
+              ctrl.libraryGroups[ind].activity_summary_dicts.length -
+              ctrl.tileDisplayCount) <= ctrl.leftmostCardIndices[ind]);
+            if (!lastItem) {
+              ctrl.leftmostCardIndices[ind]++;
+            }
+          };
+          ctrl.decrementLeftmostCardIndex = function(ind) {
+            ctrl.leftmostCardIndices[ind] = (
+              Math.max(ctrl.leftmostCardIndices[ind] - 1, 0));
+          };
+          var activateSearchMode = function() {
+            if (ctrl.pageMode !== LIBRARY_PAGE_MODES.SEARCH) {
+              $('.oppia-library-container').fadeOut(function() {
+                ctrl.pageMode = LIBRARY_PAGE_MODES.SEARCH;
+                $timeout(function() {
+                  $('.oppia-library-container').fadeIn();
+                }, 50);
+              });
+            }
+          };
+
+          // The following loads explorations belonging to a particular group.
+          // If fullResultsUrl is given it loads the page corresponding to
+          // the url. Otherwise, it will initiate a search query for the
+          // given list of categories.
+          ctrl.showFullResultsPage = function(categories, fullResultsUrl) {
+            if (fullResultsUrl) {
+              $window.location.href = fullResultsUrl;
+            } else {
+              var selectedCategories = {};
+              for (var i = 0; i < categories.length; i++) {
+                selectedCategories[categories[i]] = true;
+              }
+
+              var targetSearchQueryUrl =
+              SearchService.getSearchUrlQueryString(
+                '', selectedCategories, {});
+              $window.location.href =
+              '/search/find?q=' + targetSearchQueryUrl;
+            }
+          };
           ctrl.$onInit = function() {
             $rootScope.loadingMessage = 'I18N_LIBRARY_LOADING';
-            var possibleBannerFilenames = [
-              'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
             ctrl.bannerImageFilename = possibleBannerFilenames[
               Math.floor(Math.random() * possibleBannerFilenames.length)];
 
@@ -204,119 +341,9 @@ angular.module('oppia').directive('libraryPage', [
                 // clicked. No further action is needed.
               });
             }
-
-            ctrl.setActiveGroup = function(groupIndex) {
-              ctrl.activeGroupIndex = groupIndex;
-            };
-
-            ctrl.clearActiveGroup = function() {
-              ctrl.activeGroupIndex = null;
-            };
-
-            // If the value below is changed, the following CSS values in
-            // oppia.css must be changed:
-            // - .oppia-exp-summary-tiles-container: max-width
-            // - .oppia-library-carousel: max-width
-            var MAX_NUM_TILES_PER_ROW = 4;
             ctrl.tileDisplayCount = 0;
 
-            var initCarousels = function() {
-              // This prevents unnecessary execution of this method immediately
-              // after a window resize event is fired.
-              if (!ctrl.libraryGroups) {
-                return;
-              }
-
-              var windowWidth = $(window).width() * 0.85;
-              // The number 20 is added to LIBRARY_TILE_WIDTH_PX in order to
-              // compensate for padding and margins. 20 is just an arbitrary
-              // number.
-              ctrl.tileDisplayCount = Math.min(
-                Math.floor(windowWidth / (LIBRARY_TILE_WIDTH_PX + 20)),
-                MAX_NUM_TILES_PER_ROW);
-
-              $('.oppia-library-carousel').css({
-                width: (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX) + 'px'
-              });
-
-              // The following determines whether to enable left scroll after
-              // resize.
-              for (var i = 0; i < ctrl.libraryGroups.length; i++) {
-                var carouselJQuerySelector = (
-                  '.oppia-library-carousel-tiles:eq(n)'.replace(
-                    'n', <string><any>i));
-                var carouselScrollPositionPx = $(
-                  carouselJQuerySelector).scrollLeft();
-                var index = Math.ceil(
-                  carouselScrollPositionPx / LIBRARY_TILE_WIDTH_PX);
-                ctrl.leftmostCardIndices[i] = index;
-              }
-            };
-
             var isAnyCarouselCurrentlyScrolling = false;
-
-            ctrl.scroll = function(ind, isLeftScroll) {
-              if (isAnyCarouselCurrentlyScrolling) {
-                return;
-              }
-              var carouselJQuerySelector = (
-                '.oppia-library-carousel-tiles:eq(n)'.replace('n', ind));
-
-              var direction = isLeftScroll ? -1 : 1;
-              var carouselScrollPositionPx = $(
-                carouselJQuerySelector).scrollLeft();
-
-              // Prevent scrolling if there more carousel pixed widths than
-              // there are tile widths.
-              if (ctrl.libraryGroups[ind].activity_summary_dicts.length <=
-                  ctrl.tileDisplayCount) {
-                return;
-              }
-
-              carouselScrollPositionPx = Math.max(0, carouselScrollPositionPx);
-
-              if (isLeftScroll) {
-                ctrl.leftmostCardIndices[ind] = Math.max(
-                  0, ctrl.leftmostCardIndices[ind] - ctrl.tileDisplayCount);
-              } else {
-                ctrl.leftmostCardIndices[ind] = Math.min(
-                  ctrl.libraryGroups[ind].activity_summary_dicts.length -
-                    ctrl.tileDisplayCount + 1,
-                  ctrl.leftmostCardIndices[ind] + ctrl.tileDisplayCount);
-              }
-
-              var newScrollPositionPx = carouselScrollPositionPx +
-                (ctrl.tileDisplayCount * LIBRARY_TILE_WIDTH_PX * direction);
-
-              $(carouselJQuerySelector).animate({
-                scrollLeft: newScrollPositionPx
-              }, {
-                duration: 800,
-                queue: false,
-                start: function() {
-                  isAnyCarouselCurrentlyScrolling = true;
-                },
-                complete: function() {
-                  isAnyCarouselCurrentlyScrolling = false;
-                }
-              });
-            };
-
-            // The carousels do not work when the width is 1 card long, so we
-            // need to handle this case discretely and also prevent swiping
-            // past the first and last card.
-            ctrl.incrementLeftmostCardIndex = function(ind) {
-              var lastItem = ((
-                ctrl.libraryGroups[ind].activity_summary_dicts.length -
-                ctrl.tileDisplayCount) <= ctrl.leftmostCardIndices[ind]);
-              if (!lastItem) {
-                ctrl.leftmostCardIndices[ind]++;
-              }
-            };
-            ctrl.decrementLeftmostCardIndex = function(ind) {
-              ctrl.leftmostCardIndices[ind] = (
-                Math.max(ctrl.leftmostCardIndices[ind] - 1, 0));
-            };
 
             $(window).resize(function() {
               initCarousels();
@@ -324,38 +351,6 @@ angular.module('oppia').directive('libraryPage', [
               // time (several seconds) to update.
               $scope.$apply();
             });
-
-            var activateSearchMode = function() {
-              if (ctrl.pageMode !== LIBRARY_PAGE_MODES.SEARCH) {
-                $('.oppia-library-container').fadeOut(function() {
-                  ctrl.pageMode = LIBRARY_PAGE_MODES.SEARCH;
-                  $timeout(function() {
-                    $('.oppia-library-container').fadeIn();
-                  }, 50);
-                });
-              }
-            };
-
-            // The following loads explorations belonging to a particular group.
-            // If fullResultsUrl is given it loads the page corresponding to
-            // the url. Otherwise, it will initiate a search query for the
-            // given list of categories.
-            ctrl.showFullResultsPage = function(categories, fullResultsUrl) {
-              if (fullResultsUrl) {
-                $window.location.href = fullResultsUrl;
-              } else {
-                var selectedCategories = {};
-                for (var i = 0; i < categories.length; i++) {
-                  selectedCategories[categories[i]] = true;
-                }
-
-                var targetSearchQueryUrl =
-                SearchService.getSearchUrlQueryString(
-                  '', selectedCategories, {});
-                $window.location.href =
-                '/search/find?q=' + targetSearchQueryUrl;
-              }
-            };
 
             var libraryWindowCutoffPx = 530;
             ctrl.libraryWindowIsNarrow = (

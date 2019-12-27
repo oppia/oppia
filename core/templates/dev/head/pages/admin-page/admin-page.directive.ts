@@ -53,6 +53,28 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
         function($http, $location, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
+          ctrl.isActivitiesTabOpen = function() {
+            return AdminRouterService.isActivitiesTabOpen();
+          };
+          ctrl.isJobsTabOpen = function() {
+            return AdminRouterService.isJobsTabOpen();
+          };
+          ctrl.isConfigTabOpen = function() {
+            return AdminRouterService.isConfigTabOpen();
+          };
+          ctrl.isRolesTabOpen = function() {
+            return AdminRouterService.isRolesTabOpen();
+          };
+          ctrl.isMiscTabOpen = function() {
+            return AdminRouterService.isMiscTabOpen();
+          };
+          ctrl.setStatusMessage = function(statusMessage) {
+            ctrl.statusMessage = statusMessage;
+          };
+
+          $scope.$on('$locationChangeSuccess', function() {
+            AdminRouterService.showTab($location.path().replace('/', '#'));
+          });
           ctrl.$onInit = function() {
             ctrl.userEmail = '';
             AdminDataService.getDataAsync().then(function(response) {
@@ -60,31 +82,7 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
             });
             ctrl.inDevMode = DEV_MODE;
             ctrl.statusMessage = '';
-            ctrl.isActivitiesTabOpen = function() {
-              return AdminRouterService.isActivitiesTabOpen();
-            };
-            ctrl.isJobsTabOpen = function() {
-              return AdminRouterService.isJobsTabOpen();
-            };
-            ctrl.isConfigTabOpen = function() {
-              return AdminRouterService.isConfigTabOpen();
-            };
-            ctrl.isRolesTabOpen = function() {
-              return AdminRouterService.isRolesTabOpen();
-            };
-            ctrl.isMiscTabOpen = function() {
-              return AdminRouterService.isMiscTabOpen();
-            };
-
             CsrfTokenService.initializeToken();
-
-            ctrl.setStatusMessage = function(statusMessage) {
-              ctrl.statusMessage = statusMessage;
-            };
-
-            $scope.$on('$locationChangeSuccess', function() {
-              AdminRouterService.showTab($location.path().replace('/', '#'));
-            });
           };
         }]
     };

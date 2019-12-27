@@ -35,6 +35,9 @@ angular.module('oppia').directive('graphPropertyEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        $scope.$watch('$ctrl.localValue.property', function() {
+          ctrl.value = ctrl.localValue.property.name;
+        });
         ctrl.$onInit = function() {
           ctrl.alwaysEditable = true;
 
@@ -60,10 +63,6 @@ angular.module('oppia').directive('graphPropertyEditor', [
               ctrl.localValue.property = ctrl.graphProperties[i];
             }
           }
-
-          $scope.$watch('$ctrl.localValue.property', function() {
-            ctrl.value = ctrl.localValue.property.name;
-          });
         };
       }]
     };

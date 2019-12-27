@@ -47,6 +47,45 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
         '$scope', '$filter', '$sce', '$translate', 'DeviceInfoService',
         function($scope, $filter, $sce, $translate, DeviceInfoService) {
           var ctrl = this;
+          ctrl.onKeypress = function(evt) {
+            if (evt.keyCode === 13) {
+              $scope.$emit('submittedSchemaBasedUnicodeForm');
+            }
+          };
+
+          ctrl.getPlaceholder = function() {
+            if (!ctrl.uiConfig()) {
+              return '';
+            } else {
+              if (!ctrl.uiConfig().placeholder &&
+                  DeviceInfoService.hasTouchEvents()) {
+                return $translate.instant(
+                  'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
+              }
+              return ctrl.uiConfig().placeholder;
+            }
+          };
+
+          ctrl.getRows = function() {
+            if (!ctrl.uiConfig()) {
+              return null;
+            } else {
+              return ctrl.uiConfig().rows;
+            }
+          };
+
+          ctrl.getCodingMode = function() {
+            if (!ctrl.uiConfig()) {
+              return null;
+            } else {
+              return ctrl.uiConfig().coding_mode;
+            }
+          };
+
+          ctrl.getDisplayedValue = function() {
+            return $sce.trustAsHtml(
+              $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
+          };
           ctrl.$onInit = function() {
             if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {
               // Flag that is flipped each time the codemirror view is
@@ -95,46 +134,6 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
                 }, 200);
               });
             }
-
-            ctrl.onKeypress = function(evt) {
-              if (evt.keyCode === 13) {
-                $scope.$emit('submittedSchemaBasedUnicodeForm');
-              }
-            };
-
-            ctrl.getPlaceholder = function() {
-              if (!ctrl.uiConfig()) {
-                return '';
-              } else {
-                if (!ctrl.uiConfig().placeholder &&
-                    DeviceInfoService.hasTouchEvents()) {
-                  return $translate.instant(
-                    'I18N_PLAYER_DEFAULT_MOBILE_PLACEHOLDER');
-                }
-                return ctrl.uiConfig().placeholder;
-              }
-            };
-
-            ctrl.getRows = function() {
-              if (!ctrl.uiConfig()) {
-                return null;
-              } else {
-                return ctrl.uiConfig().rows;
-              }
-            };
-
-            ctrl.getCodingMode = function() {
-              if (!ctrl.uiConfig()) {
-                return null;
-              } else {
-                return ctrl.uiConfig().coding_mode;
-              }
-            };
-
-            ctrl.getDisplayedValue = function() {
-              return $sce.trustAsHtml(
-                $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
-            };
           };
         }]
     };

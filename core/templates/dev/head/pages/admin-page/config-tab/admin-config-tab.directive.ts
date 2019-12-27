@@ -39,72 +39,70 @@ angular.module('oppia').directive('adminConfigTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        ctrl.isNonemptyObject = function(object) {
+          var hasAtLeastOneElement = false;
+          for (var property in object) {
+            hasAtLeastOneElement = true;
+          }
+          return hasAtLeastOneElement;
+        };
+
+        ctrl.reloadConfigProperties = function() {
+          AdminDataService.getDataAsync().then(function(response) {
+            ctrl.configProperties = response.config_properties;
+          });
+        };
+
+        ctrl.revertToDefaultConfigPropertyValue = function(configPropertyId) {
+          if (
+            !$window.confirm('This action is irreversible. Are you sure?')) {
+            return;
+          }
+
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'revert_config_property',
+            config_property_id: configPropertyId
+          }).then(function() {
+            ctrl.setStatusMessage('Config property reverted successfully.');
+            ctrl.reloadConfigProperties();
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+        };
+
+        ctrl.saveConfigProperties = function() {
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          if (
+            !$window.confirm('This action is irreversible. Are you sure?')) {
+            return;
+          }
+
+          ctrl.setStatusMessage('Saving...');
+
+          AdminTaskManagerService.startTask();
+          var newConfigPropertyValues = {};
+          for (var property in ctrl.configProperties) {
+            newConfigPropertyValues[property] = (
+              ctrl.configProperties[property].value);
+          }
+
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'save_config_properties',
+            new_config_property_values: newConfigPropertyValues
+          }).then(function() {
+            ctrl.setStatusMessage('Data saved successfully.');
+            AdminTaskManagerService.finishTask();
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+            AdminTaskManagerService.finishTask();
+          });
+        };
         ctrl.$onInit = function() {
           ctrl.configProperties = {};
-
-          ctrl.isNonemptyObject = function(object) {
-            var hasAtLeastOneElement = false;
-            for (var property in object) {
-              hasAtLeastOneElement = true;
-            }
-            return hasAtLeastOneElement;
-          };
-
-          ctrl.reloadConfigProperties = function() {
-            AdminDataService.getDataAsync().then(function(response) {
-              ctrl.configProperties = response.config_properties;
-            });
-          };
-
-          ctrl.revertToDefaultConfigPropertyValue = function(configPropertyId) {
-            if (
-              !$window.confirm('This action is irreversible. Are you sure?')) {
-              return;
-            }
-
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'revert_config_property',
-              config_property_id: configPropertyId
-            }).then(function() {
-              ctrl.setStatusMessage('Config property reverted successfully.');
-              ctrl.reloadConfigProperties();
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
-          };
-
-          ctrl.saveConfigProperties = function() {
-            if (AdminTaskManagerService.isTaskRunning()) {
-              return;
-            }
-            if (
-              !$window.confirm('This action is irreversible. Are you sure?')) {
-              return;
-            }
-
-            ctrl.setStatusMessage('Saving...');
-
-            AdminTaskManagerService.startTask();
-            var newConfigPropertyValues = {};
-            for (var property in ctrl.configProperties) {
-              newConfigPropertyValues[property] = (
-                ctrl.configProperties[property].value);
-            }
-
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'save_config_properties',
-              new_config_property_values: newConfigPropertyValues
-            }).then(function() {
-              ctrl.setStatusMessage('Data saved successfully.');
-              AdminTaskManagerService.finishTask();
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-              AdminTaskManagerService.finishTask();
-            });
-          };
-
           ctrl.reloadConfigProperties();
         };
       }]

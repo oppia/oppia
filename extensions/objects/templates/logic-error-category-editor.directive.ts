@@ -34,6 +34,9 @@ angular.module('oppia').directive('logicErrorCategoryEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        $scope.$watch('$ctrl.localValue.category', function() {
+          ctrl.value = ctrl.localValue.category.name;
+        });
         ctrl.$onInit = function() {
           ctrl.alwaysEditable = true;
           ctrl.errorCategories = [{
@@ -70,10 +73,6 @@ angular.module('oppia').directive('logicErrorCategoryEditor', [
               ctrl.localValue.category = ctrl.errorCategories[i];
             }
           }
-
-          $scope.$watch('$ctrl.localValue.category', function() {
-            ctrl.value = ctrl.localValue.category.name;
-          });
         };
       }]
     };

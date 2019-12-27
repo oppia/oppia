@@ -61,6 +61,85 @@ angular.module('oppia').directive('learnerLocalNav', [
             UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
+          ctrl.getFeedbackPopoverUrl = function() {
+            return UrlInterpolationService.getDirectiveTemplateUrl(
+              FEEDBACK_POPOVER_PATH);
+          };
+
+          ctrl.showLearnerSuggestionModal = function() {
+            SuggestionModalForExplorationPlayerService.showSuggestionModal(
+              'edit_exploration_state_content', {});
+          };
+          ctrl.showFlagExplorationModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration-player-page/templates/' +
+                'flag-exploration-modal.template.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance', 'PlayerPositionService',
+                function($scope, $uibModalInstance, PlayerPositionService) {
+                  $scope.flagMessageTextareaIsShown = false;
+                  var stateName = PlayerPositionService.getCurrentStateName();
+
+                  $scope.showFlagMessageTextarea = function(value) {
+                    if (value) {
+                      $scope.flagMessageTextareaIsShown = true;
+                      FocusManagerService.setFocus('flagMessageTextarea');
+                    }
+                  };
+
+                  $scope.submitReport = function() {
+                    if ($scope.flagMessage) {
+                      $uibModalInstance.close({
+                        report_type: $scope.flag,
+                        report_text: $scope.flagMessage,
+                        state: stateName
+                      });
+                    }
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            }).result.then(function(result) {
+              var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
+                FLAG_EXPLORATION_URL_TEMPLATE, {
+                  exploration_id: ctrl.explorationId
+                }
+              );
+              var report = (
+                '[' + result.state + '] (' + result.report_type + ') ' +
+                result.report_text);
+              $http.post(flagExplorationUrl, {
+                report_text: report
+              }).then(null, function(error) {
+                AlertsService.addWarning(error);
+              });
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/exploration-player-page/templates/' +
+                  'exploration-successfully-flagged-modal.template.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.close = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
+              });
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
+          };
           ctrl.$onInit = function() {
             ctrl.explorationId = ExplorationEngineService.getExplorationId();
             ReadOnlyExplorationBackendApiService
@@ -74,86 +153,6 @@ angular.module('oppia').directive('learnerLocalNav', [
               ctrl.username = userInfo.getUsername();
               $rootScope.loadingMessage = '';
             });
-
-            ctrl.getFeedbackPopoverUrl = function() {
-              return UrlInterpolationService.getDirectiveTemplateUrl(
-                FEEDBACK_POPOVER_PATH);
-            };
-
-            ctrl.showLearnerSuggestionModal = function() {
-              SuggestionModalForExplorationPlayerService.showSuggestionModal(
-                'edit_exploration_state_content', {});
-            };
-            ctrl.showFlagExplorationModal = function() {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-player-page/templates/' +
-                  'flag-exploration-modal.template.html'),
-                backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance', 'PlayerPositionService',
-                  function($scope, $uibModalInstance, PlayerPositionService) {
-                    $scope.flagMessageTextareaIsShown = false;
-                    var stateName = PlayerPositionService.getCurrentStateName();
-
-                    $scope.showFlagMessageTextarea = function(value) {
-                      if (value) {
-                        $scope.flagMessageTextareaIsShown = true;
-                        FocusManagerService.setFocus('flagMessageTextarea');
-                      }
-                    };
-
-                    $scope.submitReport = function() {
-                      if ($scope.flagMessage) {
-                        $uibModalInstance.close({
-                          report_type: $scope.flag,
-                          report_text: $scope.flagMessage,
-                          state: stateName
-                        });
-                      }
-                    };
-
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
-              }).result.then(function(result) {
-                var flagExplorationUrl = UrlInterpolationService.interpolateUrl(
-                  FLAG_EXPLORATION_URL_TEMPLATE, {
-                    exploration_id: ctrl.explorationId
-                  }
-                );
-                var report = (
-                  '[' + result.state + '] (' + result.report_type + ') ' +
-                  result.report_text);
-                $http.post(flagExplorationUrl, {
-                  report_text: report
-                }).then(null, function(error) {
-                  AlertsService.addWarning(error);
-                });
-                $uibModal.open({
-                  templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                    '/pages/exploration-player-page/templates/' +
-                    'exploration-successfully-flagged-modal.template.html'),
-                  backdrop: true,
-                  controller: [
-                    '$scope', '$uibModalInstance',
-                    function($scope, $uibModalInstance) {
-                      $scope.close = function() {
-                        $uibModalInstance.dismiss('cancel');
-                      };
-                    }
-                  ]
-                }).result.then(function() {}, function() {
-                  // This callback is triggered when the Cancel button is
-                  // clicked. No further action is needed.
-                });
-              }, function() {
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
-              });
-            };
           };
         }]
     };

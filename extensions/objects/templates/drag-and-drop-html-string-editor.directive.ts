@@ -31,6 +31,9 @@ angular.module('oppia').directive('dragAndDropHtmlStringEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        ctrl.selection = function(selectedItem) {
+          ctrl.value = selectedItem;
+        };
         ctrl.$onInit = function() {
           ctrl.name = math.random().toString(36).substring(7);
           ctrl.initArgs = ctrl.getInitArgs();
@@ -40,10 +43,6 @@ angular.module('oppia').directive('dragAndDropHtmlStringEditor', [
             ctrl.value = ctrl.choices[0].id;
           }
           ctrl.selectedItem = ctrl.value;
-
-          ctrl.selection = function(selectedItem) {
-            ctrl.value = selectedItem;
-          };
         };
       }]
     };

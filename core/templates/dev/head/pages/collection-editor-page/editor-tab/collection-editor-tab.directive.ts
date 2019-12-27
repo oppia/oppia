@@ -44,18 +44,17 @@ angular.module('oppia').directive('collectionEditorTab', [
         function(
             CollectionEditorStateService, CollectionLinearizerService) {
           var ctrl = this;
+          // Returns a list of collection nodes which represents a valid
+          // linear path through the collection.
+          ctrl.getLinearlySortedNodes = function() {
+            return (
+              CollectionLinearizerService.getCollectionNodesInPlayableOrder(
+                ctrl.collection));
+          };
           ctrl.$onInit = function() {
             ctrl.hasLoadedCollection = (
               CollectionEditorStateService.hasLoadedCollection);
             ctrl.collection = CollectionEditorStateService.getCollection();
-
-            // Returns a list of collection nodes which represents a valid
-            // linear path through the collection.
-            ctrl.getLinearlySortedNodes = function() {
-              return (
-                CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-                  ctrl.collection));
-            };
           };
         }]
     };

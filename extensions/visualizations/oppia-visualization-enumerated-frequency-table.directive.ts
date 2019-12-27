@@ -38,6 +38,9 @@ angular.module('oppia').directive(
           '$attrs', 'HtmlEscaperService',
           function($attrs, HtmlEscaperService) {
             var ctrl = this;
+            ctrl.toggleAnswerVisibility = function(i) {
+              ctrl.answerVisible[i] = !ctrl.answerVisible[i];
+            };
             ctrl.$onInit = function() {
               ctrl.data = HtmlEscaperService.escapedJsonToObj(
                 $attrs.escapedData);
@@ -50,9 +53,6 @@ angular.module('oppia').directive(
                 // are hidden by default.
                 return i === 0;
               });
-              ctrl.toggleAnswerVisibility = function(i) {
-                ctrl.answerVisible[i] = !ctrl.answerVisible[i];
-              };
             };
           }]
       };

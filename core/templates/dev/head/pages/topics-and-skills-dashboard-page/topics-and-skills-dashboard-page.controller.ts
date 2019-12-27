@@ -73,10 +73,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES) {
           var ctrl = this;
-          ctrl.TAB_NAME_TOPICS = 'topics';
-          ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
-          ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
-
           var _initDashboard = function() {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
@@ -198,10 +194,14 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 result.description, result.rubrics, result.explanation, []);
             });
           };
-
-          _initDashboard();
           $scope.$on(
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, _initDashboard);
+          ctrl.$onInit = function() {
+            ctrl.TAB_NAME_TOPICS = 'topics';
+            ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
+            ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
+            _initDashboard();
+          };
         }
       ]
     };

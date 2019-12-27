@@ -38,6 +38,81 @@ angular.module('oppia').directive('adminJobsTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        ctrl.showJobOutput = function(jobId) {
+          var adminJobOutputUrl = UrlInterpolationService.interpolateUrl(
+            ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
+              jobId: jobId
+            });
+          $http.get(adminJobOutputUrl).then(function(response) {
+            ctrl.showingJobOutput = true;
+            ctrl.jobOutput = response.data.output || [];
+            ctrl.jobOutput.sort();
+            $timeout(function() {
+              document.querySelector('#job-output').scrollIntoView();
+            });
+          });
+        };
+
+        ctrl.startNewJob = function(jobType) {
+          ctrl.setStatusMessage('Starting new job...');
+
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'start_new_job',
+            job_type: jobType
+          }).then(function() {
+            ctrl.setStatusMessage('Job started successfully.');
+            window.location.reload();
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+        };
+
+        ctrl.cancelJob = function(jobId, jobType) {
+          ctrl.setStatusMessage('Cancelling job...');
+
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'cancel_job',
+            job_id: jobId,
+            job_type: jobType
+          }).then(function() {
+            ctrl.setStatusMessage('Abort signal sent to job.');
+            window.location.reload();
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+        };
+
+        ctrl.startComputation = function(computationType) {
+          ctrl.setStatusMessage('Starting computation...');
+
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'start_computation',
+            computation_type: computationType
+          }).then(function() {
+            ctrl.setStatusMessage('Computation started successfully.');
+            window.location.reload();
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+        };
+
+        ctrl.stopComputation = function(computationType) {
+          ctrl.setStatusMessage('Stopping computation...');
+
+          $http.post(ADMIN_HANDLER_URL, {
+            action: 'stop_computation',
+            computation_type: computationType
+          }).then(function() {
+            ctrl.setStatusMessage('Abort signal sent to computation.');
+            window.location.reload();
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+        };
         ctrl.$onInit = function() {
           ctrl.HUMAN_READABLE_CURRENT_TIME = '';
           ctrl.CONTINUOUS_COMPUTATIONS_DATA = {};
@@ -57,81 +132,6 @@ angular.module('oppia').directive('adminJobsTab', [
           });
 
           ctrl.showingJobOutput = false;
-          ctrl.showJobOutput = function(jobId) {
-            var adminJobOutputUrl = UrlInterpolationService.interpolateUrl(
-              ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
-                jobId: jobId
-              });
-            $http.get(adminJobOutputUrl).then(function(response) {
-              ctrl.showingJobOutput = true;
-              ctrl.jobOutput = response.data.output || [];
-              ctrl.jobOutput.sort();
-              $timeout(function() {
-                document.querySelector('#job-output').scrollIntoView();
-              });
-            });
-          };
-
-          ctrl.startNewJob = function(jobType) {
-            ctrl.setStatusMessage('Starting new job...');
-
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'start_new_job',
-              job_type: jobType
-            }).then(function() {
-              ctrl.setStatusMessage('Job started successfully.');
-              window.location.reload();
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
-          };
-
-          ctrl.cancelJob = function(jobId, jobType) {
-            ctrl.setStatusMessage('Cancelling job...');
-
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'cancel_job',
-              job_id: jobId,
-              job_type: jobType
-            }).then(function() {
-              ctrl.setStatusMessage('Abort signal sent to job.');
-              window.location.reload();
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
-          };
-
-          ctrl.startComputation = function(computationType) {
-            ctrl.setStatusMessage('Starting computation...');
-
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'start_computation',
-              computation_type: computationType
-            }).then(function() {
-              ctrl.setStatusMessage('Computation started successfully.');
-              window.location.reload();
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
-          };
-
-          ctrl.stopComputation = function(computationType) {
-            ctrl.setStatusMessage('Stopping computation...');
-
-            $http.post(ADMIN_HANDLER_URL, {
-              action: 'stop_computation',
-              computation_type: computationType
-            }).then(function() {
-              ctrl.setStatusMessage('Abort signal sent to computation.');
-              window.location.reload();
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
-          };
         };
       }]
     };

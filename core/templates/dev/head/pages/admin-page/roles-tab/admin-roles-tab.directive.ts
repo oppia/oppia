@@ -41,6 +41,62 @@ angular.module('oppia').directive('adminRolesTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        ctrl.submitRoleViewForm = function(values) {
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+
+          ctrl.setStatusMessage('Processing query...');
+
+          AdminTaskManagerService.startTask();
+          ctrl.result = {};
+          $http.get(ADMIN_ROLE_HANDLER_URL, {
+            params: {
+              method: values.method,
+              role: values.role,
+              username: values.username
+            }
+          }).then(function(response) {
+            ctrl.result = response.data;
+            if (Object.keys(ctrl.result).length === 0) {
+              ctrl.resultRolesVisible = false;
+              ctrl.setStatusMessage('No results.');
+            } else {
+              ctrl.resultRolesVisible = true;
+              ctrl.setStatusMessage('Success.');
+            }
+            ctrl.viewFormValues.username = '';
+            ctrl.viewFormValues.role = '';
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+          AdminTaskManagerService.finishTask();
+        };
+
+        ctrl.submitUpdateRoleForm = function(values) {
+          if (AdminTaskManagerService.isTaskRunning()) {
+            return;
+          }
+          ctrl.setStatusMessage('Updating User Role');
+          AdminTaskManagerService.startTask();
+          $http.post(ADMIN_ROLE_HANDLER_URL, {
+            role: values.newRole,
+            username: values.username,
+            topic_id: values.topicId
+          }).then(function() {
+            ctrl.setStatusMessage(
+              'Role of ' + values.username +
+              ' successfully updated to ' + values.newRole);
+            ctrl.updateFormValues.username = '';
+            ctrl.updateFormValues.newRole = '';
+            ctrl.updateFormValues.topicId = '';
+          }, function(errorResponse) {
+            ctrl.setStatusMessage(
+              'Server error: ' + errorResponse.data.error);
+          });
+          AdminTaskManagerService.finishTask();
+        };
         ctrl.$onInit = function() {
           ctrl.resultRolesVisible = false;
           ctrl.result = {};
@@ -84,63 +140,6 @@ angular.module('oppia').directive('adminRolesTab', [
             ctrl.graphData.finalStateIds = finalStateIds;
             ctrl.graphDataLoaded = true;
           });
-
-          ctrl.submitRoleViewForm = function(values) {
-            if (AdminTaskManagerService.isTaskRunning()) {
-              return;
-            }
-
-            ctrl.setStatusMessage('Processing query...');
-
-            AdminTaskManagerService.startTask();
-            ctrl.result = {};
-            $http.get(ADMIN_ROLE_HANDLER_URL, {
-              params: {
-                method: values.method,
-                role: values.role,
-                username: values.username
-              }
-            }).then(function(response) {
-              ctrl.result = response.data;
-              if (Object.keys(ctrl.result).length === 0) {
-                ctrl.resultRolesVisible = false;
-                ctrl.setStatusMessage('No results.');
-              } else {
-                ctrl.resultRolesVisible = true;
-                ctrl.setStatusMessage('Success.');
-              }
-              ctrl.viewFormValues.username = '';
-              ctrl.viewFormValues.role = '';
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
-            AdminTaskManagerService.finishTask();
-          };
-
-          ctrl.submitUpdateRoleForm = function(values) {
-            if (AdminTaskManagerService.isTaskRunning()) {
-              return;
-            }
-            ctrl.setStatusMessage('Updating User Role');
-            AdminTaskManagerService.startTask();
-            $http.post(ADMIN_ROLE_HANDLER_URL, {
-              role: values.newRole,
-              username: values.username,
-              topic_id: values.topicId
-            }).then(function() {
-              ctrl.setStatusMessage(
-                'Role of ' + values.username +
-                ' successfully updated to ' + values.newRole);
-              ctrl.updateFormValues.username = '';
-              ctrl.updateFormValues.newRole = '';
-              ctrl.updateFormValues.topicId = '';
-            }, function(errorResponse) {
-              ctrl.setStatusMessage(
-                'Server error: ' + errorResponse.data.error);
-            });
-            AdminTaskManagerService.finishTask();
-          };
         };
       }]
     };

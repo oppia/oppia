@@ -52,6 +52,44 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             FocusManagerService, PencilCodeEditorRulesService,
             CurrentInteractionService) {
           var ctrl = this;
+          var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
+          var pce = new PencilCodeEmbed(iframeDiv);
+          ctrl.reset = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/PencilCodeEditor/directives/' +
+                'pencil-code-reset-confirmation.directive.html'),
+              backdrop: 'static',
+              keyboard: false,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss();
+                  };
+
+                  $scope.resetCode = function() {
+                    $uibModalInstance.close();
+                  };
+                }]
+            }).result.then(function() {
+              pce.setCode(ctrl.initialCode);
+            }, function() {
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
+          };
+
+          var getNormalizedCode = function() {
+            // Converts tabs to spaces.
+            return pce.getCode().replace(/\t/g, '  ');
+          };
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+            ctrl.interactionIsActive = false;
+            pce.hideMiddleButton();
+            pce.hideToggleButton();
+            pce.setReadOnly();
+          });
           ctrl.$onInit = function() {
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
 
@@ -59,15 +97,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
               ctrl.getLastAnswer().code;
 
-            var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
-            var pce = new PencilCodeEmbed(iframeDiv);
             pce.beginLoad(ctrl.initialCode);
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-              pce.hideMiddleButton();
-              pce.hideToggleButton();
-              pce.setReadOnly();
-            });
             pce.on('load', function() {
               // Hides the error console at the bottom right, and prevents it
               // from showing up even if the code has an error. Also, hides the
@@ -105,37 +135,6 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
               // it.
               FocusManagerService.clearFocus();
             });
-
-            ctrl.reset = function() {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                  '/interactions/PencilCodeEditor/directives/' +
-                  'pencil-code-reset-confirmation.directive.html'),
-                backdrop: 'static',
-                keyboard: false,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function($scope, $uibModalInstance) {
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss();
-                    };
-
-                    $scope.resetCode = function() {
-                      $uibModalInstance.close();
-                    };
-                  }]
-              }).result.then(function() {
-                pce.setCode(ctrl.initialCode);
-              }, function() {
-                // This callback is triggered when the Cancel button is clicked.
-                // No further action is needed.
-              });
-            };
-
-            var getNormalizedCode = function() {
-              // Converts tabs to spaces.
-              return pce.getCode().replace(/\t/g, '  ');
-            };
 
             var errorIsHappening = false;
             var hasSubmittedAnswer = false;

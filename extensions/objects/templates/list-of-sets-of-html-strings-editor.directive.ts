@@ -32,6 +32,68 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        ctrl.allowedChoices = function() {
+          var allowedList = [];
+          for (var i = 0; i <= math.min(
+            ctrl.maxPrevIndex, ctrl.choices.length - 1); i++) {
+            allowedList.push(i + 1);
+          }
+          return allowedList;
+        };
+
+        ctrl.selectedItem = function(choiceListIndex, selectedRankString) {
+          var choiceHtml = ctrl.choices[choiceListIndex].id;
+          var selectedRank = parseInt(selectedRankString) - 1;
+          errorMessage = '';
+          // Reorder the ctrl.choices array to make it consistent with the
+          // selected rank.
+          // ctrl.choices.splice(selectedRank, 0, ctrl.choices.splice(
+          // choiceListIndex, 1)[0]);
+          var choiceHtmlHasBeenAdded = false;
+          ctrl.maxPrevIndex = math.max(selectedRank + 1,
+            ctrl.maxPrevIndex);
+
+          for (var i = 0; i < ctrl.value.length; i++) {
+            choiceHtmlHasBeenAdded = false;
+            var choiceHtmlIndex = ctrl.value[i].indexOf(choiceHtml);
+            if (choiceHtmlIndex > -1) {
+              if (i !== selectedRank) {
+                ctrl.value[i].splice(choiceHtmlIndex, 1);
+                if (ctrl.value[selectedRank] === undefined) {
+                  ctrl.value[selectedRank] = [choiceHtml];
+                } else {
+                  ctrl.value[selectedRank].push(choiceHtml);
+                }
+              }
+              choiceHtmlHasBeenAdded = true;
+              break;
+            }
+          }
+          for (var i = 0; i < ctrl.value.length; i++) {
+            if (ctrl.value[i].length === 0) {
+              if (i === ctrl.value.length - 1) {
+                // If it is empty list at the last, pop it out.
+                ctrl.value.pop();
+              } else {
+                // Continuity error.
+                errorMessage = ('No choice(s) is assigned at position ' +
+                  String(i + 1) + '. Please assign some choice at this ' +
+                  'position.');
+              }
+            }
+          }
+          if (!choiceHtmlHasBeenAdded) {
+            if (ctrl.value[selectedRank] === undefined) {
+              ctrl.value[selectedRank] = [choiceHtml];
+            } else {
+              ctrl.value[selectedRank].push(choiceHtml);
+            }
+          }
+        };
+
+        ctrl.getWarningText = function() {
+          return errorMessage;
+        };
         ctrl.$onInit = function() {
           var errorMessage = '';
 
@@ -71,69 +133,6 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
             ctrl.maxPrevIndex = math.max(parseInt(ctrl.selectedRank),
               ctrl.maxPrevIndex);
           }
-
-          ctrl.allowedChoices = function() {
-            var allowedList = [];
-            for (var i = 0; i <= math.min(
-              ctrl.maxPrevIndex, ctrl.choices.length - 1); i++) {
-              allowedList.push(i + 1);
-            }
-            return allowedList;
-          };
-
-          ctrl.selectedItem = function(choiceListIndex, selectedRankString) {
-            var choiceHtml = ctrl.choices[choiceListIndex].id;
-            var selectedRank = parseInt(selectedRankString) - 1;
-            errorMessage = '';
-            // Reorder the ctrl.choices array to make it consistent with the
-            // selected rank.
-            // ctrl.choices.splice(selectedRank, 0, ctrl.choices.splice(
-            // choiceListIndex, 1)[0]);
-            var choiceHtmlHasBeenAdded = false;
-            ctrl.maxPrevIndex = math.max(selectedRank + 1,
-              ctrl.maxPrevIndex);
-
-            for (var i = 0; i < ctrl.value.length; i++) {
-              choiceHtmlHasBeenAdded = false;
-              var choiceHtmlIndex = ctrl.value[i].indexOf(choiceHtml);
-              if (choiceHtmlIndex > -1) {
-                if (i !== selectedRank) {
-                  ctrl.value[i].splice(choiceHtmlIndex, 1);
-                  if (ctrl.value[selectedRank] === undefined) {
-                    ctrl.value[selectedRank] = [choiceHtml];
-                  } else {
-                    ctrl.value[selectedRank].push(choiceHtml);
-                  }
-                }
-                choiceHtmlHasBeenAdded = true;
-                break;
-              }
-            }
-            for (var i = 0; i < ctrl.value.length; i++) {
-              if (ctrl.value[i].length === 0) {
-                if (i === ctrl.value.length - 1) {
-                  // If it is empty list at the last, pop it out.
-                  ctrl.value.pop();
-                } else {
-                  // Continuity error.
-                  errorMessage = ('No choice(s) is assigned at position ' +
-                    String(i + 1) + '. Please assign some choice at this ' +
-                    'position.');
-                }
-              }
-            }
-            if (!choiceHtmlHasBeenAdded) {
-              if (ctrl.value[selectedRank] === undefined) {
-                ctrl.value[selectedRank] = [choiceHtml];
-              } else {
-                ctrl.value[selectedRank].push(choiceHtml);
-              }
-            }
-          };
-
-          ctrl.getWarningText = function() {
-            return errorMessage;
-          };
         };
       }]
     };

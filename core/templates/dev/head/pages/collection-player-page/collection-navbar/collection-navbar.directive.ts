@@ -35,13 +35,11 @@ angular.module('oppia').directive('collectionNavbar', [
         function(
             $scope, ReadOnlyCollectionBackendApiService, UrlService) {
           var ctrl = this;
-          ctrl.$onInit = function() {
-            $scope.$on('collectionLoaded', function() {
-              ctrl.collectionTitle = (
-                ReadOnlyCollectionBackendApiService.getCollectionDetails(
-                  UrlService.getCollectionIdFromUrl()).title);
-            });
-          };
+          $scope.$on('collectionLoaded', function() {
+            ctrl.collectionTitle = (
+              ReadOnlyCollectionBackendApiService.getCollectionDetails(
+                UrlService.getCollectionIdFromUrl()).title);
+          });
         }]
     };
   }

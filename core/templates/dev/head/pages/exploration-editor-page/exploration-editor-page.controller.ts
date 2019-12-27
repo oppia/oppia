@@ -198,21 +198,6 @@ angular.module('oppia').directive('explorationEditorPage', [
             UserEmailPreferencesService, UserExplorationPermissionsService,
             EVENT_EXPLORATION_PROPERTY_CHANGED) {
           var ctrl = this;
-          ctrl.EditabilityService = EditabilityService;
-          ctrl.StateEditorService = StateEditorService;
-
-          /** ********************************************************
-           * Called on initial load of the exploration editor page.
-           *********************************************************/
-          $rootScope.loadingMessage = 'Loading';
-
-          ctrl.explorationId = ContextService.getExplorationId();
-          ctrl.explorationUrl = '/create/' + ctrl.explorationId;
-          ctrl.explorationDownloadUrl = (
-            '/createhandler/download/' + ctrl.explorationId);
-          ctrl.revertExplorationUrl = (
-            '/createhandler/revert/' + ctrl.explorationId);
-
           var setPageTitle = function() {
             if (ExplorationTitleService.savedMemento) {
               PageTitleService.setPageTitle(
@@ -225,12 +210,9 @@ angular.module('oppia').directive('explorationEditorPage', [
 
           $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
 
-          ctrl.getActiveTabName = RouterService.getActiveTabName;
-
           /** ******************************************
           * Methods affecting the graph visualization.
           ********************************************/
-          ctrl.areExplorationWarningsVisible = false;
           ctrl.toggleExplorationWarningVisibility = function() {
             ctrl.areExplorationWarningsVisible = (
               !ctrl.areExplorationWarningsVisible);
@@ -402,8 +384,6 @@ angular.module('oppia').directive('explorationEditorPage', [
             });
           };
 
-          ctrl.initExplorationPage();
-
           $scope.$on('initExplorationPage', function(
               unusedEvtData, successCallback) {
             ctrl.initExplorationPage(successCallback);
@@ -424,142 +404,6 @@ angular.module('oppia').directive('explorationEditorPage', [
             placement: 'bottom'
           };
 
-          ctrl.EDITOR_TUTORIAL_OPTIONS = [{
-            type: 'title',
-            heading: 'Creating in Oppia',
-            text: (
-              'Explorations are learning experiences that you create using ' +
-              'Oppia. Think of explorations as a conversation between a ' +
-              'student and a tutor.')
-          }, {
-            type: 'function',
-            fn: function(isGoingForward) {
-              $('html, body').animate({
-                scrollTop: (isGoingForward ? 0 : 20)
-              }, 1000);
-            }
-          }, {
-            type: 'element',
-            selector: _ID_TUTORIAL_STATE_CONTENT,
-            heading: 'Content',
-            text: (
-              '<p>An Oppia exploration is divided into several \'cards\'. ' +
-              'The first part of a card is the <b>content</b>.</p>' +
-              '<p>Use the content section to set the scene. ' +
-              'Tell the learner a story, give them some information, ' +
-              'and then ask a relevant question.</p>'),
-            placement: 'bottom'
-          }, {
-            type: 'function',
-            fn: function(isGoingForward) {
-              var idToScrollTo = (
-                isGoingForward ? _ID_TUTORIAL_STATE_INTERACTION :
-                _ID_TUTORIAL_STATE_CONTENT);
-              $('html, body').animate({
-                scrollTop: angular.element(idToScrollTo).offset().top - 200
-              }, 1000);
-            }
-          }, {
-            type: 'title',
-            selector: _ID_TUTORIAL_STATE_INTERACTION,
-            heading: 'Interaction',
-            text: (
-              '<p>After you\'ve written the content of your conversation, ' +
-              'choose an <b>interaction type</b>. ' +
-              'An interaction is how you want your learner to respond ' +
-              'to your question.</p> ' +
-              '<p>Oppia has several built-in interactions, including:</p>' +
-              '<ul>' +
-              '  <li>' +
-              '    Multiple Choice' +
-              '  </li>' +
-              '  <li>' +
-              '    Text/Number input' +
-              '  </li>' +
-              '  <li>' +
-              '    Code snippets' +
-              '  </li>' +
-              '</ul>' +
-              'and more.')
-          }, {
-            type: 'function',
-            fn: function(isGoingForward) {
-              var idToScrollTo = (
-                isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
-                _ID_TUTORIAL_STATE_INTERACTION);
-              $('html, body').animate({
-                scrollTop: angular.element(idToScrollTo).offset().top - 200
-              }, 1000);
-            }
-          }, {
-            type: 'title',
-            heading: 'Responses',
-            text: (
-              'After the learner uses the interaction you created, it\'s ' +
-              'your turn again to choose how your exploration will respond ' +
-              'to their input. You can send a learner to a new card or have ' +
-              'them repeat the same card, depending on how they answer.')
-          }, {
-            type: 'function',
-            fn: function(isGoingForward) {
-              var idToScrollTo = (
-                isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
-                _ID_TUTORIAL_STATE_INTERACTION);
-              $('html, body').animate({
-                scrollTop: angular.element(idToScrollTo).offset().top - 200
-              }, 1000);
-            }
-          }, {
-            type: 'element',
-            selector: _ID_TUTORIAL_PREVIEW_TAB,
-            heading: 'Preview',
-            text: (
-              'At any time, you can click the <b>preview</b> button to play ' +
-              'through your exploration.'),
-            placement: 'bottom'
-          }, saveButtonTutorialElement, {
-            type: 'title',
-            heading: 'Tutorial Complete',
-            text: (
-              '<h2>Now for the fun part...</h2>' +
-              'That\'s the end of the tour! ' +
-              'To finish up, here are some things we suggest: ' +
-              '<ul>' +
-              '  <li>' +
-              '    Create your first card!' +
-              '  </li>' +
-              '  <li>' +
-              '    Preview your exploration.' +
-              '  </li>' +
-              '  <li>' +
-              '    Check out more resources in the ' +
-              '    <a href="https://oppia.github.io/#/" target="_blank">' +
-              '      Help Center.' +
-              '    </a>' +
-              '  </li>' +
-              '</ul>')
-          }];
-
-          // Remove save from tutorial if user does not has edit rights for
-          // exploration since in that case Save Draft button will not be
-          // visible on the create page.
-          UserExplorationPermissionsService.getPermissionsAsync()
-            .then(function(permissions) {
-              if (!permissions.can_edit) {
-                var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
-                  saveButtonTutorialElement);
-                ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
-              }
-            });
-
-          // Replace the ng-joyride template with one that uses <[...]>
-          // interpolators instead of/ {{...}} interpolators.
-          var ngJoyrideTemplate = $templateCache.get(
-            'ng-joyride-title-tplv1.html');
-          ngJoyrideTemplate = ngJoyrideTemplate.replace(
-            /\{\{/g, '<[').replace(/\}\}/g, ']>');
-          $templateCache.put('ng-joyride-title-tplv1.html', ngJoyrideTemplate);
-
           var leaveTutorial = function() {
             EditabilityService.onEndTutorial();
             $scope.$apply();
@@ -578,7 +422,6 @@ angular.module('oppia').directive('explorationEditorPage', [
             leaveTutorial();
           };
 
-          ctrl.tutorialInProgress = false;
           ctrl.startTutorial = function() {
             RouterService.navigateToMainTab();
             // The $timeout wrapper is needed for all components on the page to
@@ -646,6 +489,161 @@ angular.module('oppia').directive('explorationEditorPage', [
           $scope.$on(
             'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
           $scope.$on('openEditorTutorial', ctrl.startTutorial);
+          ctrl.$onInit = function() {
+            ctrl.EditabilityService = EditabilityService;
+            ctrl.StateEditorService = StateEditorService;
+
+            /** ********************************************************
+             * Called on initial load of the exploration editor page.
+             *********************************************************/
+            $rootScope.loadingMessage = 'Loading';
+
+            ctrl.explorationId = ContextService.getExplorationId();
+            ctrl.explorationUrl = '/create/' + ctrl.explorationId;
+            ctrl.explorationDownloadUrl = (
+              '/createhandler/download/' + ctrl.explorationId);
+            ctrl.revertExplorationUrl = (
+              '/createhandler/revert/' + ctrl.explorationId);
+            ctrl.getActiveTabName = RouterService.getActiveTabName;
+            ctrl.areExplorationWarningsVisible = false;
+            ctrl.initExplorationPage();
+            ctrl.EDITOR_TUTORIAL_OPTIONS = [{
+              type: 'title',
+              heading: 'Creating in Oppia',
+              text: (
+                'Explorations are learning experiences that you create using ' +
+                'Oppia. Think of explorations as a conversation between a ' +
+                'student and a tutor.')
+            }, {
+              type: 'function',
+              fn: function(isGoingForward) {
+                $('html, body').animate({
+                  scrollTop: (isGoingForward ? 0 : 20)
+                }, 1000);
+              }
+            }, {
+              type: 'element',
+              selector: _ID_TUTORIAL_STATE_CONTENT,
+              heading: 'Content',
+              text: (
+                '<p>An Oppia exploration is divided into several \'cards\'. ' +
+                'The first part of a card is the <b>content</b>.</p>' +
+                '<p>Use the content section to set the scene. ' +
+                'Tell the learner a story, give them some information, ' +
+                'and then ask a relevant question.</p>'),
+              placement: 'bottom'
+            }, {
+              type: 'function',
+              fn: function(isGoingForward) {
+                var idToScrollTo = (
+                  isGoingForward ? _ID_TUTORIAL_STATE_INTERACTION :
+                  _ID_TUTORIAL_STATE_CONTENT);
+                $('html, body').animate({
+                  scrollTop: angular.element(idToScrollTo).offset().top - 200
+                }, 1000);
+              }
+            }, {
+              type: 'title',
+              selector: _ID_TUTORIAL_STATE_INTERACTION,
+              heading: 'Interaction',
+              text: (
+                '<p>After you\'ve written the content of your conversation, ' +
+                'choose an <b>interaction type</b>. ' +
+                'An interaction is how you want your learner to respond ' +
+                'to your question.</p> ' +
+                '<p>Oppia has several built-in interactions, including:</p>' +
+                '<ul>' +
+                '  <li>' +
+                '    Multiple Choice' +
+                '  </li>' +
+                '  <li>' +
+                '    Text/Number input' +
+                '  </li>' +
+                '  <li>' +
+                '    Code snippets' +
+                '  </li>' +
+                '</ul>' +
+                'and more.')
+            }, {
+              type: 'function',
+              fn: function(isGoingForward) {
+                var idToScrollTo = (
+                  isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
+                  _ID_TUTORIAL_STATE_INTERACTION);
+                $('html, body').animate({
+                  scrollTop: angular.element(idToScrollTo).offset().top - 200
+                }, 1000);
+              }
+            }, {
+              type: 'title',
+              heading: 'Responses',
+              text: (
+                'After the learner uses the interaction you created, it\'s ' +
+                'your turn again to choose how your exploration will respond ' +
+                'to their input. You can send a learner to a new card or ' +
+                'have them repeat the same card, depending on how they answer.')
+            }, {
+              type: 'function',
+              fn: function(isGoingForward) {
+                var idToScrollTo = (
+                  isGoingForward ? _ID_TUTORIAL_PREVIEW_TAB :
+                  _ID_TUTORIAL_STATE_INTERACTION);
+                $('html, body').animate({
+                  scrollTop: angular.element(idToScrollTo).offset().top - 200
+                }, 1000);
+              }
+            }, {
+              type: 'element',
+              selector: _ID_TUTORIAL_PREVIEW_TAB,
+              heading: 'Preview',
+              text: (
+                'At any time, you can click the <b>preview</b> button to ' +
+                'play through your exploration.'),
+              placement: 'bottom'
+            }, saveButtonTutorialElement, {
+              type: 'title',
+              heading: 'Tutorial Complete',
+              text: (
+                '<h2>Now for the fun part...</h2>' +
+                'That\'s the end of the tour! ' +
+                'To finish up, here are some things we suggest: ' +
+                '<ul>' +
+                '  <li>' +
+                '    Create your first card!' +
+                '  </li>' +
+                '  <li>' +
+                '    Preview your exploration.' +
+                '  </li>' +
+                '  <li>' +
+                '    Check out more resources in the ' +
+                '    <a href="https://oppia.github.io/#/" target="_blank">' +
+                '      Help Center.' +
+                '    </a>' +
+                '  </li>' +
+                '</ul>')
+            }];
+            // Remove save from tutorial if user does not has edit rights for
+            // exploration since in that case Save Draft button will not be
+            // visible on the create page.
+            UserExplorationPermissionsService.getPermissionsAsync()
+              .then(function(permissions) {
+                if (!permissions.can_edit) {
+                  var index = ctrl.EDITOR_TUTORIAL_OPTIONS.indexOf(
+                    saveButtonTutorialElement);
+                  ctrl.EDITOR_TUTORIAL_OPTIONS.splice(index, 1);
+                }
+              });
+
+            // Replace the ng-joyride template with one that uses <[...]>
+            // interpolators instead of/ {{...}} interpolators.
+            var ngJoyrideTemplate = $templateCache.get(
+              'ng-joyride-title-tplv1.html');
+            ngJoyrideTemplate = ngJoyrideTemplate.replace(
+              /\{\{/g, '<[').replace(/\}\}/g, ']>');
+            $templateCache.put(
+              'ng-joyride-title-tplv1.html', ngJoyrideTemplate);
+            ctrl.tutorialInProgress = false;
+          };
         }
       ]
     };

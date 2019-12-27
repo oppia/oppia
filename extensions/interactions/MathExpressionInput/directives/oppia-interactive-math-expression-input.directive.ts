@@ -148,42 +148,6 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
           };
           var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
             '/overrides/guppy/oppia_symbols.json');
-          Guppy.init({
-            symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
-              oppiaSymbolsUrl]});
-          var guppyInstance = new Guppy(guppyDivId, {
-            settings: {
-              empty_content: (
-                '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
-              buttons: []
-            },
-            events: {
-              done: function(e) {
-                ctrl.submitAnswer();
-              },
-              change: function(e) {
-                // Need to manually trigger the digest cycle
-                // to make any 'watchers' aware of changes in answer.
-                $scope.$apply();
-              },
-              ready: function() {
-                if (DeviceInfoService.isMobileUserAgent() &&
-                  DeviceInfoService.hasTouchEvents()) {
-                  ctrl.mobileOverlayIsShown = true;
-                  // Wait for the scope change to apply. Since we interact with
-                  // the DOM elements, they need to be added by angular before
-                  // the function is called. Timeout of 0 to wait
-                  // until the end of the current digest cycle,
-                  // false to not start a new digest cycle.
-                  // A new cycle is not needed since no angular variables
-                  // are changed within the function.
-                  $timeout(makeGuppyMobileFriendly, 0, false);
-                }
-              }
-            }
-          });
-
-          guppyInstance.render();
           var labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
           $scope.$on('focusOn', function(e, name) {
@@ -223,9 +187,46 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             CurrentInteractionService.onSubmit(
               answer, MathExpressionInputRulesService);
           };
+          ctrl.$onInit = function() {
+            Guppy.init({
+              symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+                oppiaSymbolsUrl]});
+            var guppyInstance = new Guppy(guppyDivId, {
+              settings: {
+                empty_content: (
+                  '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
+                buttons: []
+              },
+              events: {
+                done: function(e) {
+                  ctrl.submitAnswer();
+                },
+                change: function(e) {
+                  // Need to manually trigger the digest cycle
+                  // to make any 'watchers' aware of changes in answer.
+                  $scope.$apply();
+                },
+                ready: function() {
+                  if (DeviceInfoService.isMobileUserAgent() &&
+                    DeviceInfoService.hasTouchEvents()) {
+                    ctrl.mobileOverlayIsShown = true;
+                    // Wait for the scope change to apply. Since we interact
+                    // with the DOM elements, they need to be added by angular
+                    // before the function is called. Timeout of 0 to wait
+                    // until the end of the current digest cycle,
+                    // false to not start a new digest cycle.
+                    // A new cycle is not needed since no angular variables
+                    // are changed within the function.
+                    $timeout(makeGuppyMobileFriendly, 0, false);
+                  }
+                }
+              }
+            });
 
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
+            guppyInstance.render();
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
+          };
         }
       ]
     };

@@ -35,18 +35,16 @@ angular.module('oppia').directive('subtopicSummaryTile', [
       controller: ['SUBTOPIC_VIEWER_URL_TEMPLATE',
         function(SUBTOPIC_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.$onInit = function() {
-            ctrl.getSubtopicLink = function() {
-              return UrlInterpolationService.interpolateUrl(
-                SUBTOPIC_VIEWER_URL_TEMPLATE, {
-                  topic_name: ctrl.getTopicName(),
-                  subtopic_id: ctrl.getSubtopicId().toString()
-                });
-            };
+          ctrl.getSubtopicLink = function() {
+            return UrlInterpolationService.interpolateUrl(
+              SUBTOPIC_VIEWER_URL_TEMPLATE, {
+                topic_name: ctrl.getTopicName(),
+                subtopic_id: ctrl.getSubtopicId().toString()
+              });
+          };
 
-            ctrl.getStaticImageUrl = function(imagePath) {
-              return UrlInterpolationService.getStaticImageUrl(imagePath);
-            };
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
         }]
     };

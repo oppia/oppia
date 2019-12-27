@@ -34,17 +34,15 @@ angular.module('oppia').directive('storySummaryTile', [
       controller: ['STORY_VIEWER_URL_TEMPLATE',
         function(STORY_VIEWER_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.$onInit = function() {
-            ctrl.getStoryLink = function() {
-              return UrlInterpolationService.interpolateUrl(
-                STORY_VIEWER_URL_TEMPLATE, {
-                  story_id: ctrl.getStoryId()
-                });
-            };
+          ctrl.getStoryLink = function() {
+            return UrlInterpolationService.interpolateUrl(
+              STORY_VIEWER_URL_TEMPLATE, {
+                story_id: ctrl.getStoryId()
+              });
+          };
 
-            ctrl.getStaticImageUrl = function(imagePath) {
-              return UrlInterpolationService.getStaticImageUrl(imagePath);
-            };
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
         }]
     };

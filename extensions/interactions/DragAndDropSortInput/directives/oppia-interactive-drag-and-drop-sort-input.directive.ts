@@ -44,11 +44,25 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
         function(
             $attrs, UrlService, CurrentInteractionService) {
           var ctrl = this;
+          var answers = [];
+          ctrl.submitAnswer = function() {
+            // Converting list of dicts to list of lists to make it consistent
+            // with the ListOfSetsOfHtmlStrings object.
+            answers = [];
+            for (var i = 0; i < ctrl.list.length; i++) {
+              answers.push([ctrl.list[i].title]);
+              for (var j = 0; j < ctrl.list[i].items.length; j++) {
+                answers[i].push(ctrl.list[i].items[j].title);
+              }
+            }
+
+            CurrentInteractionService.onSubmit(
+              answers, DragAndDropSortInputRulesService);
+          };
           ctrl.$onInit = function() {
             ctrl.choices = HtmlEscaperService.escapedJsonToObj(
               $attrs.choicesWithValue);
 
-            var answers = [];
             ctrl.list = [];
             ctrl.dataMaxDepth = 1;
 
@@ -76,21 +90,6 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
                   e.elements.placeholder[0].style.borderColor = '#000000';
                 }
               }
-            };
-
-            ctrl.submitAnswer = function() {
-              // Converting list of dicts to list of lists to make it consistent
-              // with the ListOfSetsOfHtmlStrings object.
-              answers = [];
-              for (var i = 0; i < ctrl.list.length; i++) {
-                answers.push([ctrl.list[i].title]);
-                for (var j = 0; j < ctrl.list[i].items.length; j++) {
-                  answers[i].push(ctrl.list[i].items[j].title);
-                }
-              }
-
-              CurrentInteractionService.onSubmit(
-                answers, DragAndDropSortInputRulesService);
             };
 
             CurrentInteractionService.registerCurrentInteraction(

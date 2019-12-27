@@ -36,25 +36,24 @@ angular.module('oppia').directive('unicodeStringEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
+        $scope.$watch('$ctrl.initArgs', function(newValue) {
+          ctrl.largeInput = false;
+          if (newValue && newValue.largeInput) {
+            ctrl.largeInput = newValue.largeInput;
+          }
+        });
+
+        // Reset the component each time the value changes (e.g. if this is
+        // part of an editable list).
+        $scope.$watch('$ctrl.value', function() {
+          ctrl.localValue = {
+            label: ctrl.value || ''
+          };
+        }, true);
         ctrl.$onInit = function() {
           ctrl.alwaysEditable = ctrl.getAlwaysEditable();
           ctrl.initArgs = ctrl.getInitArgs();
           ctrl.largeInput = false;
-
-          $scope.$watch('$ctrl.initArgs', function(newValue) {
-            ctrl.largeInput = false;
-            if (newValue && newValue.largeInput) {
-              ctrl.largeInput = newValue.largeInput;
-            }
-          });
-
-          // Reset the component each time the value changes (e.g. if this is
-          // part of an editable list).
-          $scope.$watch('$ctrl.value', function() {
-            ctrl.localValue = {
-              label: ctrl.value || ''
-            };
-          }, true);
 
           if (ctrl.alwaysEditable) {
             $scope.$watch('$ctrl.localValue.label', function(newValue) {

@@ -77,6 +77,390 @@ angular.module('oppia').directive('learnerDashboardPage', [
             FeedbackMessageSummaryObjectFactory,
             SuggestionModalForLearnerDashboardService, UserService) {
           var ctrl = this;
+          ctrl.setActiveSection = function(newActiveSectionName) {
+            ctrl.activeSection = newActiveSectionName;
+            if (ctrl.activeSection ===
+              LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK &&
+              ctrl.feedbackThreadActive === true) {
+              ctrl.feedbackThreadActive = false;
+            }
+          };
+
+          ctrl.setActiveSubsection = function(newActiveSubsectionName) {
+            ctrl.activeSubsection = newActiveSubsectionName;
+          };
+
+          ctrl.getExplorationUrl = function(explorationId) {
+            return '/explore/' + explorationId;
+          };
+
+          ctrl.getCollectionUrl = function(collectionId) {
+            return '/collection/' + collectionId;
+          };
+
+          ctrl.checkMobileView = function() {
+            return ($window.innerWidth < 500);
+          };
+
+          ctrl.getVisibleExplorationList = function(startCompletedExpIndex) {
+            return ctrl.completedExplorationsList.slice(
+              startCompletedExpIndex, Math.min(
+                startCompletedExpIndex + ctrl.PAGE_SIZE,
+                ctrl.completedExplorationsList.length));
+          };
+
+          ctrl.showUsernamePopover = function(subscriberUsername) {
+            // The popover on the subscription card is only shown if the
+            // length of the subscriber username is greater than 10 and the
+            // user hovers over the truncated username.
+            if (subscriberUsername.length > 10) {
+              return 'mouseenter';
+            } else {
+              return 'none';
+            }
+          };
+
+          ctrl.goToPreviousPage = function(section, subsection) {
+            if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+              if (subsection === (
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+                ctrl.startIncompleteExpIndex = Math.max(
+                  ctrl.startIncompleteExpIndex - ctrl.PAGE_SIZE, 0);
+              } else if (
+                subsection === (
+                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+                ctrl.startIncompleteCollectionIndex = Math.max(
+                  ctrl.startIncompleteCollectionIndex - ctrl.PAGE_SIZE, 0);
+              }
+            } else if (
+              section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
+              if (subsection === (
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+                ctrl.startCompletedExpIndex = Math.max(
+                  ctrl.startCompletedExpIndex - ctrl.PAGE_SIZE, 0);
+              } else if (
+                subsection === (
+                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+                ctrl.startCompletedCollectionIndex = Math.max(
+                  ctrl.startCompletedCollectionIndex - ctrl.PAGE_SIZE, 0);
+              }
+            }
+          };
+
+          ctrl.goToNextPage = function(section, subsection) {
+            if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+              if (subsection === (
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+                if (ctrl.startIncompleteExpIndex +
+                  ctrl.PAGE_SIZE <= ctrl.incompleteExplorationsList.length) {
+                  ctrl.startIncompleteExpIndex += ctrl.PAGE_SIZE;
+                }
+              } else if (
+                subsection === (
+                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+                if (ctrl.startIncompleteCollectionIndex +
+                  ctrl.PAGE_SIZE <=
+                    ctrl.startIncompleteCollectionIndex.length) {
+                  ctrl.startIncompleteCollectionIndex += ctrl.PAGE_SIZE;
+                }
+              }
+            } else if (
+              section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
+              if (subsection === (
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
+                if (ctrl.startCompletedExpIndex +
+                  ctrl.PAGE_SIZE <= ctrl.completedExplorationsList.length) {
+                  ctrl.startCompletedExpIndex += ctrl.PAGE_SIZE;
+                }
+              } else if (
+                subsection === (
+                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
+                if (ctrl.startCompletedCollectionIndex +
+                  ctrl.PAGE_SIZE <= ctrl.startCompletedCollectionIndex.length
+                ) {
+                  ctrl.startCompletedCollectionIndex += ctrl.PAGE_SIZE;
+                }
+              }
+            }
+          };
+
+          ctrl.setExplorationsSortingOptions = function(sortType) {
+            if (sortType === ctrl.currentExpSortType) {
+              ctrl.isCurrentExpSortDescending =
+                !ctrl.isCurrentExpSortDescending;
+            } else {
+              ctrl.currentExpSortType = sortType;
+            }
+          };
+
+          ctrl.setSubscriptionSortingOptions = function(sortType) {
+            if (sortType === ctrl.currentSubscriptionSortType) {
+              ctrl.isCurrentSubscriptionSortDescending = (
+                !ctrl.isCurrentSubscriptionSortDescending);
+            } else {
+              ctrl.currentSubscriptionSortType = sortType;
+            }
+          };
+
+          ctrl.setFeedbackSortingOptions = function(sortType) {
+            if (sortType === ctrl.currentFeedbackThreadsSortType) {
+              ctrl.isCurrentFeedbackSortDescending = (
+                !ctrl.isCurrentFeedbackSortDescending);
+            } else {
+              ctrl.currentFeedbackThreadsSortType = sortType;
+            }
+          };
+
+          ctrl.getValueOfExplorationSortKey = function(exploration) {
+            // This function is passed as a custom comparator function to
+            // `orderBy`, so that special cases can be handled while sorting
+            // explorations.
+            if (ctrl.currentExpSortType ===
+                EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key) {
+              return null;
+            } else {
+              return exploration[ctrl.currentExpSortType];
+            }
+          };
+
+          ctrl.getValueOfSubscriptionSortKey = function(subscription) {
+            // This function is passed as a custom comparator function to
+            // `orderBy`, so that special cases can be handled while sorting
+            // subscriptions.
+            var value = subscription[ctrl.currentSubscribersSortType];
+            if (ctrl.currentSubscribersSortType ===
+                SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.IMPACT.key) {
+              value = (value || 0);
+            }
+            return value;
+          };
+
+          ctrl.sortFeedbackThreadsFunction = function(feedbackThread) {
+            return feedbackThread[ctrl.currentFeedbackThreadsSortType];
+          };
+
+          var getPlaylistSortableOptions = function(activityType) {
+            return {
+              'ui-floating': 'auto',
+              start: function(e, ui) {
+                ui.placeholder.height(ui.item.height());
+                $scope.$apply();
+              },
+              sort: function(e, ui) {
+                /* eslint-disable quote-props */
+                // Making top : 0px to avoid irregular change in position.
+                ui.helper.css(
+                  {'top': '0 px'});
+                /* eslint-enable quote-props */
+              },
+              update: function(e, ui) {
+                var insertExpInLearnerPlaylistUrl = (
+                  UrlInterpolationService.interpolateUrl(
+                    ('/learnerplaylistactivityhandler/<activityType>/' +
+                    '<activityId>'), {
+                      activityType: activityType,
+                      activityId: (
+                        ctrl.explorationPlaylist[ui.item.sortable.index].id)
+                    }));
+
+                $http.post(insertExpInLearnerPlaylistUrl, {
+                  index: ui.item.sortable.dropindex
+                });
+                $scope.$apply();
+              },
+              stop: function(e, ui) {
+                $scope.$apply();
+              },
+              axis: 'y'
+            };
+          };
+          ctrl.onClickThread = function(
+              threadStatus, explorationId, threadId, explorationTitle) {
+            ctrl.loadingFeedbacks = true;
+            var threadDataUrl = UrlInterpolationService.interpolateUrl(
+              '/learnerdashboardthreadhandler/<threadId>', {
+                threadId: threadId
+              });
+            ctrl.explorationTitle = explorationTitle;
+            ctrl.feedbackThreadActive = true;
+            ctrl.threadStatus = threadStatus;
+            ctrl.explorationId = explorationId;
+            ctrl.threadId = threadId;
+
+            for (
+              var index = 0; index < ctrl.threadSummaries.length; index++) {
+              if (ctrl.threadSummaries[index].threadId === threadId) {
+                threadIndex = index;
+                var threadSummary = ctrl.threadSummaries[index];
+                threadSummary.markTheLastTwoMessagesAsRead();
+                if (!threadSummary.lastMessageRead) {
+                  ctrl.numberOfUnreadThreads -= 1;
+                }
+              }
+            }
+
+            $http.get(threadDataUrl).then(function(response) {
+              var messageSummaryDicts = response.data.message_summary_list;
+              ctrl.messageSummaries = [];
+              for (index = 0; index < messageSummaryDicts.length; index++) {
+                ctrl.messageSummaries.push(
+                  FeedbackMessageSummaryObjectFactory.createFromBackendDict(
+                    messageSummaryDicts[index]));
+              }
+              ctrl.loadingFeedbacks = false;
+            });
+          };
+
+          ctrl.showAllThreads = function() {
+            ctrl.feedbackThreadActive = false;
+            threadIndex = null;
+          };
+
+          ctrl.addNewMessage = function(threadId, newMessage) {
+            var url = UrlInterpolationService.interpolateUrl(
+              '/threadhandler/<threadId>', {
+                threadId: threadId
+              });
+            var payload = {
+              updated_status: null,
+              updated_subject: null,
+              text: newMessage
+            };
+            ctrl.messageSendingInProgress = true;
+            $http.post(url, payload).then(function() {
+              ctrl.threadSummary = ctrl.threadSummaries[threadIndex];
+              ctrl.threadSummary.appendNewMessage(
+                newMessage, ctrl.username);
+              ctrl.messageSendingInProgress = false;
+              ctrl.newMessage.text = null;
+              var newMessageSummary = (
+                FeedbackMessageSummaryObjectFactory.createNewMessage(
+                  ctrl.threadSummary.totalMessageCount, newMessage,
+                  ctrl.username, ctrl.profilePictureDataUrl));
+              ctrl.messageSummaries.push(newMessageSummary);
+            });
+          };
+
+          ctrl.showSuggestionModal = function(
+              newContent, oldContent, description) {
+            SuggestionModalForLearnerDashboardService.showSuggestionModal(
+              'edit_exploration_state_content',
+              {
+                newContent: newContent,
+                oldContent: oldContent,
+                description: description
+              }
+            );
+          };
+
+          ctrl.openRemoveActivityModal = function(
+              sectionNameI18nId, subsectionName, activity) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/learner-dashboard-page/modal-templates/' +
+                'remove-activity-from-learner-dashboard-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                sectionNameI18nId: function() {
+                  return sectionNameI18nId;
+                },
+                subsectionName: function() {
+                  return subsectionName;
+                },
+                activity: function() {
+                  return activity;
+                }
+              },
+              controller: [
+                '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
+                'subsectionName', 'ACTIVITY_TYPE_COLLECTION',
+                'ACTIVITY_TYPE_EXPLORATION',
+                function(
+                    $scope, $uibModalInstance, $http, sectionNameI18nId,
+                    subsectionName, ACTIVITY_TYPE_COLLECTION,
+                    ACTIVITY_TYPE_EXPLORATION) {
+                  $scope.sectionNameI18nId = sectionNameI18nId;
+                  $scope.subsectionName = subsectionName;
+                  $scope.activityTitle = activity.title;
+                  $scope.remove = function() {
+                    var activityType = '';
+                    if (subsectionName ===
+                      LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+                      activityType = ACTIVITY_TYPE_EXPLORATION;
+                    } else if (subsectionName ===
+                              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
+                                .COLLECTIONS) {
+                      activityType = ACTIVITY_TYPE_COLLECTION;
+                    } else {
+                      throw new Error('Subsection name is not valid.');
+                    }
+
+                    var removeActivityUrlPrefix = '';
+                    if (sectionNameI18nId ===
+                        LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
+                      removeActivityUrlPrefix =
+                        '/learnerplaylistactivityhandler/';
+                    } else if (sectionNameI18nId ===
+                              LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+                      removeActivityUrlPrefix =
+                        '/learnerincompleteactivityhandler/';
+                    } else {
+                      throw new Error('Section name is not valid.');
+                    }
+
+                    var removeActivityUrl = (
+                      UrlInterpolationService.interpolateUrl(
+                        removeActivityUrlPrefix +
+                        '<activityType>/<activityId>', {
+                          activityType: activityType,
+                          activityId: activity.id
+                        }));
+
+                    $http['delete'](removeActivityUrl);
+                    $uibModalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            }).result.then(function() {
+              if (sectionNameI18nId ===
+                  LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
+                if (subsectionName ===
+                    LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+                  var index = ctrl.incompleteExplorationsList.indexOf(
+                    activity);
+                  if (index !== -1) {
+                    ctrl.incompleteExplorationsList.splice(index, 1);
+                  }
+                } else if (subsectionName ===
+                          LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+                  var index = ctrl.incompleteCollectionsList.indexOf(
+                    activity);
+                  if (index !== -1) {
+                    ctrl.incompleteCollectionsList.splice(index, 1);
+                  }
+                }
+              } else if (sectionNameI18nId ===
+                        LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
+                if (subsectionName ===
+                    LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+                  var index = ctrl.explorationPlaylist.indexOf(activity);
+                  if (index !== -1) {
+                    ctrl.explorationPlaylist.splice(index, 1);
+                  }
+                } else if (subsectionName ===
+                          LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+                  var index = ctrl.collectionPlaylist.indexOf(activity);
+                  if (index !== -1) {
+                    ctrl.collectionPlaylist.splice(index, 1);
+                  }
+                }
+              }
+            });
+          };
           ctrl.$onInit = function() {
             ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
               EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
@@ -217,396 +601,10 @@ angular.module('oppia').directive('learnerDashboardPage', [
             ctrl.getLocaleAbbreviatedDatetimeString = (
               DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
-            ctrl.setActiveSection = function(newActiveSectionName) {
-              ctrl.activeSection = newActiveSectionName;
-              if (ctrl.activeSection ===
-                LEARNER_DASHBOARD_SECTION_I18N_IDS.FEEDBACK &&
-                ctrl.feedbackThreadActive === true) {
-                ctrl.feedbackThreadActive = false;
-              }
-            };
-
-            ctrl.setActiveSubsection = function(newActiveSubsectionName) {
-              ctrl.activeSubsection = newActiveSubsectionName;
-            };
-
-            ctrl.getExplorationUrl = function(explorationId) {
-              return '/explore/' + explorationId;
-            };
-
-            ctrl.getCollectionUrl = function(collectionId) {
-              return '/collection/' + collectionId;
-            };
-
-            ctrl.checkMobileView = function() {
-              return ($window.innerWidth < 500);
-            };
-
-            ctrl.getVisibleExplorationList = function(startCompletedExpIndex) {
-              return ctrl.completedExplorationsList.slice(
-                startCompletedExpIndex, Math.min(
-                  startCompletedExpIndex + ctrl.PAGE_SIZE,
-                  ctrl.completedExplorationsList.length));
-            };
-
-            ctrl.showUsernamePopover = function(subscriberUsername) {
-              // The popover on the subscription card is only shown if the
-              // length of the subscriber username is greater than 10 and the
-              // user hovers over the truncated username.
-              if (subscriberUsername.length > 10) {
-                return 'mouseenter';
-              } else {
-                return 'none';
-              }
-            };
-
-            ctrl.goToPreviousPage = function(section, subsection) {
-              if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-                if (subsection === (
-                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
-                  ctrl.startIncompleteExpIndex = Math.max(
-                    ctrl.startIncompleteExpIndex - ctrl.PAGE_SIZE, 0);
-                } else if (
-                  subsection === (
-                    LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
-                  ctrl.startIncompleteCollectionIndex = Math.max(
-                    ctrl.startIncompleteCollectionIndex - ctrl.PAGE_SIZE, 0);
-                }
-              } else if (
-                section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
-                if (subsection === (
-                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
-                  ctrl.startCompletedExpIndex = Math.max(
-                    ctrl.startCompletedExpIndex - ctrl.PAGE_SIZE, 0);
-                } else if (
-                  subsection === (
-                    LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
-                  ctrl.startCompletedCollectionIndex = Math.max(
-                    ctrl.startCompletedCollectionIndex - ctrl.PAGE_SIZE, 0);
-                }
-              }
-            };
-
-            ctrl.goToNextPage = function(section, subsection) {
-              if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-                if (subsection === (
-                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
-                  if (ctrl.startIncompleteExpIndex +
-                    ctrl.PAGE_SIZE <= ctrl.incompleteExplorationsList.length) {
-                    ctrl.startIncompleteExpIndex += ctrl.PAGE_SIZE;
-                  }
-                } else if (
-                  subsection === (
-                    LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
-                  if (ctrl.startIncompleteCollectionIndex +
-                    ctrl.PAGE_SIZE <=
-                      ctrl.startIncompleteCollectionIndex.length) {
-                    ctrl.startIncompleteCollectionIndex += ctrl.PAGE_SIZE;
-                  }
-                }
-              } else if (
-                section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
-                if (subsection === (
-                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
-                  if (ctrl.startCompletedExpIndex +
-                    ctrl.PAGE_SIZE <= ctrl.completedExplorationsList.length) {
-                    ctrl.startCompletedExpIndex += ctrl.PAGE_SIZE;
-                  }
-                } else if (
-                  subsection === (
-                    LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
-                  if (ctrl.startCompletedCollectionIndex +
-                    ctrl.PAGE_SIZE <= ctrl.startCompletedCollectionIndex.length
-                  ) {
-                    ctrl.startCompletedCollectionIndex += ctrl.PAGE_SIZE;
-                  }
-                }
-              }
-            };
-
-            ctrl.setExplorationsSortingOptions = function(sortType) {
-              if (sortType === ctrl.currentExpSortType) {
-                ctrl.isCurrentExpSortDescending =
-                  !ctrl.isCurrentExpSortDescending;
-              } else {
-                ctrl.currentExpSortType = sortType;
-              }
-            };
-
-            ctrl.setSubscriptionSortingOptions = function(sortType) {
-              if (sortType === ctrl.currentSubscriptionSortType) {
-                ctrl.isCurrentSubscriptionSortDescending = (
-                  !ctrl.isCurrentSubscriptionSortDescending);
-              } else {
-                ctrl.currentSubscriptionSortType = sortType;
-              }
-            };
-
-            ctrl.setFeedbackSortingOptions = function(sortType) {
-              if (sortType === ctrl.currentFeedbackThreadsSortType) {
-                ctrl.isCurrentFeedbackSortDescending = (
-                  !ctrl.isCurrentFeedbackSortDescending);
-              } else {
-                ctrl.currentFeedbackThreadsSortType = sortType;
-              }
-            };
-
-            ctrl.getValueOfExplorationSortKey = function(exploration) {
-              // This function is passed as a custom comparator function to
-              // `orderBy`, so that special cases can be handled while sorting
-              // explorations.
-              if (ctrl.currentExpSortType ===
-                  EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key) {
-                return null;
-              } else {
-                return exploration[ctrl.currentExpSortType];
-              }
-            };
-
-            ctrl.getValueOfSubscriptionSortKey = function(subscription) {
-              // This function is passed as a custom comparator function to
-              // `orderBy`, so that special cases can be handled while sorting
-              // subscriptions.
-              var value = subscription[ctrl.currentSubscribersSortType];
-              if (ctrl.currentSubscribersSortType ===
-                  SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.IMPACT.key) {
-                value = (value || 0);
-              }
-              return value;
-            };
-
-            ctrl.sortFeedbackThreadsFunction = function(feedbackThread) {
-              return feedbackThread[ctrl.currentFeedbackThreadsSortType];
-            };
-
-            var getPlaylistSortableOptions = function(activityType) {
-              return {
-                'ui-floating': 'auto',
-                start: function(e, ui) {
-                  ui.placeholder.height(ui.item.height());
-                  $scope.$apply();
-                },
-                sort: function(e, ui) {
-                  /* eslint-disable quote-props */
-                  // Making top : 0px to avoid irregular change in position.
-                  ui.helper.css(
-                    {'top': '0 px'});
-                  /* eslint-enable quote-props */
-                },
-                update: function(e, ui) {
-                  var insertExpInLearnerPlaylistUrl = (
-                    UrlInterpolationService.interpolateUrl(
-                      ('/learnerplaylistactivityhandler/<activityType>/' +
-                      '<activityId>'), {
-                        activityType: activityType,
-                        activityId: (
-                          ctrl.explorationPlaylist[ui.item.sortable.index].id)
-                      }));
-
-                  $http.post(insertExpInLearnerPlaylistUrl, {
-                    index: ui.item.sortable.dropindex
-                  });
-                  $scope.$apply();
-                },
-                stop: function(e, ui) {
-                  $scope.$apply();
-                },
-                axis: 'y'
-              };
-            };
-
             ctrl.collectionPlaylistSortableOptions = getPlaylistSortableOptions(
               ACTIVITY_TYPE_COLLECTION);
             ctrl.explorationPlaylistSortableOptions = (
               getPlaylistSortableOptions(ACTIVITY_TYPE_EXPLORATION));
-
-            ctrl.onClickThread = function(
-                threadStatus, explorationId, threadId, explorationTitle) {
-              ctrl.loadingFeedbacks = true;
-              var threadDataUrl = UrlInterpolationService.interpolateUrl(
-                '/learnerdashboardthreadhandler/<threadId>', {
-                  threadId: threadId
-                });
-              ctrl.explorationTitle = explorationTitle;
-              ctrl.feedbackThreadActive = true;
-              ctrl.threadStatus = threadStatus;
-              ctrl.explorationId = explorationId;
-              ctrl.threadId = threadId;
-
-              for (
-                var index = 0; index < ctrl.threadSummaries.length; index++) {
-                if (ctrl.threadSummaries[index].threadId === threadId) {
-                  threadIndex = index;
-                  var threadSummary = ctrl.threadSummaries[index];
-                  threadSummary.markTheLastTwoMessagesAsRead();
-                  if (!threadSummary.lastMessageRead) {
-                    ctrl.numberOfUnreadThreads -= 1;
-                  }
-                }
-              }
-
-              $http.get(threadDataUrl).then(function(response) {
-                var messageSummaryDicts = response.data.message_summary_list;
-                ctrl.messageSummaries = [];
-                for (index = 0; index < messageSummaryDicts.length; index++) {
-                  ctrl.messageSummaries.push(
-                    FeedbackMessageSummaryObjectFactory.createFromBackendDict(
-                      messageSummaryDicts[index]));
-                }
-                ctrl.loadingFeedbacks = false;
-              });
-            };
-
-            ctrl.showAllThreads = function() {
-              ctrl.feedbackThreadActive = false;
-              threadIndex = null;
-            };
-
-            ctrl.addNewMessage = function(threadId, newMessage) {
-              var url = UrlInterpolationService.interpolateUrl(
-                '/threadhandler/<threadId>', {
-                  threadId: threadId
-                });
-              var payload = {
-                updated_status: null,
-                updated_subject: null,
-                text: newMessage
-              };
-              ctrl.messageSendingInProgress = true;
-              $http.post(url, payload).then(function() {
-                ctrl.threadSummary = ctrl.threadSummaries[threadIndex];
-                ctrl.threadSummary.appendNewMessage(
-                  newMessage, ctrl.username);
-                ctrl.messageSendingInProgress = false;
-                ctrl.newMessage.text = null;
-                var newMessageSummary = (
-                  FeedbackMessageSummaryObjectFactory.createNewMessage(
-                    ctrl.threadSummary.totalMessageCount, newMessage,
-                    ctrl.username, ctrl.profilePictureDataUrl));
-                ctrl.messageSummaries.push(newMessageSummary);
-              });
-            };
-
-            ctrl.showSuggestionModal = function(
-                newContent, oldContent, description) {
-              SuggestionModalForLearnerDashboardService.showSuggestionModal(
-                'edit_exploration_state_content',
-                {
-                  newContent: newContent,
-                  oldContent: oldContent,
-                  description: description
-                }
-              );
-            };
-
-            ctrl.openRemoveActivityModal = function(
-                sectionNameI18nId, subsectionName, activity) {
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/learner-dashboard-page/modal-templates/' +
-                  'remove-activity-from-learner-dashboard-modal.template.html'),
-                backdrop: true,
-                resolve: {
-                  sectionNameI18nId: function() {
-                    return sectionNameI18nId;
-                  },
-                  subsectionName: function() {
-                    return subsectionName;
-                  },
-                  activity: function() {
-                    return activity;
-                  }
-                },
-                controller: [
-                  '$scope', '$uibModalInstance', '$http', 'sectionNameI18nId',
-                  'subsectionName', 'ACTIVITY_TYPE_COLLECTION',
-                  'ACTIVITY_TYPE_EXPLORATION',
-                  function(
-                      $scope, $uibModalInstance, $http, sectionNameI18nId,
-                      subsectionName, ACTIVITY_TYPE_COLLECTION,
-                      ACTIVITY_TYPE_EXPLORATION) {
-                    $scope.sectionNameI18nId = sectionNameI18nId;
-                    $scope.subsectionName = subsectionName;
-                    $scope.activityTitle = activity.title;
-                    $scope.remove = function() {
-                      var activityType = '';
-                      if (subsectionName ===
-                        LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                        activityType = ACTIVITY_TYPE_EXPLORATION;
-                      } else if (subsectionName ===
-                                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS
-                                  .COLLECTIONS) {
-                        activityType = ACTIVITY_TYPE_COLLECTION;
-                      } else {
-                        throw new Error('Subsection name is not valid.');
-                      }
-
-                      var removeActivityUrlPrefix = '';
-                      if (sectionNameI18nId ===
-                          LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-                        removeActivityUrlPrefix =
-                          '/learnerplaylistactivityhandler/';
-                      } else if (sectionNameI18nId ===
-                                LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-                        removeActivityUrlPrefix =
-                          '/learnerincompleteactivityhandler/';
-                      } else {
-                        throw new Error('Section name is not valid.');
-                      }
-
-                      var removeActivityUrl = (
-                        UrlInterpolationService.interpolateUrl(
-                          removeActivityUrlPrefix +
-                          '<activityType>/<activityId>', {
-                            activityType: activityType,
-                            activityId: activity.id
-                          }));
-
-                      $http['delete'](removeActivityUrl);
-                      $uibModalInstance.close();
-                    };
-
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
-              }).result.then(function() {
-                if (sectionNameI18nId ===
-                    LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-                  if (subsectionName ===
-                      LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                    var index = ctrl.incompleteExplorationsList.indexOf(
-                      activity);
-                    if (index !== -1) {
-                      ctrl.incompleteExplorationsList.splice(index, 1);
-                    }
-                  } else if (subsectionName ===
-                            LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-                    var index = ctrl.incompleteCollectionsList.indexOf(
-                      activity);
-                    if (index !== -1) {
-                      ctrl.incompleteCollectionsList.splice(index, 1);
-                    }
-                  }
-                } else if (sectionNameI18nId ===
-                          LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-                  if (subsectionName ===
-                      LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
-                    var index = ctrl.explorationPlaylist.indexOf(activity);
-                    if (index !== -1) {
-                      ctrl.explorationPlaylist.splice(index, 1);
-                    }
-                  } else if (subsectionName ===
-                            LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
-                    var index = ctrl.collectionPlaylist.indexOf(activity);
-                    if (index !== -1) {
-                      ctrl.collectionPlaylist.splice(index, 1);
-                    }
-                  }
-                }
-              });
-            };
           };
         }
       ]};

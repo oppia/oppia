@@ -43,6 +43,42 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
             $attrs, $translate, SetInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
+          var hasDuplicates = function(answer) {
+            for (var i = 0; i < answer.length; i++) {
+              for (var j = 0; j < i; j++) {
+                if (angular.equals(answer[i], answer[j])) {
+                  return true;
+                }
+              }
+            }
+            return false;
+          };
+
+          var hasBlankOption = function(answer) {
+            return answer.some(function(element) {
+              return (element === '');
+            });
+          };
+
+          ctrl.submitAnswer = function(answer) {
+            if (hasDuplicates(answer)) {
+              ctrl.errorMessage = (
+                'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+            } else {
+              ctrl.errorMessage = '';
+              CurrentInteractionService.onSubmit(
+                answer, SetInputRulesService);
+            }
+          };
+
+          ctrl.isAnswerValid = function() {
+            return (ctrl.answer.length > 0 &&
+              !hasBlankOption(ctrl.answer));
+          };
+
+          var submitAnswerFn = function() {
+            ctrl.submitAnswer(ctrl.answer);
+          };
           ctrl.$onInit = function() {
             ctrl.schema = {
               type: 'list',
@@ -58,43 +94,6 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
 
             // Adds an input field by default
             ctrl.answer = [''];
-
-            var hasDuplicates = function(answer) {
-              for (var i = 0; i < answer.length; i++) {
-                for (var j = 0; j < i; j++) {
-                  if (angular.equals(answer[i], answer[j])) {
-                    return true;
-                  }
-                }
-              }
-              return false;
-            };
-
-            var hasBlankOption = function(answer) {
-              return answer.some(function(element) {
-                return (element === '');
-              });
-            };
-
-            ctrl.submitAnswer = function(answer) {
-              if (hasDuplicates(answer)) {
-                ctrl.errorMessage = (
-                  'I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
-              } else {
-                ctrl.errorMessage = '';
-                CurrentInteractionService.onSubmit(
-                  answer, SetInputRulesService);
-              }
-            };
-
-            ctrl.isAnswerValid = function() {
-              return (ctrl.answer.length > 0 &&
-                !hasBlankOption(ctrl.answer));
-            };
-
-            var submitAnswerFn = function() {
-              ctrl.submitAnswer(ctrl.answer);
-            };
 
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswerFn, ctrl.isAnswerValid);

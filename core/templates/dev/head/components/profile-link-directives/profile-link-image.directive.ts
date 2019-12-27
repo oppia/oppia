@@ -35,15 +35,13 @@ angular.module('oppia').directive('profileLinkImage', [
         '$http',
         function($http) {
           var ctrl = this;
+          var DEFAULT_PROFILE_IMAGE_PATH = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/avatar/user_blue_72px.png'));
+          ctrl.isUsernameLinkable = function(username) {
+            return SYSTEM_USER_IDS.indexOf(username) === -1;
+          };
           ctrl.$onInit = function() {
-            var DEFAULT_PROFILE_IMAGE_PATH = (
-              UrlInterpolationService.getStaticImageUrl(
-                '/avatar/user_blue_72px.png'));
-
-            ctrl.isUsernameLinkable = function(username) {
-              return SYSTEM_USER_IDS.indexOf(username) === -1;
-            };
-
             ctrl.profileImageUrl = (
               '/preferenceshandler/profile_picture_by_username/' +
               ctrl.username());

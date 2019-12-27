@@ -46,6 +46,20 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
             $attrs, WindowDimensionsService,
             CurrentInteractionService, ContextService) {
           var ctrl = this;
+          ctrl.submitAnswer = function() {
+            // We used to show "(Continue)" to indicate a 'continue' action
+            // when the learner browses through the history of the
+            // exploration, but this apparently can be mistaken for a
+            //  button/control. The following makes the learner's "answer" a
+            // bit more conversational, as if they were chatting with Oppia.
+            var humanReadableAnswer = DEFAULT_HUMAN_READABLE_ANSWER;
+            if (ctrl.buttonText !== DEFAULT_BUTTON_TEXT) {
+              humanReadableAnswer = ctrl.buttonText;
+            }
+
+            CurrentInteractionService.onSubmit(
+              humanReadableAnswer, ContinueRulesService);
+          };
           ctrl.$onInit = function() {
             ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
               $attrs.buttonTextWithValue);
@@ -53,21 +67,6 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
             var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';
 
             ctrl.isInEditorMode = ContextService.isInExplorationEditorMode();
-
-            ctrl.submitAnswer = function() {
-              // We used to show "(Continue)" to indicate a 'continue' action
-              // when the learner browses through the history of the
-              // exploration, but this apparently can be mistaken for a
-              //  button/control. The following makes the learner's "answer" a
-              // bit more conversational, as if they were chatting with Oppia.
-              var humanReadableAnswer = DEFAULT_HUMAN_READABLE_ANSWER;
-              if (ctrl.buttonText !== DEFAULT_BUTTON_TEXT) {
-                humanReadableAnswer = ctrl.buttonText;
-              }
-
-              CurrentInteractionService.onSubmit(
-                humanReadableAnswer, ContinueRulesService);
-            };
 
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, null);

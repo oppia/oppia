@@ -47,6 +47,59 @@ angular.module('oppia').directive('topicLandingPage', [
             SiteAnalyticsService, UrlInterpolationService,
             TOPIC_LANDING_PAGE_DATA) {
           var ctrl = this;
+          var getImageData = function(index) {
+            var imageKey = 'image_' + index;
+            if (landingPageData[imageKey]) {
+              var imagePath = UrlInterpolationService.interpolateUrl(
+                angular.copy(assetsPathFormat), {
+                  subject: ctrl.subject,
+                  topic: topic,
+                  file_name: landingPageData[imageKey].file_name
+                });
+              return {
+                src: UrlInterpolationService.getStaticImageUrl(imagePath),
+                alt: landingPageData[imageKey].alt
+              };
+            }
+          };
+          ctrl.getVideoUrl = function() {
+            if (landingPageData.video) {
+              var videoPath = UrlInterpolationService.interpolateUrl(
+                angular.copy(assetsPathFormat), {
+                  subject: ctrl.subject,
+                  topic: topic,
+                  file_name: landingPageData.video
+                });
+              return UrlInterpolationService.getStaticVideoUrl(videoPath);
+            } else {
+              throw Error(
+                'There is no video data available for this landing page.');
+            }
+          };
+
+          ctrl.onClickGetStartedButton = function() {
+            var collectionId = topicData.collection_id;
+            SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
+              collectionId);
+            $timeout(function() {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                '/collection/<collection_id>', {
+                  collection_id: collectionId
+                });
+            }, 150);
+          };
+
+          ctrl.onClickLearnMoreButton = function() {
+            $timeout(function() {
+              $window.location = '/splash';
+            }, 150);
+          };
+
+          ctrl.onClickExploreLessonsButton = function() {
+            $timeout(function() {
+              $window.location = '/library';
+            }, 150);
+          };
           ctrl.$onInit = function() {
             var pathArray = $window.location.pathname.split('/');
             ctrl.subject = pathArray[2];
@@ -60,64 +113,8 @@ angular.module('oppia').directive('topicLandingPage', [
             PageTitleService.setPageTitle(pageTitle);
             ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
               '/splash/books.svg');
-
-            var getImageData = function(index) {
-              var imageKey = 'image_' + index;
-              if (landingPageData[imageKey]) {
-                var imagePath = UrlInterpolationService.interpolateUrl(
-                  angular.copy(assetsPathFormat), {
-                    subject: ctrl.subject,
-                    topic: topic,
-                    file_name: landingPageData[imageKey].file_name
-                  });
-                return {
-                  src: UrlInterpolationService.getStaticImageUrl(imagePath),
-                  alt: landingPageData[imageKey].alt
-                };
-              }
-            };
-
             ctrl.image1 = getImageData(1);
             ctrl.image2 = getImageData(2);
-
-            ctrl.getVideoUrl = function() {
-              if (landingPageData.video) {
-                var videoPath = UrlInterpolationService.interpolateUrl(
-                  angular.copy(assetsPathFormat), {
-                    subject: ctrl.subject,
-                    topic: topic,
-                    file_name: landingPageData.video
-                  });
-                return UrlInterpolationService.getStaticVideoUrl(videoPath);
-              } else {
-                throw Error(
-                  'There is no video data available for this landing page.');
-              }
-            };
-
-            ctrl.onClickGetStartedButton = function() {
-              var collectionId = topicData.collection_id;
-              SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
-                collectionId);
-              $timeout(function() {
-                $window.location = UrlInterpolationService.interpolateUrl(
-                  '/collection/<collection_id>', {
-                    collection_id: collectionId
-                  });
-              }, 150);
-            };
-
-            ctrl.onClickLearnMoreButton = function() {
-              $timeout(function() {
-                $window.location = '/splash';
-              }, 150);
-            };
-
-            ctrl.onClickExploreLessonsButton = function() {
-              $timeout(function() {
-                $window.location = '/library';
-              }, 150);
-            };
           };
         }]
     };

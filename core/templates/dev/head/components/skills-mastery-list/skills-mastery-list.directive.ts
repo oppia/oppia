@@ -40,6 +40,54 @@ angular.module('oppia').directive('skillsMasteryList', [
             $scope, $uibModal, UserService,
             MASTERY_CUTOFF, MASTERY_COLORS) {
           var ctrl = this;
+          ctrl.getMasteryPercentage = function(degreeOfMastery) {
+            return Math.round(degreeOfMastery * 100);
+          };
+
+          ctrl.getColorForMastery = function(degreeOfMastery) {
+            if (degreeOfMastery >= MASTERY_CUTOFF.GOOD_CUTOFF) {
+              return MASTERY_COLORS.GOOD_MASTERY_COLOR;
+            } else if (degreeOfMastery >= MASTERY_CUTOFF.MEDIUM_CUTOFF) {
+              return MASTERY_COLORS.MEDIUM_MASTERY_COLOR;
+            } else {
+              return MASTERY_COLORS.BAD_MASTERY_COLOR;
+            }
+          };
+
+          ctrl.getMasteryBarStyle = function(skillId) {
+            return {
+              width: ctrl.getMasteryPercentage(
+                ctrl.getDegreesOfMastery()[skillId]) + '%',
+              background: ctrl.getColorForMastery(
+                ctrl.getDegreesOfMastery()[skillId])
+            };
+          };
+
+          ctrl.openConceptCardModal = function(skillId) {
+            var skillDescription = ctrl.getSkillDescriptions()[skillId];
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/components/concept-card/concept-card-modal.template.html'
+              ),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function(
+                    $scope, $uibModalInstance) {
+                  $scope.skillIds = [skillId];
+                  $scope.index = 0;
+                  $scope.currentSkill = skillDescription;
+
+                  $scope.closeModal = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
+            });
+          };
           ctrl.$onInit = function() {
             ctrl.userIsLoggedIn = null;
             UserService.getUserInfoAsync().then(function(userInfo) {
@@ -55,55 +103,6 @@ angular.module('oppia').directive('skillsMasteryList', [
                   mastery: degreesOfMastery[skillId]
                 };
               });
-
-            ctrl.getMasteryPercentage = function(degreeOfMastery) {
-              return Math.round(degreeOfMastery * 100);
-            };
-
-            ctrl.getColorForMastery = function(degreeOfMastery) {
-              if (degreeOfMastery >= MASTERY_CUTOFF.GOOD_CUTOFF) {
-                return MASTERY_COLORS.GOOD_MASTERY_COLOR;
-              } else if (degreeOfMastery >= MASTERY_CUTOFF.MEDIUM_CUTOFF) {
-                return MASTERY_COLORS.MEDIUM_MASTERY_COLOR;
-              } else {
-                return MASTERY_COLORS.BAD_MASTERY_COLOR;
-              }
-            };
-
-            ctrl.getMasteryBarStyle = function(skillId) {
-              return {
-                width: ctrl.getMasteryPercentage(
-                  ctrl.getDegreesOfMastery()[skillId]) + '%',
-                background: ctrl.getColorForMastery(
-                  ctrl.getDegreesOfMastery()[skillId])
-              };
-            };
-
-            ctrl.openConceptCardModal = function(skillId) {
-              var skillDescription = ctrl.getSkillDescriptions()[skillId];
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/components/concept-card/concept-card-modal.template.html'
-                ),
-                backdrop: true,
-                controller: [
-                  '$scope', '$uibModalInstance',
-                  function(
-                      $scope, $uibModalInstance) {
-                    $scope.skillIds = [skillId];
-                    $scope.index = 0;
-                    $scope.currentSkill = skillDescription;
-
-                    $scope.closeModal = function() {
-                      $uibModalInstance.dismiss('cancel');
-                    };
-                  }
-                ]
-              }).result.then(function() {}, function() {
-                // This callback is triggered when the Cancel button is
-                // clicked. No further action is needed.
-              });
-            };
           };
         }]
     };

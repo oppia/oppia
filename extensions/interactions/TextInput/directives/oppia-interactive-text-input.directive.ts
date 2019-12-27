@@ -46,6 +46,21 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
             $attrs, FocusManagerService, TextInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
+          ctrl.submitAnswer = function(answer) {
+            if (!answer) {
+              return;
+            }
+
+            CurrentInteractionService.onSubmit(answer, TextInputRulesService);
+          };
+
+          var submitAnswerFn = function() {
+            ctrl.submitAnswer(ctrl.answer);
+          };
+
+          var validityCheckFn = function() {
+            return ctrl.answer.length > 0;
+          };
           ctrl.$onInit = function() {
             ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
               $attrs.placeholderWithValue);
@@ -64,22 +79,6 @@ angular.module('oppia').directive('oppiaInteractiveTextInput', [
             if (ctrl.rows && ctrl.rows !== 1) {
               ctrl.schema.ui_config.rows = ctrl.rows;
             }
-
-            ctrl.submitAnswer = function(answer) {
-              if (!answer) {
-                return;
-              }
-
-              CurrentInteractionService.onSubmit(answer, TextInputRulesService);
-            };
-
-            var submitAnswerFn = function() {
-              ctrl.submitAnswer(ctrl.answer);
-            };
-
-            var validityCheckFn = function() {
-              return ctrl.answer.length > 0;
-            };
 
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswerFn, validityCheckFn);

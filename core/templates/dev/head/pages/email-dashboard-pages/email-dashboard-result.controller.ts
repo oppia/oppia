@@ -34,115 +34,114 @@ angular.module('oppia').directive('emailDashboardResultPage', [
         '$http', '$timeout', '$window', 'UrlInterpolationService',
         function($http, $timeout, $window, UrlInterpolationService) {
           var ctrl = this;
-          ctrl.$onInit = function() {
-            var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
-            var CANCEL_EMAIL_HANDLER_URL =
-              '/emaildashboardcancelresult/<query_id>';
-            var EMAIL_DASHBOARD_PAGE = '/emaildashboard';
-            var TEST_BULK_EMAIL_URL =
-              '/emaildashboardtestbulkemailhandler/<query_id>';
+          var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
+          var CANCEL_EMAIL_HANDLER_URL =
+            '/emaildashboardcancelresult/<query_id>';
+          var EMAIL_DASHBOARD_PAGE = '/emaildashboard';
+          var TEST_BULK_EMAIL_URL =
+            '/emaildashboardtestbulkemailhandler/<query_id>';
 
-            var getQueryId = function() {
-              return $window.location.pathname.split('/').slice(-1)[0];
-            };
+          var getQueryId = function() {
+            return $window.location.pathname.split('/').slice(-1)[0];
+          };
 
-            var validateEmailSubjectAndBody = function() {
-              var dataIsValid = true;
-              if (ctrl.emailSubject.length === 0) {
-                ctrl.invalid.subject = true;
-                dataIsValid = false;
-              }
-              if (ctrl.emailBody.length === 0) {
-                ctrl.invalid.body = true;
-                dataIsValid = false;
-              }
-              return dataIsValid;
-            };
+          var validateEmailSubjectAndBody = function() {
+            var dataIsValid = true;
+            if (ctrl.emailSubject.length === 0) {
+              ctrl.invalid.subject = true;
+              dataIsValid = false;
+            }
+            if (ctrl.emailBody.length === 0) {
+              ctrl.invalid.body = true;
+              dataIsValid = false;
+            }
+            return dataIsValid;
+          };
 
-            ctrl.submitEmail = function() {
-              var resultHandlerUrl = UrlInterpolationService.interpolateUrl(
-                RESULT_HANDLER_URL, {
-                  query_id: getQueryId()
-                });
-              var dataIsValid = validateEmailSubjectAndBody();
+          ctrl.submitEmail = function() {
+            var resultHandlerUrl = UrlInterpolationService.interpolateUrl(
+              RESULT_HANDLER_URL, {
+                query_id: getQueryId()
+              });
+            var dataIsValid = validateEmailSubjectAndBody();
 
-              if (ctrl.emailOption === 'custom' &&
-                ctrl.maxRecipients === null) {
-                ctrl.invalid.maxRecipients = true;
-                dataIsValid = false;
-              }
+            if (ctrl.emailOption === 'custom' &&
+              ctrl.maxRecipients === null) {
+              ctrl.invalid.maxRecipients = true;
+              dataIsValid = false;
+            }
 
-              if (dataIsValid) {
-                ctrl.submitIsInProgress = true;
-                var data = {
-                  email_subject: ctrl.emailSubject,
-                  email_body: ctrl.emailBody,
-                  email_intent: ctrl.emailIntent,
-                  max_recipients: (
-                    ctrl.emailOption !== 'all' ? ctrl.max_recipients : null)
-                };
-
-                $http.post(resultHandlerUrl, {
-                  data: data
-                }).then(function() {
-                  ctrl.emailSubmitted = true;
-                  $timeout(function() {
-                    $window.location.href = EMAIL_DASHBOARD_PAGE;
-                  }, 4000);
-                }).then(null, function() {
-                  ctrl.errorHasOccurred = true;
-                  ctrl.submitIsInProgress = false;
-                });
-                ctrl.invalid.subject = false;
-                ctrl.invalid.body = false;
-                ctrl.invalid.maxRecipients = false;
-              }
-            };
-
-            ctrl.resetForm = function() {
-              ctrl.emailSubject = '';
-              ctrl.emailBody = '';
-              ctrl.emailOption = 'all';
-            };
-
-            ctrl.cancelEmail = function() {
+            if (dataIsValid) {
               ctrl.submitIsInProgress = true;
-              var cancelUrlHandler = UrlInterpolationService.interpolateUrl(
-                CANCEL_EMAIL_HANDLER_URL, {
-                  query_id: getQueryId()
-                });
+              var data = {
+                email_subject: ctrl.emailSubject,
+                email_body: ctrl.emailBody,
+                email_intent: ctrl.emailIntent,
+                max_recipients: (
+                  ctrl.emailOption !== 'all' ? ctrl.max_recipients : null)
+              };
 
-              $http.post(cancelUrlHandler).then(function() {
-                ctrl.emailCancelled = true;
+              $http.post(resultHandlerUrl, {
+                data: data
+              }).then(function() {
+                ctrl.emailSubmitted = true;
                 $timeout(function() {
                   $window.location.href = EMAIL_DASHBOARD_PAGE;
                 }, 4000);
-              }, function() {
+              }).then(null, function() {
                 ctrl.errorHasOccurred = true;
                 ctrl.submitIsInProgress = false;
               });
-            };
+              ctrl.invalid.subject = false;
+              ctrl.invalid.body = false;
+              ctrl.invalid.maxRecipients = false;
+            }
+          };
 
-            ctrl.sendTestEmail = function() {
-              var testEmailHandlerUrl = UrlInterpolationService.interpolateUrl(
-                TEST_BULK_EMAIL_URL, {
-                  query_id: getQueryId()
-                });
-              var dataIsValid = validateEmailSubjectAndBody();
+          ctrl.resetForm = function() {
+            ctrl.emailSubject = '';
+            ctrl.emailBody = '';
+            ctrl.emailOption = 'all';
+          };
 
-              if (dataIsValid) {
-                $http.post(testEmailHandlerUrl, {
-                  email_subject: ctrl.emailSubject,
-                  email_body: ctrl.emailBody
-                }).then(function() {
-                  ctrl.testEmailSentSuccesfully = true;
-                });
-                ctrl.invalid.subject = false;
-                ctrl.invalid.body = false;
-                ctrl.invalid.maxRecipients = false;
-              }
-            };
+          ctrl.cancelEmail = function() {
+            ctrl.submitIsInProgress = true;
+            var cancelUrlHandler = UrlInterpolationService.interpolateUrl(
+              CANCEL_EMAIL_HANDLER_URL, {
+                query_id: getQueryId()
+              });
 
+            $http.post(cancelUrlHandler).then(function() {
+              ctrl.emailCancelled = true;
+              $timeout(function() {
+                $window.location.href = EMAIL_DASHBOARD_PAGE;
+              }, 4000);
+            }, function() {
+              ctrl.errorHasOccurred = true;
+              ctrl.submitIsInProgress = false;
+            });
+          };
+
+          ctrl.sendTestEmail = function() {
+            var testEmailHandlerUrl = UrlInterpolationService.interpolateUrl(
+              TEST_BULK_EMAIL_URL, {
+                query_id: getQueryId()
+              });
+            var dataIsValid = validateEmailSubjectAndBody();
+
+            if (dataIsValid) {
+              $http.post(testEmailHandlerUrl, {
+                email_subject: ctrl.emailSubject,
+                email_body: ctrl.emailBody
+              }).then(function() {
+                ctrl.testEmailSentSuccesfully = true;
+              });
+              ctrl.invalid.subject = false;
+              ctrl.invalid.body = false;
+              ctrl.invalid.maxRecipients = false;
+            }
+          };
+          ctrl.$onInit = function() {
             ctrl.emailOption = 'all';
             ctrl.emailSubject = '';
             ctrl.emailBody = '';

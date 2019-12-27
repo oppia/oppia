@@ -54,9 +54,88 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_OPENED, INTERACTION_SPECS, StatsReportingService) {
           var ctrl = this;
+          var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+          var resetLocalHintsArray = function() {
+            ctrl.hintIndexes = [];
+            var numHints = HintsAndSolutionManagerService.getNumHints();
+            for (var index = 0; index < numHints; index++) {
+              ctrl.hintIndexes.push(index);
+            }
+          };
+
+          ctrl.isHintButtonVisible = function(index) {
+            return (
+              HintsAndSolutionManagerService.isHintViewable(index) &&
+              ctrl.displayedCard !== null &&
+              ctrl.displayedCard.doesInteractionSupportHints());
+          };
+
+          ctrl.isSolutionButtonVisible = function() {
+            return HintsAndSolutionManagerService.isSolutionViewable();
+          };
+
+          ctrl.displayHintModal = function(index) {
+            ctrl.activeHintIndex = index;
+            var promise = (
+              HintAndSolutionModalService.displayHintModal(index));
+            promise.result.then(null, function() {
+              ctrl.activeHintIndex = null;
+            });
+          };
+
+          ctrl.onClickSolutionButton = function() {
+            ctrl.solutionModalIsActive = true;
+            if (HintsAndSolutionManagerService.isSolutionConsumed()) {
+              ctrl.displaySolutionModal();
+            } else {
+              var interstitialModalPromise = (
+                HintAndSolutionModalService
+                  .displaySolutionInterstitialModal());
+              interstitialModalPromise.result.then(function() {
+                ctrl.displaySolutionModal();
+              }, function() {
+                ctrl.solutionModalIsActive = false;
+              });
+            }
+          };
+
+          ctrl.displaySolutionModal = function() {
+            ctrl.solutionModalIsActive = true;
+            var inQuestionMode = (
+              ExplorationPlayerStateService.isInQuestionMode());
+            if (!_editorPreviewMode && !inQuestionMode) {
+              StatsReportingService.recordSolutionHit(
+                PlayerPositionService.getCurrentStateName());
+            }
+            var promise = HintAndSolutionModalService.displaySolutionModal();
+            promise.result.then(null, function() {
+              ctrl.solutionModalIsActive = false;
+            });
+          };
+
+          $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
+            ctrl.displayedCard = newCard;
+            HintsAndSolutionManagerService.reset(
+              newCard.getHints(), newCard.getSolution()
+            );
+            resetLocalHintsArray();
+          });
+
+          ctrl.isTooltipVisible = function() {
+            return HintsAndSolutionManagerService.isHintTooltipOpen();
+          };
+
+          $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
+            var displayedCardIndex =
+              PlayerPositionService.getDisplayedCardIndex();
+            ctrl.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
+              displayedCardIndex);
+            if (ctrl.currentlyOnLatestCard) {
+              resetLocalHintsArray();
+            }
+          });
           ctrl.$onInit = function() {
             ctrl.hintIndexes = [];
-            var _editorPreviewMode = ContextService.isInExplorationEditorPage();
             // Represents the index of the currently viewed hint.
             ctrl.activeHintIndex = null;
             ctrl.displayedCard = null;
@@ -65,86 +144,6 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.isHintConsumed = HintsAndSolutionManagerService.isHintConsumed;
             ctrl.isSolutionConsumed = (
               HintsAndSolutionManagerService.isSolutionConsumed);
-
-            var resetLocalHintsArray = function() {
-              ctrl.hintIndexes = [];
-              var numHints = HintsAndSolutionManagerService.getNumHints();
-              for (var index = 0; index < numHints; index++) {
-                ctrl.hintIndexes.push(index);
-              }
-            };
-
-            ctrl.isHintButtonVisible = function(index) {
-              return (
-                HintsAndSolutionManagerService.isHintViewable(index) &&
-                ctrl.displayedCard !== null &&
-                ctrl.displayedCard.doesInteractionSupportHints());
-            };
-
-            ctrl.isSolutionButtonVisible = function() {
-              return HintsAndSolutionManagerService.isSolutionViewable();
-            };
-
-            ctrl.displayHintModal = function(index) {
-              ctrl.activeHintIndex = index;
-              var promise = (
-                HintAndSolutionModalService.displayHintModal(index));
-              promise.result.then(null, function() {
-                ctrl.activeHintIndex = null;
-              });
-            };
-
-            ctrl.onClickSolutionButton = function() {
-              ctrl.solutionModalIsActive = true;
-              if (HintsAndSolutionManagerService.isSolutionConsumed()) {
-                ctrl.displaySolutionModal();
-              } else {
-                var interstitialModalPromise = (
-                  HintAndSolutionModalService
-                    .displaySolutionInterstitialModal());
-                interstitialModalPromise.result.then(function() {
-                  ctrl.displaySolutionModal();
-                }, function() {
-                  ctrl.solutionModalIsActive = false;
-                });
-              }
-            };
-
-            ctrl.displaySolutionModal = function() {
-              ctrl.solutionModalIsActive = true;
-              var inQuestionMode = (
-                ExplorationPlayerStateService.isInQuestionMode());
-              if (!_editorPreviewMode && !inQuestionMode) {
-                StatsReportingService.recordSolutionHit(
-                  PlayerPositionService.getCurrentStateName());
-              }
-              var promise = HintAndSolutionModalService.displaySolutionModal();
-              promise.result.then(null, function() {
-                ctrl.solutionModalIsActive = false;
-              });
-            };
-
-            $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
-              ctrl.displayedCard = newCard;
-              HintsAndSolutionManagerService.reset(
-                newCard.getHints(), newCard.getSolution()
-              );
-              resetLocalHintsArray();
-            });
-
-            ctrl.isTooltipVisible = function() {
-              return HintsAndSolutionManagerService.isHintTooltipOpen();
-            };
-
-            $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
-              var displayedCardIndex =
-                PlayerPositionService.getDisplayedCardIndex();
-              ctrl.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
-                displayedCardIndex);
-              if (ctrl.currentlyOnLatestCard) {
-                resetLocalHintsArray();
-              }
-            });
             resetLocalHintsArray();
           };
         }]

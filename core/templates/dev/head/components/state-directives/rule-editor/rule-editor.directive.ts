@@ -63,219 +63,217 @@ angular.module('oppia').directive('ruleEditor', [
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
           var ctrl = this;
+          // This returns the rule description string.
+          var computeRuleDescriptionFragments = function() {
+            if (!ctrl.rule.type) {
+              ctrl.ruleDescriptionFragments = [];
+              return '';
+            }
+
+            var ruleDescription = (
+              INTERACTION_SPECS[ctrl.currentInteractionId].rule_descriptions[
+                ctrl.rule.type]);
+
+            var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
+            var finalInputArray = ruleDescription.split(PATTERN);
+            if (finalInputArray.length % 3 !== 1) {
+              $log.error('Could not process rule description.');
+            }
+
+            var result = [];
+            for (var i = 0; i < finalInputArray.length; i += 3) {
+              result.push({
+                // Omit the leading noneditable string.
+                text: i !== 0 ? finalInputArray[i] : '',
+                type: 'noneditable'
+              });
+              if (i === finalInputArray.length - 1) {
+                break;
+              }
+
+              var answerChoices = ResponsesService.getAnswerChoices();
+
+              if (answerChoices) {
+                // This rule is for a multiple-choice, image-click, or item
+                // selection interaction.
+                // TODO(sll): Remove the need for this special case.
+                if (answerChoices.length > 0) {
+                  if (finalInputArray[2] === 'SetOfHtmlString') {
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'checkboxes',
+                      varName: finalInputArray[i + 1]
+                    });
+                  } else if (finalInputArray[2] ===
+                    'ListOfSetsOfHtmlStrings') {
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'dropdown',
+                      varName: finalInputArray[i + 1]
+                    });
+                  } else if (
+                    finalInputArray[i + 2] === 'DragAndDropHtmlString') {
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'dragAndDropHtmlStringSelect',
+                      varName: finalInputArray[i + 1]
+                    });
+                  } else if (
+                    finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'dragAndDropPositiveIntSelect',
+                      varName: finalInputArray[i + 1]
+                    });
+                  } else {
+                    ctrl.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.val,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'select',
+                      varName: finalInputArray[i + 1]
+                    });
+                    if (!ctrl.rule.inputs[finalInputArray[i + 1]]) {
+                      ctrl.rule.inputs[finalInputArray[i + 1]] = (
+                        ctrl.ruleDescriptionChoices[0].id);
+                    }
+                  }
+                } else {
+                  ctrl.ruleDescriptionChoices = [];
+                  result.push({
+                    text: ' [Error: No choices available] ',
+                    type: 'noneditable'
+                  });
+                }
+              } else {
+                result.push({
+                  type: finalInputArray[i + 2],
+                  varName: finalInputArray[i + 1]
+                });
+              }
+            }
+
+            // The following is necessary in order to ensure that the
+            // object-editor HTML tags load correctly when the rule type is
+            // changed. This is an issue for, e.g., the MusicNotesInput
+            // interaction, where the rule inputs can sometimes be integers
+            // and sometimes be lists of music notes.
+            ctrl.ruleDescriptionFragments = [];
+            $timeout(function() {
+              ctrl.ruleDescriptionFragments = result;
+            }, 10);
+
+            return ruleDescription;
+          };
+
+          $scope.$on('updateAnswerGroupInteractionId', function(
+              evt, newInteractionId) {
+            ctrl.currentInteractionId = newInteractionId;
+          });
+
+          ctrl.onSelectNewRuleType = function(newRuleType) {
+            var oldRuleInputs = angular.copy(ctrl.rule.inputs) || {};
+            var oldRuleInputTypes = angular.copy(ctrl.rule.inputTypes) || {};
+
+            ctrl.rule.type = newRuleType;
+            ctrl.rule.inputs = {};
+            ctrl.rule.inputTypes = {};
+
+            var tmpRuleDescription = computeRuleDescriptionFragments();
+            // This provides the list of choices for the multiple-choice and
+            // image-click interactions.
+            var answerChoices = ResponsesService.getAnswerChoices();
+
+            // Finds the parameters and sets them in ctrl.rule.inputs.
+            var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+            while (true) {
+              if (!tmpRuleDescription.match(PATTERN)) {
+                break;
+              }
+              var varName = tmpRuleDescription.match(PATTERN)[1];
+              var varType = null;
+              if (tmpRuleDescription.match(PATTERN)[2]) {
+                varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
+              }
+              ctrl.rule.inputTypes[varName] = varType;
+
+              // TODO(sll): Find a more robust way of doing this. For example,
+              // we could associate a particular varName with answerChoices
+              // depending on the interaction. This varName would take its
+              // default value from answerChoices, but other variables would
+              // take their default values from the DEFAULT_OBJECT_VALUES
+              // dict.
+              if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
+                ctrl.rule.inputs[varName] = [];
+              } else if (answerChoices) {
+                ctrl.rule.inputs[varName] = angular.copy(
+                  answerChoices[0].val);
+              } else {
+                ctrl.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
+              }
+
+              tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
+            }
+
+            for (var key in ctrl.rule.inputs) {
+              if (oldRuleInputs.hasOwnProperty(key) &&
+                oldRuleInputTypes[key] === ctrl.rule.inputTypes[key]) {
+                ctrl.rule.inputs[key] = oldRuleInputs[key];
+              }
+            }
+          };
+
+          ctrl.cancelThisEdit = function() {
+            ctrl.onCancelRuleEdit();
+          };
+
+          ctrl.saveThisRule = function() {
+            ctrl.onSaveRule();
+          };
+
+          ctrl.init = function() {
+            // Select a default rule type, if one isn't already selected.
+            if (ctrl.rule.type === null) {
+              ctrl.onSelectNewRuleType(ctrl.rule.type);
+            }
+            computeRuleDescriptionFragments();
+          };
           ctrl.$onInit = function() {
             ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
             ctrl.editRuleForm = {};
-
-            // This returns the rule description string.
-            var computeRuleDescriptionFragments = function() {
-              if (!ctrl.rule.type) {
-                ctrl.ruleDescriptionFragments = [];
-                return '';
-              }
-
-              var ruleDescription = (
-                INTERACTION_SPECS[ctrl.currentInteractionId].rule_descriptions[
-                  ctrl.rule.type]);
-
-              var PATTERN = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
-              var finalInputArray = ruleDescription.split(PATTERN);
-              if (finalInputArray.length % 3 !== 1) {
-                $log.error('Could not process rule description.');
-              }
-
-              var result = [];
-              for (var i = 0; i < finalInputArray.length; i += 3) {
-                result.push({
-                  // Omit the leading noneditable string.
-                  text: i !== 0 ? finalInputArray[i] : '',
-                  type: 'noneditable'
-                });
-                if (i === finalInputArray.length - 1) {
-                  break;
-                }
-
-                var answerChoices = ResponsesService.getAnswerChoices();
-
-                if (answerChoices) {
-                  // This rule is for a multiple-choice, image-click, or item
-                  // selection interaction.
-                  // TODO(sll): Remove the need for this special case.
-                  if (answerChoices.length > 0) {
-                    if (finalInputArray[2] === 'SetOfHtmlString') {
-                      ctrl.ruleDescriptionChoices = answerChoices.map(
-                        function(choice) {
-                          return {
-                            id: choice.label,
-                            val: choice.label
-                          };
-                        }
-                      );
-                      result.push({
-                        type: 'checkboxes',
-                        varName: finalInputArray[i + 1]
-                      });
-                    } else if (finalInputArray[2] ===
-                      'ListOfSetsOfHtmlStrings') {
-                      ctrl.ruleDescriptionChoices = answerChoices.map(
-                        function(choice) {
-                          return {
-                            id: choice.label,
-                            val: choice.label
-                          };
-                        }
-                      );
-                      result.push({
-                        type: 'dropdown',
-                        varName: finalInputArray[i + 1]
-                      });
-                    } else if (
-                      finalInputArray[i + 2] === 'DragAndDropHtmlString') {
-                      ctrl.ruleDescriptionChoices = answerChoices.map(
-                        function(choice) {
-                          return {
-                            id: choice.label,
-                            val: choice.label
-                          };
-                        }
-                      );
-                      result.push({
-                        type: 'dragAndDropHtmlStringSelect',
-                        varName: finalInputArray[i + 1]
-                      });
-                    } else if (
-                      finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
-                      ctrl.ruleDescriptionChoices = answerChoices.map(
-                        function(choice) {
-                          return {
-                            id: choice.label,
-                            val: choice.label
-                          };
-                        }
-                      );
-                      result.push({
-                        type: 'dragAndDropPositiveIntSelect',
-                        varName: finalInputArray[i + 1]
-                      });
-                    } else {
-                      ctrl.ruleDescriptionChoices = answerChoices.map(
-                        function(choice) {
-                          return {
-                            id: choice.val,
-                            val: choice.label
-                          };
-                        }
-                      );
-                      result.push({
-                        type: 'select',
-                        varName: finalInputArray[i + 1]
-                      });
-                      if (!ctrl.rule.inputs[finalInputArray[i + 1]]) {
-                        ctrl.rule.inputs[finalInputArray[i + 1]] = (
-                          ctrl.ruleDescriptionChoices[0].id);
-                      }
-                    }
-                  } else {
-                    ctrl.ruleDescriptionChoices = [];
-                    result.push({
-                      text: ' [Error: No choices available] ',
-                      type: 'noneditable'
-                    });
-                  }
-                } else {
-                  result.push({
-                    type: finalInputArray[i + 2],
-                    varName: finalInputArray[i + 1]
-                  });
-                }
-              }
-
-              // The following is necessary in order to ensure that the
-              // object-editor HTML tags load correctly when the rule type is
-              // changed. This is an issue for, e.g., the MusicNotesInput
-              // interaction, where the rule inputs can sometimes be integers
-              // and sometimes be lists of music notes.
-              ctrl.ruleDescriptionFragments = [];
-              $timeout(function() {
-                ctrl.ruleDescriptionFragments = result;
-              }, 10);
-
-              return ruleDescription;
-            };
-
-            $scope.$on('updateAnswerGroupInteractionId', function(
-                evt, newInteractionId) {
-              ctrl.currentInteractionId = newInteractionId;
-            });
-
-            ctrl.onSelectNewRuleType = function(newRuleType) {
-              var oldRuleInputs = angular.copy(ctrl.rule.inputs) || {};
-              var oldRuleInputTypes = angular.copy(ctrl.rule.inputTypes) || {};
-
-              ctrl.rule.type = newRuleType;
-              ctrl.rule.inputs = {};
-              ctrl.rule.inputTypes = {};
-
-              var tmpRuleDescription = computeRuleDescriptionFragments();
-              // This provides the list of choices for the multiple-choice and
-              // image-click interactions.
-              var answerChoices = ResponsesService.getAnswerChoices();
-
-              // Finds the parameters and sets them in ctrl.rule.inputs.
-              var PATTERN = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-              while (true) {
-                if (!tmpRuleDescription.match(PATTERN)) {
-                  break;
-                }
-                var varName = tmpRuleDescription.match(PATTERN)[1];
-                var varType = null;
-                if (tmpRuleDescription.match(PATTERN)[2]) {
-                  varType = tmpRuleDescription.match(PATTERN)[2].substring(1);
-                }
-                ctrl.rule.inputTypes[varName] = varType;
-
-                // TODO(sll): Find a more robust way of doing this. For example,
-                // we could associate a particular varName with answerChoices
-                // depending on the interaction. This varName would take its
-                // default value from answerChoices, but other variables would
-                // take their default values from the DEFAULT_OBJECT_VALUES
-                // dict.
-                if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
-                  ctrl.rule.inputs[varName] = [];
-                } else if (answerChoices) {
-                  ctrl.rule.inputs[varName] = angular.copy(
-                    answerChoices[0].val);
-                } else {
-                  ctrl.rule.inputs[varName] = DEFAULT_OBJECT_VALUES[varType];
-                }
-
-                tmpRuleDescription = tmpRuleDescription.replace(PATTERN, ' ');
-              }
-
-              for (var key in ctrl.rule.inputs) {
-                if (oldRuleInputs.hasOwnProperty(key) &&
-                  oldRuleInputTypes[key] === ctrl.rule.inputTypes[key]) {
-                  ctrl.rule.inputs[key] = oldRuleInputs[key];
-                }
-              }
-            };
-
-            ctrl.cancelThisEdit = function() {
-              ctrl.onCancelRuleEdit();
-            };
-
-            ctrl.saveThisRule = function() {
-              ctrl.onSaveRule();
-            };
-
-            ctrl.init = function() {
-              // Select a default rule type, if one isn't already selected.
-              if (ctrl.rule.type === null) {
-                ctrl.onSelectNewRuleType(ctrl.rule.type);
-              }
-              computeRuleDescriptionFragments();
-            };
-
             ctrl.init();
           };
         }]

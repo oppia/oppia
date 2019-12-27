@@ -53,6 +53,66 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
             $scope, $element, $attrs, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
+          ctrl.submitGraph = function() {
+            // Here, angular.copy is needed to strip $$hashkey from the graph.
+            CurrentInteractionService.onSubmit(
+              angular.copy(ctrl.graph), GraphInputRulesService);
+          };
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+            ctrl.interactionIsActive = false;
+
+            ctrl.canAddVertex = false;
+            ctrl.canDeleteVertex = false;
+            ctrl.canEditVertexLabel = false;
+            ctrl.canMoveVertex = false;
+            ctrl.canAddEdge = false;
+            ctrl.canDeleteEdge = false;
+            ctrl.canEditEdgeWeight = false;
+          });
+
+          ctrl.resetGraph = function() {
+            var newGraph = HtmlEscaperService.escapedJsonToObj(
+              $attrs.graphWithValue);
+            if (checkValidGraph(newGraph)) {
+              ctrl.graph = newGraph;
+            } else {
+              ctrl.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
+            }
+          };
+
+          var init = function() {
+            if (ctrl.interactionIsActive) {
+              ctrl.resetGraph();
+            } else {
+              ctrl.graph = ctrl.getLastAnswer();
+            }
+            var stringToBool = function(str) {
+              return (str === 'true');
+            };
+            ctrl.canAddVertex = ctrl.interactionIsActive ?
+              stringToBool($attrs.canAddVertexWithValue) : false;
+            ctrl.canDeleteVertex = ctrl.interactionIsActive ?
+              stringToBool($attrs.canDeleteVertexWithValue) : false;
+            ctrl.canEditVertexLabel = ctrl.interactionIsActive ?
+              stringToBool($attrs.canEditVertexLabelWithValue) : false;
+            ctrl.canMoveVertex = ctrl.interactionIsActive ?
+              stringToBool($attrs.canMoveVertexWithValue) : false;
+            ctrl.canAddEdge = ctrl.interactionIsActive ?
+              stringToBool($attrs.canAddEdgeWithValue) : false;
+            ctrl.canDeleteEdge = ctrl.interactionIsActive ?
+              stringToBool($attrs.canDeleteEdgeWithValue) : false;
+            ctrl.canEditEdgeWeight = ctrl.interactionIsActive ?
+              stringToBool($attrs.canEditEdgeWeightWithValue) : false;
+          };
+
+          // TODO(czxcjx): Write this function
+          var checkValidGraph = function(graph) {
+            return Boolean(graph);
+          };
+
+          var validityCheckFn = function() {
+            return checkValidGraph(ctrl.graph);
+          };
           ctrl.$onInit = function() {
             ctrl.errorMessage = '';
             ctrl.graph = {
@@ -62,67 +122,8 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
               isWeighted: false,
               isLabeled: false
             };
-            ctrl.submitGraph = function() {
-              // Here, angular.copy is needed to strip $$hashkey from the graph.
-              CurrentInteractionService.onSubmit(
-                angular.copy(ctrl.graph), GraphInputRulesService);
-            };
+
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-
-              ctrl.canAddVertex = false;
-              ctrl.canDeleteVertex = false;
-              ctrl.canEditVertexLabel = false;
-              ctrl.canMoveVertex = false;
-              ctrl.canAddEdge = false;
-              ctrl.canDeleteEdge = false;
-              ctrl.canEditEdgeWeight = false;
-            });
-
-            ctrl.resetGraph = function() {
-              var newGraph = HtmlEscaperService.escapedJsonToObj(
-                $attrs.graphWithValue);
-              if (checkValidGraph(newGraph)) {
-                ctrl.graph = newGraph;
-              } else {
-                ctrl.errorMessage = 'I18N_INTERACTIONS_GRAPH_ERROR_INVALID';
-              }
-            };
-
-            var init = function() {
-              if (ctrl.interactionIsActive) {
-                ctrl.resetGraph();
-              } else {
-                ctrl.graph = ctrl.getLastAnswer();
-              }
-              var stringToBool = function(str) {
-                return (str === 'true');
-              };
-              ctrl.canAddVertex = ctrl.interactionIsActive ?
-                stringToBool($attrs.canAddVertexWithValue) : false;
-              ctrl.canDeleteVertex = ctrl.interactionIsActive ?
-                stringToBool($attrs.canDeleteVertexWithValue) : false;
-              ctrl.canEditVertexLabel = ctrl.interactionIsActive ?
-                stringToBool($attrs.canEditVertexLabelWithValue) : false;
-              ctrl.canMoveVertex = ctrl.interactionIsActive ?
-                stringToBool($attrs.canMoveVertexWithValue) : false;
-              ctrl.canAddEdge = ctrl.interactionIsActive ?
-                stringToBool($attrs.canAddEdgeWithValue) : false;
-              ctrl.canDeleteEdge = ctrl.interactionIsActive ?
-                stringToBool($attrs.canDeleteEdgeWithValue) : false;
-              ctrl.canEditEdgeWeight = ctrl.interactionIsActive ?
-                stringToBool($attrs.canEditEdgeWeightWithValue) : false;
-            };
-
-            // TODO(czxcjx): Write this function
-            var checkValidGraph = function(graph) {
-              return Boolean(graph);
-            };
-
-            var validityCheckFn = function() {
-              return checkValidGraph(ctrl.graph);
-            };
 
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitGraph, validityCheckFn);

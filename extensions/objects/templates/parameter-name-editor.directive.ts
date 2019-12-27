@@ -35,6 +35,20 @@ angular.module('oppia').directive('parameterNameEditor', [
         '$scope', '$attrs', 'ExplorationParamSpecsService',
         function($scope, $attrs, ExplorationParamSpecsService) {
           var ctrl = this;
+          ctrl.validate = function() {
+            return (ctrl.availableParamNames.length === 0) ? false : true;
+          };
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
+          $scope.$watch('$ctrl.value', function(newValue) {
+            if (newValue) {
+              ctrl.localValue = newValue;
+            }
+          }, true);
+
+          $scope.$watch('$ctrl.localValue', function(newValue) {
+            ctrl.value = newValue;
+          });
           ctrl.$onInit = function() {
             ctrl.availableParamNames =
               ExplorationParamSpecsService.savedMemento.getParamNames();
@@ -45,26 +59,10 @@ angular.module('oppia').directive('parameterNameEditor', [
               ctrl.localValue = ctrl.availableParamNames[0];
             }
 
-            ctrl.validate = function() {
-              return (ctrl.availableParamNames.length === 0) ? false : true;
-            };
-
             ctrl.SCHEMA = {
               type: 'unicode',
               choices: ctrl.availableParamNames
             };
-
-            // Reset the component each time the value changes (e.g. if this is
-            // part of an editable list).
-            $scope.$watch('$ctrl.value', function(newValue) {
-              if (newValue) {
-                ctrl.localValue = newValue;
-              }
-            }, true);
-
-            $scope.$watch('$ctrl.localValue', function(newValue) {
-              ctrl.value = newValue;
-            });
           };
         }]
     };

@@ -42,20 +42,19 @@ angular.module('oppia').directive('oppiaResponseGraphInput', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
+        ctrl.getDirectedEdgeArrowPoints = function(index) {
+          return GraphDetailService.getDirectedEdgeArrowPoints(
+            ctrl.graph, index);
+        };
+
+        ctrl.getEdgeCentre = function(index) {
+          return GraphDetailService.getEdgeCentre(ctrl.graph, index);
+        };
         ctrl.$onInit = function() {
           ctrl.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
           ctrl.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
           ctrl.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
           ctrl.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
-
-          ctrl.getDirectedEdgeArrowPoints = function(index) {
-            return GraphDetailService.getDirectedEdgeArrowPoints(
-              ctrl.graph, index);
-          };
-
-          ctrl.getEdgeCentre = function(index) {
-            return GraphDetailService.getEdgeCentre(ctrl.graph, index);
-          };
         };
       }]
     };

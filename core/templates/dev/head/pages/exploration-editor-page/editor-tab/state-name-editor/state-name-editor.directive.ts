@@ -53,74 +53,74 @@ angular.module('oppia').directive('stateNameEditor', [
             StateEditorService, FocusManagerService, ExplorationStatesService,
             RouterService) {
           var ctrl = this;
+          var _stateNameMemento = null;
+          $scope.$on('stateEditorInitialized', function() {
+            ctrl.initStateNameEditor();
+          });
+
+          ctrl.initStateNameEditor = function() {
+            _stateNameMemento = null;
+            ctrl.stateNameEditorIsShown = false;
+            ctrl.stateName = StateEditorService.getActiveStateName();
+          };
+
+          ctrl.openStateNameEditor = function() {
+            ctrl.stateNameEditorIsShown = true;
+            ctrl.tmpStateName = ctrl.stateName;
+            _stateNameMemento = ctrl.stateName;
+            FocusManagerService.setFocus('stateNameEditorOpened');
+          };
+
+          ctrl.saveStateName = function(newStateName) {
+            var normalizedNewName =
+              ctrl._getNormalizedStateName(newStateName);
+            if (!_isNewStateNameValid(normalizedNewName)) {
+              return false;
+            }
+
+            if (_stateNameMemento === normalizedNewName) {
+              ctrl.stateNameEditorIsShown = false;
+              return false;
+            } else {
+              ExplorationStatesService.renameState(
+                StateEditorService.getActiveStateName(), normalizedNewName);
+              ctrl.stateNameEditorIsShown = false;
+              // Save the contents of other open fields.
+              $rootScope.$broadcast('externalSave');
+              ctrl.initStateNameEditor();
+              return true;
+            }
+          };
+
+          $scope.$on('externalSave', function() {
+            if (ctrl.stateNameEditorIsShown) {
+              ctrl.saveStateName(ctrl.tmpStateName);
+            }
+          });
+
+          ctrl._getNormalizedStateName = function(newStateName) {
+            return $filter('normalizeWhitespace')(newStateName);
+          };
+
+          var _isNewStateNameValid = function(stateName) {
+            if (stateName === StateEditorService.getActiveStateName()) {
+              return true;
+            }
+            return ExplorationStatesService.isNewStateNameValid(
+              stateName, true);
+          };
+
+          ctrl.saveStateNameAndRefresh = function(newStateName) {
+            var normalizedStateName =
+              ctrl._getNormalizedStateName(newStateName);
+            var valid = ctrl.saveStateName(normalizedStateName);
+            if (valid) {
+              RouterService.navigateToMainTab(normalizedStateName);
+            }
+          };
           ctrl.$onInit = function() {
             ctrl.EditabilityService = EditabilityService;
-            var _stateNameMemento = null;
             ctrl.stateNameEditorIsShown = false;
-            $scope.$on('stateEditorInitialized', function() {
-              ctrl.initStateNameEditor();
-            });
-
-            ctrl.initStateNameEditor = function() {
-              _stateNameMemento = null;
-              ctrl.stateNameEditorIsShown = false;
-              ctrl.stateName = StateEditorService.getActiveStateName();
-            };
-
-            ctrl.openStateNameEditor = function() {
-              ctrl.stateNameEditorIsShown = true;
-              ctrl.tmpStateName = ctrl.stateName;
-              _stateNameMemento = ctrl.stateName;
-              FocusManagerService.setFocus('stateNameEditorOpened');
-            };
-
-            ctrl.saveStateName = function(newStateName) {
-              var normalizedNewName =
-                ctrl._getNormalizedStateName(newStateName);
-              if (!_isNewStateNameValid(normalizedNewName)) {
-                return false;
-              }
-
-              if (_stateNameMemento === normalizedNewName) {
-                ctrl.stateNameEditorIsShown = false;
-                return false;
-              } else {
-                ExplorationStatesService.renameState(
-                  StateEditorService.getActiveStateName(), normalizedNewName);
-                ctrl.stateNameEditorIsShown = false;
-                // Save the contents of other open fields.
-                $rootScope.$broadcast('externalSave');
-                ctrl.initStateNameEditor();
-                return true;
-              }
-            };
-
-            $scope.$on('externalSave', function() {
-              if (ctrl.stateNameEditorIsShown) {
-                ctrl.saveStateName(ctrl.tmpStateName);
-              }
-            });
-
-            ctrl._getNormalizedStateName = function(newStateName) {
-              return $filter('normalizeWhitespace')(newStateName);
-            };
-
-            var _isNewStateNameValid = function(stateName) {
-              if (stateName === StateEditorService.getActiveStateName()) {
-                return true;
-              }
-              return ExplorationStatesService.isNewStateNameValid(
-                stateName, true);
-            };
-
-            ctrl.saveStateNameAndRefresh = function(newStateName) {
-              var normalizedStateName =
-                ctrl._getNormalizedStateName(newStateName);
-              var valid = ctrl.saveStateName(normalizedStateName);
-              if (valid) {
-                RouterService.navigateToMainTab(normalizedStateName);
-              }
-            };
           };
         }]
     };

@@ -31,6 +31,9 @@ angular.module('oppia').directive('dragAndDropPositiveIntEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        ctrl.selection = function(selectedRank) {
+          ctrl.value = parseInt(selectedRank);
+        };
         ctrl.$onInit = function() {
           if (!parseInt(ctrl.value)) {
             ctrl.value = 1;
@@ -44,9 +47,6 @@ angular.module('oppia').directive('dragAndDropPositiveIntEditor', [
           for (var i = 0; i < ctrl.choices.length; i++) {
             ctrl.allowedRanks.push(i + 1);
           }
-          ctrl.selection = function(selectedRank) {
-            ctrl.value = parseInt(selectedRank);
-          };
         };
       }]
     };

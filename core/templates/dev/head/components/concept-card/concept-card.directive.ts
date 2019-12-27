@@ -40,6 +40,19 @@ angular.module('oppia').directive('conceptCard', [
             $scope, $filter, $rootScope,
             ConceptCardBackendApiService, ConceptCardObjectFactory) {
           var ctrl = this;
+          ctrl.isLastWorkedExample = function() {
+            return ctrl.numberOfWorkedExamplesShown ===
+              ctrl.currentConceptCard.getWorkedExamples().length;
+          };
+
+          ctrl.showMoreWorkedExamples = function() {
+            ctrl.numberOfWorkedExamplesShown++;
+          };
+
+          $scope.$watch('$ctrl.index', function(newIndex) {
+            ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
+            ctrl.numberOfWorkedExamplesShown = 0;
+          });
           ctrl.$onInit = function() {
             ctrl.conceptCards = [];
             ctrl.currentConceptCard = null;
@@ -55,20 +68,6 @@ angular.module('oppia').directive('conceptCard', [
               });
               ctrl.loadingMessage = '';
               ctrl.currentConceptCard = ctrl.conceptCards[ctrl.index];
-            });
-
-            ctrl.isLastWorkedExample = function() {
-              return ctrl.numberOfWorkedExamplesShown ===
-                ctrl.currentConceptCard.getWorkedExamples().length;
-            };
-
-            ctrl.showMoreWorkedExamples = function() {
-              ctrl.numberOfWorkedExamplesShown++;
-            };
-
-            $scope.$watch('$ctrl.index', function(newIndex) {
-              ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
-              ctrl.numberOfWorkedExamplesShown = 0;
             });
           };
         }

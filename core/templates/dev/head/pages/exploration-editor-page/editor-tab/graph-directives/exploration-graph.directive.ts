@@ -45,87 +45,86 @@ angular.module('oppia').directive('explorationGraph', [
             ExplorationStatesService, GraphDataService, RouterService,
             StateEditorService, UrlInterpolationService) {
           var ctrl = this;
+          // We hide the graph at the outset in order not to confuse new
+          // exploration creators.
+          ctrl.isGraphShown = function() {
+            return Boolean(ExplorationStatesService.isInitialized() &&
+              ExplorationStatesService.getStateNames().length > 1);
+          };
+
+          ctrl.deleteState = function(deleteStateName) {
+            ExplorationStatesService.deleteState(deleteStateName);
+          };
+
+          ctrl.onClickStateInMinimap = function(stateName) {
+            RouterService.navigateToMainTab(stateName);
+          };
+
+          ctrl.getActiveStateName = function() {
+            return StateEditorService.getActiveStateName();
+          };
+
+          ctrl.openStateGraphModal = function() {
+            AlertsService.clearWarnings();
+
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/exploration-graph-modal.template.html'),
+              backdrop: true,
+              resolve: {
+                isEditable: function() {
+                  return ctrl.isEditable;
+                }
+              },
+              windowClass: 'oppia-large-modal-window',
+              controller: [
+                '$scope', '$uibModalInstance', 'StateEditorService',
+                'GraphDataService', 'isEditable',
+                function($scope, $uibModalInstance, StateEditorService,
+                    GraphDataService, isEditable) {
+                  $scope.currentStateName = StateEditorService
+                    .getActiveStateName();
+                  $scope.graphData = GraphDataService.getGraphData();
+                  $scope.isEditable = isEditable;
+
+                  $scope.deleteState = function(stateName) {
+                    $uibModalInstance.close({
+                      action: 'delete',
+                      stateName: stateName
+                    });
+                  };
+
+                  $scope.selectState = function(stateName) {
+                    $uibModalInstance.close({
+                      action: 'navigate',
+                      stateName: stateName
+                    });
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                    AlertsService.clearWarnings();
+                  };
+                }
+              ]
+            }).result.then(function(closeDict) {
+              if (closeDict.action === 'delete') {
+                ExplorationStatesService.deleteState(closeDict.stateName);
+              } else if (closeDict.action === 'navigate') {
+                ctrl.onClickStateInMinimap(closeDict.stateName);
+              } else {
+                console.error('Invalid closeDict action: ' +
+                  closeDict.action);
+              }
+            }, function() {
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
+            });
+          };
           ctrl.$onInit = function() {
             ctrl.getGraphData = GraphDataService.getGraphData;
             ctrl.isEditable = EditabilityService.isEditable;
-
-            // We hide the graph at the outset in order not to confuse new
-            // exploration creators.
-            ctrl.isGraphShown = function() {
-              return Boolean(ExplorationStatesService.isInitialized() &&
-                ExplorationStatesService.getStateNames().length > 1);
-            };
-
-            ctrl.deleteState = function(deleteStateName) {
-              ExplorationStatesService.deleteState(deleteStateName);
-            };
-
-            ctrl.onClickStateInMinimap = function(stateName) {
-              RouterService.navigateToMainTab(stateName);
-            };
-
-            ctrl.getActiveStateName = function() {
-              return StateEditorService.getActiveStateName();
-            };
-
-            ctrl.openStateGraphModal = function() {
-              AlertsService.clearWarnings();
-
-              $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-editor-page/editor-tab/templates/' +
-                  'modal-templates/exploration-graph-modal.template.html'),
-                backdrop: true,
-                resolve: {
-                  isEditable: function() {
-                    return ctrl.isEditable;
-                  }
-                },
-                windowClass: 'oppia-large-modal-window',
-                controller: [
-                  '$scope', '$uibModalInstance', 'StateEditorService',
-                  'GraphDataService', 'isEditable',
-                  function($scope, $uibModalInstance, StateEditorService,
-                      GraphDataService, isEditable) {
-                    $scope.currentStateName = StateEditorService
-                      .getActiveStateName();
-                    $scope.graphData = GraphDataService.getGraphData();
-                    $scope.isEditable = isEditable;
-
-                    $scope.deleteState = function(stateName) {
-                      $uibModalInstance.close({
-                        action: 'delete',
-                        stateName: stateName
-                      });
-                    };
-
-                    $scope.selectState = function(stateName) {
-                      $uibModalInstance.close({
-                        action: 'navigate',
-                        stateName: stateName
-                      });
-                    };
-
-                    $scope.cancel = function() {
-                      $uibModalInstance.dismiss('cancel');
-                      AlertsService.clearWarnings();
-                    };
-                  }
-                ]
-              }).result.then(function(closeDict) {
-                if (closeDict.action === 'delete') {
-                  ExplorationStatesService.deleteState(closeDict.stateName);
-                } else if (closeDict.action === 'navigate') {
-                  ctrl.onClickStateInMinimap(closeDict.stateName);
-                } else {
-                  console.error('Invalid closeDict action: ' +
-                    closeDict.action);
-                }
-              }, function() {
-                // This callback is triggered when the Cancel button is
-                // clicked. No further action is needed.
-              });
-            };
           };
         }]
     };

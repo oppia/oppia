@@ -41,24 +41,40 @@ angular.module('oppia').directive('teachPage', [
             $timeout, $window, SiteAnalyticsService,
             UrlInterpolationService) {
           var ctrl = this;
+          var activeTabClass = 'oppia-about-tabs-active';
+          var visibleContent = 'oppia-about-visible-content';
+          var activateTab = function(tabName) {
+            $("a[id='" + tabName + "']").parent().addClass(
+              activeTabClass
+            ).siblings().removeClass(activeTabClass);
+            $('.' + tabName).addClass(visibleContent).siblings().removeClass(
+              visibleContent
+            );
+          };
+          ctrl.onTabClick = function(tabName) {
+            // Update hash
+            window.location.hash = '#' + tabName;
+            activateTab(tabName);
+          };
+
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+
+          ctrl.onApplyToTeachWithOppia = function() {
+            SiteAnalyticsService.registerApplyToTeachWithOppiaEvent();
+            $timeout(function() {
+              $window.location = ctrl.TEACH_FORM_URL;
+            }, 150);
+            return false;
+          };
           ctrl.$onInit = function() {
             // Define constants
             ctrl.TAB_ID_TEACH = 'teach';
             ctrl.TAB_ID_PLAYBOOK = 'playbook';
             ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
 
-            var activeTabClass = 'oppia-about-tabs-active';
             var hash = window.location.hash.slice(1);
-            var visibleContent = 'oppia-about-visible-content';
-
-            var activateTab = function(tabName) {
-              $("a[id='" + tabName + "']").parent().addClass(
-                activeTabClass
-              ).siblings().removeClass(activeTabClass);
-              $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-                visibleContent
-              );
-            };
 
             if (hash === ctrl.TAB_ID_TEACH) {
               activateTab(ctrl.TAB_ID_TEACH);
@@ -73,24 +89,6 @@ angular.module('oppia').directive('teachPage', [
               } else if (hashChange === ctrl.TAB_ID_PLAYBOOK) {
                 activateTab(ctrl.TAB_ID_PLAYBOOK);
               }
-            };
-
-            ctrl.onTabClick = function(tabName) {
-              // Update hash
-              window.location.hash = '#' + tabName;
-              activateTab(tabName);
-            };
-
-            ctrl.getStaticImageUrl = function(imagePath) {
-              return UrlInterpolationService.getStaticImageUrl(imagePath);
-            };
-
-            ctrl.onApplyToTeachWithOppia = function() {
-              SiteAnalyticsService.registerApplyToTeachWithOppiaEvent();
-              $timeout(function() {
-                $window.location = ctrl.TEACH_FORM_URL;
-              }, 150);
-              return false;
             };
           };
         }]

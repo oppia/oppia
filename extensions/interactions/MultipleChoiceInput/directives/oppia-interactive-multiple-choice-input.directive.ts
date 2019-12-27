@@ -46,19 +46,18 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
         '$attrs', 'CurrentInteractionService',
         function($attrs, CurrentInteractionService) {
           var ctrl = this;
+          ctrl.submitAnswer = function(answer) {
+            if (answer === null) {
+              return;
+            }
+            answer = parseInt(answer, 10);
+            CurrentInteractionService.onSubmit(
+              answer, MultipleChoiceInputRulesService);
+          };
           ctrl.$onInit = function() {
             ctrl.choices = HtmlEscaperService.escapedJsonToObj(
               $attrs.choicesWithValue);
             ctrl.answer = null;
-
-            ctrl.submitAnswer = function(answer) {
-              if (answer === null) {
-                return;
-              }
-              answer = parseInt(answer, 10);
-              CurrentInteractionService.onSubmit(
-                answer, MultipleChoiceInputRulesService);
-            };
             CurrentInteractionService.registerCurrentInteraction(null, null);
           };
         }]

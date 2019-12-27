@@ -63,38 +63,177 @@ angular.module('oppia').directive('versionDiffVisualization', [
       controllerAs: '$ctrl',
       controller: ['$uibModal', function($uibModal) {
         var ctrl = this;
+        // Constants for color of nodes in diff graph
+        var COLOR_ADDED = '#4EA24E';
+        var COLOR_DELETED = '#DC143C';
+        var COLOR_CHANGED = '#1E90FF';
+        var COLOR_UNCHANGED = 'beige';
+        var COLOR_RENAMED_UNCHANGED = '#FFD700';
+
+        // Constants for names in legend
+        var NODE_TYPE_ADDED = 'Added';
+        var NODE_TYPE_DELETED = 'Deleted';
+        var NODE_TYPE_CHANGED = 'Changed';
+        var NODE_TYPE_CHANGED_RENAMED = 'Changed/renamed';
+        var NODE_TYPE_RENAMED = 'Renamed';
+        var NODE_TYPE_UNCHANGED = 'Unchanged';
+
+        var STATE_PROPERTY_ADDED = 'added';
+        var STATE_PROPERTY_DELETED = 'deleted';
+        var STATE_PROPERTY_CHANGED = 'changed';
+        var STATE_PROPERTY_UNCHANGED = 'unchanged';
+
+        // Object whose keys are legend node names and whose values are
+        // 'true' or false depending on whether the state property is used in
+        // the diff graph. (Will be used to generate legend)
+        var _stateTypeUsed = {};
+        _stateTypeUsed[NODE_TYPE_ADDED] = false;
+        _stateTypeUsed[NODE_TYPE_DELETED] = false;
+        _stateTypeUsed[NODE_TYPE_CHANGED] = false;
+        _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
+        _stateTypeUsed[NODE_TYPE_RENAMED] = false;
+        _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
+        var diffGraphNodes = {};
+        // Opens the modal showing the history diff for a given state.
+        // stateId is the unique ID assigned to a state during the
+        // calculation of the state graph.
+        ctrl.onClickStateInDiffGraph = function(stateId) {
+          var oldStateName = undefined;
+          if (nodesData[stateId].newestStateName !==
+              nodesData[stateId].originalStateName) {
+            oldStateName = nodesData[stateId].originalStateName;
+          }
+          ctrl.showStateDiffModal(nodesData[stateId].newestStateName,
+            oldStateName, nodesData[stateId].stateProperty);
+        };
+
+        // Shows a modal comparing changes on a state between 2 versions.
+        //
+        // Arguments:
+        // - stateName is the name of the state in the newer version.
+        // - oldStateName is undefined if the name of the state is unchanged
+        //     between the 2 versions, or the name of the state in the older
+        //     version if the state name is changed.
+        // - stateProperty is whether the state is added, changed, unchanged
+        //   or deleted.
+        ctrl.showStateDiffModal = function(
+            newStateName, oldStateName, stateProperty) {
+          $uibModal.open({
+            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+              '/pages/exploration-editor-page/modal-templates/' +
+              'state-diff-modal.template.html'),
+            backdrop: true,
+            windowClass: 'state-diff-modal',
+            resolve: {
+              newStateName: function() {
+                return newStateName;
+              },
+              oldStateName: function() {
+                return oldStateName;
+              },
+              newState: function() {
+                if (stateProperty !== STATE_PROPERTY_DELETED &&
+                    ctrl.getDiffData().v2States.hasOwnProperty(
+                      newStateName)) {
+                  return ctrl.getDiffData().v2States[newStateName];
+                } else {
+                  return null;
+                }
+              },
+              oldState: function() {
+                var stateNameToRetrieve = oldStateName || newStateName;
+                if (stateProperty !== STATE_PROPERTY_ADDED &&
+                    ctrl.getDiffData().v1States.hasOwnProperty(
+                      stateNameToRetrieve)) {
+                  return ctrl.getDiffData().v1States[stateNameToRetrieve];
+                } else {
+                  return null;
+                }
+              },
+              headers: function() {
+                return {
+                  leftPane: ctrl.getLaterVersionHeader(),
+                  rightPane: ctrl.getEarlierVersionHeader()
+                };
+              }
+            },
+            controller: [
+              '$scope', '$http', '$uibModalInstance', '$timeout',
+              'newStateName', 'oldStateName', 'newState', 'oldState',
+              'headers', 'ContextService',
+              'UrlInterpolationService',
+              function(
+                  $scope, $http, $uibModalInstance, $timeout,
+                  newStateName, oldStateName, newState, oldState,
+                  headers, ContextService,
+                  UrlInterpolationService) {
+                var STATE_YAML_URL = UrlInterpolationService.interpolateUrl(
+                  '/createhandler/state_yaml/<exploration_id>', {
+                    exploration_id: (
+                      ContextService.getExplorationId())
+                  });
+
+                $scope.headers = headers;
+                $scope.newStateName = newStateName;
+                $scope.oldStateName = oldStateName;
+                /*
+                 * $scope.yamlStrs is an object with keys 'earlierVersion' and
+                 * 'laterVersion', whose values are the YAML representations
+                 * of the compared versions.
+                 */
+                $scope.yamlStrs = {};
+
+                if (newState) {
+                  $http.post(STATE_YAML_URL, {
+                    state_dict: newState.toBackendDict(),
+                    width: 50
+                  }).then(function(response) {
+                    $scope.yamlStrs.leftPane = response.data.yaml;
+                  });
+                } else {
+                  // Note: the timeout is needed or the string will be sent
+                  // before codemirror has fully loaded and will not be
+                  // displayed. This causes issues with the e2e tests.
+                  $timeout(function() {
+                    $scope.yamlStrs.leftPane = '';
+                  }, 200);
+                }
+
+                if (oldState) {
+                  $http.post(STATE_YAML_URL, {
+                    state_dict: oldState.toBackendDict(),
+                    width: 50
+                  }).then(function(response) {
+                    $scope.yamlStrs.rightPane = response.data.yaml;
+                  });
+                } else {
+                  // Note: the timeout is needed or the string will be sent
+                  // before codemirror has fully loaded and will not be
+                  // displayed. This causes issues with the e2e tests.
+                  $timeout(function() {
+                    $scope.yamlStrs.rightPane = '';
+                  }, 200);
+                }
+
+                $scope.cancel = function() {
+                  $uibModalInstance.dismiss('cancel');
+                };
+
+                // Options for the codemirror mergeview.
+                $scope.CODEMIRROR_MERGEVIEW_OPTIONS = {
+                  lineNumbers: true,
+                  readOnly: true,
+                  mode: 'yaml',
+                  viewportMargin: 20
+                };
+              }
+            ]
+          }).result.then(function() {}, function() {
+            // This callback is triggered when the Cancel button is
+            // clicked. No further action is needed.
+          });
+        };
         ctrl.$onInit = function() {
-          // Constants for color of nodes in diff graph
-          var COLOR_ADDED = '#4EA24E';
-          var COLOR_DELETED = '#DC143C';
-          var COLOR_CHANGED = '#1E90FF';
-          var COLOR_UNCHANGED = 'beige';
-          var COLOR_RENAMED_UNCHANGED = '#FFD700';
-
-          // Constants for names in legend
-          var NODE_TYPE_ADDED = 'Added';
-          var NODE_TYPE_DELETED = 'Deleted';
-          var NODE_TYPE_CHANGED = 'Changed';
-          var NODE_TYPE_CHANGED_RENAMED = 'Changed/renamed';
-          var NODE_TYPE_RENAMED = 'Renamed';
-          var NODE_TYPE_UNCHANGED = 'Unchanged';
-
-          var STATE_PROPERTY_ADDED = 'added';
-          var STATE_PROPERTY_DELETED = 'deleted';
-          var STATE_PROPERTY_CHANGED = 'changed';
-          var STATE_PROPERTY_UNCHANGED = 'unchanged';
-
-          // Object whose keys are legend node names and whose values are
-          // 'true' or false depending on whether the state property is used in
-          // the diff graph. (Will be used to generate legend)
-          var _stateTypeUsed = {};
-          _stateTypeUsed[NODE_TYPE_ADDED] = false;
-          _stateTypeUsed[NODE_TYPE_DELETED] = false;
-          _stateTypeUsed[NODE_TYPE_CHANGED] = false;
-          _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
-          _stateTypeUsed[NODE_TYPE_RENAMED] = false;
-          _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
-
           ctrl.LEGEND_GRAPH_COLORS = {};
           ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_ADDED] = COLOR_ADDED;
           ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_DELETED] = COLOR_DELETED;
@@ -119,7 +258,6 @@ angular.module('oppia').directive('versionDiffVisualization', [
               'stroke: #B22222; stroke-opacity: 0.8; ' +
               'marker-end: url(#arrowhead-red)')
           };
-          var diffGraphNodes = {};
           ctrl.diffGraphSecondaryLabels = {};
           ctrl.diffGraphNodeColors = {};
 
@@ -196,145 +334,6 @@ angular.module('oppia').directive('versionDiffVisualization', [
             }
           }
           ctrl.legendGraph.finalStateIds = [_lastUsedStateType];
-          // Opens the modal showing the history diff for a given state.
-          // stateId is the unique ID assigned to a state during the
-          // calculation of the state graph.
-          ctrl.onClickStateInDiffGraph = function(stateId) {
-            var oldStateName = undefined;
-            if (nodesData[stateId].newestStateName !==
-                nodesData[stateId].originalStateName) {
-              oldStateName = nodesData[stateId].originalStateName;
-            }
-            ctrl.showStateDiffModal(nodesData[stateId].newestStateName,
-              oldStateName, nodesData[stateId].stateProperty);
-          };
-
-          // Shows a modal comparing changes on a state between 2 versions.
-          //
-          // Arguments:
-          // - stateName is the name of the state in the newer version.
-          // - oldStateName is undefined if the name of the state is unchanged
-          //     between the 2 versions, or the name of the state in the older
-          //     version if the state name is changed.
-          // - stateProperty is whether the state is added, changed, unchanged
-          //   or deleted.
-          ctrl.showStateDiffModal = function(
-              newStateName, oldStateName, stateProperty) {
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/modal-templates/' +
-                'state-diff-modal.template.html'),
-              backdrop: true,
-              windowClass: 'state-diff-modal',
-              resolve: {
-                newStateName: function() {
-                  return newStateName;
-                },
-                oldStateName: function() {
-                  return oldStateName;
-                },
-                newState: function() {
-                  if (stateProperty !== STATE_PROPERTY_DELETED &&
-                      ctrl.getDiffData().v2States.hasOwnProperty(
-                        newStateName)) {
-                    return ctrl.getDiffData().v2States[newStateName];
-                  } else {
-                    return null;
-                  }
-                },
-                oldState: function() {
-                  var stateNameToRetrieve = oldStateName || newStateName;
-                  if (stateProperty !== STATE_PROPERTY_ADDED &&
-                      ctrl.getDiffData().v1States.hasOwnProperty(
-                        stateNameToRetrieve)) {
-                    return ctrl.getDiffData().v1States[stateNameToRetrieve];
-                  } else {
-                    return null;
-                  }
-                },
-                headers: function() {
-                  return {
-                    leftPane: ctrl.getLaterVersionHeader(),
-                    rightPane: ctrl.getEarlierVersionHeader()
-                  };
-                }
-              },
-              controller: [
-                '$scope', '$http', '$uibModalInstance', '$timeout',
-                'newStateName', 'oldStateName', 'newState', 'oldState',
-                'headers', 'ContextService',
-                'UrlInterpolationService',
-                function(
-                    $scope, $http, $uibModalInstance, $timeout,
-                    newStateName, oldStateName, newState, oldState,
-                    headers, ContextService,
-                    UrlInterpolationService) {
-                  var STATE_YAML_URL = UrlInterpolationService.interpolateUrl(
-                    '/createhandler/state_yaml/<exploration_id>', {
-                      exploration_id: (
-                        ContextService.getExplorationId())
-                    });
-
-                  $scope.headers = headers;
-                  $scope.newStateName = newStateName;
-                  $scope.oldStateName = oldStateName;
-                  /*
-                   * $scope.yamlStrs is an object with keys 'earlierVersion' and
-                   * 'laterVersion', whose values are the YAML representations
-                   * of the compared versions.
-                   */
-                  $scope.yamlStrs = {};
-
-                  if (newState) {
-                    $http.post(STATE_YAML_URL, {
-                      state_dict: newState.toBackendDict(),
-                      width: 50
-                    }).then(function(response) {
-                      $scope.yamlStrs.leftPane = response.data.yaml;
-                    });
-                  } else {
-                    // Note: the timeout is needed or the string will be sent
-                    // before codemirror has fully loaded and will not be
-                    // displayed. This causes issues with the e2e tests.
-                    $timeout(function() {
-                      $scope.yamlStrs.leftPane = '';
-                    }, 200);
-                  }
-
-                  if (oldState) {
-                    $http.post(STATE_YAML_URL, {
-                      state_dict: oldState.toBackendDict(),
-                      width: 50
-                    }).then(function(response) {
-                      $scope.yamlStrs.rightPane = response.data.yaml;
-                    });
-                  } else {
-                    // Note: the timeout is needed or the string will be sent
-                    // before codemirror has fully loaded and will not be
-                    // displayed. This causes issues with the e2e tests.
-                    $timeout(function() {
-                      $scope.yamlStrs.rightPane = '';
-                    }, 200);
-                  }
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-
-                  // Options for the codemirror mergeview.
-                  $scope.CODEMIRROR_MERGEVIEW_OPTIONS = {
-                    lineNumbers: true,
-                    readOnly: true,
-                    mode: 'yaml',
-                    viewportMargin: 20
-                  };
-                }
-              ]
-            }).result.then(function() {}, function() {
-              // This callback is triggered when the Cancel button is
-              // clicked. No further action is needed.
-            });
-          };
         };
       }]
     };

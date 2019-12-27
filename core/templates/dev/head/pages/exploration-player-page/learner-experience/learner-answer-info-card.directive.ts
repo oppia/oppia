@@ -41,26 +41,26 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
         function(ExplorationEngineService, ExplorationHtmlFormatterService,
             LearnerAnswerInfoService, PlayerTranscriptService) {
           var ctrl = this;
+          var interaction = ExplorationEngineService.getState().interaction;
+          ctrl.submitLearnerAnswerInfo = function() {
+            LearnerAnswerInfoService.recordLearnerAnswerInfo(
+              ctrl.answerDetails);
+            PlayerTranscriptService.addNewInput(
+              {answerDetails: ctrl.answerDetails}, false);
+            PlayerTranscriptService.addNewResponse(
+              LearnerAnswerInfoService.getSolicitAnswerDetailsFeedback());
+            ctrl.getSubmitAnswerFn()(
+              LearnerAnswerInfoService.getCurrentAnswer(),
+              LearnerAnswerInfoService.getCurrentInteractionRulesService());
+          };
+
+          ctrl.displayCurrentAnswer = function() {
+            return ExplorationHtmlFormatterService.getAnswerHtml(
+              LearnerAnswerInfoService.getCurrentAnswer(), interaction.id,
+              interaction.customizationArgs);
+          };
           ctrl.$onInit = function() {
             ctrl.answerDetails = null;
-            var interaction = ExplorationEngineService.getState().interaction;
-            ctrl.submitLearnerAnswerInfo = function() {
-              LearnerAnswerInfoService.recordLearnerAnswerInfo(
-                ctrl.answerDetails);
-              PlayerTranscriptService.addNewInput(
-                {answerDetails: ctrl.answerDetails}, false);
-              PlayerTranscriptService.addNewResponse(
-                LearnerAnswerInfoService.getSolicitAnswerDetailsFeedback());
-              ctrl.getSubmitAnswerFn()(
-                LearnerAnswerInfoService.getCurrentAnswer(),
-                LearnerAnswerInfoService.getCurrentInteractionRulesService());
-            };
-
-            ctrl.displayCurrentAnswer = function() {
-              return ExplorationHtmlFormatterService.getAnswerHtml(
-                LearnerAnswerInfoService.getCurrentAnswer(), interaction.id,
-                interaction.customizationArgs);
-            };
           };
         }]
     };

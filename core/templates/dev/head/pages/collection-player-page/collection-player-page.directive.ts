@@ -70,15 +70,193 @@ angular.module('oppia').directive('collectionPlayerPage', [
             UrlInterpolationService, UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+          ctrl.setIconHighlight = function(index) {
+            ctrl.activeHighlightedIconIndex = index;
+          };
+
+          ctrl.unsetIconHighlight = function() {
+            ctrl.activeHighlightedIconIndex = -1;
+          };
+
+          ctrl.togglePreviewCard = function() {
+            ctrl.explorationCardIsShown = !ctrl.explorationCardIsShown;
+          };
+
+          ctrl.getCollectionNodeForExplorationId = function(explorationId) {
+            var collectionNode = (
+              ctrl.collection.getCollectionNodeByExplorationId(
+                explorationId));
+            if (!collectionNode) {
+              AlertsService.addWarning(
+                'There was an error loading the collection.');
+            }
+            return collectionNode;
+          };
+
+          ctrl.getNextRecommendedCollectionNodes = function() {
+            return ctrl.getCollectionNodeForExplorationId(
+              ctrl.collectionPlaythrough.getNextExplorationId());
+          };
+
+          ctrl.getCompletedExplorationNodes = function() {
+            return ctrl.getCollectionNodeForExplorationId(
+              ctrl.collectionPlaythrough.getCompletedExplorationIds());
+          };
+
+          ctrl.getNonRecommendedCollectionNodeCount = function() {
+            return ctrl.collection.getCollectionNodeCount() - (
+              ctrl.collectionPlaythrough
+                .getNextRecommendedCollectionNodeCount(
+                ) + ctrl.collectionPlaythrough
+                .getCompletedExplorationNodeCount(
+                ));
+          };
+
+          ctrl.updateExplorationPreview = function(explorationId) {
+            ctrl.explorationCardIsShown = true;
+            ctrl.currentExplorationId = explorationId;
+            ctrl.summaryToPreview = ctrl.getCollectionNodeForExplorationId(
+              explorationId).getExplorationSummaryObject();
+          };
+
+          // Calculates the SVG parameters required to draw the curved path.
+          ctrl.generatePathParameters = function() {
+            // The pathSvgParameters represents the final string of SVG
+            // parameters for the bezier curve to be generated. The default
+            // parameters represent the first curve ie. lesson 1 to lesson 3.
+            ctrl.pathSvgParameters = 'M250 80  C 470 100, 470 280, 250 300';
+            var collectionNodeCount =
+            ctrl.collection.getCollectionNodeCount();
+            // The sParameterExtension represents the co-ordinates following
+            // the 'S' (smooth curve to) command in SVG.
+            var sParameterExtension = '';
+            ctrl.pathIconParameters = ctrl.generatePathIconParameters();
+            if (collectionNodeCount === 1) {
+              ctrl.pathSvgParameters = '';
+            } else if (collectionNodeCount === 2) {
+              ctrl.pathSvgParameters = 'M250 80  C 470 100, 470 280, 250 300';
+            } else {
+              // The x and y here represent the co-ordinates of the control
+              // points for the bezier curve (path).
+              var y = 500;
+              for (var i = 1; i < Math.floor(collectionNodeCount / 2); i++) {
+                var x = (i % 2) ? 30 : 470;
+                sParameterExtension += x + ' ' + y + ', ';
+                y += 20;
+                sParameterExtension += 250 + ' ' + y + ', ';
+                y += 200;
+              }
+              if (sParameterExtension !== '') {
+                ctrl.pathSvgParameters += ' S ' + sParameterExtension;
+              }
+            }
+            if (collectionNodeCount % 2 === 0) {
+              if (collectionNodeCount === 2) {
+                ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
+              } else {
+                ctrl.svgHeight = y - ctrl.EVEN_SVG_HEIGHT_OFFSET_PX;
+              }
+            } else {
+              if (collectionNodeCount === 1) {
+                ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
+              } else {
+                ctrl.svgHeight = y - ctrl.ODD_SVG_HEIGHT_OFFSET_PX;
+              }
+            }
+          };
+
+          ctrl.generatePathIconParameters = function() {
+            var collectionNodes = ctrl.collection.getCollectionNodes();
+            var iconParametersArray = [];
+            iconParametersArray.push({
+              thumbnailIconUrl:
+                collectionNodes[0].getExplorationSummaryObject(
+                ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
+              left: '225px',
+              top: '35px',
+              thumbnailBgColor:
+                collectionNodes[0].getExplorationSummaryObject(
+                ).thumbnail_bg_color
+            });
+
+            // Here x and y represent the co-ordinates for the icons in the
+            // path.
+            var x = ctrl.ICON_X_MIDDLE_PX;
+            var y = ctrl.ICON_Y_INITIAL_PX;
+            var countMiddleIcon = 1;
+
+            for (var i = 1;
+              i < ctrl.collection.getCollectionNodeCount(); i++) {
+              if (countMiddleIcon === 0 && x === ctrl.ICON_X_MIDDLE_PX) {
+                x = ctrl.ICON_X_LEFT_PX;
+                y += ctrl.ICON_Y_INCREMENT_PX;
+                countMiddleIcon = 1;
+              } else if (countMiddleIcon === 1 &&
+                  x === ctrl.ICON_X_MIDDLE_PX) {
+                x = ctrl.ICON_X_RIGHT_PX;
+                y += ctrl.ICON_Y_INCREMENT_PX;
+                countMiddleIcon = 0;
+              } else {
+                x = ctrl.ICON_X_MIDDLE_PX;
+                y += ctrl.ICON_Y_INCREMENT_PX;
+              }
+              iconParametersArray.push({
+                thumbnailIconUrl:
+                  collectionNodes[i].getExplorationSummaryObject(
+                  ).thumbnail_icon_url.replace(
+                    'subjects', 'inverted_subjects'),
+                left: x + 'px',
+                top: y + 'px',
+                thumbnailBgColor:
+                  collectionNodes[i].getExplorationSummaryObject(
+                  ).thumbnail_bg_color
+              });
+            }
+            return iconParametersArray;
+          };
+
+          ctrl.getExplorationUrl = function(explorationId) {
+            return (
+              '/explore/' + explorationId + '?collection_id=' +
+              ctrl.collectionId);
+          };
+
+          ctrl.getExplorationTitlePosition = function(index) {
+            if (index % 2 === 0 ) {
+              return '8px';
+            } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
+              return '30px';
+            } else if ((index + 1) % 4 === 0) {
+              return '-40px';
+            }
+          };
+          $scope.$watch('$ctrl.collection', function(newValue) {
+            if (newValue !== null) {
+              ctrl.generatePathParameters();
+            }
+          }, true);
+
+          ctrl.scrollToLocation = function(id) {
+            $location.hash(id);
+            $anchorScroll();
+          };
+
+          ctrl.closeOnClickingOutside = function() {
+            ctrl.explorationCardIsShown = false;
+          };
+
+          ctrl.onClickStopPropagation = function($evt) {
+            $evt.stopPropagation();
+          };
           ctrl.$onInit = function() {
             $rootScope.loadingMessage = 'Loading';
             ctrl.collection = null;
             ctrl.collectionPlaythrough = null;
             ctrl.collectionId = UrlService.getCollectionIdFromUrl();
             ctrl.explorationCardIsShown = false;
-            ctrl.getStaticImageUrl = function(imagePath) {
-              return UrlInterpolationService.getStaticImageUrl(imagePath);
-            };
             // The pathIconParameters is an array containing the co-ordinates,
             // background color and icon url for the icons generated on the
             // path.
@@ -111,166 +289,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
                   'content', response.meta_description);
               }
             );
-            ctrl.setIconHighlight = function(index) {
-              ctrl.activeHighlightedIconIndex = index;
-            };
-
-            ctrl.unsetIconHighlight = function() {
-              ctrl.activeHighlightedIconIndex = -1;
-            };
-
-            ctrl.togglePreviewCard = function() {
-              ctrl.explorationCardIsShown = !ctrl.explorationCardIsShown;
-            };
-
-            ctrl.getCollectionNodeForExplorationId = function(explorationId) {
-              var collectionNode = (
-                ctrl.collection.getCollectionNodeByExplorationId(
-                  explorationId));
-              if (!collectionNode) {
-                AlertsService.addWarning(
-                  'There was an error loading the collection.');
-              }
-              return collectionNode;
-            };
-
-            ctrl.getNextRecommendedCollectionNodes = function() {
-              return ctrl.getCollectionNodeForExplorationId(
-                ctrl.collectionPlaythrough.getNextExplorationId());
-            };
-
-            ctrl.getCompletedExplorationNodes = function() {
-              return ctrl.getCollectionNodeForExplorationId(
-                ctrl.collectionPlaythrough.getCompletedExplorationIds());
-            };
-
-            ctrl.getNonRecommendedCollectionNodeCount = function() {
-              return ctrl.collection.getCollectionNodeCount() - (
-                ctrl.collectionPlaythrough
-                  .getNextRecommendedCollectionNodeCount(
-                  ) + ctrl.collectionPlaythrough
-                  .getCompletedExplorationNodeCount(
-                  ));
-            };
-
-            ctrl.updateExplorationPreview = function(explorationId) {
-              ctrl.explorationCardIsShown = true;
-              ctrl.currentExplorationId = explorationId;
-              ctrl.summaryToPreview = ctrl.getCollectionNodeForExplorationId(
-                explorationId).getExplorationSummaryObject();
-            };
-
-            // Calculates the SVG parameters required to draw the curved path.
-            ctrl.generatePathParameters = function() {
-              // The pathSvgParameters represents the final string of SVG
-              // parameters for the bezier curve to be generated. The default
-              // parameters represent the first curve ie. lesson 1 to lesson 3.
-              ctrl.pathSvgParameters = 'M250 80  C 470 100, 470 280, 250 300';
-              var collectionNodeCount =
-              ctrl.collection.getCollectionNodeCount();
-              // The sParameterExtension represents the co-ordinates following
-              // the 'S' (smooth curve to) command in SVG.
-              var sParameterExtension = '';
-              ctrl.pathIconParameters = ctrl.generatePathIconParameters();
-              if (collectionNodeCount === 1) {
-                ctrl.pathSvgParameters = '';
-              } else if (collectionNodeCount === 2) {
-                ctrl.pathSvgParameters = 'M250 80  C 470 100, 470 280, 250 300';
-              } else {
-                // The x and y here represent the co-ordinates of the control
-                // points for the bezier curve (path).
-                var y = 500;
-                for (var i = 1; i < Math.floor(collectionNodeCount / 2); i++) {
-                  var x = (i % 2) ? 30 : 470;
-                  sParameterExtension += x + ' ' + y + ', ';
-                  y += 20;
-                  sParameterExtension += 250 + ' ' + y + ', ';
-                  y += 200;
-                }
-                if (sParameterExtension !== '') {
-                  ctrl.pathSvgParameters += ' S ' + sParameterExtension;
-                }
-              }
-              if (collectionNodeCount % 2 === 0) {
-                if (collectionNodeCount === 2) {
-                  ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
-                } else {
-                  ctrl.svgHeight = y - ctrl.EVEN_SVG_HEIGHT_OFFSET_PX;
-                }
-              } else {
-                if (collectionNodeCount === 1) {
-                  ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
-                } else {
-                  ctrl.svgHeight = y - ctrl.ODD_SVG_HEIGHT_OFFSET_PX;
-                }
-              }
-            };
-
-            ctrl.generatePathIconParameters = function() {
-              var collectionNodes = ctrl.collection.getCollectionNodes();
-              var iconParametersArray = [];
-              iconParametersArray.push({
-                thumbnailIconUrl:
-                  collectionNodes[0].getExplorationSummaryObject(
-                  ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
-                left: '225px',
-                top: '35px',
-                thumbnailBgColor:
-                  collectionNodes[0].getExplorationSummaryObject(
-                  ).thumbnail_bg_color
-              });
-
-              // Here x and y represent the co-ordinates for the icons in the
-              // path.
-              var x = ctrl.ICON_X_MIDDLE_PX;
-              var y = ctrl.ICON_Y_INITIAL_PX;
-              var countMiddleIcon = 1;
-
-              for (var i = 1;
-                i < ctrl.collection.getCollectionNodeCount(); i++) {
-                if (countMiddleIcon === 0 && x === ctrl.ICON_X_MIDDLE_PX) {
-                  x = ctrl.ICON_X_LEFT_PX;
-                  y += ctrl.ICON_Y_INCREMENT_PX;
-                  countMiddleIcon = 1;
-                } else if (countMiddleIcon === 1 &&
-                    x === ctrl.ICON_X_MIDDLE_PX) {
-                  x = ctrl.ICON_X_RIGHT_PX;
-                  y += ctrl.ICON_Y_INCREMENT_PX;
-                  countMiddleIcon = 0;
-                } else {
-                  x = ctrl.ICON_X_MIDDLE_PX;
-                  y += ctrl.ICON_Y_INCREMENT_PX;
-                }
-                iconParametersArray.push({
-                  thumbnailIconUrl:
-                    collectionNodes[i].getExplorationSummaryObject(
-                    ).thumbnail_icon_url.replace(
-                      'subjects', 'inverted_subjects'),
-                  left: x + 'px',
-                  top: y + 'px',
-                  thumbnailBgColor:
-                    collectionNodes[i].getExplorationSummaryObject(
-                    ).thumbnail_bg_color
-                });
-              }
-              return iconParametersArray;
-            };
-
-            ctrl.getExplorationUrl = function(explorationId) {
-              return (
-                '/explore/' + explorationId + '?collection_id=' +
-                ctrl.collectionId);
-            };
-
-            ctrl.getExplorationTitlePosition = function(index) {
-              if (index % 2 === 0 ) {
-                return '8px';
-              } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
-                return '30px';
-              } else if ((index + 1) % 4 === 0) {
-                return '-40px';
-              }
-            };
 
             $http.get('/collectionsummarieshandler/data', {
               params: {
@@ -344,26 +362,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
                   'There was an error loading the collection.');
               }
             );
-
-            $scope.$watch('$ctrl.collection', function(newValue) {
-              if (newValue !== null) {
-                ctrl.generatePathParameters();
-              }
-            }, true);
-
-            ctrl.scrollToLocation = function(id) {
-              $location.hash(id);
-              $anchorScroll();
-            };
-
-            ctrl.closeOnClickingOutside = function() {
-              ctrl.explorationCardIsShown = false;
-            };
-
-            ctrl.onClickStopPropagation = function($evt) {
-              $evt.stopPropagation();
-            };
-
             // Touching anywhere outside the mobile preview should hide it.
             document.addEventListener('touchstart', function() {
               if (ctrl.explorationCardIsShown === true) {

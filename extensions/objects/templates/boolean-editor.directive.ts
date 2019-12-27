@@ -25,19 +25,17 @@ angular.module('oppia').directive('booleanEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        ctrl.$onInit = function() {
-          // Reset the component each time the value changes (e.g. if this is
-          // part of an editable list).
-          $scope.$watch('$ctrl.value', function(newValue) {
-            ctrl.localValue = {
-              label: newValue || false
-            };
-          }, true);
+        // Reset the component each time the value changes (e.g. if this is
+        // part of an editable list).
+        $scope.$watch('$ctrl.value', function(newValue) {
+          ctrl.localValue = {
+            label: newValue || false
+          };
+        }, true);
 
-          $scope.$watch('$ctrl.localValue.label', function(newValue) {
-            ctrl.value = newValue;
-          });
-        };
+        $scope.$watch('$ctrl.localValue.label', function(newValue) {
+          ctrl.value = newValue;
+        });
       }],
       restrict: 'E',
       scope: {},

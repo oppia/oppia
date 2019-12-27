@@ -39,6 +39,13 @@ angular.module('oppia').directive('searchResults', [
         function($scope, $rootScope, $q, $timeout, $window,
             SiteAnalyticsService, UserService) {
           var ctrl = this;
+          ctrl.onRedirectToLogin = function(destinationUrl) {
+            SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
+            $timeout(function() {
+              $window.location = destinationUrl;
+            }, 150);
+            return false;
+          };
           ctrl.$onInit = function() {
             ctrl.someResultsExist = true;
 
@@ -60,14 +67,6 @@ angular.module('oppia').directive('searchResults', [
             $q.all([userInfoPromise, searchResultsPromise]).then(function() {
               $rootScope.loadingMessage = '';
             });
-
-            ctrl.onRedirectToLogin = function(destinationUrl) {
-              SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
-              $timeout(function() {
-                $window.location = destinationUrl;
-              }, 150);
-              return false;
-            };
 
             ctrl.noExplorationsImgUrl =
              UrlInterpolationService.getStaticImageUrl(

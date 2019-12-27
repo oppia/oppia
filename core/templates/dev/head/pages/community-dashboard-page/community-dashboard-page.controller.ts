@@ -66,6 +66,26 @@ angular.module('oppia').directive('communityDashboardPage', [
             COMMUNITY_DASHBOARD_TABS_DETAILS,
             DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
           var ctrl = this;
+          var prevSelectedLanguageCode = (
+            LocalStorageService.getLastSelectedTranslationLanguageCode());
+          var allAudioLanguageCodes = LanguageUtilService
+            .getAllVoiceoverLanguageCodes();
+          ctrl.onChangeLanguage = function() {
+            TranslationLanguageService.setActiveLanguageCode(
+              ctrl.languageCode);
+            LocalStorageService.updateLastSelectedTranslationLanguageCode(
+              ctrl.languageCode);
+          };
+
+          ctrl.showLanguageSelector = function() {
+            var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
+            return (
+              activeTabDetail.customizationOptions.indexOf(
+                'language') !== -1);
+          };
+          ctrl.onTabClick = function(activeTabName) {
+            ctrl.activeTabName = activeTabName;
+          };
           ctrl.$onInit = function() {
             ctrl.profilePictureDataUrl = null;
             ctrl.username = null;
@@ -77,11 +97,6 @@ angular.module('oppia').directive('communityDashboardPage', [
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.username = userInfo.getUsername();
             });
-
-            var prevSelectedLanguageCode = (
-              LocalStorageService.getLastSelectedTranslationLanguageCode());
-            var allAudioLanguageCodes = LanguageUtilService
-              .getAllVoiceoverLanguageCodes();
 
             ctrl.languageCodesAndDescriptions = (
               allAudioLanguageCodes.map(function(languageCode) {
@@ -99,28 +114,11 @@ angular.module('oppia').directive('communityDashboardPage', [
             TranslationLanguageService.setActiveLanguageCode(
               ctrl.languageCode);
 
-            ctrl.onChangeLanguage = function() {
-              TranslationLanguageService.setActiveLanguageCode(
-                ctrl.languageCode);
-              LocalStorageService.updateLastSelectedTranslationLanguageCode(
-                ctrl.languageCode);
-            };
-
-            ctrl.showLanguageSelector = function() {
-              var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
-              return (
-                activeTabDetail.customizationOptions.indexOf(
-                  'language') !== -1);
-            };
-
             ctrl.activeTabName = 'myContributionTab';
             ctrl.tabsDetails = COMMUNITY_DASHBOARD_TABS_DETAILS;
             ctrl.OPPIA_AVATAR_IMAGE_URL = (
               UrlInterpolationService.getStaticImageUrl(
                 '/avatar/oppia_avatar_100px.svg'));
-            ctrl.onTabClick = function(activeTabName) {
-              ctrl.activeTabName = activeTabName;
-            };
           };
         }]
     };

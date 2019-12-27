@@ -33,10 +33,8 @@ angular.module('oppia').directive('profileLinkText', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.$onInit = function() {
-          ctrl.isUsernameLinkable = function(username) {
-            return SYSTEM_USER_IDS.indexOf(username) === -1;
-          };
+        ctrl.isUsernameLinkable = function(username) {
+          return SYSTEM_USER_IDS.indexOf(username) === -1;
         };
       }]
     };

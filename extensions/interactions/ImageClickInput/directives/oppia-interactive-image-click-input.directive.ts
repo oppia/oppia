@@ -52,9 +52,93 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
         '$element', '$attrs', '$scope', 'CurrentInteractionService',
         function($element, $attrs, $scope, CurrentInteractionService) {
           var ctrl = this;
+          var imageAndRegions = HtmlEscaperService.escapedJsonToObj(
+            $attrs.imageAndRegionsWithValue);
+          ctrl.updateCurrentlyHoveredRegions = function() {
+            for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
+              var labeledRegion = imageAndRegions.labeledRegions[i];
+              var regionArea = labeledRegion.region.area;
+              if (regionArea[0][0] <= ctrl.mouseX &&
+                  ctrl.mouseX <= regionArea[1][0] &&
+                  regionArea[0][1] <= ctrl.mouseY &&
+                  ctrl.mouseY <= regionArea[1][1]) {
+                ctrl.currentlyHoveredRegions.push(labeledRegion.label);
+              }
+            }
+          };
+          ctrl.getRegionDimensions = function(index) {
+            var image = $($element).find('.oppia-image-click-img');
+            var labeledRegion = imageAndRegions.labeledRegions[index];
+            var regionArea = labeledRegion.region.area;
+            var leftDelta =
+            image.offset().left - image.parent().offset().left;
+            var topDelta = image.offset().top - image.parent().offset().top;
+            return {
+              left: regionArea[0][0] * image.width() + leftDelta,
+              top: regionArea[0][1] * image.height() + topDelta,
+              width: (regionArea[1][0] - regionArea[0][0]) * image.width(),
+              height: (regionArea[1][1] - regionArea[0][1]) * image.height()
+            };
+          };
+          ctrl.getRegionDisplay = function(label) {
+            if (ctrl.currentlyHoveredRegions.indexOf(label) === -1) {
+              return 'none';
+            } else {
+              return 'inline';
+            }
+          };
+          ctrl.getDotDisplay = function() {
+            if (ContextService.getEditorTabContext() ===
+                EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
+              return 'none';
+            }
+            return 'inline';
+          };
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+            ctrl.interactionIsActive = false;
+            ctrl.lastAnswer = {
+              clickPosition: [ctrl.mouseX, ctrl.mouseY]
+            };
+          });
+          ctrl.getDotLocation = function() {
+            var image = $($element).find('.oppia-image-click-img');
+            var dotLocation = {
+              left: null,
+              top: null
+            };
+            if (ctrl.lastAnswer) {
+              dotLocation.left =
+                ctrl.lastAnswer.clickPosition[0] * image.width() +
+                image.offset().left -
+                image.parent().offset().left - 5;
+              dotLocation.top =
+                ctrl.lastAnswer.clickPosition[1] * image.height() +
+                image.offset().top -
+                image.parent().offset().top - 5;
+            }
+            return dotLocation;
+          };
+          ctrl.onMousemoveImage = function(event) {
+            if (!ctrl.interactionIsActive) {
+              return;
+            }
+            var image = $($element).find('.oppia-image-click-img');
+            ctrl.mouseX =
+              (event.pageX - image.offset().left) / image.width();
+            ctrl.mouseY =
+              (event.pageY - image.offset().top) / image.height();
+            ctrl.currentlyHoveredRegions = [];
+            ctrl.updateCurrentlyHoveredRegions();
+          };
+          ctrl.onClickImage = function() {
+            var answer = {
+              clickPosition: [ctrl.mouseX, ctrl.mouseY],
+              clickedRegions: ctrl.currentlyHoveredRegions
+            };
+            CurrentInteractionService.onSubmit(
+              answer, ImageClickInputRulesService);
+          };
           ctrl.$onInit = function() {
-            var imageAndRegions = HtmlEscaperService.escapedJsonToObj(
-              $attrs.imageAndRegionsWithValue);
             ctrl.highlightRegionsOnHover =
               ($attrs.highlightRegionsOnHoverWithValue === 'true');
             ctrl.filepath = imageAndRegions.imagePath;
@@ -110,18 +194,6 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
 
             ctrl.currentlyHoveredRegions = [];
             ctrl.allRegions = imageAndRegions.labeledRegions;
-            ctrl.updateCurrentlyHoveredRegions = function() {
-              for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
-                var labeledRegion = imageAndRegions.labeledRegions[i];
-                var regionArea = labeledRegion.region.area;
-                if (regionArea[0][0] <= ctrl.mouseX &&
-                    ctrl.mouseX <= regionArea[1][0] &&
-                    regionArea[0][1] <= ctrl.mouseY &&
-                    ctrl.mouseY <= regionArea[1][1]) {
-                  ctrl.currentlyHoveredRegions.push(labeledRegion.label);
-                }
-              }
-            };
             if (!ctrl.interactionIsActive) {
               /* The following lines highlight the learner's last answer for
                 this card. This need only be done at the beginning as if he
@@ -131,78 +203,6 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
               ctrl.mouseY = ctrl.getLastAnswer().clickPosition[1];
               ctrl.updateCurrentlyHoveredRegions();
             }
-            ctrl.getRegionDimensions = function(index) {
-              var image = $($element).find('.oppia-image-click-img');
-              var labeledRegion = imageAndRegions.labeledRegions[index];
-              var regionArea = labeledRegion.region.area;
-              var leftDelta =
-              image.offset().left - image.parent().offset().left;
-              var topDelta = image.offset().top - image.parent().offset().top;
-              return {
-                left: regionArea[0][0] * image.width() + leftDelta,
-                top: regionArea[0][1] * image.height() + topDelta,
-                width: (regionArea[1][0] - regionArea[0][0]) * image.width(),
-                height: (regionArea[1][1] - regionArea[0][1]) * image.height()
-              };
-            };
-            ctrl.getRegionDisplay = function(label) {
-              if (ctrl.currentlyHoveredRegions.indexOf(label) === -1) {
-                return 'none';
-              } else {
-                return 'inline';
-              }
-            };
-            ctrl.getDotDisplay = function() {
-              if (ContextService.getEditorTabContext() ===
-                  EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
-                return 'none';
-              }
-              return 'inline';
-            };
-            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-              ctrl.interactionIsActive = false;
-              ctrl.lastAnswer = {
-                clickPosition: [ctrl.mouseX, ctrl.mouseY]
-              };
-            });
-            ctrl.getDotLocation = function() {
-              var image = $($element).find('.oppia-image-click-img');
-              var dotLocation = {
-                left: null,
-                top: null
-              };
-              if (ctrl.lastAnswer) {
-                dotLocation.left =
-                  ctrl.lastAnswer.clickPosition[0] * image.width() +
-                  image.offset().left -
-                  image.parent().offset().left - 5;
-                dotLocation.top =
-                  ctrl.lastAnswer.clickPosition[1] * image.height() +
-                  image.offset().top -
-                  image.parent().offset().top - 5;
-              }
-              return dotLocation;
-            };
-            ctrl.onMousemoveImage = function(event) {
-              if (!ctrl.interactionIsActive) {
-                return;
-              }
-              var image = $($element).find('.oppia-image-click-img');
-              ctrl.mouseX =
-                (event.pageX - image.offset().left) / image.width();
-              ctrl.mouseY =
-                (event.pageY - image.offset().top) / image.height();
-              ctrl.currentlyHoveredRegions = [];
-              ctrl.updateCurrentlyHoveredRegions();
-            };
-            ctrl.onClickImage = function() {
-              var answer = {
-                clickPosition: [ctrl.mouseX, ctrl.mouseY],
-                clickedRegions: ctrl.currentlyHoveredRegions
-              };
-              CurrentInteractionService.onSubmit(
-                answer, ImageClickInputRulesService);
-            };
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
           };

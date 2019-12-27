@@ -50,6 +50,38 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
             $attrs, WindowDimensionsService,
             UrlService, CurrentInteractionService) {
           var ctrl = this;
+          ctrl.onToggleCheckbox = function() {
+            ctrl.newQuestion = false;
+            ctrl.selectionCount = Object.keys(ctrl.userSelections).filter(
+              function(obj) {
+                return ctrl.userSelections[obj];
+              }
+            ).length;
+            ctrl.preventAdditionalSelections = (
+              ctrl.selectionCount >= ctrl.maxAllowableSelectionCount);
+            ctrl.notEnoughSelections = (
+              ctrl.selectionCount < ctrl.minAllowableSelectionCount);
+          };
+
+          ctrl.submitMultipleChoiceAnswer = function(index) {
+            ctrl.userSelections[ctrl.choices[index]] = true;
+            ctrl.submitAnswer(ctrl.userSelections);
+          };
+
+          ctrl.submitAnswer = function() {
+            var answers = Object.keys(ctrl.userSelections).filter(
+              function(obj) {
+                return ctrl.userSelections[obj];
+              }
+            );
+
+            CurrentInteractionService.onSubmit(
+              answers, ItemSelectionInputRulesService);
+          };
+
+          var validityCheckFn = function() {
+            return !ctrl.notEnoughSelections;
+          };
           ctrl.$onInit = function() {
             ctrl.choices = HtmlEscaperService.escapedJsonToObj(
               $attrs.choicesWithValue);
@@ -76,39 +108,6 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
             // The following indicates that the number of answers is less than
             // minAllowableSelectionCount.
             ctrl.notEnoughSelections = (ctrl.minAllowableSelectionCount > 0);
-
-            ctrl.onToggleCheckbox = function() {
-              ctrl.newQuestion = false;
-              ctrl.selectionCount = Object.keys(ctrl.userSelections).filter(
-                function(obj) {
-                  return ctrl.userSelections[obj];
-                }
-              ).length;
-              ctrl.preventAdditionalSelections = (
-                ctrl.selectionCount >= ctrl.maxAllowableSelectionCount);
-              ctrl.notEnoughSelections = (
-                ctrl.selectionCount < ctrl.minAllowableSelectionCount);
-            };
-
-            ctrl.submitMultipleChoiceAnswer = function(index) {
-              ctrl.userSelections[ctrl.choices[index]] = true;
-              ctrl.submitAnswer(ctrl.userSelections);
-            };
-
-            ctrl.submitAnswer = function() {
-              var answers = Object.keys(ctrl.userSelections).filter(
-                function(obj) {
-                  return ctrl.userSelections[obj];
-                }
-              );
-
-              CurrentInteractionService.onSubmit(
-                answers, ItemSelectionInputRulesService);
-            };
-
-            var validityCheckFn = function() {
-              return !ctrl.notEnoughSelections;
-            };
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, validityCheckFn);
           };

@@ -50,10 +50,10 @@ angular.module('oppia').directive('storyViewerPage', [
             PageTitleService, StoryPlaythroughObjectFactory,
             StoryViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
           var ctrl = this;
+          ctrl.checkMobileView = function() {
+            return ($window.innerWidth < 500);
+          };
           ctrl.$onInit = function() {
-            ctrl.checkMobileView = function() {
-              return ($window.innerWidth < 500);
-            };
             ctrl.storyIsLoaded = false;
             $rootScope.loadingMessage = 'Loading';
             var storyId = UrlService.getStoryIdFromViewerUrl();
