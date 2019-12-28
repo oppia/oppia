@@ -24,6 +24,7 @@ from constants import constants
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
+import python_utils
 
 from google.appengine.ext import ndb
 
@@ -161,6 +162,50 @@ class ExplorationModel(base_models.VersionedModel):
         )
         exploration_commit_log.exploration_id = self.id
         exploration_commit_log.put()
+
+    @classmethod
+    def _trusted_multi_commit(
+            cls, models, committer_id, commit_type, commit_message,
+            commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            models: list(ExplorationModel). Models for which to create the
+                commit.
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(ExplorationModel, cls)._trusted_multi_commit(
+            models, committer_id, commit_type, commit_message, commit_cmds)
+
+        committer_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(committer_id))
+        committer_username = (
+            committer_user_settings_model.username
+            if committer_user_settings_model else '')
+        commit_log_models = []
+        exp_rights_models = ExplorationRightsModel.get_multi(
+            [model.id for model in models], include_deleted=True)
+        for model, rights_model in python_utils.ZIP(models, exp_rights_models):
+
+            exploration_commit_log = ExplorationCommitLogEntryModel.create(
+                model.id, model.version, committer_id, committer_username,
+                commit_type, commit_message, commit_cmds, rights_model.status,
+                rights_model.community_owned
+            )
+            exploration_commit_log.exploration_id = model.id
+            commit_log_models.append(exploration_commit_log)
+        ndb.put_multi_async(commit_log_models)
 
 
 class ExplorationRightsSnapshotMetadataModel(
@@ -324,6 +369,57 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
+
+    @classmethod
+    def _trusted_multi_commit(
+            cls, models, committer_id, commit_type, commit_message,
+            commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            models: list(ExplorationModel). Models for which to create the
+                commit.
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(ExplorationRightsModel, cls)._trusted_multi_commit(
+            models, committer_id, commit_type, commit_message, commit_cmds)
+
+        # Create and delete events will already be recorded in the
+        # ExplorationModel.
+        if commit_type not in ['create', 'delete']:
+            committer_user_settings_model = (
+                user_models.UserSettingsModel.get_by_id(committer_id))
+            committer_username = (
+                committer_user_settings_model.username
+                if committer_user_settings_model else '')
+            commit_log_models = []
+            for model in models:
+                commit_log_models.append(ExplorationCommitLogEntryModel(
+                    id=('rights-%s-%s' % (model.id, model.version)),
+                    user_id=committer_id,
+                    username=committer_username,
+                    exploration_id=model.id,
+                    commit_type=commit_type,
+                    commit_message=commit_message,
+                    commit_cmds=commit_cmds,
+                    version=None,
+                    post_commit_status=model.status,
+                    post_commit_community_owned=model.community_owned,
+                    post_commit_is_private=(
+                        model.status == constants.ACTIVITY_STATUS_PRIVATE)
+                ))
+            ndb.put_multi_async(commit_log_models)
 
     @classmethod
     def export_data(cls, user_id):

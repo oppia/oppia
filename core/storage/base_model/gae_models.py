@@ -518,7 +518,7 @@ class VersionedModel(BaseModel):
         if self.deleted:
             raise Exception('This model instance has been deleted.')
 
-    def _compute_snapshot(self):
+    def compute_snapshot(self):
         """Generates a snapshot (dict) from the model property values."""
         return self.to_dict(exclude=['created_on', 'last_updated'])
 
@@ -561,7 +561,7 @@ class VersionedModel(BaseModel):
         return reconstituted_model
 
     @classmethod
-    def _get_snapshot_id(cls, instance_id, version_number):
+    def get_snapshot_id(cls, instance_id, version_number):
         """Gets a unique snapshot id for this instance and version.
 
         Args:
@@ -592,35 +592,65 @@ class VersionedModel(BaseModel):
 
                 {'cmd': 'AUTO_revert_version_number'
                  'version_number': 4}
+        """
+        VersionedModel._trusted_multi_commit(
+            [self], committer_id, commit_type, commit_message, commit_cmds)
+
+    @classmethod
+    def _trusted_multi_commit(
+            cls, versioned_models, committer_id, commit_type, commit_message,
+            commit_cmds):
+        """Evaluates and executes commits. Main function for all commit types.
+
+        Args:
+            versioned_models: list(cls). List of models to commit.
+            committer_id: str. The user_id of the user who committed the change.
+            commit_type: str. Unique identifier of commit type. Possible values
+                are in COMMIT_TYPE_CHOICES.
+            commit_message: str.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, should give sufficient information to
+                reconstruct the commit. Dict always contains:
+                    cmd: str. Unique command.
+                And then additional arguments for that command. For example:
+
+                {'cmd': 'AUTO_revert_version_number'
+                 'version_number': 4}
 
         Raises:
             Exception: No snapshot metadata class has been defined.
             Exception: No snapshot content class has been defined.
             Exception: commit_cmds is not a list of dicts.
         """
-        if self.SNAPSHOT_METADATA_CLASS is None:
-            raise Exception('No snapshot metadata class defined.')
-        if self.SNAPSHOT_CONTENT_CLASS is None:
-            raise Exception('No snapshot content class defined.')
         if not isinstance(commit_cmds, list):
             raise Exception(
                 'Expected commit_cmds to be a list of dicts, received %s'
                 % commit_cmds)
 
-        self.version += 1
+        snapshot_metadata_models = []
+        snapshot_content_models = []
+        for model in versioned_models:
+            if model.SNAPSHOT_METADATA_CLASS is None:
+                raise Exception('No snapshot metadata class defined.')
+            if model.SNAPSHOT_CONTENT_CLASS is None:
+                raise Exception('No snapshot content class defined.')
 
-        snapshot = self._compute_snapshot()
-        snapshot_id = self._get_snapshot_id(self.id, self.version)
+            model.version += 1
 
-        snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS(  # pylint: disable=not-callable
-            id=snapshot_id, committer_id=committer_id, commit_type=commit_type,
-            commit_message=commit_message, commit_cmds=commit_cmds)
-        snapshot_content_instance = self.SNAPSHOT_CONTENT_CLASS(  # pylint: disable=not-callable
-            id=snapshot_id, content=snapshot)
+            snapshot = model.compute_snapshot()
+            snapshot_id = model.get_snapshot_id(model.id, model.version)
+
+            snapshot_metadata_models.append(model.SNAPSHOT_METADATA_CLASS(  # pylint: disable=not-callable
+                id=snapshot_id, committer_id=committer_id,
+                commit_type=commit_type, commit_message=commit_message,
+                commit_cmds=commit_cmds))
+            snapshot_content_models.append(model.SNAPSHOT_CONTENT_CLASS(  # pylint: disable=not-callable
+                id=snapshot_id, content=snapshot))
 
         transaction_services.run_in_transaction(
             BaseModel.put_multi,
-            [snapshot_metadata_instance, snapshot_content_instance, self])
+            snapshot_metadata_models + snapshot_content_models +
+            versioned_models)
 
     def delete(self, committer_id, commit_message, force_deletion=False):
         """Deletes this model instance.
@@ -642,7 +672,7 @@ class VersionedModel(BaseModel):
                 python_utils.UNICODE(num + 1) for num in python_utils.RANGE(
                     current_version)]
             snapshot_ids = [
-                self._get_snapshot_id(self.id, version_number)
+                self.get_snapshot_id(self.id, version_number)
                 for version_number in version_numbers]
 
             metadata_keys = [
@@ -667,6 +697,58 @@ class VersionedModel(BaseModel):
             self._trusted_commit(
                 committer_id, self._COMMIT_TYPE_DELETE, commit_message,
                 commit_cmds)
+
+    @classmethod
+    def delete_multi(
+            cls, entity_ids, committer_id,
+            commit_message, force_deletion=False):
+        """Deletes the given cls instancies with the give entity_ids.
+
+        Args:
+            entity_ids: list(str). Ids of entities to delete.
+            committer_id: str. The user_id of the user who committed the change.
+            commit_message: str.
+            force_deletion: bool. If True these models are deleted completely
+                from storage, otherwise there are only marked as deleted.
+                Default is False.
+
+        Raises:
+            Exception: This model instance has been already deleted.
+        """
+        versioned_models = cls.get_multi(entity_ids)
+        if force_deletion:
+            all_models_metadata_keys = []
+            all_models_content_keys = []
+            for model in versioned_models:
+                model_version_numbers = [
+                    python_utils.UNICODE(num + 1) for num in
+                    python_utils.RANGE(model.version)]
+                model_snapshot_ids = [
+                    model.get_snapshot_id(model.id, version_number)
+                    for version_number in model_version_numbers]
+
+                all_models_metadata_keys.extend([
+                    ndb.Key(model.SNAPSHOT_METADATA_CLASS, snapshot_id)
+                    for snapshot_id in model_snapshot_ids])
+                all_models_content_keys.extend([
+                    ndb.Key(model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
+                    for snapshot_id in model_snapshot_ids])
+
+            ndb.delete_multi(
+                all_models_metadata_keys + all_models_content_keys +
+                versioned_models)
+        else:
+            for model in versioned_models:
+                model._require_not_marked_deleted()  # pylint: disable=protected-access
+                model.deleted = True
+
+            commit_cmds = [{
+                'cmd': cls.CMD_DELETE_COMMIT
+            }]
+
+            cls._trusted_multi_commit(
+                versioned_models, committer_id, cls._COMMIT_TYPE_DELETE,
+                commit_message, commit_cmds)
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
@@ -754,7 +836,7 @@ class VersionedModel(BaseModel):
         # states_schema_version value from the latest exploration version.
 
         # pylint: disable=protected-access
-        snapshot_id = model._get_snapshot_id(model.id, version_number)
+        snapshot_id = model.get_snapshot_id(model.id, version_number)
         new_model = cls(id=model.id)
         new_model._reconstitute_from_snapshot_id(snapshot_id)
         new_model.version = current_version
@@ -784,7 +866,7 @@ class VersionedModel(BaseModel):
         # pylint: disable=protected-access
         cls.get(entity_id)._require_not_marked_deleted()
 
-        snapshot_id = cls._get_snapshot_id(entity_id, version_number)
+        snapshot_id = cls.get_snapshot_id(entity_id, version_number)
 
         return cls(
             id=entity_id,
@@ -824,7 +906,7 @@ class VersionedModel(BaseModel):
         snapshot_ids = []
         # pylint: disable=protected-access
         for version in version_numbers:
-            snapshot_id = cls._get_snapshot_id(entity_id, version)
+            snapshot_id = cls.get_snapshot_id(entity_id, version)
             snapshot_ids.append(snapshot_id)
 
         snapshot_models = cls.SNAPSHOT_CONTENT_CLASS.get_multi(snapshot_ids)
@@ -906,7 +988,7 @@ class VersionedModel(BaseModel):
             cls.get(model_instance_id)._require_not_marked_deleted()
 
         snapshot_ids = [
-            cls._get_snapshot_id(model_instance_id, version_number)
+            cls.get_snapshot_id(model_instance_id, version_number)
             for version_number in version_numbers]
         # pylint: enable=protected-access
         metadata_keys = [

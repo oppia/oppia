@@ -2173,7 +2173,7 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
             translator_ids=[self.user_b_id]
         )
         exp_summary_model.put()
-        exp_services.delete_exploration_summary(exploration.id)
+        exp_services.delete_exploration_summaries([exploration.id])
 
         job_id = (
             exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())

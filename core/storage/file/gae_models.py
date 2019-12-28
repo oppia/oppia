@@ -212,7 +212,7 @@ class FileModel(base_models.VersionedModel):
         self.content = snapshot_blob
         return self
 
-    def _compute_snapshot(self):
+    def compute_snapshot(self):
         """Manually overwrite the superclass method. Returns the content of
         this FileModel instance.
 
