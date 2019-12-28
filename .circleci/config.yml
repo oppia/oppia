@@ -42,10 +42,9 @@ anchor_for_installing_cc_test_reporter: &install_cc
     chmod +x ./cc-test-reporter
     ./cc-test-reporter before-build
 
-anchor_for_restoring_cache: &restore_cache
-  keys:
-    - setup-files-cache-{{ checksum "date" }}-{{ .Branch }}
-    - third-party-cache-{{ checksum "date" }}-{{ .Branch }}
+anchor_for_attaching_setup_files: &attaching_files
+  attach_workspace:
+    at: /home/circleci/oppia
 
 version: 2
 jobs:
@@ -53,13 +52,10 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
       - run:
           <<: *install_dependencies
-      - save_cache:
-          key: setup-files-cache-{{ checksum "date" }}
+      - persist_to_workspace:
+          root: /home/circleci/oppia
           paths:
             - node_modules/
             - ../oppia_tools/
@@ -68,8 +64,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - restore_cache:
-          <<: *restore_cache
+      - run:
+          <<: *attaching_files
       - run:
           <<: *install_dependencies
       - run:
@@ -85,8 +81,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - restore_cache:
-          <<: *restore_cache
+      - run:
+        <<: *attaching_files
       - run:
           <<: *install_dependencies
       - run:
@@ -98,8 +94,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - restore_cache:
-          <<: *restore_cache
+      - run:
+        <<: *attaching_files
       - run:
           <<: *install_dependencies
       - run:
@@ -117,8 +113,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - restore_cache:
-          <<: *restore_cache
+      - run:
+        <<: *attaching_files
       - run:
           <<: *install_dependencies
       - run: sudo pip install webtest
