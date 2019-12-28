@@ -99,8 +99,6 @@ class BuildTests(test_utils.GenericTestBase):
         error_message = ('File %s does not exist.') % re.escape(
             non_existent_filepaths[0])
         # Exception will be raised at first file determined to be non-existent.
-        error_message = ('File %s does not exist.') % non_existent_filepaths[0]
-        error_message = re.escape(error_message)
         with self.assertRaisesRegexp(
             OSError, error_message):
             build._ensure_files_exist(non_existent_filepaths)
