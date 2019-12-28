@@ -40,7 +40,8 @@ angular.module('oppia').directive('oppiaShortResponseContinue', [
           ctrl.$onInit = function() {
             ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
           };
-        }]
+        }
+      ]
     };
   }
 ]);

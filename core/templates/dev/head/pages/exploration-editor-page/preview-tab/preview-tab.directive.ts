@@ -154,8 +154,7 @@ angular.module('oppia').directive('previewTab', [
                 ExplorationEngineService.init(
                   returnDict, null, null, null,
                   function(
-                      unusedInitialStateName, unusedInitHtml,
-                      unusedNewParams) {
+                      unusedInitialStateName, unusedInitHtml, unusedNewParams) {
                     ctrl.loadPreviewState(initStateNameForPreview, []);
                   });
                 PlayerCorrectnessFeedbackEnabledService.init(
@@ -166,8 +165,8 @@ angular.module('oppia').directive('previewTab', [
           };
 
           // This allows the active state to be kept up-to-date whilst
-          // navigating in preview mode, ensuring that the state does
-          // not change when toggling between editor and preview.
+          // navigating in preview mode, ensuring that the state does not change
+          // when toggling between editor and preview.
           $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
             StateEditorService.setActiveStateName(stateName);
           });

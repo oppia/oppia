@@ -91,8 +91,7 @@ angular.module('oppia').directive('filepathEditor', [
         /**
          * Resamples an image to the specified dimension.
          *
-         * @param imageDataURI A DOMString containing the input image data
-         * URI.
+         * @param imageDataURI A DOMString containing the input image data URI.
          * @param width The desired output width.
          * @param height The desired output height.
          * @return A DOMString containing the output image data URI.
@@ -116,8 +115,7 @@ angular.module('oppia').directive('filepathEditor', [
         /**
          * Crops an image to the specified rectangular region.
          *
-         * @param imageDataURI A DOMString containing the input image data
-         * URI.
+         * @param imageDataURI A DOMString containing the input image data URI.
          * @param x The x coorinate of the top-left corner of the crop region.
          * @param y The y coorinate of the top-left corner of the crop region.
          * @param width The width of the crop region.
@@ -125,8 +123,7 @@ angular.module('oppia').directive('filepathEditor', [
          * @return A DOMString containing the output image data URI.
          */
 
-        var getCroppedImageData = function(
-            imageDataURI, x, y, width, height) {
+        var getCroppedImageData = function(imageDataURI, x, y, width, height) {
           // Put the original image in a canvas.
           var img = new Image();
           img.src = imageDataURI;
@@ -185,13 +182,12 @@ angular.module('oppia').directive('filepathEditor', [
           // Even though the event listeners are added to the image container,
           // the events seem to be reported with 'target' set to the deepest
           // element where the event occurred. In other words, if the event
-          // occurred outside of the crop area, then the (x, y) reported will
-          // be the one with respect to the image container, but if the event
+          // occurred outside of the crop area, then the (x, y) reported will be
+          // the one with respect to the image container, but if the event
           // occurs inside the crop area, then the (x, y) reported will be the
           // one with respect to the crop area itself. So this function does
-          // normalization on the (x, y) values so that they are always
-          // reported with respect to the image container
-          // (makes calculations easier).
+          // normalization on the (x, y) values so that they are always reported
+          // with respect to the image container (makes calculations easier).
           var x = e.offsetX;
           var y = e.offsetY;
           var containerClass = 'filepath-editor-image-crop-container';
@@ -312,8 +308,8 @@ angular.module('oppia').directive('filepathEditor', [
 
           // It is important to check the pointer position for corners first,
           // since the conditions overlap. In other words, the pointer can be
-          // at the top border and at the top-right corner at the same time,
-          // in which case we want to recognize the corner.
+          // at the top border and at the top-right corner at the same time, in
+          // which case we want to recognize the corner.
           if (xOnLeftBorder && yOnTopBorder) {
             // Upper left corner.
             ctrl.mousePositionWithinCropArea = MOUSE_TOP_LEFT;
@@ -381,8 +377,7 @@ angular.module('oppia').directive('filepathEditor', [
           var dimensions = ctrl.calculateTargetImageDimensions();
           var cropWidth = ctrl.cropArea.x2 - ctrl.cropArea.x1;
           var cropHeight = ctrl.cropArea.y2 - ctrl.cropArea.y1;
-          return (
-            cropWidth < dimensions.width || cropHeight < dimensions.height);
+          return cropWidth < dimensions.width || cropHeight < dimensions.height;
         };
 
         ctrl.onMouseMoveOnImageArea = function(e) {

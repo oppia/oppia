@@ -93,6 +93,7 @@ angular.module('oppia').directive('storyEditorPage', [
           ctrl.$onInit = function() {
             StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
           };
-        }]
+        }
+      ]
     };
   }]);

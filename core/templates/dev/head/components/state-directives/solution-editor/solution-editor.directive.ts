@@ -78,7 +78,8 @@ angular.module('oppia').directive('solutionEditor', [
               ui_config: {}
             };
           };
-        }]
+        }
+      ]
     };
   }
 ]);

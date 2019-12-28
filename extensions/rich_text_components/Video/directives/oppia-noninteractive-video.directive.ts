@@ -93,7 +93,8 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
               ctrl.tabIndexVal = -1;
             }
           };
-        }]
+        }
+      ]
     };
   }
 ]);

@@ -71,8 +71,7 @@ angular.module('oppia').directive('statisticsTab', [
           var _EXPLORATION_STATS_VERSION_ALL = 'all';
           var stateStatsModalIsOpen = false;
 
-          ctrl.getLocaleAbbreviatedDatetimeString =
-          function(millisSinceEpoch) {
+          ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               millisSinceEpoch);
           };
@@ -93,33 +92,31 @@ angular.module('oppia').directive('statisticsTab', [
               ctrl.stateStats = data.state_stats_mapping;
 
               ReadOnlyExplorationBackendApiService.loadLatestExploration(
-                ExplorationDataService.explorationId).then(
-                function(response) {
-                  var statesDict = response.exploration.states;
-                  var states = StatesObjectFactory.createFromBackendDict(
-                    statesDict);
-                  var initStateName = response.exploration.init_state_name;
+                ExplorationDataService.explorationId).then(function(response) {
+                var statesDict = response.exploration.states;
+                var states = StatesObjectFactory.createFromBackendDict(
+                  statesDict);
+                var initStateName = response.exploration.init_state_name;
 
-                  ctrl.playthroughsAreAvailable =
-                    ExplorationFeaturesService
-                      .isPlaythroughRecordingEnabled() &&
-                    !ExplorationFeaturesService.isImprovementsTabEnabled();
-                  ctrl.statsGraphData = ComputeGraphService.compute(
-                    initStateName, states);
-                  var improvements = (
-                    StateImprovementSuggestionService.getStateImprovements(
-                      states, ctrl.stateStats));
-                  ctrl.highlightStates = {};
-                  improvements.forEach(function(impItem) {
-                    // TODO(bhenning): This is the feedback for improvement
-                    // types and should be included with the definitions of
-                    // the improvement types.
-                    if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
-                      ctrl.highlightStates[impItem.stateName] = (
-                        'May be confusing');
-                    }
-                  });
+                ctrl.playthroughsAreAvailable =
+                  ExplorationFeaturesService.isPlaythroughRecordingEnabled() &&
+                  !ExplorationFeaturesService.isImprovementsTabEnabled();
+                ctrl.statsGraphData = ComputeGraphService.compute(
+                  initStateName, states);
+                var improvements = (
+                  StateImprovementSuggestionService.getStateImprovements(
+                    states, ctrl.stateStats));
+                ctrl.highlightStates = {};
+                improvements.forEach(function(impItem) {
+                  // TODO(bhenning): This is the feedback for improvement types
+                  // and should be included with the definitions of the
+                  // improvement types.
+                  if (impItem.type === IMPROVE_TYPE_INCOMPLETE) {
+                    ctrl.highlightStates[impItem.stateName] = (
+                      'May be confusing');
+                  }
                 });
+              });
 
               if (numActualStarts > 0) {
                 ctrl.explorationHasBeenVisited = true;
@@ -231,8 +228,7 @@ angular.module('oppia').directive('statisticsTab', [
                         var escapedData =
                           HtmlEscaperService.objToEscapedJson(vizInfo.data);
                         var escapedOptions =
-                          HtmlEscaperService.objToEscapedJson(
-                            vizInfo.options);
+                          HtmlEscaperService.objToEscapedJson(vizInfo.options);
 
                         var el = $(
                           '<oppia-visualization-' +
@@ -297,6 +293,7 @@ angular.module('oppia').directive('statisticsTab', [
 
             ctrl.explorationHasBeenVisited = false;
           };
-        }]
+        }
+      ]
     };
   }]);

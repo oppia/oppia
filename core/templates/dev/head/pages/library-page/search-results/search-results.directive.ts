@@ -72,6 +72,7 @@ angular.module('oppia').directive('searchResults', [
              UrlInterpolationService.getStaticImageUrl(
                '/general/no_explorations_found.png');
           };
-        }]
+        }
+      ]
     };
   }]);

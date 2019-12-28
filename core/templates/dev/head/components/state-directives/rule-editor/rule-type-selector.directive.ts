@@ -97,6 +97,7 @@ angular.module('oppia').directive('ruleTypeSelector', [function() {
             $scope.$apply();
           });
         };
-      }]
+      }
+    ]
   };
 }]);

@@ -477,11 +477,9 @@ angular.module('oppia').directive('questionPlayer', [
             var testIsPassed = true;
             var failedSkillIds = [];
             if (isInPassOrFailMode()) {
-              Object.keys(
-                ctrl.scorePerSkillMapping).forEach(function(skillId) {
-                var correctionRate = (
-                  ctrl.scorePerSkillMapping[skillId].score /
-                  ctrl.scorePerSkillMapping[skillId].total);
+              Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
+                var correctionRate = ctrl.scorePerSkillMapping[skillId].score /
+                  ctrl.scorePerSkillMapping[skillId].total;
                 if (correctionRate <
                   ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
                   testIsPassed = false;
@@ -594,6 +592,7 @@ angular.module('oppia').directive('questionPlayer', [
             initResults();
             ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           };
-        }]
+        }
+      ]
     };
   }]);

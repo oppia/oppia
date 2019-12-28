@@ -69,7 +69,8 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
           ctrl.$onInit = function() {
             ctrl.skillDescription = skillSummary.description;
           };
-        }]
+        }
+      ]
     };
   }
 ]);

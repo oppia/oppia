@@ -72,7 +72,8 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswerFn, isAnswerValid);
           };
-        }]
+        }
+      ]
     };
   }
 ]);

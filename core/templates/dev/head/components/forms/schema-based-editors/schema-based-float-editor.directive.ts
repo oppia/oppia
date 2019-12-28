@@ -110,6 +110,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               ctrl.hasLoaded = true;
             });
           };
-        }]
+        }
+      ]
     };
   }]);

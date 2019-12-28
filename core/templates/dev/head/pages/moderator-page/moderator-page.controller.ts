@@ -129,6 +129,7 @@ angular.module('oppia').directive('moderatorPage', [
                 ctrl.displayedFeaturedActivityReferences);
             });
           };
-        }]
+        }
+      ]
     };
   }]);

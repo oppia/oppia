@@ -51,6 +51,7 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
               ctrl.localValue = 0;
             }
           };
-        }]
+        }
+      ]
     };
   }]);

@@ -111,7 +111,8 @@ angular.module('oppia').directive('oppiaInteractiveEndExploration', [
               });
             }
           };
-        }]
+        }
+      ]
     };
   }
 ]);

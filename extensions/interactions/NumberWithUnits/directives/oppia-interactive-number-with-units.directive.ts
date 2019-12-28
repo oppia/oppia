@@ -124,7 +124,8 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswerFn, ctrl.isAnswerValid);
           };
-        }]
+        }
+      ]
     };
   }
 ]);

@@ -34,8 +34,8 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
         '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
         function($scope, $rootScope, SearchService, WindowDimensionsService) {
           var ctrl = this;
-          // Called when the first batch of search results is retrieved from
-          // the server.
+          // Called when the first batch of search results is retrieved from the
+          // server.
           $scope.$on(
             'initialSearchResultsLoaded', function(evt, activityList) {
               ctrl.allActivitiesInOrder = activityList;
@@ -71,6 +71,7 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
               $scope.$apply();
             });
           };
-        }]
+        }
+      ]
     };
   }]);

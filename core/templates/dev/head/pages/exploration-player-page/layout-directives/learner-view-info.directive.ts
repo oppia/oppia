@@ -88,12 +88,12 @@ angular.module('oppia').directive('learnerViewInfo', [
               },
               controller: [
                 '$scope', '$uibModalInstance',
-                'DateTimeFormatService', 'RatingComputationService',
-                'expInfo', 'UrlInterpolationService',
+                'DateTimeFormatService', 'RatingComputationService', 'expInfo',
+                'UrlInterpolationService',
                 function(
                     $scope, $uibModalInstance,
-                    DateTimeFormatService, RatingComputationService,
-                    expInfo, UrlInterpolationService) {
+                    DateTimeFormatService, RatingComputationService, expInfo,
+                    UrlInterpolationService) {
                   var getExplorationTagsSummary = function(arrayOfTags) {
                     var tagsToShow = [];
                     var tagsInTooltip = [];
@@ -159,15 +159,13 @@ angular.module('oppia').directive('learnerViewInfo', [
                   $scope.infoCardBackgroundImageUrl = expInfo
                     .thumbnail_icon_url;
                   $scope.getStaticImageUrl = function(imagePath) {
-                    return UrlInterpolationService.getStaticImageUrl(
-                      imagePath);
+                    return UrlInterpolationService.getStaticImageUrl(imagePath);
                   };
                   $scope.lastUpdatedString = getLastUpdatedString(
                     expInfo.last_updated_msec);
                   $scope.numViews = expInfo.num_views;
                   $scope.objective = expInfo.objective;
-                  $scope.explorationIsPrivate = (
-                    expInfo.status === 'private');
+                  $scope.explorationIsPrivate = (expInfo.status === 'private');
 
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss();

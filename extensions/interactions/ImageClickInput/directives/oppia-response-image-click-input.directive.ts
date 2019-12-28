@@ -43,7 +43,8 @@ angular.module('oppia').directive('oppiaResponseImageClickInput', [
               _answer.clickedRegions.length > 0 ?
                 '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
           };
-        }]
+        }
+      ]
     };
   }
 ]);

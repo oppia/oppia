@@ -55,8 +55,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
             SearchExplorationsBackendApiService, SiteAnalyticsService,
             INVALID_NAME_CHARS) {
           var ctrl = this;
-          var CREATE_NEW_EXPLORATION_URL_TEMPLATE =
-          '/create/<exploration_id>';
+          var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
           /**
            * Fetches a list of exploration metadata dicts from backend, given
@@ -126,8 +125,8 @@ angular.module('oppia').directive('collectionNodeCreator', [
                     ctrl.collection, newExplorationId, summaryBackendObject);
                 } else {
                   AlertsService.addWarning(
-                    'That exploration does not exist or you do not have' +
-                    'edit access to it.');
+                    'That exploration does not exist or you do not have edit ' +
+                    'access to it.');
                 }
               }, function() {
                 AlertsService.addWarning(
@@ -188,6 +187,7 @@ angular.module('oppia').directive('collectionNodeCreator', [
             ctrl.newExplorationTitle = '';
             ctrl.searchQueryHasError = false;
           };
-        }]
+        }
+      ]
     };
   }]);

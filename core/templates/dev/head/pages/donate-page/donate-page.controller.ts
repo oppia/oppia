@@ -48,13 +48,14 @@ angular.module('oppia').directive('donatePage', [
           };
 
           ctrl.onDonateThroughPayPal = function() {
-            // Redirection to PayPal will be initiated at the same time as
-            // this function is run, but should be slow enough to allow this
-            // function time to complete. It is not possible to do
-            // $http.post() in javascript after a delay because cross-site
-            // POSTing is notpermitted in scripts; see
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP
-            // /Access_control_CORS for more information.
+            // Redirection to PayPal will be initiated at the same time as this
+            // function is run, but should be slow enough to allow this function
+            // time to complete. It is not possible to do $http.post() in
+            // javascript after a delay because cross-site POSTing is not
+            // permitted in scripts; see
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control
+            // _CORS
+            // for more information.
             SiteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
           };
           ctrl.$onInit = function() {
@@ -62,6 +63,7 @@ angular.module('oppia').directive('donatePage', [
             ctrl.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/opp_donate_text.svg');
           };
-        }]
+        }
+      ]
     };
   }]);

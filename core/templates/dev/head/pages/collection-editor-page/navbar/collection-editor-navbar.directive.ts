@@ -92,6 +92,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
           $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
           $scope.$on(
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
+
           ctrl.getWarningsCount = function() {
             return ctrl.validationIssues.length;
           };
@@ -196,8 +197,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                         return;
                       }
                       if (!ctrl.newObjective) {
-                        AlertsService.addWarning(
-                          'Please specify an objective');
+                        AlertsService.addWarning('Please specify an objective');
                         return;
                       }
                       if (!ctrl.newCategory) {
@@ -291,6 +291,7 @@ angular.module('oppia').directive('collectionEditorNavbar', [
 
             ctrl.validationIssues = [];
           };
-        }]
+        }
+      ]
     };
   }]);

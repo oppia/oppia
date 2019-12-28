@@ -131,6 +131,7 @@ angular.module('oppia').directive('createActivityButton', [
               }
             }
           };
-        }]
+        }
+      ]
     };
   }]);

@@ -264,6 +264,7 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
             return StateTopAnswersStatsService.getUnresolvedStateStats(
               StateEditorService.getActiveStateName());
           };
-        }]
+        }
+      ]
     };
   }]);

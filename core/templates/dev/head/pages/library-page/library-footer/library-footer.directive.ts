@@ -37,6 +37,7 @@ angular.module('oppia').directive('libraryFooter', [
             var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
             ctrl.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
           };
-        }]
+        }
+      ]
     };
   }]);

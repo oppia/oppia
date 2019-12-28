@@ -38,5 +38,6 @@ angular.module('oppia').directive('thanksPage', [
           ctrl.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/donate.png');
         };
-      }]};
+      }]
+    };
   }]);

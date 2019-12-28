@@ -53,8 +53,7 @@ angular.module('oppia').directive('baseContent', [
 
           var ctrl = this;
           ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
-          ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar(
-          );
+          ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
           ctrl.isBackgroundMaskActive = () => (
             BackgroundMaskService.isMaskActive());
           ctrl.skipToMainContent = function() {
@@ -73,7 +72,8 @@ angular.module('oppia').directive('baseContent', [
             ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
             ctrl.DEV_MODE = $rootScope.DEV_MODE;
           };
-        }]
+        }
+      ]
     };
   }
 ]);

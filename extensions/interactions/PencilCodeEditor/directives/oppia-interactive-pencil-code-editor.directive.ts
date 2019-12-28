@@ -192,7 +192,8 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
           };
-        }]
+        }
+      ]
     };
   }
 ]);

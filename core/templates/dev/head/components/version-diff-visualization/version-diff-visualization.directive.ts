@@ -115,8 +115,8 @@ angular.module('oppia').directive('versionDiffVisualization', [
         // - oldStateName is undefined if the name of the state is unchanged
         //     between the 2 versions, or the name of the state in the older
         //     version if the state name is changed.
-        // - stateProperty is whether the state is added, changed, unchanged
-        //   or deleted.
+        // - stateProperty is whether the state is added, changed, unchanged or
+        //   deleted.
         ctrl.showStateDiffModal = function(
             newStateName, oldStateName, stateProperty) {
           $uibModal.open({
@@ -179,8 +179,8 @@ angular.module('oppia').directive('versionDiffVisualization', [
                 $scope.oldStateName = oldStateName;
                 /*
                  * $scope.yamlStrs is an object with keys 'earlierVersion' and
-                 * 'laterVersion', whose values are the YAML representations
-                 * of the compared versions.
+                 * 'laterVersion', whose values are the YAML representations of
+                 * the compared versions.
                  */
                 $scope.yamlStrs = {};
 

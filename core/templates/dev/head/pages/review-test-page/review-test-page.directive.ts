@@ -69,8 +69,7 @@ angular.module('oppia').directive('reviewTestPage', [
               STORY_VIEWER_PAGE, {
                 story_id: ctrl.storyId
               });
-            ReviewTestBackendApiService.fetchReviewTestData(
-              ctrl.storyId).then(
+            ReviewTestBackendApiService.fetchReviewTestData(ctrl.storyId).then(
               function(result) {
                 var skillIdList = [];
                 var skillDescriptions = [];

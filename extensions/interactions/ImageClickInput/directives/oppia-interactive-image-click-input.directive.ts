@@ -70,8 +70,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             var image = $($element).find('.oppia-image-click-img');
             var labeledRegion = imageAndRegions.labeledRegions[index];
             var regionArea = labeledRegion.region.area;
-            var leftDelta =
-            image.offset().left - image.parent().offset().left;
+            var leftDelta = image.offset().left - image.parent().offset().left;
             var topDelta = image.offset().top - image.parent().offset().top;
             return {
               left: regionArea[0][0] * image.width() + leftDelta,
@@ -206,7 +205,8 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
 
             CurrentInteractionService.registerCurrentInteraction(null, null);
           };
-        }]
+        }
+      ]
     };
   }
 ]);

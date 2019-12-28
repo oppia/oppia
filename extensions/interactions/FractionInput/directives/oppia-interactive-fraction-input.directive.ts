@@ -119,8 +119,8 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
                 !ctrl.allowNonzeroIntegerPart &&
                   fraction.hasNonzeroIntegerPart()) {
                 errorMessage = (
-                  'Please enter your answer as a fraction (e.g., 5/3 ' +
-                  'instead of 1 2/3).');
+                  'Please enter your answer as a fraction (e.g., 5/3 instead ' +
+                  'of 1 2/3).');
                 ctrl.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else {
@@ -160,7 +160,8 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
             CurrentInteractionService.registerCurrentInteraction(
               submitAnswerFn, ctrl.isAnswerValid);
           };
-        }]
+        }
+      ]
     };
   }
 ]);

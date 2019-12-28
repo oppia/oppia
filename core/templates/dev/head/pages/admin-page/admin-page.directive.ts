@@ -84,7 +84,8 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
             ctrl.statusMessage = '';
             CsrfTokenService.initializeToken();
           };
-        }]
+        }
+      ]
     };
   }
 ]);

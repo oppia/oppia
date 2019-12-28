@@ -160,9 +160,9 @@ angular.module('oppia').directive('libraryPage', [
             });
           };
 
-          // The carousels do not work when the width is 1 card long, so we
-          // need to handle this case discretely and also prevent swiping
-          // past the first and last card.
+          // The carousels do not work when the width is 1 card long, so we need
+          // to handle this case discretely and also prevent swiping past the
+          // first and last card.
           ctrl.incrementLeftmostCardIndex = function(ind) {
             var lastItem = ((
               ctrl.libraryGroups[ind].activity_summary_dicts.length -
@@ -199,11 +199,9 @@ angular.module('oppia').directive('libraryPage', [
                 selectedCategories[categories[i]] = true;
               }
 
-              var targetSearchQueryUrl =
-              SearchService.getSearchUrlQueryString(
+              var targetSearchQueryUrl = SearchService.getSearchUrlQueryString(
                 '', selectedCategories, {});
-              $window.location.href =
-              '/search/find?q=' + targetSearchQueryUrl;
+              $window.location.href = '/search/find?q=' + targetSearchQueryUrl;
             }
           };
           ctrl.$onInit = function() {
@@ -364,7 +362,8 @@ angular.module('oppia').directive('libraryPage', [
               $scope.$apply();
             });
           };
-        }]
+        }
+      ]
     };
   }
 ]);

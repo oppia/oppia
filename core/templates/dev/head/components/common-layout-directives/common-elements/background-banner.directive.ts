@@ -39,6 +39,7 @@ angular.module('oppia').directive('backgroundBanner', [
             ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
               '/background/' + bannerImageFilename);
           };
-        }]
+        }
+      ]
     };
   }]);

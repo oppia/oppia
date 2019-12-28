@@ -46,7 +46,8 @@ angular.module('oppia').directive('oppiaShortResponseMultipleChoiceInput', [
             var response = $filter('convertToPlainText')(_choices[_answer]);
             ctrl.response = $filter('truncateAtFirstLine')(response);
           };
-        }]
+        }
+      ]
     };
   }
 ]);

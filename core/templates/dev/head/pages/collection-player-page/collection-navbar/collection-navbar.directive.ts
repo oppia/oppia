@@ -40,7 +40,8 @@ angular.module('oppia').directive('collectionNavbar', [
               ReadOnlyCollectionBackendApiService.getCollectionDetails(
                 UrlService.getCollectionIdFromUrl()).title);
           });
-        }]
+        }
+      ]
     };
   }
 ]);

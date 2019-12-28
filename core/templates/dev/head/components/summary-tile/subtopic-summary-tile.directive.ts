@@ -46,6 +46,7 @@ angular.module('oppia').directive('subtopicSummaryTile', [
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
-        }]
+        }
+      ]
     };
   }]);

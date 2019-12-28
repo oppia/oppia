@@ -114,8 +114,7 @@ angular.module('oppia').directive('explorationGraph', [
               } else if (closeDict.action === 'navigate') {
                 ctrl.onClickStateInMinimap(closeDict.stateName);
               } else {
-                console.error('Invalid closeDict action: ' +
-                  closeDict.action);
+                console.error('Invalid closeDict action: ' + closeDict.action);
               }
             }, function() {
               // This callback is triggered when the Cancel button is
@@ -130,6 +129,7 @@ angular.module('oppia').directive('explorationGraph', [
           ctrl.isEditable = function() {
             return EditabilityService.isEditable();
           };
-        }]
+        }
+      ]
     };
   }]);

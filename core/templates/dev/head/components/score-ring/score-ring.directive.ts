@@ -68,6 +68,7 @@ angular.module('oppia').directive('scoreRing', [
               return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
             }
           };
-        }]
+        }
+      ]
     };
   }]);

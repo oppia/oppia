@@ -102,8 +102,7 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           ctrl.containsMisconceptions = function() {
             var containsMisconceptions = false;
-            Object.keys(
-              ctrl.misconceptionsBySkill).forEach(function(skillId) {
+            Object.keys(ctrl.misconceptionsBySkill).forEach(function(skillId) {
               if (ctrl.misconceptionsBySkill[skillId].length > 0) {
                 containsMisconceptions = true;
               }
@@ -140,8 +139,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                   $scope.done = function() {
                     $uibModalInstance.close({
                       misconception: $scope.selectedMisconception,
-                      misconceptionSkillId:
-                      $scope.selectedMisconceptionSkillId,
+                      misconceptionSkillId: $scope.selectedMisconceptionSkillId,
                       feedbackIsUsed: $scope.misconceptionFeedbackIsUsed
                     });
                   };
@@ -178,8 +176,8 @@ angular.module('oppia').directive('answerGroupEditor', [
           };
 
           // Updates answer choices when the interaction requires it -- e.g.,
-          // the rules for multiple choice need to refer to the multiple
-          // choice interaction's customization arguments.
+          // the rules for multiple choice need to refer to the multiple choice
+          // interaction's customization arguments.
           // TODO(sll): Remove the need for this watcher, or make it less
           // ad hoc.
           $scope.$on('updateAnswerChoices', function() {
@@ -260,10 +258,8 @@ angular.module('oppia').directive('answerGroupEditor', [
                 };
               case 'NormalizedRectangle2D':
                 return [
-                  [getDefaultInputValue('Real'),
-                    getDefaultInputValue('Real')],
-                  [getDefaultInputValue('Real'),
-                    getDefaultInputValue('Real')]];
+                  [getDefaultInputValue('Real'), getDefaultInputValue('Real')],
+                  [getDefaultInputValue('Real'), getDefaultInputValue('Real')]];
               case 'ImageRegion':
                 return {
                   area: getDefaultInputValue('NormalizedRectangle2D'),
@@ -277,8 +273,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               case 'ClickOnImage':
                 return {
                   clickPosition: [
-                    getDefaultInputValue('Real'),
-                    getDefaultInputValue('Real')],
+                    getDefaultInputValue('Real'), getDefaultInputValue('Real')],
                   clickedRegions: []
                 };
             }
@@ -312,8 +307,8 @@ angular.module('oppia').directive('answerGroupEditor', [
               description = description.replace(PATTERN, ' ');
             }
 
-            // Save the state of the rules before adding a new one (in case
-            // the user cancels the addition).
+            // Save the state of the rules before adding a new one (in case the
+            // user cancels the addition).
             ctrl.rulesMemento = angular.copy(ctrl.rules);
 
             // TODO(bhenning): Should use functionality in ruleEditor.js, but
@@ -407,6 +402,7 @@ angular.module('oppia').directive('answerGroupEditor', [
 
             _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
           };
-        }]
+        }
+      ]
     };
   }]);

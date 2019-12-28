@@ -71,8 +71,7 @@ angular.module('oppia').directive('communityDashboardPage', [
           var allAudioLanguageCodes = LanguageUtilService
             .getAllVoiceoverLanguageCodes();
           ctrl.onChangeLanguage = function() {
-            TranslationLanguageService.setActiveLanguageCode(
-              ctrl.languageCode);
+            TranslationLanguageService.setActiveLanguageCode(ctrl.languageCode);
             LocalStorageService.updateLastSelectedTranslationLanguageCode(
               ctrl.languageCode);
           };
@@ -80,8 +79,7 @@ angular.module('oppia').directive('communityDashboardPage', [
           ctrl.showLanguageSelector = function() {
             var activeTabDetail = ctrl.tabsDetails[ctrl.activeTabName];
             return (
-              activeTabDetail.customizationOptions.indexOf(
-                'language') !== -1);
+              activeTabDetail.customizationOptions.indexOf('language') !== -1);
           };
           ctrl.onTabClick = function(activeTabName) {
             ctrl.activeTabName = activeTabName;
@@ -120,6 +118,7 @@ angular.module('oppia').directive('communityDashboardPage', [
               UrlInterpolationService.getStaticImageUrl(
                 '/avatar/oppia_avatar_100px.svg'));
           };
-        }]
+        }
+      ]
     };
   }]);

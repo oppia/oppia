@@ -102,7 +102,8 @@ angular.module('oppia').directive('rubricsEditor', [
               ui_config: {}
             };
           };
-        }]
+        }
+      ]
     };
   }
 ]);

@@ -76,7 +76,8 @@ angular.module('oppia').directive('collectionEditorPage', [
             CollectionEditorStateService.loadCollection(
               UrlService.getCollectionIdFromEditorUrl());
           };
-        }]
+        }
+      ]
     };
   }
 ]);

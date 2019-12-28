@@ -116,6 +116,7 @@ angular.module('oppia').directive('topicLandingPage', [
             ctrl.image1 = getImageData(1);
             ctrl.image2 = getImageData(2);
           };
-        }]
+        }
+      ]
     };
   }]);

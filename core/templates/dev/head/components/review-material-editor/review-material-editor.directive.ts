@@ -76,7 +76,8 @@ angular.module('oppia').directive('reviewMaterialEditor', [
               ctrl.getBindableDict().displayedConceptCardExplanation;
             ctrl.conceptCardExplanationEditorIsShown = false;
           };
-        }]
+        }
+      ]
     };
   }
 ]);

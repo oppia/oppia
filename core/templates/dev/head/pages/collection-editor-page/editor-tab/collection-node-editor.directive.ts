@@ -65,8 +65,8 @@ angular.module('oppia').directive('collectionNodeEditor', [
             if (!CollectionLinearizerService.shiftNodeLeft(
               ctrl.collection, explorationId)) {
               AlertsService.fatalWarning(
-                'Internal collection editor error. Could not shift ' +
-                'node left with ID: ' + explorationId);
+                'Internal collection editor error. Could not shift node left ' +
+                'with ID: ' + explorationId);
             }
           };
 
@@ -84,6 +84,7 @@ angular.module('oppia').directive('collectionNodeEditor', [
           ctrl.$onInit = function() {
             ctrl.collection = CollectionEditorStateService.getCollection();
           };
-        }]
+        }
+      ]
     };
   }]);

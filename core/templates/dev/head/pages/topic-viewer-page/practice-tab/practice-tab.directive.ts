@@ -41,6 +41,7 @@ angular.module('oppia').directive('practiceTab', [
         function(
             $scope) {
           var ctrl = this;
+
           ctrl.newPracticeSession = function() {
             var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
               PRACTICE_SESSIONS_URL, {
@@ -48,6 +49,7 @@ angular.module('oppia').directive('practiceTab', [
               });
             $window.location.href = practiceSessionsUrl;
           };
-        }]
+        }
+      ]
     };
   }]);

@@ -116,8 +116,8 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             if (!CollectionValidationService.isTagValid(
               ctrl.displayedCollectionTags)) {
               AlertsService.addWarning(
-                'Please ensure that there are no duplicate tags and that' +
-                'all tags contain only lower case and spaces.');
+                'Please ensure that there are no duplicate tags and that all ' +
+                'tags contain only lower case and spaces.');
               return;
             }
             CollectionUpdateService.setCollectionTags(
@@ -141,6 +141,7 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             ctrl.languageListForSelect = SUPPORTED_CONTENT_LANGUAGES;
             ctrl.TAG_REGEX = TAG_REGEX;
           };
-        }]
+        }
+      ]
     };
   }]);

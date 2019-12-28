@@ -91,6 +91,7 @@ angular.module('oppia').directive('teachPage', [
               }
             };
           };
-        }]
+        }
+      ]
     };
   }]);

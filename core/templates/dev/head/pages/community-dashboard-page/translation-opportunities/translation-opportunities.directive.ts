@@ -100,8 +100,7 @@ angular.module('oppia').directive(
               !ctrl.opportunitiesAreLoading &&
                 ctrl.moreOpportunitiesAvailable) {
               ctrl.opportunitiesAreLoading = true;
-              var cos = ContributionOpportunitiesService;
-              cos.getMoreTranslationOpportunities(
+              ContributionOpportunitiesService.getMoreTranslationOpportunities(
                 TranslationLanguageService.getActiveLanguageCode(),
                 updateWithNewOpportunities);
             }
@@ -124,11 +123,9 @@ angular.module('oppia').directive(
                 }
               },
               controller: [
-                '$scope', '$uibModalInstance', 'opportunity',
-                'userIsLoggedIn',
+                '$scope', '$uibModalInstance', 'opportunity', 'userIsLoggedIn',
                 function(
-                    $scope, $uibModalInstance, opportunity,
-                    userIsLoggedIn) {
+                    $scope, $uibModalInstance, opportunity, userIsLoggedIn) {
                   $scope.userIsLoggedIn = userIsLoggedIn;
                   $scope.uploadingTranslation = false;
                   $scope.activeWrittenTranslation = {};
@@ -145,8 +142,7 @@ angular.module('oppia').directive(
                   $scope.moreAvailable = false;
                   $scope.textToTranslate = '';
                   $scope.languageDescription = (
-                    TranslationLanguageService.getActiveLanguageDescription(
-                    ));
+                    TranslationLanguageService.getActiveLanguageDescription());
                   TranslateTextService.init(
                     opportunity.id,
                     TranslationLanguageService.getActiveLanguageCode(),

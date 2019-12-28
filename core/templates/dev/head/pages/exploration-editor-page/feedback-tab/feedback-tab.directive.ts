@@ -146,8 +146,7 @@ angular.module('oppia').directive('feedbackTab', [
                     !_hasUnsavedChanges() ? 'primary' : 'default');
           };
 
-          // TODO(Allan): Implement ability to edit suggestions before
-          // applying.
+          // TODO(Allan): Implement ability to edit suggestions before applying.
           ctrl.showSuggestionModal = function() {
             SuggestionModalForExplorationEditorService.showSuggestionModal(
               ctrl.activeThread.suggestion.suggestionType,
@@ -172,8 +171,7 @@ angular.module('oppia').directive('feedbackTab', [
               return;
             }
             if (!tmpStatus) {
-              AlertsService.addWarning('Invalid message status: ' +
-                tmpStatus);
+              AlertsService.addWarning('Invalid message status: ' + tmpStatus);
               return;
             }
             ctrl.threadIsUpdated = true;
@@ -240,6 +238,7 @@ angular.module('oppia').directive('feedbackTab', [
               $rootScope.loadingMessage = '';
             });
           };
-        }]
+        }
+      ]
     };
   }]);

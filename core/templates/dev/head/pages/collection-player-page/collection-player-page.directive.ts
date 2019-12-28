@@ -87,8 +87,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
 
           ctrl.getCollectionNodeForExplorationId = function(explorationId) {
             var collectionNode = (
-              ctrl.collection.getCollectionNodeByExplorationId(
-                explorationId));
+              ctrl.collection.getCollectionNodeByExplorationId(explorationId));
             if (!collectionNode) {
               AlertsService.addWarning(
                 'There was an error loading the collection.');
@@ -108,11 +107,9 @@ angular.module('oppia').directive('collectionPlayerPage', [
 
           ctrl.getNonRecommendedCollectionNodeCount = function() {
             return ctrl.collection.getCollectionNodeCount() - (
-              ctrl.collectionPlaythrough
-                .getNextRecommendedCollectionNodeCount(
-                ) + ctrl.collectionPlaythrough
-                .getCompletedExplorationNodeCount(
-                ));
+              ctrl.collectionPlaythrough.getNextRecommendedCollectionNodeCount(
+              ) + ctrl.collectionPlaythrough.getCompletedExplorationNodeCount(
+              ));
           };
 
           ctrl.updateExplorationPreview = function(explorationId) {
@@ -128,8 +125,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
             // parameters for the bezier curve to be generated. The default
             // parameters represent the first curve ie. lesson 1 to lesson 3.
             ctrl.pathSvgParameters = 'M250 80  C 470 100, 470 280, 250 300';
-            var collectionNodeCount =
-            ctrl.collection.getCollectionNodeCount();
+            var collectionNodeCount = ctrl.collection.getCollectionNodeCount();
             // The sParameterExtension represents the co-ordinates following
             // the 'S' (smooth curve to) command in SVG.
             var sParameterExtension = '';
@@ -188,14 +184,12 @@ angular.module('oppia').directive('collectionPlayerPage', [
             var y = ctrl.ICON_Y_INITIAL_PX;
             var countMiddleIcon = 1;
 
-            for (var i = 1;
-              i < ctrl.collection.getCollectionNodeCount(); i++) {
+            for (var i = 1; i < ctrl.collection.getCollectionNodeCount(); i++) {
               if (countMiddleIcon === 0 && x === ctrl.ICON_X_MIDDLE_PX) {
                 x = ctrl.ICON_X_LEFT_PX;
                 y += ctrl.ICON_Y_INCREMENT_PX;
                 countMiddleIcon = 1;
-              } else if (countMiddleIcon === 1 &&
-                  x === ctrl.ICON_X_MIDDLE_PX) {
+              } else if (countMiddleIcon === 1 && x === ctrl.ICON_X_MIDDLE_PX) {
                 x = ctrl.ICON_X_RIGHT_PX;
                 y += ctrl.ICON_Y_INCREMENT_PX;
                 countMiddleIcon = 0;
@@ -206,8 +200,7 @@ angular.module('oppia').directive('collectionPlayerPage', [
               iconParametersArray.push({
                 thumbnailIconUrl:
                   collectionNodes[i].getExplorationSummaryObject(
-                  ).thumbnail_icon_url.replace(
-                    'subjects', 'inverted_subjects'),
+                  ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
                 left: x + 'px',
                 top: y + 'px',
                 thumbnailBgColor:
@@ -276,6 +269,12 @@ angular.module('oppia').directive('collectionPlayerPage', [
               WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
             $anchorScroll.yOffset = -80;
 
+            // Touching anywhere outside the mobile preview should hide it.
+            document.addEventListener('touchstart', function() {
+              if (ctrl.explorationCardIsShown === true) {
+                ctrl.explorationCardIsShown = false;
+              }
+            });
             $http.get('/collection_handler/data/' + ctrl.collectionId).then(
               function(response) {
                 response = response.data;
@@ -362,14 +361,9 @@ angular.module('oppia').directive('collectionPlayerPage', [
                   'There was an error loading the collection.');
               }
             );
-            // Touching anywhere outside the mobile preview should hide it.
-            document.addEventListener('touchstart', function() {
-              if (ctrl.explorationCardIsShown === true) {
-                ctrl.explorationCardIsShown = false;
-              }
-            });
           };
-        }]
+        }
+      ]
     };
   }
 ]);

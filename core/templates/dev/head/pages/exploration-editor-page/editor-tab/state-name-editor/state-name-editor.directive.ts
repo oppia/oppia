@@ -122,6 +122,7 @@ angular.module('oppia').directive('stateNameEditor', [
             ctrl.EditabilityService = EditabilityService;
             ctrl.stateNameEditorIsShown = false;
           };
-        }]
+        }
+      ]
     };
   }]);

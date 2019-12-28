@@ -40,6 +40,7 @@ angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
                 ctrl.storyTitle = storyDataDict.story_title;
               });
           };
-        }]
+        }
+      ]
     };
   }]);

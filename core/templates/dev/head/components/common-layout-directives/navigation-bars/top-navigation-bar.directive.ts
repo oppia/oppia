@@ -110,8 +110,7 @@ angular.module('oppia').directive('topNavigationBar', [
            *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
            */
           ctrl.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
-            NavigationService.onMenuKeypress(
-              evt, menuName, eventsTobeHandled);
+            NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             ctrl.activeMenuName = NavigationService.activeMenuName;
           };
 
@@ -214,6 +213,22 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.isSuperAdmin = null;
             ctrl.userIsLoggedIn = null;
             ctrl.username = '';
+            ctrl.currentUrl = window.location.pathname.split('/')[1];
+            ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
+            ctrl.logoutUrl = LOGOUT_URL;
+            ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
+            ctrl.standardNavIsShown = (
+              NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);
+            ctrl.googleSignInIconUrl = (
+              UrlInterpolationService.getStaticImageUrl(
+                '/google_signin_buttons/google_signin.svg'));
+            ctrl.ACTION_OPEN = NavigationService.ACTION_OPEN;
+            ctrl.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
+            ctrl.KEYBOARD_EVENT_TO_KEY_CODES =
+            NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
+            ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+            ctrl.navElementsVisibilityStatus = {};
+
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {
                 $translate.use(userInfo.getPreferredSiteLanguageCode());
@@ -250,23 +265,7 @@ angular.module('oppia').directive('topNavigationBar', [
             UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
               ctrl.profilePictureDataUrl = dataUrl;
             });
-            ctrl.currentUrl = window.location.pathname.split('/')[1];
-            ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
-            ctrl.logoutUrl = LOGOUT_URL;
-            ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
-            ctrl.standardNavIsShown = (
-              NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);
-            ctrl.googleSignInIconUrl = (
-              UrlInterpolationService.getStaticImageUrl(
-                '/google_signin_buttons/google_signin.svg'));
-            ctrl.ACTION_OPEN = NavigationService.ACTION_OPEN;
-            ctrl.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
-            ctrl.KEYBOARD_EVENT_TO_KEY_CODES =
-            NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
 
-
-            ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-            ctrl.navElementsVisibilityStatus = {};
             for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
               ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
             }

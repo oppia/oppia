@@ -111,8 +111,7 @@ angular.module('oppia').directive('ruleEditor', [
                       type: 'checkboxes',
                       varName: finalInputArray[i + 1]
                     });
-                  } else if (finalInputArray[2] ===
-                    'ListOfSetsOfHtmlStrings') {
+                  } else if (finalInputArray[2] === 'ListOfSetsOfHtmlStrings') {
                     ctrl.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {
                         return {
@@ -189,8 +188,8 @@ angular.module('oppia').directive('ruleEditor', [
             // The following is necessary in order to ensure that the
             // object-editor HTML tags load correctly when the rule type is
             // changed. This is an issue for, e.g., the MusicNotesInput
-            // interaction, where the rule inputs can sometimes be integers
-            // and sometimes be lists of music notes.
+            // interaction, where the rule inputs can sometimes be integers and
+            // sometimes be lists of music notes.
             ctrl.ruleDescriptionFragments = [];
             setTimeout(function() {
               ctrl.ruleDescriptionFragments = result;
@@ -234,8 +233,7 @@ angular.module('oppia').directive('ruleEditor', [
               // we could associate a particular varName with answerChoices
               // depending on the interaction. This varName would take its
               // default value from answerChoices, but other variables would
-              // take their default values from the DEFAULT_OBJECT_VALUES
-              // dict.
+              // take their default values from the DEFAULT_OBJECT_VALUES dict.
               if (angular.equals(DEFAULT_OBJECT_VALUES[varType], [])) {
                 ctrl.rule.inputs[varName] = [];
               } else if (answerChoices) {
@@ -273,6 +271,7 @@ angular.module('oppia').directive('ruleEditor', [
             }
             computeRuleDescriptionFragments();
           };
-        }]
+        }
+      ]
     };
   }]);

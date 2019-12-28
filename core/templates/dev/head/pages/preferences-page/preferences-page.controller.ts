@@ -113,8 +113,7 @@ angular.module('oppia').directive('preferencesPage', [
             }
           };
 
-          ctrl.onSubjectInterestsSelectionChange = function(
-              subjectInterests) {
+          ctrl.onSubjectInterestsSelectionChange = function(subjectInterests) {
             AlertsService.clearWarnings();
             ctrl.subjectInterestsChangedAtLeastOnce = true;
             ctrl.subjectInterestsWarningText = null;
@@ -139,9 +138,9 @@ angular.module('oppia').directive('preferencesPage', [
           };
 
           ctrl.showUsernamePopover = function(creatorUsername) {
-            // The popover on the subscription card is only shown if the
-            // length of the creator username is greater than 10 and the user
-            // hovers over the truncated username.
+            // The popover on the subscription card is only shown if the length
+            // of the creator username is greater than 10 and the user hovers
+            // over the truncated username.
             if (creatorUsername.length > 10) {
               return 'mouseenter';
             } else {
@@ -190,8 +189,7 @@ angular.module('oppia').directive('preferencesPage', [
                       var reader = new FileReader();
                       reader.onload = function(e) {
                         $scope.$apply(function() {
-                          $scope.uploadedImage = (
-                            <FileReader>e.target).result;
+                          $scope.uploadedImage = (<FileReader>e.target).result;
                         });
                       };
                       reader.readAsDataURL(file);
@@ -226,8 +224,8 @@ angular.module('oppia').directive('preferencesPage', [
               UserService.setProfileImageDataUrlAsync(
                 newProfilePictureDataUrl)
                 .then(function() {
-                  // The reload is needed in order to update the profile
-                  // picture in the top-right corner.
+                  // The reload is needed in order to update the profile picture
+                  // in the top-right corner.
                   $window.location.reload();
                 });
             }, function() {
@@ -294,6 +292,7 @@ angular.module('oppia').directive('preferencesPage', [
             LanguageUtilService.getLanguageIdsAndTexts();
             ctrl.SITE_LANGUAGE_CHOICES = SUPPORTED_SITE_LANGUAGES;
           };
-        }]
+        }
+      ]
     };
   }]);

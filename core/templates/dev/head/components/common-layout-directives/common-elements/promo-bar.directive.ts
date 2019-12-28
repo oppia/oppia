@@ -36,8 +36,7 @@ angular.module('oppia').directive('promoBar', [
             if (!isSessionStorageAvailable()) {
               return false;
             }
-            return !!angular.fromJson(
-              $window.sessionStorage.promoIsDismissed);
+            return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
           };
           var setPromoDismissed = function(promoIsDismissed) {
             if (!isSessionStorageAvailable()) {
@@ -68,12 +67,13 @@ angular.module('oppia').directive('promoBar', [
               ctrl.promoBarMessage = promoBarObject.promoBarMessage;
             });
 
-            // TODO(bhenning): Utilize cookies for tracking when a promo is
+            // TODO(#8300): Utilize cookies for tracking when a promo is
             // dismissed. Cookies allow for a longer-lived memory of whether the
             // promo is dismissed.
             ctrl.promoIsVisible = !isPromoDismissed();
           };
-        }]
+        }
+      ]
     };
   }
 ]);

@@ -34,8 +34,8 @@ angular.module('oppia').directive('musicPhraseEditor', [
         var ctrl = this;
         // The maximum number of notes allowed in a music phrase.
         var _MAX_NOTES_IN_PHRASE = 8;
-        // Reset the component each time the value changes (e.g. if this is
-        // part of an editable list).
+        // Reset the component each time the value changes (e.g. if this is part
+        // of an editable list).
         $scope.$watch('$ctrl.value', function(newValue) {
           // TODO(sll): Check that $ctrl.value is a list.
           ctrl.localValue = [];

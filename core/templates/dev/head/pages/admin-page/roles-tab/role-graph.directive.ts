@@ -101,6 +101,7 @@ angular.module('oppia').directive('roleGraph', [
               );
             }
           };
-        }]
+        }
+      ]
     };
   }]);

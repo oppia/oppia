@@ -51,8 +51,7 @@ angular.module('oppia').directive('solutionExplanationEditor', [
               StateSolutionService.displayed.explanation.getHtml() !==
               StateSolutionService.savedMemento.explanation.getHtml());
             if (contentHasChanged) {
-              var solutionContentId =
-              StateSolutionService.displayed.explanation
+              var solutionContentId = StateSolutionService.displayed.explanation
                 .getContentId();
               ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
                 solutionContentId);
@@ -84,6 +83,7 @@ angular.module('oppia').directive('solutionExplanationEditor', [
               ui_config: {}
             };
           };
-        }]
+        }
+      ]
     };
   }]);

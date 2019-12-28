@@ -65,6 +65,7 @@ angular.module('oppia').directive('collectionEditorNavbarBreadcrumb', [
           ctrl.$onInit = function() {
             ctrl.collection = CollectionEditorStateService.getCollection();
           };
-        }]
+        }
+      ]
     };
   }]);

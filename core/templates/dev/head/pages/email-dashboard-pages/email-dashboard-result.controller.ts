@@ -88,7 +88,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
                 setTimeout(function() {
                   $window.location.href = EMAIL_DASHBOARD_PAGE;
                 }, 4000);
-              }).then(null, function() {
+              }, function() {
                 ctrl.errorHasOccurred = true;
                 ctrl.submitIsInProgress = false;
               });
@@ -162,6 +162,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
             ctrl.errorHasOccurred = false;
             ctrl.testEmailSentSuccesfully = false;
           };
-        }]
+        }
+      ]
     };
   }]);

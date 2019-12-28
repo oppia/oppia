@@ -54,8 +54,7 @@ angular.module('oppia').directive('adminConfigTab', [
         };
 
         ctrl.revertToDefaultConfigPropertyValue = function(configPropertyId) {
-          if (
-            !$window.confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm('This action is irreversible. Are you sure?')) {
             return;
           }
 
@@ -75,8 +74,7 @@ angular.module('oppia').directive('adminConfigTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          if (
-            !$window.confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm('This action is irreversible. Are you sure?')) {
             return;
           }
 

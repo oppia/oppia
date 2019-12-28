@@ -41,7 +41,8 @@ angular.module('oppia').directive('oppiaVisualizationFrequencyTable', [
               HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
             ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
           };
-        }]
+        }
+      ]
     };
   }
 ]);

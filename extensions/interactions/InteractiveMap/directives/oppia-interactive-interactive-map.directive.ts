@@ -89,9 +89,8 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
                 shadowAnchor: [13, 41],
                 // The URL to a retina sized version of the icon image.
                 // Used for Retina screen devices.
-                iconRetinaUrl: UrlInterpolationService
-                  .getExtensionResourceUrl(
-                    '/interactions/InteractiveMap/static/marker-icon-2x.png'),
+                iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon-2x.png'),
                 shadowRetinaUrl: (
                   UrlInterpolationService.getExtensionResourceUrl(
                     '/interactions/InteractiveMap/static/marker-shadow.png'))
@@ -139,12 +138,11 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
               }
             });
 
-          $scope.$on('leafletDirectiveMap.interactiveMap.mouseout',
-            function() {
-              if (!ctrl.interactionIsActive) {
-                ctrl.hideOverlay();
-              }
-            });
+          $scope.$on('leafletDirectiveMap.interactiveMap.mouseout', function() {
+            if (!ctrl.interactionIsActive) {
+              ctrl.hideOverlay();
+            }
+          });
           $scope.$on('leafletDirectiveMap.interactiveMap.click',
             function(evt, args) {
               if (ctrl.interactionIsActive) {
@@ -165,7 +163,8 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
             ctrl.mapMarkers = {};
             refreshMap();
           };
-        }]
+        }
+      ]
     };
   }
 ]);

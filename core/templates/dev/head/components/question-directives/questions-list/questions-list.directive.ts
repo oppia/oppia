@@ -274,8 +274,7 @@ angular.module('oppia').directive('questionsList', [
                   };
 
                   $scope.startQuestionCreation = function() {
-                    $uibModalInstance.close(
-                      $scope.linkedSkillsWithDifficulty);
+                    $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
                   };
 
                   $scope.cancelModal = function() {
@@ -328,8 +327,7 @@ angular.module('oppia').directive('questionsList', [
               });
           };
 
-          ctrl.editQuestion = function(
-              questionSummaryForOneSkill, difficulty) {
+          ctrl.editQuestion = function(questionSummaryForOneSkill, difficulty) {
             if (ctrl.editorIsOpen) {
               return;
             }
@@ -339,18 +337,16 @@ angular.module('oppia').directive('questionsList', [
               questionSummaryForOneSkill.getQuestionId()).then(
               function(response) {
                 if (response.associated_skill_dicts) {
-                  response.associated_skill_dicts.forEach(
-                    function(skillDict) {
-                      ctrl.misconceptionsBySkill[skillDict.id] =
-                        skillDict.misconceptions.map(function(misconception) {
-                          return (
-                            MisconceptionObjectFactory.createFromBackendDict(
-                              misconception));
-                        });
-                      ctrl.associatedSkillSummaries.push(
-                        SkillSummaryObjectFactory.create(
-                          skillDict.id, skillDict.description));
-                    });
+                  response.associated_skill_dicts.forEach(function(skillDict) {
+                    ctrl.misconceptionsBySkill[skillDict.id] =
+                      skillDict.misconceptions.map(function(misconception) {
+                        return MisconceptionObjectFactory.createFromBackendDict(
+                          misconception);
+                      });
+                    ctrl.associatedSkillSummaries.push(
+                      SkillSummaryObjectFactory.create(
+                        skillDict.id, skillDict.description));
+                  });
                 }
                 ctrl.question =
                   QuestionObjectFactory.createFromBackendDict(
@@ -453,8 +449,7 @@ angular.module('oppia').directive('questionsList', [
                   };
 
                   $scope.done = function() {
-                    $uibModalInstance.close(
-                      $scope.linkedSkillsWithDifficulty);
+                    $uibModalInstance.close($scope.linkedSkillsWithDifficulty);
                   };
 
                   init();
@@ -488,8 +483,7 @@ angular.module('oppia').directive('questionsList', [
                           ctrl.getQuestionSummariesAsync(
                             ctrl.selectedSkillIds, true, true
                           );
-                          AlertsService.addSuccessMessage(
-                            'Updated Difficulty');
+                          AlertsService.addSuccessMessage('Updated Difficulty');
                         }, 100 * count);
                       }
                     });
@@ -531,8 +525,7 @@ angular.module('oppia').directive('questionsList', [
                   $scope.questionId = questionId;
                   $scope.misconceptionsBySkill = misconceptionsBySkill;
                   $scope.canEditQuestion = canEditQuestion;
-                  $scope.newQuestionIsBeingCreated = (
-                    newQuestionIsBeingCreated);
+                  $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
 
                   if (!newQuestionIsBeingCreated) {
                     $scope.validationError = $scope.question.validate(
@@ -551,8 +544,7 @@ angular.module('oppia').directive('questionsList', [
                   $scope.removeSkill = function(skillId) {
                     if ($scope.associatedSkillSummaries.length === 1) {
                       AlertsService.addInfoMessage(
-                        'A question should be linked to at least ' +
-                        'one skill.');
+                        'A question should be linked to at least one skill.');
                       return;
                     }
                     returnArray.push({
@@ -560,14 +552,12 @@ angular.module('oppia').directive('questionsList', [
                       task: 'remove'
                     });
                     $scope.associatedSkillSummaries =
-                      $scope.associatedSkillSummaries.filter(
-                        function(summary) {
-                          return summary.getId() !== skillId;
-                        });
+                      $scope.associatedSkillSummaries.filter(function(summary) {
+                        return summary.getId() !== skillId;
+                      });
                   };
                   $scope.undo = function() {
-                    $scope.associatedSkillSummaries = (
-                      associatedSkillSummaries);
+                    $scope.associatedSkillSummaries = associatedSkillSummaries;
                     returnArray = [];
                   };
                   $scope.addSkill = function() {
@@ -652,9 +642,8 @@ angular.module('oppia').directive('questionsList', [
                       var modalInstance = $uibModal.open({
                         templateUrl:
                           UrlInterpolationService.getDirectiveTemplateUrl(
-                            '/components/question-directives/' +
-                            'modal-templates/confirm-question-modal-' +
-                            'exit-modal.directive.html'),
+                            '/components/question-directives/modal-templates/' +
+                            'confirm-question-modal-exit-modal.directive.html'),
                         backdrop: true,
                         controller: [
                           '$scope', '$uibModalInstance',

@@ -61,16 +61,15 @@ angular.module('oppia').directive('searchBar', [
            * @param {object} evt
            * @param {String} menuName - name of menu to perform action
            * on(category/language)
-           * @param {object} eventsTobeHandled - Map keyboard events('Enter')
-           * to corresponding actions to be performed(open/close).
+           * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
+           * corresponding actions to be performed(open/close).
            *
            * @example
            *  onMenuKeypress($event, 'category', {enter: 'open'})
            */
 
           ctrl.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
-            NavigationService.onMenuKeypress(
-              evt, menuName, eventsTobeHandled);
+            NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             ctrl.activeMenuName = NavigationService.activeMenuName;
           };
           // Update the description, numSelections and summary fields of the
@@ -91,15 +90,14 @@ angular.module('oppia').directive('searchBar', [
             ctrl.selectionDetails[itemsType].numSelections = totalCount;
 
             ctrl.selectionDetails[itemsType].summary = (
-              totalCount === 0 ? (
-                'I18N_LIBRARY_ALL_' + itemsName.toUpperCase()) :
+              totalCount === 0 ? 'I18N_LIBRARY_ALL_' + itemsName.toUpperCase() :
               totalCount === 1 ? selectedItems[0] :
               'I18N_LIBRARY_N_' + itemsName.toUpperCase());
             ctrl.translationData[itemsName + 'Count'] = totalCount;
 
             // TODO(milit): When the language changes, the translations won't
-            // change until the user changes the selection and this function
-            // is re-executed.
+            // change until the user changes the selection and this function is
+            // re-executed.
             if (selectedItems.length > 0) {
               var translatedItems = [];
               for (var i = 0; i < selectedItems.length; i++) {
@@ -155,8 +153,7 @@ angular.module('oppia').directive('searchBar', [
             if ($window.location.pathname === '/search/find') {
               $location.url('/find?q=' + searchUrlQueryString);
             } else {
-              $window.location.href = (
-                '/search/find?q=' + searchUrlQueryString);
+              $window.location.href = '/search/find?q=' + searchUrlQueryString;
             }
           };
           var updateSearchFieldsBasedOnUrlQuery = function() {

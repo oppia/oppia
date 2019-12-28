@@ -151,6 +151,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.currentlyOnLatestCard = true;
             resetLocalHintsArray();
           };
-        }]
+        }
+      ]
     };
   }]);

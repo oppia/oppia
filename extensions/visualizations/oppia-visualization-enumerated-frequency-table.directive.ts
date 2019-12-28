@@ -49,12 +49,13 @@ angular.module('oppia').directive(
               ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
 
               ctrl.answerVisible = ctrl.data.map(function(_, i) {
-                // First element is shown while all others
-                // are hidden by default.
+                // First element is shown while all others are hidden by
+                // default.
                 return i === 0;
               });
             };
-          }]
+          }
+        ]
       };
     }
   ]);

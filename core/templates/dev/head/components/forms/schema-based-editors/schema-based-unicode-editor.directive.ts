@@ -135,7 +135,8 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
               });
             }
           };
-        }]
+        }
+      ]
     };
   }
 ]);

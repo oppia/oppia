@@ -95,7 +95,8 @@ angular.module('oppia').directive('oppiaInteractiveDragAndDropSortInput', [
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, null);
           };
-        }]
+        }
+      ]
     };
   }
 ]);

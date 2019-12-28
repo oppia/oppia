@@ -43,7 +43,8 @@ angular.module('oppia').directive('collectionLocalNav', [
           ctrl.$onInit = function() {
             ctrl.collectionId = UrlService.getCollectionIdFromUrl();
           };
-        }]
+        }
+      ]
     };
   }
 ]);

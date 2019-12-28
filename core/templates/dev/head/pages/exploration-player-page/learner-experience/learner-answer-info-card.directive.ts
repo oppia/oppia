@@ -62,7 +62,8 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
           ctrl.$onInit = function() {
             ctrl.answerDetails = null;
           };
-        }]
+        }
+      ]
     };
   }
 ]

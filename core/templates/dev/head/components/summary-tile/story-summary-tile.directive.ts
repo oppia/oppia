@@ -44,6 +44,7 @@ angular.module('oppia').directive('storySummaryTile', [
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
-        }]
+        }
+      ]
     };
   }]);

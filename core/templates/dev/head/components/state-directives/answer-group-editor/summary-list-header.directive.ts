@@ -43,7 +43,8 @@ angular.module('oppia').directive('summaryListHeader', [
           ctrl.deleteItem = function(evt) {
             ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
           };
-        }]
+        }
+      ]
     };
   }
 ]);

@@ -104,6 +104,7 @@ angular.module('oppia').directive('skillsMasteryList', [
                 };
               });
           };
-        }]
+        }
+      ]
     };
   }]);

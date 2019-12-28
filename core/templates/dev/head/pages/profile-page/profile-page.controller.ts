@@ -51,8 +51,7 @@ angular.module('oppia').directive('profilePage', [
             .getStaticImageUrl('/general/no_profile_picture.png');
 
           ctrl.getLocaleDateString = function(millisSinceEpoch) {
-            return DateTimeFormatService.getLocaleDateString(
-              millisSinceEpoch);
+            return DateTimeFormatService.getLocaleDateString(millisSinceEpoch);
           };
           ctrl.$onInit = function() {
             $rootScope.loadingMessage = 'Loading';
@@ -217,6 +216,7 @@ angular.module('oppia').directive('profilePage', [
               $rootScope.loadingMessage = '';
             });
           };
-        }]
+        }
+      ]
     };
   }]);

@@ -93,6 +93,7 @@ angular.module('oppia').directive('collectionSummaryTile', [
             ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
             ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;
           };
-        }]
+        }
+      ]
     };
   }]);

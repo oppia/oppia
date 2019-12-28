@@ -64,7 +64,8 @@ angular.module('oppia').directive('parameterNameEditor', [
               choices: ctrl.availableParamNames
             };
           };
-        }]
+        }
+      ]
     };
   }
 ]);

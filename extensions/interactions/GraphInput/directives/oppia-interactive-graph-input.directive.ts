@@ -151,7 +151,8 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
             ctrl.canEditEdgeWeight = ctrl.interactionIsActive ?
               stringToBool($attrs.canEditEdgeWeightWithValue) : false;
           };
-        }]
+        }
+      ]
     };
   }
 ]);

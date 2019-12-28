@@ -108,6 +108,7 @@ angular.module('oppia').directive('storiesList', [
               // No further action is needed.
             });
           };
-        }]
+        }
+      ]
     };
   }]);

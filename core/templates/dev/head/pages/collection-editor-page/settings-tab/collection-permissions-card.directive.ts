@@ -42,6 +42,7 @@ angular.module('oppia').directive('collectionPermissionsCard', [
             ctrl.collectionRights =
               CollectionEditorStateService.getCollectionRights();
           };
-        }]
+        }
+      ]
     };
   }]);

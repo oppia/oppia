@@ -56,6 +56,7 @@ angular.module('oppia').directive('profileLinkImage', [
                 DEFAULT_PROFILE_IMAGE_PATH);
             });
           };
-        }]
+        }
+      ]
     };
   }]);

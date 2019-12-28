@@ -429,8 +429,8 @@ angular.module('oppia').directive('explorationEditorPage', [
           ctrl.startTutorial = function() {
             RouterService.navigateToMainTab();
             // The setTimeout wrapper is needed for all components on the page
-            // to load, otherwise elements within ng-if's are not guaranteed
-            // to be present on the page.
+            // to load, otherwise elements within ng-if's are not guaranteed to
+            // be present on the page.
             setTimeout(function() {
               EditabilityService.onStartTutorial();
               ctrl.tutorialInProgress = true;

@@ -63,7 +63,8 @@ angular.module('oppia').directive('i18nFooter', [
                 $translate.proposedLanguage();
             }, 50);
           };
-        }]
+        }
+      ]
     };
   }]);
 

@@ -83,8 +83,7 @@ angular.module('oppia').directive('stewardsLandingPage', [
                 href: '/library'
               }];
             } else if (tabName === ctrl.TAB_NAME_VOLUNTEERS) {
-              // TODO(sll): Add "Get in Touch" link that points to contact
-              // form.
+              // TODO(sll): Add "Get in Touch" link that points to contact form.
               return [{
                 text: 'Browse Volunteer Opportunities',
                 href: 'https://www.oppiafoundation.org/volunteer'
@@ -148,6 +147,7 @@ angular.module('oppia').directive('stewardsLandingPage', [
               $scope.$apply();
             });
           };
-        }]
+        }
+      ]
     };
   }]);

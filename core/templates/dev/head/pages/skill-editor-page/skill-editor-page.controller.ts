@@ -54,6 +54,7 @@ angular.module('oppia').directive('skillEditorPage', [
           ctrl.$onInit = function() {
             SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
           };
-        }]
+        }
+      ]
     };
   }]);

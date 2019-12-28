@@ -305,8 +305,6 @@ angular.module('oppia').factory('ExplorationSaveService', [
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in ExplorationDataService).
           $window.location.reload();
-        }, function() {
-
         });
       },
 
