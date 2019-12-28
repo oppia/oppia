@@ -30,6 +30,7 @@ import python_utils
 
 from scripts import build
 from scripts import common
+from scripts import install_chrome_on_travis
 from scripts import install_third_party_libs
 from scripts import run_e2e_tests
 from scripts import setup
@@ -321,6 +322,42 @@ of the failed tests in ../protractor-screenshots/
 
         with setup_swap, setup_gae_swap, install_swap:
             run_e2e_tests.setup_and_install_dependencies(False)
+
+    def test_setup_and_install_dependencies_on_travis(self):
+        # pylint: disable=unused-argument
+        def mock_setup_main(args):
+            return
+
+        def mock_install_third_party_libs_main(args):
+            return
+
+        def mock_setup_gae_main(args):
+            return
+
+        def mock_install_chrome_main(args):
+            return
+        # pylint: enable=unused-argument
+
+        def mock_getenv(unused_variable_name):
+            return True
+
+        setup_swap = self.swap_with_checks(
+            setup, 'main', mock_setup_main, expected_kwargs={'args': []})
+        setup_gae_swap = self.swap_with_checks(
+            setup_gae, 'main', mock_setup_gae_main, expected_kwargs={'args': []}
+            )
+        install_swap = self.swap_with_checks(
+            install_third_party_libs, 'main',
+            mock_install_third_party_libs_main, expected_kwargs={'args': []})
+        install_chrome_swap = self.swap_with_checks(
+            install_chrome_on_travis, 'main', mock_install_chrome_main,
+            expected_kwargs={'args': []})
+        getenv_swap = self.swap_with_checks(
+            os, 'getenv', mock_getenv, expected_args=('TRAVIS',))
+
+        with setup_swap, setup_gae_swap, install_swap, install_chrome_swap:
+            with getenv_swap:
+                run_e2e_tests.setup_and_install_dependencies(False)
 
     def test_setup_and_install_dependencies_with_skip(self):
         # pylint: disable=unused-argument
