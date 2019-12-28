@@ -2658,9 +2658,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v12_dict_to_v13_dict(cls, exploration_dict):
         """Converts a v12 exploration dict into a v13 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v12.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v13.
@@ -2678,9 +2680,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v13_dict_to_v14_dict(cls, exploration_dict):
         """Converts a v13 exploration dict into a v14 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v13.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v14.
@@ -2698,9 +2702,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v14_dict_to_v15_dict(cls, exploration_dict):
         """Converts a v14 exploration dict into a v15 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v14.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v15.
@@ -2718,9 +2724,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v15_dict_to_v16_dict(cls, exploration_dict):
         """Converts a v15 exploration dict into a v16 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v15.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v16.
@@ -2738,9 +2746,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v16_dict_to_v17_dict(cls, exploration_dict):
         """Converts a v16 exploration dict into a v17 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v16.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v17.
@@ -2758,9 +2768,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v17_dict_to_v18_dict(cls, exploration_dict):
         """Converts a v17 exploration dict into a v18 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v17.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v18.
@@ -2780,9 +2792,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v18_dict_to_v19_dict(cls, exploration_dict):
         """Converts a v18 exploration dict into a v19 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v18.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v19.
@@ -2801,9 +2815,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v19_dict_to_v20_dict(cls, exploration_dict):
         """Converts a v19 exploration dict into a v20 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v19.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v20.
@@ -2825,9 +2841,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v20_dict_to_v21_dict(cls, exploration_dict):
         """Converts a v20 exploration dict into a v21 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v20.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v21.
@@ -2847,9 +2865,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v21_dict_to_v22_dict(cls, exploration_dict):
         """Converts a v21 exploration dict into a v22 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v21.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v22.
@@ -2870,9 +2890,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v22_dict_to_v23_dict(cls, exploration_dict):
         """Converts a v22 exploration dict into a v23 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v22.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v23.
@@ -2892,9 +2914,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v23_dict_to_v24_dict(cls, exploration_dict):
         """Converts a v23 exploration dict into a v24 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v23.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v24.
@@ -2914,9 +2938,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
         """Converts a v24 exploration dict into a v25 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v24.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v25.
@@ -2937,9 +2963,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v25_dict_to_v26_dict(cls, exploration_dict):
         """Converts a v25 exploration dict into a v26 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v25.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v26.
@@ -2958,9 +2986,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v26_dict_to_v27_dict(cls, exploration_dict):
         """Converts a v26 exploration dict into a v27 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v26.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v27.
@@ -2980,9 +3010,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v27_dict_to_v28_dict(cls, exploration_dict):
         """Converts a v27 exploration dict into a v28 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v27.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v28.
@@ -3001,9 +3033,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v28_dict_to_v29_dict(cls, exploration_dict):
         """Converts a v28 exploration dict into a v29 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v28.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v29.
@@ -3023,10 +3057,12 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v29_dict_to_v30_dict(cls, exp_id, exploration_dict):
         """Converts a v29 exploration dict into a v30 exploration dict.
+        
         Args:
             exp_id: str. ID of the exploration.
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v29.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v30.
@@ -3045,9 +3081,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v30_dict_to_v31_dict(cls, exploration_dict):
         """Converts a v30 exploration dict into a v31 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v30.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v31.
@@ -3067,9 +3105,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v31_dict_to_v32_dict(cls, exploration_dict):
         """Converts a v31 exploration dict into a v32 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v31.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v32.
@@ -3088,9 +3128,11 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_v32_dict_to_v33_dict(cls, exploration_dict):
         """Converts a v32 exploration dict into a v33 exploration dict.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v32.
+                
         Returns:
             dict. The dict representation of the Exploration domain object,
             following schema version v33.
@@ -3113,6 +3155,7 @@ class Exploration(python_utils.OBJECT):
 
         Adds solicit_answer_details in state to ask learners for the
         answer details.
+        
         Args:
             exploration_dict: dict. The dict representation of an exploration
                 with schema version v33.
