@@ -40,9 +40,9 @@ angular.module('oppia').directive('adminMiscTab', [
         var ctrl = this;
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
-
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
+
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;

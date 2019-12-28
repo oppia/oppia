@@ -55,11 +55,11 @@ angular.module('oppia').directive('ruleEditor', [
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', 'StateEditorService',
+        '$scope', 'StateEditorService',
         'ValidatorsService', 'INTERACTION_SPECS',
         'ResponsesService', 'StateInteractionIdService',
         function(
-            $scope, $timeout, StateEditorService,
+            $scope, StateEditorService,
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
           var ctrl = this;
@@ -192,7 +192,7 @@ angular.module('oppia').directive('ruleEditor', [
             // interaction, where the rule inputs can sometimes be integers
             // and sometimes be lists of music notes.
             ctrl.ruleDescriptionFragments = [];
-            $timeout(function() {
+            setTimeout(function() {
               ctrl.ruleDescriptionFragments = result;
             }, 10);
 
@@ -264,17 +264,14 @@ angular.module('oppia').directive('ruleEditor', [
             ctrl.onSaveRule();
           };
 
-          ctrl.init = function() {
+          ctrl.$onInit = function() {
+            ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
+            ctrl.editRuleForm = {};
             // Select a default rule type, if one isn't already selected.
             if (ctrl.rule.type === null) {
               ctrl.onSelectNewRuleType(ctrl.rule.type);
             }
             computeRuleDescriptionFragments();
-          };
-          ctrl.$onInit = function() {
-            ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
-            ctrl.editRuleForm = {};
-            ctrl.init();
           };
         }]
     };

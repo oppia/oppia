@@ -125,6 +125,14 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             return HintsAndSolutionManagerService.isHintTooltipOpen();
           };
 
+          ctrl.isHintConsumed = function(hintIndex) {
+            return HintsAndSolutionManagerService.isHintConsumed(hintIndex);
+          };
+
+          ctrl.isSolutionConsumed = function() {
+            return HintsAndSolutionManagerService.isSolutionConsumed();
+          };
+
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
             var displayedCardIndex =
               PlayerPositionService.getDisplayedCardIndex();
@@ -141,9 +149,6 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.displayedCard = null;
             ctrl.solutionModalIsActive = false;
             ctrl.currentlyOnLatestCard = true;
-            ctrl.isHintConsumed = HintsAndSolutionManagerService.isHintConsumed;
-            ctrl.isSolutionConsumed = (
-              HintsAndSolutionManagerService.isSolutionConsumed);
             resetLocalHintsArray();
           };
         }]

@@ -34,7 +34,7 @@ angular.module('oppia').directive('attributionGuide', [
             BrowserCheckerService, UrlService) {
           var ctrl = this;
           ctrl.$onInit = function() {
-            ctrl.isMobileDevice = BrowserCheckerService.isMobileDevice();
+            ctrl.deviceUsedIsMobile = BrowserCheckerService.isMobileDevice();
             ctrl.iframed = UrlService.isIframed();
           };
         }]

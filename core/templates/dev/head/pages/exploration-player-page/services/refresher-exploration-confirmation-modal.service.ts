@@ -37,8 +37,8 @@ angular.module('oppia').factory(
               'refresher-exploration-confirmation-modal.template.html'),
             backdrop: 'static',
             controller: [
-              '$scope', '$uibModalInstance', '$window', '$timeout',
-              function($scope, $uibModalInstance, $window, $timeout) {
+              '$scope', '$uibModalInstance', '$window',
+              function($scope, $uibModalInstance, $window) {
                 $scope.confirmRedirect = function() {
                   redirectConfirmationCallback();
 
@@ -65,7 +65,7 @@ angular.module('oppia').factory(
                   // time to complete.
                   // TODO(bhenning): Find a reliable way to send events that
                   // does not get interrupted with browser redirection.
-                  $timeout(function() {
+                  setTimeout(function() {
                     $window.open(url, '_self');
                   }, 150);
 

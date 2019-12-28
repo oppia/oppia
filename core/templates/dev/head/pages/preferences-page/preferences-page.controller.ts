@@ -46,24 +46,25 @@ angular.module('oppia').directive('preferencesPage', [
         '/pages/preferences-page/preferences-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate',
+        '$http', '$q', '$rootScope', '$scope', '$translate',
         '$window', '$uibModal', 'AlertsService', 'LanguageUtilService',
         'UrlInterpolationService', 'UserService', 'UtilsService',
         'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
         'ENABLE_ACCOUNT_DELETION', 'SUPPORTED_AUDIO_LANGUAGES',
         'SUPPORTED_SITE_LANGUAGES',
         function(
-            $http, $q, $rootScope, $scope, $timeout, $translate,
+            $http, $q, $rootScope, $scope, $translate,
             $window, $uibModal, AlertsService, LanguageUtilService,
             UrlInterpolationService, UserService, UtilsService,
             DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
             ENABLE_ACCOUNT_DELETION, SUPPORTED_AUDIO_LANGUAGES,
             SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
+          var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
+
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
-          var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
           var _saveDataItem = function(updateType, data) {
             $http.put(_PREFERENCES_DATA_URL, {
               update_type: updateType,
@@ -77,7 +78,7 @@ angular.module('oppia').directive('preferencesPage', [
           // and this function to force it to reload
           var _forceSelect2Refresh = function() {
             ctrl.select2DropdownIsShown = false;
-            $timeout(function() {
+            setTimeout(function() {
               ctrl.select2DropdownIsShown = true;
             }, 100);
           };
@@ -195,7 +196,7 @@ angular.module('oppia').directive('preferencesPage', [
                       };
                       reader.readAsDataURL(file);
 
-                      $timeout(function() {
+                      setTimeout(function() {
                         $('.oppia-profile-image-uploader').fadeIn();
                       }, 100);
                     });

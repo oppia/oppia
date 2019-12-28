@@ -33,15 +33,15 @@ angular.module('oppia').directive('loginRequiredMessage', [
         'login-required-message.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', '$window', 'SiteAnalyticsService', 'UserService',
-        function($scope, $timeout, $window, SiteAnalyticsService, UserService) {
+        '$scope', '$window', 'SiteAnalyticsService', 'UserService',
+        function($scope, $window, SiteAnalyticsService, UserService) {
           var ctrl = this;
           ctrl.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
             UserService.getLoginUrlAsync().then(
               function(loginUrl) {
                 if (loginUrl) {
-                  $timeout(function() {
+                  setTimeout(function() {
                     $window.location = loginUrl;
                   }, 150);
                 } else {

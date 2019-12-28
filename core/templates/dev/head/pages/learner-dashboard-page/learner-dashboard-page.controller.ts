@@ -77,6 +77,8 @@ angular.module('oppia').directive('learnerDashboardPage', [
             FeedbackMessageSummaryObjectFactory,
             SuggestionModalForLearnerDashboardService, UserService) {
           var ctrl = this;
+          var threadIndex = null;
+
           ctrl.setActiveSection = function(newActiveSectionName) {
             ctrl.activeSection = newActiveSectionName;
             if (ctrl.activeSection ===
@@ -274,7 +276,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               axis: 'y'
             };
           };
-          var threadIndex = null;
+
           ctrl.onClickThread = function(
               threadStatus, explorationId, threadId, explorationTitle) {
             ctrl.loadingFeedbacks = true;
@@ -462,6 +464,17 @@ angular.module('oppia').directive('learnerDashboardPage', [
               }
             });
           };
+
+          ctrl.getLabelClass = function(status) {
+            return ThreadStatusDisplayService.getLabelClass(status);
+          };
+          ctrl.getHumanReadableStatus = function(status) {
+            return ThreadStatusDisplayService.getHumanReadableStatus(status);
+          };
+          ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              millisSinceEpoch);
+          };
           ctrl.$onInit = function() {
             ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
               EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
@@ -594,12 +607,6 @@ angular.module('oppia').directive('learnerDashboardPage', [
             ctrl.newMessage = {
               text: ''
             };
-
-            ctrl.getLabelClass = ThreadStatusDisplayService.getLabelClass;
-            ctrl.getHumanReadableStatus = (
-              ThreadStatusDisplayService.getHumanReadableStatus);
-            ctrl.getLocaleAbbreviatedDatetimeString = (
-              DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
             ctrl.collectionPlaylistSortableOptions = getPlaylistSortableOptions(
               ACTIVITY_TYPE_COLLECTION);

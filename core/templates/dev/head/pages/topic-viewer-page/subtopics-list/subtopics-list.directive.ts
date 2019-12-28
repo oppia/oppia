@@ -32,9 +32,9 @@ angular.module('oppia').directive('subtopicsList', [
         '/pages/topic-viewer-page/subtopics-list/' +
         'subtopics-list.directive.html'),
       controller: [
-        'WindowDimensionsService', '$scope', '$timeout', 'UrlService',
+        'WindowDimensionsService', '$scope', 'UrlService',
         function(
-            WindowDimensionsService, $scope, $timeout, UrlService) {
+            WindowDimensionsService, $scope, UrlService) {
           var SUBTOPIC_TILE_WIDTH_PX = 310;
           $scope.leftmostCardIndices = 0;
           var MAX_NUM_TILES_PER_ROW = 4;
@@ -126,7 +126,7 @@ angular.module('oppia').directive('subtopicsList', [
           $scope.decrementLeftmostCardIndex = function() {
             $scope.leftmostCardIndices--;
           };
-          $timeout(function() {
+          setTimeout(function() {
             initCarousels();
           }, 390);
 

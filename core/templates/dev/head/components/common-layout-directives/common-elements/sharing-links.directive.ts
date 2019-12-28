@@ -55,19 +55,22 @@ angular.module('oppia').directive('sharingLinks', [
               ctrl.activityType = 'explore';
               ctrl.activityId = ctrl.explorationId;
 
-              ctrl.registerShareEvent = (
-                SiteAnalyticsService.registerShareExplorationEvent);
+              ctrl.registerShareEvent = function(network) {
+                SiteAnalyticsService.registerShareExplorationEvent(network);
+              };
 
-              ctrl.showEmbedExplorationModal = (
-                ExplorationEmbedButtonService.showModal);
+              ctrl.showEmbedExplorationModal = function(expId) {
+                ExplorationEmbedButtonService.showModal(expId);
+              };
             } else if (ctrl.shareType === 'collection') {
               ctrl.collectionId = ctrl.getCollectionId();
 
               ctrl.activityType = 'collection';
               ctrl.activityId = ctrl.collectionId;
 
-              ctrl.registerShareEvent = (
-                SiteAnalyticsService.registerShareCollectionEvent);
+              ctrl.registerShareEvent = function(network) {
+                SiteAnalyticsService.registerShareCollectionEvent(network);
+              };
             } else {
               throw Error(
                 'SharingLinks directive can only be used either in the' +

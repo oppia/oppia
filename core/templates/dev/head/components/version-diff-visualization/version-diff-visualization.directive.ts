@@ -159,12 +159,12 @@ angular.module('oppia').directive('versionDiffVisualization', [
               }
             },
             controller: [
-              '$scope', '$http', '$uibModalInstance', '$timeout',
+              '$scope', '$http', '$uibModalInstance',
               'newStateName', 'oldStateName', 'newState', 'oldState',
               'headers', 'ContextService',
               'UrlInterpolationService',
               function(
-                  $scope, $http, $uibModalInstance, $timeout,
+                  $scope, $http, $uibModalInstance,
                   newStateName, oldStateName, newState, oldState,
                   headers, ContextService,
                   UrlInterpolationService) {
@@ -195,7 +195,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
                   // Note: the timeout is needed or the string will be sent
                   // before codemirror has fully loaded and will not be
                   // displayed. This causes issues with the e2e tests.
-                  $timeout(function() {
+                  setTimeout(function() {
                     $scope.yamlStrs.leftPane = '';
                   }, 200);
                 }
@@ -211,7 +211,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
                   // Note: the timeout is needed or the string will be sent
                   // before codemirror has fully loaded and will not be
                   // displayed. This causes issues with the e2e tests.
-                  $timeout(function() {
+                  setTimeout(function() {
                     $scope.yamlStrs.rightPane = '';
                   }, 200);
                 }

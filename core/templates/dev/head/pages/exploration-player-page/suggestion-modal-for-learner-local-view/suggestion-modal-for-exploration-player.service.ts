@@ -40,11 +40,11 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
         backdrop: 'static',
         resolve: {},
         controller: [
-          '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
+          '$scope', '$uibModalInstance', 'ExplorationEngineService',
           'PlayerPositionService', 'PlayerTranscriptService',
           'SuggestionModalService',
           function(
-              $scope, $timeout, $uibModalInstance, ExplorationEngineService,
+              $scope, $uibModalInstance, ExplorationEngineService,
               PlayerPositionService, PlayerTranscriptService,
               SuggestionModalService) {
             var stateName = PlayerPositionService.getCurrentStateName();
@@ -58,7 +58,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
             $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
             $scope.showEditor = false;
             // Rte initially displays content unrendered for a split second
-            $timeout(function() {
+            setTimeout(function() {
               $scope.showEditor = true;
             }, 500);
 

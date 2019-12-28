@@ -20,10 +20,10 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
-  '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
+  '$http', '$rootScope', '$window', 'AlertsService',
   'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $window, AlertsService,
+      $http, $rootScope, $window, AlertsService,
       UrlInterpolationService) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
@@ -47,7 +47,7 @@ angular.module('oppia').factory('SkillCreationService', [
           explanation_dict: explanation,
           rubrics: rubrics
         }).then(function(response) {
-          $timeout(function() {
+          setTimeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(
               CREATE_NEW_SKILL_URL_TEMPLATE, {
                 skill_id: response.data.skillId

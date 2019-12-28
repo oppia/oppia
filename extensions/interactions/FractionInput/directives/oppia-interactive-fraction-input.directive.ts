@@ -49,12 +49,17 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
             FractionObjectFactory, FRACTION_PARSING_ERRORS,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.getWarningText = function() {
-            return errorMessage;
-          };
           // Label for errors caused whilst parsing a fraction.
           var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
           var errorMessage = '';
+          var requireSimplestForm = (
+            $attrs.requireSimplestFormWithValue === 'true');
+          var allowImproperFraction = (
+            $attrs.allowImproperFractionWithValue === 'true');
+
+          ctrl.getWarningText = function() {
+            return errorMessage;
+          };
 
           /**
            * Disables the input box if the data entered is not a valid prefix
@@ -90,10 +95,7 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
                 FORM_ERROR_TYPE, true);
             }
           });
-          var requireSimplestForm = (
-            $attrs.requireSimplestFormWithValue === 'true');
-          var allowImproperFraction = (
-            $attrs.allowImproperFractionWithValue === 'true');
+
           ctrl.submitAnswer = function(answer) {
             try {
               var fraction = FractionObjectFactory.fromRawInputString(

@@ -201,19 +201,27 @@ angular.module('oppia').directive('feedbackTab', [
             }
             ctrl.tmpMessage.status = ctrl.activeThread.status;
           };
+          ctrl.getLabelClass = function(status) {
+            return ThreadStatusDisplayService.getLabelClass(status);
+          };
+          ctrl.getHumanReadableStatus = function(status) {
+            return ThreadStatusDisplayService.getHumanReadableStatus(status);
+          };
+          ctrl.getLocaleAbbreviatedDatetimeString = function(
+              millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              millisSinceEpoch);
+          };
+          ctrl.isExplorationEditable = function() {
+            return EditabilityService.isEditable();
+          };
+
           ctrl.$onInit = function() {
             ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
             ctrl.threadData = ThreadDataService.data;
-            ctrl.getLabelClass = ThreadStatusDisplayService.getLabelClass;
-            ctrl.getHumanReadableStatus = (
-              ThreadStatusDisplayService.getHumanReadableStatus);
-            ctrl.getLocaleAbbreviatedDatetimeString = (
-              DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-
             ctrl.activeThread = null;
             ctrl.userIsLoggedIn = null;
             ctrl.threadIsUpdated = false;
-            ctrl.isExplorationEditable = EditabilityService.isEditable;
             $rootScope.loadingMessage = 'Loading';
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {

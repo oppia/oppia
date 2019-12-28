@@ -43,8 +43,8 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
         'schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$timeout', 'FocusManagerService',
-        function($scope, $filter, $timeout, FocusManagerService) {
+        '$scope', '$filter', 'FocusManagerService',
+        function($scope, $filter, FocusManagerService) {
           var ctrl = this;
           ctrl.validate = function(localValue) {
             return $filter('isFloat')(localValue) !== undefined;
@@ -106,7 +106,7 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
             }
             // This prevents the red 'invalid input' warning message from
             // flashing at the outset.
-            $timeout(function() {
+            setTimeout(function() {
               ctrl.hasLoaded = true;
             });
           };

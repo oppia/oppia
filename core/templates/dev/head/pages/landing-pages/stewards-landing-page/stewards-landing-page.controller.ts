@@ -34,10 +34,10 @@ angular.module('oppia').directive('stewardsLandingPage', [
         'stewards-landing-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', '$window', 'SiteAnalyticsService',
+        '$scope', '$window', 'SiteAnalyticsService',
         'UrlInterpolationService', 'UrlService', 'WindowDimensionsService',
         function(
-            $scope, $timeout, $window, SiteAnalyticsService,
+            $scope, $window, SiteAnalyticsService,
             UrlInterpolationService, UrlService, WindowDimensionsService) {
           var ctrl = this;
           ctrl.setActiveTabName = function(newActiveTabName) {
@@ -106,7 +106,7 @@ angular.module('oppia').directive('stewardsLandingPage', [
           ctrl.onClickButton = function(buttonDefinition) {
             SiteAnalyticsService.registerStewardsLandingPageEvent(
               ctrl.activeTabName, buttonDefinition.text);
-            $timeout(function() {
+            setTimeout(function() {
               $window.location = buttonDefinition.href;
             }, 150);
           };
@@ -116,14 +116,6 @@ angular.module('oppia').directive('stewardsLandingPage', [
           var isWindowNarrow = function(windowWidthPx) {
             return windowWidthPx <= 890;
           };
-
-          ctrl.windowIsNarrow = isWindowNarrow(
-            WindowDimensionsService.getWidth());
-          WindowDimensionsService.registerOnResizeHook(function() {
-            ctrl.windowIsNarrow = isWindowNarrow(
-              WindowDimensionsService.getWidth());
-            $scope.$apply();
-          });
 
           ctrl.$onInit = function() {
             ctrl.TAB_NAME_PARENTS = 'Parents';
@@ -148,6 +140,13 @@ angular.module('oppia').directive('stewardsLandingPage', [
               }
             }
             ctrl.buttonDefinitions = getButtonDefinitions(ctrl.activeTabName);
+            ctrl.windowIsNarrow = isWindowNarrow(
+              WindowDimensionsService.getWidth());
+            WindowDimensionsService.registerOnResizeHook(function() {
+              ctrl.windowIsNarrow = isWindowNarrow(
+                WindowDimensionsService.getWidth());
+              $scope.$apply();
+            });
           };
         }]
     };

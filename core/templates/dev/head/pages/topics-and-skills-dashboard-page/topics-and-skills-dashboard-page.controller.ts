@@ -200,6 +200,9 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             ctrl.TAB_NAME_TOPICS = 'topics';
             ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
             ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
+            // The _initDashboard function is written separately since it is
+            // also called in $scope.$on when some external events are
+            // triggered.
             _initDashboard();
           };
         }

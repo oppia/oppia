@@ -80,7 +80,7 @@ angular.module('oppia').config([
       $compileProvider, $cookiesProvider, $httpProvider,
       $interpolateProvider, $locationProvider, $provide) {
     // Refer: https://docs.angularjs.org/guide/migration
-    // #migrate1.5to1.6-ng-services-$location.
+    // #migrate1.5to1.6-ng-services-$location
     // The default hash-prefix used for URLs has changed from
     // the empty string ('') to the bang ('!') in Angular v1.6.
     // For example, rather than mydomain.com/#/a/b/c
@@ -223,6 +223,7 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 angular.module('oppia').factory('$exceptionHandler', [
   '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
+    // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
     // The tpload error namespace has changed in Angular v1.7.
     // Previously, the tpload error was namespaced to $compile.
     // So, the code that matches errors of the form [$compile:tpload]

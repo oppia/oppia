@@ -48,9 +48,9 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
         'interactive-map-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$scope', '$timeout', 'BrowserCheckerService',
+        '$attrs', '$scope', 'BrowserCheckerService',
         'CurrentInteractionService', function(
-            $attrs, $scope, $timeout, BrowserCheckerService,
+            $attrs, $scope, BrowserCheckerService,
             CurrentInteractionService) {
           var ctrl = this;
           var coords = ctrl.coords || [0, 0];

@@ -41,6 +41,8 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        var demoExplorationIds = [];
+
         ctrl.reloadExploration = function(explorationId) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
@@ -65,7 +67,7 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
             AdminTaskManagerService.finishTask();
           });
         };
-        var demoExplorationIds = [];
+
         ctrl.reloadAllExplorations = function() {
           if (!ctrl.reloadingAllExplorationPossible) {
             return;

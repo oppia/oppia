@@ -33,12 +33,12 @@ angular.module('oppia').directive('createActivityButton', [
         '!html-loader!./create-activity-button.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$timeout', '$window', '$uibModal',
+        '$window', '$uibModal',
         'ExplorationCreationService', 'CollectionCreationService',
         'SiteAnalyticsService', 'UrlService', 'UserService',
         'ALLOW_YAML_FILE_UPLOAD',
         function(
-            $timeout, $window, $uibModal,
+            $window, $uibModal,
             ExplorationCreationService, CollectionCreationService,
             SiteAnalyticsService, UrlService, UserService,
             ALLOW_YAML_FILE_UPLOAD) {
@@ -46,7 +46,7 @@ angular.module('oppia').directive('createActivityButton', [
           ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent(
               'createActivityButton');
-            $timeout(function() {
+            setTimeout(function() {
               $window.location = destinationUrl;
             }, 150);
             return false;
@@ -107,6 +107,9 @@ angular.module('oppia').directive('createActivityButton', [
               });
             }
           };
+          ctrl.showUploadExplorationModal = function() {
+            ExplorationCreationService.showUploadExplorationModal();
+          };
           ctrl.$onInit = function() {
             ctrl.creationInProgress = false;
             ctrl.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
@@ -117,10 +120,6 @@ angular.module('oppia').directive('createActivityButton', [
               ctrl.canCreateCollections = userInfo.canCreateCollections();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
             });
-
-            ctrl.showUploadExplorationModal = (
-              ExplorationCreationService.showUploadExplorationModal);
-
             // If the user clicked on a 'create' button to get to the dashboard,
             // open the create modal immediately (or redirect to the exploration
             // editor if the create modal does not need to be shown).

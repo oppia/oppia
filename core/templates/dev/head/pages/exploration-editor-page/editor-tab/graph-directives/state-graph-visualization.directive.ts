@@ -84,12 +84,12 @@ angular.module('oppia').directive('stateGraphVisualization', [
         '/pages/exploration-editor-page/editor-tab/graph-directives/' +
         'state-graph-visualization.directive.html'),
       controller: [
-        '$element', '$filter', '$scope', '$timeout',
+        '$element', '$filter', '$scope',
         'ExplorationWarningsService', 'StateGraphLayoutService',
         'TranslationStatusService', 'MAX_NODES_PER_ROW',
         'MAX_NODE_LABEL_LENGTH',
         function(
-            $element, $filter, $scope, $timeout,
+            $element, $filter, $scope,
             ExplorationWarningsService, StateGraphLayoutService,
             TranslationStatusService, MAX_NODES_PER_ROW,
             MAX_NODE_LABEL_LENGTH) {
@@ -111,7 +111,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
               );
 
               // Wait for the graph to finish loading before showing it again.
-              $timeout(function() {
+              setTimeout(function() {
                 $scope.graphLoaded = true;
               });
             }
@@ -120,7 +120,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
           var makeGraphPannable = function() {
             // Without the timeout, $element.find fails to find the required
             // rect in the state graph modal dialog.
-            $timeout(function() {
+            setTimeout(function() {
               var dimensions = getElementDimensions();
 
               d3.select($element.find('rect.pannable-rect')[0])
@@ -164,7 +164,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
                 makeGraphPannable();
               }
 
-              $timeout(function() {
+              setTimeout(function() {
                 var dimensions = getElementDimensions();
 
                 // Center the graph at the node representing the current state.

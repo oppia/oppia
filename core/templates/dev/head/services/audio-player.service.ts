@@ -17,10 +17,10 @@
  */
 
 angular.module('oppia').factory('AudioPlayerService', [
-  '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
+  '$q', 'AssetsBackendApiService', 'AudioTranslationManagerService',
   'ContextService', 'ngAudio',
   function(
-      $q, $timeout, AssetsBackendApiService, AudioTranslationManagerService,
+      $q, AssetsBackendApiService, AudioTranslationManagerService,
       ContextService, ngAudio) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
@@ -43,7 +43,7 @@ angular.module('oppia').factory('AudioPlayerService', [
             // object is asynchronously loaded. So we use a timeout
             // to grab native audio.
             // TODO(tjiang11): Look for a better way to handle this.
-            $timeout(function() {
+            setTimeout(function() {
               // _currentTrack could be null if the learner stops audio
               // shortly after loading a new card or language. In such
               // cases, we do not want to attempt setting the 'onended'

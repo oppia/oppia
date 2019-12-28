@@ -51,9 +51,10 @@ angular.module('oppia').directive('collectionEditorTab', [
               CollectionLinearizerService.getCollectionNodesInPlayableOrder(
                 ctrl.collection));
           };
+          ctrl.hasLoadedCollection = function() {
+            return CollectionEditorStateService.hasLoadedCollection();
+          };
           ctrl.$onInit = function() {
-            ctrl.hasLoadedCollection = (
-              CollectionEditorStateService.hasLoadedCollection);
             ctrl.collection = CollectionEditorStateService.getCollection();
           };
         }]

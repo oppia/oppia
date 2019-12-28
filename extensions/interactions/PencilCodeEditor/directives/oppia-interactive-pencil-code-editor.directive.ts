@@ -45,15 +45,14 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
         'pencil-code-editor-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$element', '$timeout', '$uibModal',
+        '$scope', '$attrs', '$element', '$uibModal',
         'FocusManagerService', 'PencilCodeEditorRulesService',
         'CurrentInteractionService',
-        function($scope, $attrs, $element, $timeout, $uibModal,
+        function($scope, $attrs, $element, $uibModal,
             FocusManagerService, PencilCodeEditorRulesService,
             CurrentInteractionService) {
           var ctrl = this;
-          var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
-          var pce = new PencilCodeEmbed(iframeDiv);
+          var iframeDiv, pce;
           ctrl.reset = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
@@ -91,6 +90,8 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             pce.setReadOnly();
           });
           ctrl.$onInit = function() {
+            iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
+            pce = new PencilCodeEmbed(iframeDiv);
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
 
             ctrl.initialCode = ctrl.interactionIsActive ?
@@ -184,7 +185,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
                 error: error.message
               }, PencilCodeEditorRulesService);
 
-              $timeout(function() {
+              setTimeout(function() {
                 errorIsHappening = false;
               }, 1000);
             });

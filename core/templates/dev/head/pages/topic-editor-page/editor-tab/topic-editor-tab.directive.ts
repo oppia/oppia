@@ -37,14 +37,14 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$timeout', 'AlertsService',
+        '$scope', '$uibModal', 'AlertsService',
         'ContextService', 'CsrfTokenService', 'ImageUploadHelperService',
         'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
         'UrlInterpolationService', 'StoryCreationService',
         'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, $uibModal, $timeout, AlertsService,
+            $scope, $uibModal, AlertsService,
             ContextService, CsrfTokenService, ImageUploadHelperService,
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
             UrlInterpolationService, StoryCreationService,
@@ -171,7 +171,7 @@ angular.module('oppia').directive('topicEditorTab', [
                         });
                       };
                       reader.readAsDataURL(file);
-                      $timeout(function() {
+                      setTimeout(function() {
                         $('.oppia-thumbnail-uploader').fadeIn();
                       }, 100);
                     });

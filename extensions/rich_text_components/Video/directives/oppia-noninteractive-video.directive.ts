@@ -37,9 +37,9 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'ContextService', '$element',
-        'AutoplayedVideosService', 'PAGE_CONTEXT', '$timeout', '$window',
+        'AutoplayedVideosService', 'PAGE_CONTEXT', '$window',
         function($attrs, ContextService, $element,
-            AutoplayedVideosService, PAGE_CONTEXT, $timeout, $window) {
+            AutoplayedVideosService, PAGE_CONTEXT, $window) {
           var ctrl = this;
           ctrl.$onInit = function() {
             var start = (
@@ -51,7 +51,7 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
             ctrl.timingParams = '&start=' + start + '&end=' + end;
             ctrl.autoplaySuffix = '&autoplay=0';
 
-            $timeout(function() {
+            setTimeout(function() {
               // Check whether creator wants to autoplay this video or not
               var autoplayVal = HtmlEscaperService.escapedJsonToObj(
                 $attrs.autoplayWithValue);

@@ -49,12 +49,12 @@ angular.module('oppia').directive('skillsList', [
         '/pages/topics-and-skills-dashboard-page/skills-list/' +
         'skills-list.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$rootScope', '$timeout',
+        '$scope', '$uibModal', '$rootScope',
         'EditableTopicBackendApiService', 'EditableSkillBackendApiService',
         'TopicsAndSkillsDashboardBackendApiService',
         'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
-            $scope, $uibModal, $rootScope, $timeout,
+            $scope, $uibModal, $rootScope,
             EditableTopicBackendApiService, EditableSkillBackendApiService,
             TopicsAndSkillsDashboardBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
@@ -97,7 +97,7 @@ angular.module('oppia').directive('skillsList', [
             modalInstance.result.then(function() {
               EditableSkillBackendApiService.deleteSkill(skillId).then(
                 function(status) {
-                  $timeout(function() {
+                  setTimeout(function() {
                     $rootScope.$broadcast(
                       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                   }, 100);
@@ -146,7 +146,7 @@ angular.module('oppia').directive('skillsList', [
                       'Added skill with id ' + skillId + ' to topic.',
                       changeList
                     ).then(function() {
-                      $timeout(function() {
+                      setTimeout(function() {
                         $rootScope.$broadcast(
                           EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                       }, 100);
@@ -196,7 +196,7 @@ angular.module('oppia').directive('skillsList', [
                 skill.id, supersedingSkillId).then(function() {
                 // Broadcast will update the skills list in the dashboard so
                 // that the merged skills are not shown anymore.
-                $timeout(function() {
+                setTimeout(function() {
                   $rootScope.$broadcast(
                     EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 }, 100);

@@ -29,22 +29,32 @@ angular.module('oppia').directive('i18nFooter', [
       template: require('!html-loader!./i18n-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$timeout', '$translate', 'UserService',
+        '$http', '$translate', 'UserService',
         'SUPPORTED_SITE_LANGUAGES',
         function(
-            $http, $timeout, $translate, UserService,
+            $http, $translate, UserService,
             SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
+          ctrl.changeLanguage = function() {
+            $translate.use(ctrl.currentLanguageCode);
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              if (userInfo.isLoggedIn()) {
+                $http.put(siteLanguageUrl, {
+                  site_language_code: ctrl.currentLanguageCode
+                });
+              }
+            });
+          };
           ctrl.$onInit = function() {
             // Changes the language of the translations.
             var preferencesDataUrl = '/preferenceshandler/data';
             var siteLanguageUrl = '/save_site_language';
             ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
 
-            // The $timeout seems to be necessary for the dropdown
+            // The setTimeout seems to be necessary for the dropdown
             // to show anything at the outset, if the default language
             // is not English.
-            $timeout(function() {
+            setTimeout(function() {
               // $translate.use() returns undefined until the language
               // file is fully loaded, which causes a blank field
               // in the dropdown, hence we use $translate.proposedLanguage()
@@ -52,17 +62,6 @@ angular.module('oppia').directive('i18nFooter', [
               ctrl.currentLanguageCode = $translate.use() ||
                 $translate.proposedLanguage();
             }, 50);
-
-            ctrl.changeLanguage = function() {
-              $translate.use(ctrl.currentLanguageCode);
-              UserService.getUserInfoAsync().then(function(userInfo) {
-                if (userInfo.isLoggedIn()) {
-                  $http.put(siteLanguageUrl, {
-                    site_language_code: ctrl.currentLanguageCode
-                  });
-                }
-              });
-            };
           };
         }]
     };

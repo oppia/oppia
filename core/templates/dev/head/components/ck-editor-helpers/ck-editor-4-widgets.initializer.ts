@@ -22,9 +22,9 @@ require('services/html-escaper.service.ts');
 require('services/rte-helper.service.ts');
 
 angular.module('oppia').run([
-  '$timeout', '$compile', '$rootScope', 'RteHelperService',
+  '$compile', '$rootScope', 'RteHelperService',
   'HtmlEscaperService',
-  function($timeout, $compile, $rootScope, RteHelperService,
+  function($compile, $rootScope, RteHelperService,
       HtmlEscaperService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
@@ -100,9 +100,9 @@ angular.module('oppia').run([
                    * http://docs.ckeditor.com/#!/api/CKEDITOR.dom.element
                    */
                   $compile($(that.element.$).contents())($rootScope);
-                  // $timeout ensures we do not take the undo snapshot until
+                  // setTimeout ensures we do not take the undo snapshot until
                   // after angular finishes its changes to the component tags.
-                  $timeout(function() {
+                  setTimeout(function() {
                     // For inline widgets, place the caret after the
                     // widget so the user can continue typing immediately.
                     if (isInline) {
@@ -113,7 +113,7 @@ angular.module('oppia').run([
                       editor.getSelection().selectRanges([range]);
                       // Another timeout needed so the undo snapshot is
                       // not taken until the caret is in the right place.
-                      $timeout(function() {
+                      setTimeout(function() {
                         editor.fire('unlockSnapshot');
                         editor.fire('saveSnapshot');
                       });
@@ -181,7 +181,7 @@ angular.module('oppia').run([
                 // Need to manually $compile so the directive renders.
                 $compile($(this.element.$).contents())($rootScope);
               }
-              $timeout(function() {
+              setTimeout(function() {
                 editor.fire('unlockSnapshot');
                 editor.fire('saveSnapshot');
               });

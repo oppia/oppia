@@ -46,12 +46,12 @@ angular.module('oppia').directive('feedbackPopup', [
         '/pages/exploration-player-page/layout-directives/' +
         'feedback-popup.directive.html'),
       controller: [
-        '$scope', '$element', '$filter', '$http', '$log', '$timeout',
+        '$scope', '$element', '$filter', '$http', '$log',
         'AlertsService', 'BackgroundMaskService', 'FocusManagerService',
         'PlayerPositionService', 'UserService', 'WindowDimensionsService',
         'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
         function(
-            $scope, $element, $filter, $http, $log, $timeout,
+            $scope, $element, $filter, $http, $log,
             AlertsService, BackgroundMaskService, FocusManagerService,
             PlayerPositionService, UserService, WindowDimensionsService,
             FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
@@ -137,7 +137,7 @@ angular.module('oppia').directive('feedbackPopup', [
             }
 
             $scope.feedbackSubmitted = true;
-            $timeout(function() {
+            setTimeout(function() {
               var triggerElt = getTriggerElt();
               if (triggerElt) {
                 triggerElt.trigger('click');
@@ -150,7 +150,7 @@ angular.module('oppia').directive('feedbackPopup', [
             // The timeout is needed to postpone the click event to
             // the subsequent digest cycle. Otherwise, an "$apply already
             // in progress" error is raised.
-            $timeout(function() {
+            setTimeout(function() {
               getTriggerElt().trigger('click');
             });
             BackgroundMaskService.deactivateMask();

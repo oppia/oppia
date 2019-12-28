@@ -91,8 +91,8 @@ angular.module('oppia').factory('RteHelperService', [
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$uibModalInstance', '$timeout',
-            function($scope, $uibModalInstance, $timeout) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.customizationArgSpecs = customizationArgSpecs;
 
               // Without this code, the focus will remain in the background RTE
@@ -103,7 +103,7 @@ angular.module('oppia').factory('RteHelperService', [
               // modal instead.
               $scope.modalIsLoading = true;
               FocusManagerService.setFocus('tmpFocusPoint');
-              $timeout(function() {
+              setTimeout(function() {
                 $scope.modalIsLoading = false;
               });
 

@@ -31,8 +31,8 @@ angular.module('oppia').directive('emailDashboardResultPage', [
         '/pages/email_dashboard/email_dashboard_result_directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$timeout', '$window', 'UrlInterpolationService',
-        function($http, $timeout, $window, UrlInterpolationService) {
+        '$http', '$window', 'UrlInterpolationService',
+        function($http, $window, UrlInterpolationService) {
           var ctrl = this;
           var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
           var CANCEL_EMAIL_HANDLER_URL =
@@ -85,7 +85,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
                 data: data
               }).then(function() {
                 ctrl.emailSubmitted = true;
-                $timeout(function() {
+                setTimeout(function() {
                   $window.location.href = EMAIL_DASHBOARD_PAGE;
                 }, 4000);
               }).then(null, function() {
@@ -113,7 +113,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
 
             $http.post(cancelUrlHandler).then(function() {
               ctrl.emailCancelled = true;
-              $timeout(function() {
+              setTimeout(function() {
                 $window.location.href = EMAIL_DASHBOARD_PAGE;
               }, 4000);
             }, function() {

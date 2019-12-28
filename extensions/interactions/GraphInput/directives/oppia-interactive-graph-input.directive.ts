@@ -128,7 +128,28 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitGraph, validityCheckFn);
 
-            init();
+            if (ctrl.interactionIsActive) {
+              ctrl.resetGraph();
+            } else {
+              ctrl.graph = ctrl.getLastAnswer();
+            }
+            var stringToBool = function(str) {
+              return (str === 'true');
+            };
+            ctrl.canAddVertex = ctrl.interactionIsActive ?
+              stringToBool($attrs.canAddVertexWithValue) : false;
+            ctrl.canDeleteVertex = ctrl.interactionIsActive ?
+              stringToBool($attrs.canDeleteVertexWithValue) : false;
+            ctrl.canEditVertexLabel = ctrl.interactionIsActive ?
+              stringToBool($attrs.canEditVertexLabelWithValue) : false;
+            ctrl.canMoveVertex = ctrl.interactionIsActive ?
+              stringToBool($attrs.canMoveVertexWithValue) : false;
+            ctrl.canAddEdge = ctrl.interactionIsActive ?
+              stringToBool($attrs.canAddEdgeWithValue) : false;
+            ctrl.canDeleteEdge = ctrl.interactionIsActive ?
+              stringToBool($attrs.canDeleteEdgeWithValue) : false;
+            ctrl.canEditEdgeWeight = ctrl.interactionIsActive ?
+              stringToBool($attrs.canEditEdgeWeightWithValue) : false;
           };
         }]
     };

@@ -27,12 +27,12 @@ require('services/debug-info-tracker.service.ts');
 require('services/exploration-features.service.ts');
 
 angular.module('oppia').factory('RouterService', [
-  '$interval', '$location', '$rootScope', '$timeout', '$window',
+  '$interval', '$location', '$rootScope', '$window',
   'DebugInfoTrackerService', 'ExplorationFeaturesService',
   'ExplorationInitStateNameService', 'ExplorationStatesService',
   'StateEditorService',
   function(
-      $interval, $location, $rootScope, $timeout, $window,
+      $interval, $location, $rootScope, $window,
       DebugInfoTrackerService, ExplorationFeaturesService,
       ExplorationInitStateNameService, ExplorationStatesService,
       StateEditorService) {
@@ -239,7 +239,7 @@ angular.module('oppia').factory('RouterService', [
             // link for more information -
             // http://blog.theodybrothers.com/2015/08/getting-inside-angular-scopeapplyasync.html
             $rootScope.$applyAsync();
-            $timeout(function() {
+            setTimeout(function() {
               $('.oppia-editor-cards-container').fadeIn();
             }, 150);
           });
@@ -254,7 +254,7 @@ angular.module('oppia').factory('RouterService', [
       navigateToPreviewTab: function() {
         if (activeTabName !== TABS.PREVIEW.name) {
           _savePendingChanges();
-          $timeout(function() {
+          setTimeout(function() {
             _actuallyNavigate(SLUG_PREVIEW, null);
           }, PREVIEW_TAB_WAIT_TIME_MSEC);
         }

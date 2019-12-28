@@ -47,7 +47,7 @@ angular.module('oppia').directive('libraryPage', [
         '/pages/library-page/library-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
+        '$http', '$log', '$rootScope', '$scope', '$uibModal',
         '$window', 'AlertsService', 'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'PageTitleService', 'SearchService',
@@ -55,7 +55,7 @@ angular.module('oppia').directive('libraryPage', [
         'WindowDimensionsService', 'ALL_CATEGORIES',
         'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
         function(
-            $http, $log, $rootScope, $scope, $timeout, $uibModal,
+            $http, $log, $rootScope, $scope, $uibModal,
             $window, AlertsService, LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             PageTitleService, SearchService,
@@ -65,6 +65,13 @@ angular.module('oppia').directive('libraryPage', [
           var ctrl = this;
           var possibleBannerFilenames = [
             'banner1.svg', 'banner2.svg', 'banner3.svg', 'banner4.svg'];
+          // If the value below is changed, the following CSS values in
+          // oppia.css must be changed:
+          // - .oppia-exp-summary-tiles-container: max-width
+          // - .oppia-library-carousel: max-width
+          var MAX_NUM_TILES_PER_ROW = 4;
+          var isAnyCarouselCurrentlyScrolling = false;
+
           ctrl.setActiveGroup = function(groupIndex) {
             ctrl.activeGroupIndex = groupIndex;
           };
@@ -72,11 +79,7 @@ angular.module('oppia').directive('libraryPage', [
           ctrl.clearActiveGroup = function() {
             ctrl.activeGroupIndex = null;
           };
-          // If the value below is changed, the following CSS values in
-          // oppia.css must be changed:
-          // - .oppia-exp-summary-tiles-container: max-width
-          // - .oppia-library-carousel: max-width
-          var MAX_NUM_TILES_PER_ROW = 4;
+
           var initCarousels = function() {
             // This prevents unnecessary execution of this method immediately
             // after a window resize event is fired.
@@ -109,7 +112,7 @@ angular.module('oppia').directive('libraryPage', [
               ctrl.leftmostCardIndices[i] = index;
             }
           };
-          var isAnyCarouselCurrentlyScrolling = false;
+
           ctrl.scroll = function(ind, isLeftScroll) {
             if (isAnyCarouselCurrentlyScrolling) {
               return;
@@ -176,7 +179,7 @@ angular.module('oppia').directive('libraryPage', [
             if (ctrl.pageMode !== LIBRARY_PAGE_MODES.SEARCH) {
               $('.oppia-library-container').fadeOut(function() {
                 ctrl.pageMode = LIBRARY_PAGE_MODES.SEARCH;
-                $timeout(function() {
+                setTimeout(function() {
                   $('.oppia-library-container').fadeIn();
                 }, 50);
               });
@@ -316,12 +319,12 @@ angular.module('oppia').directive('libraryPage', [
 
                 // Initialize the carousel(s) on the library index page.
                 // Pause is necessary to ensure all elements have loaded.
-                $timeout(initCarousels, 390);
+                setTimeout(initCarousels, 390);
 
 
                 // Check if actual and expected widths are the same.
                 // If not produce an error that would be caught by e2e tests.
-                $timeout(function() {
+                setTimeout(function() {
                   var actualWidth = $('exploration-summary-tile').width();
                   if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
                     console.error(

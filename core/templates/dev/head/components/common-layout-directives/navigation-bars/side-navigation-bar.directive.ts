@@ -27,7 +27,7 @@ angular.module('oppia').directive('sideNavigationBar', [
       template: require(
         '!html-loader!./side-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$timeout', '$window', function($timeout, $window) {
+      controller: ['$window', function($window) {
         var ctrl = this;
         ctrl.getStaticImageUrl = function(imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);

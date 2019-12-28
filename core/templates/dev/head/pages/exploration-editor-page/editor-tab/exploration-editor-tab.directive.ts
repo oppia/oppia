@@ -265,9 +265,10 @@ angular.module('oppia').directive('explorationEditorTab', [
           ctrl.navigateToState = function(stateName) {
             RouterService.navigateToMainTab(stateName);
           };
+          ctrl.areParametersEnabled = function() {
+            return ExplorationFeaturesService.areParametersEnabled();
+          };
           ctrl.$onInit = function() {
-            ctrl.areParametersEnabled =
-              ExplorationFeaturesService.areParametersEnabled;
             ctrl.interactionIsShown = false;
           };
         }]

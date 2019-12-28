@@ -259,24 +259,37 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                   'There was an error when unpublishing the collection.');
               });
           };
+          ctrl.isLoadingCollection = function() {
+            return CollectionEditorStateService.isLoadingCollection();
+          };
+          ctrl.isSaveInProgress = function() {
+            return CollectionEditorStateService.isSavingCollection();
+          };
+          ctrl.getActiveTabName = function() {
+            return RouterService.getActiveTabName();
+          };
+          ctrl.selectMainTab = function() {
+            RouterService.navigateToMainTab();
+          };
+          ctrl.selectPreviewTab = function() {
+            RouterService.navigateToPreviewTab();
+          };
+          ctrl.selectSettingsTab = function() {
+            RouterService.navigateToSettingsTab();
+          };
+          ctrl.selectStatsTab = function() {
+            RouterService.navigateToStatsTab();
+          };
+          ctrl.selectHistoryTab = function() {
+            RouterService.navigateToHistoryTab();
+          };
           ctrl.$onInit = function() {
             ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.collectionRights = (
               CollectionEditorStateService.getCollectionRights());
 
-            ctrl.isLoadingCollection = (
-              CollectionEditorStateService.isLoadingCollection);
             ctrl.validationIssues = [];
-            ctrl.isSaveInProgress = (
-              CollectionEditorStateService.isSavingCollection);
-
-            ctrl.getActiveTabName = RouterService.getActiveTabName;
-            ctrl.selectMainTab = RouterService.navigateToMainTab;
-            ctrl.selectPreviewTab = RouterService.navigateToPreviewTab;
-            ctrl.selectSettingsTab = RouterService.navigateToSettingsTab;
-            ctrl.selectStatsTab = RouterService.navigateToStatsTab;
-            ctrl.selectHistoryTab = RouterService.navigateToHistoryTab;
           };
         }]
     };

@@ -123,12 +123,13 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             CollectionUpdateService.setCollectionTags(
               ctrl.collection, ctrl.displayedCollectionTags);
           };
+          ctrl.hasPageLoaded = function() {
+            return CollectionEditorStateService.hasLoadedCollection();
+          };
           ctrl.$onInit = function() {
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
               COLLECTION_TITLE_INPUT_FOCUS_LABEL);
-            ctrl.hasPageLoaded = (
-              CollectionEditorStateService.hasLoadedCollection);
             ctrl.CATEGORY_LIST_FOR_SELECT2 = ALL_CATEGORIES.map(
               function(category) {
                 return {

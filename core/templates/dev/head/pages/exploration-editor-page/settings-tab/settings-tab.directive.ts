@@ -202,9 +202,12 @@ angular.module('oppia').directive('settingsTab', [
           };
 
           // Methods for enabling advanced features.
-          ctrl.areParametersEnabled =
-            ExplorationFeaturesService.areParametersEnabled;
-          ctrl.enableParameters = ExplorationFeaturesService.enableParameters;
+          ctrl.areParametersEnabled = function() {
+            return ExplorationFeaturesService.areParametersEnabled();
+          };
+          ctrl.enableParameters = function() {
+            ExplorationFeaturesService.enableParameters();
+          };
 
           ctrl.isAutomaticTextToSpeechEnabled = (
             ExplorationAutomaticTextToSpeechService
@@ -214,10 +217,12 @@ angular.module('oppia').directive('settingsTab', [
               .toggleAutomaticTextToSpeech
           );
 
-          ctrl.isCorrectnessFeedbackEnabled = (
-            ExplorationCorrectnessFeedbackService.isEnabled);
-          ctrl.toggleCorrectnessFeedback = (
-            ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
+          ctrl.isCorrectnessFeedbackEnabled = function() {
+            return ExplorationCorrectnessFeedbackService.isEnabled();
+          };
+          ctrl.toggleCorrectnessFeedback = function() {
+            ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
+          };
 
           // Methods for rights management.
           ctrl.openEditRolesForm = function() {

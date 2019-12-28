@@ -43,7 +43,7 @@ angular.module('oppia').directive('supplementalCard', [
         '/pages/exploration-player-page/learner-experience/' +
         'supplemental-card.directive.html'),
       controller: [
-        '$scope', '$timeout', '$window',
+        '$scope', '$window',
         'WindowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',
         'TWO_CARD_THRESHOLD_PX', 'EVENT_ACTIVE_CARD_CHANGED',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'AudioTranslationManagerService',
@@ -51,7 +51,7 @@ angular.module('oppia').directive('supplementalCard', [
         'COMPONENT_NAME_FEEDBACK', 'AUDIO_HIGHLIGHT_CSS_CLASS',
         'CurrentInteractionService',
         function(
-            $scope, $timeout, $window,
+            $scope, $window,
             WindowDimensionsService, CONTENT_FOCUS_LABEL_PREFIX,
             TWO_CARD_THRESHOLD_PX, EVENT_ACTIVE_CARD_CHANGED,
             CONTINUE_BUTTON_FOCUS_LABEL, AudioTranslationManagerService,

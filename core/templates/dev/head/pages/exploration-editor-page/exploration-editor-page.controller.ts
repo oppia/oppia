@@ -159,7 +159,7 @@ angular.module('oppia').directive('explorationEditorPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache',
-        '$timeout', '$uibModal', '$window', 'AutosaveInfoModalsService',
+        '$uibModal', '$window', 'AutosaveInfoModalsService',
         'ChangeListService', 'ContextService', 'EditabilityService',
         'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
         'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
@@ -179,7 +179,7 @@ angular.module('oppia').directive('explorationEditorPage', [
         'EVENT_EXPLORATION_PROPERTY_CHANGED',
         function(
             $http, $log, $q, $rootScope, $scope, $templateCache,
-            $timeout, $uibModal, $window, AutosaveInfoModalsService,
+            $uibModal, $window, AutosaveInfoModalsService,
             ChangeListService, ContextService, EditabilityService,
             ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
             ExplorationCorrectnessFeedbackService, ExplorationDataService,
@@ -198,6 +198,21 @@ angular.module('oppia').directive('explorationEditorPage', [
             UserEmailPreferencesService, UserExplorationPermissionsService,
             EVENT_EXPLORATION_PROPERTY_CHANGED) {
           var ctrl = this;
+          var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
+          var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
+          var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
+          var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
+
+          var saveButtonTutorialElement = {
+            type: 'element',
+            selector: _ID_TUTORIAL_SAVE_BUTTON,
+            heading: 'Save',
+            text: (
+              'When you\'re done making changes, ' +
+              'be sure to save your work.<br><br>'),
+            placement: 'bottom'
+          };
+
           var setPageTitle = function() {
             if (ExplorationTitleService.savedMemento) {
               PageTitleService.setPageTitle(
@@ -384,25 +399,14 @@ angular.module('oppia').directive('explorationEditorPage', [
             });
           };
 
+          ctrl.getActiveTabName = function() {
+            return RouterService.getActiveTabName();
+          };
+
           $scope.$on('initExplorationPage', function(
               unusedEvtData, successCallback) {
             ctrl.initExplorationPage(successCallback);
           });
-
-          var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
-          var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
-          var _ID_TUTORIAL_PREVIEW_TAB = '#tutorialPreviewTab';
-          var _ID_TUTORIAL_SAVE_BUTTON = '#tutorialSaveButton';
-
-          var saveButtonTutorialElement = {
-            type: 'element',
-            selector: _ID_TUTORIAL_SAVE_BUTTON,
-            heading: 'Save',
-            text: (
-              'When you\'re done making changes, ' +
-              'be sure to save your work.<br><br>'),
-            placement: 'bottom'
-          };
 
           var leaveTutorial = function() {
             EditabilityService.onEndTutorial();
@@ -424,10 +428,10 @@ angular.module('oppia').directive('explorationEditorPage', [
 
           ctrl.startTutorial = function() {
             RouterService.navigateToMainTab();
-            // The $timeout wrapper is needed for all components on the page to
-            // load, otherwise elements within ng-if's are not guaranteed to be
-            // present on the page.
-            $timeout(function() {
+            // The setTimeout wrapper is needed for all components on the page
+            // to load, otherwise elements within ng-if's are not guaranteed
+            // to be present on the page.
+            setTimeout(function() {
               EditabilityService.onStartTutorial();
               ctrl.tutorialInProgress = true;
             });
@@ -489,6 +493,7 @@ angular.module('oppia').directive('explorationEditorPage', [
           $scope.$on(
             'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
           $scope.$on('openEditorTutorial', ctrl.startTutorial);
+
           ctrl.$onInit = function() {
             ctrl.EditabilityService = EditabilityService;
             ctrl.StateEditorService = StateEditorService;
@@ -504,8 +509,10 @@ angular.module('oppia').directive('explorationEditorPage', [
               '/createhandler/download/' + ctrl.explorationId);
             ctrl.revertExplorationUrl = (
               '/createhandler/revert/' + ctrl.explorationId);
-            ctrl.getActiveTabName = RouterService.getActiveTabName;
             ctrl.areExplorationWarningsVisible = false;
+            // The initExplorationPage function is written separately since it
+            // is also called in $scope.$on when some external events are
+            // triggered.
             ctrl.initExplorationPage();
             ctrl.EDITOR_TUTORIAL_OPTIONS = [{
               type: 'title',

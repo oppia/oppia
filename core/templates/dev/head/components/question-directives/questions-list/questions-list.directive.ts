@@ -66,7 +66,7 @@ angular.module('oppia').directive('questionsList', [
         'questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
+        '$scope', '$filter', '$http', '$q', '$uibModal', '$window',
         '$location', 'AlertsService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
         'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
@@ -76,7 +76,7 @@ angular.module('oppia').directive('questionsList', [
         'MODE_SELECT_SKILL', 'SKILL_DIFFICULTIES', 'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService', 'QuestionsListService',
         function(
-            $scope, $filter, $http, $q, $timeout, $uibModal, $window,
+            $scope, $filter, $http, $q, $uibModal, $window,
             $location, AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
             EditableSkillBackendApiService, MisconceptionObjectFactory,
@@ -483,7 +483,7 @@ angular.module('oppia').directive('questionsList', [
                     function() {
                       count++;
                       if (count === changedDifficultyCount) {
-                        $timeout(function() {
+                        setTimeout(function() {
                           QuestionsListService.resetPageNumber();
                           ctrl.getQuestionSummariesAsync(
                             ctrl.selectedSkillIds, true, true
@@ -687,7 +687,7 @@ angular.module('oppia').directive('questionsList', [
                 EditableQuestionBackendApiService.editQuestionSkillLinks(
                   questionId, array, questionDifficulty).then(
                   data => {
-                    $timeout(function() {
+                    setTimeout(function() {
                       QuestionsListService.resetPageNumber();
                       _reInitializeSelectedSkillIds();
                       ctrl.getQuestionSummariesAsync(
@@ -705,6 +705,13 @@ angular.module('oppia').directive('questionsList', [
             });
           };
 
+          ctrl.getQuestionSummariesForOneSkill = function() {
+            return QuestionsListService.getCachedQuestionSummaries();
+          };
+          ctrl.getCurrentPageNumber = function() {
+            return QuestionsListService.getCurrentPageNumber();
+          };
+
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
             _initTab(false);
           });
@@ -713,11 +720,9 @@ angular.module('oppia').directive('questionsList', [
             ctrl.selectedSkillIds = [];
             ctrl.associatedSkillSummaries = [];
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
-            ctrl.getQuestionSummariesForOneSkill =
-              QuestionsListService.getCachedQuestionSummaries;
-            ctrl.getCurrentPageNumber = (
-              QuestionsListService.getCurrentPageNumber);
             ctrl.editorIsOpen = false;
+            // The _initTab function is written separately since it is also
+            // called in $scope.$on when some external events are triggered.
             _initTab(true);
           };
         }

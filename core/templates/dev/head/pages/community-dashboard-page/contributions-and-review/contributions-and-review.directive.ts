@@ -354,16 +354,6 @@ angular.module('oppia').directive('contributionsAndReview', [
             }
           };
 
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.isAdmin = userInfo.isAdmin();
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-            ctrl.userDetailsLoading = false;
-            if (ctrl.isAdmin) {
-              ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
-            } else if (ctrl.userIsLoggedIn) {
-              ctrl.switchToContributionsTab(ctrl.SUGGESTION_TYPE_QUESTION);
-            }
-          });
           ctrl.$onInit = function() {
             ctrl.isAdmin = false;
             ctrl.userDetailsLoading = true;
@@ -395,6 +385,16 @@ angular.module('oppia').directive('contributionsAndReview', [
                 text: 'Translations'
               }
             ];
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.isAdmin = userInfo.isAdmin();
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              ctrl.userDetailsLoading = false;
+              if (ctrl.isAdmin) {
+                ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
+              } else if (ctrl.userIsLoggedIn) {
+                ctrl.switchToContributionsTab(ctrl.SUGGESTION_TYPE_QUESTION);
+              }
+            });
           };
         }
       ]

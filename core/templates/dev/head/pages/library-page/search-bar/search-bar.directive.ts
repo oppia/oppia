@@ -37,12 +37,12 @@ angular.module('oppia').directive('searchBar', [
         '/pages/library-page/search-bar/search-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$rootScope', '$scope', '$timeout', '$translate',
+        '$location', '$rootScope', '$scope', '$translate',
         '$window', 'ConstructTranslationIdsService', 'DebouncerService',
         'HtmlEscaperService', 'LanguageUtilService', 'NavigationService',
         'SearchService', 'UrlService', 'SEARCH_DROPDOWN_CATEGORIES',
         function(
-            $location, $rootScope, $scope, $timeout, $translate,
+            $location, $rootScope, $scope, $translate,
             $window, ConstructTranslationIdsService, DebouncerService,
             HtmlEscaperService, LanguageUtilService, NavigationService,
             SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
@@ -129,6 +129,10 @@ angular.module('oppia').directive('searchBar', [
             ctrl.selectionDetails[itemsType].selections = {};
             updateSelectionDetails(itemsType);
             onSearchQueryChangeExec();
+          };
+
+          ctrl.isSearchInProgress = function() {
+            return SearchService.isSearchInProgress();
           };
 
           $scope.$watch('$ctrl.searchQuery', function(
@@ -232,7 +236,6 @@ angular.module('oppia').directive('searchBar', [
 
           $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
           ctrl.$onInit = function() {
-            ctrl.isSearchInProgress = SearchService.isSearchInProgress;
             ctrl.SEARCH_DROPDOWN_CATEGORIES = (
               SEARCH_DROPDOWN_CATEGORIES.map(
                 function(categoryName) {

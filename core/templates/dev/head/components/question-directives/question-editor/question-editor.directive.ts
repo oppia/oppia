@@ -227,6 +227,8 @@ angular.module('oppia').directive('questionEditor', [
             ctrl.interactionIsShown = false;
 
             ctrl.stateEditorInitialized = false;
+            // The _init function is written separately since it is also called
+            // in $scope.$on when some external events are triggered.
             _init();
           };
         }]

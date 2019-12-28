@@ -49,11 +49,11 @@ angular.module('oppia').directive('graphViz', [
         'graph-viz.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$element', '$attrs', '$document', '$timeout',
+        '$scope', '$element', '$attrs', '$document',
         'FocusManagerService', 'GraphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
         'EVENT_NEW_CARD_AVAILABLE', 'DeviceInfoService',
         function(
-            $scope, $element, $attrs, $document, $timeout,
+            $scope, $element, $attrs, $document,
             FocusManagerService, GraphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
           var ctrl = this;

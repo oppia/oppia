@@ -537,6 +537,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
           };
           ctrl.$onInit = function() {
             ctrl.alwaysEditable = true;
+            // The initializeEditor function is written separately since it
+            // is also called in resetEditor function.
             ctrl.initializeEditor();
           };
         }]

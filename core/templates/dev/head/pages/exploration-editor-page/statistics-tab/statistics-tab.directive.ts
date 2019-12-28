@@ -69,6 +69,8 @@ angular.module('oppia').directive('statisticsTab', [
             IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
           var _EXPLORATION_STATS_VERSION_ALL = 'all';
+          var stateStatsModalIsOpen = false;
+
           ctrl.getLocaleAbbreviatedDatetimeString =
           function(millisSinceEpoch) {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
@@ -131,7 +133,6 @@ angular.module('oppia').directive('statisticsTab', [
               ];
             });
           };
-          var stateStatsModalIsOpen = false;
           ctrl.onClickStateInStatsGraph = function(stateName) {
             if (!stateStatsModalIsOpen) {
               stateStatsModalIsOpen = true;

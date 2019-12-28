@@ -128,8 +128,7 @@ angular.module('oppia').directive('answerGroupEditor', [
 
                   $scope.selectMisconception = function(
                       misconception, skillId) {
-                    $scope.selectedMisconception =
-                    angular.copy(misconception);
+                    $scope.selectedMisconception = angular.copy(misconception);
                     $scope.selectedMisconceptionSkillId = skillId;
                   };
 
@@ -177,7 +176,6 @@ angular.module('oppia').directive('answerGroupEditor', [
           ctrl.getAnswerChoices = function() {
             return ResponsesService.getAnswerChoices();
           };
-          ctrl.answerChoices = ctrl.getAnswerChoices();
 
           // Updates answer choices when the interaction requires it -- e.g.,
           // the rules for multiple choice need to refer to the multiple
@@ -405,6 +403,7 @@ angular.module('oppia').directive('answerGroupEditor', [
             ctrl.misconceptionName = null;
             ctrl.misconceptionsBySkill =
               StateEditorService.getMisconceptionsBySkill();
+            ctrl.answerChoices = ctrl.getAnswerChoices();
 
             _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
           };

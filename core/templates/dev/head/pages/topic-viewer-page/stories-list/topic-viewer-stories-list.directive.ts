@@ -31,8 +31,8 @@ angular.module('oppia').directive('storiesList', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-viewer-page/stories-list/' +
         'topic-viewer-stories-list.directive.html'),
-      controller: ['WindowDimensionsService', '$scope', '$timeout',
-        function(WindowDimensionsService, $scope, $timeout) {
+      controller: ['WindowDimensionsService', '$scope',
+        function(WindowDimensionsService, $scope) {
           var STORY_TILE_WIDTH_PX = 360;
           $scope.leftmostCardIndices = 0;
           var MAX_NUM_TILES_PER_ROW = 4;
@@ -125,7 +125,7 @@ angular.module('oppia').directive('storiesList', [
           $scope.decrementLeftmostCardIndex = function() {
             $scope.leftmostCardIndices--;
           };
-          $timeout(function() {
+          setTimeout(function() {
             initCarousels();
           }, 390);
 

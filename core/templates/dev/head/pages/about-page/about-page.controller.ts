@@ -38,6 +38,21 @@ angular.module('oppia').directive('aboutPage', [
           var activeTabClass = 'oppia-about-tabs-active';
           var hash = window.location.hash.slice(1);
           var visibleContent = 'oppia-about-visible-content';
+          var listOfNamesToThank = [
+            'Alex Kauffmann', 'Allison Barros',
+            'Amy Latten', 'Brett Barros',
+            'Crystal Kwok', 'Daniel Hernandez',
+            'Divya Siddarth', 'Ilwon Yoon',
+            'Jennifer Chen', 'John Cox',
+            'John Orr', 'Katie Berlent',
+            'Michael Wawszczak', 'Mike Gainer',
+            'Neil Fraser', 'Noah Falstein',
+            'Nupur Jain', 'Peter Norvig',
+            'Philip Guo', 'Piotr Mitros',
+            'Rachel Chen', 'Rahim Nathwani',
+            'Robyn Choo', 'Tricia Ngoon',
+            'Vikrant Nanda', 'Vinamrata Singal',
+            'Yarin Feigenbaum'];
 
           var activateTab = function(tabName) {
             $("a[id='" + tabName + "']").parent().addClass(
@@ -63,26 +78,13 @@ angular.module('oppia').directive('aboutPage', [
             }
           };
 
-          var listOfNamesToThank = [
-            'Alex Kauffmann', 'Allison Barros',
-            'Amy Latten', 'Brett Barros',
-            'Crystal Kwok', 'Daniel Hernandez',
-            'Divya Siddarth', 'Ilwon Yoon',
-            'Jennifer Chen', 'John Cox',
-            'John Orr', 'Katie Berlent',
-            'Michael Wawszczak', 'Mike Gainer',
-            'Neil Fraser', 'Noah Falstein',
-            'Nupur Jain', 'Peter Norvig',
-            'Philip Guo', 'Piotr Mitros',
-            'Rachel Chen', 'Rahim Nathwani',
-            'Robyn Choo', 'Tricia Ngoon',
-            'Vikrant Nanda', 'Vinamrata Singal',
-            'Yarin Feigenbaum'];
-
           ctrl.onTabClick = function(tabName) {
             // Update hash
             window.location.hash = '#' + tabName;
             activateTab(tabName);
+          };
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
@@ -107,7 +109,6 @@ angular.module('oppia').directive('aboutPage', [
             ctrl.listOfNames = listOfNamesToThank
               .slice(0, listOfNamesToThank.length - 1).join(', ') +
               ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
-            ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
             ctrl.aboutPageMascotImgUrl = UrlInterpolationService
               .getStaticImageUrl('/general/about_page_mascot.png');
             ctrl.listOfNames = listOfNamesToThank

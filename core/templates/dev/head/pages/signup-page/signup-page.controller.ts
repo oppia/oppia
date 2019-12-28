@@ -193,14 +193,14 @@ angular.module('oppia').directive('signupPage', [
               resolve: {},
               controller: [
                 '$scope', '$uibModalInstance', 'SiteAnalyticsService',
-                'UserService', '$timeout', '$window',
+                'UserService', '$window',
                 function($scope, $uibModalInstance, SiteAnalyticsService,
-                    UserService, $timeout, $window) {
+                    UserService, $window) {
                   $scope.continueRegistration = function() {
                     UserService.getLoginUrlAsync().then(
                       function(loginUrl) {
                         if (loginUrl) {
-                          $timeout(function() {
+                          setTimeout(function() {
                             $window.location = loginUrl;
                           }, 150);
                         } else {

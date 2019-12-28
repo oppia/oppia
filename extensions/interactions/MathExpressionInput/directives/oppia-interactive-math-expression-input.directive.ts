@@ -46,51 +46,22 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
         'math-expression-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
+        '$scope', '$attrs', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
         'CurrentInteractionService',
         function(
-            $scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
+            $scope, $attrs, $element, LABEL_FOR_CLEARING_FOCUS,
             DebouncerService, DeviceInfoService, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
-          var guppyDivElt = $element[0].querySelector('.guppy-div');
-
-          // Dynamically assigns a unique id to the guppy-div
-          guppyDivElt.setAttribute(
-            'id', 'guppy_' + Math.floor(Math.random() * 100000000));
-          var guppyDivId = guppyDivElt.id;
-          var guppyInstance = new Guppy(guppyDivId, {
-            settings: {
-              empty_content: (
-                '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
-              buttons: []
-            },
-            events: {
-              done: function(e) {
-                ctrl.submitAnswer();
-              },
-              change: function(e) {
-                // Need to manually trigger the digest cycle
-                // to make any 'watchers' aware of changes in answer.
-                $scope.$apply();
-              },
-              ready: function() {
-                if (DeviceInfoService.isMobileUserAgent() &&
-                  DeviceInfoService.hasTouchEvents()) {
-                  ctrl.mobileOverlayIsShown = true;
-                  // Wait for the scope change to apply. Since we interact
-                  // with the DOM elements, they need to be added by angular
-                  // before the function is called. Timeout of 0 to wait
-                  // until the end of the current digest cycle,
-                  // false to not start a new digest cycle.
-                  // A new cycle is not needed since no angular variables
-                  // are changed within the function.
-                  $timeout(makeGuppyMobileFriendly, 0, false);
-                }
-              }
-            }
-          });
+          var guppyDivElt, guppyDivId, guppyInstance;
+          var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
+            '/overrides/guppy/oppia_symbols.json');
+          var labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          var answer = {
+            ascii: '',
+            latex: ''
+          };
 
           /**
            * Adds a button overlay and invisible text field used to bring up
@@ -116,7 +87,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
 
               // If the guppy div hasn't rendered yet, retry after 100ms.
               if (guppySize.width === 0 || guppySize.height === 0) {
-                $timeout(positionButtonOverlay, 100);
+                setTimeout(positionButtonOverlay, 100);
               } else {
                 $('#startMathInputButton').css({
                   top: guppyOffset.top,
@@ -178,9 +149,6 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               setGuppyContentFromInput();
             });
           };
-          var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
-            '/overrides/guppy/oppia_symbols.json');
-          var labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
           $scope.$on('focusOn', function(e, name) {
             if (!labelForFocusTarget) {
@@ -193,11 +161,6 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               guppyInstance.deactivate();
             }
           });
-
-          var answer = {
-            ascii: '',
-            latex: ''
-          };
 
           ctrl.isCurrentAnswerValid = function() {
             var latexAnswer = guppyInstance.latex();
@@ -220,6 +183,43 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               answer, MathExpressionInputRulesService);
           };
           ctrl.$onInit = function() {
+            guppyDivElt = $element[0].querySelector('.guppy-div');
+
+            // Dynamically assigns a unique id to the guppy-div
+            guppyDivElt.setAttribute(
+              'id', 'guppy_' + Math.floor(Math.random() * 100000000));
+            guppyDivId = guppyDivElt.id;
+            guppyInstance = new Guppy(guppyDivId, {
+              settings: {
+                empty_content: (
+                  '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
+                buttons: []
+              },
+              events: {
+                done: function(e) {
+                  ctrl.submitAnswer();
+                },
+                change: function(e) {
+                  // Need to manually trigger the digest cycle
+                  // to make any 'watchers' aware of changes in answer.
+                  $scope.$apply();
+                },
+                ready: function() {
+                  if (DeviceInfoService.isMobileUserAgent() &&
+                    DeviceInfoService.hasTouchEvents()) {
+                    ctrl.mobileOverlayIsShown = true;
+                    // Wait for the scope change to apply. Since we interact
+                    // with the DOM elements, they need to be added by angular
+                    // before the function is called. Timeout of 0 to wait
+                    // until the end of the current digest cycle,
+                    // false to not start a new digest cycle.
+                    // A new cycle is not needed since no angular variables
+                    // are changed within the function.
+                    setTimeout(makeGuppyMobileFriendly, 0, false);
+                  }
+                }
+              }
+            });
             Guppy.init({
               symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
                 oppiaSymbolsUrl]});

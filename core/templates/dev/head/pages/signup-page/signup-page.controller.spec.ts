@@ -71,6 +71,10 @@ describe('Signup controller', function() {
           };
         }
       });
+      // Refer: https://www.codelord.net/2017/01/09/
+      // unit-testing-angular-components-with-%24componentcontroller/
+      // Angular and $componentController does not take care of
+      // $onInit lifecycle hook, so we need to call it explicitly.
       ctrl.$onInit();
     }));
 

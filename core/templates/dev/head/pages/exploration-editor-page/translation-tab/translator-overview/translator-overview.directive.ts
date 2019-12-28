@@ -40,12 +40,12 @@ angular.module('oppia').directive('translatorOverview', [
         '/pages/exploration-editor-page/translation-tab/translator-overview/' +
         'translator-overview.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$timeout', '$window',
+        '$rootScope', '$scope', '$window',
         'ExplorationLanguageCodeService', 'LanguageUtilService',
         'TranslationLanguageService', 'TranslationStatusService',
         'TranslationTabActiveModeService', 'DEFAULT_AUDIO_LANGUAGE',
         'SUPPORTED_AUDIO_LANGUAGES', function(
-            $rootScope, $scope, $timeout, $window,
+            $rootScope, $scope, $window,
             ExplorationLanguageCodeService, LanguageUtilService,
             TranslationLanguageService, TranslationStatusService,
             TranslationTabActiveModeService, DEFAULT_AUDIO_LANGUAGE,
