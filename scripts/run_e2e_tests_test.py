@@ -460,7 +460,7 @@ of the failed tests in ../protractor-screenshots/
                 with tweak_constant_file_swap, run_cmd_swap, build_main_swap:
                     with hash_file_path_swap:
                         run_e2e_tests.build_js_files(True)
-        with open(mock_hash_file_path) as f:
+        with python_utils.open_file(mock_hash_file_path, 'r') as f:
             content = f.readlines()
         os.remove(mock_hash_file_path)
         self.assertEqual(content, ['{}'])

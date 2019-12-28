@@ -264,7 +264,7 @@ def build_js_files(dev_mode):
     else:
         # The 'hashes.json' file is used by the `url-interpolation` service.
         if not os.path.isfile(HASHES_FILE_PATH):
-            with open(HASHES_FILE_PATH, 'w') as hash_file:
+            with python_utils.open_file(HASHES_FILE_PATH, 'w') as hash_file:
                 hash_file.write('{}')
         try:
             common.run_cmd(
