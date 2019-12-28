@@ -35,7 +35,7 @@ export class ReviewTestBackendApiService {
     private http: HttpClient
   ) {}
 
-  _fetchReviewTestData(storyId: string) {
+  _fetchReviewTestData(storyId: string): Promise<Object> {
     return this.http.get(
       this.urlInterpolationService.interpolateUrl(
         ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
@@ -44,7 +44,7 @@ export class ReviewTestBackendApiService {
     ).toPromise();
   }
 
-  fetchReviewTestData(storyId: string) {
+  fetchReviewTestData(storyId: string): Promise<Object> {
     return this._fetchReviewTestData(storyId);
   }
 }
