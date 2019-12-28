@@ -44,7 +44,7 @@ anchor_for_installing_cc_test_reporter: &install_cc
 
 anchor_for_attaching_setup_files: &attaching_files
   attach_workspace:
-    at: /home/circleci/oppia
+    at: /home/circleci/
 
 version: 2
 jobs:
@@ -55,10 +55,11 @@ jobs:
       - run:
           <<: *install_dependencies
       - persist_to_workspace:
-          root: /home/circleci/oppia
+          root: /home/circleci/
           paths:
-            - node_modules/
-            - ../oppia_tools/
+            - oppia/node_modules/
+            - oppia/third_party/
+            - oppia_tools/
 
   lint_tests:
     <<: *job_defaults
