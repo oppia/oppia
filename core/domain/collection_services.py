@@ -488,7 +488,7 @@ def record_played_exploration_in_collection_context(
         progress_model.put()
 
 
-def _get_collection_summary_dicts_from_models(collection_summary_models):
+def get_collection_summary_dicts_from_models(collection_summary_models):
     """Given an iterable of CollectionSummaryModel instances, create a dict
     containing corresponding collection summary domain objects, keyed by id.
 
