@@ -35,6 +35,9 @@ angular.module('oppia').directive('i18nFooter', [
             $http, $translate, UserService,
             SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
+          // Changes the language of the translations.
+          var preferencesDataUrl = '/preferenceshandler/data';
+          var siteLanguageUrl = '/save_site_language';
           ctrl.changeLanguage = function() {
             $translate.use(ctrl.currentLanguageCode);
             UserService.getUserInfoAsync().then(function(userInfo) {
@@ -46,9 +49,6 @@ angular.module('oppia').directive('i18nFooter', [
             });
           };
           ctrl.$onInit = function() {
-            // Changes the language of the translations.
-            var preferencesDataUrl = '/preferenceshandler/data';
-            var siteLanguageUrl = '/save_site_language';
             ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
 
             // The setTimeout seems to be necessary for the dropdown
