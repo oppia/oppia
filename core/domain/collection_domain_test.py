@@ -1082,7 +1082,11 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
 
     def test_is_private(self):
         self.assertTrue(self.collection_summary.is_private())
-        self.collection_summary.status = constants.ACTIVITY_STATUS_PUBLIC
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, True, ['owner_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
         self.assertFalse(self.collection_summary.is_private())
 
     def test_is_solely_owned_by_user_one_owner(self):
@@ -1090,7 +1094,11 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             self.collection_summary.is_solely_owned_by_user('owner_id'))
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('other_id'))
-        self.collection_summary.owner_ids = ['other_id']
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, True, ['other_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id'))
         self.assertTrue(
@@ -1101,7 +1109,11 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             self.collection_summary.is_solely_owned_by_user('owner_id'))
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('other_id'))
-        self.collection_summary.owner_ids = ['owner_id', 'other_id']
+        self.collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [],
+            constants.ACTIVITY_STATUS_PUBLIC, True, ['owner_id', 'other_id'],
+            ['editor_id'], ['viewer_id'], ['contributor_id'], {}, 1, 1,
+            datetime.datetime.utcnow(), datetime.datetime.utcnow())
         self.assertFalse(
             self.collection_summary.is_solely_owned_by_user('owner_id'))
         self.assertFalse(
