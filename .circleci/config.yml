@@ -44,8 +44,8 @@ anchor_for_installing_cc_test_reporter: &install_cc
 
 anchor_for_restoring_cache: &restore_cache
   keys:
-    - setup-files-cache-{{ checksum "date" }}
-    - third-party-cache-{{ checksum "date" }}
+    - setup-files-cache-{{ checksum "date" }}-{{ .Branch }}
+    - third-party-cache-{{ checksum "date" }}-{{ .Branch }}
 
 version: 2
 jobs:
@@ -68,6 +68,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - restore_cache:
+          <<: *restore_cache
       - run:
           <<: *install_dependencies
       - run:
@@ -83,11 +85,10 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run:
-          <<: *install_dependencies
-      - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
+      - run:
+          <<: *install_dependencies
       - run:
           name: Run typescript tests
           command: |
@@ -97,9 +98,6 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run:
-          <<: *install_dependencies
-      - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
       - run:
@@ -117,9 +115,6 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run:
-          <<: *install_dependencies
-      - run: date +%F > date
       - restore_cache:
           <<: *restore_cache
       - run: sudo pip install webtest
