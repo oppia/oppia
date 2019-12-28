@@ -172,7 +172,7 @@ node_modules/.bin/webdriver-manager start --versions.chrome 2.41 --detach --quie
 # TODO(jacob): Find a webdriver or selenium argument that controls log level.
 (node_modules/.bin/webdriver-manager start 2>/dev/null)&
 # Start a demo server.
-(python ../oppia_tools/google_appengine_1.9.67/google_appengine/dev_appserver.py --host=0.0.0.0 --port=9001 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true $APP_YAML_FILEPATH)&
+(python ../oppia_tools/google_appengine_1.9.67/google_appengine/dev_appserver.py --host=0.0.0.0 --port=9001 --clear_datastore=yes --dev_appserver_log_level=critical --log_level=critical --skip_sdk_update_check=true $APP_YAML_FILEPATH > log.txt)&
 
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done
@@ -250,3 +250,6 @@ else
     node_modules/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
   fi
 fi
+
+# Print log from backend server.
+cat log.txt
