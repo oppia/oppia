@@ -19,15 +19,14 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');
- require('domain/utilities/url-interpolation.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
 
 require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').directive('thumbnailUploader', [
-'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -39,16 +38,16 @@ angular.module('oppia').directive('thumbnailUploader', [
         '/components/forms/custom-forms-directives/' +
         'thumbnail-uploader.directive.html'),
       controller: ['$scope', '$uibModal',
-      'AlertsService', 'ContextService', 'CsrfTokenService',
-      'ImageUploadHelperService',
-      function($scope, $uibModal,
-          AlertsService, ContextService, CsrfTokenService,
-          ImageUploadHelperService) {
-        $scope.showEditThumbnailModal = function() {
+        'AlertsService', 'ContextService', 'CsrfTokenService',
+        'ImageUploadHelperService',
+        function($scope, $uibModal,
+            AlertsService, ContextService, CsrfTokenService,
+            ImageUploadHelperService) {
+          $scope.showEditThumbnailModal = function() {
             if ($scope.disabled) {
               return;
             }
-            let tempImageName = '';
+            var tempImageName = '';
 
             var saveTopicThumbnailImageData = function(imageURI) {
               let resampledFile = null;
@@ -61,7 +60,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               }
               postImageToServer(resampledFile);
             };
-    
+
             var postImageToServer = function(resampledFile) {
               let form = new FormData();
               form.append('image', resampledFile);
@@ -124,11 +123,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                       minContainerHeight: 405,
                       minContainerWidth: 720,
                       minCropBoxWidth: 180,
-                      aspectRatio: 16 / 9,
-                      crop: function(event) {
-                        console.log(event.detail.width);
-                        console.log(event.detail.height);
-                      }
+                      aspectRatio: 16 / 9
                     });
                   };
                   $scope.onFileChanged = function(file) {
@@ -180,7 +175,7 @@ angular.module('oppia').directive('thumbnailUploader', [
               saveTopicThumbnailImageData(newThumbnailDataUrl);
             });
           };
-      }]
+        }]
     };
   }
 ]);
