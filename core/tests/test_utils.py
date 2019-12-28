@@ -194,6 +194,11 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.response = response
 
 
+class IntendedException(Exception):
+    """Exception for intended failure in swap check."""
+    pass
+
+
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
@@ -1841,7 +1846,8 @@ tags: []
     @contextlib.contextmanager
     def swap_with_checks(
             self, obj, attr, newvalue, expected_args=None, expected_kwargs=None,
-            called=True, called_times=None):
+            called=True, called_times=None,
+            expected_exception=IntendedException):
         """Swap an object's function value within the context of a
         'with' statement. The object can be anything that supports
         getattr and setattr, such as class instances, modules, ...
@@ -1884,6 +1890,9 @@ tags: []
                 checked.
             called_times: int|None. How many times this function will be called.
                 If the value is None, this will not be checked.
+            expected_exception: Exceptiono. The exception that you expect to be
+                raised in this function. By default the exception is
+                IntendedException.
 
         Note:
             Currently the function does not support specify the ordered invoke
@@ -1894,7 +1903,7 @@ tags: []
         """
         original = getattr(obj, attr)
         newvalue.called_times = 0
-        msg = 'Failed in check function %s' % attr
+        msg = 'Failed in check function %s.%s' % (obj.__name__, attr)
         def wrapper(*args, **kwargs):
             """Wrapper function for the new value. This function will do the
             check before the wrapped function is invoked. After the function
@@ -1924,9 +1933,13 @@ tags: []
                     expected_kwargs.remove(kwargs)
                 else:
                     raise Exception()
-            result = newvalue(*args, **kwargs)
-            newvalue.called_times += 1
-            return result
+            try:
+                result = newvalue(*args, **kwargs)
+                newvalue.called_times += 1
+                return result
+            except expected_exception as error:
+                newvalue.called_times += 1
+                raise error
         setattr(obj, attr, wrapper)
         error_occurred = False
         try:

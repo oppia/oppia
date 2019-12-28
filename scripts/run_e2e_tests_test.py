@@ -367,15 +367,21 @@ of the failed tests in ../protractor-screenshots/
             run_e2e_tests.tweak_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, False)
 
-    def test_build_js_files_in_dev_mode(self):
+    def test_build_js_files_in_dev_mode_with_hash_file_exists(self):
 
         def mock_tweak_constant_file(unused_filename, unused_dev_mode):
             pass
+
+        def mock_is_file(unused_path):
+            return True
 
         expected_commands = [
             self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
             'webpack.dev.config.ts']
 
+        is_file_swap = self.swap_with_checks(
+            os.path, 'isfile', mock_is_file,
+            expected_args=(run_e2e_tests.HASHES_FILE_PATH,))
 
         tweak_constant_file_swap = self.swap_with_checks(
             run_e2e_tests, 'tweak_constant_file', mock_tweak_constant_file,
@@ -389,7 +395,81 @@ of the failed tests in ../protractor-screenshots/
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
                 with tweak_constant_file_swap, run_cmd_swap, build_main_swap:
-                    run_e2e_tests.build_js_files(True)
+                    with is_file_swap:
+                        run_e2e_tests.build_js_files(True)
+
+    def test_build_js_files_in_dev_mode_with_hash_file_not_exist(self):
+        def mock_tweak_constant_file(unused_filename, unused_dev_mode):
+            pass
+
+        expected_commands = [
+            self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
+            'webpack.dev.config.ts']
+        mock_hash_file_path = 'NOT_A_FILE.json'
+
+        hash_file_path_swap = self.swap(
+            run_e2e_tests, 'HASHES_FILE_PATH', mock_hash_file_path)
+        tweak_constant_file_swap = self.swap_with_checks(
+            run_e2e_tests, 'tweak_constant_file', mock_tweak_constant_file,
+            expected_args=(self.mock_constant_file_path, True))
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', self.mock_run_cmd,
+            expected_args=(expected_commands,))
+        build_main_swap = self.swap_with_checks(
+            build, 'main', self.mock_build_main, expected_kwargs={'args': []})
+        print_swap = self.print_swap(called=False)
+        with print_swap, self.constant_file_path_swap:
+            with self.node_bin_path_swap, self.webpack_bin_path_swap:
+                with tweak_constant_file_swap, run_cmd_swap, build_main_swap:
+                    with hash_file_path_swap:
+                        run_e2e_tests.build_js_files(True)
+        with open(mock_hash_file_path) as f:
+            content = f.readlines()
+        os.remove(mock_hash_file_path)
+        self.assertEqual(content, ['{}'])
+
+    def test_build_js_files_in_dev_mode_with_exception_raised(self):
+
+        def mock_tweak_constant_file(unused_filename, unused_dev_mode):
+            pass
+
+        def mock_is_file(unused_path):
+            return True
+
+        def mock_run_cmd(commands):
+            raise subprocess.CalledProcessError(
+                returncode=2, cmd=commands, output='ERROR')
+
+        def mock_exit(unused_code):
+            pass
+
+        expected_commands = [
+            self.mock_node_bin_path, self.mock_webpack_bin_path, '--config',
+            'webpack.dev.config.ts']
+
+        is_file_swap = self.swap_with_checks(
+            os.path, 'isfile', mock_is_file,
+            expected_args=(run_e2e_tests.HASHES_FILE_PATH,))
+
+        tweak_constant_file_swap = self.swap_with_checks(
+            run_e2e_tests, 'tweak_constant_file', mock_tweak_constant_file,
+            expected_args=(self.mock_constant_file_path, True))
+        run_cmd_swap = self.swap_with_checks(
+            common, 'run_cmd', mock_run_cmd, expected_args=(expected_commands,),
+            expected_exception=subprocess.CalledProcessError)
+        # The mock exit will not actually exit the program, so the
+        # build_js_files function will continue and build.main will still be
+        # executed. But in actual case, this function will not be executed.
+        build_main_swap = self.swap_with_checks(
+            build, 'main', self.mock_build_main, expected_kwargs={'args': []})
+        exit_swap = self.swap_with_checks(
+            sys, 'exit', mock_exit, expected_args=(2,))
+        print_swap = self.print_swap(expected_args=('ERROR',))
+        with print_swap, self.constant_file_path_swap:
+            with self.node_bin_path_swap, self.webpack_bin_path_swap:
+                with tweak_constant_file_swap, run_cmd_swap:
+                    with is_file_swap, exit_swap, build_main_swap:
+                        run_e2e_tests.build_js_files(True)
 
     def test_build_js_files_in_prod_mode(self):
 
@@ -572,11 +652,11 @@ of the failed tests in ../protractor-screenshots/
 
     def test_get_parameter_for_config_file_with_browserstack(self):
         result = run_e2e_tests.get_parameter_for_config_file(True)
-        self.assertEqual(run_e2e_tests.BROWSER_STACK_CONFIG_FILE, result)
+        self.assertEqual(run_e2e_tests.BROWSER_STACK_CONFIG_FILE_PATH, result)
 
     def test_get_parameter_for_config_file_without_browserstack(self):
         result = run_e2e_tests.get_parameter_for_config_file(False)
-        self.assertEqual(run_e2e_tests.PROTRACTOR_CONFIG_FILE, result)
+        self.assertEqual(run_e2e_tests.PROTRACTOR_CONFIG_FILE_PATH, result)
 
     def test_get_parameter_for_one_sharding_instance(self):
         result = run_e2e_tests.get_parameter_for_sharding(True, 1)
@@ -605,7 +685,7 @@ of the failed tests in ../protractor-screenshots/
             True, True, 3, 'Full', False)
         self.assertEqual(
             result, [
-                run_e2e_tests.BROWSER_STACK_CONFIG_FILE,
+                run_e2e_tests.BROWSER_STACK_CONFIG_FILE_PATH,
                 '--capabilities.shardTestFiles=True',
                 '--capabilities.maxInstances=3',
                 '--suite', 'Full', '--params.devMode=False'

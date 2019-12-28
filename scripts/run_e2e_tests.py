@@ -66,9 +66,11 @@ GECKO_PROVIDER_BAK_FILE_PATH = os.path.join(
 WEBPACK_BIN_PATH = os.path.join(
     common.CURR_DIR, 'node_modules', 'webpack', 'bin', 'webpack.js')
 PATTERN_FOR_REPLACE_WEBDRIVER_CODE = r'this\.osArch = os\.arch\(\);'
-PROTRACTOR_CONFIG_FILE = os.path.join('core', 'tests', 'protractor.conf.js')
-BROWSER_STACK_CONFIG_FILE = os.path.join(
+PROTRACTOR_CONFIG_FILE_PATH = os.path.join(
+    'core', 'tests', 'protractor.conf.js')
+BROWSER_STACK_CONFIG_FILE_PATH = os.path.join(
     'core', 'tests', 'protractor-browserstack.conf.js')
+HASHES_FILE_PATH = os.path.join('assets', 'hashes.json')
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -257,9 +259,17 @@ def build_js_files(dev_mode):
     if not dev_mode:
         python_utils.PRINT('  Generating files for production mode...')
     else:
-        common.run_cmd(
-            [common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
-             'webpack.dev.config.ts'])
+        # The 'hashes.json' file is used by the `url-interpolation` service.
+        if not os.path.isfile(HASHES_FILE_PATH):
+            with open(HASHES_FILE_PATH, 'w') as hash_file:
+                hash_file.write('{}')
+        try:
+            common.run_cmd(
+                [common.NODE_BIN_PATH, WEBPACK_BIN_PATH, '--config',
+                 'webpack.dev.config.ts'])
+        except subprocess.CalledProcessError as error:
+            python_utils.PRINT(error.output)
+            sys.exit(error.returncode)
     build.main(args=(['--prod_env'] if not dev_mode else []))
 
 
@@ -325,10 +335,10 @@ def get_parameter_for_config_file(run_on_browserstack):
         str. Represents the config file path.
     """
     if not run_on_browserstack:
-        return PROTRACTOR_CONFIG_FILE
+        return PROTRACTOR_CONFIG_FILE_PATH
     else:
         python_utils.PRINT('Running the tests on browsertack...')
-        return BROWSER_STACK_CONFIG_FILE
+        return BROWSER_STACK_CONFIG_FILE_PATH
 
 
 def get_parameter_for_sharding(sharding, sharding_instances):
