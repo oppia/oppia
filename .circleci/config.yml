@@ -101,6 +101,8 @@ jobs:
       - restore_cache:
           <<: *restore_cache
       - run:
+          <<: *install_dependencies
+      - run:
           name: Run frontend tests
           command: |
             python -m scripts.run_frontend_tests --run_minified_tests --skip_install
@@ -117,6 +119,8 @@ jobs:
       - checkout
       - restore_cache:
           <<: *restore_cache
+      - run:
+          <<: *install_dependencies
       - run: sudo pip install webtest
       - run: sudo pip install coverage
       - run:
