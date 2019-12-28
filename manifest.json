@@ -535,6 +535,27 @@
           "js": ["ui-utils.js"]
         }
       },
+      "cropperJs": {
+        "version": "1.5.6",
+        "downloadFormat": "zip",
+        "url": "https://github.com/fengyuanchen/cropperjs/archive/v1.5.6.zip",
+        "rootDirPrefix": "cropperjs-",
+        "targetDirPrefix": "cropperjs-",
+        "bundle": {
+          "css": ["dist/cropper.min.css"],
+          "js": ["dist/cropper.js"]
+        }
+      },
+      "jqueryCropper": {
+        "version": "1.0.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/fengyuanchen/jquery-cropper/archive/v1.0.1.zip",
+        "rootDirPrefix": "jquery-cropper-",
+        "targetDirPrefix": "jquery-cropper-",
+        "bundle": {
+          "js": ["dist/jquery-cropper.js"]
+        }
+      },
       "waveSurferJs": {
         "version": "2.2.1",
         "downloadFormat": "files",
