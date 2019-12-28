@@ -42,9 +42,6 @@ anchor_for_installing_cc_test_reporter: &install_cc
     chmod +x ./cc-test-reporter
     ./cc-test-reporter before-build
 
-anchor_for_attaching_setup_files: &attaching_files
-  attach_workspace:
-    at: /home/circleci/
 
 version: 2
 jobs:
@@ -65,8 +62,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run:
-          <<: *attaching_files
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
       - run:
@@ -82,8 +79,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run:
-        <<: *attaching_files
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
       - run:
@@ -95,8 +92,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run:
-        <<: *attaching_files
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
       - run:
@@ -114,8 +111,8 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run:
-        <<: *attaching_files
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
       - run: sudo pip install webtest
