@@ -33,7 +33,7 @@ angular.module('oppia').directive('searchBar', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        dropup: '&'
+        enableDropup: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library-page/search-bar/search-bar.directive.html'),
