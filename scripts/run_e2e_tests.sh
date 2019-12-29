@@ -157,8 +157,9 @@ else
   APP_YAML_FILEPATH="app.yaml"
 fi
 
-# Delete the modified feconf.py file(-i.bak)
+# Delete the modified constants.ts and feconf.py file(-i.bak)
 rm assets/constants.ts.bak
+rm feconf.py.bak
 
 # Start a selenium server using chromedriver 2.41.
 # The 'detach' option continues the flow once the server is up and runnning.
