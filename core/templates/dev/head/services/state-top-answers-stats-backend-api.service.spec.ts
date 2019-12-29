@@ -16,57 +16,85 @@
  * @fileoverview Unit tests for StateTopAnswersStatsBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-require('services/state-top-answers-stats-backend-api.service.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-describe('StateTopAnswersStatsBackendApiService', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+import { StateTopAnswersStatsBackendApiService } from
+  'services/state-top-answers-stats-backend-api.service';
 
-  beforeEach(angular.mock.inject(function($injector) {
-    this.StateTopAnswersStatsBackendApiService =
-      $injector.get('StateTopAnswersStatsBackendApiService');
-    this.$httpBackend = $injector.get('$httpBackend');
-  }));
+describe('StateTopAnswersStatsBackendApiService', () => {
+  let httpTestingController:HttpTestingController;
+  let stateTopAnswersStatsBackendApiService:
+   StateTopAnswersStatsBackendApiService;
 
-  afterEach(function() {
-    this.$httpBackend.verifyNoOutstandingExpectation();
-    this.$httpBackend.verifyNoOutstandingRequest();
-  });
+  var ERROR_STATUS_CODE = 500;
 
-  describe('.fetchStats', function() {
-    it('returns the data provided by the backend.', function() {
-      var backendDict = {
-        answers: {
-          Hola: [
-            {answer: 'hola', frequency: 7},
-            {answer: 'adios', frequency: 5},
-            {answer: 'que?', frequency: 2},
-          ]
-        },
-        interaction_ids: {Hola: 'TextInput'},
-      };
-      var successHandler = jasmine.createSpy('success');
-      var failureHandler = jasmine.createSpy('failure');
-      this.$httpBackend.expectGET(
-        '/createhandler/state_answer_stats/7'
-      ).respond(backendDict);
+  var sampleDataResults = {
+    answers: {
+      Hola: [
+        {answer: 'hola', frequency: 7},
+        {answer: 'adios', frequency: 5},
+        {answer: 'que?', frequency: 2},
+      ]
+    },
+    interaction_ids: {Hola: 'TextInput'},
+  };
 
-      this.StateTopAnswersStatsBackendApiService.fetchStats('7').then(
-        successHandler, failureHandler);
-      this.$httpBackend.flush();
-
-      expect(successHandler).toHaveBeenCalledWith(backendDict);
-      expect(failureHandler).not.toHaveBeenCalled();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [StateTopAnswersStatsBackendApiService]
     });
+    stateTopAnswersStatsBackendApiService = TestBed.get(
+      StateTopAnswersStatsBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
+
+  afterEach(() => {
+    httpTestingController.verify();
+  });
+
+  it('should successfully fetch data from the backend',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      stateTopAnswersStatsBackendApiService.fetchStats('7')
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        '/createhandler/state_answer_stats/7');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should use rejection handler if data backend request failed',
+    fakeAsync(() => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      stateTopAnswersStatsBackendApiService.fetchStats('7')
+        .then(successHandler, failHandler);
+
+      var req = httpTestingController.expectOne(
+        '/createhandler/state_answer_stats/7');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading data.', {
+        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 });
