@@ -213,11 +213,9 @@ class CollectionRightsModel(base_models.VersionedModel):
             dict. The content of the model. Only valid fields and values are
             present.
         """
-        # The status field could contain different values in history, all
-        # these values are equal to public now.
-        if ('status' in model_dict and
-                model_dict['status'] not in [constants.ACTIVITY_STATUS_PRIVATE,
-                                             constants.ACTIVITY_STATUS_PUBLIC]):
+        # The status field could contain 'publicized' value in history, this
+        # value is now equivalent to 'public'.
+        if model_dict['status'] == 'publicized':
             model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
         # The voice_artist_ids field was previously named translator_ids, we
         # need to move the values from translator_ids field to voice_artist_ids

@@ -183,7 +183,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_transform_dict_to_valid_format_status(self):
         broken_dict = dict(**self.exp_1_dict)
-        broken_dict['status'] = 'wrong_public_status'
+        broken_dict['status'] = 'publicized'
 
         transformed_dict = (
             exp_models.ExplorationRightsModel
@@ -444,7 +444,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'voiced_exploration_ids': [],
             'viewable_exploration_ids': []
         }
-        self.assertEqual(expected_exploration_ids, exploration_ids)
+        self.assertEqual(expected_explwrong_public_statusoration_ids, exploration_ids)
 
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):

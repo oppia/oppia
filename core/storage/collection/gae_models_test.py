@@ -170,7 +170,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_transform_dict_to_valid_format_status(self):
         broken_dict = dict(**self.col_1_dict)
-        broken_dict['status'] = 'wrong_public_status'
+        broken_dict['status'] = 'publicized'
 
         transformed_dict = (
             collection_models.CollectionRightsModel
