@@ -1,5 +1,126 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.8.8 (30 Dec 2019)
+------------------------
+Bug fixes
+* Adds correct path for the dir in skip_files of app_dev.yaml (#8309)
+* Fixes #8184: Force refresh and prevent submitting new message while one message is being submitted (#8290)
+* Fix ckeditor tableselection issue (#8256)
+* Fix new structure editor issues (#8245)
+* Fix #8178: Remove fit-content from codebase (#8240)
+* Fix #8214: non-null exploration version is passed in the stats calls (#8235)
+* Fix #8114: Fixing admin page navbar (#8224)
+* Fix admin navbar icons (#8113)
+* Fix date formatting (#8084)
+* Adds log for #6921 to track sequence of steps (#8069)
+* Fix ordering in UpgradedServices file (#8050)
+* Fix #7973: Fixes tutorial, navbar for small screens (#8044)
+* Fix #7975: 'this' was out of scope in SidebarStatusService (#8011)
+* Fix #7124: add css to preferences-bio textarea (#8010)
+* Fix #7967: ensure chapter editor validation failures are not cut off on right (#8001)
+* Fix #7963: Adds margin for logic proof help lines (#7997)
+* Fix #7960, #7995: Fix date, publish button (#7996)
+* Fix #6158: Log for interpolate url issue (#7952)
+* Fixes 7939: Admin navbar misplaced fix (#7940)
+* Fix #7926: Add polyfill for navigator.mediaDevices.getUserMedia (#7933)
+* Fix #7906: Adds a check for errorCallback (#7927)
+* Resolves ckeditor.js 404 issue on the community dashboard page  (#7924)
+* Fix #7342:  Replace ctrl.stateName with updated state name value (#7907)
+* Fix #7691: Card Basic Setting Alignment Fixed (#7904)
+* Fix #7784: Add type as a second parameter when contructing a blob (#7785)
+* Fix #6546: Preserve GIF Animation on resize and crop (#7760)
+
+Code health
+* Fix continue button not working in presence of correctness feedback (#8293)
+* Fixed a typo in fileoverview in unit tests of ClassroomBackendApiService (#8120)
+* Fix #6847: Use absolute path to require html files (#8078)
+* Change ALL_LANGUAGE_CODES to SUPPORTED_CONTENT_LANGUAGES (#8062)
+* Fix part of #8016: Added a seperate backend api service for review-test-page directive  (#8061)
+* Fix UpgradedServices to use true dependency management (#8013)
+* Fix #5145: unifies from_backend_dict and from_dict methods in Playthrough and ExplorationIssue domain models (#7992)
+* Fixes part of #6240: e2e tests for chapter create, edit, and delete (#7922)
+
+Development workflow
+* Upgrade eslint (#8109)
+* Fixes: start.py can not run on Windows system (#8106)
+* Disable audit tests (#8104)
+* Upgrade Text Input Prediction Service and Text Input Tokenizer (#8103)
+* Introduce Github Actions actions frontend tests (#8102)
+* Upgrades TextInputRules, TextInputValidation and PencilCodeEditorRule Service to Angular (#8095)
+* Migrating Context, LocalStorage Service to Angular (#8094)
+* Upgrades StateObjectFactory and StatesObjectFactory to Angular (#8093)
+* Revert "Fixes (partially): oppia can not not run on Windows  (#7971)" (#8087)
+* Fix #8068: Fix no-message in lint error for bad patterns issue. (#8075)
+* Fixes part of #5939: Custom pylint extension to ensure that comments follow correct format. (#8066)
+* Fix small error in pre-commit hook to prevent .pyc file from being copied. (#8065)
+*  Upgrades UrlInterpolationService to Angular (#8064)
+* Fix #8046: create command line flag for no automatic restart (#8058)
+* Resolves audit issues (#8056)
+* Fixes part of #5939: Custom pylint extension for checking division operator (#8034)
+* Add more explanation to the top of the run_backend_tests script. (#8012)
+* Upgrades Validator, ImprovementDisplay, ExplorationHTMLFormatter, SolutionObjectFactory and InteractionObjectFactory to Angular (#7989)
+* Resolve comments from PR 7953 (#7979)
+* Fix #6988: Remove fonts directory (#7978)
+* Fixes (partially): oppia can not not run on Windows  (#7971)
+* Fix skulpt install (#7953)
+* Resolve audit errors (#7949)
+* Fix part of #7427: Addresses docstring issues in one of the files (prod_validation_jobs_one_off.py) (#7948)
+* Fix #7918: Run install_third_party_libs.py script before running e2e tests (#7947)
+* Migration angular services: changes in human readable (#7945)
+* Upgrades NumberWithUnits related services to Angular (#7944)
+* Update tests according to the changes in #7930 (#7941)
+* Angular Services Migration combined (#7934)
+* Fixes #7647: Subprocess check call conversion (#7930)
+* Fix #7868: Added lint check for a newline above args in python doc string (#7929)
+* Migrating CsrfTokenService (#7818)
+
+Translations
+*  Fix #8179: The voiceover error message doesn't get displayed in every tab. (#8234)
+* Adds Ga and Akan languages in supported audio langauge list (#8086)
+
+Community contribution and dashboard
+* Fix #7994: Add frontend SkillOpportunity and ExplorationOpportunity object class (#8063)
+* Services required for voiceover application  (#7857)
+* Fix part of #7471: Backend changes for question suggestion integration (#7819)
+* Fix part of #6776: Frontend changes for listing skill opportunities on the Community Dashboard page. (#7602)
+
+New structures
+* Allowed empty misconception notes in skill editor (#8131)
+* Fixed question image upload and added visibility of private pages to admins and TMs (#8090)
+* Allow question linkage to skills outside topic during creation (#8045)
+* Empty rubric explanation allowed with placeholder (#8042)
+* Add editable linked skills list to question editor (#8004)
+* Fix part of #5914: Add testing for nonexistent users in export_data (#7942)
+* Fix part of #5914: Takeout Service (#7644)
+
+Updates to static pages
+* Wipeout 4.1: Implement part of frontend wipeout (#8022)
+* Fix #7867: do client-side redirect for app pages. (#7921)
+* Fix part of #7643: Replace templateUrl with template in splash page (#7702)
+
+Infrastructural changes
+* Upgrades state editor properties services (#8110)
+* Fix #7880: Fix node installation for 32 bit systems (#8108)
+* Remove extra one-off jobs (#8107)
+* Fix karma.conf.ts issues that is falsely increasing the frontend test coverage (#8085)
+* Wipeout 2.9: Check snapshot content models when looking for user_id (#8036)
+* Fix part of #6271: Update update_worked_examples to accept object as a parameter instead of dict (#8021)
+* Wipeout 3.4: Start using GAE user ID (#8008)
+* Release Automation [Milestone 7]: Automation for initial release preparation (#8005)
+* Migrating filters (#7935)
+
+Testing coverage
+* Fixes part of #7450: removes all calls to user_services._save_user_settings from user_services_test.py (#7972)
+* Fix Part of #6240: Subtopic Editor Drag and Drop Skills E2E Test (#7901)
+* Fix part of #6240: Add e2e tests for testing navigation buttons in an exploration (#7888)
+* Fix #6687: Write e2e tests for file upload process (#7839)
+
+Improvements to editors and players
+* Fixes #7430: Added a directive to prevent title overflow from the exploration info box  (#7985)
+* Fix part of #6482: button is disable until all requirements are fulfilled - fixed \o/ (#7908)
+* Voiceover application storage model and domain class (#7843)
+
+
 v2.8.7 (24 Nov 2019)
 ------------------------
 Code health
