@@ -153,10 +153,39 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             self.USER_ID_COMMITTER, 'Created new collection right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
+        self.col_1_dict = (
+            collection_models.CollectionRightsModel.get_by_id(
+                self.COLLECTION_ID_1).to_dict())
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             collection_models.CollectionRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_transform_dict_to_valid_format_basic(self):
+        transformed_dict = (
+            collection_models.CollectionRightsModel
+            .transform_dict_to_valid(self.col_1_dict))
+        self.assertEqual(transformed_dict, self.col_1_dict)
+
+    def test_transform_dict_to_valid_format_status(self):
+        broken_dict = dict(**self.col_1_dict)
+        broken_dict['status'] = 'wrong_public_status'
+
+        transformed_dict = (
+            collection_models.CollectionRightsModel
+            .transform_dict_to_valid(broken_dict))
+        self.assertEqual(transformed_dict, self.col_1_dict)
+
+    def test_transform_dict_to_valid_format_translator_ids(self):
+        broken_dict = dict(**self.col_1_dict)
+        del broken_dict['voice_artist_ids']
+        broken_dict['translator_ids'] = [self.USER_ID_1]
+
+        transformed_dict = (
+            collection_models.CollectionRightsModel
+            .transform_dict_to_valid(broken_dict))
+        self.assertEqual(transformed_dict, self.col_1_dict)
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):

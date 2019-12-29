@@ -196,6 +196,37 @@ class CollectionRightsModel(base_models.VersionedModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def transform_dict_to_valid(model_dict):
+        """Replace invalid fields and values in the CollectionRightsModel dict.
+
+        Some old CollectionRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we would try to create CollectionRightsModel. We need
+        to remove or replace these fields and values.
+
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the CollectionRightsModel.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+        # The status field could contain different values in history, all
+        # these values are equal to public now.
+        if ('status' in model_dict and
+                model_dict['status'] not in [constants.ACTIVITY_STATUS_PRIVATE,
+                                             constants.ACTIVITY_STATUS_PUBLIC]):
+            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+        # The voice_artist_ids field was previously named translator_ids, we
+        # need to move the values from translator_ids field to voice_artist_ids
+        # and delete translator_ids.
+        if 'translator_ids' in model_dict and model_dict['translator_ids']:
+            model_dict['voice_artist_ids'] = model_dict['translator_ids']
+            model_dict['translator_ids'] = []
+        return model_dict
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether CollectionRightsModel or its snapshots references the
@@ -214,7 +245,9 @@ class CollectionRightsModel(base_models.VersionedModel):
                 cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
                     base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
             for snapshot_content_model in snapshot_content_models:
-                reconstituted_model = cls(**snapshot_content_model.content)
+                reconstituted_model = cls(
+                    **CollectionRightsModel.transform_dict_to_valid(
+                        snapshot_content_model.content))
                 if any((user_id in reconstituted_model.owner_ids,
                         user_id in reconstituted_model.editor_ids,
                         user_id in reconstituted_model.voice_artist_ids,

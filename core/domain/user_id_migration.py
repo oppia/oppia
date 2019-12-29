@@ -18,6 +18,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
+from constants import constants
 from core import jobs
 from core.platform import models
 import feconf
@@ -205,9 +206,12 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             rights_snapshot_model: CollectionRightsSnapshotContentModel.
                 The model that contains the old user IDs.
         """
+        content = (
+            collection_models.CollectionRightsModel.transform_dict_to_valid(
+                rights_snapshot_model.content))
+        reconstituted_rights_model = (
+            collection_models.CollectionRightsModel(**content))
 
-        reconstituted_rights_model = collection_models.CollectionRightsModel(
-            **rights_snapshot_model.content)
         reconstituted_rights_model.owner_ids = (
             SnapshotsUserIdMigrationJob._replace_gae_ids(
                 reconstituted_rights_model.owner_ids))
@@ -220,6 +224,7 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         reconstituted_rights_model.viewer_ids = (
             SnapshotsUserIdMigrationJob._replace_gae_ids(
                 reconstituted_rights_model.viewer_ids))
+
         rights_snapshot_model.content = reconstituted_rights_model.to_dict()
         rights_snapshot_model.put(update_last_updated_time=False)
 
@@ -232,16 +237,11 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             rights_snapshot_model: ExplorationRightsSnapshotContentModel.
                 The model that contains the old user IDs.
         """
-        content = rights_snapshot_model.content
-        # Some old exploration rights snapshot models contain all_viewer_ids
-        # field that is not present in the current version of the
-        # ExplorationRightsModels. We need to remove that field from the
-        # dictionary so that we can recreate the ExplorationRightsModel and
-        # migrate the user ids.
-        if 'all_viewer_ids' in content:
-            del content['all_viewer_ids']
-        reconstituted_rights_model = exp_models.ExplorationRightsModel(
-            **rights_snapshot_model.content)
+        content = exp_models.ExplorationRightsModel.transform_dict_to_valid(
+            rights_snapshot_model.content)
+        reconstituted_rights_model = (
+            exp_models.ExplorationRightsModel(**content))
+
         reconstituted_rights_model.owner_ids = (
             SnapshotsUserIdMigrationJob._replace_gae_ids(
                 reconstituted_rights_model.owner_ids))
@@ -254,6 +254,7 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         reconstituted_rights_model.viewer_ids = (
             SnapshotsUserIdMigrationJob._replace_gae_ids(
                 reconstituted_rights_model.viewer_ids))
+
         rights_snapshot_model.content = reconstituted_rights_model.to_dict()
         rights_snapshot_model.put(update_last_updated_time=False)
 

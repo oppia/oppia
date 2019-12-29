@@ -154,13 +154,51 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             viewable_if_private=False,
             first_published_msec=0.4
         ).save(
-            self.USER_ID_COMMITTER, 'Created new collection right',
+            self.USER_ID_COMMITTER, 'Created new exploration right',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+        self.exp_1_dict = (
+            exploration_models.ExplorationRightsModel.get_by_id(
+                self.EXPLORATION_ID_1).to_dict())
 
     def test_get_deletion_policy(self):
         self.assertEqual(
             exploration_models.ExplorationRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
+    def test_transform_dict_to_valid_format_basic(self):
+        transformed_dict = (
+            exploration_models.ExplorationRightsModel
+            .transform_dict_to_valid(self.exp_1_dict))
+        self.assertEqual(transformed_dict, self.exp_1_dict)
+
+    def test_transform_dict_to_valid_format_all_viewer_ids(self):
+        broken_dict = dict(**self.exp_1_dict)
+        broken_dict['all_viewer_ids'] = [self.USER_ID_1, self.USER_ID_2]
+
+        transformed_dict = (
+            exploration_models.ExplorationRightsModel
+            .transform_dict_to_valid(broken_dict))
+        self.assertEqual(transformed_dict, self.exp_1_dict)
+
+    def test_transform_dict_to_valid_format_status(self):
+        broken_dict = dict(**self.exp_1_dict)
+        broken_dict['status'] = 'wrong_public_status'
+
+        transformed_dict = (
+            exploration_models.ExplorationRightsModel
+            .transform_dict_to_valid(broken_dict))
+        self.assertEqual(transformed_dict, self.exp_1_dict)
+
+    def test_transform_dict_to_valid_format_translator_ids(self):
+        broken_dict = dict(**self.exp_1_dict)
+        del broken_dict['voice_artist_ids']
+        broken_dict['translator_ids'] = [self.USER_ID_1]
+
+        transformed_dict = (
+            exploration_models.ExplorationRightsModel
+            .transform_dict_to_valid(broken_dict))
+        self.assertEqual(transformed_dict, self.exp_1_dict)
 
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
