@@ -158,7 +158,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
         self.exp_1_dict = (
-            exploration_models.ExplorationRightsModel.get_by_id(
+            exp_models.ExplorationRightsModel.get_by_id(
                 self.EXPLORATION_ID_1).to_dict())
 
     def test_get_deletion_policy(self):
@@ -168,7 +168,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
 
     def test_transform_dict_to_valid_format_basic(self):
         transformed_dict = (
-            exploration_models.ExplorationRightsModel
+            exp_models.ExplorationRightsModel
             .transform_dict_to_valid(self.exp_1_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
@@ -177,7 +177,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         broken_dict['all_viewer_ids'] = [self.USER_ID_1, self.USER_ID_2]
 
         transformed_dict = (
-            exploration_models.ExplorationRightsModel
+            exp_models.ExplorationRightsModel
             .transform_dict_to_valid(broken_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
@@ -186,7 +186,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         broken_dict['status'] = 'wrong_public_status'
 
         transformed_dict = (
-            exploration_models.ExplorationRightsModel
+            exp_models.ExplorationRightsModel
             .transform_dict_to_valid(broken_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
@@ -196,7 +196,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         broken_dict['translator_ids'] = [self.USER_ID_1]
 
         transformed_dict = (
-            exploration_models.ExplorationRightsModel
+            exp_models.ExplorationRightsModel
             .transform_dict_to_valid(broken_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
