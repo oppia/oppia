@@ -39,11 +39,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var contextIsLessonRelated = (
           ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
-        var canWriteToFs = (
-          ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
         var contextIsExplorationPlayer = (
           ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_PLAYER);
 
@@ -87,7 +82,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         }).join(',');
         var buttonNames = [];
         names.forEach(function(name) {
-          if (!(contextIsExplorationPlayer)) {
+          if (ContextService.canWriteToFs()) {
             buttonNames.push('Oppia' + name);
             buttonNames.push('-');
           }

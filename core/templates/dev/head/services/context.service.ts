@@ -225,6 +225,17 @@ export class ContextService {
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
   }
+
+  // Following method helps to know whether RTE components requiring fullscreen
+  // can be used in a particular mode.
+  canWriteToFs(): boolean {
+    return (
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
+      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
+      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.STORY_EDITOR ||
+      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR);
+  }
 }
 
 angular.module('oppia').factory(
