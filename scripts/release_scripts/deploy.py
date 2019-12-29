@@ -453,7 +453,7 @@ def execute_deployment():
     deploy_data_path = os.path.join(
         os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', app_name)
 
-    install_third_party_libs.main(args=[])
+    install_third_party_libs.main()
 
     if not common.is_current_branch_a_release_branch():
         raise Exception(
