@@ -69,3 +69,12 @@ def pre_delete_user(user_id):
         explorations_to_be_deleted_ids,
         collections_to_be_deleted_ids,
     )
+
+
+def delete_user(pending_deletion_model):
+    """Smth.
+
+    Args:
+        pending_deletion_model: PendingDeletionRequestModel.
+    """
+    pass
