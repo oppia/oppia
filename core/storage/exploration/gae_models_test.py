@@ -444,7 +444,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             'voiced_exploration_ids': [],
             'viewable_exploration_ids': []
         }
-        self.assertEqual(expected_explwrong_public_statusoration_ids, exploration_ids)
+        self.assertEqual(expected_exploration_ids, exploration_ids)
 
 
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
