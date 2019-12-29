@@ -78,3 +78,12 @@ def delete_user(pending_deletion_model):
         pending_deletion_model: PendingDeletionRequestModel.
     """
     pass
+
+
+def verify_user_deleted(pending_deletion_model):
+    """Smth.
+
+    Args:
+        pending_deletion_model: PendingDeletionRequestModel.
+    """
+    pass
