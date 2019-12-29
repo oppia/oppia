@@ -39,7 +39,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var contextIsLessonRelated = (
           ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
-        var canUseFs = (
+        var canWriteToFs = (
           ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
