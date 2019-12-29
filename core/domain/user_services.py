@@ -609,7 +609,7 @@ def get_system_user():
     return system_user
 
 
-def _save_user_settings(user_settings):
+def save_user_settings(user_settings):
     """Commits a user settings object to the datastore.
 
     Args:
@@ -761,7 +761,7 @@ def create_new_user(gae_id, email):
     user_settings = UserSettings(
         user_id, gae_id, email, feconf.ROLE_ID_EXPLORATION_EDITOR,
         preferred_language_codes=[constants.DEFAULT_LANGUAGE_CODE])
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
     create_user_contributions(user_id, [], [])
     return user_settings
 
@@ -831,7 +831,7 @@ def set_username(user_id, new_username):
             'Sorry, the username \"%s\" is already taken! Please pick '
             'a different one.' % new_username)
     user_settings.username = new_username
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def record_agreement_to_terms(user_id):
@@ -842,7 +842,7 @@ def record_agreement_to_terms(user_id):
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_agreed_to_terms = datetime.datetime.utcnow()
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_profile_picture_data_url(user_id, profile_picture_data_url):
@@ -854,7 +854,7 @@ def update_profile_picture_data_url(user_id, profile_picture_data_url):
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.profile_picture_data_url = profile_picture_data_url
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_user_bio(user_id, user_bio):
@@ -866,7 +866,7 @@ def update_user_bio(user_id, user_bio):
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_user_default_dashboard(user_id, default_dashboard):
@@ -878,7 +878,7 @@ def update_user_default_dashboard(user_id, default_dashboard):
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.default_dashboard = default_dashboard
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_user_creator_dashboard_display(
@@ -893,7 +893,7 @@ def update_user_creator_dashboard_display(
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.creator_dashboard_display_pref = (
         creator_dashboard_display_pref)
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_subject_interests(user_id, subject_interests):
@@ -924,7 +924,7 @@ def update_subject_interests(user_id, subject_interests):
 
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.subject_interests = subject_interests
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def _update_first_contribution_msec(user_id, first_contribution_msec):
@@ -937,7 +937,7 @@ def _update_first_contribution_msec(user_id, first_contribution_msec):
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.first_contribution_msec = first_contribution_msec
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_first_contribution_msec_if_not_set(user_id, first_contribution_msec):
@@ -965,7 +965,7 @@ def update_preferred_language_codes(user_id, preferred_language_codes):
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_language_codes = preferred_language_codes
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_preferred_site_language_code(user_id, preferred_site_language_code):
@@ -979,7 +979,7 @@ def update_preferred_site_language_code(user_id, preferred_site_language_code):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_site_language_code = (
         preferred_site_language_code)
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_preferred_audio_language_code(
@@ -994,7 +994,7 @@ def update_preferred_audio_language_code(
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.preferred_audio_language_code = (
         preferred_audio_language_code)
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def update_user_role(user_id, role):
@@ -1011,7 +1011,7 @@ def update_user_role(user_id, role):
         raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.role = role
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def get_human_readable_user_ids(user_ids):
@@ -1059,7 +1059,7 @@ def record_user_started_state_editor_tutorial(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_editor_tutorial = (
         datetime.datetime.utcnow())
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def record_user_started_state_translation_tutorial(user_id):
@@ -1072,7 +1072,7 @@ def record_user_started_state_translation_tutorial(user_id):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_started_state_translation_tutorial = (
         datetime.datetime.utcnow())
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def record_user_logged_in(user_id):
@@ -1085,7 +1085,7 @@ def record_user_logged_in(user_id):
 
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_logged_in = datetime.datetime.utcnow()
-    _save_user_settings(user_settings)
+    save_user_settings(user_settings)
 
 
 def record_user_edited_an_exploration(user_id):
@@ -1098,7 +1098,7 @@ def record_user_edited_an_exploration(user_id):
     user_settings = get_user_settings(user_id)
     if user_settings:
         user_settings.last_edited_an_exploration = datetime.datetime.utcnow()
-        _save_user_settings(user_settings)
+        save_user_settings(user_settings)
 
 
 def record_user_created_an_exploration(user_id):
@@ -1111,7 +1111,7 @@ def record_user_created_an_exploration(user_id):
     user_settings = get_user_settings(user_id)
     if user_settings:
         user_settings.last_created_an_exploration = datetime.datetime.utcnow()
-        _save_user_settings(user_settings)
+        save_user_settings(user_settings)
 
 
 def update_email_preferences(
