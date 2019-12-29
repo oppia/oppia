@@ -39,8 +39,6 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var contextIsLessonRelated = (
           ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
-        var contextIsExplorationPlayer = (
-          ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_PLAYER);
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
