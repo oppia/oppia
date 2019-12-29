@@ -59,5 +59,5 @@ def main(args=None):
     subprocess.check_call(['sudo', 'dpkg', '-i', travis_chrome_path])
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     main()

@@ -114,6 +114,7 @@
 /scripts/docstrings_checker.py @kevinlee12
 /scripts/docstrings_checker_test.py @kevinlee12
 /scripts/install_chrome_on_travis.py @kevinlee12
+/scripts/install_chrome_on_travis_test.py @kevinlee12
 /scripts/install_prerequisites.sh @kevinlee12
 /scripts/install_third_party.py @kevinlee12
 /scripts/install_third_party_libs.py @kevinlee12
