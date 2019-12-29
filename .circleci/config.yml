@@ -42,10 +42,6 @@ anchor_for_installing_cc_test_reporter: &install_cc
     chmod +x ./cc-test-reporter
     ./cc-test-reporter before-build
 
-anchor_for_restoring_cache: &restore_cache
-  keys:
-    - setup-files-cache-{{ checksum "date" }}
-    - third-party-cache-{{ checksum "date" }}
 
 version: 2
 jobs:
@@ -53,21 +49,21 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
       - run:
           <<: *install_dependencies
-      - save_cache:
-          key: setup-files-cache-{{ checksum "date" }}
+      - persist_to_workspace:
+          root: /home/circleci/
           paths:
-            - node_modules/
-            - ../oppia_tools/
+            - oppia/node_modules/
+            - oppia/third_party/
+            - oppia_tools/
 
   lint_tests:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
       - run:
@@ -83,11 +79,10 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
       - run:
           name: Run typescript tests
           command: |
@@ -97,11 +92,10 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
       - run:
           name: Run frontend tests
           command: |
@@ -117,11 +111,10 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
       - run: sudo pip install webtest
       - run: sudo pip install coverage
       - run:
