@@ -419,11 +419,6 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
-
-    @classmethod
     def _generate_id(cls, user_id, thread_id):
         """Returns the unique id corresponding to the given user and thread ids.
 

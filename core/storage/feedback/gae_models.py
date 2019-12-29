@@ -473,15 +473,10 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
 
     @staticmethod
     def get_user_id_migration_policy():
-        """GeneralFeedbackThreadUserModel has one field that contains user
-        ID.
+        """GeneralFeedbackThreadUserModel has ID that contains user ID and one
+        field that contains user ID.
         """
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def generate_full_id(cls, user_id, thread_id):

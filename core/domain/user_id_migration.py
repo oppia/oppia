@@ -86,9 +86,8 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             old_user_id: str. The old (GAE) ID of the user being migrated.
             new_user_id: str. The newly generated ID of the user being migrated.
         """
-
         old_models = model_class.query(
-            model_class.get_user_id_migration_field() == old_user_id).fetch()
+            model_class.user_id == old_user_id).fetch()
         new_models = []
         for old_model in old_models:
             model_values = old_model.to_dict()
@@ -119,6 +118,9 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             migration_field == old_user_id).fetch()
         for model in found_models:
             model_values = model.to_dict()
+            # We need to get the string name of the field here and in order to
+            # make the query for the model (on one of the previous lines) easy
+            # to form the model field needs to be in the object format.
             model_values[migration_field._name] = new_user_id  # pylint: disable=protected-access
             model.populate(**model_values)
             model_class.put_multi([model], update_last_updated_time=False)
@@ -211,7 +213,6 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 rights_snapshot_model.content))
         reconstituted_rights_model = (
             collection_models.CollectionRightsModel(**content))
-
         reconstituted_rights_model.owner_ids = (
             SnapshotsUserIdMigrationJob._replace_gae_ids(
                 reconstituted_rights_model.owner_ids))
@@ -456,26 +457,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
         """
         if user_id not in model_id:
             return False
-        if user_id is None or user_id == feconf.SYSTEM_COMMITTER_ID:
-            return True
-        return user_models.UserSettingsModel.get_by_id(user_id) is not None
-
-    @staticmethod
-    def _check_one_field_exists(model):
-        """Check if UserSettingsModel exists for one field or that field is
-        SYSTEM_COMMITTER_ID.
-
-        Args:
-            model: BaseModel. Model being checked.
-
-        Returns:
-            True if UserSettingsModel with id as user ID field in model exists
-            or user ID field is SYSTEM_COMMITTER_ID, False otherwise.
-        """
-        model_class = model.__class__
-        model_values = model.to_dict()
-        user_id = model_values[model_class.get_user_id_migration_field()._name]  # pylint: disable=protected-access
-        if user_id is None or user_id == feconf.SYSTEM_COMMITTER_ID:
+        if user_id == feconf.SYSTEM_COMMITTER_ID:
             return True
         return user_models.UserSettingsModel.get_by_id(user_id) is not None
 
@@ -500,15 +482,26 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD):
-            if (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_id_and_user_id_exist(model.id, model.user_id)):
+            user_id = model.user_id
+            if user_id is None:
+                yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
+            elif (ModelsUserIdsHaveUserSettingsVerificationJob
+                    ._check_id_and_user_id_exist(model.id, user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
-            if (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_one_field_exists(model)):
+            # We need to get the string name of the field here and because
+            # the get_user_id_migration_field method is primary implemented
+            # for use in the UserIdMigrationJob for forming query it needs
+            # to return the field as an object.
+            user_id = model.to_dict()[
+                model_class.get_user_id_migration_field()._name]  # pylint: disable=protected-access
+            if user_id is None:
+                yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
+            elif (ModelsUserIdsHaveUserSettingsVerificationJob
+                    ._does_user_settings_model_exist(user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)

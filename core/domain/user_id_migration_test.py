@@ -557,7 +557,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
              [self.WRONG_GAE_ID]],
             output)
 
-    def test_migrate_exploration_rights_snapshot_model(self):
+    def test_migrate_exp_rights_snapshot_model(self):
         original_rights_model = exp_models.ExplorationRightsModel(
             id=self.SNAPSHOT_ID,
             owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
@@ -601,7 +601,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             [self.USER_1_USER_ID, self.USER_3_USER_ID],
             migrated_rights_model.viewer_ids)
 
-    def test_migrate_exploration_rights_snapshot_model_wrong_id(self):
+    def test_migrate_exp_rights_snapshot_model_wrong_id(self):
         original_rights_model = exp_models.ExplorationRightsModel(
             id=self.SNAPSHOT_ID,
             owner_ids=[self.WRONG_GAE_ID],
@@ -624,6 +624,55 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             ['FAILURE - ExplorationRightsSnapshotContentModel',
              [self.WRONG_GAE_ID]],
             output)
+    
+    def test_migrate_exp_rights_snapshot_model_wrong_field(self):
+        original_rights_model = exp_models.ExplorationRightsModel(
+            id=self.SNAPSHOT_ID,
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.SYSTEM_COMMITTER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        original_rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.content['all_viewer_ids'] = ['id1']
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output[0],
+            [u'SUCCESS - ExplorationRightsSnapshotContentModel', 1])
+
+        migrated_rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                self.SNAPSHOT_ID))
+        self.assertEqual(
+            original_rights_snapshot_model.last_updated,
+            migrated_rights_snapshot_model.last_updated)
+
+        self.assertNotIn(
+            'all_viewer_ids', migrated_rights_snapshot_model.content)
+
+        migrated_rights_model = exp_models.ExplorationRightsModel(
+            **migrated_rights_snapshot_model.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
+            migrated_rights_model.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model.viewer_ids)
+
 
     def test_migrate_question_rights_snapshot_model(self):
         original_rights_model = question_models.QuestionRightsModel(
@@ -973,6 +1022,14 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]).put()
+        feedback_models.GeneralFeedbackThreadModel(
+            id='type.id.generated',
+            entity_type='type',
+            entity_id='id',
+            subject='subject').put()
+        feedback_models.GeneralFeedbackThreadUserModel(
+            id='None.thread_id',
+            thread_id='thread_id').put()
         topic_models.TopicRightsModel.put_multi([
             topic_models.TopicRightsModel(
                 id='topic_1_id',
@@ -987,8 +1044,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             ['FAILURE - CompletedActivitiesModel', [self.USER_1_GAE_ID]],
             output)
         self.assertIn(
-            ['SUCCESS - CompletedActivitiesModel', 1],
-            output)
+            ['SUCCESS - CompletedActivitiesModel', 1], output)
         self.assertIn(
             ['FAILURE - ExpUserLastPlaythroughModel',
              ['%s.%s' % (self.USER_2_GAE_ID, 'exp_id')]],
@@ -1004,13 +1060,12 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             ['FAILURE - ExplorationSnapshotMetadataModel', ['exp_1_id']],
             output)
         self.assertIn(
-            ['SUCCESS - ExplorationSnapshotMetadataModel', 1],
-            output)
+            ['SUCCESS - ExplorationSnapshotMetadataModel', 1], output)
         self.assertIn(
-            ['FAILURE - TopicRightsModel', ['topic_1_id']],
-            output)
+            ['SUCCESS_NONE - GeneralFeedbackThreadModel', 1], output)
         self.assertIn(
-            ['SUCCESS - TopicRightsModel', 1],
-            output)
+            ['SUCCESS_NONE - GeneralFeedbackThreadUserModel', 1], output)
         self.assertIn(
-            ['SUCCESS - UserSettingsModel', 3], output)
+            ['FAILURE - TopicRightsModel', ['topic_1_id']], output)
+        self.assertIn(['SUCCESS - TopicRightsModel', 1], output)
+        self.assertIn(['SUCCESS - UserSettingsModel', 3], output)

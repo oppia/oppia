@@ -409,15 +409,10 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_user_id_migration_policy():
-        """ExpUserLastPlaythroughModel has ID that contains user id and
+        """ExpUserLastPlaythroughModel has ID that contains user ID and
         one other field that contains user ID.
         """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -1007,11 +1002,6 @@ class ExplorationUserDataModel(base_models.BaseModel):
         return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
-
-    @classmethod
     def _generate_id(cls, user_id, exploration_id):
         """Generates key for the instance of ExplorationUserDataModel class in
         the required format with the arguments provided.
@@ -1159,11 +1149,6 @@ class CollectionProgressModel(base_models.BaseModel):
         field that contains user ID.
         """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
@@ -1320,11 +1305,6 @@ class StoryProgressModel(base_models.BaseModel):
         that contains user ID.
         """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -1620,11 +1600,6 @@ class UserSkillMasteryModel(base_models.BaseModel):
         return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
-
-    @classmethod
     def construct_model_id(cls, user_id, skill_id):
         """Returns model id corresponding to user and skill.
 
@@ -1701,11 +1676,6 @@ class UserContributionScoringModel(base_models.BaseModel):
         other field that contains user ID.
         """
         return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
-
-    @classmethod
-    def get_user_id_migration_field(cls):
-        """Return field that contains user ID."""
-        return cls.user_id
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):

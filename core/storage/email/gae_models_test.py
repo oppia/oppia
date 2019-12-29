@@ -359,12 +359,6 @@ class GeneralFeedbackEmailReplyToIdModelTest(test_utils.GenericTestBase):
             .get_user_id_migration_policy(),
             base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD)
 
-    def test_get_user_id_migration_field(self):
-        self.assertEqual(
-            email_models.GeneralFeedbackEmailReplyToIdModel
-            .get_user_id_migration_policy(),
-            email_models.GeneralFeedbackEmailReplyToIdModel.user_id)
-
     def test_put_function(self):
         email_reply_model = email_models.GeneralFeedbackEmailReplyToIdModel(
             id='user_id_1.exploration.exp_id.thread_id',
