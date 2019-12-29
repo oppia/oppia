@@ -5101,10 +5101,11 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
             item: ndb.Model. BaseUserModel to validate.
         """
         exp_ids = cls._get_exp_ids(item)
-
-        not_marked_exp_ids = [
-            exp_id for exp_id in exp_ids if
-            not exp_models.ExplorationModel.get_by_id(exp_id).deleted]
+        not_marked_exp_ids = []
+        for exp_id in exp_ids:
+            exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
+            if exp_model is None or not exp_model.deleted:
+                not_marked_exp_ids.append(exp_id)
 
         if not_marked_exp_ids:
             cls.errors['deleted exploration check'].append(
@@ -5119,9 +5120,12 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
             item: ndb.Model. BaseUserModel to validate.
         """
         col_ids = cls._get_col_ids(item)
-        not_marked_col_ids = [
-            col_id for col_id in col_ids if
-            not collection_models.CollectionModel.get_by_id(col_id).deleted]
+        not_marked_col_ids = []
+        for col_id in col_ids:
+            col_model = collection_models.CollectionModel.get_by_id(col_id)
+            if col_model is None or not col_model.deleted:
+                not_marked_col_ids.append(col_id)
+
         if not_marked_col_ids:
             cls.errors['deleted collection check'].append(
                 'Entity id %s: Collections with ids %s are not marked as '

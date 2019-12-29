@@ -15777,3 +15777,25 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
                 'not marked as deleted"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)
+
+    def test_exploration_deleted_failure(self):
+        exp = exp_models.ExplorationModel.get_by_id('exp_id')
+        exp.delete(self.user_id, '', force_deletion=True)
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted exploration check '
+                'of PendingDeletionRequestModel\', '
+                '[u"Entity id %s: Explorations with ids [u\'exp_id\'] are '
+                'not marked as deleted"]]') % self.user_id]
+        run_job_and_check_output(self, expected_output)
+
+    def test_collection_deleted_failure(self):
+        col = collection_models.CollectionModel.get_by_id('col_id')
+        col.delete(self.user_id, '', force_deletion=True)
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted collection check '
+                'of PendingDeletionRequestModel\', '
+                '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
+                'not marked as deleted"]]') % self.user_id]
+        run_job_and_check_output(self, expected_output)
