@@ -91,7 +91,6 @@ describe('Context service', () => {
       () => {
         expect(ecs.canAddOrEditComponents()).toBe(false);
       });
-
   });
 
   describe('behavior in the exploration editor view', () => {
@@ -153,7 +152,6 @@ describe('Context service', () => {
       () => {
         expect(ecs.canAddOrEditComponents()).toBe(true);
       });
-
   });
 
   describe('behavior in question editor modal', () => {
