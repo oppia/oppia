@@ -15,6 +15,9 @@ workflows:
       - backend_tests:
           requires:
             - setup
+      - e2e_tests:
+          requires:
+            - setup
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -133,6 +136,22 @@ jobs:
             ./cc-test-reporter upload-coverage
           when: on_success
 
+  e2e_tests:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          <<: *install_dependencies
+      - run:
+          name: RUN_E2E_TESTS_FILE_UPLOAD_FEATURES
+          command: |
+            bash scripts/run_e2e_tests.sh --suite="fileUploadFeatures"
+      - run:
+          name: RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR
+          command: |
+            bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor"
 notify:
   webhooks:
     # A list of hook hashes, containing the url field
