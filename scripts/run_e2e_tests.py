@@ -166,10 +166,10 @@ def check_running_instance(*ports):
     """Check if exists running oppia instance.
 
     Args:
-        ports: list[int]. A list of ports that oppia instances may be running.
+        ports: list(int). A list of ports that oppia instances may be running.
 
     Return:
-        boolean represents whether the ports are open.
+        bool: Whether the ports are open.
     """
     running = False
     for port in ports:
@@ -206,7 +206,7 @@ def tweak_constant_file(constant_file, dev_mode):
 
     Args:
         constant_file: str. File path to the constant file.
-        dev_mode: boolean. Represents whether the program is running on dev
+        dev_mode: bool. Represents whether the program is running on dev
             mode.
     """
     pattern = '"DEV_MODE": .*'
@@ -221,7 +221,7 @@ def tweak_feconf_file(feconf_file_path, enable_community_dashboard):
 
     Args:
         feconf_file_path: str. Path to the feconf.py file.
-        enable_community_dashboard: boolean. Represents whether community
+        enable_community_dashboard: bool. Represents whether community
             dashboard is enabled.
     """
     pattern = 'COMMUNITY_DASHBOARD_ENABLED = .*'
@@ -233,7 +233,7 @@ def run_webdriver_manager(parameters):
     """Run commands of webdriver manager.
 
     Args:
-        parameters: list[str]. A list of parameters to pass to webdriver
+        parameters: list(str). A list of parameters to pass to webdriver
             manager.
     """
     web_driver_command = [common.NODE_BIN_PATH, WEBDRIVER_MANAGER_BIN_PATH]
@@ -244,7 +244,7 @@ def run_webdriver_manager(parameters):
 def setup_and_install_dependencies(skip_install):
     """Run the setup and installation scripts."""
     if not skip_install:
-        install_third_party_libs.main(args=[])
+        install_third_party_libs.main()
     setup.main(args=[])
     setup_gae.main(args=[])
     if os.getenv('TRAVIS'):
@@ -255,7 +255,7 @@ def build_js_files(dev_mode):
     """Build the javascript files.
 
     Args:
-        dev_mode: boolean. Represents whether run the related commands in dev
+        dev_mode: bool. Represents whether run the related commands in dev
             mode.
     """
     tweak_constant_file(CONSTANT_FILE_PATH, dev_mode)
@@ -335,7 +335,7 @@ def get_parameter_for_config_file(run_on_browserstack):
         run_on_browserstack: bool. Whether run the test on browserstack.
 
     Returns:
-        str. Represents the config file path.
+        str: The config file path.
     """
     if not run_on_browserstack:
         return PROTRACTOR_CONFIG_FILE_PATH
@@ -352,7 +352,7 @@ def get_parameter_for_sharding(sharding, sharding_instances):
         sharding_instances: int. How many sharding instances to be running.
 
     Returns:
-        list[str]. A list of parameters to represent the sharding configuration.
+        list(str): A list of parameters to represent the sharding configuration.
     """
     if not sharding or sharding_instances == 1:
         return []
@@ -368,7 +368,7 @@ def get_parameter_for_dev_mode(dev_mode):
         dev_mode: bool. Whether the test is running on dev_mode.
 
     Returns:
-        str. A string for the testing mode command line parameter.
+        str: A string for the testing mode command line parameter.
     """
     return '--params.devMode=%s' % dev_mode
 
@@ -381,7 +381,7 @@ def get_parameter_for_suite(suite):
             `full`, all tests will run.
 
     Returns:
-        list[str]. A list of command line parameter for suite.
+        list(str): A list of command line parameter for suite.
     """
     return ['--suite', suite]
 
@@ -391,16 +391,16 @@ def get_e2e_test_parameters(
     """Return parameters for the end-2-end tests.
 
     Args:
-        run_on_browserstack: boolean. Represents whether the tests should run
+        run_on_browserstack: bool. Represents whether the tests should run
             on browserstack.
-        sharding: boolean. Disables/Enables parallelization of protractor tests.
+        sharding: bool. Disables/Enables parallelization of protractor tests.
         sharding_instances: str. Sets the number of parallel browsers to open
             while sharding.
         suite: str. Performs test for different suites.
-        dev_mode: boolean. Represents whether run the related commands in dev
+        dev_mode: bool. Represents whether run the related commands in dev
             mode.
     Returns:
-        list[str] Parameters for running the tests.
+        list(str): Parameters for running the tests.
     """
     config_file = get_parameter_for_config_file(run_on_browserstack)
     sharding_parameters = get_parameter_for_sharding(
@@ -420,13 +420,13 @@ def start_google_engine(dev_mode):
     """Start the google engine server.
 
     Args:
-        dev_mode: boolean. Represents whether run the related commands in dev
+        dev_mode: bool. Represents whether run the related commands in dev
             mode.
     """
     app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode else '')
 
     p = subprocess.Popen(
-        '%s %s/dev_appserver.py  --host 0.0.0.0 --port %s '
+        '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
         '--clear_datastore=yes --dev_appserver_log_level=critical '
         '--log_level=critical --skip_sdk_update_check=true %s' % (
             common.CURRENT_PYTHON_BIN, common.GOOGLE_APP_ENGINE_HOME,

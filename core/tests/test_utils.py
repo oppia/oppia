@@ -918,7 +918,7 @@ tags: []
         # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
         # of the stub provided by testbed. This custom mock is disabled
         # immediately once the signup is complete. This is done to avoid
-        # external  calls being made to Gravatar when running the backend
+        # external calls being made to Gravatar when running the backend
         # tests.
         gae_id = self.get_gae_id_from_email(email)
         user_services.create_new_user(gae_id, email)
@@ -1858,7 +1858,7 @@ tags: []
             If you want to check subprocess.Popen is invoked twice
             like `subprocess.Popen(['python'], shell=True)` and
             `subprocess.Popen(['python2], shell=False), you can first
-            define the mock  function, then the swap, and just run the
+            define the mock function, then the swap, and just run the
             target function in context, as follows:
                 def mock_popen(command, shell):
                     return
@@ -1872,34 +1872,34 @@ tags: []
                 with popen_swap:
                     function_will_invoke_popen()
 
-        Args:
-            obj: Any. The target that you want to swap a function with.
-            attr: str. The name of the function to be swapped.
-            newvalue: Function. The new function you want to use.
-            expected_args: None|tuple|list[tuple]. The expected args that you
-                want this function to be invoked with. When its value is None,
-                args will  not be checked. If the value type is tuple, means
-                everytime  the function is invoked should by the args in this
-                tuple. If the  value type is list, the function will check
-                whether the called args is in the list. If the invoking args
-                tuple is in the list, this tuple will be removed from the list.
-            expected_kwargs: None|dict|list[dict]. The expected key word args
-                you want this function to be invoked with. Similar to
-                expected_args.
-            called: Bool. Whether the function is invoked. This will always be
-                checked.
-            called_times: int|None. How many times this function will be called.
-                If the value is None, this will not be checked.
-            expected_exception: Exceptiono. The exception that you expect to be
-                raised in this function. By default the exception is
-                IntendedException.
-
         Note:
             Currently the function does not support specify the ordered invoke
             args. Also, as the example above, if the actual code invoked
             `subprocess.Popen(['python2'], shell=True)` and
             `subprocess.Popen(['python'], shell=False), the check will still
             pass. Use with caution.
+
+        Args:
+            obj: *. the Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            newvalue: Function. The new function you want to use.
+            expected_args: None|tuple|list(tuple). The expected args that you
+                want this function to be invoked with. When its value is None,
+                args will not be checked. If the value type is tuple, means
+                everytime the function is invoked should by the args in this
+                tuple. If the value type is list, the function will check
+                whether the called args is in the list. If the invoking args
+                tuple is in the list, this tuple will be removed from the list.
+            expected_kwargs: None|dict|list(dict). The expected key word args
+                you want this function to be invoked with. Similar to
+                expected_args.
+            called: bool. Whether the function is invoked. This will always be
+                checked.
+            called_times: int|None. How many times this function will be called.
+                If the value is None, this will not be checked.
+            expected_exception: Exceptiono. The exception that you expect to be
+                raised in this function. By default the exception is
+                IntendedException.
         """
         original = getattr(obj, attr)
         newvalue.called_times = 0
