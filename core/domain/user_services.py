@@ -1094,7 +1094,7 @@ def update_last_logged_in(user_settings, new_last_logged_in):
 
     Args:
         user_settings: str. The unique ID of the user.
-        new_last_logged_in: datetime. The new datetime of the last 
+        new_last_logged_in: datetime. The new datetime of the last
             logged in session.
     """
 
