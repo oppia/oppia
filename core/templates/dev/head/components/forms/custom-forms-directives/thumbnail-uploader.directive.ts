@@ -124,7 +124,8 @@ angular.module('oppia').directive('thumbnailUploader', [
 
                   $scope.initialiseCropper = function() {
                     let thumbnailImage = (
-                      document.getElementById('croppable-thumbnail'));
+                      <HTMLImageElement>document.getElementById(
+                        'croppable-thumbnail'));
                     cropper = new Cropper(thumbnailImage, {
                       minContainerHeight: 405,
                       minContainerWidth: 720,
