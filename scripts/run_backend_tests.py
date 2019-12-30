@@ -89,7 +89,6 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.THIRD_PARTY_DIR, 'six-1.12.0'),
     os.path.join(common.THIRD_PARTY_DIR, 'soupsieve-1.9.1'),
     os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
-    os.path.join(common.THIRD_PARTY_DIR, 'webencodings-0.5.1'),
 ]
 
 COVERAGE_DIR = os.path.join(
