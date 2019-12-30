@@ -22,10 +22,18 @@ var waitFor = require('./waitFor.js');
 
 var ClassroomPage = function() {
   var PAGE_URL_PREFIX = '/classroom/';
+  var topicSummaryTiles = element.all(
+    by.css('.protractor-test-topic-summary-tile'));
 
   this.get = function(classroomName) {
     browser.get(PAGE_URL_PREFIX + classroomName);
     waitFor.pageToFullyLoad();
+  };
+
+  this.expectNumberOfTopicsToBe = function(count) {
+    topicSummaryTiles.then(function(topics) {
+      expect(topics.length).toEqual(count);
+    });
   };
 };
 

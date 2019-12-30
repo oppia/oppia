@@ -24,6 +24,7 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var ClassroomPage = require('../protractor_utils/ClassroomPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require(
   '../protractor_utils/TopicsAndSkillsDashboardPage.js');
 var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
@@ -31,12 +32,14 @@ var TopicEditorPage = require('../protractor_utils/TopicEditorPage.js');
 describe('Classroom page functionality', function() {
   var adminPage = null;
   var classroomPage = null;
+  var libraryPage = null;
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
     classroomPage = new ClassroomPage.ClassroomPage();
+    libraryPage = new LibraryPage.LibraryPage();
     topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
     topicEditorPage =
@@ -46,14 +49,17 @@ describe('Classroom page functionality', function() {
       'creator@classroomPage.com', 'creatorClassroomPage');
   });
 
-  it('should add a new topic to the Math classroom', function() {
+  beforeEach(function() {
+    users.login('creator@classroomPage.com');
+  });
+
+  it('should add a new published topic to the Math classroom', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
     topicEditorPage.submitTopicThumbnail('../data/img.png');
     topicEditorPage.saveTopic('Added thumbnail.');
-    topicEditorPage.publishTopic();
     browser.getCurrentUrl().then(function(url) {
-      var topicId = url.split('/')[4];
+      var topicId = url.split('/')[4].slice(0, -1);
       adminPage.editConfigProperty(
         'The set of topic IDs for each classroom page.',
         'List',
@@ -62,11 +68,35 @@ describe('Classroom page functionality', function() {
             'Unicode').setValue(topicId);
         });
       classroomPage.get('Math');
+      classroomPage.expectNumberOfTopicsToBe(0);
+      topicsAndSkillsDashboardPage.get();
+      topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
+      topicEditorPage.publishTopic();
+      classroomPage.get('Math');
+      classroomPage.expectNumberOfTopicsToBe(1);
     });
+    users.logout();
+  });
+
+  fit('should search for explorations from classroom page', function() {
+    workflow.createAndPublishExploration(
+      'Exploration Title',
+      'Algorithms',
+      'This is the objective.',
+      'English');
+    classroomPage.get('Math');
+    libraryPage.findExploration('Title');
+    libraryPage.expectExplorationToBeVisible('Exploration Title');
+
+    libraryPage.selectLanguages(['English']);
+    libraryPage.expectCurrentLanguageSelectionToBe(['English']);
+
+    libraryPage.selectCategories(['Algorithms']);
+    libraryPage.expectCurrentCategorySelectionToBe(['Algorithms']);
+    users.logout();
   });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
-    users.logout();
   });
 });
