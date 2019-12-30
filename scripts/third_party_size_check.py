@@ -78,14 +78,16 @@ def _check_size_in_dir(dir_path, skip_files_list):
     """
     number_of_files_in_dir = 0
     for name in os.listdir(dir_path):
-        if os.path.join(dir_path, name) in skip_files_list:
+        file_path = os.path.join(dir_path, name)
+        # The dir pattern of skip_files in app_dev.yaml ends with '/'.
+        file_path += '/' if os.path.isdir(file_path) else ''
+        if file_path in skip_files_list:
             continue
-        if os.path.isfile(os.path.join(dir_path, name)):
+        if os.path.isfile(file_path):
             number_of_files_in_dir += 1
-        else:
-            if os.path.isdir(os.path.join(dir_path, name)):
-                number_of_files_in_dir += _check_size_in_dir(
-                    os.path.join(dir_path, name), skip_files_list)
+        elif os.path.isdir(file_path):
+            number_of_files_in_dir += _check_size_in_dir(
+                file_path, skip_files_list)
     return number_of_files_in_dir
 
 
