@@ -23,6 +23,11 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { PromoBarService } from
   'services/promo-bar.service';
 
+export interface PromoBarData {
+  promoBarEnabled: boolean,
+  promoBarMessage: string
+}
+
 describe('Promo bar Service', () => {
   let promoBarService: PromoBarService = null;
   let httpTestingController: HttpTestingController;
@@ -38,7 +43,7 @@ describe('Promo bar Service', () => {
 
   it('should return promo bar data',
     fakeAsync(() => {
-      promoBarService.getPromoBarData().then(function(data) {
+      promoBarService.getPromoBarData().then(function(data: PromoBarData) {
         expect(data.promoBarEnabled).toBe(true);
         expect(data.promoBarMessage).toBe('test message');
       });
