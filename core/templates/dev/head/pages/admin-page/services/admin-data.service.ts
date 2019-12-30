@@ -52,4 +52,3 @@ export class AdminDataService {
 angular.module('oppia').factory(
   'AdminDataService',
   downgradeInjectable(AdminDataService));
-
