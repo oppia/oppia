@@ -697,8 +697,9 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
     # This must come after the explorations are retrieved. Otherwise the
     # memcache keys will be reinstated.
-    exploration_memcache_keys = [exp_fetchers.get_exploration_memcache_key(
-        exploration_id) for exploration_id in exploration_ids]
+    exploration_memcache_keys = [
+        exp_fetchers.get_exploration_memcache_key(exploration_id)
+        for exploration_id in exploration_ids]
     memcache_services.delete_multi(exploration_memcache_keys)
 
     # Delete the explorations from search.
@@ -708,30 +709,30 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
     # force_deletion is True.
     delete_exploration_summaries(exploration_ids)
 
-    for exploration_id in exploration_ids:
-        # Remove the explorations from the featured activity references, if
-        # necessary.
-        activity_services.remove_featured_activity(
-            constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+    # Remove the explorations from the featured activity references, if
+    # necessary.
+    activity_services.remove_featured_activities(
+        constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
 
-        # Remove from subscribers.
-        taskqueue_services.defer(
-            delete_exploration_from_subscribed_users,
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-            exploration_id)
+    # Remove from subscribers.
+    taskqueue_services.defer(
+        delete_explorations_from_subscribed_users,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        exploration_ids)
 
 
-def delete_exploration_from_subscribed_users(exploration_id):
-    """Remove exploration from all subscribers' activity_ids.
+def delete_explorations_from_subscribed_users(exploration_ids):
+    """Remove explorations from all subscribers' activity_ids.
 
     Args:
-        exploration_id: The id of the exploration to delete.
+        exploration_ids: list(str). The ids of the explorations to delete.
     """
     subscription_models = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.activity_ids ==
-        exploration_id).fetch()
+        user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
+    ).fetch()
     for model in subscription_models:
-        model.activity_ids.remove(exploration_id)
+        model.activity_ids = [
+            id_ for id_ in model.activity_ids if id_ not in exploration_ids]
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 

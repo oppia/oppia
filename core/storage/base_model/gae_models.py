@@ -735,8 +735,8 @@ class VersionedModel(BaseModel):
                     for snapshot_id in model_snapshot_ids])
 
             ndb.delete_multi(
-                all_models_metadata_keys + all_models_content_keys +
-                versioned_models)
+                all_models_metadata_keys + all_models_content_keys)
+            super(VersionedModel, cls).delete_multi(versioned_models)
         else:
             for model in versioned_models:
                 model._require_not_marked_deleted()  # pylint: disable=protected-access

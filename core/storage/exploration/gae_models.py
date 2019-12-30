@@ -379,8 +379,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
         Note that this extends the superclass method.
 
         Args:
-            models: list(ExplorationModel). Models for which to create the
-                commit.
+            models: list(ExplorationRightsModel). Models for which to create the
+                commits.
             committer_id: str. The user_id of the user who committed the
                 change.
             commit_type: str. The type of commit. Possible values are in

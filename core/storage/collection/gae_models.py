@@ -290,6 +290,57 @@ class CollectionRightsModel(base_models.VersionedModel):
             ).put_async()
 
     @classmethod
+    def _trusted_multi_commit(
+            cls, models, committer_id, commit_type, commit_message,
+            commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            models: list(CollectionRightsModel). Models for which to create the
+                commits.
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(CollectionRightsModel, cls)._trusted_multi_commit(
+            models, committer_id, commit_type, commit_message, commit_cmds)
+
+        # Create and delete events will already be recorded in the
+        # CollectionModel.
+        if commit_type not in ['create', 'delete']:
+            committer_user_settings_model = (
+                user_models.UserSettingsModel.get_by_id(committer_id))
+            committer_username = (
+                committer_user_settings_model.username
+                if committer_user_settings_model else '')
+            commit_log_models = []
+            for model in models:
+                commit_log_models.append(CollectionCommitLogEntryModel(
+                    id=('rights-%s-%s' % (model.id, model.version)),
+                    user_id=committer_id,
+                    username=committer_username,
+                    collection_id=model.id,
+                    commit_type=commit_type,
+                    commit_message=commit_message,
+                    commit_cmds=commit_cmds,
+                    version=None,
+                    post_commit_status=model.status,
+                    post_commit_community_owned=model.community_owned,
+                    post_commit_is_private=(
+                        model.status == constants.ACTIVITY_STATUS_PRIVATE)
+                ))
+            ndb.put_multi_async(commit_log_models)
+
+    @classmethod
     def export_data(cls, user_id):
         """(Takeout) Export user-relevant properties of CollectionRightsModel.
 
