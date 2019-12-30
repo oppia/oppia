@@ -78,7 +78,7 @@ describe('Classroom page functionality', function() {
     users.logout();
   });
 
-  fit('should search for explorations from classroom page', function() {
+  it('should search for explorations from classroom page', function() {
     workflow.createAndPublishExploration(
       'Exploration Title',
       'Algorithms',
