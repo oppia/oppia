@@ -81,12 +81,8 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var buttonNames = [];
         if (ContextService.canAddOrEditComponents()) {
           names.forEach(function(name) {
-            var component = _RICH_TEXT_COMPONENTS.find(element =>
-              element.id === name);
-            if (!(!ContextService.canWriteToFs() && component.requiresFs)) {
-              buttonNames.push('Oppia' + name);
-              buttonNames.push('-');
-            }
+            buttonNames.push('Oppia' + name);
+            buttonNames.push('-');
           });
         }
         buttonNames.pop();

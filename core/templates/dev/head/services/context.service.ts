@@ -226,21 +226,17 @@ export class ContextService {
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
   }
 
-  // Following method helps to know whether RTE components requiring writing
-  // to the file system can be used in a particular mode.
-  canWriteToFs(): boolean {
+  canAddOrEditComponents(): boolean {
     return (
       this.getPageContext() ===
       ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR ||
+      this.getPageContext() ===
+      ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR ||
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.STORY_EDITOR ||
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR);
-  }
-  canAddOrEditComponents(): boolean {
-    return !(
-      this.getPageContext() ===
-      ServicesConstants.PAGE_CONTEXT.EXPLORATION_PLAYER ||
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.QUESTION_PLAYER);
   }
 }
 

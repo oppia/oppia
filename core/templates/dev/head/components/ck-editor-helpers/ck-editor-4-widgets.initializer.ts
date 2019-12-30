@@ -62,9 +62,9 @@ angular.module('oppia').run([
             template: componentTemplate,
             draggable: false,
             edit: function() {
-              if ((!ContextService.canWriteToFs() &&
-                  componentDefn.requiresFs) ||
-                  !(ContextService.canAddOrEditComponents())) {
+              // the following check allows editing of inline RTE components
+              // only in editor pages
+              if (!ContextService.canAddOrEditComponents()) {
                 return;
               }
               editor.fire('lockSnapshot', {

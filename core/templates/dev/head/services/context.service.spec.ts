@@ -86,6 +86,12 @@ describe('Context service', () => {
     it('should correctly retrieve the correct entity type', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
+
+    it('should correctly check that page allows to editing of RTE components',
+      () => {
+        expect(ecs.canAddOrEditComponents()).toBe(false);
+      });
+
   });
 
   describe('behavior in the exploration editor view', () => {
@@ -110,10 +116,6 @@ describe('Context service', () => {
 
     it('should correctly retrieve the correct entity type', () => {
       expect(ecs.getEntityType()).toBe('exploration');
-    });
-
-    it('should correctly check that page can write to file system', () => {
-      expect(ecs.canWriteToFs()).toBe(true);
     });
 
     it('should correctly check that page allows to editing of RTE components',
@@ -147,9 +149,11 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('topic_editor');
     });
 
-    it('should correctly check that page can write to file system', () => {
-      expect(ecs.canWriteToFs()).toBe(true);
-    });
+    it('should correctly check that page allows to editing of RTE components',
+      () => {
+        expect(ecs.canAddOrEditComponents()).toBe(true);
+      });
+
   });
 
   describe('behavior in question editor modal', () => {
@@ -215,9 +219,10 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('story_editor');
     });
 
-    it('should correctly check that page can write to file system', () => {
-      expect(ecs.canWriteToFs()).toBe(true);
-    });
+    it('should correctly check that page allows to editing of RTE components',
+      () => {
+        expect(ecs.canAddOrEditComponents()).toBe(true);
+      });
   });
 
   describe('behavior in the skill editor view', () => {
@@ -245,9 +250,10 @@ describe('Context service', () => {
       expect(ecs.getPageContext()).toBe('skill_editor');
     });
 
-    it('should correctly check that page can write to file system', () => {
-      expect(ecs.canWriteToFs()).toBe(true);
-    });
+    it('should correctly check that page allows to editing of RTE components',
+      () => {
+        expect(ecs.canAddOrEditComponents()).toBe(true);
+      });
   });
 
   describe('behavior in other pages', () => {
