@@ -76,7 +76,6 @@
     "jasmine-core": "^3.5.0",
     "jasmine-spec-reporter": "^4.2.1",
     "jquery": "^3.4.0",
-    "jquery-cropper": "^1.0.1",
     "karma": "^4.3.0",
     "karma-chrome-launcher": "^2.2.0",
     "karma-coverage": "^2.0.1",

@@ -16,9 +16,12 @@
  * @fileoverview Directive for uploading images.
  */
 
+import Cropper from 'cropperjs';
+
 require(
   'components/common-layout-directives/common-elements/' +
   'alert-message.directive.ts');
+require('cropperjs/dist/cropper.min.css');
 require('domain/utilities/url-interpolation.service.ts');
 
 require('services/context.service.ts');
@@ -117,9 +120,12 @@ angular.module('oppia').directive('thumbnailUploader', [
                     ImageUploadHelperService) {
                   $scope.uploadedImage = null;
                   $scope.invalidImageWarningIsShown = false;
+                  let cropper = null;
 
                   $scope.initialiseCropper = function() {
-                    $('#croppable-thumbnail').cropper({
+                    let thumbnailImage = (
+                      document.getElementById('croppable-thumbnail'));
+                    cropper = new Cropper(thumbnailImage, {
                       minContainerHeight: 405,
                       minContainerWidth: 720,
                       minCropBoxWidth: 180,
@@ -157,8 +163,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                   };
 
                   $scope.confirm = function() {
-                    var croppedImageDataUrl = ($('#croppable-thumbnail')
-                      .data('cropper')
+                    var croppedImageDataUrl = (cropper
                       .getCroppedCanvas()
                       .toDataURL());
                     $uibModalInstance.close(croppedImageDataUrl);

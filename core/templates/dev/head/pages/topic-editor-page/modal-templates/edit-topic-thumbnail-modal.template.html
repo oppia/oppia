@@ -16,12 +16,6 @@
         <button class="btn btn-secondary oppia-thumbnail-reset-button" ng-click="reset()">
           <i class="material-icons oppia-vcenter">&#xE14C;</i>
         </button>
-        <!-- <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
-                  area-type="square" result-image-size="150"
-                  on-load-error="onInvalidImageLoaded()"
-                  result-image-format="image/png"
-                  class="protractor-test-photo-crop">
-        </img-crop> -->
         <img ng-if="uploadedImage" id="croppable-thumbnail" ng-src="<[uploadedImage]>">
       </div>
     </div>
