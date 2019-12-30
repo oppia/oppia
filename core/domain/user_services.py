@@ -1088,7 +1088,7 @@ def record_user_logged_in(user_id):
     _save_user_settings(user_settings)
 
 
-def update_last_logged_in(user_settings, new_last_logged_in=None):
+def update_last_logged_in(user_settings, new_last_logged_in):
     """Updates last_logged_in to the new given datetime for the user with
     given user_settings.
 
