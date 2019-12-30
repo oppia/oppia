@@ -131,7 +131,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         user_e_settings.last_created_an_exploration = (
             user_e_settings.last_created_an_exploration -
             datetime.timedelta(days=10))
-        # Last edited time also changes when user creates an explorationan.
+        # Last edited time also changes when user creates an exploration.
         user_e_settings.last_edited_an_exploration = (
             datetime.datetime.utcnow() - datetime.timedelta(days=10))
         user_services.update_last_logged_in(

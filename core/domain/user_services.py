@@ -1090,12 +1090,12 @@ def record_user_logged_in(user_id):
 
 def update_last_logged_in(user_settings, new_last_logged_in):
     """Updates last_logged_in to the new given datetime for the user with
-    given user_settings.
+    given user_settings. Should only be used by tests.
 
     Args:
-        user_settings: str. The unique ID of the user.
+        user_settings: UserSettings domain object.
         new_last_logged_in: datetime. The new datetime of the last
-            logged in session.
+            logged in session. Could be None.
     """
 
     user_settings.last_logged_in = new_last_logged_in
