@@ -134,11 +134,11 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         # Last edited time also changes when user creates an explorationan.
         user_e_settings.last_edited_an_exploration = (
             datetime.datetime.utcnow() - datetime.timedelta(days=10))
-        user_services.update_last_logged_in(user_e_settings, 
+        user_services.update_last_logged_in(user_e_settings,
             user_e_settings.last_logged_in - datetime.timedelta(days=10))
 
         user_a_settings = user_services.get_user_settings(self.user_a_id)
-        user_services.update_last_logged_in(user_a_settings, 
+        user_services.update_last_logged_in(user_a_settings,
             user_a_settings.last_logged_in - datetime.timedelta(days=3))
 
         # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
