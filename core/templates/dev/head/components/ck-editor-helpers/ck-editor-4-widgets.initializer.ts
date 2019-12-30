@@ -62,7 +62,9 @@ angular.module('oppia').run([
             template: componentTemplate,
             draggable: false,
             edit: function() {
-              if (!ContextService.canWriteToFs()) {
+              if ((!ContextService.canWriteToFs() &&
+                  componentDefn.requiresFs) ||
+                  !(ContextService.canAddOrEditComponents())) {
                 return;
               }
               editor.fire('lockSnapshot', {

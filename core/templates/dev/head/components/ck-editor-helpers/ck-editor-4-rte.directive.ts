@@ -79,12 +79,16 @@ angular.module('oppia').directive('ckEditor4Rte', [
           return 'oppia' + name;
         }).join(',');
         var buttonNames = [];
-        names.forEach(function(name) {
-          if (ContextService.canWriteToFs()) {
-            buttonNames.push('Oppia' + name);
-            buttonNames.push('-');
-          }
-        });
+        if (ContextService.canAddOrEditComponents()) {
+          names.forEach(function(name) {
+            var component = _RICH_TEXT_COMPONENTS.find(element =>
+              element.id === name);
+            if (!(!ContextService.canWriteToFs() && component.requiresFs)) {
+              buttonNames.push('Oppia' + name);
+              buttonNames.push('-');
+            }
+          });
+        }
         buttonNames.pop();
         // All icons on the toolbar except the Rich Text components.
         var allIcons = ['undo', 'redo', 'bold', 'Italic', 'numberedList',
