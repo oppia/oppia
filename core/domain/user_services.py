@@ -1093,9 +1093,9 @@ def update_last_logged_in(user_settings, new_last_logged_in):
     given user_settings. Should only be used by tests.
 
     Args:
-        user_settings: UserSettings domain object.
-        new_last_logged_in: datetime. The new datetime of the last
-            logged in session. Could be None.
+        user_settings: UserSettings. The UserSettings domain object.
+        new_last_logged_in: datetime or None. The new datetime of the last
+            logged in session.
     """
 
     user_settings.last_logged_in = new_last_logged_in
