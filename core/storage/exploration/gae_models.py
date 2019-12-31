@@ -235,25 +235,27 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
         Some old ExplorationRightsSnapshotContentModels can contain fields
         and field values that are no longer supported and would cause
-        an exception when we would try to create ExplorationRightsModel. We need
-        to remove or replace these fields and values.
+        an exception when we try to reconstitute a ExplorationRightsModel from
+        them. We need to remove or replace these fields and values.
 
         Args:
             model_dict: dict. The content of the model. Some fields and field
-                values might no longer exist in the ExplorationRightsModel.
+                values might no longer exist in the ExplorationRightsModel
+                schema.
 
         Returns:
             dict. The content of the model. Only valid fields and values are
             present.
         """
-        # The all_viewer_ids field was used in history, we need to remove it.
+        # The all_viewer_ids field was previously used in some versions of the
+        # model, we need to remove it.
         if 'all_viewer_ids' in model_dict:
             del model_dict['all_viewer_ids']
-        # The status field could contain 'publicized' value in history, this
+        # The status field could historically take the value 'publicized', this
         # value is now equivalent to 'public'.
         if model_dict['status'] == 'publicized':
             model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
-        # The voice_artist_ids field was previously named translator_ids, we
+        # The voice_artist_ids field was previously named translator_ids. We
         # need to move the values from translator_ids field to voice_artist_ids
         # and delete translator_ids.
         if 'translator_ids' in model_dict and model_dict['translator_ids']:

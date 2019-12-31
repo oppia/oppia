@@ -118,9 +118,10 @@ class UserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             migration_field == old_user_id).fetch()
         for model in found_models:
             model_values = model.to_dict()
-            # We need to get the string name of the field here and in order to
-            # make the query for the model (on one of the previous lines) easy
-            # to form the model field needs to be in the object format.
+            # We need to get the name of the migration_field in order to
+            # retrieve its value from the model_values. The migration_field
+            # needs to be in the object format so that we are able to form
+            # the model query easily (on one of the previous lines).
             model_values[migration_field._name] = new_user_id  # pylint: disable=protected-access
             model.populate(**model_values)
             model_class.put_multi([model], update_last_updated_time=False)
@@ -208,11 +209,11 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             rights_snapshot_model: CollectionRightsSnapshotContentModel.
                 The model that contains the old user IDs.
         """
-        content = (
+        content_dict = (
             collection_models.CollectionRightsModel.transform_dict_to_valid(
                 rights_snapshot_model.content))
         reconstituted_rights_model = (
-            collection_models.CollectionRightsModel(**content))
+            collection_models.CollectionRightsModel(**content_dict))
         reconstituted_rights_model.owner_ids = (
             SnapshotsUserIdMigrationJob._replace_gae_ids(
                 reconstituted_rights_model.owner_ids))
@@ -238,10 +239,11 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             rights_snapshot_model: ExplorationRightsSnapshotContentModel.
                 The model that contains the old user IDs.
         """
-        content = exp_models.ExplorationRightsModel.transform_dict_to_valid(
-            rights_snapshot_model.content)
+        content_dict = (
+            exp_models.ExplorationRightsModel.transform_dict_to_valid(
+                rights_snapshot_model.content))
         reconstituted_rights_model = (
-            exp_models.ExplorationRightsModel(**content))
+            exp_models.ExplorationRightsModel(**content_dict))
 
         reconstituted_rights_model.owner_ids = (
             SnapshotsUserIdMigrationJob._replace_gae_ids(
@@ -492,10 +494,11 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
         elif (model_class.get_user_id_migration_policy() ==
               base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD):
-            # We need to get the string name of the field here and because
-            # the get_user_id_migration_field method is primary implemented
-            # for use in the UserIdMigrationJob for forming query it needs
-            # to return the field as an object.
+            # We need to get the name of the migration_field in order to
+            # retrieve its value from the model.to_dict(). The migration_field
+            # needs to be in the object format so that we are able to form
+            # the model query easily
+            # (in UserIdMigrationJob._change_model_with_one_user_id_field).
             user_id = model.to_dict()[
                 model_class.get_user_id_migration_field()._name]  # pylint: disable=protected-access
             if user_id is None:
