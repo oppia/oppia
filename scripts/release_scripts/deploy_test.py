@@ -69,7 +69,7 @@ class DeployTests(test_utils.GenericTestBase):
     def setUp(self):
         super(DeployTests, self).setUp()
         # pylint: disable=unused-argument
-        def mock_main(args):
+        def mock_main():
             pass
         def mock_copytree(unused_dir1, unused_dir2, ignore):
             pass

@@ -629,8 +629,8 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
 
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.owner_id, 'Name', 'Description',
-            [], [], [], [], 1)
+            self.topic_id, self.owner_id, 'Name', 'abbrev', None,
+            'Description', [], [], [], [], 1)
 
     def test_get_feedback_threads_linked_to_topics(self):
         self.login(self.OWNER_EMAIL)

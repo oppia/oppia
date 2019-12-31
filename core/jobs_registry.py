@@ -57,6 +57,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
+    opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
@@ -77,8 +78,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    user_jobs_one_off.UserGaeIdOneOffJob
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
