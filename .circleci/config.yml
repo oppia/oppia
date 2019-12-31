@@ -18,7 +18,7 @@ workflows:
       - e2e_file_upload_features:
           requires:
             - setup
-      - e2e_topic_and_story_editory:
+      - e2e_topic_and_story_editor:
           requires:
             - setup
 
@@ -152,7 +152,7 @@ jobs:
           command: |
             bash scripts/run_e2e_tests.sh --suite="fileUploadFeatures"
   
-  e2e_topic_and_story_editory:
+  e2e_topic_and_story_editor:
     <<: *job_defaults
     steps:
       - checkout
