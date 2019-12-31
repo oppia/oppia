@@ -101,7 +101,8 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
     def test_cannot_get_question_from_model_with_invalid_schema_version(self):
         # Delete all question models.
         all_question_models = question_models.QuestionModel.get_all()
-        question_models.QuestionModel.delete_multi(all_question_models)
+        for model in all_question_models:
+            model.delete(feconf.SYSTEM_COMMITTER_ID, '', force_deletion=True)
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)
