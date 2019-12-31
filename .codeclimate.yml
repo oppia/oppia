@@ -46,19 +46,26 @@ plugins:
             Please use datetime.datetime.utcnow() instead of
             datetime.datetime.now().
 
+        no-tabs:
+          pattern: "\t"
+          annotation: "Please use spaces instead of tabs."
+          categories: Style
+          path_patterns:
+            - "[^assets/i18n/]"
+
         lf-endings:
-          pattern: \r
+          pattern: "\r"
           annotation: "Please do not use CRLF endings."
           categories: Style
           content: >
             Please make sure all files only have LF endings (no CRLF).
 
         merge-conflict:
-          pattern: \<\<\<\<\<\<\<
+          pattern: "<<<<<<<"
           annotation: "Please fully resolve existing merge conflicts."
 
         merge-conflicts:
-          pattern: \>\>\>\>\>\>\>
+          pattern: ">>>>>>>"
           annotation: "Please fully resolve existing merge conflicts."
 
         no-glyphicon:
@@ -68,7 +75,7 @@ plugins:
             Please use equivalent material-icons instead of glyphicons.
 
         invalid-todo:
-          pattern: TODO[^\(]*[^\)][^:]*[^\w]*$
+          pattern: TODO[^(]*[^)][^:]*[\W]*$
           annotation: "Please use correct format for TODO"
           categories: Style
           content: >
@@ -78,18 +85,26 @@ plugins:
         no-browser-explore:
           pattern: \b(browser.explore)\(
           annotation: "In tests, please do not use browser.explore()."
+          path_patterns:
+            - "**/*.{js,ts}"
 
         no-browser-pause:
           pattern: \b(browser.pause)\(
           annotation: "In tests, please do not use browser.pause()"
+          path_patterns:
+            - "**/*.{js,ts}"
 
         no-browser-sleep:
           pattern: \b(browser.sleep)\(
           annotation: "In tests, please do not use browser.sleep()."
+          path_patterns:
+            - "**/[^embedding]*.{js,ts}"
 
         no-browser-waitForAngular:
           pattern: \b(browser.waitForAngular)\(
           annotation: "In tests, please do not use browser.waitForAngular()."
+          path_patterns:
+            - "**/*.{js,ts}"
 
         use-describe:
           pattern: \b(ddescribe|fdescribe)\(
@@ -97,16 +112,28 @@ plugins:
           content: >
             In tests, please use 'describe' instead of
             'ddescribe' or 'fdescribe'.
+          path_patterns:
+            - "**/*.{js,ts}"
 
         use-it:
           pattern: \b(iit|fit)\(
           annotation: "In tests, please use 'it' instead of 'iit' or 'fit'"
+          path_patterns:
+            - "**/*.{js,ts}"
 
         no-inject:
           pattern: \b(beforeEach\(inject\(function)\(
           annotation: "Please do not use 'inject'"
           content: >
             In tests, please use 'angular.mock.inject' instead of 'inject'.
+          path_patterns:
+            - "**/*.{js,ts}"
+
+        directives-reference:
+          pattern: "templateUrl: '"
+          annotation: "The directives must be directly referenced."
+          path_patterns:
+            - "**/*.{js,ts}"
 
         no-parent:
           pattern: \$parent
@@ -114,10 +141,232 @@ plugins:
           content: >
             Please do not access parent properties using $parent.
             Use the scope object for this purpose.
+          path_patterns:
+            - "**/*.{js,ts,html}"
+
+        no-relative-import:
+          pattern: require\(.*\.\..*\);
+          annotation: "Please don't use relative imports in require()."
+          path_patterns:
+            - "**/[^core/tests/]*.html"
+
+        directives-direct-reference:
+          pattern: text\/ng-template
+          annotation: "The directives must be directly referenced."
+          path_patterns:
+            - "**/*.html"
 
         no-trailing-whitespaces:
-          pattern: ( \t)+$
-          annotation: 'There should not be any trailing whitespaces.'
+          pattern: "[ \t]+$"
+          annotation: "There should not be any trailing whitespaces."
+          path_patterns:
+            - "**/*.html"
+
+        no-print:
+          pattern: \Wprint\(
+          annotation: "Please do not use print statement."
+          path_patterns:
+            - "**/*.py"
+
+        use-PRINT:
+          pattern: \sprint\(
+          annotation: "Please use python_utils.PRINT()."
+          path_patterns:
+            - "**/*.py"
+
+        no-pylint-exclusion:
+          pattern: >
+            # pylint:\s*disable=[A-Z][0-9]{4}
+          annotation: "Please remove pylint exclusion if it is unnecessary."
+          path_patterns:
+            - "**/*.py"
+
+        no-assertEquals:
+          pattern: self.assertEquals\(
+          annotation: "Please do not use self.assertEquals method."
+          content: >
+            Please do not use self.assertEquals method. This method has
+            been deprecated. Instead use self.assertEqual method.
+          path_patterns:
+            - "**/*.py"
+
+        no-open:
+          pattern: >
+            with open\(|= open\(
+          annotation: "Please use python_utils.open_file() instead of open()."
+          path_patterns:
+            - "**/*.py"
+
+        no-stringIO:
+          pattern: StringIO
+          annotation: "Please do not use StringIO."
+          content: >
+            Please use python_utils_io() instead of import StringIO.
+          path_patterns:
+            - "**/*.py"
+
+        use-url-quote:
+          pattern: urllib\..*quote\(
+          annotation: "Please use python_utils.url_quote()."
+          path_patterns:
+            - "**/*.py"
+
+        use-url-unquote-plus:
+          pattern: urllib\..*unquote_plus\(
+          annotation: "Please use python_utils.url_unquote_plus()."
+          path_patterns:
+            - "**/*.py"
+
+        use-url-encode:
+          pattern: urllib\..*urlencode\(
+          annotation: "Please use python_utils.url_encode()."
+          path_patterns:
+            - "**/*.py"
+
+        use-url-retrieve:
+          pattern: urllib\..*urlretrieve\(
+          annotation: "Please use python_utils.url_retrieve()."
+          path_patterns:
+            - "**/*.py"
+
+        use-url-open:
+          pattern: urllib(2)?\..*urlopen\(
+          annotation: "Please use python_utils.url_open()."
+          path_patterns:
+            - "**/*.py"
+
+        use-url-split:
+          pattern: urlsplit
+          annotation: "Please use python_utils.url_split()."
+          path_patterns:
+            - "**/*.py"
+
+        use-url-parse:
+          pattern: urlparse
+          annotation: "Please use python_utils.url_parse()."
+          path_patterns:
+            - "**/*.py"
+
+        use-url-unsplit:
+          pattern: urlunsplit
+          annotation: "Please use python_utils.url_unsplit()."
+          path_patterns:
+            - "**/*.py"
+
+        use-parse-query-string:
+          pattern: parse_qs
+          annotation: "Please use python_utils.parse_query_string()."
+          path_patterns:
+            - "**/*.py"
+
+        use-urllib-unquote:
+          pattern: \Wunquote\(
+          annotation: "Please use python_utils.urllib_unquote()."
+          path_patterns:
+            - "**/*.py"
+
+        use-url-join:
+          pattern: urljoin
+          annotation: "Please use python_utils.url_join()."
+          path_patterns:
+            - "**/*.py"
+
+        use-url-request:
+          pattern: urllib(2)?\..*Request\(
+          annotation: "Please use python_utils.url_request()."
+          path_patterns:
+            - "**/*.py"
+
+        use-INPUT:
+          pattern: >
+            [^.|_|\w]input\(
+          annotation: "Please use python_utils.INPUT."
+          path_patterns:
+            - "**/*.py"
+
+        use-MAP:
+          pattern: >
+            [^.|_|\w|\s]\(map\(
+          annotation: "Please use python_utils.MAP."
+          path_patterns:
+            - "**/*.py"
+
+        use-NEXT:
+          pattern: \Wnext\(
+          annotation: "Please use python_utils.NEXT."
+          path_patterns:
+            - "**/*.py"
+
+        use-OBJECT:
+          pattern: >
+            object\):
+          annotation: "Please use python_utils.OBJECT."
+          path_patterns:
+            - "**/*.py"
+
+        use-RANGE:
+          pattern: \Wrange\(
+          annotation: "Please use python_utils.RANGE."
+          path_patterns:
+            - "**/*.py"
+
+        use-ROUND:
+          pattern: \Wround\(
+          annotation: "Please use python_utils.ROUND."
+          path_patterns:
+            - "**/*.py"
+
+        use-convert-to-bytes:
+          pattern: \Wstr\(
+          annotation: "Please try to use python_utils.convert_to_bytes()."
+          content: >
+            Please try to use python_utils.convert_to_bytes() for the strings
+            used in webapp2's built-in methods or for strings used directly
+            in NDB datastore models. If you need to cast ints/floats to
+            strings, please use python_utils.UNICODE() instead.
+          path_patterns:
+            - "**/*.py"
+
+        use-ZIP:
+          pattern: \Wzip\(
+          annotation: "Please use python_utils.ZIP."
+          path_patterns:
+            - "**/*.py"
+
+        use-BASESTRING:
+          pattern: basestring
+          annotation: "Please use python_utils.BASESTRING."
+          path_patterns:
+            - "**/*.py"
+
+        use-with-metaclass:
+          pattern: __metaclass__
+          annotation: "Please use python_utils.with_metaclass()."
+          path_patterns:
+            - "**/*.py"
+
+        no-interitems:
+          pattern: iteritems
+          annotation: "Please use items() instead."
+          path_patterns:
+            - "**/*.py"
+
+        no-itervalues:
+          pattern: itervalues
+          annotation: "Please use values() instead."
+          path_patterns:
+            - "**/*.py"
+
+        no-iterkeys:
+          pattern: iterkeys
+          annotation: "Please use keys() instead."
+          path_patterns:
+            - "**/*.py"
+    exclude_patterns:
+      - "python_utils.py"
+      - "python_utils_test.py"
+      - "scripts/pre_commit_linter.py"
+      - "core/tests/build_sources/assets/*"
 
 exclude_patterns:
 - "third_party/*"
@@ -127,19 +376,19 @@ exclude_patterns:
 - "CHANGELOG"
 - "integrations/*"
 - "integrations_dev/*"
-- "*.svg"
-- "*.gif"
-- "*.png"
-- "*.zip"
-- "*.ico"
-- "*.jpg"
-- "*.min.js"
+- "**/*.svg"
+- "**/*.gif"
+- "**/*.png"
+- "**/*.zip"
+- "**/*.ico"
+- "**/*.jpg"
+- "**/*.min.js"
 - "backend_prod_files/*"
 - "assets/scripts/*"
 - "core/tests/data/*"
 - "core/tests/build_sources/*"
-- "*.mp3"
-- "*.mp4"
+- "**/*.mp3"
+- "**/*.mp4"
 - "node_modules/*"
 - "typings/*"
 - "local_compiled_js/*"
@@ -147,3 +396,4 @@ exclude_patterns:
 - "core/tests/services_sources/*"
 - "core/tests/release_sources/tmp_unzip.zip"
 - "core/tests/release_sources/tmp_unzip.tar.gz"
+- "ubuntu_dockerfile"

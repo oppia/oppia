@@ -89,8 +89,8 @@ EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
 EXCLUDED_PATHS = (
-    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
+    'third_party/*', 'build/*', '.codeclimate.yml', '.git/*', '*.pyc',
+    'CHANGELOG', 'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
@@ -117,12 +117,12 @@ CONFIG_FILE_PATHS = (
 BAD_PATTERNS = {
     '__author__': {
         'message': 'Please remove author tags from this file.',
-        'excluded_files': ('.codeclimate.yml'),
+        'excluded_files': (),
         'excluded_dirs': ()},
     'datetime.datetime.now()': {
         'message': 'Please use datetime.datetime.utcnow() instead of'
                    'datetime.datetime.now().',
-        'excluded_files': ('.codeclimate.yml'),
+        'excluded_files': (),
         'excluded_dirs': ()},
     '\t': {
         'message': 'Please use spaces instead of tabs.',
@@ -135,16 +135,16 @@ BAD_PATTERNS = {
         'excluded_dirs': ()},
     '<<<<<<<': {
         'message': 'Please fully resolve existing merge conflicts.',
-        'excluded_files': ('.codeclimate.yml'),
+        'excluded_files': (),
         'excluded_dirs': ()},
     '>>>>>>>': {
         'message': 'Please fully resolve existing merge conflicts.',
-        'excluded_files': ('.codeclimate.yml'),
+        'excluded_files': (),
         'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
                    'instead of glyphicons.',
-        'excluded_files': ('.codeclimate.yml'),
+        'excluded_files': (),
         'excluded_dirs': ()}
 }
 
@@ -153,7 +153,7 @@ BAD_PATTERNS_REGEXP = [
         'regexp': re.compile(r'TODO[^\(]*[^\)][^:]*[^\w]*$'),
         'message': 'Please assign TODO comments to a user '
                    'in the format TODO(username): XXX. ',
-        'excluded_files': ('.codeclimate.yml'),
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]
