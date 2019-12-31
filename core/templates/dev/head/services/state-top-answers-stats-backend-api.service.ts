@@ -16,20 +16,37 @@
  * @fileoverview Service to fetch statistics about an exploration's states.
  */
 
-require('services/services.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StateTopAnswersStatsBackendApiService', [
-  '$http', 'UrlInterpolationService', 'STATE_ANSWER_STATS_URL',
-  function($http, UrlInterpolationService, STATE_ANSWER_STATS_URL) {
-    return {
-      fetchStats: function(explorationId) {
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            STATE_ANSWER_STATS_URL, {exploration_id: explorationId})
-        ).then(function(response) {
-          return response.data;
-        });
-      },
-    };
+import { ServicesConstants } from 'services/services.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StateTopAnswersStatsBackendApiService {
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient
+  ) {}
+
+  _fetchStats(explorationId: string): Promise<Object> {
+    return this.http.get(
+      this.urlInterpolationService.interpolateUrl(
+        ServicesConstants.STATE_ANSWER_STATS_URL,
+        {exploration_id: explorationId}
+      )
+    ).toPromise();
   }
-]);
+
+  fetchStats(explorationId: string): Promise<Object> {
+    return this._fetchStats(explorationId);
+  }
+}
+
+angular.module('oppia').factory(
+  'StateTopAnswersStatsBackendApiService',
+  downgradeInjectable(StateTopAnswersStatsBackendApiService));
