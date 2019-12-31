@@ -54,7 +54,6 @@ angular.module('oppia').factory('ImprovementTaskService', [
       PlaythroughImprovementTaskObjectFactory,
       SuggestionImprovementTaskObjectFactory,
     ]);
-    var tasksPromise = null;
     return {
       /** @returns {Object[]} */
       getImprovementTaskObjectFactoryRegistry: function() {
