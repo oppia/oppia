@@ -971,4 +971,3 @@ RTE_CONTENT_SPEC = {
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'negative-numbers', 'ratios']
 }
-
