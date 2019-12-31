@@ -16,29 +16,18 @@
  * @fileoverview Tests for ReadOnlyStoryNodeObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
+import { ReadOnlyStoryNodeObjectFactory } from
+  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 
-describe('Read only story node object factory', function() {
-  var ReadOnlyStoryNodeObjectFactory = null;
-  var _sampleSubtopic = null;
+describe('Read only story node object factory', () => {
+  let readOnlyStoryNodeObjectFactory: ReadOnlyStoryNodeObjectFactory = null;
   var _sampleStoryNode = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    ReadOnlyStoryNodeObjectFactory = $injector.get(
-      'ReadOnlyStoryNodeObjectFactory');
+  beforeEach(() => {
+    readOnlyStoryNodeObjectFactory = TestBed.get(
+      ReadOnlyStoryNodeObjectFactory);
 
     var sampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
@@ -55,9 +44,9 @@ describe('Read only story node object factory', function() {
       },
       completed: true
     };
-    _sampleStoryNode = ReadOnlyStoryNodeObjectFactory.createFromBackendDict(
+    _sampleStoryNode = readOnlyStoryNodeObjectFactory.createFromBackendDict(
       sampleReadOnlyStoryNodeBackendDict);
-  }));
+  });
 
   it('should correctly return all the values', function() {
     expect(_sampleStoryNode.getId()).toEqual('node_1');

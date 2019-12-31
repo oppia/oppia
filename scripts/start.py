@@ -30,7 +30,7 @@ import time
 
 # Install third party libraries before importing other files.
 from . import install_third_party_libs
-install_third_party_libs.main(args=[])
+install_third_party_libs.main()
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
