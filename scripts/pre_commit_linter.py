@@ -64,7 +64,7 @@ import time
 
 # Install third party dependencies before proceeding.
 from . import install_third_party_libs
-install_third_party_libs.main(args=[])
+install_third_party_libs.main()
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
@@ -536,6 +536,10 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party_libs.py',
     '/.github/']
 
+# NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
+NODE_DIR = os.path.abspath(
+    os.path.join(os.getcwd(), os.pardir, 'oppia_tools', 'node-10.18.0'))
+
 if not os.getcwd().endswith('oppia'):
     python_utils.PRINT('')
     python_utils.PRINT(
@@ -573,7 +577,6 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-3.13.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pygsheets-2.0.2'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
     os.path.join('third_party', 'bleach-3.1.0'),
@@ -696,8 +699,7 @@ def _lint_all_files(
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
-    node_path = os.path.join(
-        parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
+    node_path = os.path.join(NODE_DIR, 'bin', 'node')
     eslint_path = os.path.join(
         'node_modules', 'eslint', 'bin', 'eslint.js')
     stylelint_path = os.path.join(
@@ -1818,8 +1820,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         # The path for node is set explicitly, since otherwise the lint
         # tests fail on CircleCI due to the TypeScript files not being
         # compilable.
-        node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
-        os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
+        os.environ['PATH'] = '%s/bin:' % NODE_DIR + os.environ['PATH']
 
         self.verbose_mode_enabled = verbose_mode_enabled
         self.process_manager = multiprocessing.Manager().dict()
@@ -2027,8 +2028,7 @@ class JsTsLintChecksManager(LintChecksManager):
         Args:
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
-        node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
-        os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
+        os.environ['PATH'] = '%s/bin:' % NODE_DIR + os.environ['PATH']
 
         super(JsTsLintChecksManager, self).__init__(
             verbose_mode_enabled=verbose_mode_enabled)
@@ -3123,10 +3123,7 @@ class OtherLintChecksManager(LintChecksManager):
 
     def _lint_html_files(self):
         """This function is used to check HTML files for linting errors."""
-        parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-        node_path = os.path.join(
-            parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
+        node_path = os.path.join(NODE_DIR, 'bin', 'node')
         htmllint_path = os.path.join(
             'node_modules', 'htmllint-cli', 'bin', 'cli.js')
 

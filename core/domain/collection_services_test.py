@@ -43,10 +43,10 @@ transaction_services = models.Registry.import_transaction_services()
 # updated, reverted, deleted, created, rights changed. See TODO(msl): at
 # the top of exp_services_test for more original context.
 
-# pylint: disable=protected-access
-def _count_at_least_editable_collection_summaries(user_id):
+
+def count_at_least_editable_collection_summaries(user_id):
     """Returns the count of collection summaries that are atleast editable."""
-    return len(collection_services._get_collection_summary_dicts_from_models(
+    return len(collection_services.get_collection_summary_dicts_from_models(
         collection_models.CollectionSummaryModel.get_at_least_editable(
             user_id=user_id)))
 
@@ -808,7 +808,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
         # The collection shows up in queries.
         self.assertEqual(
-            _count_at_least_editable_collection_summaries(self.owner_id), 1)
+            count_at_least_editable_collection_summaries(self.owner_id), 1)
 
         collection_services.delete_collection(
             self.owner_id, self.COLLECTION_ID)
@@ -817,7 +817,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # The deleted collection does not show up in any queries.
         self.assertEqual(
-            _count_at_least_editable_collection_summaries(self.owner_id), 0)
+            count_at_least_editable_collection_summaries(self.owner_id), 0)
 
         # But the models still exist in the backend.
         self.assertIn(
@@ -839,7 +839,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.save_new_default_collection(self.COLLECTION_ID, self.owner_id)
         # The collection shows up in queries.
         self.assertEqual(
-            _count_at_least_editable_collection_summaries(self.owner_id), 1)
+            count_at_least_editable_collection_summaries(self.owner_id), 1)
 
         collection_services.delete_collection(
             self.owner_id, self.COLLECTION_ID, force_deletion=True)
@@ -848,7 +848,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # The deleted collection does not show up in any queries.
         self.assertEqual(
-            _count_at_least_editable_collection_summaries(self.owner_id), 0)
+            count_at_least_editable_collection_summaries(self.owner_id), 0)
 
         # The collection model has been purged from the backend.
         self.assertNotIn(
@@ -870,7 +870,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
         # The deleted collection summary does not show up in any queries.
         self.assertEqual(
-            _count_at_least_editable_collection_summaries(self.owner_id), 0)
+            count_at_least_editable_collection_summaries(self.owner_id), 0)
 
         # The collection summary model has been purged from the backend.
         self.assertNotIn(

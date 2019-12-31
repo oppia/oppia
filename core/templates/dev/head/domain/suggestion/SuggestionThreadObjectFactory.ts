@@ -17,82 +17,102 @@
    thread domain objects.
  */
 
-require('domain/suggestion/SuggestionObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('SuggestionThreadObjectFactory', [
-  'SuggestionObjectFactory', function(SuggestionObjectFactory) {
-    var SuggestionThread = function(
-        status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-        threadId, suggestion) {
-      this.status = status;
-      this.subject = subject;
-      this.summary = summary;
-      this.originalAuthorName = originalAuthorName;
-      this.lastUpdated = lastUpdated;
-      this.messageCount = messageCount;
-      this.threadId = threadId;
-      this.suggestion = suggestion;
-      this.messages = [];
-    };
+import { Suggestion, SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
 
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    SuggestionThread['createFromBackendDicts'] = function(
-    /* eslint-enable dot-notation */
-        suggestionThreadBackendDict, suggestionBackendDict) {
-      var suggestion;
-      if (suggestionBackendDict.suggestion_type ===
-          'edit_exploration_state_content') {
-        suggestion = SuggestionObjectFactory.createFromBackendDict(
-          suggestionBackendDict);
-      }
-      return new SuggestionThread(
-        suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
-        suggestionThreadBackendDict.summary,
-        suggestionThreadBackendDict.original_author_username,
-        suggestionThreadBackendDict.last_updated,
-        suggestionThreadBackendDict.message_count,
-        suggestionThreadBackendDict.thread_id, suggestion);
-    };
-
-    SuggestionThread.prototype.setMessages = function(messages) {
-      this.messages = messages;
-    };
-
-    SuggestionThread.prototype.getMessages = function() {
-      return this.messages;
-    };
-
-    SuggestionThread.prototype.isSuggestionHandled = function() {
-      return this.suggestion ? this.suggestion.status !== 'review' : null;
-    };
-
-    SuggestionThread.prototype.getSuggestionStateName = function() {
-      return this.suggestion ? this.suggestion.stateName : null;
-    };
-
-    SuggestionThread.prototype.setSuggestionStatus = function(status) {
-      if (this.suggestion) {
-        this.suggestion.status = status;
-      }
-    };
-
-    SuggestionThread.prototype.getSuggestionStatus = function() {
-      return this.suggestion ? this.suggestion.status : null;
-    };
-
-    SuggestionThread.prototype.getReplacementHtmlFromSuggestion = function() {
-      return this.suggestion ? this.suggestion.newValue.html : null;
-    };
-
-    SuggestionThread.prototype.isSuggestionThread = function() {
-      return true;
-    };
-
-    SuggestionThread.prototype.getSuggestion = function() {
-      return this.suggestion;
-    };
-
-    return SuggestionThread;
+class SuggestionThread {
+  status: string;
+  subject: string;
+  summary: string;
+  originalAuthorName: string;
+  lastUpdated: number;
+  messageCount: number;
+  threadId: string;
+  suggestion: Suggestion;
+  // TODO(#7165): Replace any with exact type.
+  messages: Array<any>;
+  constructor(
+      status: string, subject: string, summary: string,
+      originalAuthorName: string, lastUpdated: number, messageCount: number,
+      threadId: string, suggestion: Suggestion) {
+    this.status = status;
+    this.subject = subject;
+    this.summary = summary;
+    this.originalAuthorName = originalAuthorName;
+    this.lastUpdated = lastUpdated;
+    this.messageCount = messageCount;
+    this.threadId = threadId;
+    this.suggestion = suggestion;
+    this.messages = [];
   }
-]);
+  // TODO(#7165): Replace any with exact type.
+  setMessages(messages: Array<any>): void {
+    this.messages = messages;
+  }
+  // TODO(#7165): Replace any with exact type.
+  getMessages(): Array<any> {
+    return this.messages;
+  }
+
+  isSuggestionHandled(): boolean | null {
+    return this.suggestion ? this.suggestion.status !== 'review' : null;
+  }
+
+  getSuggestionStateName(): string | null {
+    return this.suggestion ? this.suggestion.stateName : null;
+  }
+
+  setSuggestionStatus(status: string): void {
+    if (this.suggestion) {
+      this.suggestion.status = status;
+    }
+  }
+
+  getSuggestionStatus(): string | null {
+    return this.suggestion ? this.suggestion.status : null;
+  }
+
+  getReplacementHtmlFromSuggestion(): string | null {
+    return this.suggestion ? this.suggestion.newValue.html : null;
+  }
+
+  isSuggestionThread(): boolean {
+    return true;
+  }
+
+  getSuggestion(): Suggestion {
+    return this.suggestion;
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SuggestionThreadObjectFactory {
+  constructor(private suggestionObjectFactory: SuggestionObjectFactory) {}
+  // TODO(#7165): Replace 'any' with the exact type.
+  createFromBackendDicts(
+      suggestionThreadBackendDict: any,
+      suggestionBackendDict: any): SuggestionThread {
+    let suggestion;
+    if (suggestionBackendDict.suggestion_type ===
+        'edit_exploration_state_content') {
+      suggestion = this.suggestionObjectFactory.createFromBackendDict(
+        suggestionBackendDict);
+    }
+    return new SuggestionThread(
+      suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
+      suggestionThreadBackendDict.summary,
+      suggestionThreadBackendDict.original_author_username,
+      suggestionThreadBackendDict.last_updated,
+      suggestionThreadBackendDict.message_count,
+      suggestionThreadBackendDict.thread_id, suggestion);
+  }
+}
+
+angular.module('oppia').factory(
+  'SuggestionThreadObjectFactory',
+  downgradeInjectable(SuggestionThreadObjectFactory));

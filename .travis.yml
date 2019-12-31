@@ -8,25 +8,18 @@ services:
 
 branches:
   only:
-  - master
   - develop
   - /^release-\d+\.\d+\.\d+$/
   - /^release-\d+\.\d+\.\d+-hotfix-\d+$/
 
 env:
   jobs:
-    # These lines are commented out because these checks are being run on CircleCI
-    # here: https://circleci.com/gh/oppia/oppia
-    # - RUN_LINT=true
-    # - RUN_FRONTEND_TESTS=true
-    # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
-    # TODO(sll): Reinstate this when we can get it to run in reasonable time.
-    # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
     # TODO(sll): Reinstate this when the load tests are more reliable.
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true EXCLUDE_LOAD_TESTS=false
     - RUN_E2E_TESTS_ACCESSIBILITY=true
     - RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES=true
     - RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES=true
+    - RUN_E2E_TESTS_ADMIN_PAGE=true
     - RUN_E2E_TESTS_COLLECTIONS=true
     - RUN_E2E_TESTS_COMMUNITY_DASHBOARD=true
     - RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES=true
@@ -38,18 +31,17 @@ env:
     - RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB=true
     - RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB=true
     - RUN_E2E_TESTS_EXTENSIONS=true
-    - RUN_E2E_TESTS_FILE_UPLOAD_FEATURES=true
     - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
     - RUN_E2E_TESTS_LEARNER=true
     - RUN_E2E_TESTS_LIBRARY=true
     - RUN_E2E_TESTS_NAVIGATION=true
     - RUN_E2E_TESTS_PREFERENCES=true
+    - RUN_E2E_TESTS_PROFILE_FEATURES=true
     - RUN_E2E_TESTS_PROFILE_MENU=true
     - RUN_E2E_TESTS_PUBLICATION=true
     - RUN_E2E_TESTS_SKILL_EDITOR=true
     - RUN_E2E_TESTS_SUBSCRIPTIONS=true
     - RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD=true
-    - RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR=true
     - RUN_E2E_TESTS_USERS=true
 
 jobs:
@@ -88,20 +80,11 @@ install:
 - python -m scripts.install_third_party_libs
 
 script:
-# These lines are commented out because these checks are being run on CircleCI
-# here: https://circleci.com/gh/oppia/oppia
-# - if [ "$RUN_LINT" == 'true' ]; then python scripts/third_party_size_check.py; python scripts/pre_commit_linter.py --path=. --verbose; fi
-# Travis aborts test run if nothing is printed back to STDOUT for some time.
-# -x is used to avoid that.
-# - if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
-# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests; fi
-# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
-# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
-# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'false' ] && [ "$EXCLUDE_LOAD_TESTS" == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 # Run the e2e tests in the production environment (using --prod_env).
 - if [ "$RUN_E2E_TESTS_ACCESSIBILITY" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="additionalEditorFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="additionalPlayerFeatures" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_ADMIN_PAGE" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="adminPage" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_COLLECTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="collections" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_COMMUNITY_DASHBOARD" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="communityDashboard" --community_dashboard_enabled --prod_env; fi
 - if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="coreEditorAndPlayerFeatures" --prod_env; fi
@@ -113,24 +96,19 @@ script:
 - if [ "$RUN_E2E_TESTS_EXPLORATION_STATISTICS_TAB" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="explorationStatisticsTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXPLORATION_TRANSLATION_TAB" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="explorationTranslationTab" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_EXTENSIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_FILE_UPLOAD_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="fileUploadFeatures"; fi
 - if [ "$RUN_E2E_TESTS_LEARNER_DASHBOARD" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="learnerDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_LEARNER" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="learner" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_LIBRARY" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_NAVIGATION" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="navigation" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PREFERENCES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="preferences" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_PROFILE_FEATURES" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="profileFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PROFILE_MENU" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="profileMenu" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_PUBLICATION" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="publication" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="skillEditor" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="subscriptions" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env; fi
-- if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_USERS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
-# These lines are commented out because these checks are being run on CircleCI
-# here: https://circleci.com/gh/oppia/oppia
-# after_success:
-# - if [ "$RUN_BACKEND_TESTS" == 'true' ] && [ "$REPORT_BACKEND_COVERAGE" == 'true' ]; then codecov; fi
-# - if [ "$RUN_FRONTEND_TESTS" == 'true' ]; then codecov --file ../karma_coverage_reports/coverage-final.json; fi
+
 
 cache:
   # Cache Oppia's dependencies.
