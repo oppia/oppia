@@ -17,44 +17,56 @@
  * story summary domain objects.
  */
 
-angular.module('oppia').factory('StorySummaryObjectFactory', [function() {
-  var StorySummary = function(id, title, nodeCount, storyIsPublished) {
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
+
+export class StorySummary {
+  _id: any;
+  _title: any;
+  _nodeCount: any;
+  _storyIsPublished: any;
+
+  constructor(id, title, nodeCount, storyIsPublished) {
     this._id = id;
     this._title = title;
     this._nodeCount = nodeCount;
     this._storyIsPublished = storyIsPublished;
-  };
+  }
 
-  // Instance methods
-
-  StorySummary.prototype.getId = function() {
+  getId() {
     return this._id;
-  };
+  }
 
-  StorySummary.prototype.getTitle = function() {
+  getTitle() {
     return this._title;
-  };
+  }
 
-  StorySummary.prototype.getNodeCount = function() {
+  getNodeCount() {
     return this._nodeCount;
-  };
+  }
 
-  StorySummary.prototype.isStoryPublished = function() {
+  isStoryPublished() {
     return this._storyIsPublished;
-  };
+  }
+}
 
-
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  StorySummary['createFromBackendDict'] = function(storySummaryBackendDict) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class StorySummaryObjectFactory {
+  createFromBackendDict(storySummaryBackendDict: any): StorySummary {
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
       storySummaryBackendDict.node_count,
       storySummaryBackendDict.story_is_published
     );
-  };
+  }
+}
 
-  return StorySummary;
-}]);
+angular
+  .module('oppia')
+  .factory(
+    'StorySummaryObjectFactory',
+    downgradeInjectable(StorySummaryObjectFactory)
+  );
