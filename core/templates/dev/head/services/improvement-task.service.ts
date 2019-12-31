@@ -71,16 +71,14 @@ angular.module('oppia').factory('ImprovementTaskService', [
        * the future.
        */
       fetchTasks: function() {
-        if (tasksPromise === null) {
-          tasksPromise = $q.all(
-            improvementTaskObjectFactoryRegistry.map(
-              taskFactory => taskFactory.fetchTasks())
-          ).then(tasksFromFactories => {
-            // Flatten the tasks into a single array before returning.
-            return [].concat.apply([], tasksFromFactories);
-          });
-        }
-        return tasksPromise;
+        return $q.all(
+          improvementTaskObjectFactoryRegistry.map(function(taskFactory) {
+            return taskFactory.fetchTasks();
+          })
+        ).then(function(tasksFromFactories) {
+          // Flatten the tasks into a single array before returning.
+          return [].concat.apply([], tasksFromFactories);
+        });
       },
       fetchOpenTaskCount: function() {
         var isTaskOpen = function(task) {
