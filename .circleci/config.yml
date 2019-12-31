@@ -20,13 +20,6 @@ var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppia
-  # Its okay to hardcode the CC_TEST_REPORTER_ID as the only risk in doing so is
-  # when someone uses this test coverage ID to post incorrect coverage data.
-  # This generally does not occur and if it happens, it would be replaced with
-  # data from subsequent coverage payloads. See this comment for more
-  # information: https://github.com/oppia/oppia/pull/7067#issuecomment-508822501
-  environment:
-    CC_TEST_REPORTER_ID: 561968e2f03d3bb4f1aed69dc94174c2e3b9dc82cf1f8ad31fc799f8c67afc6e
   docker:
     - image: *docker_image
 
@@ -35,17 +28,6 @@ anchor_for_installing_dependencies: &install_dependencies
   command: |
     python -m scripts.install_third_party_libs
 
-anchor_for_installing_cc_test_reporter: &install_cc
-  name: Install codeclimate test reporter
-  command: |
-    curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-    chmod +x ./cc-test-reporter
-    ./cc-test-reporter before-build
-
-anchor_for_restoring_cache: &restore_cache
-  keys:
-    - setup-files-cache-{{ checksum "date" }}
-    - third-party-cache-{{ checksum "date" }}
 
 version: 2
 jobs:
@@ -53,21 +35,21 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
       - run:
           <<: *install_dependencies
-      - save_cache:
-          key: setup-files-cache-{{ checksum "date" }}
+      - persist_to_workspace:
+          root: /home/circleci/
           paths:
-            - node_modules/
-            - ../oppia_tools/
+            - oppia/node_modules/
+            - oppia/third_party/
+            - oppia_tools/
 
   lint_tests:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
       - run:
@@ -83,11 +65,10 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
       - run:
           name: Run typescript tests
           command: |
@@ -97,11 +78,10 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
       - run:
           name: Run frontend tests
           command: |
@@ -117,28 +97,14 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
+      - attach_workspace:
+          at: /home/circleci/
       - run:
           <<: *install_dependencies
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
-      - run: sudo pip install webtest
-      - run: sudo pip install coverage
       - run:
           name: Run backend tests
           command: |
             python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
-      - run:
-          <<: *install_cc
-      - run:
-          name: Generate backend coverage report
-          command: |
-            sudo pip install codecov
-            codecov -F backend
-            ./cc-test-reporter format-coverage -t coverage.py coverage.xml
-            ./cc-test-reporter sum-coverage coverage/codeclimate.json
-            ./cc-test-reporter upload-coverage
-          when: on_success
 
 notify:
   webhooks:
