@@ -16,35 +16,25 @@
  * @fileoverview Unit test for DebugInfoTrackerService.
  */
 
-import { UpgradedServices } from 'services/UpgradedServices';
+import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 
-require('services/debug-info-tracker.service.ts');
+describe('DebugInfoTrackerService', () => {
+  let debugInfoTrackerService: DebugInfoTrackerService = null;
 
-describe('DebugInfoTrackerService', function() {
-  var DebugInfoTrackerService = null;
+  beforeEach(() => {
+    debugInfoTrackerService = new DebugInfoTrackerService();
+  });
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    DebugInfoTrackerService = $injector.get('DebugInfoTrackerService');
-  }));
-
-  it('should add new actions', function() {
-    DebugInfoTrackerService.addAction({
+  it('should add new actions', () => {
+    debugInfoTrackerService.addAction({
       index: 1,
       interactionId: 'Continue'
     });
-    DebugInfoTrackerService.addAction({
+    debugInfoTrackerService.addAction({
       index: 2,
       interactionId: 'MultipleChoiceInput'
     });
-    expect(DebugInfoTrackerService.getSequenceOfActions()).toEqual([{
+    expect(debugInfoTrackerService.getSequenceOfActions()).toEqual([{
       index: 1,
       interactionId: 'Continue'
     }, {
@@ -53,16 +43,16 @@ describe('DebugInfoTrackerService', function() {
     }]);
   });
 
-  it('should reset the sequence correctly', function() {
-    DebugInfoTrackerService.addAction({
+  it('should reset the sequence correctly', () => {
+    debugInfoTrackerService.addAction({
       index: 1,
       interactionId: 'Continue'
     });
-    expect(DebugInfoTrackerService.getSequenceOfActions()).toEqual([{
+    expect(debugInfoTrackerService.getSequenceOfActions()).toEqual([{
       index: 1,
       interactionId: 'Continue'
     }]);
-    DebugInfoTrackerService.reset();
-    expect(DebugInfoTrackerService.getSequenceOfActions()).toEqual([]);
+    debugInfoTrackerService.reset();
+    expect(debugInfoTrackerService.getSequenceOfActions()).toEqual([]);
   });
 });

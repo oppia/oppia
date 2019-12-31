@@ -261,11 +261,14 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
         # Setup test variables.
         test_export_thread_type = 'exploration'
         test_export_thread_id = 'export_thread_1'
-        test_export_author_id = 'export_author_1'
         test_export_updated_status = 'open'
         test_export_updated_subject = 'export_subject_1'
         test_export_text = 'Export test text.'
         test_export_received_via_email = False
+
+        self.signup('export_author_1@example.com', 'exportAuthor1')
+        test_export_author_id = (
+            self.get_user_id_from_email('export_author_1@example.com'))
 
         thread_id = feedback_services.create_thread(
             test_export_thread_type,

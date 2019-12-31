@@ -389,7 +389,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     [USER_ID].[THREAD_ID]
     """
 
-    user_id = ndb.StringProperty(required=False, indexed=True)
+    user_id = ndb.StringProperty(required=True, indexed=True)
     thread_id = ndb.StringProperty(required=False, indexed=True)
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)

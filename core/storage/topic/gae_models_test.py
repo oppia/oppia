@@ -43,7 +43,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.save_new_topic(
-            'topic_id', 'owner_id', 'name', 'description', [], [], [], [], 0)
+            'topic_id', 'owner_id', 'name', 'abbrev', None,
+            'description', [], [], [], [], 0)
         self.assertTrue(
             topic_models.TopicModel.has_reference_to_user_id('owner_id'))
         self.assertFalse(
@@ -66,6 +67,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         topic = topic_models.TopicModel(
             id=self.TOPIC_ID,
             name=self.TOPIC_NAME,
+            abbreviated_name='abbrev',
             canonical_name=self.TOPIC_CANONICAL_NAME,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
@@ -96,7 +98,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     def test_get_by_name(self):
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID,
-            name=self.TOPIC_NAME
+            name=self.TOPIC_NAME,
+            abbreviated_name='abbrev'
         )
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         self.assertEqual(

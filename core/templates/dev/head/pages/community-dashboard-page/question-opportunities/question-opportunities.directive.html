@@ -1,7 +1,9 @@
 <div>
-  <opportunities-list data-loading="$ctrl.opportunitiesAreLoading"
+  <opportunities-list opportunity-data-is-loading="$ctrl.opportunitiesAreLoading"
                       opportunities="$ctrl.opportunities"
                       more-available="$ctrl.moreOpportunitiesAvailable"
-                      on-load-more-opportunities="$ctrl.onLoadMoreOpportunities()">
+                      on-click-action-button="$ctrl.onClickSuggestQuestionButton"
+                      on-load-more-opportunities="$ctrl.onLoadMoreOpportunities()"
+                      progress-bar-required="$ctrl.progressBarRequired">
   </opportunities-list>
 </div>
