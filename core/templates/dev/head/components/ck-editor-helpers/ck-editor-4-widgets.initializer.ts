@@ -62,8 +62,8 @@ angular.module('oppia').run([
             template: componentTemplate,
             draggable: false,
             edit: function() {
-              // the following check allows editing of inline RTE components
-              // only in editor pages
+              // The following check allows the editing of the RTE components
+              // only in editor pages.
               if (!ContextService.canAddOrEditComponents()) {
                 return;
               }

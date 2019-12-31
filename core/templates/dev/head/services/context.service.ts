@@ -227,16 +227,15 @@ export class ContextService {
   }
 
   canAddOrEditComponents(): boolean {
-    return (
-      this.getPageContext() ===
-      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR ||
-      this.getPageContext() ===
-      ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR ||
-      this.getPageContext() ===
-      ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR ||
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.STORY_EDITOR ||
-      this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR);
+    var currentPageContext = this.getPageContext();
+    var allowedPageContext = [];
+    allowedPageContext.push(ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
+    allowedPageContext.push(ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR);
+    allowedPageContext.push(ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR);
+    allowedPageContext.push(ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR);
+    allowedPageContext.push(ServicesConstants.PAGE_CONTEXT.STORY_EDITOR);
+    allowedPageContext.push(ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR);
+    return (allowedPageContext.includes(currentPageContext));
   }
 }
 
