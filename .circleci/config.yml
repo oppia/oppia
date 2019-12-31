@@ -148,7 +148,7 @@ jobs:
       - run:
           <<: *install_dependencies
       - run:
-          name: RUN_E2E_TESTS_FILE_UPLOAD_FEATURES
+          name: Run e2e file upload features test
           command: |
             bash scripts/run_e2e_tests.sh --suite="fileUploadFeatures"
   
@@ -161,7 +161,7 @@ jobs:
       - run:
           <<: *install_dependencies
       - run:
-          name: RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR
+          name: Run e2e topic and story editor test
           command: |
             bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor"
 notify:
