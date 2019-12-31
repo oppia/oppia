@@ -27,12 +27,16 @@ import subprocess
 import python_utils
 import release_constants
 
-NODE_VERSION = '10.15.3'
-YARN_VERSION = 'v1.17.3'
+NODE_VERSION = '10.18.0'
+
+# NB: Please ensure that the version is consistent with the version in .yarnrc.
+YARN_VERSION = 'v1.21.1'
+
+COVERAGE_VERSION = '4.5.4'
 
 RELEASE_BRANCH_NAME_PREFIX = 'release-'
 CURR_DIR = os.path.abspath(os.getcwd())
-OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
+OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, os.pardir, 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 GOOGLE_APP_ENGINE_HOME = os.path.join(
     OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine')
@@ -105,7 +109,7 @@ def require_cwd_to_be_oppia(allow_deploy_dir=False):
     current_dirname = os.path.basename(os.path.normpath(os.getcwd()))
     is_deploy_dir = (
         current_dirname.startswith('deploy-') and
-        os.path.isdir(os.path.join(os.getcwd(), '..', 'oppia')))
+        os.path.isdir(os.path.join(os.getcwd(), os.pardir, 'oppia')))
 
     if is_oppia_dir or (allow_deploy_dir and is_deploy_dir):
         return
@@ -416,6 +420,21 @@ def check_prs_for_current_release_are_released(repo):
                 'There are PRs for current release which do not have '
                 'a \'PR: released\' label. Please ensure that they are '
                 'released before release summary generation.')
+
+
+def convert_to_posixpath(file_path):
+    """Converts a Windows style filepath to posixpath format. If the operating
+    system is not Windows, this function does nothing.
+
+    Args:
+        file_path: str. The path to be converted.
+
+    Returns:
+        str. Returns a posixpath version of the file path.
+    """
+    if not is_windows_os():
+        return file_path
+    return file_path.replace('\\', '/')
 
 
 class CD(python_utils.OBJECT):

@@ -23,6 +23,7 @@ from core.domain import collection_jobs_one_off
 from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
+from core.domain import feedback_jobs_one_off
 from core.domain import opportunity_jobs_one_off
 from core.domain import prod_validation_jobs_one_off
 from core.domain import question_jobs_one_off
@@ -54,7 +55,9 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
+    feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
+    opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
@@ -75,8 +78,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    user_jobs_one_off.UserGaeIdOneOffJob
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
