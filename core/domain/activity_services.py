@@ -93,18 +93,18 @@ def remove_featured_activities(activity_type, activity_ids):
     """
     featured_references = get_featured_activity_references()
 
-    activity_references_found = []
+    activity_references_ids_found = []
     new_activity_references = []
     for reference in featured_references:
         if reference.type != activity_type or reference.id not in activity_ids:
             new_activity_references.append(reference)
         else:
-            activity_references_found.append(reference.id)
+            activity_references_ids_found.append(reference.id)
 
-    if activity_references_found:
+    if activity_references_ids_found:
         # It is quite unusual for a featured activity to be unpublished or
         # deleted, so we log a message.
-        for activity_id in activity_references_found:
+        for activity_id in activity_references_ids_found:
             logging.info(
                 'The %s with id %s was removed from the featured list.' % (
                     activity_type, activity_id))
