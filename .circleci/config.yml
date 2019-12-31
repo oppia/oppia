@@ -15,7 +15,10 @@ workflows:
       - backend_tests:
           requires:
             - setup
-      - e2e_tests:
+      - e2e_file_upload_features:
+          requires:
+            - setup
+      - e2e_topic_and_story_editory:
           requires:
             - setup
 
@@ -136,7 +139,7 @@ jobs:
             ./cc-test-reporter upload-coverage
           when: on_success
 
-  e2e_tests:
+  e2e_file_upload_features:
     <<: *job_defaults
     steps:
       - checkout
@@ -148,6 +151,15 @@ jobs:
           name: RUN_E2E_TESTS_FILE_UPLOAD_FEATURES
           command: |
             bash scripts/run_e2e_tests.sh --suite="fileUploadFeatures"
+  
+  e2e_topic_and_story_editory:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          <<: *install_dependencies
       - run:
           name: RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR
           command: |
