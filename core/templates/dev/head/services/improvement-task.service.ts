@@ -71,13 +71,13 @@ angular.module('oppia').factory('ImprovementTaskService', [
        * the future.
        */
       fetchTasks: function() {
-          tasksPromise = $q.all(
-            improvementTaskObjectFactoryRegistry.map(
-              taskFactory => taskFactory.fetchTasks())
-          ).then(tasksFromFactories => {
-            // Flatten the tasks into a single array before returning.
-            return [].concat.apply([], tasksFromFactories);
-          });
+        tasksPromise = $q.all(
+          improvementTaskObjectFactoryRegistry.map(
+            taskFactory => taskFactory.fetchTasks())
+        ).then(tasksFromFactories => {
+          // Flatten the tasks into a single array before returning.
+          return [].concat.apply([], tasksFromFactories);
+        });
         return tasksPromise;
       },
       fetchOpenTaskCount: function() {
