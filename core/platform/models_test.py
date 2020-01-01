@@ -180,6 +180,23 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         with self.assertRaises(Exception):
             self.registry_instance.import_models([''])
 
+    def test_get_all_storage_model_classes(self):
+        """Tests get_all_storage_model_classes."""
+        from core.storage.base_model import gae_models as base_models
+        from core.storage.exploration import gae_models as exp_models
+        from core.storage.user import gae_models as user_models
+        classes = self.registry_instance.get_all_storage_model_classes()
+        self.assertIn(exp_models.ExplorationModel, classes)
+        self.assertIn(exp_models.ExplorationSnapshotContentModel, classes)
+        self.assertIn(exp_models.ExplorationSnapshotMetadataModel, classes)
+        self.assertIn(user_models.UserSettingsModel, classes)
+        self.assertIn(user_models.CompletedActivitiesModel, classes)
+        self.assertNotIn(base_models.BaseModel, classes)
+        self.assertNotIn(base_models.BaseCommitLogEntryModel, classes)
+        self.assertNotIn(base_models.VersionedModel, classes)
+        self.assertNotIn(base_models.BaseSnapshotMetadataModel, classes)
+        self.assertNotIn(base_models.BaseSnapshotContentModel, classes)
+
     def test_import_current_user_services(self):
         """Tests import current user services function."""
         from core.platform.users import gae_current_user_services
