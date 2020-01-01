@@ -31,7 +31,9 @@ from core.platform import models
          models.NAMES.exploration, models.NAMES.feedback,
          models.NAMES.suggestion, models.NAMES.user])
 
+
 def get_models_to_export():
+    """Returns set of all models whose data to export."""
     return {
         'collection_rights_data',
         'general_feedback_email_reply_to_id_data',
@@ -53,6 +55,7 @@ def get_models_to_export():
         'user_stats_data',
         'user_subscriptions_data'
     }
+
 
 def export_data_for_user(user_id):
     """Exports selected models according to model defined export_data functions.

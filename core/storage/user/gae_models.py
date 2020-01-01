@@ -694,6 +694,7 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    @staticmethod
     def get_user_id_migration_policy():
         """UserEmailPreferencesModel has ID that contains user ID and needs to
         be replaced.
@@ -813,6 +814,7 @@ class UserSubscribersModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    @staticmethod
     def get_user_id_migration_policy():
         """UserSubscribersModel has ID that contains user ID and needs to be
         replaced.
@@ -856,6 +858,7 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    @staticmethod
     def get_user_id_migration_policy():
         """UserRecentChangesBatchModel has ID that contains user ID and needs to
         be replaced.
@@ -1640,6 +1643,7 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    @staticmethod
     def get_user_id_migration_policy():
         """UserBulkEmailsModel has ID that contains user ID and needs to be
         replaced.

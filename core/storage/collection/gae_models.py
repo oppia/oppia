@@ -218,6 +218,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
+    @staticmethod
     def transform_dict_to_valid(model_dict):
         """Replace invalid fields and values in the CollectionRightsModel dict.
 

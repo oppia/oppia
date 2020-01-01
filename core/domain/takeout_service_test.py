@@ -31,12 +31,12 @@ import inspect
 import re
 
 (
-    base_models, collection_models, email_models, exploration_models, 
-    feedback_models, suggestion_models, 
+    base_models, collection_models, email_models, exploration_models,
+    feedback_models, suggestion_models,
     user_models) = models.Registry.import_models([
-        models.NAMES.base_model, models.NAMES.collection, models.NAMES.email, 
-        models.NAMES.exploration, models.NAMES.feedback, models.NAMES.suggestion,
-        models.NAMES.user])
+        models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
+        models.NAMES.exploration, models.NAMES.feedback,
+        models.NAMES.suggestion, models.NAMES.user])
 
 
 class TakeoutServiceUnitTests(test_utils.GenericTestBase):
@@ -620,7 +620,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
         self.assertEqual(exported_data, expected_export)
-    
+
+
     def test_get_models_to_export(self):
         """Ensure that the set of models to export is the set of models with
         export policy CONTAINS_USER_DATA, and that all other models have
@@ -630,14 +631,14 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         model_names_list = [
             model_name
             for model_name in dir(models.NAMES)
-            if not model_name.startswith('__') and not model_name == 'base_model'
+            if not (model_name.startswith('__') and model_name == 'base_model')
         ]
         model_modules = models.Registry.import_models(model_names_list)
         for model_module in model_modules:
             for _, obj in inspect.getmembers(model_module):
                 if inspect.isclass(obj):
                     all_models.append(obj)
-        
+
         models_to_export = takeout_service.get_models_to_export()
         for model in all_models:
             export_policy = model.get_export_policy()
