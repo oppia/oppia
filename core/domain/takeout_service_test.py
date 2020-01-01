@@ -27,12 +27,16 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
+import inspect
+import re
 
 (
-    collection_models, email_models, exploration_models, feedback_models,
-    suggestion_models, user_models) = models.Registry.import_models([
-        models.NAMES.collection, models.NAMES.email, models.NAMES.exploration,
-        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user])
+    base_models, collection_models, email_models, exploration_models, 
+    feedback_models, suggestion_models, 
+    user_models) = models.Registry.import_models([
+        models.NAMES.base_model, models.NAMES.collection, models.NAMES.email, 
+        models.NAMES.exploration, models.NAMES.feedback, models.NAMES.suggestion,
+        models.NAMES.user])
 
 
 class TakeoutServiceUnitTests(test_utils.GenericTestBase):
@@ -616,3 +620,38 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         exported_data = takeout_service.export_data_for_user(self.USER_ID_1)
         self.assertEqual(exported_data, expected_export)
+    
+    def test_get_models_to_export(self):
+        """Ensure that the set of models to export is the set of models with
+        export policy CONTAINS_USER_DATA, and that all other models have
+        export policy NOT_APPLICABLE.
+        """
+        all_models = []
+        model_names_list = [
+            model_name
+            for model_name in dir(models.NAMES)
+            if not model_name.startswith('__') and not model_name == 'base_model'
+        ]
+        model_modules = models.Registry.import_models(model_names_list)
+        for model_module in model_modules:
+            for _, obj in inspect.getmembers(model_module):
+                if inspect.isclass(obj):
+                    all_models.append(obj)
+        
+        models_to_export = takeout_service.get_models_to_export()
+        for model in all_models:
+            export_policy = model.get_export_policy()
+            # Split the model name by uppercase characters.
+            split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
+            # Join the split name with underscores and add _data for final name.
+            final_name = ('_').join([x.lower() for x in split_name]) + '_data'
+            if final_name in models_to_export:
+                self.assertEqual(
+                    base_models.EXPORT_POLICY.CONTAINS_USER_DATA,
+                    export_policy
+                )
+            else:
+                self.assertEqual(
+                    base_models.EXPORT_POLICY.NOT_APPLICABLE,
+                    export_policy
+                )

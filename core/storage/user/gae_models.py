@@ -1420,7 +1420,7 @@ class UserQueryModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
     @classmethod
@@ -1601,7 +1601,7 @@ class UserContributionScoringModel(base_models.BaseModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
     @classmethod

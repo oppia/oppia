@@ -404,7 +404,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     @staticmethod
     def get_export_policy():
         """Model contains user data."""
-        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_multi(cls, exp_id, exp_versions):

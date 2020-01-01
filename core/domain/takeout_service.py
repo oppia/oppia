@@ -31,6 +31,28 @@ from core.platform import models
          models.NAMES.exploration, models.NAMES.feedback,
          models.NAMES.suggestion, models.NAMES.user])
 
+def get_models_to_export():
+    return {
+        'collection_rights_data',
+        'general_feedback_email_reply_to_id_data',
+        'exploration_rights_data',
+        'general_feedback_message_data',
+        'general_feedback_thread_data',
+        'general_feedback_thread_user_data',
+        'general_suggestion_data',
+        'collection_progress_data',
+        'completed_activities_data',
+        'exp_user_last_playthrough_data',
+        'exploration_user_data_data',
+        'incomplete_activities_data',
+        'learner_playlist_data',
+        'story_progress_data',
+        'user_contributions_data',
+        'user_settings_data',
+        'user_skill_mastery_data',
+        'user_stats_data',
+        'user_subscriptions_data'
+    }
 
 def export_data_for_user(user_id):
     """Exports selected models according to model defined export_data functions.
@@ -58,15 +80,13 @@ def export_data_for_user(user_id):
                 all_models.append(obj)
 
     exported_data = dict()
+    models_to_export = get_models_to_export()
     for model in all_models:
-        if (model.get_export_policy()
-                == base_models.EXPORT_POLICY.NOT_APPLICABLE):
-            continue
         # Split the model name by uppercase characters.
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
         # Join the split name with underscores and add _data for final name.
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
-        exported_data[final_name] = model.export_data(user_id)
-
+        if final_name in models_to_export:
+            exported_data[final_name] = model.export_data(user_id)
     # Combine the data into a single dictionary.
     return exported_data
