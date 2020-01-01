@@ -300,6 +300,7 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """
         return base_models.USER_ID_MIGRATION_POLICY.COPY
 
+
     @staticmethod
     def export_data(user_id):
         """(Takeout) Export CompletedActivitiesModel's user properties.
