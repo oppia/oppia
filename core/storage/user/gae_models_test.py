@@ -1881,3 +1881,9 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)

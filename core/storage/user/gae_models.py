@@ -1829,3 +1829,10 @@ class PendingDeletionRequestModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """PendingDeletionRequestModel is going to be used later and only as
+        a temporary model, so it doesn't need to be migrated.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
