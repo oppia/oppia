@@ -51,10 +51,9 @@ describe('Context service', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
 
-    it('should correctly check that page allows editing of RTE components',
-      () => {
-        expect(ecs.canAddOrEditComponents()).toBe(false);
-      });
+    it('should affirm that the page forbids editing of RTE components', () => {
+      expect(ecs.canAddOrEditComponents()).toBe(false);
+    });
   });
 
   describe('behavior in the exploration learner embed view', () => {
@@ -87,10 +86,9 @@ describe('Context service', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
 
-    it('should correctly check that page allows editing of RTE components',
-      () => {
-        expect(ecs.canAddOrEditComponents()).toBe(false);
-      });
+    it('should affirm that the page forbids editing of RTE components', () => {
+      expect(ecs.canAddOrEditComponents()).toBe(false);
+    });
   });
 
   describe('behavior in the exploration editor view', () => {
