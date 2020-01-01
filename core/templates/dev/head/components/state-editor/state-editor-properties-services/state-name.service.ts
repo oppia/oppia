@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current interaction hints.
+ * @fileoverview A data service that stores the current state name.
  */
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
@@ -27,26 +27,26 @@ import { UtilsService } from 'services/utils.service';
 @Injectable({
   providedIn: 'root'
 })
-export class StateHintsService extends StatePropertyService {
-  private activeHintIndex: any;
+export class StateNameService extends StatePropertyService {
+  private stateNameEditorIsShown: boolean = false;
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
-    this.setterMethodKey = 'saveHints';
+    this.setterMethodKey = 'saveName';
   }
 
-  getActiveHintIndex(): any {
-    return this.activeHintIndex;
+  isStateNameEditorShown(): boolean {
+    return this.stateNameEditorIsShown;
   }
 
-  setActiveHintIndex(index: any): void {
-    this.activeHintIndex = index;
+  setStateNameEditorVisibility(value: boolean): void {
+    this.stateNameEditorIsShown = value;
   }
 
   init(stateName: string, value: any): void {
     super.init(stateName, value);
-    this.setActiveHintIndex(null);
+    this.setStateNameEditorVisibility(false);
   }
 }
 
 angular.module('oppia').factory(
-  'StateHintsService', downgradeInjectable(StateHintsService));
+  'StateNameService', downgradeInjectable(StateNameService));

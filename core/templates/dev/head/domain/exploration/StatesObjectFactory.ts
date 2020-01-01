@@ -47,7 +47,7 @@ export class States {
       newStateName);
   }
   setState(stateName: string, stateData: any): void {
-    this._states[stateName] = Object.assign({}, stateData);
+    this._states[stateName].copy(stateData);
   }
   hasState(stateName: string): boolean {
     return this._states.hasOwnProperty(stateName);
