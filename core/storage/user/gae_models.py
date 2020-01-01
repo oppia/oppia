@@ -270,6 +270,10 @@ class CompletedActivitiesModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether CompletedActivitiesModel exists for user.
 
@@ -329,6 +333,10 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -396,6 +404,11 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         contains information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -509,6 +522,10 @@ class LearnerPlaylistModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether LearnerPlaylistModel exists for user.
 
@@ -572,6 +589,10 @@ class UserContributionsModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -643,6 +664,10 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether UserEmailPreferencesModel exists for user.
 
@@ -688,6 +713,10 @@ class UserSubscriptionsModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -752,6 +781,10 @@ class UserSubscribersModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether UserSubscribersModel exists for user.
 
@@ -789,6 +822,10 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -866,6 +903,10 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -983,6 +1024,10 @@ class ExplorationUserDataModel(base_models.BaseModel):
         ratings.
         """
         return base_models.DELETION_POLICY.ANONYMIZE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        pass  # TODO
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1132,6 +1177,11 @@ class CollectionProgressModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1288,6 +1338,11 @@ class StoryProgressModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1472,6 +1527,11 @@ class UserQueryModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_multi(
+            cls.query(cls.submitter_id == user_id).fetch(keys_only=True))
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether UserQueryModel exists for user.
 
@@ -1541,6 +1601,10 @@ class UserBulkEmailsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether UserBulkEmailsModel exists for user.
 
@@ -1581,6 +1645,11 @@ class UserSkillMasteryModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1659,6 +1728,11 @@ class UserContributionScoringModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
