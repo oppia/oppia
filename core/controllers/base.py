@@ -148,6 +148,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.user_id = None
         self.username = None
         self.partially_logged_in = False
+        self.user_is_scheduled_for_deletion = False
 
         if self.gae_id:
             user_settings = user_services.get_user_settings_by_gae_id(
@@ -158,6 +159,8 @@ class BaseHandler(webapp2.RequestHandler):
                     self.gae_id, email)
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
+
+            self.user_is_scheduled_for_deletion = user_settings.to_be_deleted
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
                     user_services.has_fully_registered(user_settings.user_id)):
@@ -212,7 +215,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         # In DEV_MODE, clearing cookies does not log out the user, so we
         # force-clear them by redirecting to the logout URL.
-        if constants.DEV_MODE and self.partially_logged_in:
+        if ((constants.DEV_MODE and self.partially_logged_in) or
+                self.user_is_scheduled_for_deletion):
             self.redirect(
                 current_user_services.create_logout_url(self.request.uri))
             return

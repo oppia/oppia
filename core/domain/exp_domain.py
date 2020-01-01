@@ -3795,3 +3795,23 @@ class ExplorationSummary(python_utils.OBJECT):
             'title': self.title,
             'objective': self.objective,
         }
+
+    def is_private(self):
+        """Checks whether the exploration is private.
+
+        Returns:
+            bool. Whether the exploration is private.
+        """
+        return self.status == constants.ACTIVITY_STATUS_PRIVATE
+
+    def is_solely_owned_by_user(self, user_id):
+        """Checks whether the exploration is solely owned by the user.
+
+        Args:
+            user_id: str. The id of the user.
+
+        Returns:
+            bool. Whether the exploration is solely owned by the user.
+        """
+        return user_id in self.owner_ids and len(self.owner_ids) == 1
+

@@ -774,6 +774,23 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
 
 
 
+class DeleteAccountHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(DeleteAccountHandlerTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+
+    def test_delete_delete_account_page(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+            data = self.delete_json('/delete-account-handler')
+            self.assertEqual(data, {'success': True})
+
+    def test_delete_delete_account_page_disabled(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
+            self.delete_json('/delete-account-handler', expected_status_int=404)
+
+
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
     def test_username_check(self):

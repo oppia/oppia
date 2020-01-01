@@ -137,20 +137,12 @@ class CreatorDashboardHandler(base.BaseHandler):
             return python_utils.ROUND(
                 rating, feconf.AVERAGE_RATINGS_DASHBOARD_PRECISION)
 
-        # We need to do the filtering because some activities that were
-        # originally subscribed to may have been deleted since.
-        subscribed_exploration_summaries = [
-            summary for summary in
-            exp_fetchers.get_exploration_summaries_matching_ids(
-                subscription_services.get_exploration_ids_subscribed_to(
-                    self.user_id))
-            if summary is not None]
-        subscribed_collection_summaries = [
-            summary for summary in
-            collection_services.get_collection_summaries_matching_ids(
-                subscription_services.get_collection_ids_subscribed_to(
-                    self.user_id))
-            if summary is not None]
+        subscribed_exploration_summaries = (
+            exp_fetchers.get_exploration_summaries_subscribed_to(
+                self.user_id))
+        subscribed_collection_summaries = (
+            collection_services.get_collection_summaries_subscribed_to(
+                self.user_id))
 
         exploration_ids_subscribed_to = [
             summary.id for summary in subscribed_exploration_summaries]

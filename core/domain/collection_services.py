@@ -36,6 +36,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -526,6 +527,24 @@ def get_collection_summaries_matching_ids(collection_ids):
         for model in collection_models.CollectionSummaryModel.get_multi(
             collection_ids)]
 
+
+def get_collection_summaries_subscribed_to(user_id):
+    """Returns a list of CollectionSummary domain objects that the user
+    subscribes to.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(CollectionSummary). List of CollectionSummary domain objects that
+        the user subscribes to.
+    """
+    return [
+        summary for summary in
+        get_collection_summaries_matching_ids(
+            subscription_services.get_collection_ids_subscribed_to(user_id)
+        ) if summary is not None
+    ]
 
 # TODO(bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this

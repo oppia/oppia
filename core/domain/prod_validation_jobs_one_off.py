@@ -5085,6 +5085,68 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
             cls._validate_score]
 
 
+class PendingDeletionRequestModelValidator(BaseUserModelValidator):
+    """Class for validating PendingDeletionRequestModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (user_models.UserSettingsModel, [item.id]),
+        }
+
+    @classmethod
+    def _validate_explorations_are_marked_deleted(cls, item):
+        """Validates that explorations for model are marked as deleted.
+
+        Args:
+            item: ndb.Model. BaseUserModel to validate.
+        """
+        exp_ids = cls._get_exp_ids(item)
+        not_marked_exp_ids = []
+        for exp_id in exp_ids:
+            exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
+            if exp_model is None or not exp_model.deleted:
+                not_marked_exp_ids.append(exp_id)
+
+        if not_marked_exp_ids:
+            cls.errors['deleted exploration check'].append(
+                'Entity id %s: Explorations with ids %s are not marked as '
+                'deleted' % (item.id, not_marked_exp_ids))
+
+    @classmethod
+    def _validate_collections_are_marked_deleted(cls, item):
+        """Validates that collections for model are marked as deleted.
+
+        Args:
+            item: ndb.Model. BaseUserModel to validate.
+        """
+        col_ids = cls._get_col_ids(item)
+        not_marked_col_ids = []
+        for col_id in col_ids:
+            col_model = collection_models.CollectionModel.get_by_id(col_id)
+            if col_model is None or not col_model.deleted:
+                not_marked_col_ids.append(col_id)
+
+        if not_marked_col_ids:
+            cls.errors['deleted collection check'].append(
+                'Entity id %s: Collections with ids %s are not marked as '
+                'deleted' % (item.id, not_marked_col_ids))
+
+    @classmethod
+    def _get_exp_ids(cls, item):
+        return item.exploration_ids
+
+    @classmethod
+    def _get_col_ids(cls, item):
+        return item.collection_ids
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_explorations_are_marked_deleted,
+            cls._validate_collections_are_marked_deleted]
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -5231,7 +5293,9 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.UserBulkEmailsModel: UserBulkEmailsModelValidator,
     user_models.UserSkillMasteryModel: UserSkillMasteryModelValidator,
     user_models.UserContributionScoringModel: (
-        UserContributionScoringModelValidator)
+        UserContributionScoringModelValidator),
+    user_models.PendingDeletionRequestModel: (
+        PendingDeletionRequestModelValidator)
 }
 
 
@@ -6106,3 +6170,12 @@ class UserContributionScoringModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserContributionScoringModel]
+
+
+class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates PendingDeletionRequestModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.PendingDeletionRequestModel]
+

@@ -36,7 +36,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     """Tests for UserSettingsModel class."""
 
     NONEXISTENT_USER_ID = 'id_x'
-    NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
     USER_1_GAE_ID = 'gae_id'
     USER_1_EMAIL = 'user@example.com'
@@ -1851,3 +1850,40 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
+    """Tests for PendingDeletionRequestModel."""
+
+    NONEXISTENT_USER_ID = 'id_x'
+    USER_1_ID = 'user_1_id'
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(PendingDeletionRequestModelTests, self).setUp()
+
+        user_models.PendingDeletionRequestModel(
+            id=self.USER_1_ID,
+            exploration_ids=[],
+            collection_ids=[],
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            user_models.PendingDeletionRequestModel
+            .has_reference_to_user_id(self.USER_1_ID)
+        )
+        self.assertFalse(
+            user_models.PendingDeletionRequestModel
+            .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
+        )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
