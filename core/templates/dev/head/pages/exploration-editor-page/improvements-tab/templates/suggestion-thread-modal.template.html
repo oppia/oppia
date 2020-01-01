@@ -44,7 +44,7 @@
       <p ng-if="m.message_id === 0" class="protractor-test-improvements-thread-message-body">
         <[activeThread.subject]>
       </p>
-      <button ng-click="openSuggestionReviewer(activeThread)" ng-if="m.message_id === 0"
+      <button ng-click="onClickReviewSuggestion()" ng-if="m.message_id === 0"
               class="btn btn-primary protractor-test-improvements-review-suggestion-button">
         Review Suggestion
       </button>
