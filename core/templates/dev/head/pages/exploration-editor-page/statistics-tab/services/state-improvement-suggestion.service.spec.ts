@@ -20,7 +20,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { CamelCaseToHyphensPipe } from
   'filters/string-utility-filters/camel-case-to-hyphens.pipe';
-import { StateImprovementSuggestionService } from
+import { StateImprovementSuggestionService, StateStats } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
 import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
@@ -304,8 +304,16 @@ describe('StateImprovementSuggestionService', () => {
         },
       }
     };
-    // TODO(#7165): Replace any with exact type.
-    var _createState = (destStateName: any): any => {
+    /* eslint-disable camelcase */
+    interface InteractionType {
+      interaction: {
+        default_outcome?: {
+          dest: string
+        }
+      }
+    }
+    /* eslint-enable camelcase */
+    var _createState = (destStateName: string): InteractionType => {
       // Only a partial state definition is needed for these tests.
       if (destStateName) {
         return {
@@ -322,25 +330,22 @@ describe('StateImprovementSuggestionService', () => {
         };
       }
     };
-    // TODO(#7165): Replace any with exact type.
-    var _createDefaultStateStats = (): any => {
+    var _createDefaultStateStats = (): StateStats => {
       return {
         total_entry_count: 0,
         no_submitted_answer_count: 0
       };
     };
-    // TODO(#7165): Replace any with exact type.
-    var _enterStateWithoutAnswer = (stateStats: any): void => {
+    var _enterStateWithoutAnswer = (
+        stateStats: StateStats): void => {
       stateStats.total_entry_count++;
     };
-    // TODO(#7165): Replace any with exact type.
-    var _answerIncorrectly = (stateStats: any): void => {
+    var _answerIncorrectly = (stateStats: StateStats): void => {
       stateStats.total_entry_count++;
       stateStats.no_submitted_answer_count++;
     };
 
-    // TODO(#7165): Replace any with exact type.
-    var _answerDefaultOutcome = (stateStats: any): void => {
+    var _answerDefaultOutcome = (stateStats: StateStats): void => {
       stateStats.total_entry_count++;
     };
 
