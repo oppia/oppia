@@ -87,3 +87,28 @@ def verify_user_deleted(pending_deletion_model):
         pending_deletion_model: PendingDeletionRequestModel.
     """
     pass
+
+def delete_user_models(user_id):
+    """Smth.
+
+    Args:
+        user_id: PendingDeletionRequestModel.
+    """
+    user_models.UserSettingsModel.apply_deletion_policy(user_id)
+    user_models.CompletedActivitiesModel.apply_deletion_policy(user_id)
+    user_models.IncompleteActivitiesModel.apply_deletion_policy(user_id)
+    user_models.ExpUserLastPlaythroughModel.apply_deletion_policy(user_id)
+    user_models.LearnerPlaylistModel.apply_deletion_policy(user_id)
+    user_models.UserContributionsModel.apply_deletion_policy(user_id)
+    user_models.UserEmailPreferencesModel.apply_deletion_policy(user_id)
+    user_models.UserSubscriptionsModel.apply_deletion_policy(user_id)
+    user_models.UserSubscribersModel.apply_deletion_policy(user_id)
+    user_models.UserRecentChangesBatchModel.apply_deletion_policy(user_id)
+    user_models.UserStatsModel.apply_deletion_policy(user_id)
+    # TODO(): ExplorationUserDataModel
+    user_models.CollectionProgressModel.apply_deletion_policy(user_id)
+    user_models.StoryProgressModel.apply_deletion_policy(user_id)
+    user_models.UserQueryModel.apply_deletion_policy(user_id)
+    user_models.UserBulkEmailsModel.apply_deletion_policy(user_id)
+    user_models.UserSkillMasteryModel.apply_deletion_policy(user_id)
+    user_models.UserContributionScoringModel.apply_deletion_policy(user_id)

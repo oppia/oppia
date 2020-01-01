@@ -117,6 +117,10 @@ class UserSettingsModel(base_models.BaseModel):
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_by_id(user_id)
+
+    @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether UserSettingsModel exists for user.
 
@@ -1024,10 +1028,6 @@ class ExplorationUserDataModel(base_models.BaseModel):
         ratings.
         """
         return base_models.DELETION_POLICY.ANONYMIZE
-
-    @classmethod
-    def apply_deletion_policy(cls, user_id):
-        pass  # TODO
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
