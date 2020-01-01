@@ -1088,6 +1088,20 @@ def record_user_logged_in(user_id):
     _save_user_settings(user_settings)
 
 
+def update_last_logged_in(user_settings, new_last_logged_in):
+    """Updates last_logged_in to the new given datetime for the user with
+    given user_settings. Should only be used by tests.
+
+    Args:
+        user_settings: UserSettings. The UserSettings domain object.
+        new_last_logged_in: datetime or None. The new datetime of the last
+            logged in session.
+    """
+
+    user_settings.last_logged_in = new_last_logged_in
+    _save_user_settings(user_settings)
+
+
 def record_user_edited_an_exploration(user_id):
     """Updates last_edited_an_exploration to the current datetime for
     the user with given user_id.
