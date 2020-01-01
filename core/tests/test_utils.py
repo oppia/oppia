@@ -1382,7 +1382,7 @@ tags: []
             self, story_id, owner_id, title, description, notes,
             corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new skill with a default version 1 story contents
+        """Saves a new story with a default version 1 story contents
         data dictionary.
 
         This function should only be used for creating stories in tests

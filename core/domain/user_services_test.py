@@ -1335,7 +1335,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_get_human_readable_user_ids(self):
         # Create an unregistered user who has no username.
         user_models.UserSettingsModel(
-            id='unregistered_user_id', email='user@example.com',
+            id='unregistered_user_id',
+            gae_id='gae_unregistered_user_id',
+            email='user@example.com',
             username='').put()
 
         user_ids = user_services.get_human_readable_user_ids(
