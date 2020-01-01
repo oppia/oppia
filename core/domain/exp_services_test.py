@@ -536,7 +536,30 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # The exploration summary is deleted, however.
         self.assertIsNone(exp_models.ExpSummaryModel.get_by_id(self.EXP_0_ID))
 
-    def test_soft_deletion_of_exploration(self):
+        # The delete commit exists.
+        self.assertIsNotNone(
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-%s-%s' % (self.EXP_0_ID, 1)))
+
+        # The snapshot models exist.
+        exp_snapshot_id = (
+            exp_models.ExplorationModel.get_snapshot_id(self.EXP_0_ID, 1))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                exp_snapshot_id))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get_by_id(
+                exp_snapshot_id))
+        exp_rights_snapshot_id = (
+            exp_models.ExplorationRightsModel.get_snapshot_id(self.EXP_0_ID, 1))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                exp_rights_snapshot_id))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                exp_rights_snapshot_id))
+
+    def test_soft_deletion_of_multiple_explorations(self):
         """Test that soft deletion of explorations works correctly."""
         # TODO(sll): Add tests for deletion of states and version snapshots.
 
@@ -567,6 +590,48 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertIsNone(exp_models.ExpSummaryModel.get_by_id(self.EXP_0_ID))
         self.assertIsNone(exp_models.ExpSummaryModel.get_by_id(self.EXP_1_ID))
 
+        # The delete commits exist.
+        self.assertIsNotNone(
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-%s-%s' % (self.EXP_0_ID, 1)))
+        self.assertIsNotNone(
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exploration-%s-%s' % (self.EXP_1_ID, 1)))
+
+        # The snapshot models exist.
+        exp_0_snapshot_id = (
+            exp_models.ExplorationModel.get_snapshot_id(self.EXP_0_ID, 1))
+        exp_1_snapshot_id = (
+            exp_models.ExplorationModel.get_snapshot_id(self.EXP_1_ID, 1))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                exp_0_snapshot_id))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get_by_id(
+                exp_0_snapshot_id))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
+                exp_1_snapshot_id))
+        self.assertIsNotNone(
+            exp_models.ExplorationSnapshotContentModel.get_by_id(
+                exp_1_snapshot_id))
+        exp_0_rights_snapshot_id = (
+            exp_models.ExplorationRightsModel.get_snapshot_id(self.EXP_0_ID, 1))
+        exp_1_rights_snapshot_id = (
+            exp_models.ExplorationRightsModel.get_snapshot_id(self.EXP_1_ID, 1))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                exp_0_rights_snapshot_id))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                exp_0_rights_snapshot_id))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                exp_1_rights_snapshot_id))
+        self.assertIsNotNone(
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                exp_1_rights_snapshot_id))
+
     def test_hard_deletion_of_exploration(self):
         """Test that hard deletion of exploration works correctly."""
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
@@ -587,7 +652,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertIsNone(
             exp_models.ExplorationModel.get_by_id(self.EXP_0_ID))
 
-    def test_hard_deletion_of_explorations(self):
+    def test_hard_deletion_of_multiple_explorations(self):
         """Test that hard deletion of explorations works correctly."""
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
         self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)

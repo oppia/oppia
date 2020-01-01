@@ -198,11 +198,11 @@ class ExplorationModel(base_models.VersionedModel):
         committer_username = (
             committer_user_settings_model.username
             if committer_user_settings_model else '')
+
         commit_log_models = []
         exp_rights_models = ExplorationRightsModel.get_multi(
             [model.id for model in models], include_deleted=True)
         for model, rights_model in python_utils.ZIP(models, exp_rights_models):
-
             exploration_commit_log = ExplorationCommitLogEntryModel.create(
                 model.id, model.version, committer_id, committer_username,
                 commit_type, commit_message, commit_cmds, rights_model.status,

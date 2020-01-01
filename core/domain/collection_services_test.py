@@ -822,7 +822,6 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
 
     def test_soft_deletion_of_collection(self):
         """Test that soft deletion of collection works correctly."""
-        # TODO(sll): Add tests for deletion of states and version snapshots.
         self.save_new_default_collection(self.COLLECTION_0_ID, self.owner_id)
 
         # The collection shows up in queries.
@@ -846,6 +845,31 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertIsNone(
             collection_models.CollectionSummaryModel
             .get_by_id(self.COLLECTION_0_ID))
+
+        # The delete commit exists.
+        self.assertIsNotNone(
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'collection-%s-%s' % (self.COLLECTION_0_ID, 1)))
+
+        # The snapshot models exist.
+        collection_snapshot_id = (
+            collection_models.CollectionModel.get_snapshot_id(
+                self.COLLECTION_0_ID, 1))
+        self.assertIsNotNone(
+            collection_models.CollectionSnapshotMetadataModel.get_by_id(
+                collection_snapshot_id))
+        self.assertIsNotNone(
+            collection_models.CollectionSnapshotContentModel.get_by_id(
+                collection_snapshot_id))
+        collection_rights_snapshot_id = (
+            collection_models.CollectionRightsModel.get_snapshot_id(
+                self.COLLECTION_0_ID, 1))
+        self.assertIsNotNone(
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                collection_rights_snapshot_id))
+        self.assertIsNotNone(
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                collection_rights_snapshot_id))
 
     def test_soft_deletion_of_multiple_collections(self):
         """Test that soft deletion of multiple collections works correctly."""
@@ -881,6 +905,52 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
         self.assertIsNone(
             collection_models.CollectionSummaryModel
             .get_by_id(self.COLLECTION_1_ID))
+
+        # The delete commits exist.
+        self.assertIsNotNone(
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'collection-%s-%s' % (self.COLLECTION_0_ID, 1)))
+        self.assertIsNotNone(
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'collection-%s-%s' % (self.COLLECTION_1_ID, 1)))
+
+        # The snapshot models exist.
+        collection_0_snapshot_id = (
+            collection_models.CollectionModel.get_snapshot_id(
+                self.COLLECTION_0_ID, 1))
+        collection_1_snapshot_id = (
+            collection_models.CollectionModel.get_snapshot_id(
+                self.COLLECTION_1_ID, 1))
+        self.assertIsNotNone(
+            collection_models.CollectionSnapshotMetadataModel.get_by_id(
+                collection_0_snapshot_id))
+        self.assertIsNotNone(
+            collection_models.CollectionSnapshotContentModel.get_by_id(
+                collection_0_snapshot_id))
+        self.assertIsNotNone(
+            collection_models.CollectionSnapshotMetadataModel.get_by_id(
+                collection_1_snapshot_id))
+        self.assertIsNotNone(
+            collection_models.CollectionSnapshotContentModel.get_by_id(
+                collection_1_snapshot_id))
+        collection_0_rights_snapshot_id = (
+            collection_models.CollectionRightsModel.get_snapshot_id(
+                self.COLLECTION_0_ID, 1))
+        collection_1_rights_snapshot_id = (
+            collection_models.CollectionRightsModel.get_snapshot_id(
+                self.COLLECTION_1_ID, 1))
+        self.assertIsNotNone(
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                collection_0_rights_snapshot_id))
+        self.assertIsNotNone(
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                collection_0_rights_snapshot_id))
+        self.assertIsNotNone(
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                collection_1_rights_snapshot_id))
+        self.assertIsNotNone(
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                collection_1_rights_snapshot_id))
 
     def test_hard_deletion_of_collection(self):
         """Test that hard deletion of collection works correctly."""
