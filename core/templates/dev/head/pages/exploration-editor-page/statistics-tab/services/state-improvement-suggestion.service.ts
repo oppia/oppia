@@ -19,8 +19,23 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
+import { States }
+  from 'domain/exploration/StatesObjectFactory';
 import { ExplorationEditorPageConstants }
   from 'pages/exploration-editor-page/exploration-editor-page.constants';
+
+interface RankedStates {
+  rank: number;
+  stateName: string;
+  type: string;
+}
+
+/* eslint-disable camelcase */
+export interface StateStats {
+  total_entry_count: number;
+  no_submitted_answer_count: number;
+}
+/* eslint-enable camelcase */
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +43,8 @@ import { ExplorationEditorPageConstants }
 export class StateImprovementSuggestionService {
   // TODO(#7165): Replace any with exact type.
   getStateImprovements(
-      explorationStates: any, allStateStats: any): any {
+      explorationStates: States,
+      allStateStats: {[state: string]: StateStats}): RankedStates[] {
     const rankComparator = (lhs, rhs) => {
       return rhs.rank - lhs.rank;
     };
