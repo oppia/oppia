@@ -15,12 +15,6 @@ workflows:
       - backend_tests:
           requires:
             - setup
-      - e2e_file_upload_features:
-          requires:
-            - setup
-      - e2e_topic_and_story_editor:
-          requires:
-            - setup
       - e2e_accessibility:
           requires:
             - setup
@@ -34,6 +28,9 @@ workflows:
           requires:
             - setup
       - e2e_exploration_history_tab:
+          requires:
+            - setup
+      - e2e_file_upload_features:
           requires:
             - setup
       - e2e_learner_dashboard:
@@ -58,6 +55,9 @@ workflows:
           requires:
             - setup
       - e2e_topics_and_skills_dashboard:
+          requires:
+            - setup
+      - e2e_topic_and_story_editor:
           requires:
             - setup
       - e2e_users:
@@ -154,32 +154,6 @@ jobs:
           command: |
             python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
 
-  e2e_file_upload_features:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          <<: *install_dependencies
-      - run:
-          name: Run e2e file upload features test
-          command: |
-            bash scripts/run_e2e_tests.sh --suite="fileUploadFeatures"
-
-  e2e_topic_and_story_editor:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/
-      - run:
-          <<: *install_dependencies
-      - run:
-          name: Run e2e topic and story editor test
-          command: |
-            bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor"
-
   e2e_accessibility:
     <<: *job_defaults
     steps:
@@ -244,6 +218,19 @@ jobs:
           name: Run exploration history tab test
           command: |
             bash scripts/run_e2e_tests.sh --suite="explorationHistoryTab" --prod_env
+
+  e2e_file_upload_features:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          <<: *install_dependencies
+      - run:
+          name: Run e2e file upload features test
+          command: |
+            bash scripts/run_e2e_tests.sh --suite="fileUploadFeatures"
 
   e2e_learner_dashboard:
     <<: *job_defaults
@@ -348,6 +335,19 @@ jobs:
           name: Run topics and skills dashboard test
           command: |
             bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env
+
+  e2e_topic_and_story_editor:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          <<: *install_dependencies
+      - run:
+          name: Run e2e topic and story editor test
+          command: |
+            bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor"
 
   e2e_users:
     <<: *job_defaults
