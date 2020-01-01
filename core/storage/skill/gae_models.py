@@ -101,6 +101,11 @@ class SkillModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SkillModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_merged_skills(cls):
         """Returns the skill models which have been merged.
@@ -254,6 +259,10 @@ class SkillSummaryModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    def get_user_id_migration_policy():
+        """SkillSummaryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
 
 class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill rights snapshot."""
@@ -312,8 +321,19 @@ class SkillRightsModel(base_models.VersionedModel):
                 reconstituted_model = cls(**snapshot_content_model.content)
                 if user_id == reconstituted_model.creator_id:
                     return True
-        return (cls.query(cls.creator_id == user_id).get() is not None or
+        return (cls.query(cls.creator_id == user_id).get(
+            keys_only=True) is not None or
                 cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SkillRightsModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.creator_id
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

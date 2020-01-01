@@ -36,13 +36,16 @@ class ActivityReferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Activity references are not related to users."""
+        """ActivityReferencesModel are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
+    def get_user_id_migration_policy():
+        """ActivityReferencesModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_or_create(cls, list_name):

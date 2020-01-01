@@ -92,10 +92,15 @@ class StateCounterModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State counter data is aggregated and anonymized, and cannot be tied
+        """StateCounterModels is aggregated and anonymized, and cannot be tied
         back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateCounterModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_or_create(cls, exploration_id, state_name):
@@ -139,10 +144,17 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Answer submitted event logs are anonymized, and cannot be tied back
-        to an individual user.
+        """AnswerSubmittedEventLogEntryModels are anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """AnswerSubmittedEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -198,10 +210,17 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration actual start event logs are anonymized, and cannot be
-        tied back to an individual user.
+        """ExplorationActualStartEventLogEntryModels are anonymized, and cannot
+        be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationActualStartEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -252,10 +271,15 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Solution hit event logs are anonymized, and cannot be tied back to
-        an individual user.
+        """SolutionHitEventLogEntryModels are anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SolutionHitEventLogEntryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -334,10 +358,17 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Start exploration event logs are anonymized, and cannot be tied back
-        to an individual user.
+        """StartExplorationEventLogEntryModels are anonymized, and cannot be
+        tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StartExplorationEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -460,10 +491,17 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Maybe leave exploration event logs are anonymized, and cannot be tied
-        back to an individual user.
+        """MaybeLeaveExplorationEventLogEntryModels are anonymized, and cannot
+        be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """MaybeLeaveExplorationEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -577,10 +615,17 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Complete exploration event logs are anonymized, and cannot be tied
-        back to an individual user.
+        """CompleteExplorationEventLogEntryModels are anonymized, and cannot be
+        tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """CompleteExplorationEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -666,10 +711,17 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Rate exploration event logs are anonymized, and cannot be tied back
-        to an individual user.
+        """RateExplorationEventLogEntryModels are anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """RateExplorationEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, user_id):
@@ -759,10 +811,15 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State hit event logs are anonymized, and cannot be tied back to an
-        individual user.
+        """StateHitEventLogEntryModels are anonymized, and cannot be tied back
+        to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateHitEventLogEntryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -841,10 +898,17 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State complete event logs are anonymized, and cannot be tied back to
-        an individual user.
+        """StateCompleteEventLogEntryModels are anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateCompleteEventLogEntryModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -900,10 +964,17 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Leave for refresher exploration event logs are anonymized, and cannot
-        be tied back to an individual user.
+        """LeaveForRefresherExplorationEventLogEntryModels are anonymized, and
+        cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """LeaveForRefresherExplorationEventLogEntryModel doesn't have any field
+        with user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -981,10 +1052,15 @@ class ExplorationStatsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration stats are aggregated and anonymized, and cannot be tied
-        back to an individual user.
+        """ExplorationStatsModels are aggregated and anonymized, and cannot be
+        tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationStatsModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -1144,10 +1220,15 @@ class ExplorationIssuesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration issues are aggregated and anonymized, and cannot be tied
-        back to an individual user.
+        """ExplorationIssuesModels are aggregated and anonymized, and cannot be
+        tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationIssuesModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exp_id, exp_version):
@@ -1229,10 +1310,15 @@ class PlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Playthroughs are anonymized, and cannot be tied back to an individual
-        user.
+        """PlaythroughModels are anonymized, and cannot be tied back to an
+        individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """PlaythroughModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1346,10 +1432,15 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Learner answer details are aggregated and anonymized, and cannot be
-        tied back to an individual user.
+        """LearnerAnswerDetailsModels are aggregated and anonymized, and cannot
+        be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """LearnerAnswerDetailsModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_state_reference_for_exploration(cls, exp_id, state_name):
@@ -1487,10 +1578,15 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration annotations are aggregated and anonymized, and cannot be
-        tied back to an individual user.
+        """ExplorationAnnotationsModels are aggregated and anonymized, and
+        cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationAnnotationsModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_entity_id(cls, exploration_id, exploration_version):
@@ -1611,10 +1707,15 @@ class StateAnswersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State answers are aggregated and anonymized, and cannot be tied back
-        to an individual user.
+        """StateAnswersModels are aggregated and anonymized, and cannot be tied
+        back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateAnswersModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _get_model(
@@ -1928,10 +2029,15 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """State answer calc outputs are aggregated and anonymized, and cannot
-        be tied back to an individual user.
+        """StateAnswersCalcOutputModels are aggregated and anonymized, and
+        cannot be tied back to an individual user.
         """
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StateAnswersCalcOutputModels doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def create_or_update(

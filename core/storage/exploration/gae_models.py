@@ -128,6 +128,11 @@ class ExplorationModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
@@ -246,6 +251,38 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
+    def transform_dict_to_valid(model_dict):
+        """Replace invalid fields and values in the ExplorationRightsModel dict.
+
+        Some old ExplorationRightsSnapshotContentModels can contain fields
+        and field values that are no longer supported and would cause
+        an exception when we try to reconstitute a ExplorationRightsModel from
+        them. We need to remove or replace these fields and values.
+
+        Args:
+            model_dict: dict. The content of the model. Some fields and field
+                values might no longer exist in the ExplorationRightsModel
+                schema.
+
+        Returns:
+            dict. The content of the model. Only valid fields and values are
+            present.
+        """
+        # The all_viewer_ids field was previously used in some versions of the
+        # model, we need to remove it.
+        if 'all_viewer_ids' in model_dict:
+            del model_dict['all_viewer_ids']
+        # The status field could historically take the value 'publicized', this
+        # value is now equivalent to 'public'.
+        if model_dict['status'] == 'publicized':
+            model_dict['status'] = constants.ACTIVITY_STATUS_PUBLIC
+        # The voice_artist_ids field was previously named translator_ids. We
+        # need to move the values from translator_ids field to voice_artist_ids
+        # and delete translator_ids.
+        if 'translator_ids' in model_dict and model_dict['translator_ids']:
+            model_dict['voice_artist_ids'] = model_dict['translator_ids']
+            model_dict['translator_ids'] = []
+        return model_dict
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -265,7 +302,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
                     base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
             for snapshot_content_model in snapshot_content_models:
-                reconstituted_model = cls(**snapshot_content_model.content)
+                reconstituted_model = cls(
+                    **ExplorationRightsModel.transform_dict_to_valid(
+                        snapshot_content_model.content))
                 if any((user_id in reconstituted_model.owner_ids,
                         user_id in reconstituted_model.editor_ids,
                         user_id in reconstituted_model.voice_artist_ids,
@@ -277,8 +316,54 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 cls.editor_ids == user_id,
                 cls.voice_artist_ids == user_id,
                 cls.viewer_ids == user_id
-            )).get() is not None
+            )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationRightsModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the owner_ids, editor_ids,
+        voice_artist_ids and viewer_ids.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.owner_ids == old_user_id, cls.editor_ids == old_user_id,
+                cls.voice_artist_ids == old_user_id,
+                cls.viewer_ids == old_user_id)).fetch():
+            model.owner_ids = [
+                new_user_id if owner_id == old_user_id else owner_id
+                for owner_id in model.owner_ids]
+            model.editor_ids = [
+                new_user_id if editor_id == old_user_id else editor_id
+                for editor_id in model.editor_ids]
+            model.voice_artist_ids = [
+                new_user_id if voice_art_id == old_user_id else voice_art_id
+                for voice_art_id in model.voice_artist_ids]
+            model.viewer_ids = [
+                new_user_id if viewer_id == old_user_id else viewer_id
+                for viewer_id in model.viewer_ids]
+            migrated_models.append(model)
+        cls.put_multi(migrated_models, update_last_updated_time=False)
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in owner_ids,
+        editor_ids, voice_artist_ids and viewer_ids.
+        """
+        user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
+                    self.viewer_ids)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -579,7 +664,45 @@ class ExpSummaryModel(base_models.BaseModel):
             cls.voice_artist_ids == user_id,
             cls.viewer_ids == user_id,
             cls.contributor_ids == user_id
-        )).get() is not None
+        )).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExpSummaryModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the owner_ids, editor_ids,
+        voice_artist_ids, viewer_ids and contributor_ids.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.owner_ids == old_user_id, cls.editor_ids == old_user_id,
+                cls.voice_artist_ids == old_user_id,
+                cls.viewer_ids == old_user_id,
+                cls.contributor_ids == old_user_id)).fetch():
+            model.owner_ids = [
+                new_user_id if owner_id == old_user_id else owner_id
+                for owner_id in model.owner_ids]
+            model.editor_ids = [
+                new_user_id if editor_id == old_user_id else editor_id
+                for editor_id in model.editor_ids]
+            model.voice_artist_ids = [
+                new_user_id if voice_art_id == old_user_id else voice_art_id
+                for voice_art_id in model.voice_artist_ids]
+            model.viewer_ids = [
+                new_user_id if viewer_id == old_user_id else viewer_id
+                for viewer_id in model.viewer_ids]
+            model.contributor_ids = [
+                new_user_id if contributor_id == old_user_id else contributor_id
+                for contributor_id in model.contributor_ids]
+            migrated_models.append(model)
+        cls.put_multi(migrated_models, update_last_updated_time=False)
 
     @classmethod
     def get_non_private(cls):
@@ -679,3 +802,15 @@ class ExpSummaryModel(base_models.BaseModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in owner_ids,
+        editor_ids, voice_artist_ids, viewer_ids and contributor_ids.
+        """
+        user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
+                    self.viewer_ids + self.contributor_ids)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)

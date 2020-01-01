@@ -71,6 +71,13 @@ class ExplorationOpportunitySummaryModel(base_models.BaseModel):
         """
         return False
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationOpportunitySummaryModel doesn't have any field with user
+        ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_all_translation_opportunities(
             cls, page_size, urlsafe_start_cursor, language_code):
@@ -193,8 +200,7 @@ class SkillOpportunityModel(base_models.BaseModel):
 
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
-        """ExplorationOpportunitySummaryModel doesn't reference any user_id
-        directly.
+        """SkillOpportunityModel doesn't reference any user_id directly.
 
         Args:
             unused_user_id: str. The (unused) ID of the user whose data
@@ -204,6 +210,11 @@ class SkillOpportunityModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return False
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SkillOpportunityModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
@@ -237,3 +248,9 @@ class SkillOpportunityModel(base_models.BaseModel):
         results, cursor, more = cls.get_all().order(
             cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
         return (results, (cursor.urlsafe() if cursor else None), more)
+
+    @classmethod
+    def delete_all(cls):
+        """Deletes all entities of this class."""
+        keys = cls.query().fetch(keys_only=True)
+        ndb.delete_multi(keys)

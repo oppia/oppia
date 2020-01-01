@@ -57,13 +57,17 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """File metadata are not related to users."""
+        """FileMetadataModel are not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    def get_user_id_migration_policy():
+        """FileMetadataModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_new_id(cls, entity_name):
@@ -213,13 +217,17 @@ class FileModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """File is not related to users."""
+        """FileModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    def get_user_id_migration_policy():
+        """FileModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _reconstitute(self, snapshot_blob):
         """Overrides the superclass method. Reconstitutes a FileModel

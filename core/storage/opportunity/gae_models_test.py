@@ -70,6 +70,12 @@ class ExplorationOpportunitySummaryModelUnitTest(test_utils.GenericTestBase):
             opportunity_models.ExplorationOpportunitySummaryModel
             .has_reference_to_user_id('any_id'))
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            opportunity_models.ExplorationOpportunitySummaryModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
     def test_get_all_translation_opportunities(self):
         results, cursor, more = (
             opportunity_models.ExplorationOpportunitySummaryModel
@@ -186,6 +192,12 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
             opportunity_models.SkillOpportunityModel
             .has_reference_to_user_id('any_id'))
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            opportunity_models.SkillOpportunityModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
     def test_get_skill_opportunities(self):
         results, cursor, more = (
             opportunity_models.SkillOpportunityModel
@@ -212,3 +224,17 @@ class SkillOpportunityModelTest(test_utils.GenericTestBase):
         self.assertEqual(results[0].id, 'opportunity_id2')
         self.assertFalse(more)
         self.assertTrue(isinstance(cursor, python_utils.BASESTRING))
+
+    def test_delete_all_skill_opportunities(self):
+        results, _, more = (
+            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
+                1, None))
+        self.assertEqual(len(results), 1)
+
+        opportunity_models.SkillOpportunityModel.delete_all()
+
+        results, _, more = (
+            opportunity_models.SkillOpportunityModel.get_skill_opportunities(
+                1, None))
+        self.assertEqual(len(results), 0)
+        self.assertFalse(more)

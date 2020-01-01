@@ -18,14 +18,21 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import random
+import string
+
 from constants import constants
 from core.platform import models
 import feconf
+import python_utils
 
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+transaction_services = models.Registry.import_transaction_services()
+
+USER_ID_LENGTH = 32
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -99,6 +106,8 @@ class UserSettingsModel(base_models.BaseModel):
     preferred_audio_language_code = ndb.StringProperty(
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
+    # Whether the user requested deletion.
+    to_be_deleted = ndb.BooleanProperty(default=False)
 
     @staticmethod
     def get_deletion_policy():
@@ -124,6 +133,13 @@ class UserSettingsModel(base_models.BaseModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserSettingsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -159,6 +175,33 @@ class UserSettingsModel(base_models.BaseModel):
             'preferred_site_language_code': user.preferred_site_language_code,
             'preferred_audio_language_code': user.preferred_audio_language_code
         }
+
+    @classmethod
+    def get_new_id(cls, unused_entity_name):
+        """Gets a new id for an entity, based on its name.
+
+        The returned id is guaranteed to be unique among all instances of this
+        entity.
+
+        Args:
+            unused_entity_name: The name of the entity. Coerced to a utf-8
+                encoded string. Defaults to ''.
+
+        Returns:
+            str. New unique id for this entity class.
+
+        Raises:
+            Exception: An ID cannot be generated within a reasonable number
+                of attempts.
+        """
+        for _ in python_utils.RANGE(base_models.MAX_RETRIES):
+            new_id = ''.join(
+                random.choice(string.ascii_lowercase)
+                for _ in python_utils.RANGE(USER_ID_LENGTH))
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception('New id generator is producing too many collisions.')
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
@@ -251,6 +294,13 @@ class CompletedActivitiesModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
+    def get_user_id_migration_policy():
+        """CompletedActivitiesModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
+    @staticmethod
     def export_data(user_id):
         """(Takeout) Export CompletedActivitiesModel's user properties.
 
@@ -309,6 +359,13 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """IncompleteActivitiesModel has ID that contains user ID and needs to
+        be replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -374,7 +431,14 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExpUserLastPlaythroughModel has ID that contains user ID and
+        one other field that contains user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -487,6 +551,13 @@ class LearnerPlaylistModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
+    def get_user_id_migration_policy():
+        """LearnerPlaylistModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
+    @staticmethod
     def export_data(user_id):
         """(Takeout) Export user-relevant properties of LearnerPlaylistModel.
 
@@ -548,6 +619,13 @@ class UserContributionsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserContributionsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -616,6 +694,12 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    def get_user_id_migration_policy():
+        """UserEmailPreferencesModel has ID that contains user ID and needs to
+        be replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
 
 class UserSubscriptionsModel(base_models.BaseModel):
     """A list of things that a user subscribes to.
@@ -661,6 +745,13 @@ class UserSubscriptionsModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserSubscriptionsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @staticmethod
     def export_data(user_id):
@@ -722,6 +813,12 @@ class UserSubscribersModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    def get_user_id_migration_policy():
+        """UserSubscribersModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     """A list of recent changes corresponding to things a user subscribes to.
@@ -758,6 +855,12 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    def get_user_id_migration_policy():
+        """UserRecentChangesBatchModel has ID that contains user ID and needs to
+        be replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
 
 class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -834,6 +937,13 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserStatsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
 
     @classmethod
     def get_or_create(cls, user_id):
@@ -949,7 +1059,14 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationUserDataModel has ID that contains user id and one other
+        field that contains user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, exploration_id):
@@ -1097,7 +1214,14 @@ class CollectionProgressModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """CollectionProgressModel has ID that contains user id and one other
+        field that contains user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, collection_id):
@@ -1252,7 +1376,14 @@ class StoryProgressModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """StoryProgressModel has ID that contains user id and one other field
+        that contains user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def _generate_id(cls, user_id, story_id):
@@ -1433,7 +1564,18 @@ class UserQueryModel(base_models.BaseModel):
         Returns:
             bool. Whether the model for user_id exists.
         """
-        return cls.query(cls.submitter_id == user_id).get() is not None
+        return cls.query(cls.submitter_id == user_id).get(
+            keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserQueryModel has two fields that contain user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.submitter_id
 
     @classmethod
     def fetch_page(cls, page_size, cursor):
@@ -1498,6 +1640,12 @@ class UserBulkEmailsModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    def get_user_id_migration_policy():
+        """UserBulkEmailsModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
+
 
 class UserSkillMasteryModel(base_models.BaseModel):
     """Model for storing a user's degree of mastery of a skill in Oppia.
@@ -1537,7 +1685,14 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserSkillMasteryModel has ID that contains user id and one other
+        field that contains user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def construct_model_id(cls, user_id, skill_id):
@@ -1614,7 +1769,14 @@ class UserContributionScoringModel(base_models.BaseModel):
         Returns:
             bool. Whether the models for user_id exists.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UserContributionScoringModel has ID that contains user id and one
+        other field that contains user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def get_all_categories_where_user_can_review(cls, user_id):
@@ -1732,3 +1894,44 @@ class UserContributionScoringModel(base_models.BaseModel):
         else:
             model.score += increment_by
             model.put()
+
+
+class PendingDeletionRequestModel(base_models.BaseModel):
+    """Model for storing pending deletion requests.
+
+    Model contains activity ids that were marked as deleted and should be
+    force deleted in the deletion process.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    # IDs of all the private explorations created by this user.
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of all the private collections created by this user.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """PendingDeletionRequestModel should be deleted after the user is
+        deleted.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether PendingDeletionRequestModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """PendingDeletionRequestModel is going to be used later and only as
+        a temporary model, so it doesn't need to be migrated.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

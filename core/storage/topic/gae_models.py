@@ -20,6 +20,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
 from core.platform import models
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -101,6 +102,11 @@ class TopicModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -269,6 +275,10 @@ class TopicSummaryModel(base_models.BaseModel):
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
+    def get_user_id_migration_policy():
+        """TopicSummaryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
@@ -322,6 +332,11 @@ class SubtopicPageModel(base_models.VersionedModel):
             bool. Whether any models refer to the given user ID.
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SubtopicPageModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -460,8 +475,31 @@ class TopicRightsModel(base_models.VersionedModel):
                 reconstituted_model = cls(**snapshot_content_model.content)
                 if user_id in reconstituted_model.manager_ids:
                     return True
-        return (cls.query(cls.manager_ids == user_id).get() is not None or
+        return (cls.query(cls.manager_ids == user_id).get(
+            keys_only=True) is not None or
                 cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicRightsModel has one field that contains multiple user IDs."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the manager_ids.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(cls.manager_ids == old_user_id).fetch():
+            model.manager_ids = [
+                new_user_id if manager_id == old_user_id else manager_id
+                for manager_id in model.manager_ids]
+            migrated_models.append(model)
+        cls.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def get_by_user(cls, user_id):
@@ -478,6 +516,14 @@ class TopicRightsModel(base_models.VersionedModel):
             cls.manager_ids == user_id
         )
         return topic_rights_models
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in manager_ids."""
+        user_ids = [user_id for user_id in self.manager_ids
+                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

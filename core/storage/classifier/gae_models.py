@@ -71,13 +71,17 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Classifier training job is not related to users."""
+        """ClassifierTrainingJobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    def get_user_id_migration_policy():
+        """ClassifierTrainingJobModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -227,13 +231,19 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Training job exploration mapping is not related to users."""
+        """TrainingJobExplorationMappingModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    def get_user_id_migration_policy():
+        """TrainingJobExplorationMappingModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):
