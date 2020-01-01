@@ -93,8 +93,13 @@ class JobModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Job is not related to users."""
+        """JobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """JobModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @property
     def is_cancelable(self):
@@ -204,5 +209,10 @@ class ContinuousComputationModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Continuous computation is not related to users."""
+        """ContinuousComputationModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ContinuousComputationModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
