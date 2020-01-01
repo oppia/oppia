@@ -51,6 +51,8 @@ import { CodeReplPredictionService } from
 import { CodeReplRulesService } from
   'interactions/CodeRepl/directives/code-repl-rules.service';
 import { ComputeGraphService } from 'services/compute-graph.service';
+import { ConceptCardObjectFactory } from
+  'domain/skill/ConceptCardObjectFactory';
 import { ContextService } from 'services/context.service';
 import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
 import { CsrfTokenService } from 'services/csrf-token.service';
@@ -132,6 +134,8 @@ import { PlaythroughIssueObjectFactory } from
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+import { ReadOnlyStoryNodeObjectFactory } from
+  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -181,6 +185,8 @@ import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+import { StoryPlaythroughObjectFactory } from
+  'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
 import { SubtitledHtmlObjectFactory } from
@@ -284,6 +290,8 @@ export class UpgradedServices {
       new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
+    upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
+      new ReadOnlyStoryNodeObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['StateImprovementSuggestionService'] =
       new StateImprovementSuggestionService();
@@ -362,6 +370,10 @@ export class UpgradedServices {
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
     upgradedServices['StateEditorService'] =
+      new StateEditorService(upgradedServices['SolutionValidityService']);
+    upgradedServices['StoryPlaythroughObjectFactory'] =
+      new StoryPlaythroughObjectFactory(
+        upgradedServices['ReadOnlyStoryNodeObjectFactory']);
     new StateEditorService(upgradedServices['SolutionValidityService']);
     upgradedServices['StoryReferenceObjectFactory'] =
         new StoryReferenceObjectFactory();
@@ -399,6 +411,9 @@ export class UpgradedServices {
     upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
       upgradedServices['NormalizeWhitespacePipe'],
       upgradedServices['CodeNormalizerService']);
+    upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
+      upgradedServices['SubtitledHtmlObjectFactory'],
+      upgradedServices['RecordedVoiceoversObjectFactory']);
     upgradedServices['ContextService'] = new ContextService(
       upgradedServices['UrlService'],
       upgradedServices['EntityContextObjectFactory']);
