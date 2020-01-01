@@ -172,13 +172,13 @@ class ExplorationModel(base_models.VersionedModel):
     def _trusted_multi_commit(
             cls, models, committer_id, commit_type, commit_message,
             commit_cmds):
-        """Record the event to the commit log after the model commit.
+        """Record the events to the commit log after the model commit.
 
         Note that this extends the superclass method.
 
         Args:
             models: list(ExplorationModel). Models for which to create the
-                commit.
+                commits.
             committer_id: str. The user_id of the user who committed the
                 change.
             commit_type: str. The type of commit. Possible values are in
@@ -456,31 +456,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_is_private=(
                     self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
-
-    @classmethod
-    def _trusted_multi_commit(
-            cls, models, committer_id, commit_type, commit_message,
-            commit_cmds):
-        """Record the event to the commit log after the model commit.
-
-        Note that this extends the superclass method.
-
-        Args:
-            models: list(ExplorationRightsModel). Models for which to create the
-                commits.
-            committer_id: str. The user_id of the user who committed the
-                change.
-            commit_type: str. The type of commit. Possible values are in
-                core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
-            commit_cmds: list(dict). A list of commands, describing changes
-                made in this model, should give sufficient information to
-                reconstruct the commit. Each dict always contains:
-                    cmd: str. Unique command.
-                and then additional arguments for that command.
-        """
-        super(ExplorationRightsModel, cls)._trusted_multi_commit(
-            models, committer_id, commit_type, commit_message, commit_cmds)
 
     @classmethod
     def export_data(cls, user_id):

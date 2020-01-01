@@ -820,12 +820,11 @@ def delete_collections(committer_id, collection_ids, force_deletion=False):
 
     Args:
         committer_id: str. ID of the committer.
-        collection_ids: list(str). ID of the collections to be deleted.
-        force_deletion: bool. If true, the collection and its history are fully
-            deleted and are unrecoverable. Otherwise, the collection and all
-            its history are marked as deleted, but the corresponding models are
-            still retained in the datastore. This last option is the preferred
-            one.
+        collection_ids: list(str). IDs of the collections to be deleted.
+        force_deletion: bool. If true, the collections and its histories are
+            fully deleted and are unrecoverable. Otherwise, the collections and
+            all its histories are marked as deleted, but the corresponding
+            models are still retained in the datastore.
     """
     collection_models.CollectionRightsModel.delete_multi(
         collection_ids, committer_id, '', force_deletion=force_deletion)

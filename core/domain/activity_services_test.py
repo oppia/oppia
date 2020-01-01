@@ -151,7 +151,6 @@ class ActivityServicesTests(test_utils.GenericTestBase):
             activity_services.get_featured_activity_references(),
             exploration_references)
 
-        # Deleting an unfeatured activity does not affect the featured list.
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_ID_0, self.EXP_ID_1])
         self._compare_lists(

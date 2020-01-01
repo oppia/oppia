@@ -682,9 +682,9 @@ def delete_explorations(committer_id, exploration_ids, force_deletion=False):
 
     Args:
         committer_id: str. The id of the user who made the commit.
-        exploration_ids: list(str). The id of the explorations to be deleted.
+        exploration_ids: list(str). The ids of the explorations to be deleted.
         force_deletion: bool. If True, completely deletes the storage models
-            corresponding to the exploration. Otherwise, marks them as deleted
+            corresponding to the explorations. Otherwise, marks them as deleted
             but keeps the corresponding models in the datastore.
     """
     # TODO(sll): Delete the files too?
@@ -1069,7 +1069,7 @@ def save_exploration_summary(exp_summary):
 
 
 def delete_exploration_summaries(exploration_ids):
-    """Delete an exploration summary models.
+    """Delete an explorations summary models.
 
     Args:
         exploration_ids: list(str). The id of the exploration summaries to be
