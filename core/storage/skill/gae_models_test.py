@@ -22,6 +22,7 @@ from constants import constants
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
+import python_utils
 
 (base_models, skill_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.skill])
@@ -41,6 +42,11 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             skill_models.SkillModel.has_reference_to_user_id('owner_id'))
         self.assertFalse(
             skill_models.SkillModel.has_reference_to_user_id('x_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            skill_models.SkillModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
 
 class SkillCommitLogEntryModelUnitTests(test_utils.GenericTestBase):
@@ -79,14 +85,14 @@ class SkillSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertFalse(
             skill_models.SkillSummaryModel.has_reference_to_user_id('any_id'))
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            skill_models.SkillSummaryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
+
 
 class SkillRightsModelUnitTest(test_utils.GenericTestBase):
     """Test the SkillRightsModel class."""
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            skill_models.SkillRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def setUp(self):
         super(SkillRightsModelUnitTest, self).setUp()
@@ -130,6 +136,11 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
             'user_6_id', 'Created new skill rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
 
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            skill_models.SkillRightsModel.get_deletion_policy(),
+            base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
+
     def test_has_reference_to_user_id(self):
         with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
             self.assertTrue(
@@ -163,6 +174,19 @@ class SkillRightsModelUnitTest(test_utils.GenericTestBase):
             self.assertTrue(
                 skill_models.SkillRightsModel.has_reference_to_user_id(
                     'user_7_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            skill_models.SkillRightsModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                skill_models.SkillRightsModel.get_user_id_migration_field()),
+            python_utils.UNICODE(skill_models.SkillRightsModel.creator_id))
 
     def test_get_unpublished_by_creator_id(self):
         results = (
