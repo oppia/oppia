@@ -41,7 +41,6 @@ export interface StateStats {
   providedIn: 'root'
 })
 export class StateImprovementSuggestionService {
-  // TODO(#7165): Replace any with exact type.
   getStateImprovements(
       explorationStates: States,
       allStateStats: {[state: string]: StateStats}): RankedStates[] {
