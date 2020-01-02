@@ -536,6 +536,8 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party_libs.py',
     '/.github/']
 
+CIRCLECI_ENV = os.environ['CIRCLECI']
+
 if not os.getcwd().endswith('oppia'):
     python_utils.PRINT('')
     python_utils.PRINT(
@@ -3284,6 +3286,7 @@ def main(args=None):
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
+    python_utils.PRINT("ENVIRONMENT = " + CIRCLECI_ENV)
 
     if len(all_filepaths) == 0:
         python_utils.PRINT('---------------------------')
