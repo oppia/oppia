@@ -32,21 +32,26 @@ angular.module('oppia').directive('searchBar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        enableDropup: '&'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library-page/search-bar/search-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$location', '$rootScope', '$scope', '$translate',
+        '$location', '$rootScope', '$scope', '$timeout', '$translate',
         '$window', 'ConstructTranslationIdsService', 'DebouncerService',
         'HtmlEscaperService', 'LanguageUtilService', 'NavigationService',
         'SearchService', 'UrlService', 'SEARCH_DROPDOWN_CATEGORIES',
         function(
-            $location, $rootScope, $scope, $translate,
+            $location, $rootScope, $scope, $timeout, $translate,
             $window, ConstructTranslationIdsService, DebouncerService,
             HtmlEscaperService, LanguageUtilService, NavigationService,
             SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
           var ctrl = this;
+          ctrl.isSearchInProgress = function() {
+            return SearchService.isSearchInProgress();
+          };
           /**
            * Opens the submenu.
            * @param {object} evt
@@ -72,6 +77,7 @@ angular.module('oppia').directive('searchBar', [
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             ctrl.activeMenuName = NavigationService.activeMenuName;
           };
+
           // Update the description, numSelections and summary fields of the
           // relevant entry of ctrl.selectionDetails.
           var updateSelectionDetails = function(itemsType) {
@@ -129,10 +135,6 @@ angular.module('oppia').directive('searchBar', [
             onSearchQueryChangeExec();
           };
 
-          ctrl.isSearchInProgress = function() {
-            return SearchService.isSearchInProgress();
-          };
-
           $scope.$watch('$ctrl.searchQuery', function(
               newQuery, oldQuery) {
             // Run only if the query has changed.
@@ -156,6 +158,12 @@ angular.module('oppia').directive('searchBar', [
               $window.location.href = '/search/find?q=' + searchUrlQueryString;
             }
           };
+
+          // Initialize the selection descriptions and summaries.
+          for (var itemsType in ctrl.selectionDetails) {
+            updateSelectionDetails(itemsType);
+          }
+
           var updateSearchFieldsBasedOnUrlQuery = function() {
             var oldQueryString = SearchService.getCurrentUrlQueryString();
 
@@ -232,6 +240,7 @@ angular.module('oppia').directive('searchBar', [
           };
 
           $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
+          $rootScope.$on('initializeTranslation', refreshSearchBarLabels);
           ctrl.$onInit = function() {
             ctrl.SEARCH_DROPDOWN_CATEGORIES = (
               SEARCH_DROPDOWN_CATEGORIES.map(
@@ -250,7 +259,6 @@ angular.module('oppia').directive('searchBar', [
             NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
             ctrl.SUPPORTED_CONTENT_LANGUAGES = (
               LanguageUtilService.getLanguageIdsAndTexts());
-
             ctrl.searchQuery = '';
             ctrl.selectionDetails = {
               categories: {
@@ -274,11 +282,6 @@ angular.module('oppia').directive('searchBar', [
             // Non-translatable parts of the html strings, like numbers or user
             // names.
             ctrl.translationData = {};
-
-            // Initialize the selection descriptions and summaries.
-            for (var itemsType in ctrl.selectionDetails) {
-              updateSelectionDetails(itemsType);
-            }
           };
         }
       ]
