@@ -225,7 +225,7 @@ class UserSettingsModel(base_models.BaseModel):
             UserSettingsModel. The UserSettingsModel instance which has the same
             GAE user ID.
         """
-        return cls.get_all().filter(cls.gae_id == gae_id).get()
+        return cls.query(cls.gae_id == gae_id).get()
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
@@ -1027,7 +1027,12 @@ class ExplorationUserDataModel(base_models.BaseModel):
         """Exploration user data need to be copied to new model to preserve the
         ratings.
         """
-        return base_models.DELETION_POLICY.ANONYMIZE
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        cls.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1595,14 +1600,8 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User bulk emails can be deleted since it only contains information
-        relevant to the one user.
-        """
-        return base_models.DELETION_POLICY.DELETE
-
-    @classmethod
-    def apply_deletion_policy(cls, user_id):
-        cls.delete_by_id(user_id)
+        """User bulk emails should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1892,7 +1891,7 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         """PendingDeletionRequestModel should be deleted after the user is
         deleted.
         """
-        return base_models.DELETION_POLICY.DELETE
+        return base_models.DELETION_POLICY.KEEP
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

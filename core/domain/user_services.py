@@ -1033,8 +1033,10 @@ def mark_user_for_deletion(
     """
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.to_be_deleted = True
+    user_settings.deleted = True
     _save_user_settings(user_settings)
 
+    user_models.PendingDeletionRequestModel(
     user_models.PendingDeletionRequestModel(
         id=user_id,
         exploration_ids=exploration_ids,

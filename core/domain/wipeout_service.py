@@ -25,7 +25,7 @@ from core.domain import user_services
 from core.platform import models
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -77,7 +77,7 @@ def delete_user(pending_deletion_model):
     Args:
         pending_deletion_model: PendingDeletionRequestModel.
     """
-    pass
+    delete_user_models(pending_deletion_model.id)
 
 
 def verify_user_deleted(pending_deletion_model):
@@ -88,27 +88,28 @@ def verify_user_deleted(pending_deletion_model):
     """
     pass
 
+
 def delete_user_models(user_id):
     """Smth.
 
     Args:
-        user_id: PendingDeletionRequestModel.
+        user_id: str.
     """
-    user_models.UserSettingsModel.apply_deletion_policy(user_id)
-    user_models.CompletedActivitiesModel.apply_deletion_policy(user_id)
-    user_models.IncompleteActivitiesModel.apply_deletion_policy(user_id)
-    user_models.ExpUserLastPlaythroughModel.apply_deletion_policy(user_id)
-    user_models.LearnerPlaylistModel.apply_deletion_policy(user_id)
-    user_models.UserContributionsModel.apply_deletion_policy(user_id)
-    user_models.UserEmailPreferencesModel.apply_deletion_policy(user_id)
-    user_models.UserSubscriptionsModel.apply_deletion_policy(user_id)
-    user_models.UserSubscribersModel.apply_deletion_policy(user_id)
-    user_models.UserRecentChangesBatchModel.apply_deletion_policy(user_id)
-    user_models.UserStatsModel.apply_deletion_policy(user_id)
-    # TODO(): ExplorationUserDataModel
-    user_models.CollectionProgressModel.apply_deletion_policy(user_id)
-    user_models.StoryProgressModel.apply_deletion_policy(user_id)
-    user_models.UserQueryModel.apply_deletion_policy(user_id)
-    user_models.UserBulkEmailsModel.apply_deletion_policy(user_id)
-    user_models.UserSkillMasteryModel.apply_deletion_policy(user_id)
-    user_models.UserContributionScoringModel.apply_deletion_policy(user_id)
+    for model_class in models.Registry.get_storage_model_classes(
+            [models.NAMES.user]):
+        if model_class.get_deletion_policy() != base_models.DELETION_POLICY.KEEP:
+            model_class.apply_deletion_policy(user_id)
+
+
+def verify_user_models_deleted(user_id):
+    """Smth.
+
+    Args:
+        user_id: str.
+    """
+    for model_class in models.Registry.get_storage_model_classes(
+            [models.NAMES.user]):
+        if model_class.get_deletion_policy() != base_models.DELETION_POLICY.KEEP:
+            if model_class.has_reference_to_user_id(user_id):
+                return False
+    return True
