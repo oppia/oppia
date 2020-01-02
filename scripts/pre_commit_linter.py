@@ -535,10 +535,12 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/yarn.lock',
     '/scripts/install_third_party_libs.py',
     '/.github/']
+
+# Check if project is running in CircleCI.
 try:
     CIRCLECI_ENV = os.environ['CIRCLECI']
 except KeyError:
-    CIRCLECI_ENV = 'Running in local environment......'
+    CIRCLECI_ENV = False
 
 if not os.getcwd().endswith('oppia'):
     python_utils.PRINT('')
@@ -1995,7 +1997,10 @@ class LintChecksManager( # pylint: disable=inherit-non-class
 
     def _check_patterns(self):
         """Run checks relate to bad patterns."""
-        methods = [self._check_bad_patterns, self._check_mandatory_patterns]
+        if CIRCLECI_ENV:
+            methods = [self._check_mandatory_patterns]
+        else:
+            methods = [self._check_bad_patterns, self._check_mandatory_patterns]
         self._run_multiple_checks(*methods)
 
     def perform_all_lint_checks(self):
@@ -3288,7 +3293,6 @@ def main(args=None):
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
-    python_utils.PRINT('ENVIRONMENT = ' + CIRCLECI_ENV)
 
     if len(all_filepaths) == 0:
         python_utils.PRINT('---------------------------')
