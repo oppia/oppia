@@ -21,17 +21,12 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
 export class StorySummary {
-  _id: any;
-  _title: any;
-  _nodeCount: any;
-  _storyIsPublished: any;
-
-  constructor(id, title, nodeCount, storyIsPublished) {
-    this._id = id;
-    this._title = title;
-    this._nodeCount = nodeCount;
-    this._storyIsPublished = storyIsPublished;
-  }
+  constructor(
+    private _id: string,
+    private _title: string,
+    private _nodeCount: number,
+    private _storyIsPublished: boolean
+  ) {}
 
   getId() {
     return this._id;
