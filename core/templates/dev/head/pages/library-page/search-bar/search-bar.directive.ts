@@ -32,7 +32,9 @@ angular.module('oppia').directive('searchBar', [
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {},
+      bindToController: {
+        enableDropup: '&'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library-page/search-bar/search-bar.directive.html'),
       controllerAs: '$ctrl',
@@ -277,6 +279,7 @@ angular.module('oppia').directive('searchBar', [
           };
 
           $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
+          $rootScope.$on('initializeTranslation', refreshSearchBarLabels);
         }
       ]
     };

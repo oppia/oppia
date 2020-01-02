@@ -44,6 +44,8 @@
 	"I18N_ACTION_CREATE_LESSON": "Text displayed in a button on the Home page. - When the user clicks the button they are taken to their dashboard, and a dialog is opened where the user can create a new exploration. The text in the button needs to be less than 29 characters long.",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Warning message displayed below state content editor. - When the content written by user in editor mode results in a card longer than 630px in learner mode.",
 	"I18N_CLASSROOM_PAGE_HEADING": "The header displayed above the classroom name in the classroom page.",
+	"I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING": "The heading for the search bar at the bottom of the classroom page.",
+	"I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "The subheading for the search bar at the bottom of the classroom page.",
 	"I18N_CONTACT_PAGE_HEADING": "Heading for Oppia's Contact Page.",
 	"I18N_CONTACT_PAGE_PARAGRAPH_1": "Text on Oppia's Contact Page - This text serves as a guide for people interested in getting involved with Oppia.",
 	"I18N_CONTACT_PAGE_PARAGRAPH_10": "Text on Oppia's Contact Page - This text serves as a guide for people interested in getting involved with Oppia.",
