@@ -877,8 +877,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml.from_dict(self.old_content))
         exploration.states['State 1'].update_recorded_voiceovers(
             self.old_recorded_voiceovers)
-        exp_services.update_exploration(
-            self.editor_id, exploration.id, None, 'Test commit')
+        exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
         rights_manager.assign_role_for_exploration(
