@@ -332,6 +332,11 @@
 /core/templates/dev/head/components/question-directives/modal-templates/ @aks681 @vinitamurthi
 /core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
 
+# Readme
+/core/README.md @ankita240796
+/extensions/README.md @ankita240796
+/scripts/README.md @ankita240796
+
 # Skill project.
 /core/controllers/concept_card_viewer*.py @aks681
 /core/controllers/skill*.py @aks681
