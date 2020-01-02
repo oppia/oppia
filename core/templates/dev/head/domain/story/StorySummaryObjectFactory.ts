@@ -67,6 +67,5 @@ export class StorySummaryObjectFactory {
 }
 
 angular.module('oppia').factory(
-  'StorySummaryObjectFactory',
-  downgradeInjectable(StorySummaryObjectFactory)
+  'StorySummaryObjectFactory', downgradeInjectable(StorySummaryObjectFactory)
 );
