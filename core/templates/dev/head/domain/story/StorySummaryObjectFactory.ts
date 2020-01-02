@@ -49,7 +49,14 @@ export class StorySummary {
   providedIn: 'root'
 })
 export class StorySummaryObjectFactory {
-  createFromBackendDict(storySummaryBackendDict: any): StorySummary {
+  createFromBackendDict(storySummaryBackendDict: {
+    id: string;
+    title: string;
+    // eslint-disable-next-line camelcase
+    node_count: number;
+    // eslint-disable-next-line camelcase
+    story_is_published: boolean;
+  }): StorySummary {
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
