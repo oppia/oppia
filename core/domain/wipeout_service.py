@@ -46,9 +46,7 @@ def pre_delete_user(user_id):
         exp_summary.id for exp_summary in subscribed_exploration_summaries
         if exp_summary.is_private() and
         exp_summary.is_solely_owned_by_user(user_id)]
-    # TODO(#8301): Implement delete_explorations to make this efficient.
-    for exp_id in explorations_to_be_deleted_ids:
-        exp_services.delete_exploration(user_id, exp_id)
+    exp_services.delete_explorations(user_id, explorations_to_be_deleted_ids)
 
     subscribed_collection_summaries = (
         collection_services.get_collection_summaries_subscribed_to(user_id))
@@ -56,9 +54,8 @@ def pre_delete_user(user_id):
         col_summary.id for col_summary in subscribed_collection_summaries
         if col_summary.is_private() and
         col_summary.is_solely_owned_by_user(user_id)]
-    # TODO(#8301): Implement delete_collections to make this efficient.
-    for col_id in collections_to_be_deleted_ids:
-        collection_services.delete_collection(user_id, col_id)
+    collection_services.delete_collections(
+        user_id, collections_to_be_deleted_ids)
 
     # Set all the user's email preferences to False in order to disable all
     # ordinary emails that could be sent to the users.

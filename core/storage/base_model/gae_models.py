@@ -644,65 +644,35 @@ class VersionedModel(BaseModel):
 
                 {'cmd': 'AUTO_revert_version_number'
                  'version_number': 4}
-        """
-        VersionedModel._trusted_multi_commit(
-            [self], committer_id, commit_type, commit_message, commit_cmds)
-
-    @classmethod
-    def _trusted_multi_commit(
-            cls, versioned_models, committer_id, commit_type, commit_message,
-            commit_cmds):
-        """Evaluates and executes commits. Main function for all commit types.
-
-        Args:
-            versioned_models: list(cls). List of models to commit.
-            committer_id: str. The user_id of the user who committed the change.
-            commit_type: str. Unique identifier of commit type. Possible values
-                are in COMMIT_TYPE_CHOICES.
-            commit_message: str.
-            commit_cmds: list(dict). A list of commands, describing changes
-                made in this model, should give sufficient information to
-                reconstruct the commit. Dict always contains:
-                    cmd: str. Unique command.
-                And then additional arguments for that command. For example:
-
-                {'cmd': 'AUTO_revert_version_number'
-                 'version_number': 4}
 
         Raises:
             Exception: No snapshot metadata class has been defined.
             Exception: No snapshot content class has been defined.
             Exception: commit_cmds is not a list of dicts.
         """
+        if self.SNAPSHOT_METADATA_CLASS is None:
+            raise Exception('No snapshot metadata class defined.')
+        if self.SNAPSHOT_CONTENT_CLASS is None:
+            raise Exception('No snapshot content class defined.')
         if not isinstance(commit_cmds, list):
             raise Exception(
                 'Expected commit_cmds to be a list of dicts, received %s'
                 % commit_cmds)
 
-        snapshot_metadata_models = []
-        snapshot_content_models = []
-        for model in versioned_models:
-            if model.SNAPSHOT_METADATA_CLASS is None:
-                raise Exception('No snapshot metadata class defined.')
-            if model.SNAPSHOT_CONTENT_CLASS is None:
-                raise Exception('No snapshot content class defined.')
+        self.version += 1
 
-            model.version += 1
+        snapshot = self._compute_snapshot()
+        snapshot_id = self._get_snapshot_id(self.id, self.version)
 
-            snapshot = model.compute_snapshot()
-            snapshot_id = model.get_snapshot_id(model.id, model.version)
-
-            snapshot_metadata_models.append(model.SNAPSHOT_METADATA_CLASS(  # pylint: disable=not-callable
-                id=snapshot_id, committer_id=committer_id,
-                commit_type=commit_type, commit_message=commit_message,
-                commit_cmds=commit_cmds))
-            snapshot_content_models.append(model.SNAPSHOT_CONTENT_CLASS(  # pylint: disable=not-callable
-                id=snapshot_id, content=snapshot))
+        snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS(  # pylint: disable=not-callable
+            id=snapshot_id, committer_id=committer_id, commit_type=commit_type,
+            commit_message=commit_message, commit_cmds=commit_cmds)
+        snapshot_content_instance = self.SNAPSHOT_CONTENT_CLASS(  # pylint: disable=not-callable
+            id=snapshot_id, content=snapshot)
 
         transaction_services.run_in_transaction(
             BaseModel.put_multi,
-            snapshot_metadata_models + snapshot_content_models +
-            versioned_models)
+            [snapshot_metadata_instance, snapshot_content_instance, self])
 
     def delete(self, committer_id, commit_message, force_deletion=False):
         """Deletes this model instance.
@@ -751,9 +721,8 @@ class VersionedModel(BaseModel):
                 commit_cmds)
 
     @classmethod
-    def delete_multi(
-            cls, entity_ids, committer_id,
-            commit_message, force_deletion=False):
+    def delete_multi(cls, entity_ids, committer_id,
+                     commit_message, force_deletion=False):
         """Deletes the given cls instancies with the given entity_ids.
 
         Args:
@@ -797,10 +766,26 @@ class VersionedModel(BaseModel):
             commit_cmds = [{
                 'cmd': cls.CMD_DELETE_COMMIT
             }]
+            snapshot_metadata_models = []
+            snapshot_content_models = []
+            for model in versioned_models:
+                model.version += 1
+                snapshot = model.compute_snapshot()
+                snapshot_id = model.get_snapshot_id(model.id, model.version)
 
-            cls._trusted_multi_commit(
-                versioned_models, committer_id, cls._COMMIT_TYPE_DELETE,
-                commit_message, commit_cmds)
+                snapshot_metadata_models.append(model.SNAPSHOT_METADATA_CLASS(  # pylint: disable=not-callable
+                    id=snapshot_id,
+                    committer_id=committer_id,
+                    commit_type=cls._COMMIT_TYPE_DELETE,
+                    commit_message=commit_message,
+                    commit_cmds=commit_cmds))
+                snapshot_content_models.append(model.SNAPSHOT_CONTENT_CLASS(  # pylint: disable=not-callable
+                    id=snapshot_id, content=snapshot))
+
+            transaction_services.run_in_transaction(
+                BaseModel.put_multi,
+                snapshot_metadata_models + snapshot_content_models +
+                versioned_models)
 
     def put(self, *args, **kwargs):
         """For VersionedModels, this method is replaced with commit()."""
