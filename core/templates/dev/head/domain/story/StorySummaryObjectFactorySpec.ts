@@ -17,10 +17,11 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import {
   StorySummaryObjectFactory,
   StorySummary
-} from './StorySummaryObjectFactory';
+} from 'domain/story/StorySummaryObjectFactory';
 
 describe('Story summary object factory', () => {
   let factory: StorySummaryObjectFactory;

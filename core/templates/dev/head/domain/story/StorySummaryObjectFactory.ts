@@ -28,19 +28,19 @@ export class StorySummary {
     private _storyIsPublished: boolean
   ) {}
 
-  getId() {
+  getId(): string {
     return this._id;
   }
 
-  getTitle() {
+  getTitle(): string {
     return this._title;
   }
 
-  getNodeCount() {
+  getNodeCount(): number {
     return this._nodeCount;
   }
 
-  isStoryPublished() {
+  isStoryPublished(): boolean {
     return this._storyIsPublished;
   }
 }
@@ -66,9 +66,7 @@ export class StorySummaryObjectFactory {
   }
 }
 
-angular
-  .module('oppia')
-  .factory(
-    'StorySummaryObjectFactory',
-    downgradeInjectable(StorySummaryObjectFactory)
-  );
+angular.module('oppia').factory(
+  'StorySummaryObjectFactory',
+  downgradeInjectable(StorySummaryObjectFactory)
+);
