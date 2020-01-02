@@ -1069,7 +1069,7 @@ def save_exploration_summary(exp_summary):
 
 
 def delete_exploration_summaries(exploration_ids):
-    """Delete an explorations summary models.
+    """Delete multiple exploration summary models.
 
     Args:
         exploration_ids: list(str). The id of the exploration summaries to be

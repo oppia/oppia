@@ -754,7 +754,7 @@ class VersionedModel(BaseModel):
     def delete_multi(
             cls, entity_ids, committer_id,
             commit_message, force_deletion=False):
-        """Deletes the given cls instancies with the give entity_ids.
+        """Deletes the given cls instancies with the given entity_ids.
 
         Args:
             entity_ids: list(str). Ids of entities to delete.

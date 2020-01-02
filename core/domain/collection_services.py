@@ -1073,7 +1073,7 @@ def save_collection_summary(collection_summary):
 
 
 def delete_collection_summaries(collection_ids):
-    """Delete a collection summary models.
+    """Delete multiple collection summary models.
 
     Args:
         collection_ids: list(str). IDs of the collections whose collection
