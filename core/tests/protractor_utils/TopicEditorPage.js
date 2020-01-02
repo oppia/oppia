@@ -120,6 +120,12 @@ var TopicEditorPage = function() {
     return topicThumbnailUploadInput.sendKeys(absPath);
   };
 
+  this.publishTopic = function() {
+    publishTopicButton.click();
+    return waitFor.invisibilityOf(
+      publishTopicButton, 'Topic is taking too long to publish.');
+  };
+
   this.submitTopicThumbnail = function(imgPath) {
     return this.uploadThumbnail(imgPath).then(function() {
       waitFor.visibilityOf(

@@ -1425,10 +1425,10 @@ tags: []
             }])
 
     def save_new_topic(
-            self, topic_id, owner_id, name, abbreviated_name,
-            thumbnail_filename, description,
-            canonical_story_ids, additional_story_ids,
-            uncategorized_skill_ids, subtopics, next_subtopic_id,
+            self, topic_id, owner_id, name='topic', abbreviated_name='topic',
+            thumbnail_filename='topic.png', description='description',
+            canonical_story_ids=None, additional_story_ids=None,
+            uncategorized_skill_ids=None, subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
 
@@ -1456,12 +1456,14 @@ tags: []
         """
         canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in canonical_story_ids
+            for story_id in (canonical_story_ids or [])
         ]
         additional_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in additional_story_ids
+            for story_id in (additional_story_ids or [])
         ]
+        uncategorized_skill_ids = (uncategorized_skill_ids or [])
+        subtopics = (subtopics or [])
         topic = topic_domain.Topic(
             topic_id, name, abbreviated_name, thumbnail_filename,
             description, canonical_story_references,
@@ -1606,8 +1608,8 @@ tags: []
 
     def save_new_skill(
             self, skill_id, owner_id,
-            description, misconceptions=None, rubrics=None, skill_contents=None,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            description='description', misconceptions=None, rubrics=None,
+            skill_contents=None, language_code=constants.DEFAULT_LANGUAGE_CODE,
             prerequisite_skill_ids=None):
         """Creates an Oppia Skill and saves it.
 
