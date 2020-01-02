@@ -2486,7 +2486,6 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock_edit_skill/<skill_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        skill_services.create_new_skill_rights(self.skill_id, self.admin_id)
 
     def test_cannot_edit_skill_with_invalid_skill_id(self):
         self.login(self.ADMIN_EMAIL)
@@ -2575,8 +2574,6 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
                 '/mock_edit_question/<question_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        question_services.create_new_question_rights(
-            self.question_id, self.ADMIN_EMAIL)
 
     def test_guest_cannot_edit_question(self):
         with self.swap(self, 'testapp', self.mock_testapp):
