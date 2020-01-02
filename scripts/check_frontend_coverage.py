@@ -204,30 +204,32 @@ fully_covered_filenames = [
 
 class LcovStanzaRelevantLines:
 
-    def __init__(self, relevant_lines):
+    def __init__(self, stanza):
         """Initialize the object which provides relevant data of a lcov
         stanza in order to calculate any decrease in frontend test coverage.
 
         Args:
-            relevant_lines: list(str). Contains the relevant lines:
-            - relevant_lines[0]: absolute path of the file.
-            - relevant_lines[1]: total lines of the file.
-            - relevant_lines[2]: covered lines of the file.
+            stanza: list(str). Contains all the lines from a lcov stanza.
 
         Raises:
-            Exception: relevant_lines[0] is empty.
+            Exception: file_path is empty.
             Exception: Total lines number is not found.
             Exception: Covered lines number is not found.
         """
-        if not relevant_lines[0]:
+        file_path, total_lines, covered_lines = [
+            line for line in stanza.splitlines() if
+            any(line.startswith(prefix) for prefix in
+            RELEVANT_LCOV_LINE_PREFIXES)]
+
+        if not file_path:
             raise Exception(
                 'The test path is empty or null. '
                 'It\'s not possible to diff the test coverage correctly.')
 
-        _, file_name = os.path.split(relevant_lines[0])
+        _, file_name = os.path.split(file_path)
         self.file_name = file_name
 
-        match = re.search('LF:(\d+)', relevant_lines[1])
+        match = re.search('LF:(\d+)', total_lines)
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the total lines of {} file.'
@@ -235,7 +237,7 @@ class LcovStanzaRelevantLines:
                 .format(file_name))
         self.total_lines = int(match.group(1))
 
-        match = re.search('LH:(\d+)', relevant_lines[2])
+        match = re.search('LH:(\d+)', covered_lines)
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the covered lines of {} file.'
@@ -276,12 +278,8 @@ def get_stanzas_from_lcov_file():
     stanzas_list = []
 
     for item in lcov_items_list:
-        relevant_lines = [line for line in item.splitlines() if
-                          any(line.startswith(prefix) for prefix in
-                          RELEVANT_LCOV_LINE_PREFIXES)]
-
-        if len(relevant_lines) > 0:
-            stanza = LcovStanzaRelevantLines(relevant_lines)
+        if item.strip('\n'):
+            stanza = LcovStanzaRelevantLines(item)
             stanzas_list.append(stanza)
 
     return stanzas_list
