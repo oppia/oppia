@@ -205,23 +205,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                 collection_models.CollectionRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
 
-            # We remove the USER_ID_4 from the exploration to verify that the
-            # USER_ID_4 is still found in CollectionRightsSnapshotContentModel.
-            collection_model = (
-                collection_models.CollectionRightsModel.get_by_id(
-                    self.COLLECTION_ID_4))
-            collection_model.owner_ids = [self.USER_ID_1]
-            collection_model.editor_ids = [self.USER_ID_1]
-            collection_model.voice_artist_ids = [self.USER_ID_1]
-            collection_model.viewer_ids = [self.USER_ID_1]
-            collection_model.commit(
-                self.USER_ID_COMMITTER, 'Changed collection rights',
-                [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
-
-            self.assertTrue(
-                collection_models.CollectionRightsModel
-                .has_reference_to_user_id(self.USER_ID_4))
-
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             collection_models.CollectionRightsModel
