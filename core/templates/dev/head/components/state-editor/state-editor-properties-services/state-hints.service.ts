@@ -28,17 +28,17 @@ import { UtilsService } from 'services/utils.service';
   providedIn: 'root'
 })
 export class StateHintsService extends StatePropertyService {
-  private activeHintIndex: any;
+  private activeHintIndex: number;
   constructor(alertsService: AlertsService, utilsService: UtilsService) {
     super(alertsService, utilsService);
     this.setterMethodKey = 'saveHints';
   }
 
-  getActiveHintIndex(): any {
+  getActiveHintIndex(): number {
     return this.activeHintIndex;
   }
 
-  setActiveHintIndex(index: any): void {
+  setActiveHintIndex(index: number): void {
     this.activeHintIndex = index;
   }
 

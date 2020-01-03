@@ -355,12 +355,6 @@ angular.module('oppia').factory('ExplorationStatesService', [
       saveHints: function(stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);
       },
-      getNameMemento: function(stateName) {
-        return getStatePropertyMemento(stateName, 'name');
-      },
-      saveName: function(stateName, newHints) {
-        saveStateProperty(stateName, 'name', newHints);
-      },
       getSolutionMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'solution');
       },

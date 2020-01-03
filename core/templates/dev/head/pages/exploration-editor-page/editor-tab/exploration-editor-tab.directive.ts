@@ -129,7 +129,7 @@ angular.module('oppia').directive('explorationEditorTab', [
               // In this case 'stateEditorInitialized' is broadcasted so that:
               // 1. state-editor directive can initialise the child
               //    components of the state editor.
-              // 2. state-interaction-editor directive cane initialise the
+              // 2. state-interaction-editor directive can initialise the
               //    child components of the interaction editor.
               $scope.$watch(function() {
                 return (
