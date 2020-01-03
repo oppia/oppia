@@ -267,13 +267,13 @@ class BaseModel(ndb.Model):
         ndb.delete_multi(keys)
 
     @classmethod
-    def delete_by_id(cls, id):
+    def delete_by_id(cls, id_):
         """Deletes instance by id.
 
         Args:
-            id: str. Id of the model to delete.
+            id_: str. Id of the model to delete.
         """
-        ndb.Key(cls, id).delete()
+        ndb.Key(cls, id_).delete()
 
     def delete(self):
         """Deletes this instance."""

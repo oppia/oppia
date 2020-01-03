@@ -151,7 +151,7 @@ class CronJobTests(test_utils.GenericTestBase):
         self.assertEqual(all_jobs[0].job_type, 'UserDeletionOneOffJob')
         self.logout()
 
-    def test_cron_user_deletion_handler(self):
+    def test_cron_verify_user_deletion_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         self.assertEqual(
             self.count_jobs_in_taskqueue(

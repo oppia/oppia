@@ -2457,7 +2457,8 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
 
         for i in python_utils.RANGE(3):
             skill_id = '%s' % i
-            self.save_new_skill(skill_id, self.admin_id, 'description %d' % i)
+            self.save_new_skill(
+                skill_id, self.admin_id, description='description %d' % i)
             skill_services.publish_skill(skill_id, self.admin_id)
 
         self.QUESTION_ID = question_services.get_new_question_id()

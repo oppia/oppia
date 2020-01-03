@@ -86,6 +86,9 @@ def verify_user_deleted(pending_deletion_model):
 
     Args:
         pending_deletion_model: PendingDeletionRequestModel.
+
+    Returns:
+        bool. True if all the models were correctly deleted, False otherwise.
     """
     return verify_user_models_deleted(pending_deletion_model.id)
 
@@ -108,6 +111,10 @@ def verify_user_models_deleted(user_id):
 
     Args:
         user_id: str. The id of the user to be deleted.
+
+    Returns:
+        bool. True if all the user models were correctly deleted, False
+        otherwise.
     """
     for model_class in models.Registry.get_storage_model_classes(
             [models.NAMES.user]):

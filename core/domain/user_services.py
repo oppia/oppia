@@ -1037,7 +1037,6 @@ def mark_user_for_deletion(
     _save_user_settings(user_settings)
 
     user_models.PendingDeletionRequestModel(
-    user_models.PendingDeletionRequestModel(
         id=user_id,
         exploration_ids=exploration_ids,
         collection_ids=collection_ids,
