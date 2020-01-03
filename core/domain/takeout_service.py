@@ -34,7 +34,7 @@ from core.platform import models
 
 def get_models_should_be_exported():
     """Returns set of strings representing models to export.
-    
+
     Returns:
         set of str. Set of strings representing models whose data should be
         exported.
