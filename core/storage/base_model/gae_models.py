@@ -661,8 +661,8 @@ class VersionedModel(BaseModel):
 
         self.version += 1
 
-        snapshot = self._compute_snapshot()
-        snapshot_id = self._get_snapshot_id(self.id, self.version)
+        snapshot = self.compute_snapshot()
+        snapshot_id = self.get_snapshot_id(self.id, self.version)
 
         snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS(  # pylint: disable=not-callable
             id=snapshot_id, committer_id=committer_id, commit_type=commit_type,
