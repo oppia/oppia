@@ -111,13 +111,18 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User settings can be deleted since it only contains information
+        """UserSettingsModel can be deleted since it only contains information
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserSettingsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -275,6 +280,11 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of CompletedActivitiesModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -340,6 +350,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of IncompleteActivitiesModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -411,6 +426,11 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instances of ExpUserLastPlaythroughModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
@@ -527,6 +547,11 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of LearnerPlaylistModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -596,6 +621,11 @@ class UserContributionsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserContributionsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -669,6 +699,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserEmailPreferencesModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -720,6 +755,11 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserSubscriptionsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -786,6 +826,11 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserSubscribersModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -829,6 +874,11 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserRecentChangesBatchModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -910,6 +960,11 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserStatsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_by_id(user_id)
 
     @classmethod
@@ -1031,6 +1086,11 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instances of ExplorationUserDataModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
@@ -1185,6 +1245,11 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instances of CollectionProgressModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
@@ -1346,6 +1411,11 @@ class StoryProgressModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instances of StoryProgressModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
@@ -1533,6 +1603,11 @@ class UserQueryModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserQueryModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_multi(
             cls.query(cls.submitter_id == user_id).fetch(keys_only=True))
 
@@ -1647,6 +1722,11 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserSkillMasteryModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
@@ -1730,6 +1810,11 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserContributionScoringModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
         cls.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 

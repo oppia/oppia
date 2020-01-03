@@ -1852,6 +1852,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
 
+
 class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
     """Tests for PendingDeletionRequestModel."""
 
