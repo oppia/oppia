@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import os
 import re
 
+import utils
 from core.tests import test_utils
 import python_utils
 
@@ -26,10 +27,12 @@ import python_utils
 class TravisCIFileTests(test_utils.GenericTestBase):
     """Test the travis ci file and protractor.conf.js have
     same test suites."""
+
     def test_travis_ci(self):
 
         def read_protractor_conf_file():
-            protractor_config_file = open(os.path.join(os.getcwd(), 'core', 'tests', 'protractor.conf.js')).read()
+            protractor_config_file = python_utils.open_file(
+                os.path.join(os.getcwd(), 'core', 'tests', 'protractor.conf.js'), 'r').read()
             # extracting suites object from protractor.conf.js
             suites_object_regex = re.compile(r'suites = {([^}]+)}')
 
@@ -44,8 +47,8 @@ class TravisCIFileTests(test_utils.GenericTestBase):
             return test_suites.count(':')
 
         def read_travis_yml_file():
-            travis_ci_file = open(os.path.join(os.getcwd(), '.travis.yml')).read()
-            travis_ci_dict = python_utils.dict_from_yaml(travis_ci_file)
+            travis_ci_file = python_utils.open_file(os.path.join(os.getcwd(), '.travis.yml'), 'r').read()
+            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
             return len(travis_ci_dict['env']['jobs']), len(travis_ci_dict['script'])
 
         protractor_test_suites = read_protractor_conf_file()

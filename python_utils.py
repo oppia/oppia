@@ -431,15 +431,3 @@ def yaml_from_dict(dictionary, width=80):
     """
     dictionary = _recursively_convert_to_str(dictionary)
     return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
-
-def dict_from_yaml(yaml_file):
-    """Gets the dict representation of a yaml file.
-
-    Args:
-        yaml_file: yaml. Yaml file for conversion into dict.
-
-    Returns:
-        dict. Converted dict of the passed yaml file.
-    """
-    dictionary = yaml.safe_load(yaml_file)
-    return dictionary
