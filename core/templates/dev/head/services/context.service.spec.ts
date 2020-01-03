@@ -50,6 +50,10 @@ describe('Context service', () => {
     it('should correctly retrieve the correct entity type', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
+
+    it('should affirm that the page forbids editing of RTE components', () => {
+      expect(ecs.canAddOrEditComponents()).toBe(false);
+    });
   });
 
   describe('behavior in the exploration learner embed view', () => {
@@ -81,6 +85,10 @@ describe('Context service', () => {
     it('should correctly retrieve the correct entity type', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
+
+    it('should affirm that the page forbids editing of RTE components', () => {
+      expect(ecs.canAddOrEditComponents()).toBe(false);
+    });
   });
 
   describe('behavior in the exploration editor view', () => {
@@ -106,6 +114,11 @@ describe('Context service', () => {
     it('should correctly retrieve the correct entity type', () => {
       expect(ecs.getEntityType()).toBe('exploration');
     });
+
+    it('should correctly check that page allows editing of RTE components',
+      () => {
+        expect(ecs.canAddOrEditComponents()).toBe(true);
+      });
   });
 
   describe('behavior in the topic editor view', () => {
@@ -132,6 +145,11 @@ describe('Context service', () => {
     it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('topic_editor');
     });
+
+    it('should correctly check that page allows editing of RTE components',
+      () => {
+        expect(ecs.canAddOrEditComponents()).toBe(true);
+      });
   });
 
   describe('behavior in question editor modal', () => {
@@ -196,6 +214,11 @@ describe('Context service', () => {
     it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('story_editor');
     });
+
+    it('should correctly check that page allows editing of RTE components',
+      () => {
+        expect(ecs.canAddOrEditComponents()).toBe(true);
+      });
   });
 
   describe('behavior in the skill editor view', () => {
@@ -222,6 +245,11 @@ describe('Context service', () => {
     it('should correctly retrieve the page context', () => {
       expect(ecs.getPageContext()).toBe('skill_editor');
     });
+
+    it('should correctly check that page allows editing of RTE components',
+      () => {
+        expect(ecs.canAddOrEditComponents()).toBe(true);
+      });
   });
 
   describe('behavior in other pages', () => {
