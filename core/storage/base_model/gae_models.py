@@ -67,6 +67,7 @@ USER_ID_MIGRATION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'COPY_AND_UPDATE_ONE_FIELD',
     'ONE_FIELD',
     'CUSTOM',
+    'NOT_APPLICABLE'
 )
 
 # Constant used when retrieving big number of models.
