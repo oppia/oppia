@@ -434,8 +434,10 @@ def yaml_from_dict(dictionary, width=80):
 
 def dict_from_yaml(yaml_file):
     """Gets the dict representation of a yaml file.
+
     Args:
         yaml_file: yaml. Yaml file for conversion into dict.
+
     Returns:
         dict. Converted dict of the passed yaml file.
     """

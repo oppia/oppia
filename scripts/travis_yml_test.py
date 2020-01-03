@@ -50,6 +50,7 @@ class TravisCIFileTests(test_utils.GenericTestBase):
 
         protractor_test_suites = read_protractor_conf_file()
         yaml_jobs, yaml_scripts = read_travis_yml_file()
-        # subtracting 1 since protractor test suites have one extra test(full: [*.js])
+        """ subtracting 4 since protractor test suites have one extra test(full: [*.js]), and three
+         are being run by circleCi"""
         self.assertTrue((yaml_jobs == yaml_scripts) and (
-                                yaml_jobs + 1 == protractor_test_suites - 1))
+                                yaml_jobs == protractor_test_suites - 4))
