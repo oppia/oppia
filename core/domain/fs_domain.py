@@ -18,10 +18,6 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-import os
-
-from core.domain import change_domain
 from core.platform import models
 import feconf
 import python_utils
@@ -141,20 +137,12 @@ class GcsFileSystem(GeneralFileSystem):
         except cloudstorage.NotFoundError:
             return False
 
-    def get(self, filepath, version=None, mode=None):
+    def get(self, filepath):
         """Gets a file as an unencoded stream of raw bytes.
-
-        If `version` argument is unused. It is included so that this method
-        signature matches that of other file systems.
-
-        The 'mode' argument is unused. It is included so that this method
-        signature matches that of other file systems.
 
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
-            version: str. Unused argument.
-            mode: str. Unused argument.
 
         Returns:
             FileStream or None. It returns FileStream
@@ -235,12 +223,12 @@ class GcsFileSystem(GeneralFileSystem):
         # The path entered should be of the form, /bucket_name/prefix.
         path = '/%s%s' % (bucket_name, prefix)
 
-        # Remove the asset path from the prefix of filename.
         path_prefix = '/%s/' % utils.vfs_construct_path(
             bucket_name, self._assets_path)
         stats = cloudstorage.listbucket(path)
         files_in_dir = []
         for stat in stats:
+            # Remove the asset path from the prefix of filename.
             files_in_dir.append(stat.filename.replace(path_prefix, ''))
         return files_in_dir
 
@@ -293,44 +281,35 @@ class AbstractFileSystem(python_utils.OBJECT):
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
 
-    def open(self, filepath, version=None, mode='r'):
+    def open(self, filepath):
         """Returns a stream with the file content. Similar to open(...).
 
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
-            version: int or None. The version number of the file. None indicates
-                the latest version of the file.
-            mode: str. The mode with which to open the file.
 
         Returns:
             FileStream. The file stream domain object.
         """
         self._check_filepath(filepath)
-        return self._impl.get(filepath, version=version, mode=mode)
+        return self._impl.get(filepath)
 
-    def get(self, filepath, version=None, mode='r'):
+    def get(self, filepath):
         """Returns a bytestring with the file content, but no metadata.
 
         Args:
             filepath: str. The path to the relevant file within the entity's
                 assets folder.
-            version: int or None. The version number of the file. None indicates
-                the latest version of the file.
-            mode: str. The mode with which to open the file.
 
         Returns:
             FileStream. The file stream domain object.
 
         Raises:
-            IOError: The given (or latest) version of this file stream does not
-                exist.
+            IOError: The given file stream does not exist.
         """
-        file_stream = self.open(filepath, version=version, mode=mode)
+        file_stream = self.open(filepath)
         if file_stream is None:
-            raise IOError(
-                'File %s (version %s) not found.'
-                % (filepath, version if version else 'latest'))
+            raise IOError('File %s not found.' % (filepath))
         return file_stream.read()
 
     def commit(self, filepath, raw_bytes, mimetype=None):

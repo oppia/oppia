@@ -35,8 +35,8 @@ import feconf
 import python_utils
 import utils
 
-(base_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([
+    models.NAMES.exploration])
 gae_image_services = models.Registry.import_gae_image_services()
 
 

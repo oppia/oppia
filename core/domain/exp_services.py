@@ -262,11 +262,7 @@ def export_to_zip_file(exploration_id, version=None):
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
-            # Currently, the version number of all files is 1, since they are
-            # not modifiable post-upload.
-            # TODO(sll): When allowing editing of files, implement versioning
-            # for them.
-            file_contents = fs.get(filepath, version=1)
+            file_contents = fs.get(filepath)
 
             str_filepath = 'assets/%s' % filepath
             assert isinstance(str_filepath, python_utils.UNICODE)

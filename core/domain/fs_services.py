@@ -20,11 +20,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import json
 
-from constants import constants
 from core.domain import fs_domain
 from core.platform import models
 import feconf
-import python_utils
 
 gae_image_services = models.Registry.import_gae_image_services()
 
@@ -107,9 +105,10 @@ def read_classifier_data(exp_id, job_id):
     Args:
         exp_id: str. The id of the exploration.
         job_id: str. The id of the classifier training job model.
-    
+
     Returns:
-        dict. The classifier data read from the file.
+        dict|None. The classifier data read from the file. Returns None
+            if no classifier data is stored for the given job.
     """
     filepath = '%s-classifier-data.json' % (job_id)
     file_system_class = get_entity_file_system_class()
@@ -127,9 +126,6 @@ def delete_classifier_data(exp_id, job_id):
     Args:
         exp_id: str. The id of the exploration.
         job_id: str. The id of the classifier training job model.
-    
-    Returns:
-        dict. The classifier data read from the file.
     """
     filepath = '%s-classifier-data.json' % (job_id)
     file_system_class = get_entity_file_system_class()

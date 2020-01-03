@@ -18,16 +18,11 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import logging
-import os
-import shutil
-
 from constants import constants
 from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import python_utils
 import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
