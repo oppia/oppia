@@ -471,7 +471,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             list(str). The list of all question ids corresponding to the given
                 skill id.
         """
-        question_skill_link_models = cls.query(cls.skill_id == skill_id)
+        question_skill_link_models = cls.query().filter(
+            cls.skill_id == skill_id,
+            cls.deleted == False)
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
