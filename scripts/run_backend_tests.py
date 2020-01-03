@@ -104,7 +104,7 @@ ALL_ERRORS = []
 LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 _LOAD_TESTS_DIR = os.path.join(os.getcwd(), 'core', 'tests', 'load_tests')
 
-MAX_CONCURRENT_RUNS = 30
+MAX_CONCURRENT_RUNS = 25
 
 _PARSER = argparse.ArgumentParser(description="""
 Run this script from the oppia root folder:
@@ -527,9 +527,6 @@ def main(args=None):
 
         report_stdout, _ = process.communicate()
         python_utils.PRINT(report_stdout)
-
-        python_utils.PRINT('Generating xml coverage report...')
-        subprocess.check_call([sys.executable, COVERAGE_MODULE_PATH, 'xml'])
 
         coverage_result = re.search(
             r'TOTAL\s+(\d+)\s+(\d+)\s+(?P<total>\d+)%\s+', report_stdout)
