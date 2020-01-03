@@ -32,6 +32,7 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants';
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
 
@@ -47,6 +48,7 @@ import { ClassroomDomainConstants } from
     ServiceBootstrapComponent
   ],
   providers: [
+    AppConstants,
     ClassroomDomainConstants
   ]
 })
