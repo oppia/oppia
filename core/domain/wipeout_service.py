@@ -1,6 +1,6 @@
 # coding: utf-8
 #
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Services for user data."""
+"""Wipeout service."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -25,7 +25,8 @@ from core.domain import user_services
 from core.platform import models
 
 current_user_services = models.Registry.import_current_user_services()
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -78,6 +79,8 @@ def delete_user(pending_deletion_model):
         pending_deletion_model: PendingDeletionRequestModel.
     """
     delete_user_models(pending_deletion_model.id)
+    pending_deletion_model.deletion_complete = True
+    pending_deletion_model.put()
 
 
 def verify_user_deleted(pending_deletion_model):
@@ -90,7 +93,13 @@ def verify_user_deleted(pending_deletion_model):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    return verify_user_models_deleted(pending_deletion_model.id)
+    if verify_user_models_deleted(pending_deletion_model.id):
+        pending_deletion_model.delete()
+        return True
+    else:
+        pending_deletion_model.deletion_complete = False
+        pending_deletion_model.put()
+        return False
 
 
 def delete_user_models(user_id):

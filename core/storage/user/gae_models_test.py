@@ -1026,7 +1026,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
 
     def test_apply_deletion_policy(self):
         user_models.UserStatsModel.apply_deletion_policy(self.USER_ID_1)
-        self.assertIsNone( user_models.UserStatsModel.get_by_id(self.USER_ID_1))
+        self.assertIsNone(user_models.UserStatsModel.get_by_id(self.USER_ID_1))
         # Test that calling apply_deletion_policy with no existing model
         # doesn't fail.
         user_models.UserStatsModel.apply_deletion_policy(
@@ -1118,6 +1118,8 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             draft_change_list_exp_version=3,
             draft_change_list_id=1
         ).put()
+        user_models.ExplorationUserDataModel.create(
+            self.USER_1_ID, self.EXP_ID_TWO).put()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_2_ID, self.EXP_ID_ONE),
             user_id=self.USER_2_ID,
@@ -1127,8 +1129,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
             draft_change_list={'new_content': {}},
             draft_change_list_last_updated=self.DATETIME_OBJECT,
             draft_change_list_exp_version=3,
-            draft_change_list_id=1,
-            deleted=True
+            draft_change_list_id=1
         ).put()
 
     def test_get_deletion_policy(self):
@@ -1207,7 +1208,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     def test_export_data_one_exploration(self):
         """Test export data when user has one exploration."""
         user_data = user_models.ExplorationUserDataModel.export_data(
-            self.USER_1_ID)
+            self.USER_2_ID)
         expected_data = {
             self.EXP_ID_ONE: {
                 'rating': 2,
@@ -1222,14 +1223,11 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
                     feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
             }
         }
-
         self.assertDictEqual(expected_data, user_data)
 
     def test_export_data_multiple_explorations(self):
         """Test export data when user has multiple explorations."""
         # Add two more explorations.
-        user_models.ExplorationUserDataModel.create(
-            self.USER_1_ID, self.EXP_ID_TWO).put()
         user_models.ExplorationUserDataModel(
             id='%s.%s' % (self.USER_1_ID, self.EXP_ID_THREE),
             user_id=self.USER_1_ID,
@@ -1440,10 +1438,10 @@ class StoryProgressModelTests(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.DELETE)
 
     def test_apply_deletion_policy(self):
-        user_models.StoryProgressModel.apply_deletion_policy(self.USER_ID_1)
+        user_models.StoryProgressModel.apply_deletion_policy(self.USER_ID_2)
         self.assertIsNone(
             user_models.StoryProgressModel.query(
-                user_models.StoryProgressModel.user_id == self.USER_ID_1
+                user_models.StoryProgressModel.user_id == self.USER_ID_2
             ).get()
         )
         # Test that calling apply_deletion_policy with no existing model
@@ -1521,6 +1519,7 @@ class UserQueryModelTests(test_utils.GenericTestBase):
 
     QUERY_1_ID = 'id_1'
     QUERY_2_ID = 'id_2'
+    QUERY_3_ID = 'id_3'
     NONEXISTENT_USER_ID = 'submitter_id_x'
     USER_ID_1 = 'submitter_id_1'
     USER_ID_2 = 'submitter_id_2'
@@ -1537,6 +1536,10 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             id=self.QUERY_2_ID,
             submitter_id=self.USER_ID_2,
             deleted=True
+        ).put()
+        user_models.UserQueryModel(
+            id=self.QUERY_3_ID,
+            submitter_id=self.USER_ID_1
         ).put()
 
     def test_get_deletion_policy(self):
@@ -1881,6 +1884,13 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             user_id=self.USER_1_ID,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
+            has_email_been_sent=False
+        ).put()
+        user_models.UserContributionScoringModel(
+            id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_1_ID),
+            user_id=self.USER_1_ID,
+            score_category=self.SCORE_CATEGORY_2,
+            score=2,
             has_email_been_sent=False
         ).put()
         user_models.UserContributionScoringModel(

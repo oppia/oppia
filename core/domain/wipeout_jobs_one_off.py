@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs for queries personalized to individual users."""
+"""Wipeout one-off jobs."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -43,7 +43,7 @@ class UserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        yield (key, values)
 
 
 class VerifyUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -66,4 +66,4 @@ class VerifyUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        yield (key, values)
