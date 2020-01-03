@@ -1,4 +1,4 @@
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from core import jobs
 from core.domain import wipeout_service
 from core.platform import models
-
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
