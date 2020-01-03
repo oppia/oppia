@@ -143,6 +143,7 @@
 /scripts/setup_test.py @kevinlee12
 /scripts/start.py @kevinlee12
 /scripts/third_party_size_check.py @kevinlee12
+/scripts/travis_yml_test.py @showtim3 @kevinlee12
 /scripts/typescript_checks.py @ankita240796 @kevinlee12
 /scripts/typescript_checks_test.py @ankita240796 @kevinlee12
 /ubuntu_dockerfile @ezl-13 @kevinlee12
