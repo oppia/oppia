@@ -2014,10 +2014,11 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         """
         self._check_patterns()
         mandatory_patterns_messages = self.process_manager['mandatory']
-        pattern_messages = self.process_manager['bad_pattern']
-
-        return (
-            mandatory_patterns_messages + pattern_messages)
+        if not CIRCLECI_ENV:
+            pattern_messages = self.process_manager['bad_pattern']
+            return (
+                mandatory_patterns_messages + pattern_messages)
+        return mandatory_patterns_messages
 
 
 class JsTsLintChecksManager(LintChecksManager):
