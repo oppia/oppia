@@ -632,7 +632,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         model_names_list = [
             model_name
             for model_name in dir(models.NAMES)
-            if not (model_name.startswith('__') and model_name == 'base_model')
+            if not model_name.startswith('__') and model_name != 'base_model'
         ]
         model_modules = models.Registry.import_models(model_names_list)
         for model_module in model_modules:
