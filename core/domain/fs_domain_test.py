@@ -40,9 +40,8 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             fs_domain.GcsFileSystem(feconf.ENTITY_TYPE_EXPLORATION, 'eid'))
 
     def test_get_and_save(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            self.fs.commit('abc.png', 'file_contents')
-            self.assertEqual(self.fs.get('abc.png'), 'file_contents')
+        self.fs.commit('abc.png', 'file_contents')
+        self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
     def test_validate_entity_parameters(self):
         with self.assertRaisesRegexp(
@@ -59,53 +58,51 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             fs_domain.GcsFileSystem('invalid_name', 'exp_id')
 
     def test_delete(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            self.assertFalse(self.fs.isfile('abc.png'))
-            self.fs.commit('abc.png', 'file_contents')
-            self.assertTrue(self.fs.isfile('abc.png'))
+        self.assertFalse(self.fs.isfile('abc.png'))
+        self.fs.commit('abc.png', 'file_contents')
+        self.assertTrue(self.fs.isfile('abc.png'))
 
-            self.fs.delete('abc.png')
-            self.assertFalse(self.fs.isfile('abc.png'))
-            with self.assertRaisesRegexp(
-                IOError, r'File abc\.png .* not found'):
-                self.fs.get('abc.png')
+        self.fs.delete('abc.png')
+        self.assertFalse(self.fs.isfile('abc.png'))
+        with self.assertRaisesRegexp(
+            IOError, r'File abc\.png not found'):
+            self.fs.get('abc.png')
 
-            with self.assertRaisesRegexp(
-                IOError, 'Image does not exist: fake_file.png'):
-                self.fs.delete('fake_file.png')
+        with self.assertRaisesRegexp(
+            IOError, 'Image does not exist: fake_file.png'):
+            self.fs.delete('fake_file.png')
 
     def test_listdir(self):
-        with self.swap(constants, 'DEV_MODE', False):
-            self.fs.commit('abc.png', 'file_contents')
-            self.fs.commit('abcd.png', 'file_contents_2')
-            self.fs.commit('abc/abcd.png', 'file_contents_3')
-            self.fs.commit('bcd/bcde.png', 'file_contents_4')
+        self.fs.commit('abc.png', 'file_contents')
+        self.fs.commit('abcd.png', 'file_contents_2')
+        self.fs.commit('abc/abcd.png', 'file_contents_3')
+        self.fs.commit('bcd/bcde.png', 'file_contents_4')
 
-            file_names = ['abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png']
+        file_names = ['abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png']
 
-            self.assertEqual(self.fs.listdir(''), file_names)
+        self.assertEqual(self.fs.listdir(''), file_names)
 
-            self.assertEqual(
-                self.fs.listdir('abc'), ['abc/abcd.png'])
+        self.assertEqual(
+            self.fs.listdir('abc'), ['abc/abcd.png'])
 
-            with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
-                self.fs.listdir('/abc')
+        with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
+            self.fs.listdir('/abc')
 
-            with self.assertRaisesRegexp(
-                IOError,
-                (
-                    'The dir_name should not start with /'
-                    ' or end with / : abc/'
-                )
-            ):
-                self.fs.listdir('abc/')
+        with self.assertRaisesRegexp(
+            IOError,
+            (
+                'The dir_name should not start with /'
+                ' or end with / : abc/'
+            )
+        ):
+            self.fs.listdir('abc/')
 
-            self.assertEqual(self.fs.listdir('fake_dir'), [])
+        self.assertEqual(self.fs.listdir('fake_dir'), [])
 
-            new_fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(
-                    feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
-            self.assertEqual(new_fs.listdir('assets'), [])
+        new_fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, 'eid2'))
+        self.assertEqual(new_fs.listdir('assets'), [])
 
 
 class DirectoryTraversalTests(test_utils.GenericTestBase):
