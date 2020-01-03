@@ -36,7 +36,6 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     """Tests for UserSettingsModel class."""
 
     NONEXISTENT_USER_ID = 'id_x'
-    NONEXISTENT_USER_ID = 'id_x'
     USER_1_ID = 'user_id'
     USER_1_GAE_ID = 'gae_id'
     USER_1_EMAIL = 'user@example.com'
@@ -1883,3 +1882,9 @@ class PendingDeletionRequestModelTests(test_utils.GenericTestBase):
             user_models.PendingDeletionRequestModel
             .has_reference_to_user_id(self.NONEXISTENT_USER_ID)
         )
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            user_models.PendingDeletionRequestModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
