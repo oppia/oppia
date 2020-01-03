@@ -431,7 +431,7 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(
+        ndb.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1091,7 +1091,7 @@ class ExplorationUserDataModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(
+        ndb.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1250,7 +1250,7 @@ class CollectionProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(
+        ndb.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1416,7 +1416,7 @@ class StoryProgressModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(
+        ndb.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1608,7 +1608,7 @@ class UserQueryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(
+        ndb.delete_multi(
             cls.query(cls.submitter_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1727,7 +1727,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(
+        ndb.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
@@ -1815,7 +1815,7 @@ class UserContributionScoringModel(base_models.BaseModel):
         Args:
             user_id: str. The ID of the user whose data should be deleted.
         """
-        cls.delete_multi(
+        ndb.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
