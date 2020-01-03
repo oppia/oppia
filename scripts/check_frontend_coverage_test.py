@@ -168,8 +168,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         with self.exists_swap, self.open_file_swap, self.print_swap:
             with fully_covered_tests_swap:
                 check_frontend_coverage.check_coverage_changes()
-                # self.assertEqual(
-                #     self.check_function_calls_counter['mock_print'], 3)
 
     def test_check_coverage_changes_error(self):
         def mock_exists(unused_path):
