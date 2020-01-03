@@ -4872,8 +4872,7 @@ class UserSkillMasteryModelValidator(BaseUserModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_skill_mastery,
-            cls._validate_skill_is_public]
+            cls._validate_skill_mastery]
 
 
 class UserContributionScoringModelValidator(BaseUserModelValidator):

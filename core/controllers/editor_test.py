@@ -2591,6 +2591,8 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     self.state_name), expected_status_int=404)
 
     def test_delete_learner_answer_info_of_question_states(self):
+        self.logout()
+        self.login(self.ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,
@@ -2620,6 +2622,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
             self.assertEqual(
                 len(learner_answer_details.learner_answer_info_list), 0)
+        self.logout()
 
 
 class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):

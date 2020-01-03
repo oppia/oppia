@@ -2502,29 +2502,13 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_other_public_skill(self):
-        skill_services.publish_skill(self.skill_id, self.admin_id)
         self.login(self.second_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
         self.assertEqual(response['skill_id'], self.skill_id)
         self.logout()
 
-    def test_admin_can_not_edit_other_private_skill(self):
-        self.login(self.second_admin_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401)
-        self.logout()
-
-    def test_topic_manager_can_not_edit_private_skill(self):
-        self.login(self.manager_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401)
-        self.logout()
-
     def test_topic_manager_can_edit_public_skill(self):
-        skill_services.publish_skill(self.skill_id, self.admin_id)
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
@@ -2532,7 +2516,6 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_can_not_edit_public_skill(self):
-        skill_services.publish_skill(self.skill_id, self.admin_id)
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -2568,6 +2551,10 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email('a@example.com')
+        self.question_id = 'question_id'
+        self.save_new_question(
+            self.question_id, self.owner_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
@@ -2808,7 +2795,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_question_with_valid_question_id(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_QUESTION, self.question_id))

@@ -63,9 +63,6 @@ CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION = (
 CMD_MIGRATE_RUBRICS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_rubrics_schema_to_latest_version')
 
-CMD_PUBLISH_SKILL = 'publish_skill'
-
-
 class SkillChange(change_domain.BaseChange):
     """Domain object for changes made to skill object.
 

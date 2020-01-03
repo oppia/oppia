@@ -614,4 +614,4 @@ class QuestionSummaryModel(base_models.BaseModel):
     @staticmethod
     def get_user_id_migration_policy():
         """QuestionSummaryModel has one field that contains user ID."""
-        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

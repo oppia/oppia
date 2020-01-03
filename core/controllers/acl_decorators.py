@@ -1607,6 +1607,10 @@ def can_edit_question(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
+        question = question_services.get_question_by_id(
+            question_id, strict=False)
+        if question is None:
+            raise self.PageNotFoundException
         if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
         else:
@@ -1679,6 +1683,10 @@ def can_view_question_editor(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
+        question = question_services.get_question_by_id(
+            question_id, strict=False)
+        if question is None:
+            raise self.PageNotFoundException
         if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in self.user.actions:
             return handler(self, question_id, **kwargs)
         else:

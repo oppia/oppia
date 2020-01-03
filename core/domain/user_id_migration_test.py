@@ -820,7 +820,7 @@ class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
         output = [
             key[1] for key in output
             if key[0] == 'FAILURE - HAS REFERENCE TO GAE ID'][0]
-        self.assertEqual(len(output), 4)
+        self.assertEqual(len(output), 3)
         self.assertIn((self.USER_1_GAE_ID, 'CompletedActivitiesModel'), output)
         self.assertIn((self.USER_2_GAE_ID, 'CompletedActivitiesModel'), output)
         self.assertIn(

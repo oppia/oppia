@@ -537,7 +537,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_compute_summary_of_question(self):
         question_summary = question_services.compute_summary_of_question(
-            self.question, self.editor_id)
+            self.question)
 
         self.assertEqual(question_summary.id, self.question_id)
         self.assertEqual(

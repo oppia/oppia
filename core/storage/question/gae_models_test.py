@@ -542,9 +542,6 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
         )
         question_summary_model.put()
 
-        self.assertTrue(
-            question_models.QuestionSummaryModel
-            .has_reference_to_user_id('user_id'))
         self.assertFalse(
             question_models.QuestionSummaryModel
             .has_reference_to_user_id('user_id_x'))
@@ -552,4 +549,4 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             question_models.QuestionSummaryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)

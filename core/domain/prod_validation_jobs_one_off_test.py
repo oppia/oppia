@@ -2458,7 +2458,6 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
         for i in python_utils.RANGE(3):
             skill_id = '%s' % i
             self.save_new_skill(skill_id, self.admin_id, 'description %d' % i)
-            skill_services.publish_skill(skill_id, self.admin_id)
 
         self.QUESTION_ID = question_services.get_new_question_id()
         self.save_new_question(
@@ -8109,15 +8108,6 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_2 = (
             skill_models.SkillCommitLogEntryModel.get_by_id(
                 'skill-2-1'))
-        self.rights_model_instance_0 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'rights-0-1'))
-        self.rights_model_instance_1 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'rights-1-1'))
-        self.rights_model_instance_2 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'rights-2-1'))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -8132,7 +8122,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'old_value': 'description 0'
             })], 'Changes.')
         expected_output = [
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 7]']
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_created_on_greater_than_last_updated(self):
@@ -8148,15 +8138,13 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.id,
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
         self.model_instance_2.delete()
-        self.rights_model_instance_0.delete()
-        self.rights_model_instance_1.delete()
-        self.rights_model_instance_2.delete()
+
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'SkillCommitLogEntryModel\', '
@@ -8180,11 +8168,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'having value 0, expect model SkillModel with id '
                 '0 but it doesn\'t exist", u"Entity id skill-0-2: '
                 'based on field skill_ids having value 0, expect '
-                'model SkillModel with id 0 but it doesn\'t exist", '
-                'u"Entity id rights-0-1: based on field skill_ids '
-                'having value 0, expect model SkillModel with id 0 '
-                'but it doesn\'t exist"]]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
+                'model SkillModel with id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, literal_eval=True)
 
     def test_invalid_skill_version_in_model_id(self):
@@ -8203,7 +8188,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'to id 0 has a version 1 which is less than '
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 6]']
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_id(self):
@@ -8226,7 +8211,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'SkillCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
                 'No commit command domain object defined for entity with '
                 'commands: [{}]\']]'),
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 6]']
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_type(self):
@@ -8238,7 +8223,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'SkillCommitLogEntryModel\', '
                 '[u\'Entity id skill-0-1: Commit type invalid is '
                 'not allowed\']]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_post_commit_status(self):
@@ -8250,7 +8235,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'of SkillCommitLogEntryModel\', '
                 '[u\'Entity id skill-0-1: Post commit status invalid '
                 'is invalid\']]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_true_post_commit_is_private(self):
@@ -8265,7 +8250,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id %s: Post commit status is '
                 'public but post_commit_is_private is True\']]'
             ) % self.model_instance_0.id,
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_false_post_commit_is_private(self):
@@ -8280,7 +8265,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id %s: Post commit status is '
                 'private but post_commit_is_private is False\']]'
             ) % self.model_instance_0.id,
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
@@ -8309,7 +8294,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'The following required attributes are missing: '
                 'misconception_id, The following extra attributes are present: '
                 'invalid_attribute"]]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
 
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -9645,7 +9630,6 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -9974,7 +9958,6 @@ class TopicSnapshotMetadataModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -10167,7 +10150,6 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -10328,7 +10310,6 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -10504,7 +10485,6 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -10709,7 +10689,6 @@ class TopicRightsSnapshotContentModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -10868,7 +10847,6 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11151,7 +11129,6 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11375,7 +11352,6 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11587,7 +11563,6 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11794,7 +11769,6 @@ class SubtopicPageSnapshotContentModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11962,7 +11936,6 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -14588,7 +14561,6 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
         skill = skill_domain.Skill.create_default_skill(
             'skill', description='description', rubrics=rubrics)
         skill_services.save_new_skill(self.owner_id, skill)
-        skill_services.publish_skill(skill.id, self.owner_id)
         skill_services.create_user_skill_mastery(
             self.user_id, 'skill', 0.8)
 
@@ -14656,28 +14628,6 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
                 'with id skill but it doesn\'t exist"]]') % (
                     self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
-
-    def test_private_skill(self):
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skill = skill_domain.Skill.create_default_skill(
-            'privateskill', 'description', rubrics)
-        skill_services.save_new_skill(self.owner_id, skill)
-        skill_services.create_user_skill_mastery(
-            self.user_id, skill.id, 0.4)
-        expected_output = [
-            (
-                u'[u\'failed validation check for public skill check of '
-                'UserSkillMasteryModel\', [u\'Entity id %s.privateskill: '
-                'skill with id privateskill corresponding to entity is '
-                'private\']]') % self.user_id,
-            u'[u\'fully-validated UserSkillMasteryModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_invalid_skill_mastery(self):
         self.model_instance.degree_of_mastery = 10

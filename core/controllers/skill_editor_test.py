@@ -67,11 +67,6 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         """Mocks skill updates. Always fails by raising a validation error."""
         raise utils.ValidationError()
 
-    def _mock_publish_skill_raise_exception(
-            self, unused_skill_id, unused_committer_id):
-        """Mocks publishing skills. Always fails by raising an exception."""
-        raise Exception()
-
 
 class SkillEditorTest(BaseSkillEditorControllerTests):
     """Tests for SkillEditorPage."""

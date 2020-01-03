@@ -166,7 +166,6 @@ class NewSkillHandler(base.BaseHandler):
             new_skill_id, description, rubrics)
         skill.update_explanation(explanation_dict)
         skill_services.save_new_skill(self.user_id, skill)
-        skill_services.publish_skill(skill.id, self.user_id)
 
         self.render_json({
             'skillId': new_skill_id

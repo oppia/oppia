@@ -513,23 +513,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, '')
 
-    def test_cannot_publish_skill_with_invalid_skill_id(self):
-        with self.assertRaisesRegexp(
-            Exception, 'The given skill does not exist.'):
-            skill_services.publish_skill('invalid_skill_id', self.USER_ID)
-
-    def test_cannot_publish_already_published_skill(self):
-        skill_services.publish_skill(self.SKILL_ID, self.user_id_admin)
-        with self.assertRaisesRegexp(
-            Exception, 'The skill is already published.'):
-            skill_services.publish_skill(self.SKILL_ID, self.user_id_admin)
-
-    def test_normal_user_cannot_publish_skill(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'The user does not have enough rights to publish the skill.'):
-            skill_services.publish_skill(self.SKILL_ID, self.USER_ID)
-
     def test_cannot_update_skill_with_empty_changelist(self):
         with self.assertRaisesRegexp(
             Exception,

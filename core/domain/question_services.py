@@ -52,7 +52,7 @@ def create_new_question(committer_id, question, commit_message):
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
     question.version += 1
-    create_question_summary(question.id, committer_id)
+    create_question_summary(question.id)
     opportunity_services.increment_question_counts(question.linked_skill_ids, 1)
 
 
@@ -581,7 +581,7 @@ def update_question(
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)
-    create_question_summary(question_id, committer_id)
+    create_question_summary(question_id)
 
 
 def create_question_summary(question_id):
