@@ -216,12 +216,8 @@ class LcovStanzaRelevantLines:
             Exception: Total lines number is not found.
             Exception: Covered lines number is not found.
         """
-        relevant_lines = [
-            line for line in stanza.splitlines() if
-            any(line.startswith(prefix) for prefix in
-            RELEVANT_LCOV_LINE_PREFIXES)]
 
-        match = re.search('SF:(.+)', relevant_lines[0])
+        match = re.search('SF:(.+)\n', stanza)
         if match is None:
             raise Exception(
                 'The test path is empty or null. '
@@ -229,7 +225,7 @@ class LcovStanzaRelevantLines:
         _, file_name = os.path.split(match.group(1))
         self.file_name = file_name
 
-        match = re.search('LF:(\d+)', relevant_lines[1])
+        match = re.search('LF:(\d+)\n', stanza)
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the total lines of {} file.'
@@ -237,7 +233,7 @@ class LcovStanzaRelevantLines:
                 .format(file_name))
         self.total_lines = int(match.group(1))
 
-        match = re.search('LH:(\d+)', relevant_lines[2])
+        match = re.search('LH:(\d+)\n', stanza)
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the covered lines of {} file.'
@@ -254,7 +250,8 @@ def run_frontend_tests_script():
         subprocess.check_call([
             'python', '-m', 'scripts.run_frontend_tests'])
     except subprocess.CalledProcessError:
-        sys.exit(1)
+        sys.exit('The frontend tests failed. Please fix it before running the'
+        ' test coverage check.')
 
 
 def get_stanzas_from_lcov_file():
@@ -288,10 +285,8 @@ def get_stanzas_from_lcov_file():
 def check_fully_covered_filenames_list_is_sorted():
     """Check if fully_covered_filenames list is in alphabetical order."""
     if fully_covered_filenames != sorted(fully_covered_filenames):
-        python_utils.PRINT(
-            'The \033[1mfully_covered_filenames\033[0m list must be kept'
+        sys.exit('The \033[1mfully_covered_filenames\033[0m list must be kept'
             ' in alphabetical order.')
-        sys.exit(1)
 
 
 def check_coverage_changes():
@@ -326,8 +321,8 @@ def check_coverage_changes():
         else:
             if total_lines == covered_lines:
                 errors += ('\033[1m{}\033[0m file is fully covered but it\'s'
-                ' supposed to be in the whitelist. Please add the file name in'
-                ' the whitelist in the file'
+                ' not in the "100% coverage" whitelist. Please add the file'
+                ' name in the whitelist in the file'
                 ' scripts/check_frontend_test_coverage.py.\n'
                 .format(file_name))
 
@@ -344,8 +339,7 @@ def check_coverage_changes():
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('Frontend Coverage Checks Not Passed.')
         python_utils.PRINT('------------------------------------')
-        python_utils.PRINT(errors)
-        sys.exit(1)
+        sys.exit(errors)
     else:
         python_utils.PRINT('------------------------------------')
         python_utils.PRINT('All Frontend Coverage Checks Passed.')

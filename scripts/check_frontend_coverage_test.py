@@ -38,10 +38,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             'exists_is_called': True,
             'check_call_is_called': True,
         }
-        self.check_function_calls_counter = {
-            'mock_print': 0
-        }
-        self.print_messages = []
+        self.printed_messages = []
         class MockFile(python_utils.OBJECT):
             def __init__(self, lcov_items_list):
                 self.lcov_items_list = lcov_items_list
@@ -54,8 +51,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             self.check_function_calls['exists_is_called'] = True
             return True
         def mock_print(message):
-            self.check_function_calls_counter['mock_print'] += 1
-            self.print_messages.append(message)
+            self.printed_messages.append(message)
         def mock_check_call(command):
             self.check_function_calls['check_call_is_called'] = True
         self.open_file_swap = self.swap(python_utils, 'open_file',
@@ -79,7 +75,9 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         with check_call_swap:
             with self.assertRaises(SystemExit) as error:
                 check_frontend_coverage.run_frontend_tests_script()
-        self.assertEqual(error.exception.code, 1)
+        self.assertEqual(error.exception.message,
+            'The frontend tests failed. Please fix it before running the test'
+            ' coverage check.')
 
     def test_get_stanzas_from_lcov_file(self):
         self.lcov_items_list = (
@@ -170,8 +168,8 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         with self.exists_swap, self.open_file_swap, self.print_swap:
             with fully_covered_tests_swap:
                 check_frontend_coverage.check_coverage_changes()
-                self.assertEqual(
-                    self.check_function_calls_counter['mock_print'], 3)
+                # self.assertEqual(
+                #     self.check_function_calls_counter['mock_print'], 3)
 
     def test_check_coverage_changes_error(self):
         def mock_exists(unused_path):
@@ -180,7 +178,8 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         with exists_swap:
             with self.assertRaises(Exception) as error:
                 check_frontend_coverage.check_coverage_changes()
-            self.assertTrue(error.exception.message)
+            self.assertRaisesRegexp(Exception, 'Expected lcov file to be'
+            ' available at [A-Za-z/], but the file does not exist.')
         
     def test_check_coverage_changes_insertion(self):
         self.lcov_items_list = (
@@ -204,14 +203,11 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with fully_covered_tests_swap:
                 with self.assertRaises(SystemExit) as error:          
                     check_frontend_coverage.check_coverage_changes()
-                self.assertEqual(error.exception.code, 1)
-                self.assertEqual(
-                    self.check_function_calls_counter['mock_print'], 4)
-                self.assertNotEqual(self.print_messages.index(
-                    ('\033[1mfile2.ts\033[0m file is fully covered but it\'s'
-                    ' supposed to be in the whitelist. Please add the file name'
-                    ' in the whitelist in the file'
-                    ' scripts/check_frontend_test_coverage.py.\n')), -1)
+                self.assertEqual(error.exception.message,
+                    '\033[1mfile2.ts\033[0m file is fully covered but it\'s'
+                    ' not in the "100% coverage" whitelist. Please add the file'
+                    ' name in the whitelist in the file'
+                    ' scripts/check_frontend_test_coverage.py.\n')
 
     def test_check_coverage_changes_decrease(self):
         self.lcov_items_list = (
@@ -229,13 +225,10 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with fully_covered_tests_swap:
                 with self.assertRaises(SystemExit) as error:          
                     check_frontend_coverage.check_coverage_changes()
-                self.assertEqual(error.exception.code, 1)
-                self.assertEqual(
-                    self.check_function_calls_counter['mock_print'], 4)
-                self.assertNotEqual(self.print_messages.index(
-                    ('\033[1mfile.ts\033[0m file is in the whitelist but its'
+                self.assertEqual(error.exception.message,
+                    '\033[1mfile.ts\033[0m file is in the whitelist but its'
                     ' coverage decreased. Make sure it is fully covered'
-                    ' by Karma unit tests.\n')), -1)
+                    ' by Karma unit tests.\n')
 
     def test_check_coverage_changes_rename(self):
         self.lcov_items_list = (
@@ -254,21 +247,40 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
             with fully_covered_tests_swap:
                 with self.assertRaises(SystemExit) as error:          
                     check_frontend_coverage.check_coverage_changes()
-                self.assertEqual(error.exception.code, 1)
-                self.assertEqual(
-                    self.check_function_calls_counter['mock_print'], 4)
-                self.assertNotEqual(self.print_messages.index(
-                    ('\033[1mnewfilename.ts\033[0m file is'
-                    ' fully covered but it\'s supposed to be in the whitelist.'
-                    ' Please add the file name in the whitelist in the file'
-                    ' scripts/check_frontend_test_coverage.py.'
-                    '\n\033[1mfile.ts\033[0m is in the frontend test coverage'
+                self.assertEqual(error.exception.message,
+                    '\033[1mnewfilename.ts\033[0m file is'
+                    ' fully covered but it\'s not in the "100% coverage"'
+                    ' whitelist. Please add the file name in the whitelist in'
+                    ' the file scripts/check_frontend_test_coverage.py.\n'
+                    '\033[1mfile.ts\033[0m is in the frontend test coverage'
                     ' whitelist but it doesn\'t exist anymore. If you have'
                     ' renamed it, please make sure to remove the old file name'
                     ' and add the new file name in the whitelist in the file'
-                    ' scripts/check_frontend_test_coverage.py.\n')), -1)
+                    ' scripts/check_frontend_test_coverage.py.\n')
 
     def test_fully_covered_filenames_is_sorted(self):
+        self.lcov_items_list = (
+            'SF:/opensource/oppia/file.ts\n'
+            'LF:10\n'
+            'LH:10\n'
+            'end_of_record\n'
+            'SF:/opensource/oppia/anotherfile.ts\n'
+            'LF:10\n'
+            'LH:10\n'
+            'end_of_record\n'
+        )
+        fully_covered_tests_swap = self.swap(check_frontend_coverage,
+            'fully_covered_filenames', [
+                'anotherfile.ts'
+                'file.ts',
+            ])
+
+        with self.exists_swap, self.open_file_swap, self.print_swap:
+            with fully_covered_tests_swap:
+                (check_frontend_coverage
+                    .check_fully_covered_filenames_list_is_sorted())
+
+    def test_fully_covered_filenames_is_not_sorted(self):
         self.lcov_items_list = (
             'SF:/opensource/oppia/file.ts\n'
             'LF:10\n'
@@ -288,34 +300,12 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
 
         with self.exists_swap, self.open_file_swap, self.print_swap:
             with fully_covered_tests_swap:
-                with self.assertRaises(SystemExit) as error:          
-                    check_frontend_coverage.check_coverage_changes()
-                self.assertEqual(error.exception.code, 1)
-                self.assertNotEqual(self.print_messages.index(
-                    ('The \033[1mfully_covered_filenames\033[0m list must be'
-                    ' kept in alphabetical order.')), -1)
-
-    def test_fully_covered_filenames_is_not_sorted(self):
-        self.lcov_items_list = (
-            'SF:/opensource/oppia/file.ts\n'
-            'LF:10\n'
-            'LH:10\n'
-            'end_of_record\n'
-            'SF:/opensource/oppia/anotherfile.ts\n'
-            'LF:10\n'
-            'LH:10\n'
-            'end_of_record\n'
-        )
-        fully_covered_tests_swap = self.swap(check_frontend_coverage,
-            'fully_covered_filenames', [
-                'anotherfile.ts'
-                'file.ts',
-            ])
-
-        with self.exists_swap, self.open_file_swap, self.print_swap:
-            with fully_covered_tests_swap:
-                self.assertEqual(
-                    self.check_function_calls_counter['mock_print'], 0)
+                with self.assertRaises(SystemExit) as error:
+                    (check_frontend_coverage
+                        .check_fully_covered_filenames_list_is_sorted())
+                self.assertEqual(error.exception.message,
+                    'The \033[1mfully_covered_filenames\033[0m list must be'
+                    ' kept in alphabetical order.')
 
     def test_function_calls(self):
         self.lcov_items_list = (
