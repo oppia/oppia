@@ -19,10 +19,30 @@
 require('domain/utilities/url-interpolation.service.ts');
 require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ajs.ts');
 
+import { RecordedVoiceoversObjectFactory } from
+  'domain/exploration/RecordedVoiceoversObjectFactory';
+import { ReadOnlySubtopicPageObjectFactory } from
+  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { SubtopicPageContentsObjectFactory } from
+  'domain/topic/SubtopicPageContentsObjectFactory';
+import { VoiceoverObjectFactory } from
+  'domain/exploration/VoiceoverObjectFactory';
+
 angular.module('oppia').factory('SubtopicViewerBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'SUBTOPIC_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, SUBTOPIC_DATA_URL_TEMPLATE) {
-    var subtopicDataDict = null;
+  '$http', '$q', 'UrlInterpolationService',
+  'SUBTOPIC_DATA_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService,
+      SUBTOPIC_DATA_URL_TEMPLATE) {
+    var subtopicDataObject = null;
+    var readOnlySubtopicPageObjectFactory =
+    new ReadOnlySubtopicPageObjectFactory(
+      new SubtopicPageContentsObjectFactory(
+        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
+        new SubtitledHtmlObjectFactory()
+      )
+    );
     var _fetchSubtopicData = function(
         topicName, subtopicId, successCallback, errorCallback) {
       var subtopicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -32,9 +52,12 @@ angular.module('oppia').factory('SubtopicViewerBackendApiService', [
         });
 
       $http.get(subtopicDataUrl).then(function(response) {
-        subtopicDataDict = angular.copy(response.data);
+        subtopicDataObject =
+        readOnlySubtopicPageObjectFactory.createFromBackendDict(
+          angular.copy(response.data)
+        );
         if (successCallback) {
-          successCallback(subtopicDataDict);
+          successCallback(subtopicDataObject);
         }
       }, function(errorResponse) {
         if (errorCallback) {
