@@ -72,7 +72,7 @@ def pre_delete_user(user_id):
 
 
 def delete_user(pending_deletion_model):
-    """Smth.
+    """Delete all the models for user specified in pending_deletion_model.
 
     Args:
         pending_deletion_model: PendingDeletionRequestModel.
@@ -81,35 +81,38 @@ def delete_user(pending_deletion_model):
 
 
 def verify_user_deleted(pending_deletion_model):
-    """Smth.
+    """Verify that all the models for user specified in pending_deletion_model
+    are deleted.
 
     Args:
         pending_deletion_model: PendingDeletionRequestModel.
     """
-    pass
+    return verify_user_models_deleted(pending_deletion_model.id)
 
 
 def delete_user_models(user_id):
-    """Smth.
+    """Delete the user models for the user with user_id.
 
     Args:
-        user_id: str.
+        user_id: str. The id of the user to be deleted.
     """
     for model_class in models.Registry.get_storage_model_classes(
             [models.NAMES.user]):
-        if model_class.get_deletion_policy() != base_models.DELETION_POLICY.KEEP:
+        if (model_class.get_deletion_policy() !=
+                base_models.DELETION_POLICY.KEEP):
             model_class.apply_deletion_policy(user_id)
 
 
 def verify_user_models_deleted(user_id):
-    """Smth.
+    """Verify that the user models for the user with user_id are deleted.
 
     Args:
-        user_id: str.
+        user_id: str. The id of the user to be deleted.
     """
     for model_class in models.Registry.get_storage_model_classes(
             [models.NAMES.user]):
-        if model_class.get_deletion_policy() != base_models.DELETION_POLICY.KEEP:
+        if (model_class.get_deletion_policy() !=
+                base_models.DELETION_POLICY.KEEP):
             if model_class.has_reference_to_user_id(user_id):
                 return False
     return True
