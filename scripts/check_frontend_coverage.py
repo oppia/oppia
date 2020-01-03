@@ -1,4 +1,4 @@
-# Copyright 2019 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -216,20 +216,20 @@ class LcovStanzaRelevantLines:
             Exception: Total lines number is not found.
             Exception: Covered lines number is not found.
         """
-        file_path, total_lines, covered_lines = [
+        relevant_lines = [
             line for line in stanza.splitlines() if
             any(line.startswith(prefix) for prefix in
             RELEVANT_LCOV_LINE_PREFIXES)]
 
-        if not file_path:
+        match = re.search('SF:(.+)', relevant_lines[0])
+        if match is None:
             raise Exception(
                 'The test path is empty or null. '
                 'It\'s not possible to diff the test coverage correctly.')
-
-        _, file_name = os.path.split(file_path)
+        _, file_name = os.path.split(match.group(1))
         self.file_name = file_name
 
-        match = re.search('LF:(\d+)', total_lines)
+        match = re.search('LF:(\d+)', relevant_lines[1])
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the total lines of {} file.'
@@ -237,7 +237,7 @@ class LcovStanzaRelevantLines:
                 .format(file_name))
         self.total_lines = int(match.group(1))
 
-        match = re.search('LH:(\d+)', covered_lines)
+        match = re.search('LH:(\d+)', relevant_lines[2])
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the covered lines of {} file.'
@@ -326,7 +326,7 @@ def check_coverage_changes():
         else:
             if total_lines == covered_lines:
                 errors += ('\033[1m{}\033[0m file is fully covered but it\'s'
-                ' supposed to have 100% coverage. Please add the file name in'
+                ' supposed to be in the whitelist. Please add the file name in'
                 ' the whitelist in the file'
                 ' scripts/check_frontend_test_coverage.py.\n'
                 .format(file_name))
@@ -362,6 +362,7 @@ def main():
 
     check_coverage_changes()
 
-
-if __name__ == '__main__':
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when wrap_up_release.py is used as a script.
+if __name__ == '__main__': # pragma: no cover
     main()

@@ -14,7 +14,7 @@ workflows:
             - setup
       - frontend_test_coverage:
           requires:
-            - setup
+            - frontend_tests
       - backend_tests:
           requires:
             - setup
@@ -120,11 +120,10 @@ jobs:
     <<: *job_defaults
     steps:
       - checkout
-      - run:
-          <<: *install_dependencies
-      - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
+      - attach_workspace: 
+          at: /home/circleci/ 
+      - run: 
+          <<: *install_dependencies 
       - run:
           name: Check frontend test coverage
           command: |
