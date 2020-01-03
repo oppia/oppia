@@ -153,6 +153,7 @@ class CollectionModel(base_models.VersionedModel):
 class CollectionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""

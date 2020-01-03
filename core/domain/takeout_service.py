@@ -32,8 +32,13 @@ from core.platform import models
          models.NAMES.suggestion, models.NAMES.user])
 
 
-def get_models_to_export():
-    """Returns set of all models whose data to export."""
+def get_models_should_be_exported():
+    """Returns set of strings representing models to export.
+    
+    Returns:
+        set of str. Set of strings representing models whose data should be
+        exported.
+    """
     return {
         'collection_rights_data',
         'general_feedback_email_reply_to_id_data',
@@ -72,8 +77,7 @@ def export_data_for_user(user_id):
     """
     all_models = []
     model_names_list = [
-        model_name
-        for model_name in dir(models.NAMES)
+        model_name for model_name in dir(models.NAMES)
         if not model_name.startswith('__') and not model_name == 'base_model'
     ]
     model_modules = models.Registry.import_models(model_names_list)
@@ -83,7 +87,7 @@ def export_data_for_user(user_id):
                 all_models.append(obj)
 
     exported_data = dict()
-    models_to_export = get_models_to_export()
+    models_to_export = get_models_should_be_exported()
     for model in all_models:
         # Split the model name by uppercase characters.
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]

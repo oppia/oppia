@@ -623,7 +623,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exported_data, expected_export)
 
 
-    def test_get_models_to_export(self):
+    def test_get_models_should_be_exported(self):
         """Ensure that the set of models to export is the set of models with
         export policy CONTAINS_USER_DATA, and that all other models have
         export policy NOT_APPLICABLE.
@@ -640,7 +640,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                 if inspect.isclass(obj):
                     all_models.append(obj)
 
-        models_to_export = takeout_service.get_models_to_export()
+        models_to_export = takeout_service.get_models_should_be_exported()
         for model in all_models:
             export_policy = model.get_export_policy()
             # Split the model name by uppercase characters.
