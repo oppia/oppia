@@ -76,7 +76,7 @@ def delete_user(pending_deletion_model):
     Args:
         pending_deletion_model: PendingDeletionRequestModel.
     """
-    delete_user_models(pending_deletion_model.id)
+    _delete_user_models(pending_deletion_model.id)
     pending_deletion_model.deletion_complete = True
     pending_deletion_model.put()
 
@@ -91,7 +91,7 @@ def verify_user_deleted(pending_deletion_model):
     Returns:
         bool. True if all the models were correctly deleted, False otherwise.
     """
-    if verify_user_models_deleted(pending_deletion_model.id):
+    if _verify_user_models_deleted(pending_deletion_model.id):
         pending_deletion_model.delete()
         return True
     else:
@@ -100,7 +100,7 @@ def verify_user_deleted(pending_deletion_model):
         return False
 
 
-def delete_user_models(user_id):
+def _delete_user_models(user_id):
     """Delete the user models for the user with user_id.
 
     Args:
@@ -113,7 +113,7 @@ def delete_user_models(user_id):
             model_class.apply_deletion_policy(user_id)
 
 
-def verify_user_models_deleted(user_id):
+def _verify_user_models_deleted(user_id):
     """Verify that the user models for the user with user_id are deleted.
 
     Args:

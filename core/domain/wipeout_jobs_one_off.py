@@ -55,13 +55,15 @@ class VerifyUserDeletionOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         """Implements the map function for this job."""
+        # If deletion_complete is False the UserDeletionOneOffJob wasn't yet run
+        # for the user. The verification will be done in the next run of
+        # VerifyUserDeletionOneOffJob.
         if not model_instance.deletion_complete:
             yield ('NOT DELETED', model_instance.id)
+        elif wipeout_service.verify_user_deleted(model_instance):
+            yield ('SUCCESS', model_instance.id)
         else:
-            if wipeout_service.verify_user_deleted(model_instance):
-                yield ('SUCCESS', model_instance.id)
-            else:
-                yield ('FAILURE', model_instance.id)
+            yield ('FAILURE', model_instance.id)
 
     @staticmethod
     def reduce(key, values):

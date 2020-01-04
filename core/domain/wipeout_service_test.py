@@ -75,12 +75,12 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         ).put()
 
         user_settings = user_services.get_user_settings(self.user_1_id)
-        self.assertFalse(user_settings.to_be_deleted)
+        self.assertFalse(user_settings.deleted)
 
         wipeout_service.pre_delete_user(self.user_1_id)
 
         user_settings = user_services.get_user_settings(self.user_1_id)
-        self.assertTrue(user_settings.to_be_deleted)
+        self.assertTrue(user_settings.deleted)
 
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(self.user_1_id))

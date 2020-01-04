@@ -64,7 +64,8 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
         wipeout_service.pre_delete_user(self.user_1_id)
 
     def test_repeated_migration(self):
-        self._run_one_off_job()
+        output = self._run_one_off_job()
+        self.assertIn(['SUCCESS', [self.user_1_id]], output)
         output = self._run_one_off_job()
         self.assertIn(['ALREADY DONE', [self.user_1_id]], output)
 
