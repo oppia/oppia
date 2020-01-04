@@ -635,7 +635,7 @@ class VersionedModel(BaseModel):
             committer_id: str. The user_id of the user who committed the change.
             commit_type: str. Unique identifier of commit type. Possible values
                 are in COMMIT_TYPE_CHOICES.
-            commit_message: str.
+            commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:
@@ -664,11 +664,10 @@ class VersionedModel(BaseModel):
         snapshot = self.compute_snapshot()
         snapshot_id = self.get_snapshot_id(self.id, self.version)
 
-        snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS(  # pylint: disable=not-callable
-            id=snapshot_id, committer_id=committer_id, commit_type=commit_type,
-            commit_message=commit_message, commit_cmds=commit_cmds)
-        snapshot_content_instance = self.SNAPSHOT_CONTENT_CLASS(  # pylint: disable=not-callable
-            id=snapshot_id, content=snapshot)
+        snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS.create(
+            snapshot_id, committer_id, commit_type, commit_message, commit_cmds)
+        snapshot_content_instance = (
+            self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, content=snapshot))
 
         transaction_services.run_in_transaction(
             BaseModel.put_multi,
@@ -679,7 +678,7 @@ class VersionedModel(BaseModel):
 
         Args:
             committer_id: str. The user_id of the user who committed the change.
-            commit_message: str.
+            commit_message: str. The commit description message.
             force_deletion: bool. If True this model is deleted
                 completely from storage, otherwise it is only marked as deleted.
                 Default is False.
@@ -728,7 +727,7 @@ class VersionedModel(BaseModel):
         Args:
             entity_ids: list(str). Ids of entities to delete.
             committer_id: str. The user_id of the user who committed the change.
-            commit_message: str.
+            commit_message: str. The commit description message.
             force_deletion: bool. If True these models are deleted completely
                 from storage, otherwise there are only marked as deleted.
                 Default is False.
@@ -754,10 +753,11 @@ class VersionedModel(BaseModel):
                 all_models_content_keys.extend([
                     ndb.Key(model.SNAPSHOT_CONTENT_CLASS, snapshot_id)
                     for snapshot_id in model_snapshot_ids])
-
-            ndb.delete_multi(
-                all_models_metadata_keys + all_models_content_keys)
-            super(VersionedModel, cls).delete_multi(versioned_models)
+            versioned_models_keys = [model.key for model in versioned_models]
+            transaction_services.run_in_transaction(
+                ndb.delete_multi,
+                all_models_metadata_keys + all_models_content_keys +
+                versioned_models_keys)
         else:
             for model in versioned_models:
                 model._require_not_marked_deleted()  # pylint: disable=protected-access
@@ -773,14 +773,13 @@ class VersionedModel(BaseModel):
                 snapshot = model.compute_snapshot()
                 snapshot_id = model.get_snapshot_id(model.id, model.version)
 
-                snapshot_metadata_models.append(model.SNAPSHOT_METADATA_CLASS(  # pylint: disable=not-callable
-                    id=snapshot_id,
-                    committer_id=committer_id,
-                    commit_type=cls._COMMIT_TYPE_DELETE,
-                    commit_message=commit_message,
-                    commit_cmds=commit_cmds))
-                snapshot_content_models.append(model.SNAPSHOT_CONTENT_CLASS(  # pylint: disable=not-callable
-                    id=snapshot_id, content=snapshot))
+                snapshot_metadata_models.append(
+                    model.SNAPSHOT_METADATA_CLASS.create(
+                        snapshot_id, committer_id, cls._COMMIT_TYPE_DELETE,
+                        commit_message, commit_cmds))
+                snapshot_content_models.append(
+                    model.SNAPSHOT_CONTENT_CLASS.create(
+                        id=snapshot_id, content=snapshot))
 
             transaction_services.run_in_transaction(
                 BaseModel.put_multi,
@@ -796,7 +795,7 @@ class VersionedModel(BaseModel):
 
         Args:
             committer_id: str. The user_id of the user who committed the change.
-            commit_message: str.
+            commit_message: str. The commit description message.
             commit_cmds: list(dict). A list of commands, describing changes
                 made in this model, should give sufficient information to
                 reconstruct the commit. Dict always contains:
@@ -841,7 +840,7 @@ class VersionedModel(BaseModel):
         Args:
             model: VersionedModel.
             committer_id: str. The user_id of the user who committed the change.
-            commit_message: str.
+            commit_message: str. The commit description message.
             version_number: int. Version to revert to.
 
         Raises:
@@ -1000,7 +999,7 @@ class VersionedModel(BaseModel):
             It has the following keys:
                 committer_id: str. The user_id of the user who committed the
                     change.
-                commit_message: str.
+                commit_message: str. The commit description message.
                 commit_cmds: list(dict). A list of commands, describing changes
                     made in this model, should give sufficient information to
                     reconstruct the commit. Dict always contains:
@@ -1089,6 +1088,13 @@ class BaseSnapshotMetadataModel(BaseModel):
         return cls.query(cls.committer_id == user_id).get(
             keys_only=True) is not None
 
+    @classmethod
+    def create(cls, snapshot_id, committer_id, commit_type,
+               commit_message, commit_cmds):
+        return cls(id=snapshot_id, committer_id=committer_id,
+                   commit_type=commit_type, commit_message=commit_message,
+                   commit_cmds=commit_cmds)
+
     def get_unversioned_instance_id(self):
         """Gets the instance id from the snapshot id.
 
@@ -1119,6 +1125,10 @@ class BaseSnapshotContentModel(BaseModel):
     def get_user_id_migration_policy():
         """BaseSnapshotContentModel doesn't have any field with user ID."""
         return USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
+    @classmethod
+    def create(cls, snapshot_id, content):
+        return cls(id=snapshot_id, content=content)
 
     def get_unversioned_instance_id(self):
         """Gets the instance id from the snapshot id.

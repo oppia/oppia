@@ -171,14 +171,14 @@ class ExplorationModel(base_models.VersionedModel):
     @classmethod
     def delete_multi(cls, entity_ids, committer_id,
                      commit_message, force_deletion=False):
-        """Record the events to the commit log after the model commit.
+        """Deletes the given cls instances with the given entity_ids.
 
         Note that this extends the superclass method.
 
         Args:
             entity_ids: list(str). Ids of entities to delete.
             committer_id: str. The user_id of the user who committed the change.
-            commit_message: str.
+            commit_message: str. The commit description message.
             force_deletion: bool. If True these models are deleted completely
                 from storage, otherwise there are only marked as deleted.
                 Default is False.
