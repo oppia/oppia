@@ -138,12 +138,10 @@ class SkillModel(base_models.VersionedModel):
             committer_user_settings_model.username
             if committer_user_settings_model else '')
 
-        status = constants.ACTIVITY_STATUS_PUBLIC
-
         skill_commit_log_entry = SkillCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            status, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()

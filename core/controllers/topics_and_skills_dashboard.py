@@ -78,10 +78,10 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
-                        skill_id not in merged_skill_ids):
+                    skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
             if (skill_id in skill_ids_assigned_to_some_topic) and (
-                        skill_id not in merged_skill_ids):
+                    skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
 
         can_delete_topic = (
