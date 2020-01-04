@@ -27,6 +27,7 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -632,4 +633,14 @@ class DataExtractionQueryHandler(base.BaseHandler):
         response = {
             'data': extracted_answers
         }
+        self.render_json(response)
+
+class SendDummyMailHandler(base.BaseHandler):
+    def get(self):
+        data=self.request.get('emailId')
+        response = {
+            'msg': "Success! Mail sent",
+            'data': data
+        }
+        email_manager.send_dummy_mail(data)
         self.render_json(response)

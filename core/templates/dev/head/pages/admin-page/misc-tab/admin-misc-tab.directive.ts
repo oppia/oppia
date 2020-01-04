@@ -40,11 +40,14 @@ angular.module('oppia').directive('adminMiscTab', [
         var ctrl = this;
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
+        var SEND_DUMMY_MAIL_HANDLER_URL = (
+          '/senddummymailhandler');
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
         ctrl.topicIdForRegeneratingOpportunities = null;
+        ctrl.dummyMailId = null;
         ctrl.regenerationMessage = null;
 
         ctrl.clearSearchIndex = function() {
@@ -144,6 +147,15 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.showDataExtractionQueryStatus = true;
           ctrl.dataExtractionQueryStatusMessage = message;
         };
+
+
+        ctrl.dummyMail = function() {
+          console.log(ctrl.dummyMailId)
+
+          var SendMailUrl=SEND_DUMMY_MAIL_HANDLER_URL + '?';
+          SendMailUrl += 'emailId=' + encodeURIComponent(ctrl.dummyMailId);
+          $window.open(SendMailUrl);
+        }
 
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (

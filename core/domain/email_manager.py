@@ -360,6 +360,17 @@ def send_job_failure_email(job_id):
             mail_body.replace('\n', '<br/>'))
 
 
+def send_dummy_mail(emailId):
+    email_subject = 'Test Mail'
+    email_body = 'This is a test mail from Oppia.'
+    system_name_email = '%s <%s>' % (
+        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
+
+    email_services.send_mail(
+        system_name_email, emailId , email_subject,
+        email_body, email_body.replace('\n', '<br/>'), bcc_admin=False)
+    
+   
 def send_mail_to_admin(email_subject, email_body):
     """Send an email to the admin email address.
 
