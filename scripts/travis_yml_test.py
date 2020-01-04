@@ -90,7 +90,7 @@ def extract_protractor_test_suites():
 
 
 def read_protractor_conf_file():
-    """Returns the core/tests/protractor.conf.js. file"""
+    """Returns the core/tests/protractor.conf.js. file."""
     protractor_config_file = (python_utils.open_file(
         os.path.join(
             os.getcwd(), 'core', 'tests', 'protractor.conf.js'), 'r').read())

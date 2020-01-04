@@ -691,7 +691,7 @@ def snake_case_to_camel_case(snake_str):
             snake_str: str. String that is in snake_case.
 
         Returns:
-            str. Converted string that is in camelCase
+            str. Converted string that is in camelCase.
         """
     components = snake_str.split('_')
     # We capitalize the first letter of each component except the first one
