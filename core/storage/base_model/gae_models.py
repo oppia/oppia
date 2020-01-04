@@ -779,7 +779,7 @@ class VersionedModel(BaseModel):
                         commit_message, commit_cmds))
                 snapshot_content_models.append(
                     model.SNAPSHOT_CONTENT_CLASS.create(
-                        id=snapshot_id, content=snapshot))
+                        snapshot_id, content=snapshot))
 
             transaction_services.run_in_transaction(
                 BaseModel.put_multi,
