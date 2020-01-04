@@ -4171,7 +4171,7 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             'to_version': '1'
         })]
         exp_services.update_exploration(
-            self.USER_ID, exploration.id, migration_change_list,
+            self.USER_ID, exploration.id, migration_change_list, 
             'Migrate state schema.')
 
     def test_get_exp_with_draft_applied_after_draft_upgrade(self):
