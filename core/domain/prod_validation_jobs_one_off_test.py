@@ -15760,13 +15760,22 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for user_settings_ids '
-                'field check of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: based on '
-                'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.model_instance.id, self.user_id, self.user_id)]
+                u'[u\'failed validation check for deleted '
+                'user settings of PendingDeletionRequestModel\', '
+                '[u\'Entity id %s: User settings model '
+                'is not marked as deleted\']]') % (self.model_instance.id)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_user_settings_model_not_marked_deleted_failure(self):
+        user_model = user_models.UserSettingsModel.get_by_id(self.user_id)
+        user_model.deleted = False
+        user_model.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted '
+                'user settings of PendingDeletionRequestModel\', '
+                '[u\'Entity id %s: User settings model '
+                'is not marked as deleted\']]') % (self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 
     def test_exploration_not_marked_deleted_failure(self):

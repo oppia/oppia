@@ -43,6 +43,7 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
         self.signup(self.USER_2_EMAIL, self.USER_2_USERNAME)
         self.user_1_id = self.get_user_id_from_email(self.USER_1_EMAIL)
         self.user_2_id = self.get_user_id_from_email(self.USER_2_EMAIL)
+        self.user_1_gae_id = self.get_gae_id_from_email(self.USER_1_EMAIL)
 
     def test_pre_delete_user_email_subscriptions(self):
         email_preferences = user_services.get_email_preferences(self.user_1_id)
@@ -79,7 +80,8 @@ class WipeoutServicePreDeleteTests(test_utils.GenericTestBase):
 
         wipeout_service.pre_delete_user(self.user_1_id)
 
-        user_settings = user_services.get_user_settings(self.user_1_id)
+        user_settings = user_services.get_user_settings_by_gae_id(
+            self.user_1_gae_id)
         self.assertTrue(user_settings.deleted)
 
         pending_deletion_model = (
