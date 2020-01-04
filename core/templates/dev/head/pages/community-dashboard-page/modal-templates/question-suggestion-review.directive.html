@@ -1,0 +1,52 @@
+<div class="modal-header">
+  <div>
+    <h3><[questionHeader]></h3>
+    <h4 class="author-header">Submitted by <[authorName]></h4>
+  </div>
+</div>
+
+<div class="modal-body">
+  <section class="oppia-suggestion-review-container">
+    <div class="oppia-question-suggestion">
+      <question-editor question-id="questionId"
+                       misconceptions-by-skill="misconceptionsBySkill"
+                       question-state-data="questionStateData"
+                       question="question"
+                       can-edit-question="canEditQuestion"
+                       question-changed="questionChanged">
+      </question-editor>
+    </div>
+  </section>
+  <div ng-show="reviewable" class="oppia-suggestion-review-message">
+    Review message (required if rejecting):
+    <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
+  </div>
+  <div ng-show="reviewable" class="oppia-suggestion-review-message">
+    Brief Description of Changes (required if accepting):
+    <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" style="width: 100%">
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" ng-if="!reviewable" ng-click="cancel()">Cancel</button>
+  <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
+    <button class="btn btn-danger" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="reject()">Reject</button>
+  </span>
+  <span uib-tooltip="Enter commit message before accepting" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
+    <button class="btn btn-success" ng-if="reviewable" ng-disabled="commitMessage.length == 0" ng-click="accept()">Accept</button>
+  </span>
+</div>
+
+<style>
+  .author-header {
+    margin-top: -12px;
+  }
+  .oppia-question-suggestion {
+    height: 100%;
+    overflow: scroll;
+  }
+  .oppia-suggestion-review-message {
+    margin-left: 10px;
+    margin-top: 20px;
+  }
+</style>

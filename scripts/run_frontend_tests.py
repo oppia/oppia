@@ -64,25 +64,26 @@ def main(args=None):
         'on your filesystem.',
         'Running test in development environment'])
 
-    build.main(args=[])
 
-    cmd = [
-        os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
-        'start', os.path.join('core', 'tests', 'karma.conf.ts')]
-
-    task = subprocess.Popen(cmd)
-    task.communicate()
-    task.wait()
-
-    if parsed_args.run_minified_tests is True:
+    if parsed_args.run_minified_tests:
         python_utils.PRINT('Running test in production environment')
 
         build.main(args=['--prod_env', '--minify_third_party_libs_only'])
 
-        subprocess.check_call([
+        cmd = [
             os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
             'start', os.path.join('core', 'tests', 'karma.conf.ts'),
-            '--prodEnv'])
+            '--prodEnv']
+    else:
+        build.main(args=[])
+
+        cmd = [
+            os.path.join(common.NODE_MODULES_PATH, 'karma', 'bin', 'karma'),
+            'start', os.path.join('core', 'tests', 'karma.conf.ts')]
+
+    task = subprocess.Popen(cmd)
+    task.communicate()
+    task.wait()
 
     python_utils.PRINT('Done!')
     sys.exit(task.returncode)

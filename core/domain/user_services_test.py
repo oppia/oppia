@@ -530,6 +530,29 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(user_services.get_user_role_from_id(user_id),
                          feconf.ROLE_ID_COLLECTION_EDITOR)
 
+    def test_mark_user_for_deletion(self):
+        gae_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+        exploration_ids = ['exp_id']
+        collection_ids = ['col_id']
+
+        user_id = user_services.create_new_user(gae_id, user_email).user_id
+        user_services.set_username(user_id, username)
+
+        user_services.mark_user_for_deletion(
+            user_id, exploration_ids, collection_ids)
+
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertTrue(user_settings.to_be_deleted)
+
+        pending_deletion_model = (
+            user_models.PendingDeletionRequestModel.get_by_id(user_id))
+        self.assertEqual(
+            pending_deletion_model.exploration_ids, exploration_ids)
+        self.assertEqual(
+            pending_deletion_model.collection_ids, collection_ids)
+
     def test_get_current_date_as_string(self):
         custom_datetimes = [
             datetime.date(2011, 1, 1),
@@ -1312,7 +1335,9 @@ class UserSettingsTests(test_utils.GenericTestBase):
     def test_get_human_readable_user_ids(self):
         # Create an unregistered user who has no username.
         user_models.UserSettingsModel(
-            id='unregistered_user_id', email='user@example.com',
+            id='unregistered_user_id',
+            gae_id='gae_unregistered_user_id',
+            email='user@example.com',
             username='').put()
 
         user_ids = user_services.get_human_readable_user_ids(

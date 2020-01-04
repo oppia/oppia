@@ -16,44 +16,22 @@
  * @fileoverview Tests for TopicObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// TopicObjectFactory.ts is upgraded to Angular 8.
-import { SkillSummaryObjectFactory } from
-  'domain/skill/SkillSummaryObjectFactory';
-import { StoryReferenceObjectFactory } from
-  'domain/topic/StoryReferenceObjectFactory';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/topic/TopicObjectFactory.ts');
+import { Topic, TopicObjectFactory } from 'domain/topic/TopicObjectFactory';
 
-describe('Topic object factory', function() {
-  var TopicObjectFactory = null;
-  var _sampleTopic = null;
+describe('Topic object factory', () => {
+  let topicObjectFactory: TopicObjectFactory;
+  let _sampleTopic: Topic;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
-    $provide.value(
-      'StoryReferenceObjectFactory', new StoryReferenceObjectFactory());
-    $provide.value(
-      'SubtopicObjectFactory',
-      new SubtopicObjectFactory(new SkillSummaryObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function($injector) {
-    TopicObjectFactory = $injector.get('TopicObjectFactory');
+  beforeEach(() => {
+    topicObjectFactory = TestBed.get(TopicObjectFactory);
 
-    var sampleTopicBackendObject = {
+    let sampleTopicBackendObject = {
       id: 'sample_topic_id',
       name: 'Topic name',
+      abbreviated_name: 'abbrev',
+      thumbnail_filename: 'img.png',
       description: 'Topic description',
       version: 1,
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
@@ -79,34 +57,36 @@ describe('Topic object factory', function() {
       next_subtopic_id: 1,
       language_code: 'en'
     };
-    var skillIdToDescriptionDict = {
+    let skillIdToDescriptionDict = {
       skill_1: 'Description 1',
       skill_2: 'Description 2',
       skill_3: 'Description 3'
     };
-    _sampleTopic = TopicObjectFactory.create(
+    _sampleTopic = topicObjectFactory.create(
       sampleTopicBackendObject, skillIdToDescriptionDict);
-  }));
+  });
 
-  it('should not find issues with a valid topic', function() {
+  it('should not find issues with a valid topic', () => {
     expect(_sampleTopic.validate()).toEqual([]);
   });
 
-  it('should validate the topic', function() {
+  it('should validate the topic', () => {
     _sampleTopic.setName('');
+    _sampleTopic.setAbbreviatedName(''),
     _sampleTopic.addCanonicalStory('story_2');
-    _sampleTopic.getSubtopics()[0].addSkill('skill_1');
+    _sampleTopic.getSubtopics()[0].addSkill('skill_1', '');
 
     expect(_sampleTopic.validate()).toEqual([
       'Topic name should not be empty.',
+      'Abbreviated name should not be empty.',
       'The story with id story_2 is present in both canonical ' +
       'and additional stories.',
       'The skill with id skill_1 is duplicated in the topic'
     ]);
   });
 
-  it('should be able to create an interstitial topic object', function() {
-    var topic = TopicObjectFactory.createInterstitialTopic();
+  it('should be able to create an interstitial topic object', () => {
+    let topic = topicObjectFactory.createInterstitialTopic();
     expect(topic.getId()).toEqual(null);
     expect(topic.getName()).toEqual('Topic name loading');
     expect(topic.getDescription()).toEqual('Topic description loading');
@@ -117,7 +97,7 @@ describe('Topic object factory', function() {
     expect(topic.getUncategorizedSkillSummaries()).toEqual([]);
   });
 
-  it('should correctly remove the various array elements', function() {
+  it('should correctly remove the various array elements', () => {
     _sampleTopic.removeCanonicalStory('story_1');
     _sampleTopic.removeAdditionalStory('story_2');
     _sampleTopic.removeUncategorizedSkill('skill_1');
@@ -132,8 +112,8 @@ describe('Topic object factory', function() {
     ).toEqual('Description 2');
   });
 
-  it('should be able to copy from another topic', function() {
-    var secondTopic = TopicObjectFactory.create({
+  it('should be able to copy from another topic', () => {
+    let secondTopic = topicObjectFactory.create({
       id: 'topic_id_2',
       name: 'Another name',
       description: 'Another description',

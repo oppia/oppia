@@ -20,10 +20,16 @@ require(
   'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 
 require('components/entity-creation-services/story-creation.service.ts');
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/csrf-token.service.ts');
+require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -33,13 +39,17 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService', 'UrlInterpolationService', 'StoryCreationService',
+        '$scope', '$uibModal', '$timeout', 'AlertsService',
+        'ContextService', 'CsrfTokenService', 'ImageUploadHelperService',
+        'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
+        'UrlInterpolationService', 'StoryCreationService',
         'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService, UrlInterpolationService, StoryCreationService,
+            $scope, $uibModal, $timeout, AlertsService,
+            ContextService, CsrfTokenService, ImageUploadHelperService,
+            TopicEditorStateService, TopicUpdateService, UndoRedoService,
+            UrlInterpolationService, StoryCreationService,
             EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
           var _initEditor = function() {
@@ -47,7 +57,22 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
+            $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
+            var placeholderImageUrl = '/icons/story-image-icon.png';
+            if (!$scope.topic.getThumbnailFilename()) {
+              $scope.editableThumbnailDataUrl = (
+                UrlInterpolationService.getStaticImageUrl(
+                  placeholderImageUrl));
+            } else {
+              $scope.editableThumbnailDataUrl = (
+                ImageUploadHelperService
+                  .getTrustedResourceUrlForThumbnailFilename(
+                    $scope.topic.getThumbnailFilename(),
+                    ContextService.getEntityType(),
+                    ContextService.getEntityId()));
+            }
+
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
@@ -57,6 +82,8 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.canonicalStorySummaries =
               TopicEditorStateService.getCanonicalStorySummaries();
           };
+
+          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
@@ -91,6 +118,22 @@ angular.module('oppia').directive('topicEditorTab', [
             }
             TopicUpdateService.setTopicName($scope.topic, newName);
             $scope.topicNameEditorIsShown = false;
+          };
+
+          $scope.updateAbbreviatedName = function(newAbbreviatedName) {
+            if (newAbbreviatedName === $scope.topic.getAbbreviatedName()) {
+              return;
+            }
+            TopicUpdateService.setAbbreviatedTopicName(
+              $scope.topic, newAbbreviatedName);
+          };
+
+          $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {
+            if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
+              return;
+            }
+            TopicUpdateService.setThumbnailFilename(
+              $scope.topic, newThumbnailFilename);
           };
 
           $scope.updateTopicDescription = function(newDescription) {
