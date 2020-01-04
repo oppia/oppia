@@ -258,15 +258,11 @@ def export_to_zip_file(exploration_id, version=None):
         zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
-            # Currently, the version number of all files is 1, since they are
-            # not modifiable post-upload.
-            # TODO(sll): When allowing editing of files, implement versioning
-            # for them.
-            file_contents = fs.get(filepath, version=1)
+            file_contents = fs.get(filepath)
 
             str_filepath = 'assets/%s' % filepath
             assert isinstance(str_filepath, python_utils.UNICODE)
@@ -1211,9 +1207,9 @@ def save_new_exploration_from_yaml_and_assets(
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
-        fs.commit(committer_id, asset_filename, asset_content)
+        fs.commit(asset_filename, asset_content)
 
     if (exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):

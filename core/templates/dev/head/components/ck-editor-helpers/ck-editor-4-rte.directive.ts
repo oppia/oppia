@@ -39,17 +39,11 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var contextIsLessonRelated = (
           ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
           ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
-        var canUseFs = (
-          ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.STORY_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||
-            (!canUseFs && componentDefn.requiresFs) ||
             (!contextIsLessonRelated && componentDefn.isLessonRelated))) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
@@ -85,10 +79,12 @@ angular.module('oppia').directive('ckEditor4Rte', [
           return 'oppia' + name;
         }).join(',');
         var buttonNames = [];
-        names.forEach(function(name) {
-          buttonNames.push('Oppia' + name);
-          buttonNames.push('-');
-        });
+        if (ContextService.canAddOrEditComponents()) {
+          names.forEach(function(name) {
+            buttonNames.push('Oppia' + name);
+            buttonNames.push('-');
+          });
+        }
         buttonNames.pop();
         // All icons on the toolbar except the Rich Text components.
         var allIcons = ['undo', 'redo', 'bold', 'Italic', 'numberedList',

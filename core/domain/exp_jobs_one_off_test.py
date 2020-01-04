@@ -1034,7 +1034,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         classifier_model_id = classifier_models.ClassifierTrainingJobModel.create( # pylint: disable=line-too-long
             'TextClassifier', 'TextInput', self.NEW_EXP_ID, exploration.version,
             datetime.datetime.utcnow(), {}, initial_state_name,
-            feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
+            feconf.TRAINING_JOB_STATUS_COMPLETE, 1)
         # Store training job model for the classifier model.
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.NEW_EXP_ID, exploration.version, initial_state_name,
