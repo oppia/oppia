@@ -23,8 +23,8 @@ angular.module('oppia').factory('CollectionCreationBackendService', [
   '$http', '$rootScope', '$timeout', '$window',
   'SiteAnalyticsService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $window, SiteAnalyticsService,
-      UrlInterpolationService) {
+    $http, $rootScope, $timeout, $window, SiteAnalyticsService,
+    UrlInterpolationService) {
     var _createCollection = function(CREATE_NEW_COLLECTION_URL_TEMPLATE) {
       $http.post('/collection_editor_handler/create_new', {})
         .then(function(response) {
