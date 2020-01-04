@@ -34,7 +34,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
 from core.domain import question_domain
@@ -63,7 +63,7 @@ import utils
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, file_models, job_models,
+    feedback_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
@@ -72,7 +72,7 @@ import utils
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
+            models.NAMES.feedback, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
@@ -89,7 +89,6 @@ IMAGE_PATH_REGEX = (
 AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
-FILE_MODELS_REGEX = '(%s|%s)' % (IMAGE_PATH_REGEX, AUDIO_PATH_REGEX)
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'FeedbackAnalyticsAggregator',
     'InteractionAnswerSummariesAggregator',
@@ -2244,156 +2243,6 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [cls._validate_entity_type_and_entity_id_feedback_reference]
-
-
-class FileMetadataModelValidator(BaseModelValidator):
-    """Class for validating FileMetadataModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '^%s$' % FILE_MODELS_REGEX
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        snapshot_model_ids = [
-            '%s-%d' % (item.id, version)
-            for version in python_utils.RANGE(1, item.version + 1)]
-
-        # Item id is of the format:
-        # /exploration/exp_id/assets/(image|audio)/filepath.
-        exp_val = '/exploration/'
-        assets_val = '/assets'
-        start_index = item.id.find(exp_val) + len(exp_val)
-        end_index = item.id.find(assets_val)
-        exp_id = item.id[start_index:end_index]
-
-        return {
-            'snapshot_metadata_ids': (
-                file_models.FileMetadataSnapshotMetadataModel,
-                snapshot_model_ids),
-            'snapshot_content_ids': (
-                file_models.FileMetadataSnapshotContentModel,
-                snapshot_model_ids),
-            'exploration_ids': (exp_models.ExplorationModel, [exp_id])
-        }
-
-
-class FileMetadataSnapshotMetadataModelValidator(
-        BaseSnapshotMetadataModelValidator):
-    """Class for validating FileMetadataSnapshotMetadataModel."""
-
-    EXTERNAL_MODEL_NAME = 'file metadata'
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d+$' % FILE_MODELS_REGEX
-
-    @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return fs_domain.FileMetadataChange
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'file_metadata_ids': (
-                file_models.FileMetadataModel,
-                [item.id[:item.id.find('-')]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
-
-
-class FileMetadataSnapshotContentModelValidator(
-        BaseSnapshotContentModelValidator):
-    """Class for validating FileMetadataSnapshotContentModel."""
-
-    EXTERNAL_MODEL_NAME = 'file metadata'
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d+$' % FILE_MODELS_REGEX
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'file_metadata_ids': (
-                file_models.FileMetadataModel,
-                [item.id[:item.id.find('-')]]),
-        }
-
-
-class FileModelValidator(BaseModelValidator):
-    """Class for validating FileModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '^%s$' % FILE_MODELS_REGEX
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        snapshot_model_ids = [
-            '%s-%d' % (item.id, version)
-            for version in python_utils.RANGE(1, item.version + 1)]
-
-        # Item id is of the format:
-        # /exploration/exp_id/assets/(image|audio)/filepath.
-        exp_val = '/exploration/'
-        assets_val = '/assets'
-        start_index = item.id.find(exp_val) + len(exp_val)
-        end_index = item.id.find(assets_val)
-        exp_id = item.id[start_index:end_index]
-
-        return {
-            'snapshot_metadata_ids': (
-                file_models.FileSnapshotMetadataModel,
-                snapshot_model_ids),
-            'snapshot_content_ids': (
-                file_models.FileSnapshotContentModel,
-                snapshot_model_ids),
-            'exploration_ids': (exp_models.ExplorationModel, [exp_id])
-        }
-
-
-class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
-    """Class for validating FileSnapshotMetadataModel."""
-
-    EXTERNAL_MODEL_NAME = 'file'
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d+$' % FILE_MODELS_REGEX
-
-    @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return fs_domain.FileChange
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'file_ids': (
-                file_models.FileModel,
-                [item.id[:item.id.find('-')]]),
-            'committer_ids': (
-                user_models.UserSettingsModel, [item.committer_id])
-        }
-
-
-class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
-    """Class for validating FileSnapshotContentModel."""
-
-    EXTERNAL_MODEL_NAME = 'file'
-
-    @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d+$' % FILE_MODELS_REGEX
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'file_ids': (
-                file_models.FileModel,
-                [item.id[:item.id.find('-')]]),
-        }
 
 
 class JobModelValidator(BaseModelValidator):
@@ -5085,6 +4934,68 @@ class UserContributionScoringModelValidator(BaseUserModelValidator):
             cls._validate_score]
 
 
+class PendingDeletionRequestModelValidator(BaseUserModelValidator):
+    """Class for validating PendingDeletionRequestModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (user_models.UserSettingsModel, [item.id]),
+        }
+
+    @classmethod
+    def _validate_explorations_are_marked_deleted(cls, item):
+        """Validates that explorations for model are marked as deleted.
+
+        Args:
+            item: ndb.Model. BaseUserModel to validate.
+        """
+        exp_ids = cls._get_exp_ids(item)
+        not_marked_exp_ids = []
+        for exp_id in exp_ids:
+            exp_model = exp_models.ExplorationModel.get_by_id(exp_id)
+            if exp_model is None or not exp_model.deleted:
+                not_marked_exp_ids.append(exp_id)
+
+        if not_marked_exp_ids:
+            cls.errors['deleted exploration check'].append(
+                'Entity id %s: Explorations with ids %s are not marked as '
+                'deleted' % (item.id, not_marked_exp_ids))
+
+    @classmethod
+    def _validate_collections_are_marked_deleted(cls, item):
+        """Validates that collections for model are marked as deleted.
+
+        Args:
+            item: ndb.Model. BaseUserModel to validate.
+        """
+        col_ids = cls._get_col_ids(item)
+        not_marked_col_ids = []
+        for col_id in col_ids:
+            col_model = collection_models.CollectionModel.get_by_id(col_id)
+            if col_model is None or not col_model.deleted:
+                not_marked_col_ids.append(col_id)
+
+        if not_marked_col_ids:
+            cls.errors['deleted collection check'].append(
+                'Entity id %s: Collections with ids %s are not marked as '
+                'deleted' % (item.id, not_marked_col_ids))
+
+    @classmethod
+    def _get_exp_ids(cls, item):
+        return item.exploration_ids
+
+    @classmethod
+    def _get_col_ids(cls, item):
+        return item.collection_ids
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_explorations_are_marked_deleted,
+            cls._validate_collections_are_marked_deleted]
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -5135,14 +5046,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
         GeneralFeedbackThreadUserModelValidator),
     feedback_models.FeedbackAnalyticsModel: FeedbackAnalyticsModelValidator,
     feedback_models.UnsentFeedbackEmailModel: UnsentFeedbackEmailModelValidator,
-    file_models.FileMetadataModel: FileMetadataModelValidator,
-    file_models.FileMetadataSnapshotMetadataModel: (
-        FileMetadataSnapshotMetadataModelValidator),
-    file_models.FileMetadataSnapshotContentModel: (
-        FileMetadataSnapshotContentModelValidator),
-    file_models.FileModel: FileModelValidator,
-    file_models.FileSnapshotMetadataModel: FileSnapshotMetadataModelValidator,
-    file_models.FileSnapshotContentModel: FileSnapshotContentModelValidator,
     job_models.JobModel: JobModelValidator,
     job_models.ContinuousComputationModel: ContinuousComputationModelValidator,
     opportunity_models.ExplorationOpportunitySummaryModel: (
@@ -5231,7 +5134,9 @@ MODEL_TO_VALIDATOR_MAPPING = {
     user_models.UserBulkEmailsModel: UserBulkEmailsModelValidator,
     user_models.UserSkillMasteryModel: UserSkillMasteryModelValidator,
     user_models.UserContributionScoringModel: (
-        UserContributionScoringModelValidator)
+        UserContributionScoringModelValidator),
+    user_models.PendingDeletionRequestModel: (
+        PendingDeletionRequestModelValidator)
 }
 
 
@@ -5545,58 +5450,6 @@ class UnsentFeedbackEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [feedback_models.UnsentFeedbackEmailModel]
-
-
-class FileMetadataModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates FileMetadataModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileMetadataModel]
-
-
-class FileModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates FileModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileModel]
-
-
-class FileSnapshotMetadataModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates FileSnapshotMetadataModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileSnapshotMetadataModel]
-
-
-class FileSnapshotContentModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates FileSnapshotContentModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileSnapshotContentModel]
-
-
-class FileMetadataSnapshotMetadataModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates FileMetadataSnapshotMetadataModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileMetadataSnapshotMetadataModel]
-
-
-class FileMetadataSnapshotContentModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates FileMetadataSnapshotContentModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [file_models.FileMetadataSnapshotContentModel]
 
 
 class JobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
@@ -6106,3 +5959,12 @@ class UserContributionScoringModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserContributionScoringModel]
+
+
+class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates PendingDeletionRequestModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.PendingDeletionRequestModel]
+

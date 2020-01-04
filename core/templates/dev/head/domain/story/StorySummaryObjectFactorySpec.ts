@@ -16,39 +16,32 @@
  * @fileoverview Tests for StorySummaryObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/story/StorySummaryObjectFactory.ts');
+import {
+  StorySummaryObjectFactory,
+  StorySummary
+} from 'domain/story/StorySummaryObjectFactory';
 
-describe('Story summary object factory', function() {
-  var StorySummaryObjectFactory = null;
-  var _sampleStorySummary = null;
+describe('Story summary object factory', () => {
+  let factory: StorySummaryObjectFactory;
+  let _sampleStorySummary: StorySummary;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(() => {
+    factory = TestBed.get(StorySummaryObjectFactory);
 
-  beforeEach(angular.mock.inject(function($injector) {
-    StorySummaryObjectFactory = $injector.get('StorySummaryObjectFactory');
-
-    var sampleStorySummaryBackendDict = {
+    const sampleStorySummaryBackendDict = {
       id: 'sample_story_id',
       title: 'Story title',
       node_count: 5,
       story_is_published: true
     };
-    _sampleStorySummary = StorySummaryObjectFactory.createFromBackendDict(
-      sampleStorySummaryBackendDict);
-  }));
+    _sampleStorySummary = factory.createFromBackendDict(
+      sampleStorySummaryBackendDict
+    );
+  });
 
-  it('should be able to get all the values', function() {
+  it('should be able to get all the values', () => {
     expect(_sampleStorySummary.getId()).toEqual('sample_story_id');
     expect(_sampleStorySummary.getTitle()).toEqual('Story title');
     expect(_sampleStorySummary.getNodeCount()).toEqual(5);
