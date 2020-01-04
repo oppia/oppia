@@ -2126,8 +2126,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services.update_exploration(
-            self.owner_id, exploration.id, None, 'Test commit')
+        exp_services._save_exploration(self.owner_id, exploration, '', [])
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'param_changes', self.param_changes), '')
@@ -2173,8 +2172,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services.update_exploration(
-            self.owner_id, exploration.id, None, 'Test commit')
+        exp_services._save_exploration(self.owner_id, exploration, '', [])
 
         self.param_changes[0]['generator_id'] = 'fake'
         with self.assertRaisesRegexp(
@@ -2645,8 +2643,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         # Using the old version of the exploration should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
-            exp_services.update_exploration(
-                second_committer_id, v1_exploration.id, None, 'Test commit')
+            exp_services._save_exploration(
+                second_committer_id, v1_exploration, '', [])
 
         # Another person modifies the exploration.
         new_change_list = [exp_domain.ExplorationChange({
@@ -2699,8 +2697,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID, self.owner_id)
 
         exploration.title = 'First title'
-        exp_services.update_exploration(
-            self.owner_id, exploration.id, None, 'Changed title.')
+        exp_services._save_exploration(
+            self.owner_id, exploration, 'Changed title.', [])
         commit_dict_2 = {
             'committer_id': self.owner_id,
             'commit_message': 'Changed title.',
@@ -2781,8 +2779,8 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         # In version 1, the title was 'A title'.
         # In version 2, the title becomes 'V2 title'.
         exploration.title = 'V2 title'
-        exp_services.update_exploration(
-            self.owner_id, exploration.id, None, 'Changed title.')
+        exp_services._save_exploration(
+            self.owner_id, exploration, 'Changed title.', [])
 
         # In version 3, a new state is added.
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
@@ -2962,21 +2960,20 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, self.albert_id)
 
             exploration_1.title = 'Exploration 1 title'
-            exp_services.update_exploration(
-                self.bob_id, exploration_1.id, None, 'Changed title.')
+            exp_services._save_exploration(
+                self.bob_id, exploration_1, 'Changed title.', [])
 
             exploration_2 = self.save_new_valid_exploration(
                 self.EXP_ID_2, self.albert_id)
 
             exploration_1.title = 'Exploration 1 Albert title'
-            exp_services.update_exploration(
-                self.albert_id, exploration_1.id, None,
-                'Changed title to Albert1 title.')
+            exp_services._save_exploration(
+                self.albert_id, exploration_1,
+                'Changed title to Albert1 title.', [])
 
             exploration_2.title = 'Exploration 2 Albert title'
-            exp_services.update_exploration(
-                self.albert_id, exploration_2.id, None,
-                    'Changed title to Albert2.')
+            exp_services._save_exploration(
+                self.albert_id, exploration_2, 'Changed title to Albert2.', [])
 
             exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
@@ -3734,8 +3731,7 @@ title: Old Title
 
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services.update_exploration(
-            self.albert_id, exploration.id, None, 'Test commit')
+        exp_services._save_exploration(self.albert_id, exploration, '', [])
 
         param_changes = [{
             'customization_args': {
@@ -3962,8 +3958,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.USER_ID)
         exploration.param_specs = {
             'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services.update_exploration(
-            self.USER_ID, exploration.id, None, 'Test commit')
+        exp_services._save_exploration(self.USER_ID, exploration, '', [])
         self.save_new_valid_exploration(self.EXP_ID2, self.USER_ID)
         self.save_new_valid_exploration(self.EXP_ID3, self.USER_ID)
         self.init_state_name = exploration.init_state_name
@@ -4170,9 +4165,9 @@ class ApplyDraftUnitTests(test_utils.GenericTestBase):
             'from_version': '0',
             'to_version': '1'
         })]
-        exp_services.update_exploration(
-            self.USER_ID, exploration.id, migration_change_list, 
-            'Migrate state schema.')
+        exp_services._save_exploration(
+            self.USER_ID, exploration, 'Migrate state schema.',
+            migration_change_list)
 
     def test_get_exp_with_draft_applied_after_draft_upgrade(self):
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID1)
