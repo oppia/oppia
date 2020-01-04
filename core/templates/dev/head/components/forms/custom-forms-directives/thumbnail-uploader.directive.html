@@ -1,0 +1,21 @@
+<div class="thumbnail-editor form-group">
+  <label class="form-heading">Topic Thumbnail</label>
+  <div>
+    <div class="oppia-editable-section float-left" title="Change Topic Thumbnail"
+         style="height: 100px; width: 180px">
+      <div class="oppia-click-to-start-editing protractor-test-photo-clickable"
+           ng-click="showEditThumbnailModal()">
+      </div>
+      <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
+      <img ng-src="<[editableThumbnailDataUrl]>"
+           class="img-thumbnail protractor-test-custom-photo">
+    </div>
+  </div>
+</div>
+
+<style>
+  .img-thumbnail {
+    max-height: 100%;
+    max-width: 100%;
+  }
+</style>
