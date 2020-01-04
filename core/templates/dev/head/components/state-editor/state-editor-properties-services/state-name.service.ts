@@ -18,21 +18,13 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { AlertsService } from 'services/alerts.service';
-import { StatePropertyService } from
-  // eslint-disable-next-line max-len
-  'components/state-editor/state-editor-properties-services/state-property.service';
-import { UtilsService } from 'services/utils.service';
-
 @Injectable({
   providedIn: 'root'
 })
-export class StateNameService extends StatePropertyService {
+export class StateNameService {
   private stateNameEditorIsShown: boolean = false;
-  constructor(alertsService: AlertsService, utilsService: UtilsService) {
-    super(alertsService, utilsService);
-    this.setterMethodKey = 'saveName';
-  }
+  private savedMemento: string = null;
+
 
   isStateNameEditorShown(): boolean {
     return this.stateNameEditorIsShown;
@@ -42,8 +34,16 @@ export class StateNameService extends StatePropertyService {
     this.stateNameEditorIsShown = value;
   }
 
-  init(stateName: string, value: any): void {
-    super.init(stateName, value);
+  setStateNameSavedMemento(stateName: string): void {
+    this.savedMemento = stateName;
+  }
+
+  getStateNameSavedMemento(): string {
+    return this.savedMemento;
+  }
+
+  init(): void {
+    this.setStateNameSavedMemento(null);
     this.setStateNameEditorVisibility(false);
   }
 }

@@ -56,29 +56,32 @@ angular.module('oppia').directive('stateNameEditor', [
             StateEditorService, StateNameService, FocusManagerService,
             ExplorationStatesService, RouterService) {
           var ctrl = this;
+          StateNameService.init();
           ctrl.EditabilityService = EditabilityService;
           ctrl.StateEditorService = StateEditorService;
           ctrl.StateNameService = StateNameService;
-          StateNameService.setStateNameEditorVisibility(false);
 
           ctrl.initStateNameEditor = function() {
-            StateNameService.setStateNameEditorVisibility(false);
+            StateNameService.init();
           };
 
           ctrl.openStateNameEditor = function() {
+            var stateName = StateEditorService.getActiveStateName();
             StateNameService.setStateNameEditorVisibility(true);
-            ctrl.tmpStateName = StateEditorService.getActiveStateName();
+            StateNameService.setStateNameSavedMemento(stateName);
+            ctrl.tmpStateName = stateName;
             FocusManagerService.setFocus('stateNameEditorOpened');
           };
 
           ctrl.saveStateName = function(newStateName) {
             var normalizedNewName =
               ctrl._getNormalizedStateName(newStateName);
+            var savedMemento = StateNameService.getStateNameSavedMemento();
             if (!_isNewStateNameValid(normalizedNewName)) {
               return false;
             }
 
-            if (StateNameService.savedMemento === normalizedNewName) {
+            if (savedMemento === normalizedNewName) {
               StateNameService.setStateNameEditorVisibility(false);
               return false;
             } else {
