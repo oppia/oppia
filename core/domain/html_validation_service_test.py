@@ -1351,11 +1351,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc2.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc2.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
@@ -1389,9 +1389,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
 
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags(
@@ -1456,10 +1456,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/img.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+        fs.commit('image/img.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
