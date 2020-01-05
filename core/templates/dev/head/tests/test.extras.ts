@@ -16,6 +16,14 @@
  * @fileoverview Extra functions needed for running frontend tests.
  */
 
+/* This function overwrites the translationProvider for a dummy function
+ * (customLoader). This is necessary to prevent the js test warnings about an
+ * 'unexpected GET request' when the translationProvider tries to load the
+ * translation files.
+ * More info in the angular-translate documentation:
+ *   http://angular-translate.github.io/docs/#/guide
+ * (see the 'Unit Testing' section).
+ */
 export const TranslatorProviderForTests = function(
     $provide, $translateProvider) {
   $provide.factory('customLoader', ['$q', function($q) {
