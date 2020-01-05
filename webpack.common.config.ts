@@ -684,6 +684,7 @@ module.exports = {
       test: /\.css$/,
       include: [
         path.resolve(__dirname, 'extensions'),
+        path.resolve(__dirname, 'node_modules'),
       ],
       use: ['style-loader', 'css-loader']
     }]

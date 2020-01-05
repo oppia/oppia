@@ -102,14 +102,6 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             expected_feedback_models,
             self.registry_instance.import_models([models.NAMES.feedback]))
 
-    def test_import_models_file(self):
-        """Tests import_models function with file option."""
-        from core.storage.file import gae_models as file_models
-        expected_file_models = (file_models,)
-        self.assertEqual(
-            expected_file_models,
-            self.registry_instance.import_models([models.NAMES.file]))
-
     def test_import_models_job(self):
         """Tests import_models function with job option."""
         from core.storage.job import gae_models as job_models
