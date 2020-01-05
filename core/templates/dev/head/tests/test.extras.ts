@@ -16,7 +16,7 @@
  * @fileoverview Extra functions needed for running frontend tests.
  */
 
-export const TRANSLATOR_PROVIDER_FOR_TESTS = function(
+export const TranslatorProviderForTests = function(
     $provide, $translateProvider) {
   $provide.factory('customLoader', ['$q', function($q) {
     return function() {

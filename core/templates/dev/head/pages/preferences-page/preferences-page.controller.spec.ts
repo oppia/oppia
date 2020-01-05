@@ -26,7 +26,7 @@ import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+import {TranslatorProviderForTests} from 'tests/test.extras';
 
 require('pages/preferences-page/preferences-page.controller.ts');
 
@@ -54,7 +54,7 @@ describe('Preferences Controller', function() {
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     }));
     beforeEach(
-      angular.mock.module('oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
 
     beforeEach(angular.mock.inject(function(
         _$componentController_, $http, _$httpBackend_, $rootScope) {

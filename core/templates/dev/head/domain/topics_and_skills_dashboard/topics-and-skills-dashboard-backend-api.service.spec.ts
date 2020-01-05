@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+import {TranslatorProviderForTests} from 'tests/test.extras';
 
 require(
   'domain/topics_and_skills_dashboard/' +
@@ -56,7 +56,7 @@ describe('Topics and Skills Dashboard backend API service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
-    angular.mock.module('oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
+    angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

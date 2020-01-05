@@ -22,7 +22,7 @@ require('domain/question/pretest-question-backend-api.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+import {TranslatorProviderForTests} from 'tests/test.extras';
 
 describe('Pretest question backend API service', function() {
   var PretestQuestionBackendApiService = null;
@@ -33,7 +33,7 @@ describe('Pretest question backend API service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
-    'oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
+    'oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

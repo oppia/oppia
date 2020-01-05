@@ -45,7 +45,7 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+import {TranslatorProviderForTests} from 'tests/test.extras';
 
 require(
   'pages/exploration-editor-page/history-tab/services/' +
@@ -68,7 +68,7 @@ describe('Compare versions service', function() {
     var mockExplorationData = null;
 
     beforeEach(
-      angular.mock.module('oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value(
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(

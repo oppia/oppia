@@ -28,7 +28,7 @@ import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+import {TranslatorProviderForTests} from 'tests/test.extras';
 
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
@@ -116,7 +116,7 @@ describe('Story editor state service', function() {
     }
   }));
   beforeEach(
-    angular.mock.module('oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
+    angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableStoryBackendApiService = (
       FakeEditableStoryBackendApiService());

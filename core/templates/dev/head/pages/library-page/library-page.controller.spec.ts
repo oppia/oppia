@@ -26,7 +26,7 @@ import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+import {TranslatorProviderForTests} from 'tests/test.extras';
 
 require('pages/library-page/library-page.directive.ts');
 
@@ -48,7 +48,7 @@ describe('Library controller', function() {
     }));
 
     beforeEach(
-      angular.mock.module('oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value(
         'LearnerDashboardActivityIdsObjectFactory',

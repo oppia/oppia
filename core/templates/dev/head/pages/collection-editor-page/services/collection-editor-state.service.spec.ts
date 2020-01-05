@@ -29,7 +29,7 @@ import { CollectionRightsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+import {TranslatorProviderForTests} from 'tests/test.extras';
 
 require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/collection-update.service.ts');
@@ -118,7 +118,7 @@ describe('Collection editor state service', function() {
     }
   }));
   beforeEach(
-    angular.mock.module('oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
+    angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableCollectionBackendApiService = (
       FakeEditableCollectionBackendApiService());
