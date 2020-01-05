@@ -37,8 +37,10 @@ import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
 import { ImprovementActionButtonObjectFactory } from
   'domain/statistics/ImprovementActionButtonObjectFactory';
-import { ImprovementsDisplayService } from 
+/* eslint-disable max-len */
+import { ImprovementsDisplayService } from
   'pages/exploration-editor-page/improvements-tab/services/improvements-display.service';
+/* eslint-enable max-len */
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { OutcomeObjectFactory } from
@@ -128,8 +130,8 @@ describe('ImprovementTaskService', function() {
       'ImprovementActionButtonObjectFactory',
       new ImprovementActionButtonObjectFactory());
     $provide.value(
-      'ImprovementsDisplayService', 
-      new ImprovementsDisplayService())
+      'ImprovementsDisplayService',
+      new ImprovementsDisplayService());
     $provide.value(
       'LearnerActionObjectFactory', new LearnerActionObjectFactory());
     $provide.value(
