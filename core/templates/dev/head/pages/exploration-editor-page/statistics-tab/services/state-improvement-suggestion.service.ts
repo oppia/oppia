@@ -30,12 +30,12 @@ interface RankedStates {
   type: string;
 }
 
-/* eslint-disable camelcase */
 export interface StateStats {
+  // eslint-disable-next-line camelcase
   total_entry_count: number;
+  // eslint-disable-next-line camelcase
   no_submitted_answer_count: number;
 }
-/* eslint-enable camelcase */
 
 @Injectable({
   providedIn: 'root'
