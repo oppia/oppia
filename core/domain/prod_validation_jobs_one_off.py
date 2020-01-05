@@ -4939,9 +4939,20 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
-            'user_settings_ids': (user_models.UserSettingsModel, [item.id]),
-        }
+        return {}
+
+    @classmethod
+    def _validate_user_settings_are_marked_deleted(cls, item):
+        """Validates that explorations for model are marked as deleted.
+
+        Args:
+            item: ndb.Model. BaseUserModel to validate.
+        """
+        user_model = user_models.UserSettingsModel.get_by_id(item.id)
+        if user_model is None or not user_model.deleted:
+            cls.errors['deleted user settings'].append(
+                'Entity id %s: User settings model is not marked as deleted'
+                % (item.id))
 
     @classmethod
     def _validate_explorations_are_marked_deleted(cls, item):
@@ -4992,6 +5003,7 @@ class PendingDeletionRequestModelValidator(BaseUserModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
+            cls._validate_user_settings_are_marked_deleted,
             cls._validate_explorations_are_marked_deleted,
             cls._validate_collections_are_marked_deleted]
 
@@ -5967,4 +5979,3 @@ class PendingDeletionRequestModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.PendingDeletionRequestModel]
-

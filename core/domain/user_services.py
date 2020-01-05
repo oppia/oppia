@@ -100,7 +100,7 @@ class UserSettings(python_utils.OBJECT):
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None, to_be_deleted=False):
+            preferred_audio_language_code=None, deleted=False):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -138,7 +138,7 @@ class UserSettings(python_utils.OBJECT):
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
-            to_be_deleted: bool. Whether the user has requested removal of their
+            deleted: bool. Whether the user has requested removal of their
                 account.
         """
         self.user_id = user_id
@@ -165,7 +165,7 @@ class UserSettings(python_utils.OBJECT):
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
-        self.to_be_deleted = to_be_deleted
+        self.deleted = deleted
 
     def validate(self):
         """Checks that user_id and email fields of this UserSettings domain
@@ -647,7 +647,7 @@ def _save_user_settings(user_settings):
             user_settings.preferred_site_language_code),
         preferred_audio_language_code=(
             user_settings.preferred_audio_language_code),
-        to_be_deleted=user_settings.to_be_deleted
+        deleted=user_settings.deleted
     ).put()
 
 
@@ -692,7 +692,7 @@ def _transform_user_settings(user_settings_model):
                 user_settings_model.preferred_site_language_code),
             preferred_audio_language_code=(
                 user_settings_model.preferred_audio_language_code),
-            to_be_deleted=user_settings_model.to_be_deleted
+            deleted=user_settings_model.deleted
         )
     else:
         return None
@@ -1021,7 +1021,7 @@ def update_user_role(user_id, role):
 
 def mark_user_for_deletion(
         user_id, exploration_ids, collection_ids):
-    """Set to_be_deleted of the user with given user_id to True and create
+    """Set deleted of the user with given user_id to True and create
     PendingDeletionRequestModel for that user.
 
     Args:
@@ -1032,7 +1032,7 @@ def mark_user_for_deletion(
             deleted and should be hard deleted later.
     """
     user_settings = get_user_settings(user_id, strict=True)
-    user_settings.to_be_deleted = True
+    user_settings.deleted = True
     _save_user_settings(user_settings)
 
     user_models.PendingDeletionRequestModel(

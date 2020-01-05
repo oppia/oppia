@@ -180,6 +180,20 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         with self.assertRaises(Exception):
             self.registry_instance.import_models([''])
 
+    def test_get_storage_model_classes(self):
+        """Tests get_all_storage_model_classes."""
+        from core.storage.user import gae_models as user_models
+        classes = self.registry_instance.get_storage_model_classes(
+            [models.NAMES.user])
+        self.assertIn(user_models.UserSettingsModel, classes)
+        self.assertIn(user_models.CompletedActivitiesModel, classes)
+        self.assertIn(user_models.IncompleteActivitiesModel, classes)
+        self.assertIn(user_models.ExpUserLastPlaythroughModel, classes)
+        self.assertIn(user_models.LearnerPlaylistModel, classes)
+        self.assertIn(user_models.UserContributionsModel, classes)
+        self.assertIn(user_models.UserEmailPreferencesModel, classes)
+        self.assertIn(user_models.UserSubscriptionsModel, classes)
+
     def test_get_all_storage_model_classes(self):
         """Tests get_all_storage_model_classes."""
         from core.storage.base_model import gae_models as base_models

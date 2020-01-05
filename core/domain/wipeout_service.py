@@ -1,6 +1,4 @@
-# coding: utf-8
-#
-# Copyright 2014 The Oppia Authors. All Rights Reserved.
+# Copyright 2020 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Services for user data."""
+"""Service for handling the user deletion process."""
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -25,7 +23,8 @@ from core.domain import user_services
 from core.platform import models
 
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -69,3 +68,65 @@ def pre_delete_user(user_id):
         explorations_to_be_deleted_ids,
         collections_to_be_deleted_ids,
     )
+
+
+def delete_user(pending_deletion_model):
+    """Delete all the models for user specified in pending_deletion_model.
+
+    Args:
+        pending_deletion_model: PendingDeletionRequestModel.
+    """
+    _delete_user_models(pending_deletion_model.id)
+    pending_deletion_model.deletion_complete = True
+    pending_deletion_model.put()
+
+
+def verify_user_deleted(pending_deletion_model):
+    """Verify that all the models for user specified in pending_deletion_model
+    are deleted.
+
+    Args:
+        pending_deletion_model: PendingDeletionRequestModel.
+
+    Returns:
+        bool. True if all the models were correctly deleted, False otherwise.
+    """
+    if _verify_user_models_deleted(pending_deletion_model.id):
+        pending_deletion_model.delete()
+        return True
+    else:
+        pending_deletion_model.deletion_complete = False
+        pending_deletion_model.put()
+        return False
+
+
+def _delete_user_models(user_id):
+    """Delete the user models for the user with user_id.
+
+    Args:
+        user_id: str. The id of the user to be deleted.
+    """
+    for model_class in models.Registry.get_storage_model_classes(
+            [models.NAMES.user]):
+        if (model_class.get_deletion_policy() !=
+                base_models.DELETION_POLICY.KEEP):
+            model_class.apply_deletion_policy(user_id)
+
+
+def _verify_user_models_deleted(user_id):
+    """Verify that the user models for the user with user_id are deleted.
+
+    Args:
+        user_id: str. The id of the user to be deleted.
+
+    Returns:
+        bool. True if all the user models were correctly deleted, False
+        otherwise.
+    """
+    for model_class in models.Registry.get_storage_model_classes(
+            [models.NAMES.user]):
+        if (model_class.get_deletion_policy() !=
+                base_models.DELETION_POLICY.KEEP):
+            if model_class.has_reference_to_user_id(user_id):
+                return False
+    return True
