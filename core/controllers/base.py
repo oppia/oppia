@@ -80,7 +80,10 @@ class LogoutPage(webapp2.RequestHandler):
         """
 
         _clear_login_cookies(self.response.headers)
+
         url_to_redirect_to = '/'
+        if self.request.get('redirect_url'):
+            url_to_redirect_to = self.request.get('redirect_url')
 
         if constants.DEV_MODE:
             self.redirect(
@@ -160,9 +163,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 
-            self.user_is_scheduled_for_deletion = user_settings.deleted
-
-            if (self.REDIRECT_UNFINISHED_SIGNUPS and not
+            if user_settings.deleted:
+                _clear_login_cookies(self.response.headers)
+                self.user_is_scheduled_for_deletion = user_settings.deleted
+            elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
                     user_services.has_fully_registered(user_settings.user_id)):
                 _clear_login_cookies(self.response.headers)
                 self.partially_logged_in = True
@@ -213,10 +217,18 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
+        if self.user_is_scheduled_for_deletion:
+            if constants.DEV_MODE:
+                self.redirect(
+                    current_user_services.create_logout_url(
+                        feconf.ACCOUNT_TO_BE_DELETED_URL))
+            else:
+                self.redirect(feconf.ACCOUNT_TO_BE_DELETED_URL)
+            return
+
         # In DEV_MODE, clearing cookies does not log out the user, so we
         # force-clear them by redirecting to the logout URL.
-        if ((constants.DEV_MODE and self.partially_logged_in) or
-                self.user_is_scheduled_for_deletion):
+        if constants.DEV_MODE and self.partially_logged_in:
             self.redirect(
                 current_user_services.create_logout_url(self.request.uri))
             return

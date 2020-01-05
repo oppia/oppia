@@ -53,7 +53,7 @@ angular.module('oppia').directive('deleteAccountPage', [
               ]
             }).result.then(function() {
               $http['delete']('/delete-account-handler').then(function() {
-                $window.location = '/logout';
+                $window.location = '/logout?redirect_url=account-to-be-deleted';
               });
             });
           };

@@ -53,6 +53,9 @@ module.exports = {
   },
   entry: {
     about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
+    account_to_be_deleted:
+        commonPrefix + '/pages/account-to-be-deleted-page/' +
+        'account-to-be-deleted-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
     classroom:
       commonPrefix + '/pages/classroom-page/classroom-page.scripts.ts',
@@ -141,19 +144,6 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      chunks: ['admin'],
-      filename: 'admin-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Oppia is a free site for sharing knowledge via ' +
-          'interactive lessons called \'explorations\'. Learn from ' +
-          'user-created explorations, or teach and create your own.'
-      },
-      template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['about'],
       filename: 'about-page.mainpage.html',
       meta: {
@@ -163,6 +153,29 @@ module.exports = {
         'site to create 1-1 learning scenarios for others.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['account_to_be_deleted'],
+      filename: 'account-to-be-deleted-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/account-to-be-deleted-page/' +
+          'account-to-be-deleted-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['admin'],
+      filename: 'admin-page.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
+      template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
