@@ -23,7 +23,7 @@ require('domain/collection/search-explorations-backend-api.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Exploration search backend API service', function() {
   var SearchExplorationsBackendApiService = null;

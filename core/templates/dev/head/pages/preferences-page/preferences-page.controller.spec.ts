@@ -26,7 +26,7 @@ import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('pages/preferences-page/preferences-page.controller.ts');
 

@@ -49,7 +49,7 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');

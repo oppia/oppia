@@ -29,7 +29,7 @@ import { CollectionRightsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/collection-update.service.ts');

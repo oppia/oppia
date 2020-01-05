@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');

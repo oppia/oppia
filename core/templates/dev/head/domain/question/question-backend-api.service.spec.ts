@@ -21,7 +21,7 @@ require('domain/question/question-backend-api.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Question backend Api service', function() {
   var QuestionBackendApiService = null;

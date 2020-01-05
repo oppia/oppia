@@ -28,7 +28,7 @@ import { StoryObjectFactory } from 'domain/story/StoryObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');

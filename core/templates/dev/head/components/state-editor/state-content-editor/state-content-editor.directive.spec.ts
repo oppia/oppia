@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');

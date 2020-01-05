@@ -65,7 +65,7 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('App.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');

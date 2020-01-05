@@ -21,7 +21,7 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('pages/signup-page/signup-page.controller.ts');
 require('services/csrf-token.service.ts');

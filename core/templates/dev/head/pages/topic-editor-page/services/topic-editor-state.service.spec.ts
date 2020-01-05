@@ -43,7 +43,7 @@ import { VoiceoverObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-import {TranslatorProviderForTests} from 'tests/test.extras';
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-update.service.ts');
