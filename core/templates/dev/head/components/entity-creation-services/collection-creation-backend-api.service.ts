@@ -21,10 +21,10 @@ require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('CollectionCreationBackendService', [
   '$http', '$rootScope', '$timeout', '$window',
-  'SiteAnalyticsService', 'UrlInterpolationService',
-  function(
+  'SiteAnalyticsService', 'UrlInterpolationService', 
+  'CREATE_NEW_COLLECTION_URL_TEMPLATE', function(
     $http, $rootScope, $timeout, $window, SiteAnalyticsService,
-    UrlInterpolationService) {
+    UrlInterpolationService, CREATE_NEW_COLLECTION_URL_TEMPLATE) {
     var _createCollection = function(CREATE_NEW_COLLECTION_URL_TEMPLATE) {
       $http.post('/collection_editor_handler/create_new', {})
         .then(function(response) {
