@@ -667,7 +667,7 @@ class VersionedModel(BaseModel):
         snapshot_metadata_instance = self.SNAPSHOT_METADATA_CLASS.create(
             snapshot_id, committer_id, commit_type, commit_message, commit_cmds)
         snapshot_content_instance = (
-            self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, content=snapshot))
+            self.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
         transaction_services.run_in_transaction(
             BaseModel.put_multi,
@@ -778,8 +778,7 @@ class VersionedModel(BaseModel):
                         snapshot_id, committer_id, cls._COMMIT_TYPE_DELETE,
                         commit_message, commit_cmds))
                 snapshot_content_models.append(
-                    model.SNAPSHOT_CONTENT_CLASS.create(
-                        snapshot_id, content=snapshot))
+                    model.SNAPSHOT_CONTENT_CLASS.create(snapshot_id, snapshot))
 
             transaction_services.run_in_transaction(
                 BaseModel.put_multi,
@@ -1091,6 +1090,28 @@ class BaseSnapshotMetadataModel(BaseModel):
     @classmethod
     def create(cls, snapshot_id, committer_id, commit_type,
                commit_message, commit_cmds):
+        """This method returns an instance of the BaseSnapshotMetadataModel for
+        a construct with the common fields filled.
+
+        Args:
+            snapshot_id: str. The ID of the construct corresponding to this
+                snapshot.
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+
+        Returns:
+            BaseSnapshotMetadataModel. Returns the respective
+            BaseSnapshotMetadataModel instance of the construct from which this
+            is called.
+        """
         return cls(id=snapshot_id, committer_id=committer_id,
                    commit_type=commit_type, commit_message=commit_message,
                    commit_cmds=commit_cmds)
@@ -1128,6 +1149,19 @@ class BaseSnapshotContentModel(BaseModel):
 
     @classmethod
     def create(cls, snapshot_id, content):
+        """This method returns an instance of the BaseSnapshotContentModel for
+        a construct with the common fields filled.
+
+        Args:
+            snapshot_id: str. The ID of the construct corresponding to this
+                snapshot.
+            content: dict. The fields of the original model in dict format.
+
+        Returns:
+            BaseSnapshotContentModel. Returns the respective
+            BaseSnapshotContentModel instance of the construct from which this
+            is called.
+        """
         return cls(id=snapshot_id, content=content)
 
     def get_unversioned_instance_id(self):
