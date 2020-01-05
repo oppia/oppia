@@ -25,7 +25,6 @@ export class StateNameService {
   private stateNameEditorIsShown: boolean = false;
   private savedMemento: string = null;
 
-
   isStateNameEditorShown(): boolean {
     return this.stateNameEditorIsShown;
   }
