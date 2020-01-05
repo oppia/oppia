@@ -62,6 +62,7 @@ NPM_CMD = os.path.join(
 YARN_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.17.3', 'bin', 'yarn')
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
+TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT = 'check_e2e_tests_are_captured_in_ci'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -338,6 +339,23 @@ def does_diff_include_js_or_ts_files(files_to_lint):
     return False
 
 
+def does_diff_include_travis_yaml_or_protractor_conf_file(files_to_lint):
+    """Returns true if diff includes travis.yml or protractor.conf.js file.
+
+    Args:
+        files_to_lint: list(str). List of files to be linted.
+
+    Returns:
+        bool. Whether the diff contains changes in travis.yml or
+        protractor.conf.js file.
+    """
+
+    for filename in files_to_lint:
+        if filename.endswith('protractor.conf.js') or filename.endswith('.travis.yml'):
+            return True
+    return False
+
+
 def main(args=None):
     """Main method for pre-push hook that executes the Python/JS linters on all
     files that deviate from develop.
@@ -373,11 +391,18 @@ def main(args=None):
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
             frontend_status = 0
+            travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = start_python_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
+                sys.exit(1)
+            if does_diff_include_travis_yaml_or_protractor_conf_file(files_to_lint):
+                travis_ci_check_status = start_python_script(TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
+            if travis_ci_check_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing travis ci checks.')
                 sys.exit(1)
     return
 

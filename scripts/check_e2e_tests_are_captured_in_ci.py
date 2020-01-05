@@ -13,14 +13,14 @@
 # limitations under the License.
 
 """Test to check that travis.yml file & protractor.conf.js have the
-same test suites"""
+same test suites."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import os
 import re
 
-from core.tests import test_utils
 import python_utils
 import utils
 
@@ -29,13 +29,18 @@ def extract_travis_jobs_section():
     """Extracts the env/jobs section from the .travis.yml file.
 
     Returns:
-        list. A list of all jobs in travis.yml file.
+        list(str). A list of all jobs in travis.yml file.
     """
     travis_file = read_travis_yml_file()
     jobs_raw = travis_file['env']['jobs']
     suites_from_jobs = []
     for job in jobs_raw:
+        # The jobs are in the form RUN_E2E_TESTS_ACCESSIBILITY=true
+        # so the following line removes the RUN_E2E_TESTS_(14 length)
+        # and =true(5 length) part.
         suites_from_jobs.append(utils.snake_case_to_camel_case(job[14:-5].lower()))
+    suites_from_jobs.sort()
+
     return suites_from_jobs
 
 
@@ -43,17 +48,22 @@ def extract_travis_script_section():
     """Extracts the script section from the .travis.yml file.
 
     Returns:
-        list. A list of all scripts in travis.yml file.
+        list(str). A list of all scripts in travis.yml file.
     """
     travis_file = read_travis_yml_file()
     script_raw = travis_file['script']
-    # extracting test suite from patterns like --suite="accessibility"
-    hyphen_between_regex = re.compile(r'--(.+?)--')
+    # The following line extracts the test suites from patterns like
+    # --suite="accessibility" --
+    hyphen_between_regex = re.compile(r'--suite="(.+?)" --')
     suites_from_script = []
+
     for script in script_raw:
         matches = hyphen_between_regex.finditer(script)
         for match in matches:
+            # The extracted data is of the form --suite="subscriptions" --
+            # hence 9 to remove --suite=" and -4 to remove " --
             suites_from_script.append(match.group()[9:-4])
+    suites_from_script.sort()
 
     return suites_from_script
 
@@ -62,35 +72,30 @@ def extract_protractor_test_suites():
     """Extracts the test suites section from the .travis.yml file.
 
     Returns:
-        list. A list of all test suites in protractor.conf.js file.
+        list(str). A list of all test suites in protractor.conf.js file.
     """
     protractor_config_file = read_protractor_conf_file()
-    # Extracting suites object from protractor.conf.js.
-    suites_object_regex = re.compile(r'suites = {([^}]+)}')
-    for match in suites_object_regex.finditer(protractor_config_file):
-        suite = match.group()
+    # The following line extracts suite object from protractor.conf.js.
+    suite = re.compile(r'suites = {([^}]+)}').findall(protractor_config_file)[0]
 
-    comments_regex = re.compile(r'(//.*)')
-    # Removing comments of the form // from suites object.
-    suites_object = re.sub(comments_regex, '', suite)
-
-    test_suites = suites_object[10:-1]
-    words = test_suites.strip().split('\n')
+    # The following line extracts the keys/test suites from the suites object.
+    key_regex = re.compile(r'\s(.*?):')
     protractor_suites = []
-    i = 0
-    # extracting tests from strings like adminPage: ['protractor_desktop/adminTabFeatures.js'],
-    unwanted_keys = ['.js', '[', ']']
-    while i < len(words):
-        key_raw = words[i].strip().split(':')[0]
-        if not any(x in key_raw for x in unwanted_keys) and len(key_raw) != 0:
-            protractor_suites.append(key_raw)
-        i += 1
+    for match in key_regex.finditer(suite):
+        # Since the keys are in the form adminPage: so -1 to remove the
+        # colon part :
+        protractor_suites.append(match.group()[:-1].strip())
 
+    protractor_suites.sort()
     return protractor_suites
 
 
 def read_protractor_conf_file():
-    """Returns the core/tests/protractor.conf.js. file."""
+    """Returns the core/tests/protractor.conf.js. file.
+
+    Returns:
+        str. The protractor.conf.js as a string.
+    """
     protractor_config_file = (python_utils.open_file(
         os.path.join(
             os.getcwd(), 'core', 'tests', 'protractor.conf.js'), 'r').read())
@@ -109,27 +114,32 @@ def read_travis_yml_file():
     return travis_ci_dict
 
 
-class TravisCIFileTests(test_utils.GenericTestBase):
+def main():
     """Test the travis ci file and protractor.conf.js have same test suites."""
-    def test_travis_and_protractor_length(self):
+    python_utils.PRINT('Checking e2e tests are captured in travis.yml started')
+    protractor_test_suites = extract_protractor_test_suites()
+    yaml_jobs = extract_travis_jobs_section()
+    yaml_scripts = extract_travis_script_section()
 
-        protractor_test_suites = extract_protractor_test_suites()
-        yaml_jobs = extract_travis_jobs_section()
-        yaml_scripts = extract_travis_script_section()
+    # These 4 test suites are not present in travis ci.
+    # One is extra ie. (full: [*.js]), and three other tests that
+    # are being run by circleCi.
+    excluded_travis_tests = [
+        'full', 'classroomPage', 'fileUploadFeatures', 'topicAndStoryEditor']
+    for excluded_test in excluded_travis_tests:
+        protractor_test_suites.remove(excluded_test)
 
-        # Subtracting 4 since protractor test suites have one
-        # extra test(full: [*.js]), and three other tests that
-        # are being run by circleCi.
-        excluded_travis_tests = ['full', 'classroomPage', 'fileUploadFeatures', 'topicAndStoryEditor']
-        for excluded_test in excluded_travis_tests:
-            protractor_test_suites.remove(excluded_test)
+    if not (len(yaml_jobs) > 0 and len(yaml_scripts) > 0
+            and len(protractor_test_suites) > 0):
+        raise Exception('The tests suites that have been extracted from '
+                        'protractor.conf.js or travis.ci are empty.')
 
-        self.assertTrue((len(yaml_jobs) == len(yaml_scripts)) and (
-            len(yaml_jobs) == len(protractor_test_suites)))
+    if not (protractor_test_suites.sort() == yaml_jobs.sort()
+            and (yaml_jobs.sort() == yaml_scripts.sort())):
+        raise Exception('Protractor test suites and Travis Ci test suites are not in sync.')
 
-        protractor_test_suites.sort()
-        yaml_jobs.sort()
-        yaml_scripts.sort()
+    python_utils.PRINT('Done!')
 
-        self.assertTrue(protractor_test_suites.sort() == yaml_jobs.sort() and (
-          yaml_jobs.sort() == yaml_scripts.sort()))
+
+if __name__ == "__main__":
+    main()

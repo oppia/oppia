@@ -104,6 +104,8 @@
 /scripts/__init__.py @kevinlee12
 /scripts/build.py @kevinlee12
 /scripts/build_test.py @kevinlee12
+/scripts/check_e2e_tests_are_captured_in_ci.py @showtim3 @kevinlee12
+/scripts/check_e2e_tests_are_captured_in_ci_test.py @showtim3 @kevinlee12
 /scripts/clean.py @kevinlee12
 /scripts/clean_test.py @kevinlee12
 /scripts/common.py @kevinlee12
@@ -143,7 +145,6 @@
 /scripts/setup_test.py @kevinlee12
 /scripts/start.py @kevinlee12
 /scripts/third_party_size_check.py @kevinlee12
-/scripts/travis_yml_test.py @showtim3 @kevinlee12
 /scripts/typescript_checks.py @ankita240796 @kevinlee12
 /scripts/typescript_checks_test.py @ankita240796 @kevinlee12
 /ubuntu_dockerfile @ezl-13 @kevinlee12
