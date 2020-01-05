@@ -19,10 +19,9 @@
 // The module needs to be loaded before everything else since it defines the
 // main module the elements are attached to.
 require(
-    'pages/account-to-be-deleted-page/account-to-be-deleted-page.module.ts');
+  'pages/account-to-be-deleted-page/account-to-be-deleted-page.module.ts');
 require('App.ts');
 
 require('base-components/base-content.directive.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+require('components/common-layout-directives/common-elements/' +
+        'background-banner.directive.ts');
