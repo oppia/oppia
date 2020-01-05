@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Test to check that travis.yml file & protractor.conf.js have the
+"""A script to check that travis.yml file & protractor.conf.js have the
 same test suites."""
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
