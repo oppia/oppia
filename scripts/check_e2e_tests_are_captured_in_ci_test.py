@@ -68,7 +68,6 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
 
     def test_extract_travis_jobs_section(self):
         actual_travis_jobs = check_e2e_tests_are_captured_in_ci.extract_travis_jobs_section()
-        print actual_travis_jobs
         self.assertEqual(TRAVIS_SUITES, actual_travis_jobs)
 
     def test_extract_travis_script_section(self):
