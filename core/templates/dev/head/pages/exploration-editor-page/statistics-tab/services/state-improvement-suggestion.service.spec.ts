@@ -304,15 +304,14 @@ describe('StateImprovementSuggestionService', () => {
         },
       }
     };
-    /* eslint-disable camelcase */
     interface InteractionType {
       interaction: {
+        // eslint-disable-next-line camelcase
         default_outcome?: {
           dest: string
         }
       }
     }
-    /* eslint-enable camelcase */
     var _createState = (destStateName: string): InteractionType => {
       // Only a partial state definition is needed for these tests.
       if (destStateName) {
