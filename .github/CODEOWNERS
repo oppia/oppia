@@ -245,7 +245,7 @@
 /core/templates/dev/head/services/contextual/url.service*.ts @ankita240796
 /core/templates/dev/head/services/contextual/device-info.service*.ts @ankita240796
 /core/templates/dev/head/services/contextual/window-dimensions.service*.ts @ankita240796
-/core/templates/dev/head/services/contextual/window-ref.service.ts @YashJipkate
+/core/templates/dev/head/services/contextual/window-ref.service.ts @ankita240796
 
 
 # Global stylesheet.
@@ -403,8 +403,8 @@
 /core/templates/dev/head/pages/interaction-specs.constants.ts @bansalnitish
 /core/templates/dev/head/I18nFooter.ts @nithusha21
 /core/templates/dev/head/i18n-footer.directive.html @nithusha21
-/core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @YashJipkate
-/core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @YashJipkate
+/core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @bansalnitish
+/core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @bansalnitish
 /core/templates/dev/head/services/translation-file-hash-loader.service.ts @nithusha21
 /release_constants.py @ankita240796 @nithusha21 @seanlip
 
@@ -420,7 +420,7 @@
 /core/templates/dev/head/domain/utilities/ @bansalnitish
 /schema_utils*.py @seanlip
 /utils*.py @aks681
-/python_utils*.py @lilithxxx
+/python_utils*.py @kevinlee12
 
 
 # Restricted pages.
@@ -532,7 +532,7 @@
 
 
 # Draft version upgrade.
-/core/domain/draft_upgrade_services*.py @sshou14
+/core/domain/draft_upgrade_services*.py @seanlip
 
 # Critical files.
 #
