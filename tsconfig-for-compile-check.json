@@ -20,7 +20,8 @@
       "services/*": ["core/templates/dev/head/services/*"],
       "classifiers/*": ["extensions/classifiers/*"],
       "interactions/*": ["extensions/interactions/*"],
-      "filters/*": ["core/templates/dev/head/filters/*"]
+      "filters/*": ["core/templates/dev/head/filters/*"],
+      "tests/*": ["core/templates/dev/head/tests/*"]
     }
   },
   "files": [
