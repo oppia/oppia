@@ -31,6 +31,8 @@ import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+
 require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
 
 describe('Creator dashboard controller', function() {
@@ -69,7 +71,7 @@ describe('Creator dashboard controller', function() {
     };
 
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(function() {
       angular.mock.module('oppia');

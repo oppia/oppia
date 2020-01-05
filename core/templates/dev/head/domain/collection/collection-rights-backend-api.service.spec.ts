@@ -24,6 +24,8 @@ require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+
 describe('Collection rights backend API service', function() {
   var CollectionRightsBackendApiService = null;
   var sampleDataResults = null;
@@ -34,7 +36,7 @@ describe('Collection rights backend API service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
-    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    'oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

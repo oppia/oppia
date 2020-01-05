@@ -21,6 +21,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 
@@ -48,7 +50,7 @@ describe('Read only exploration backend API service', function() {
   }));
 
   beforeEach(angular.mock.module(
-    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    'oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(angular.mock.inject(function($injector) {
     ReadOnlyExplorationBackendApiService = $injector.get(

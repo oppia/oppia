@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,22 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Globals for the Karma test environment.
+ * @fileoverview Extra functions needed for running frontend tests.
  */
 
-var GLOBALS = {
-  TRANSLATOR_PROVIDER_FOR_TESTS: null
-};
-
-/* This function overwrites the translationProvider for a dummy function
- * (customLoader). This is necessary to prevent the js test warnings about an
- * 'unexpected GET request' when the translationProvider tries to load the
- * translation files.
- * More info in the angular-translate documentation:
- *   http://angular-translate.github.io/docs/#/guide
- * (see the 'Unit Testing' section).
- */
-GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS = function($provide, $translateProvider) {
+export const TRANSLATOR_PROVIDER_FOR_TESTS = function(
+    $provide, $translateProvider) {
   $provide.factory('customLoader', ['$q', function($q) {
     return function() {
       return $q.resolve({});

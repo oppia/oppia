@@ -21,6 +21,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import {TRANSLATOR_PROVIDER_FOR_TESTS} from 'tests/test.extras';
+
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/editable-story-backend-api.service.ts');
 require('services/csrf-token.service.ts');
@@ -36,7 +38,7 @@ describe('Editable story backend API service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    angular.mock.module('oppia', TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

@@ -26,7 +26,6 @@
   "files": [
     "assets/constants.ts",
     "assets/rich_text_components_definitions.ts",
-    "core/tests/karma-globals.ts",
     "core/tests/karma.conf.ts"
   ],
   "include": ["core", "extensions", "typings"],
