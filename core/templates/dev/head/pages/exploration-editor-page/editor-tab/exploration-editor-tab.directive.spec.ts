@@ -83,7 +83,7 @@ require(
 
 describe('Exploration editor tab controller', function() {
   describe('ExplorationEditorTab', function() {
-    var ecs, ess, scs, rootScope, $componentController;
+    var ecs, ess, scs, scope, rootScope, $componentController;
     var explorationEditorTabCtrl;
 
     beforeEach(angular.mock.module('oppia'));
@@ -314,15 +314,21 @@ describe('Exploration editor tab controller', function() {
         }
       });
 
+      scope = $rootScope.$new();
       explorationEditorTabCtrl = $componentController('explorationEditorTab', {
-        ExplorationStatesService: ess
+        ExplorationStatesService: ess,
+        $scope: scope
       }, {});
     }));
 
     it('should correctly broadcast the stateEditorInitialized flag with ' +
        'the state data', function() {
       ecs.setActiveStateName('Third State');
+      ecs.updateStateInteractionEditorInitialised();
+      ecs.updateStateResponsesInitialised();
+      ecs.updateStateEditorDirectiveInitialised();
       explorationEditorTabCtrl.initStateEditor();
+      scope.$digest();
       expect(
         rootScope.$broadcast
       ).toHaveBeenCalledWith(
