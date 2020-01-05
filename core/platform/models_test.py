@@ -102,14 +102,6 @@ class RegistryUnitTest(test_utils.GenericTestBase):
             expected_feedback_models,
             self.registry_instance.import_models([models.NAMES.feedback]))
 
-    def test_import_models_file(self):
-        """Tests import_models function with file option."""
-        from core.storage.file import gae_models as file_models
-        expected_file_models = (file_models,)
-        self.assertEqual(
-            expected_file_models,
-            self.registry_instance.import_models([models.NAMES.file]))
-
     def test_import_models_job(self):
         """Tests import_models function with job option."""
         from core.storage.job import gae_models as job_models
@@ -187,6 +179,20 @@ class RegistryUnitTest(test_utils.GenericTestBase):
         """Tests import_models function with an invalid option."""
         with self.assertRaises(Exception):
             self.registry_instance.import_models([''])
+
+    def test_get_storage_model_classes(self):
+        """Tests get_all_storage_model_classes."""
+        from core.storage.user import gae_models as user_models
+        classes = self.registry_instance.get_storage_model_classes(
+            [models.NAMES.user])
+        self.assertIn(user_models.UserSettingsModel, classes)
+        self.assertIn(user_models.CompletedActivitiesModel, classes)
+        self.assertIn(user_models.IncompleteActivitiesModel, classes)
+        self.assertIn(user_models.ExpUserLastPlaythroughModel, classes)
+        self.assertIn(user_models.LearnerPlaylistModel, classes)
+        self.assertIn(user_models.UserContributionsModel, classes)
+        self.assertIn(user_models.UserEmailPreferencesModel, classes)
+        self.assertIn(user_models.UserSubscriptionsModel, classes)
 
     def test_get_all_storage_model_classes(self):
         """Tests get_all_storage_model_classes."""
