@@ -34,7 +34,6 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
-from core.domain import fs_services
 from core.domain import learner_progress_services
 from core.domain import opportunity_services
 from core.domain import question_domain
@@ -555,6 +554,18 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
                     item.id, item.post_commit_status))
 
     @classmethod
+    def _validate_post_commit_status_is_public(cls, item):
+        """Validates that post_commit_status is only public.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        if not item.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC:
+            cls.errors['post commit status check'].append((
+                'Entity id %s: Post commit status %s is invalid') % (
+                    item.id, item.post_commit_status))
+
+    @classmethod
     def _validate_post_commit_is_private(cls, item):
         """Validates that post_commit_is_private is true iff
         post_commit_status is private.
@@ -584,7 +595,11 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         super(BaseCommitLogEntryModelValidator, cls).validate(item)
 
         cls._validate_post_commit_status(item)
-        cls._validate_post_commit_is_private(item)
+
+        if 'question' in item.id or 'skill' in item.id:
+            cls._validate_post_commit_status_is_public(item)
+        else:
+            cls._validate_post_commit_is_private(item)
 
 
 class BaseUserModelValidator(BaseModelValidator):

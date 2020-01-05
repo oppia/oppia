@@ -6311,43 +6311,17 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
         self.model_instance_0.put()
+        self.model_instance_1.post_commit_status = 'private'
+        self.model_instance_1.put()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
                 'of QuestionCommitLogEntryModel\', '
-                '[u\'Entity id question-0-1: Post commit status invalid '
+                '[u\'Entity id question-1-1: Post commit status private '
+                'is invalid\', '
+                'u\'Entity id question-0-1: Post commit status invalid '
                 'is invalid\']]'
-            ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_true_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'public'
-        self.model_instance_0.post_commit_is_private = True
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit is private '
-                'check of QuestionCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'public but post_commit_is_private is True\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_false_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'private'
-        self.model_instance_0.post_commit_is_private = False
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit is private '
-                'check of QuestionCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'private but post_commit_is_private is False\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
@@ -7515,43 +7489,17 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'invalid'
         self.model_instance_0.put()
+        self.model_instance_1.post_commit_status = 'private'
+        self.model_instance_1.put()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
                 'of SkillCommitLogEntryModel\', '
-                '[u\'Entity id skill-0-1: Post commit status invalid '
+                '[u\'Entity id skill-1-1: Post commit status private '
+                'is invalid\', '
+                'u\'Entity id skill-0-1: Post commit status invalid '
                 'is invalid\']]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_true_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'public'
-        self.model_instance_0.post_commit_is_private = True
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit is private '
-                'check of SkillCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'public but post_commit_is_private is True\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_false_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'private'
-        self.model_instance_0.post_commit_is_private = False
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit is private '
-                'check of SkillCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'private but post_commit_is_private is False\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
