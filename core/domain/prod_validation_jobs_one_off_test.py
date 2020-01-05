@@ -32,6 +32,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import fs_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
@@ -73,7 +74,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, file_models, job_models,
+    feedback_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
@@ -82,7 +83,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
+            models.NAMES.feedback, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
@@ -497,20 +498,23 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         next_scheduled_check_time = datetime.datetime.utcnow()
+        classifier_data = {'classifier_data': 'data'}
         id0 = classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', '0', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'StateTest0', feconf.TRAINING_JOB_STATUS_NEW,
-            None, 1)
+            'StateTest0', feconf.TRAINING_JOB_STATUS_NEW, 1)
+        fs_services.save_classifier_data(
+            'TextClassifier', id0, classifier_data)
         self.model_instance_0 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id0))
         id1 = classifier_models.ClassifierTrainingJobModel.create(
             'CodeClassifier', 'CodeRepl', '1', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'StateTest1', feconf.TRAINING_JOB_STATUS_NEW,
-            None, 1)
+            'StateTest1', feconf.TRAINING_JOB_STATUS_NEW, 1)
+        fs_services.save_classifier_data(
+            'CodeClassifier', id1, classifier_data)
         self.model_instance_1 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id1))
 
@@ -2457,7 +2461,8 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
 
         for i in python_utils.RANGE(3):
             skill_id = '%s' % i
-            self.save_new_skill(skill_id, self.admin_id, 'description %d' % i)
+            self.save_new_skill(
+                skill_id, self.admin_id, description='description %d' % i)
             skill_services.publish_skill(skill_id, self.admin_id)
 
         self.QUESTION_ID = question_services.get_new_question_id()
@@ -5274,725 +5279,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
                 'u\'%s\', u\'entity_id\': u\'invalid\', u\'message_id\': 0, '
                 'u\'entity_type\': u\'exploration\'}"]]'
             ) % (self.model_instance.id, self.thread_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileMetadataModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        self.model_instance_0 = file_models.FileMetadataModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        self.model_instance_0.commit(self.owner_id, [])
-
-        self.model_instance_1 = file_models.FileMetadataModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        self.model_instance_1.commit(self.owner_id, [])
-
-        self.job_class = (
-            prod_validation_jobs_one_off.FileMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of FileMetadataModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id,
-                    self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated
-                ),
-            u'[u\'fully-validated FileMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('exp1').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for exploration_ids field '
-                'check of FileMetadataModel\', '
-                '[u"Entity id %s: based on field exploration_ids having '
-                'value exp1, expect model ExplorationModel with id exp1 but it '
-                'doesn\'t exist"]]') % self.model_instance_1.id,
-            u'[u\'fully-validated FileMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_metadata_model_failure(self):
-        file_models.FileMetadataSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.model_instance_0.id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_metadata_ids '
-                'field check of FileMetadataModel\', '
-                '[u"Entity id %s: based on field snapshot_metadata_ids '
-                'having value %s-1, expect model '
-                'FileMetadataSnapshotMetadataModel '
-                'with id %s-1 but it doesn\'t exist"]]') % (
-                    self.model_instance_0.id, self.model_instance_0.id,
-                    self.model_instance_0.id),
-            u'[u\'fully-validated FileMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_content_model_failure(self):
-        file_models.FileMetadataSnapshotContentModel.get_by_id(
-            '%s-1' % self.model_instance_0.id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_content_ids '
-                'field check of FileMetadataModel\', '
-                '[u"Entity id %s: based on field snapshot_content_ids having '
-                'value %s-1, expect model FileMetadataSnapshotContentModel '
-                'with id %s-1 but it doesn\'t exist"]]') % (
-                    self.model_instance_0.id, self.model_instance_0.id,
-                    self.model_instance_0.id),
-            u'[u\'fully-validated FileMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileMetadataSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileMetadataSnapshotMetadataModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        file_metadata_model_0 = file_models.FileMetadataModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        file_metadata_model_0.commit(self.owner_id, [])
-
-        file_metadata_model_1 = file_models.FileMetadataModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        file_metadata_model_1.commit(self.user_id, [])
-
-        self.id_0 = file_metadata_model_0.id
-        self.id_1 = file_metadata_model_1.id
-
-        self.model_instance_0 = (
-            file_models.FileMetadataSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.id_0))
-        self.model_instance_1 = (
-            file_models.FileMetadataSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.id_1))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .FileMetadataSnapshotMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileMetadataSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of FileMetadataSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'FileMetadataSnapshotMetadataModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileMetadataSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_file_metadata_model_failure(self):
-        file_models.FileMetadataModel.get_by_id(self.id_0).delete(
-            self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for file_metadata_ids '
-                'field check of FileMetadataSnapshotMetadataModel\', '
-                '[u"Entity id %s-1: based on field file_metadata_ids '
-                'having value %s, expect model FileMetadataModel with '
-                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field file_metadata_ids having value %s, expect model '
-                'FileMetadataModel with id %s but it doesn\'t exist"]]'
-            ) % (
-                self.id_0, self.id_0, self.id_0, self.id_0,
-                self.id_0, self.id_0
-            ),
-            u'[u\'fully-validated FileMetadataSnapshotMetadataModel\', 1]']
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
-
-    def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for committer_ids field '
-                'check of FileMetadataSnapshotMetadataModel\', '
-                '[u"Entity id %s-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]'
-            ) % (self.id_1, self.user_id, self.user_id), (
-                u'[u\'fully-validated '
-                'FileMetadataSnapshotMetadataModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_invalid_file_metadata_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            file_models.FileMetadataSnapshotMetadataModel(
-                id='%s-3' % self.id_0, committer_id=self.owner_id,
-                commit_type='edit', commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for file metadata model '
-                'version check of FileMetadataSnapshotMetadataModel\', '
-                '[u\'Entity id %s-3: FileMetadata model corresponding to '
-                'id %s has a version 1 which is less than the version 3 in '
-                'snapshot metadata model id\']]'
-            ) % (self.id_0, self.id_0), (
-                u'[u\'fully-validated FileMetadataSnapshotMetadataModel\', '
-                '2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileMetadataSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileMetadataSnapshotContentModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        file_metadata_model_0 = file_models.FileMetadataModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        file_metadata_model_0.commit(self.owner_id, [])
-
-        file_metadata_model_1 = file_models.FileMetadataModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        file_metadata_model_1.commit(self.owner_id, [])
-
-        self.id_0 = file_metadata_model_0.id
-        self.id_1 = file_metadata_model_1.id
-
-        self.model_instance_0 = (
-            file_models.FileMetadataSnapshotContentModel.get_by_id(
-                '%s-1' % self.id_0))
-        self.model_instance_1 = (
-            file_models.FileMetadataSnapshotContentModel.get_by_id(
-                '%s-1' % self.id_1))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .FileMetadataSnapshotContentModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileMetadataSnapshotContentModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of FileMetadataSnapshotContentModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'FileMetadataSnapshotContentModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileMetadataSnapshotContentModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_file_metadata_model_failure(self):
-        file_models.FileMetadataModel.get_by_id(
-            self.id_0).delete(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for file_metadata_ids '
-                'field check of FileMetadataSnapshotContentModel\', '
-                '[u"Entity id %s-1: based on field file_metadata_ids '
-                'having value %s, expect model FileMetadataModel with '
-                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field file_metadata_ids having value %s, expect model '
-                'FileMetadataModel with id %s but it doesn\'t exist"]]'
-            ) % (
-                self.id_0, self.id_0, self.id_0, self.id_0, self.id_0,
-                self.id_0),
-            u'[u\'fully-validated FileMetadataSnapshotContentModel\', 1]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
-
-    def test_invalid_file_metadata_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            file_models.FileMetadataSnapshotContentModel(
-                id='%s-3' % self.id_0))
-        model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for file metadata model '
-                'version check of FileMetadataSnapshotContentModel\', '
-                '[u\'Entity id %s-3: FileMetadata model corresponding to '
-                'id %s has a version 1 which is less than '
-                'the version 3 in snapshot content model id\']]'
-            ) % (self.id_0, self.id_0), (
-                u'[u\'fully-validated FileMetadataSnapshotContentModel\', '
-                '2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        self.model_instance_0 = file_models.FileModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        self.model_instance_0.commit(self.owner_id, [])
-
-        self.model_instance_1 = file_models.FileModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        self.model_instance_1.commit(self.owner_id, [])
-
-        self.job_class = (
-            prod_validation_jobs_one_off.FileModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of FileModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id,
-                    self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated
-                ),
-            u'[u\'fully-validated FileModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('exp1').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for exploration_ids field '
-                'check of FileModel\', '
-                '[u"Entity id %s: based on field exploration_ids having '
-                'value exp1, expect model ExplorationModel with id exp1 '
-                'but it doesn\'t exist"]]') % self.model_instance_1.id,
-            u'[u\'fully-validated FileModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_metadata_model_failure(self):
-        file_models.FileSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.model_instance_0.id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_metadata_ids '
-                'field check of FileModel\', '
-                '[u"Entity id %s: based on field snapshot_metadata_ids '
-                'having value %s-1, expect model FileSnapshotMetadataModel '
-                'with id %s-1 but it doesn\'t exist"]]') % (
-                    self.model_instance_0.id, self.model_instance_0.id,
-                    self.model_instance_0.id),
-            u'[u\'fully-validated FileModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_content_model_failure(self):
-        file_models.FileSnapshotContentModel.get_by_id(
-            '%s-1' % self.model_instance_0.id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_content_ids '
-                'field check of FileModel\', '
-                '[u"Entity id %s: based on field snapshot_content_ids having '
-                'value %s-1, expect model FileSnapshotContentModel '
-                'with id %s-1 but it doesn\'t exist"]]') % (
-                    self.model_instance_0.id, self.model_instance_0.id,
-                    self.model_instance_0.id),
-            u'[u\'fully-validated FileModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileSnapshotMetadataModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        file_model_0 = file_models.FileModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        file_model_0.commit(self.owner_id, [])
-
-        file_model_1 = file_models.FileModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        file_model_1.commit(self.user_id, [])
-
-        self.id_0 = file_model_0.id
-        self.id_1 = file_model_1.id
-
-        self.model_instance_0 = (
-            file_models.FileSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.id_0))
-        self.model_instance_1 = (
-            file_models.FileSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.id_1))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .FileSnapshotMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of FileSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'FileSnapshotMetadataModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_file_model_failure(self):
-        file_models.FileModel.get_by_id(self.id_0).delete(
-            self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for file_ids '
-                'field check of FileSnapshotMetadataModel\', '
-                '[u"Entity id %s-1: based on field file_ids '
-                'having value %s, expect model FileModel with '
-                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field file_ids having value %s, expect model '
-                'FileModel with id %s but it doesn\'t exist"]]'
-            ) % (
-                self.id_0, self.id_0, self.id_0, self.id_0,
-                self.id_0, self.id_0),
-            u'[u\'fully-validated FileSnapshotMetadataModel\', 1]']
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
-
-    def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for committer_ids field '
-                'check of FileSnapshotMetadataModel\', '
-                '[u"Entity id %s-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]'
-            ) % (self.id_1, self.user_id, self.user_id), (
-                u'[u\'fully-validated '
-                'FileSnapshotMetadataModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_invalid_file_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            file_models.FileSnapshotMetadataModel(
-                id='%s-3' % self.id_0, committer_id=self.owner_id,
-                commit_type='edit', commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for file model '
-                'version check of FileSnapshotMetadataModel\', '
-                '[u\'Entity id %s-3: File model corresponding to '
-                'id %s has a version 1 which is less than the version 3 in '
-                'snapshot metadata model id\']]'
-            ) % (self.id_0, self.id_0), (
-                u'[u\'fully-validated FileSnapshotMetadataModel\', '
-                '2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileSnapshotContentModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        file_model_0 = file_models.FileModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        file_model_0.commit(self.owner_id, [])
-
-        file_model_1 = file_models.FileModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        file_model_1.commit(self.owner_id, [])
-
-        self.id_0 = file_model_0.id
-        self.id_1 = file_model_1.id
-
-        self.model_instance_0 = (
-            file_models.FileSnapshotContentModel.get_by_id(
-                '%s-1' % self.id_0))
-        self.model_instance_1 = (
-            file_models.FileSnapshotContentModel.get_by_id(
-                '%s-1' % self.id_1))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .FileSnapshotContentModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileSnapshotContentModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of FileSnapshotContentModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'FileSnapshotContentModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileSnapshotContentModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_file_model_failure(self):
-        file_models.FileModel.get_by_id(
-            self.id_0).delete(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for file_ids '
-                'field check of FileSnapshotContentModel\', '
-                '[u"Entity id %s-1: based on field file_ids '
-                'having value %s, expect model FileModel with '
-                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field file_ids having value %s, expect model '
-                'FileModel with id %s but it doesn\'t exist"]]'
-            ) % (
-                self.id_0, self.id_0, self.id_0, self.id_0, self.id_0,
-                self.id_0),
-            u'[u\'fully-validated FileSnapshotContentModel\', 1]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
-
-    def test_invalid_file_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            file_models.FileSnapshotContentModel(
-                id='%s-3' % self.id_0))
-        # We are using the b' prefix here as NDB datastore models don't accept
-        # unicode.
-        model_with_invalid_version_in_id.content = b'content'
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for file model '
-                'version check of FileSnapshotContentModel\', '
-                '[u\'Entity id %s-3: File model corresponding to '
-                'id %s has a version 1 which is less than '
-                'the version 3 in snapshot content model id\']]'
-            ) % (self.id_0, self.id_0), (
-                u'[u\'fully-validated FileSnapshotContentModel\', '
-                '2]')]
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -15759,13 +15045,22 @@ class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for user_settings_ids '
-                'field check of PendingDeletionRequestModel\', '
-                '[u"Entity id %s: based on '
-                'field user_settings_ids having value '
-                '%s, expect model UserSettingsModel '
-                'with id %s but it doesn\'t exist"]]') % (
-                    self.model_instance.id, self.user_id, self.user_id)]
+                u'[u\'failed validation check for deleted '
+                'user settings of PendingDeletionRequestModel\', '
+                '[u\'Entity id %s: User settings model '
+                'is not marked as deleted\']]') % (self.model_instance.id)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_user_settings_model_not_marked_deleted_failure(self):
+        user_model = user_models.UserSettingsModel.get_by_id(self.user_id)
+        user_model.deleted = False
+        user_model.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted '
+                'user settings of PendingDeletionRequestModel\', '
+                '[u\'Entity id %s: User settings model '
+                'is not marked as deleted\']]') % (self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 
     def test_exploration_not_marked_deleted_failure(self):
