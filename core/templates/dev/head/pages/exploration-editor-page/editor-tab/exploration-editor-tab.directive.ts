@@ -92,16 +92,6 @@ angular.module('oppia').directive('explorationEditorTab', [
             }
           }, true);
 
-          $scope.$watch(function() {
-            return StateEditorService.isStateEditorInitialised();
-          }, function() {
-            if (StateEditorService.isStateEditorInitialised() &&
-            ExplorationStatesService.isInitialized()) {
-              var stateData = ExplorationStatesService.getState(ctrl.stateName);
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
-            }
-          });
-
           ctrl.getStateContentPlaceholder = function() {
             if (
               StateEditorService.getActiveStateName() ===
@@ -133,7 +123,26 @@ angular.module('oppia').directive('explorationEditorTab', [
             StateEditorService.setInQuestionMode(false);
             var stateData = ExplorationStatesService.getState(ctrl.stateName);
             if (ctrl.stateName && stateData) {
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
+              // StateEditorService.checkEventListenerRegistrationStatus()
+              // returns true if the event listeners of the state editor child
+              // components have been registered.
+              // In this case 'stateEditorInitialized' is broadcasted so that:
+              // 1. state-editor directive can initialise the child
+              //    components of the state editor.
+              // 2. state-interaction-editor directive can initialise the
+              //    child components of the interaction editor.
+              $scope.$watch(function() {
+                return (
+                  StateEditorService.checkEventListenerRegistrationStatus());
+              }, function() {
+                if (
+                  StateEditorService.checkEventListenerRegistrationStatus() &&
+                ExplorationStatesService.isInitialized()) {
+                  var stateData = (
+                    ExplorationStatesService.getState(ctrl.stateName));
+                  $rootScope.$broadcast('stateEditorInitialized', stateData);
+                }
+              });
 
               var content = ExplorationStatesService.getStateContentMemento(
                 ctrl.stateName);
@@ -144,14 +153,6 @@ angular.module('oppia').directive('explorationEditorTab', [
               $rootScope.loadingMessage = '';
             }
           };
-
-          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
-            if (ExplorationStatesService.isInitialized()) {
-              var stateData = (
-                ExplorationStatesService.getState(ctrl.stateName));
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
-            }
-          });
 
           ctrl.recomputeGraph = function() {
             GraphDataService.recompute();

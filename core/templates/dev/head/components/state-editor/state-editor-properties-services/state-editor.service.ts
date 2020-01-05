@@ -84,13 +84,10 @@ export class StateEditorService {
     this.stateEditorDirectiveInitialised = true;
   }
 
-  isStateEditorInitialised(): boolean {
+  checkEventListenerRegistrationStatus(): boolean {
     return (
-      this.stateContentEditorInitialised &&
       this.stateInteractionEditorInitialised &&
       this.stateResponsesInitialised &&
-      this.stateHintsEditorInitialised &&
-      this.stateSolutionEditorInitialised &&
       this.stateEditorDirectiveInitialised);
   }
 

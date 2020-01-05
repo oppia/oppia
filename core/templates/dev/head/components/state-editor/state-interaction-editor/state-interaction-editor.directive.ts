@@ -144,6 +144,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
+            if (stateData === undefined || $.isEmptyObject(stateData)) {
+              throw new Error('Expected stateData to be defined but ' +
+                'received ' + stateData);
+            }
             $scope.hasLoaded = false;
             InteractionDetailsCacheService.reset();
             $rootScope.$broadcast('initializeAnswerGroups', {
