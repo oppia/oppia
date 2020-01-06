@@ -792,12 +792,12 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
-    def test_get_delete_account_page(self):
+    def test_get_pending_account_deletion_page(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/pending-account-deletion')
             self.assertIn('Pending Account Deletion', response.body)
 
-    def test_get_delete_account_page_disabled(self):
+    def test_get_pending_account_deletion_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
             self.get_html_response('/pending-account-deletion',
                                    expected_status_int=404)

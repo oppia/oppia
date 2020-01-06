@@ -81,7 +81,9 @@ class LogoutPage(webapp2.RequestHandler):
 
         _clear_login_cookies(self.response.headers)
 
-        url_to_redirect_to = self.request.get('redirect_url', '/')
+        url_to_redirect_to = (
+            python_utils.convert_to_bytes(
+                self.request.get('redirect_url', '/')))
 
         if constants.DEV_MODE:
             self.redirect(
@@ -216,14 +218,8 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         if self.user_is_scheduled_for_deletion:
-            # In DEV_MODE, clearing cookies does not log out the user, so we
-            # force-clear them by redirecting to the logout URL.
-            if constants.DEV_MODE:
-                self.redirect(
-                    current_user_services.create_logout_url(
-                        feconf.PENDING_ACCOUNT_DELETION_URL))
-            else:
-                self.redirect(feconf.PENDING_ACCOUNT_DELETION_URL)
+            self.redirect(
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
 
         # In DEV_MODE, clearing cookies does not log out the user, so we

@@ -358,7 +358,6 @@ class DeleteAccountHandler(base.BaseHandler):
 class PendingAccountDeletionPage(base.BaseHandler):
     """The account pending deletion page."""
 
-    @acl_decorators.can_manage_own_profile
     def get(self):
         """Handles GET requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:
