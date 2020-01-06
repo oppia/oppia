@@ -33,6 +33,7 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import topic_jobs_one_off
+from core.domain import user_id_migration
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 import python_utils
@@ -71,6 +72,10 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAudit,
     story_jobs_one_off.StoryMigrationOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
+    user_id_migration.GaeIdNotInModelsVerificationJob,
+    user_id_migration.ModelsUserIdsHaveUserSettingsVerificationJob,
+    user_id_migration.SnapshotsUserIdMigrationJob,
+    user_id_migration.UserIdMigrationJob,
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
@@ -135,14 +140,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileMetadataModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .FileMetadataSnapshotMetadataModelAuditOneOffJob),
-    prod_validation_jobs_one_off.FileMetadataSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionModelAuditOneOffJob,
@@ -206,7 +203,8 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserSkillMasteryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob
+    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob
 ]
 
 # List of all ContinuousComputation managers to show controls for on the
