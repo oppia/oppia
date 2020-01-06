@@ -559,6 +559,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
                 exp_rights_snapshot_id))
 
+    def test_deletion_of_multiple_explorations_empty(self):
+        """Test that delete_explorations with empty list works correctly."""
+        exp_services.delete_explorations(self.owner_id, [])
+        self.process_and_flush_pending_tasks()
+
     def test_soft_deletion_of_multiple_explorations(self):
         """Test that soft deletion of explorations works correctly."""
         # TODO(sll): Add tests for deletion of states and version snapshots.
