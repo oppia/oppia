@@ -402,7 +402,7 @@ def main(args=None):
                 travis_ci_check_status = start_python_script(TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
             if travis_ci_check_status != 0:
                 python_utils.PRINT(
-                    'Push aborted due to failing travis ci checks.')
+                    'Push aborted due to failing checks travis e2e test configuration.')
                 sys.exit(1)
     return
 

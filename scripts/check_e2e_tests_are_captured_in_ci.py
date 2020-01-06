@@ -25,13 +25,13 @@ import python_utils
 import utils
 
 
-def extract_travis_jobs_section():
+def get_e2e_suite_names_from_jobs_travis_yml_file():
     """Extracts the env/jobs section from the .travis.yml file.
 
     Returns:
-        list(str). A list of all jobs in travis.yml file.
+        list(str). A list of names of test suites in jobs section in travis.yml file.
     """
-    travis_file = read_travis_yml_file()
+    travis_file = read_and_parse_travis_yml_file()
     jobs_raw = travis_file['env']['jobs']
     suites_from_jobs = []
     for job in jobs_raw:
@@ -39,18 +39,17 @@ def extract_travis_jobs_section():
         # so the following line removes the RUN_E2E_TESTS_(14 length)
         # and =true(5 length) part.
         suites_from_jobs.append(utils.snake_case_to_camel_case(job[14:-5].lower()))
-    suites_from_jobs.sort()
 
-    return suites_from_jobs
+    return sorted(suites_from_jobs)
 
 
-def extract_travis_script_section():
+def get_e2e_suite_names_from_script_travis_yml_file():
     """Extracts the script section from the .travis.yml file.
 
     Returns:
-        list(str). A list of all scripts in travis.yml file.
+        list(str). A list of names of test suites in script section in travis.yml file.
     """
-    travis_file = read_travis_yml_file()
+    travis_file = read_and_parse_travis_yml_file()
     script_raw = travis_file['script']
     # The following line extracts the test suites from patterns like
     # --suite="accessibility" --
@@ -63,12 +62,11 @@ def extract_travis_script_section():
             # The extracted data is of the form --suite="subscriptions" --
             # hence 9 to remove --suite=" and -4 to remove " --
             suites_from_script.append(match.group()[9:-4])
-    suites_from_script.sort()
 
-    return suites_from_script
+    return sorted(suites_from_script)
 
 
-def extract_protractor_test_suites():
+def get_e2e_suite_names_from_protractor_file():
     """Extracts the test suites section from the .travis.yml file.
 
     Returns:
@@ -86,24 +84,23 @@ def extract_protractor_test_suites():
         # colon part :
         protractor_suites.append(match.group()[:-1].strip())
 
-    protractor_suites.sort()
-    return protractor_suites
+    return sorted(protractor_suites)
 
 
 def read_protractor_conf_file():
-    """Returns the core/tests/protractor.conf.js. file.
+    """Returns the contents of core/tests/protractor.conf.js file.
 
     Returns:
-        str. The protractor.conf.js as a string.
+        str. The contents of protractor.conf.js, as a string.
     """
-    protractor_config_file = (python_utils.open_file(
+    protractor_config_file = python_utils.open_file(
         os.path.join(
-            os.getcwd(), 'core', 'tests', 'protractor.conf.js'), 'r').read())
+            os.getcwd(), 'core', 'tests', 'protractor.conf.js'), 'r').read()
     return protractor_config_file
 
 
-def read_travis_yml_file():
-    """Returns the /.travis.yml file.
+def read_and_parse_travis_yml_file():
+    """Returns the contents of .travis.yml, as a dict.
 
     Returns:
         dict. A dict parsed from the travis.yml file.
@@ -117,9 +114,9 @@ def read_travis_yml_file():
 def main():
     """Test the travis ci file and protractor.conf.js have same test suites."""
     python_utils.PRINT('Checking e2e tests are captured in travis.yml started')
-    protractor_test_suites = extract_protractor_test_suites()
-    yaml_jobs = extract_travis_jobs_section()
-    yaml_scripts = extract_travis_script_section()
+    protractor_test_suites = get_e2e_suite_names_from_protractor_file()
+    yaml_jobs = get_e2e_suite_names_from_jobs_travis_yml_file()
+    yaml_scripts = get_e2e_suite_names_from_script_travis_yml_file()
 
     # These 4 test suites are not present in travis ci.
     # One is extra ie. (full: [*.js]), and three other tests that

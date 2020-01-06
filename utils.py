@@ -653,12 +653,12 @@ def unescape_encoded_uri_component(escaped_string):
 def snake_case_to_camel_case(snake_str):
     """Converts a string in snake_case to camelCase.
 
-        Args:
-            snake_str: str. String that is in snake_case.
+    Args:
+        snake_str: str. String that is in snake_case.
 
-        Returns:
-            str. Converted string that is in camelCase.
-        """
+    Returns:
+        str. Converted string that is in camelCase.
+    """
     components = snake_str.split('_')
     # We capitalize the first letter of each component except the first one
     # with the 'title' method and join them together.

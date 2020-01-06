@@ -24,28 +24,39 @@ import utils
 
 from . import check_e2e_tests_are_captured_in_ci
 
-TRAVIS_SUITES = [
-    'accessibility', 'additionalEditorFeatures', 'additionalPlayerFeatures',
-    'adminPage', 'collections', 'communityDashboard',
-    'coreEditorAndPlayerFeatures', 'creatorDashboard', 'embedding',
-    'explorationFeedbackTab', 'explorationHistoryTab',
-    'explorationImprovementsTab', 'explorationStatisticsTab',
-    'explorationTranslationTab', 'extensions', 'learner', 'learnerDashboard',
-    'library', 'navigation', 'preferences', 'profileFeatures', 'profileMenu',
-    'publication', 'skillEditor', 'subscriptions', 'topicsAndSkillsDashboard', 'users'
-    ]
+DUMMY_TEST_SUITES = [
+'accessibility', 'additionalEditorFeatures', 'additionalPlayerFeatures',
+'topicsAndSkillsDashboard', 'users']
 
 
-PROTRACTOR_SUITES = [
-    'accessibility', 'additionalEditorFeatures', 'additionalPlayerFeatures',
-    'adminPage', 'classroomPage', 'collections', 'communityDashboard',
-    'coreEditorAndPlayerFeatures', 'creatorDashboard', 'embedding',
-    'explorationFeedbackTab', 'explorationHistoryTab', 'explorationImprovementsTab',
-    'explorationStatisticsTab', 'explorationTranslationTab', 'extensions', 'fileUploadFeatures',
-    'full', 'learner', 'learnerDashboard', 'library', 'navigation', 'preferences', 'profileFeatures',
-    'profileMenu', 'publication', 'skillEditor', 'subscriptions', 'topicAndStoryEditor',
-    'topicsAndSkillsDashboard', 'users'
-    ]
+def mock_read_protractor_conf_file():
+    protractor_config_file = python_utils.open_file(
+        os.path.join(
+            os.getcwd(), 'core', 'tests', 'data', 'dummy_ci_tests', 'dummy_protractor.conf.js'), 'r').read()
+    return protractor_config_file
+
+
+def mock_read_travis_yml_file():
+    travis_ci_file = python_utils.open_file(
+        os.path.join(
+            os.getcwd(), 'core', 'tests', 'data', 'dummy_ci_tests', '.dummy_travis.yml'), 'r').read()
+    travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
+    return travis_ci_dict
+
+
+def mock_read_protractor_conf_file_fail():
+    protractor_config_file = python_utils.open_file(
+        os.path.join(
+            os.getcwd(), 'core', 'tests', 'data', 'dummy_ci_tests', 'dummy_protractor.fail.conf.js'), 'r').read()
+    return protractor_config_file
+
+
+def mock_read_travis_yml_file_fail():
+    travis_ci_file = python_utils.open_file(
+        os.path.join(
+            os.getcwd(), 'core', 'tests', 'data', 'dummy_ci_tests', '.dummy_travis_fail.yml'), 'r').read()
+    travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
+    return travis_ci_dict
 
 
 class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
@@ -55,25 +66,71 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
     def test_read_protractor_file(self):
         expected_protractor_config_file = (python_utils.open_file(
             os.path.join(
-                os.getcwd(), 'core', 'tests', 'protractor.conf.js'), 'r').read())
-        actual_protractor_config_file = check_e2e_tests_are_captured_in_ci.read_protractor_conf_file()
+                os.getcwd(), 'core', 'tests', 'data', 'dummy_ci_tests', 'dummy_protractor.conf.js'), 'r').read())
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
+            mock_read_protractor_conf_file)
+        with dummy_path:
+            actual_protractor_config_file = check_e2e_tests_are_captured_in_ci.read_protractor_conf_file()
         self.assertEqual(expected_protractor_config_file, actual_protractor_config_file)
 
     def test_read_travis_ci_file(self):
         travis_ci_file = python_utils.open_file(
-            os.path.join(os.getcwd(), '.travis.yml'), 'r').read()
+            os.path.join(
+                os.getcwd(),
+                'core', 'tests', 'data', 'dummy_ci_tests', '.dummy_travis.yml'), 'r').read()
         expected_travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
-        actual_travis_ci_dict = check_e2e_tests_are_captured_in_ci.read_travis_yml_file()
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
+            mock_read_travis_yml_file)
+        with dummy_path:
+            actual_travis_ci_dict = check_e2e_tests_are_captured_in_ci.read_and_parse_travis_yml_file()
         self.assertEqual(expected_travis_ci_dict, actual_travis_ci_dict)
 
-    def test_extract_travis_jobs_section(self):
-        actual_travis_jobs = check_e2e_tests_are_captured_in_ci.extract_travis_jobs_section()
-        self.assertEqual(TRAVIS_SUITES, actual_travis_jobs)
+    def test_get_e2e_suite_names_from_jobs_travis_yml_file(self):
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
+            mock_read_travis_yml_file)
+        with dummy_path:
+            actual_travis_jobs = check_e2e_tests_are_captured_in_ci.get_e2e_suite_names_from_jobs_travis_yml_file()
+        self.assertEqual(DUMMY_TEST_SUITES, actual_travis_jobs)
 
-    def test_extract_travis_script_section(self):
-        actual_travis_script = check_e2e_tests_are_captured_in_ci.extract_travis_script_section()
-        self.assertEqual(TRAVIS_SUITES, actual_travis_script)
+    def test_get_e2e_suite_names_from_jobs_travis_yml_file_fail(self):
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
+            mock_read_travis_yml_file_fail)
+        with dummy_path:
+            actual_travis_jobs = check_e2e_tests_are_captured_in_ci.get_e2e_suite_names_from_jobs_travis_yml_file()
+        self.assertNotEqual(DUMMY_TEST_SUITES, actual_travis_jobs)
 
-    def test_extract_protractor_test_suites(self):
-        actual_travis_jobs = check_e2e_tests_are_captured_in_ci.extract_protractor_test_suites()
-        self.assertEqual(PROTRACTOR_SUITES, actual_travis_jobs)
+    def test_get_e2e_suite_names_from_script_travis_yml_file(self):
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
+            mock_read_travis_yml_file)
+        with dummy_path:
+            actual_travis_script = check_e2e_tests_are_captured_in_ci.get_e2e_suite_names_from_script_travis_yml_file()
+        self.assertEqual(DUMMY_TEST_SUITES, actual_travis_script)
+
+    def test_get_e2e_suite_names_from_script_travis_yml_file_fail(self):
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
+            mock_read_travis_yml_file_fail)
+        with dummy_path:
+            actual_travis_script = check_e2e_tests_are_captured_in_ci.get_e2e_suite_names_from_jobs_travis_yml_file()
+        self.assertNotEqual(DUMMY_TEST_SUITES, actual_travis_script)
+
+    def test_get_e2e_suite_names_from_protractor_file(self):
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
+            mock_read_protractor_conf_file)
+        with dummy_path:
+            actual_protractor_suites = check_e2e_tests_are_captured_in_ci.get_e2e_suite_names_from_protractor_file()
+        self.assertEqual(DUMMY_TEST_SUITES, actual_protractor_suites)
+
+    def test_get_e2e_suite_names_from_protractor_file_fail(self):
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
+            mock_read_protractor_conf_file_fail)
+        with dummy_path:
+            actual_protractor_suites = check_e2e_tests_are_captured_in_ci.get_e2e_suite_names_from_protractor_file()
+        self.assertNotEqual(DUMMY_TEST_SUITES, actual_protractor_suites)
