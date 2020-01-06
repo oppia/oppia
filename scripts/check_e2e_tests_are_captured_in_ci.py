@@ -74,13 +74,13 @@ def get_e2e_suite_names_from_protractor_file():
     """
     protractor_config_file = read_protractor_conf_file()
     # The following line extracts suite object from protractor.conf.js.
-    suite = re.compile(r'suites = {([^}]+)}').findall(protractor_config_file)[0]
+    suite_object_string = re.compile(r'suites = {([^}]+)}').findall(protractor_config_file)[0]
 
     # The following line extracts the keys/test suites from the key: value pair
     # from the suites object.
     key_regex = re.compile(r'\b(.*?)(?=:)')
     protractor_suites = []
-    for match in key_regex.finditer(suite):
+    for match in key_regex.finditer(suite_object_string):
         if len(match.group()) != 0:
             protractor_suites.append(match.group())
 
