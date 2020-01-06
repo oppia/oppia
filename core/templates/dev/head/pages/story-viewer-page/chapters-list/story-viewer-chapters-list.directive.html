@@ -1,7 +1,15 @@
 <div>
+  <background-banner></background-banner>
   <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-player-tiles-container">
-    <div class="oppia-story-path-section d-none d-md-block">
-      <svg width="500px" ng-attr-height="<[$ctrl.svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
+    <div class="oppia-page-heading oppia-story-title">
+      <[$ctrl.getTitle()]>
+    </div>
+    <div class="oppia-story-description">
+      <[$ctrl.getDescription()]>
+    </div>
+
+    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-path-section d-none d-md-block">
+      <svg width="540px" ng-attr-height="<[$ctrl.svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
         <path fill="none"
               stroke="#296E5F"
               stroke-dasharray="15,28"
@@ -38,11 +46,16 @@
       <a ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes()"
          ng-href="<[$ctrl.getExplorationUrl(node)]>"
          ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
+        <div ng-style="{width: '160px',position: 'absolute',left: '<[$ctrl.getExplorationTitlePosition($index)]>',color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '18px',bottom: '65%'}">
+          <[$ctrl.getIconTitle(node, false)]>
+        </div>
+
         <svg width="100"
              height="125"
              xmlns="http://www.w3.org/2000/svg"
              xmlns:xlink="http://www.w3.org/1999/xlink"
-             version="1.1">
+             version="1.1"
+             style="position:relative;top:20px">
           <defs>
             <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
               <circle cx="50"
@@ -69,9 +82,9 @@
           </defs>
           <a xlink:href="<[$ctrl.getExplorationUrl(node)]>"
              ng-mouseover="$ctrl.updateExplorationPreview(node);
-                           $ctrl.setIconHighlight($index);"
-             ng-mouseleave="$ctrl.togglePreviewCard();
-                            $ctrl.unsetIconHighlight($index);">
+                           $ctrl.setIconHighlight(node, $index);"
+             ng-mouseleave="$ctrl.togglePreviewCard(node);
+                            $ctrl.unsetIconHighlight();">
             <circle ng-show="$ctrl.node.getExplorationId() === $ctrl.nextExplorationId &&
               $index !== $ctrl.activeHighlightedIconIndex"
                     cx="50"
@@ -94,23 +107,16 @@
                     stroke="#006553"
                     stroke-width="2"/>
           </a>
-          <text x="50%"
-                y="15"
-                alignment-baseline="middle"
-                font-family="Capriola, Roboto, Arial, sans-serif"
-                font-size="20"
-                fill="#006553"
-                text-anchor="middle">
-            <[node.getTitle()]>
-          </text>
         </svg>
       </a>
     </div>
 
-    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-table d-none d-md-none d-lg-none d-xl-none">
+    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-table d-md-none d-lg-none d-xl-none">
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes()" id="mobile-path-anchor-<[$index]>">
-        <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;">
+        <a href=""
+           title-data="<[$ctrl.getIconTitle(node, true, $index)]>"
+           class="oppia-story-node-small-screen">
           <svg width="100"
                height="150"
                xmlns="http://www.w3.org/2000/svg"
@@ -180,15 +186,6 @@
                     fill="url(#image0<[$index]>)"
                     stroke="#006553"
                     stroke-width="2"/>
-            <text x="50%"
-                  y="15"
-                  alignment-baseline="middle"
-                  font-family="Capriola, Roboto, Arial, sans-serif"
-                  font-size="20"
-                  fill="#006553"
-                  text-anchor="middle">
-              <[node.getTitle()]>
-            </text>
           </svg>
         </a>
         <img ng-src="<[$ctrl.getStaticImageUrl('/general/mobile_path_segment.svg')]>">
@@ -227,7 +224,6 @@
       <exploration-summary-tile ng-if="$ctrl.explorationCardIsShown"
                                 exploration-id="$ctrl.currentExplorationId"
                                 exploration-title="$ctrl.summaryToPreview.title"
-                                node-id="$ctrl.currentNodeId"
                                 last-updated-msec="$ctrl.summaryToPreview.last_updated_msec"
                                 objective="$ctrl.summaryToPreview.objective"
                                 category="$ctrl.summaryToPreview.category"
@@ -241,5 +237,25 @@
     </div>
   </div>
 </div>
-
 <attribution-guide></attribution-guide>
+
+<style>
+  .oppia-story-node-small-screen {
+    left: 50%;
+    position: absolute;
+    text-align: center;
+    transform: translate(-50%, 195px);
+    z-index: 1;
+  }
+  .oppia-story-node-small-screen::before {
+    color: #3f7a68;
+    content: attr(title-data);
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 16px;
+    left: -60px;
+    position: absolute;
+    text-align: center;
+    top: -30px;
+    width: 220px;
+  }
+</style>

@@ -45,7 +45,9 @@ angular.module('oppia').directive('storyViewerChaptersList', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getPlaythroughObject: '&playthroughObject'
+        getPlaythroughObject: '&playthroughObject',
+        getTitle: '&storyTitle',
+        getDescription: '&storyDescription'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-viewer-page/chapters-list' +
@@ -85,26 +87,53 @@ angular.module('oppia').directive('storyViewerChaptersList', [
 
           $anchorScroll.yOffset = -80;
 
-          ctrl.setIconHighlight = function(index) {
-            ctrl.activeHighlightedIconIndex = index;
+          ctrl.isVisibleCard = function(storyNode) {
+            if (!storyNode) {
+              return false;
+            }
+            var isNextPendingNode = (
+              ctrl.storyPlaythroughObject.getNextPendingNodeId() ===
+              storyNode.getId());
+            return storyNode.isCompleted() || isNextPendingNode;
+          };
+
+          ctrl.getIconTitle = function(node, isMobile, index) {
+            var prefix = '';
+            if (isMobile) {
+              prefix = (index + 1) + '. ';
+            }
+            if (ctrl.isVisibleCard(node)) {
+              if (node.isCompleted()) {
+                return prefix + node.getTitle() + ' - Completed!';
+              } else {
+                return prefix + node.getTitle();
+              }
+            } else {
+              return 'LOCKED';
+            }
+          };
+
+          ctrl.togglePreviewCard = function(storyNode) {
+            if (ctrl.isVisibleCard(storyNode)) {
+              ctrl.explorationCardIsShown = !ctrl.explorationCardIsShown;
+            }
+          };
+
+          ctrl.setIconHighlight = function(node, index) {
+            if (ctrl.isVisibleCard(node)) {
+              ctrl.activeHighlightedIconIndex = index;
+            }
           };
 
           ctrl.unsetIconHighlight = function() {
             ctrl.activeHighlightedIconIndex = -1;
           };
 
-          ctrl.togglePreviewCard = function() {
-            ctrl.explorationCardIsShown = !ctrl.explorationCardIsShown;
-          };
-
           ctrl.updateExplorationPreview = function(storyNode) {
-            ctrl.explorationCardIsShown = true;
+            ctrl.explorationCardIsShown = ctrl.isVisibleCard(storyNode);
             ctrl.currentExplorationId = storyNode.getExplorationId();
             ctrl.summaryToPreview = storyNode.getExplorationSummaryObject();
             ctrl.completedNode = storyNode.isCompleted();
-            ctrl.isNextPendingNode = (
-              ctrl.storyPlaythroughObject.getNextPendingNodeId() ===
-              storyNode.getId());
             ctrl.currentNodeId = storyNode.getId();
           };
 
@@ -177,6 +206,7 @@ angular.module('oppia').directive('storyViewerChaptersList', [
             for (
               var i = 1; i < ctrl.storyPlaythroughObject.getStoryNodeCount();
               i++) {
+              var thumbnailColor = null;
               if (countMiddleIcon === 0 && x === ctrl.ICON_X_MIDDLE_PX) {
                 x = ctrl.ICON_X_LEFT_PX;
                 y += ctrl.ICON_Y_INCREMENT_PX;
@@ -189,22 +219,38 @@ angular.module('oppia').directive('storyViewerChaptersList', [
                 x = ctrl.ICON_X_MIDDLE_PX;
                 y += ctrl.ICON_Y_INCREMENT_PX;
               }
+              if (!storyNodes[i].isCompleted() &&
+                (storyNodes[i].getId() !==
+                ctrl.storyPlaythroughObject.getNextPendingNodeId())) {
+                thumbnailColor = 'grey';
+              } else {
+                thumbnailColor = storyNodes[i].getExplorationSummaryObject(
+                ).thumbnail_bg_color;
+              }
               iconParametersArray.push({
                 thumbnailIconUrl:
                   storyNodes[i].getExplorationSummaryObject(
                   ).thumbnail_icon_url.replace('subjects', 'inverted_subjects'),
                 left: x + 'px',
                 top: y + 'px',
-                thumbnailBgColor:
-                  storyNodes[i].getExplorationSummaryObject(
-                  ).thumbnail_bg_color
+                thumbnailBgColor: thumbnailColor
               });
             }
             return iconParametersArray;
           };
 
+          ctrl.getExplorationTitlePosition = function(index) {
+            if (index % 2 === 0 ) {
+              return '8px';
+            } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
+              return '30px';
+            } else if ((index + 1) % 4 === 0) {
+              return '-40px';
+            }
+          };
+
           ctrl.getExplorationUrl = function(node) {
-            if (!ctrl.isNextPendingNode) {
+            if (!ctrl.isVisibleCard(node)) {
               return null;
             }
             var result = '/explore/' + node.getExplorationId();

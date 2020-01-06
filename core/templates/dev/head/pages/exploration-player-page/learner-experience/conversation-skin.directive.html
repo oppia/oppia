@@ -104,7 +104,7 @@
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
 
-      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
+      <div ng-if="!inStoryMode" class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
         <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
                                   collection-id="collectionId"
                                   exploration-id="exp.id"
@@ -146,7 +146,10 @@
     </div>
   </div>
 
-  <div ng-if="!collectionSummary && !isRefresherExploration" class="conversation-skin-back-to-collection-container">
+  <div ng-if="inStoryMode" class="conversation-skin-back-to-collection-container">
+    <a ng-href="<[storyViewerUrl]>" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_STORY"></a>
+  </div>
+  <div ng-if="!collectionSummary && !isRefresherExploration && !inStoryMode" class="conversation-skin-back-to-collection-container">
     <a ng-href="/library" class="conversation-skin-back-to-collection" translate="I18N_PLAYER_RETURN_TO_LIBRARY"></a>
   </div>
 </div>

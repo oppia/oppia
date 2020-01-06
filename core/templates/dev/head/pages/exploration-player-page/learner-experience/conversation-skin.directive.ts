@@ -417,6 +417,7 @@ angular.module('oppia').directive('conversationSkin', [
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
 
           $scope.isLoggedIn = null;
+          $scope.inStoryMode = false;
           UserService.getUserInfoAsync().then(function(userInfo) {
             $scope.isLoggedIn = userInfo.isLoggedIn();
           });
@@ -806,34 +807,38 @@ angular.module('oppia').directive('conversationSkin', [
                 var storyId = UrlService.getUrlParams().story_id;
                 var nodeId = UrlService.getUrlParams().node_id;
                 StoryViewerBackendApiService.recordStoryNodeCompletion(
-                  storyId, nodeId);
-
-                StoryViewerBackendApiService.fetchStoryData(storyId).then(
-                  function(storyDataDict) {
-                    var storyNodes = storyDataDict.story_nodes.map(
-                      function(storyNodeDict) {
-                        return ReadOnlyStoryNodeObjectFactory
-                          .createFromBackendDict(storyNodeDict);
-                      });
-                    var completedStoryNodes = [];
-                    storyNodes.forEach(function(storyNode) {
-                      if (storyNode.isCompleted) {
-                        completedStoryNodes.push(storyNode);
+                  storyId, nodeId).then(function() {
+                  $scope.inStoryMode = true;
+                  $scope.storyViewerUrl = '/story/' + storyId;
+                  StoryViewerBackendApiService.fetchStoryData(storyId).then(
+                    function(storyDataDict) {
+                      var storyNodes = storyDataDict.story_nodes.map(
+                        function(storyNodeDict) {
+                          return ReadOnlyStoryNodeObjectFactory
+                            .createFromBackendDict(storyNodeDict);
+                        });
+                      var completedStoryNodes = [];
+                      for (var i = 0; i < storyNodes.length; i++) {
+                        if (storyNodes[i].isCompleted()) {
+                          completedStoryNodes.push(storyNodes[i]);
+                        } else {
+                          $scope.nextStoryNode = storyNodes[i];
+                          break;
+                        }
+                      }
+                      if (completedStoryNodes.length %
+                        NUM_EXPLORATIONS_PER_REVIEW_TEST === 0 ||
+                        completedStoryNodes.length === storyNodes.length) {
+                        var REVIEW_TEST_URL_TEMPLATE = (
+                          '/review_test/<story_id>');
+                        $window.location =
+                          UrlInterpolationService.interpolateUrl(
+                            REVIEW_TEST_URL_TEMPLATE, {
+                              story_id: storyId
+                            });
                       }
                     });
-                    if (completedStoryNodes.length %
-                      NUM_EXPLORATIONS_PER_REVIEW_TEST === 0 ||
-                      completedStoryNodes.length === storyNodes.length) {
-                      var REVIEW_TEST_URL_TEMPLATE = (
-                        '/review_test/<story_id>');
-                      $window.location =
-                        UrlInterpolationService.interpolateUrl(
-                          REVIEW_TEST_URL_TEMPLATE, {
-                            story_id: storyId
-                          });
-                    }
-                  }
-                );
+                });
               }
 
               // For single state explorations, when the exploration reaches the
