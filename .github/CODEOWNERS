@@ -478,7 +478,6 @@
 # Simple pages.
 /core/controllers/pages*.py @jameesjohn @vojtechjelinek
 /core/controllers/custom_landing_pages*.py @jameesjohn @vojtechjelinek
-/core/templates/dev/head/pages/account-to-be-deleted-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/contact-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/delete-account-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/donate-page/ @jameesjohn @vojtechjelinek
@@ -486,6 +485,7 @@
 /core/templates/dev/head/pages/get-started-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/landing-pages/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/maintenance-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/preferences-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/signup-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/splash-page/ @jameesjohn @vojtechjelinek

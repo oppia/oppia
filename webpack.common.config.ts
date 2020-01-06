@@ -53,9 +53,6 @@ module.exports = {
   },
   entry: {
     about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
-    account_to_be_deleted:
-        commonPrefix + '/pages/account-to-be-deleted-page/' +
-        'account-to-be-deleted-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
     classroom:
       commonPrefix + '/pages/classroom-page/classroom-page.scripts.ts',
@@ -106,6 +103,9 @@ module.exports = {
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.scripts.ts',
+    pending_account_deletion:
+      commonPrefix + '/pages/pending-account-deletion-page/' +
+      'pending-account-deletion-page.scripts.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.scripts.ts',
@@ -153,16 +153,6 @@ module.exports = {
         'site to create 1-1 learning scenarios for others.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
-      chunks: ['account_to_be_deleted'],
-      filename: 'account-to-be-deleted-page.mainpage.html',
-      meta: defaultMeta,
-      template:
-          commonPrefix + '/pages/account-to-be-deleted-page/' +
-          'account-to-be-deleted-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -435,14 +425,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['privacy'],
-      filename: 'privacy-page.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['notifications_dashboard'],
       filename: 'notifications-dashboard-page.mainpage.html',
       meta: {
@@ -455,6 +437,16 @@ module.exports = {
         '/pages/notifications-dashboard-page/' +
         'notifications-dashboard-page.mainpage.html'
       ),
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['pending_account_deletion'],
+      filename: 'pending-account-deletion-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/pending-account-deletion-page/' +
+          'pending-account-deletion-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -476,6 +468,14 @@ module.exports = {
       },
       template:
         commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['privacy'],
+      filename: 'privacy-page.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

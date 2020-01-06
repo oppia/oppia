@@ -355,6 +355,17 @@ class DeleteAccountHandler(base.BaseHandler):
         self.render_json({'success': True})
 
 
+class PendingAccountDeletionPage(base.BaseHandler):
+    """The account pending deletion page."""
+
+    @acl_decorators.can_manage_own_profile
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+        self.render_template('pending-account-deletion-page.mainpage.html')
+
+
 class UsernameCheckHandler(base.BaseHandler):
     """Checks whether a username has already been taken."""
 

@@ -246,6 +246,9 @@ def _send_email(
         reply_to_id: str or None. The unique reply-to id used in reply-to email
             address sent to recipient.
         recipient_email: str or None. Override for the recipient email.
+            This should be used when the user with user_id equal to recipient_id
+            does not exist or is deleted and their email cannot be retrieved
+            via get_email_from_user_id.
     """
 
     if sender_name is None:

@@ -215,13 +215,13 @@ class BaseHandlerTests(test_utils.GenericTestBase):
         with self.swap(constants, 'DEV_MODE', False):
             self.login(self.DELETED_USER_EMAIL)
             response = self.get_html_response('/', expected_status_int=302)
-            self.assertIn('account-to-be-deleted', response.headers['location'])
+            self.assertIn('pending-account-deletion', response.headers['location'])
 
     def test_root_redirect_rules_for_deleted_user_dev_mode(self):
         with self.swap(constants, 'DEV_MODE', True):
             self.login(self.DELETED_USER_EMAIL)
             response = self.get_html_response('/', expected_status_int=302)
-            self.assertIn('account-to-be-deleted', response.headers['location'])
+            self.assertIn('pending-account-deletion', response.headers['location'])
 
     def test_root_redirect_rules_for_users_with_no_user_contribution_model(
             self):

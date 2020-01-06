@@ -773,7 +773,6 @@ class DeleteAccountPageTests(test_utils.GenericTestBase):
             self.get_html_response('/delete-account', expected_status_int=404)
 
 
-
 class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -789,6 +788,19 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
     def test_delete_delete_account_page_disabled(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
             self.delete_json('/delete-account-handler', expected_status_int=404)
+
+
+class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
+
+    def test_get_delete_account_page(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+            response = self.get_html_response('/pending-account-deletion')
+            self.assertIn('Pending Account Deletion', response.body)
+
+    def test_get_delete_account_page_disabled(self):
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
+            self.get_html_response('/pending-account-deletion',
+                                   expected_status_int=404)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
