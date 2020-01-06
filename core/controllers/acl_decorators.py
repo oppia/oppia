@@ -1875,7 +1875,7 @@ def can_edit_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if role_services.ACTION_EDIT_PUBLIC_SKILLS in self.user.actions:
+        if role_services.ACTION_EDIT_SKILLS in self.user.actions:
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
