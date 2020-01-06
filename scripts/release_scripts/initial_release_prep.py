@@ -19,114 +19,34 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
-import datetime
-import os
 import re
-import sys
+import subprocess
 
 import python_utils
 import release_constants
 from scripts import common
 
-_PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_APPENGINE_PATH = os.path.join(
-    _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67', 'google_appengine')
-_PYGSHEETS_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pygsheets-2.0.2')
-_GOOGLE_PATH = os.path.join(_PYGSHEETS_PATH, 'google')
 
-sys.path.insert(0, _APPENGINE_PATH)
-sys.path.insert(0, _PYGSHEETS_PATH)
-
-# pylint: disable=wrong-import-position
-import google # isort:skip
-# pylint: enable=wrong-import-position
-
-# Refer: https://groups.google.com/forum/#!topic/google-appengine/AJJbuQ3FaGI.
-google.__path__.append(_GOOGLE_PATH)
-
-# pylint: disable=wrong-import-position
-import pygsheets # isort:skip
-# pylint: enable=wrong-import-position
-
-RELEASE_CREDENTIALS_FILEPATH = os.path.join(
-    os.getcwd(), 'oppia-release-credentials.json')
-# This file is created when pygsheets asks the user to authenticate.
-AUTH_FILEPATH = os.path.join(os.getcwd(), 'sheets.googleapis.com-python.json')
-
-
-def get_job_details_for_current_release(
-        job_details, job_name_header, month_header, author_email_header,
-        author_name_header, instruction_doc_header):
-    """Returns a list of job names for current release from a list
-    of job details.
-
-    Args:
-        job_details: list(dict). List of dictionary of job details.
-            The keys of each dict are the headers from the jobs
-            spreadsheet.
-        job_name_header: string. The header used for job names.
-        month_header: string. The header used for month of the release.
-        author_email_header: string. The header used for email address of
-            job author.
-        author_name_header: string. The header used for name of
-            job author.
-        instruction_doc_header: string. The header used for instruction
-            doc for running the job.
-
-    Returns:
-        list(dict). The list of job details for current release.
-    """
-    job_details_for_current_release = []
-    # First three letters of the release month. Eg: Nov, Dec etc.
-    current_release_month = datetime.datetime.utcnow().strftime('%h').lower()
-    for job_detail in job_details:
-        if current_release_month in job_detail[month_header].lower():
-            job_details_for_current_release.append({
-                'job_name': job_detail[job_name_header],
-                'author_email': job_detail[author_email_header],
-                'author_name': job_detail[author_name_header],
-                'instruction_doc': job_detail[instruction_doc_header]
-            })
-    return job_details_for_current_release
-
-
-def get_mail_message_template(job_details):
+def get_mail_message_template():
     """Returns a mail template with the details for running jobs for release
     on backup server.
-
-    Args:
-        job_details: list(dict). List of dictionary of job details. The dict
-            has the following keys: job_name, author_email, author_name,
-            instruction_doc.
 
     Returns:
         string. The mail message template.
     """
-    job_names_with_instructions_and_author = ''
-    author_names_and_mail_ids = []
-    for job_detail in job_details:
-        job_names_with_instructions_and_author += (
-            '%s (Instructions: %s) (Author: %s)\n' % (
-                job_detail['job_name'], job_detail['instruction_doc'],
-                job_detail['author_name']))
-        author_names_and_mail_ids.append(
-            '%s: %s' % (
-                job_detail['author_name'], job_detail['author_email']))
-    author_names_and_mail_ids = list(set(author_names_and_mail_ids))
-    mail_message_template = (
+    return (
         'Hi Sean,\n\n'
         'You will need to run these jobs on the backup server:\n\n'
-        '%s\n'
+        '[List of jobs formatted as: {{Job Name}} '
+        '(instructions: {{Instruction doc url}}) (Author: {{Author Name}})]\n'
         'The specific instructions for jobs are linked with them. '
         'The general instructions are as follows:\n\n'
         '1. Login as admin\n'
         '2. Navigate to the admin panel and then the jobs tab\n'
         '3. Run the above jobs\n'
         '4. In case of failure/success, please send the output logs for '
-        'the job to me and the job authors: %s\n\n'
-        'Thanks!\n') % (
-            job_names_with_instructions_and_author, author_names_and_mail_ids)
-    return mail_message_template
+        'the job to me and the job authors: {{Author names}}\n\n'
+        'Thanks!\n')
 
 
 def get_extra_jobs_due_to_schema_changes(
@@ -201,9 +121,33 @@ def did_supported_audio_languages_change(
             supported_audio_language_ids_for_previous_release))
 
 
+def cut_release_branch():
+    """Calls the cut_release_or_hotfix_branch script to cut a release branch.
+
+    Raises:
+        AssertionError. The version entered is invalid.
+    """
+    common.open_new_tab_in_browser_if_possible(
+        'https://github.com/oppia/oppia/releases')
+    python_utils.PRINT(
+        'Enter the new version for the release.\n'
+        'If major changes occurred since the last release, or if '
+        'the third version is a 9, increment the minor version '
+        '(e.g. 2.5.3 -> 2.6.0 or 2.5.9 -> 2.6.0)\n'
+        'Otherwise, increment the third version number '
+        '(e.g. 2.5.3 -> 2.5.4)\n')
+    release_version = python_utils.INPUT()
+    assert re.match(r'\d+\.\d+\.\d+$', release_version)
+    subprocess.check_call([
+        'python', '-m',
+        'scripts.release_scripts.cut_release_or_hotfix_branch',
+        '--new_version=%s' % release_version])
+
+
 def main():
     """Performs task to initiate the release."""
     common.require_cwd_to_be_oppia()
+    common.verify_current_branch_name('develop')
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_NOTES_URL)
     common.ask_user_to_confirm(
@@ -241,91 +185,33 @@ def main():
         common.ask_user_to_confirm(
             'Please add the following jobs to release journal and '
             'run them after deployment:\n%s' % '\n'.join(extra_jobs_to_run))
-    try:
-        # The file here is opened and closed just to create an empty
-        # file where the release co-ordinator can enter the credentials.
-        f = python_utils.open_file(RELEASE_CREDENTIALS_FILEPATH, 'w')
-        f.close()
-        common.ask_user_to_confirm(
-            'Copy the release json credentials from the release '
-            'doc and paste them in the file %s. Make sure to save the '
-            'file once you are done.' % (
-                RELEASE_CREDENTIALS_FILEPATH))
-        client = pygsheets.authorize(client_secret=RELEASE_CREDENTIALS_FILEPATH)
 
-        repeatable_jobs_sheet = client.open(
-            'Oppia release team: Submitting an existing job for '
-            'testing on the Oppia test server (Responses)').sheet1
-        repeatable_job_details = get_job_details_for_current_release(
-            repeatable_jobs_sheet.get_all_records(),
-            'Select the job you want to test',
-            'Which upcoming release are you targeting this job for? ',
-            'Email Address',
-            'What is your name? ',
-            'Please give a clear description of why you want to '
-            'run this job on the test server')
-        repeatable_job_names = [
-            job_detail['job_name'] for job_detail in repeatable_job_details]
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.REPEATABLE_JOBS_SPREADSHEETS_URL)
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
+    common.ask_user_to_confirm(
+        'Please copy the names of the jobs to be run for this release along '
+        'with author names, author mail ids & instruction docs.')
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_DRIVE_URL)
+    common.ask_user_to_confirm(
+        'Please enter the above job names to release journal.')
+    python_utils.PRINT(get_mail_message_template())
+    common.ask_user_to_confirm(
+        'Update the mail message template by adding job names, '
+        'instruction doc url and author names '
+        'Note: Send the mail only after deploying to backup server.\n\n'
+        'Note: Add author email ids to the cc list when you send '
+        'the mail.\n\n'
+        'Note: Please check manually if the details in the above mail '
+        'are correct and add anything extra if required.\n\n'
+        'Copy and save the above template for sending a mail to Sean '
+        'to run these jobs on backup server.\n\n'
+        'If the jobs are successful on backup server, run them on test '
+        'and prod server.')
 
-        one_time_jobs_sheet = client.open(
-            'Oppia release team: Submitting a job for testing (Responses)'
-            ).sheet1
-        one_time_job_details = get_job_details_for_current_release(
-            one_time_jobs_sheet.get_all_records(),
-            'What is the name of the job to be run?',
-            'Which upcoming release are you targeting this job for?',
-            'Email Address',
-            'What is your name?',
-            'URL of a Google Doc with clear instructions on what the tester '
-            'needs to do:')
-        one_time_job_names = [
-            job_detail['job_name'] for job_detail in one_time_job_details]
-
-        if repeatable_job_names:
-            python_utils.PRINT(
-                'Repeatable jobs to run:\n%s\n' % ('\n').join(
-                    repeatable_job_names))
-        if one_time_job_names:
-            python_utils.PRINT(
-                'One time jobs to run:\n%s\n' % ('\n').join(one_time_job_names))
-        if repeatable_job_names or one_time_job_names:
-            common.open_new_tab_in_browser_if_possible(
-                release_constants.RELEASE_DRIVE_URL)
-            common.ask_user_to_confirm(
-                'Please enter the above job names to release journal.')
-            common.open_new_tab_in_browser_if_possible(
-                release_constants.REPEATABLE_JOBS_SPREADSHEETS_URL)
-            common.open_new_tab_in_browser_if_possible(
-                release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
-            python_utils.PRINT(
-                get_mail_message_template(
-                    repeatable_job_details + one_time_job_details))
-            author_mail_ids = [
-                job_details['author_email'] for job_details in (
-                    repeatable_job_details + one_time_job_details)]
-            common.ask_user_to_confirm(
-                'Note: Send the mail only after deploying to backup server.\n\n'
-                'Note: Add author email ids: %s to the cc list when you send '
-                'the mail.\n\n'
-                'Note: Please check manually if the details in the above mail '
-                'are correct and add anything extra if required.\n\n'
-                'Copy and save the above template for sending a mail to Sean '
-                'to run these jobs on backup server.\n\n'
-                'If the jobs are successful on backup server, run them on test '
-                'and prod server.' % list(set(author_mail_ids)))
-        else:
-            python_utils.PRINT('No jobs to run for the release.')
-            common.open_new_tab_in_browser_if_possible(
-                release_constants.REPEATABLE_JOBS_SPREADSHEETS_URL)
-            common.open_new_tab_in_browser_if_possible(
-                release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
-            common.ask_user_to_confirm(
-                'Please check manually if there are no jobs to run.')
-    finally:
-        if os.path.isfile(RELEASE_CREDENTIALS_FILEPATH):
-            os.remove(RELEASE_CREDENTIALS_FILEPATH)
-        if os.path.isfile(AUTH_FILEPATH):
-            os.remove(AUTH_FILEPATH)
+    cut_release_branch()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because

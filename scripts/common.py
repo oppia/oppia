@@ -27,7 +27,7 @@ import subprocess
 import python_utils
 import release_constants
 
-NODE_VERSION = '10.15.3'
+NODE_VERSION = '10.18.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
 YARN_VERSION = 'v1.21.1'
@@ -420,6 +420,21 @@ def check_prs_for_current_release_are_released(repo):
                 'There are PRs for current release which do not have '
                 'a \'PR: released\' label. Please ensure that they are '
                 'released before release summary generation.')
+
+
+def convert_to_posixpath(file_path):
+    """Converts a Windows style filepath to posixpath format. If the operating
+    system is not Windows, this function does nothing.
+
+    Args:
+        file_path: str. The path to be converted.
+
+    Returns:
+        str. Returns a posixpath version of the file path.
+    """
+    if not is_windows_os():
+        return file_path
+    return file_path.replace('\\', '/')
 
 
 class CD(python_utils.OBJECT):

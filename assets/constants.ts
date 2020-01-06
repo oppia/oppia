@@ -548,6 +548,8 @@ export = {
 
   "DEFAULT_SKILL_DIFFICULTY": 0.3,
 
+  "INLINE_RTE_COMPONENTS": ["link", "math", "skillreview"],
+
   "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
 
   "ENABLE_PREREQUISITE_SKILLS": false,

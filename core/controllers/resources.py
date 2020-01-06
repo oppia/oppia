@@ -52,7 +52,7 @@ class AssetDevHandler(base.BaseHandler):
     image and audio files are served from GCS).
     """
 
-    _SUPPORTED_TYPES = ['image', 'audio']
+    _SUPPORTED_TYPES = ['image', 'audio', 'thumbnail']
     _SUPPORTED_PAGE_CONTEXTS = [
         feconf.ENTITY_TYPE_EXPLORATION, feconf.ENTITY_TYPE_SKILL,
         feconf.ENTITY_TYPE_TOPIC, feconf.ENTITY_TYPE_STORY,
@@ -104,7 +104,7 @@ class AssetDevHandler(base.BaseHandler):
                 entity_id = page_identifier
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.DatastoreBackedFileSystem(entity_type, entity_id))
+                fs_domain.GcsFileSystem(entity_type, entity_id))
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None

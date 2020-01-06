@@ -25,13 +25,11 @@ describe('Collection Creation backend service', function() {
   var $httpBackend = null;
   var $rootScope = null;
   var SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
-  var CREATE_NEW_COLLECTION_URL_TEMPLATE = (
-    '/collection_editor/create/<collection_id>');
   var ERROR_STATUS_CODE = 500;
   // var successfulResponse = {
-  //   collectionId: SAMPLE_COLLECTION_ID 
+  //   collectionId: SAMPLE_COLLECTION_ID
   // };
-  
+
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -50,14 +48,18 @@ describe('Collection Creation backend service', function() {
   }));
 
   it('should successfully create a new collection and obtain the collection ID',
-  function() {
-    CollectionCreationBackendService.createCollection(
-      CREATE_NEW_COLLECTION_URL_TEMPLATE);
-    $httpBackend.expectPOST('/collection_editor_handler/create_new').respond(
-      {collectionId: SAMPLE_COLLECTION_ID}
-    );
-    $httpBackend.flush();
-    $rootScope.$digest();
-    expect($rootScope.loadingMessage).toBe('Creating collection');
-  });
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      CollectionCreationBackendService.createCollection();
+      $httpBackend.expectPOST('/collection_editor_handler/create_new').respond(
+        {collectionId: SAMPLE_COLLECTION_ID}
+      );
+      $httpBackend.flush();
+      $rootScope.$digest();
+      expect($rootScope.loadingMessage).toBe('Creating collection');
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    });
 });

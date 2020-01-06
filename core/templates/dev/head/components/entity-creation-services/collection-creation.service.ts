@@ -25,9 +25,13 @@ require('services/alerts.service.ts');
 // ExplorationCreationService.
 
 angular.module('oppia').factory('CollectionCreationService', [
-  '$rootScope', 'AlertsService', 'CollectionCreationBackendService',
+  '$rootScope', '$timeout', '$window', 'AlertsService',
+  'CollectionCreationBackendService', 'SiteAnalyticsService',
+  'UrlInterpolationService',
   function(
-      $rootScope, AlertsService, CollectionCreationBackendService) {
+      $rootScope, $timeout, $window, AlertsService,
+      CollectionCreationBackendService, SiteAnalyticsService,
+      UrlInterpolationService) {
     var CREATE_NEW_COLLECTION_URL_TEMPLATE = (
       '/collection_editor/create/<collection_id>');
     var collectionCreationInProgress = false;
@@ -43,8 +47,21 @@ angular.module('oppia').factory('CollectionCreationService', [
 
         $rootScope.loadingMessage = 'Creating collection';
 
-        CollectionCreationBackendService.createCollection(
-          CREATE_NEW_COLLECTION_URL_TEMPLATE);
+        CollectionCreationBackendService.createCollection().then(
+          function(response) {
+            SiteAnalyticsService.registerCreateNewCollectionEvent(
+              response.collectionId);
+            $timeout(function() {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_COLLECTION_URL_TEMPLATE, {
+                  collection_id: response.collectionId
+                }
+              );
+            }, 150);
+          }, function() {
+            $rootScope.loadingMessage = '';
+          }
+        );
       }
     };
   }

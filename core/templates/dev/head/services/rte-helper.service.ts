@@ -25,11 +25,11 @@ require('services/stateful/focus-manager.service.ts');
 angular.module('oppia').factory('RteHelperService', [
   '$document', '$log', '$uibModal',
   'FocusManagerService', 'HtmlEscaperService',
-  'UrlInterpolationService', 'RTE_COMPONENT_SPECS',
+  'UrlInterpolationService', 'INLINE_RTE_COMPONENTS', 'RTE_COMPONENT_SPECS',
   function(
       $document, $log, $uibModal,
       FocusManagerService, HtmlEscaperService,
-      UrlInterpolationService, RTE_COMPONENT_SPECS) {
+      UrlInterpolationService, INLINE_RTE_COMPONENTS, RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -75,8 +75,7 @@ angular.module('oppia').factory('RteHelperService', [
         return angular.copy(_RICH_TEXT_COMPONENTS);
       },
       isInlineComponent: function(richTextComponent) {
-        var inlineComponents = ['link', 'math', 'concept-card'];
-        return inlineComponents.indexOf(richTextComponent) !== -1;
+        return INLINE_RTE_COMPONENTS.indexOf(richTextComponent) !== -1;
       },
       // The refocusFn arg is a function that restores focus to the text editor
       // after exiting the modal, and moves the cursor back to where it was
