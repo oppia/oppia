@@ -34,11 +34,13 @@ def get_e2e_suite_names_from_jobs_travis_yml_file():
     travis_file = read_and_parse_travis_yml_file()
     jobs_raw = travis_file['env']['jobs']
     suites_from_jobs = []
+    # The following line extracts the test suite name from the jobs section that
+    # is in the form RUN_E2E_TESTS_ACCESSIBILITY=true.
+    test_regex = re.compile(r'(?<=TESTS_)(.*)(?=\=)')
     for job in jobs_raw:
-        # The jobs are in the form RUN_E2E_TESTS_ACCESSIBILITY=true
-        # so the following line removes the RUN_E2E_TESTS_(14 length)
-        # and =true(5 length) part.
-        suites_from_jobs.append(utils.snake_case_to_camel_case(job[14:-5].lower()))
+        matches = test_regex.finditer(job)
+        for match in matches:
+            suites_from_jobs.append(utils.snake_case_to_camel_case(match.group().lower()))
 
     return sorted(suites_from_jobs)
 
@@ -53,15 +55,13 @@ def get_e2e_suite_names_from_script_travis_yml_file():
     script_raw = travis_file['script']
     # The following line extracts the test suites from patterns like
     # --suite="accessibility" --
-    hyphen_between_regex = re.compile(r'--suite="(.+?)" --')
+    hyphen_between_regex = re.compile(r'(?<= --suite=")(.*)(?=")')
     suites_from_script = []
 
     for script in script_raw:
         matches = hyphen_between_regex.finditer(script)
         for match in matches:
-            # The extracted data is of the form --suite="subscriptions" --
-            # hence 9 to remove --suite=" and -4 to remove " --
-            suites_from_script.append(match.group()[9:-4])
+            suites_from_script.append(match.group())
 
     return sorted(suites_from_script)
 
@@ -76,13 +76,13 @@ def get_e2e_suite_names_from_protractor_file():
     # The following line extracts suite object from protractor.conf.js.
     suite = re.compile(r'suites = {([^}]+)}').findall(protractor_config_file)[0]
 
-    # The following line extracts the keys/test suites from the suites object.
-    key_regex = re.compile(r'\s(.*?):')
+    # The following line extracts the keys/test suites from the key: value pair
+    # from the suites object.
+    key_regex = re.compile(r'\b(.*?)(?=:)')
     protractor_suites = []
     for match in key_regex.finditer(suite):
-        # Since the keys are in the form adminPage: so -1 to remove the
-        # colon part :
-        protractor_suites.append(match.group()[:-1].strip())
+        if len(match.group()) != 0:
+            protractor_suites.append(match.group())
 
     return sorted(protractor_suites)
 
@@ -103,7 +103,7 @@ def read_and_parse_travis_yml_file():
     """Returns the contents of .travis.yml, as a dict.
 
     Returns:
-        dict. A dict parsed from the travis.yml file.
+        dict. Contents of the travis.yml file parsed as a dict.
     """
     travis_ci_file = python_utils.open_file(
         os.path.join(os.getcwd(), '.travis.yml'), 'r').read()
@@ -112,7 +112,7 @@ def read_and_parse_travis_yml_file():
 
 
 def main():
-    """Test the travis ci file and protractor.conf.js have same test suites."""
+    """Test the travis ci file and protractor.conf.js have same e2e test suites."""
     python_utils.PRINT('Checking e2e tests are captured in travis.yml started')
     protractor_test_suites = get_e2e_suite_names_from_protractor_file()
     yaml_jobs = get_e2e_suite_names_from_jobs_travis_yml_file()
