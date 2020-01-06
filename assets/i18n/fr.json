@@ -44,6 +44,8 @@
 	"I18N_ACTION_CREATE_LESSON": "Créer votre propre leçon",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Cette carte est très longue et les étudiants pourraient s'en désintéresser. Essayez de la réduire ou de la scinder en deux cartes.",
 	"I18N_CLASSROOM_PAGE_HEADING": "Page de la salle de cours Oppia",
+	"I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING": "Explorer plus de leçons",
+	"I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "Fait par la communauté",
 	"I18N_CONTACT_PAGE_HEADING": "Impliquez-vous !",
 	"I18N_CONTACT_PAGE_PARAGRAPH_1": "Merci de votre intérêt pour l’aide que vous apportez au projet Oppia !",
 	"I18N_CONTACT_PAGE_PARAGRAPH_10": "Le projet Oppia est entièrement <i>open source</i> et maintenu par une large communauté de bénévoles sur <a href=\"https://github.com/oppia/oppia/\">GitHub</a>. Nous avons actuellement besoin de codeurs, de concepteurs et de rédacteurs, donc si vous souhaitez nous aider, merci de nous en faire part ! Le meilleur moyen pour commencer est de suivre les instructions sur notre <a href=\"https://github.com/oppia/oppia/wiki\">page wiki sur GitHub</a>.",

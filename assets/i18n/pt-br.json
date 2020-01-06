@@ -44,6 +44,8 @@
 	"I18N_ACTION_CREATE_LESSON": "Crie sua própria Aula",
 	"I18N_CARD_HEIGHT_LIMIT_WARNING_MESSAGE": "Este cartão é bastante longo e os alunos podem perder o interesse. Considere encurtá-lo ou dividi-lo em duas cartas.",
 	"I18N_CLASSROOM_PAGE_HEADING": "Página da sala de aula Oppia",
+	"I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING": "Explore mais lições",
+	"I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "Feito pela Comunidade",
 	"I18N_CONTACT_PAGE_HEADING": "Envolver-se!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_1": "Obrigado pelo seu interesse em ajudar com o projeto Oppia!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_10": "O projeto Oppia é totalmente open source e é mantido por uma grande comunidade de voluntários <a href=\"https://github.com/oppia/oppia/\">GitHub</a>. Estamos precisando de codificadores, designers e redatores, então se você quiser ajudar, por favor, envie-nos uma mensagem! A melhor maneira de começar é seguir as instruções em nossa <a href=\"https://github.com/oppia/oppia/wiki\">GitHub página wiki</a>.",

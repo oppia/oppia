@@ -26,6 +26,8 @@
 	"I18N_ACTION_BROWSE_LESSONS": "Navega por nuestras lecciones",
 	"I18N_ACTION_CREATE_EXPLORATION": "Crea tu propia exploración",
 	"I18N_ACTION_CREATE_LESSON": "Crea tu propia lección",
+	"I18N_CLASSROOM_PAGE_SEARCH_BAR_HEADING": "Explorar más lecciones",
+	"I18N_CLASSROOM_PAGE_SEARCH_BAR_SUBHEADING": "De creación comunitaria",
 	"I18N_CONTACT_PAGE_HEADING": "¡Involúcrate!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_1": "¡Gracias por tu interes en ayudar al proyecto Oppia!",
 	"I18N_CONTACT_PAGE_PARAGRAPH_10_HEADING": "Mejorar y mantener el sitio",
