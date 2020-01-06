@@ -661,54 +661,74 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
             corresponding to the exploration. Otherwise, marks them as deleted
             but keeps the corresponding models in the datastore.
     """
+    delete_explorations(
+        committer_id, [exploration_id], force_deletion=force_deletion)
+
+
+def delete_explorations(committer_id, exploration_ids, force_deletion=False):
+    """Delete the explorations with the given exploration_ids.
+
+    IMPORTANT: Callers of this function should ensure that committer_id has
+    permissions to delete these explorations, prior to calling this function.
+
+    If force_deletion is True the explorations and its histories are fully
+    deleted and are unrecoverable. Otherwise, the explorations and all its
+    histories are marked as deleted, but the corresponding models are still
+    retained in the datastore. This last option is the preferred one.
+
+    Args:
+        committer_id: str. The id of the user who made the commit.
+        exploration_ids: list(str). The ids of the explorations to be deleted.
+        force_deletion: bool. If True, completely deletes the storage models
+            corresponding to the explorations. Otherwise, marks them as deleted
+            but keeps the corresponding models in the datastore.
+    """
     # TODO(sll): Delete the files too?
-
-    exploration_rights_model = exp_models.ExplorationRightsModel.get(
-        exploration_id)
-    exploration_rights_model.delete(
-        committer_id, '', force_deletion=force_deletion)
-
-    exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    exploration_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
+    exp_models.ExplorationRightsModel.delete_multi(
+        exploration_ids, committer_id, '', force_deletion=force_deletion)
+    exp_models.ExplorationModel.delete_multi(
+        exploration_ids, committer_id,
+        feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
 
-    # This must come after the exploration is retrieved. Otherwise the memcache
-    # key will be reinstated.
-    exploration_memcache_key = exp_fetchers.get_exploration_memcache_key(
-        exploration_id)
-    memcache_services.delete(exploration_memcache_key)
+    # This must come after the explorations are retrieved. Otherwise the
+    # memcache keys will be reinstated.
+    exploration_memcache_keys = [
+        exp_fetchers.get_exploration_memcache_key(exploration_id)
+        for exploration_id in exploration_ids]
+    memcache_services.delete_multi(exploration_memcache_keys)
 
-    # Delete the exploration from search.
-    search_services.delete_explorations_from_search_index([exploration_id])
+    # Delete the explorations from search.
+    search_services.delete_explorations_from_search_index(exploration_ids)
 
-    # Delete the exploration summary, regardless of whether or not
+    # Delete the exploration summaries, regardless of whether or not
     # force_deletion is True.
-    delete_exploration_summary(exploration_id)
+    delete_exploration_summaries(exploration_ids)
 
-    # Remove the exploration from the featured activity references, if
+    # Remove the explorations from the featured activity references, if
     # necessary.
-    activity_services.remove_featured_activity(
-        constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+    activity_services.remove_featured_activities(
+        constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        delete_exploration_from_subscribed_users,
+        delete_explorations_from_subscribed_users,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-        exploration_id)
+        exploration_ids)
 
 
-def delete_exploration_from_subscribed_users(exploration_id):
-    """Remove exploration from all subscribers' activity_ids.
+def delete_explorations_from_subscribed_users(exploration_ids):
+    """Remove explorations from all subscribers' activity_ids.
 
     Args:
-        exploration_id: The id of the exploration to delete.
+        exploration_ids: list(str). The ids of the explorations to delete.
     """
     subscription_models = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.activity_ids ==
-        exploration_id).fetch()
+        user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
+    ).fetch()
     for model in subscription_models:
-        model.activity_ids.remove(exploration_id)
+        model.activity_ids = [
+            id_ for id_ in model.activity_ids if id_ not in exploration_ids]
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
@@ -1044,15 +1064,15 @@ def save_exploration_summary(exp_summary):
     index_explorations_given_ids([exp_summary.id])
 
 
-def delete_exploration_summary(exploration_id):
-    """Delete an exploration summary model.
+def delete_exploration_summaries(exploration_ids):
+    """Delete multiple exploration summary models.
 
     Args:
-        exploration_id: str. The id of the exploration summary to be
+        exploration_ids: list(str). The id of the exploration summaries to be
             deleted.
     """
-
-    exp_models.ExpSummaryModel.get(exploration_id).delete()
+    summary_models = exp_models.ExpSummaryModel.get_multi(exploration_ids)
+    exp_models.ExpSummaryModel.delete_multi(summary_models)
 
 
 def revert_exploration(

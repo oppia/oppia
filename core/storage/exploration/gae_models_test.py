@@ -232,7 +232,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
                 [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
 
             snapshot_id = (
-                exp_models.ExplorationRightsModel._get_snapshot_id(
+                exp_models.ExplorationRightsModel.get_snapshot_id(
                     exp_model.id, 1))
             exp_snapshot_model = (
                 exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
