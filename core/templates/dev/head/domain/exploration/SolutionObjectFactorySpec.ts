@@ -24,6 +24,8 @@ import { ConvertToPlainTextPipe } from
   'filters/string-utility-filters/convert-to-plain-text.pipe';
 import { SolutionObjectFactory } from
   'domain/exploration/SolutionObjectFactory';
+import { SubtitledHtml } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {
@@ -43,8 +45,7 @@ describe('Solution object factory', () => {
       });
     });
 
-
-    it('should create a new solution', () => {
+    it('should get the backend dict from a solution', () => {
       expect(solution.toBackendDict()).toEqual({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',
@@ -55,7 +56,29 @@ describe('Solution object factory', () => {
       });
     });
 
+    it('should create a new solution from scratch', () => {
+      var solutionFromScratch = sof.createNew(
+        true,
+        'This is the correct answer!',
+        'This is the explanation to the answer',
+        'solution');
+
+      expect(solutionFromScratch.toBackendDict()).toEqual({
+        answer_is_exclusive: true,
+        correct_answer: 'This is the correct answer!',
+        explanation: {
+          content_id: 'solution',
+          html: 'This is the explanation to the answer'
+        }
+      });
+    });
+
     it('should create summary correctly', () => {
+      expect(solution.getSummary('GraphInput')).toEqual(
+        'One solution is "[Graph]". This is the explanation to the answer.');
+      expect(solution.getSummary('MusicNotesInput')).toEqual(
+        'One solution is "[Music Notes]". This is the explanation to the' +
+        ' answer.');
       expect(solution.getSummary('TextInput')).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');
@@ -84,6 +107,62 @@ describe('Solution object factory', () => {
       });
       expect(solution.getSummary('FractionInput')).toEqual(
         'One solution is "1/6". This is the explanation to the answer.');
+
+      solution.setCorrectAnswer({
+        correct: true
+      });
+      expect(solution.getSummary('LogicProof')).toEqual(
+        'One solution is "true". This is the explanation to the answer.');
+
+      solution.setCorrectAnswer({
+        type: 'real',
+        real: 1,
+        fraction: '',
+        units: []
+      });
+      expect(solution.getSummary('NumberWithUnits')).toEqual(
+        'One solution is "1". This is the explanation to the answer.');
+    });
+
+    it('should get oppia short answer', () => {
+      const interaction = {
+        id: '0',
+        customizationArgs: {
+          choices: {
+            value: 'This is a choice'
+          }
+        }
+      };
+      expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual({
+        prefix: 'One',
+        answer: '<oppia-short-response-0 ' +
+          'answer="&amp;quot;This is a correct answer!&amp;quot;" ' +
+          'choices="&amp;quot;This is a choice&amp;quot;">' +
+          '</oppia-short-response-0>'
+      });
+    });
+
+    it('should change the boolean value of answer exclusivity', () => {
+      solution.setAnswerExclusivity(true);
+      expect(solution.toBackendDict().answer_is_exclusive).toBe(true);
+      expect(solution.getSummary('TestInput')).toEqual(
+        'The only solution is "&quot;This is a correct answer!&quot;". ' +
+        'This is the explanation to the answer.');
+    });
+
+    it('should change the explanation correctly', () => {
+      const newExplanation = new SubtitledHtml(
+        'This is the new explanation to the answer',
+        'solution'
+      );
+      solution.setExplanation(newExplanation);
+
+      expect(solution.explanation).toBe(newExplanation);
+      expect(solution.getOppiaSolutionExplanationResponseHtml()).toBe(
+        newExplanation.getHtml());
+      expect(solution.getSummary('TestInput')).toEqual(
+        'One solution is "&quot;This is a correct answer!&quot;". ' +
+        'This is the new explanation to the answer.');
     });
   });
 });

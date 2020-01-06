@@ -108,6 +108,10 @@ export class Solution {
       '". ' + explanation + '.');
   }
 
+  setAnswerExclusivity(answerIsExclusive: boolean) {
+    this.answerIsExclusive = answerIsExclusive;
+  }
+
   setCorrectAnswer(correctAnswer: any): void {
     this.correctAnswer = correctAnswer;
   }
