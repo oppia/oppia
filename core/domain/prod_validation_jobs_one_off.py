@@ -560,7 +560,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        if not item.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC:
+        if item.post_commit_status != feconf.POST_COMMIT_STATUS_PUBLIC:
             cls.errors['post commit status check'].append((
                 'Entity id %s: Post commit status %s is invalid') % (
                     item.id, item.post_commit_status))
@@ -596,7 +596,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
 
         cls._validate_post_commit_status(item)
 
-        if 'question' in item.id or 'skill' in item.id:
+        if item.id[0:8] == 'question' or item.id[0:5] == 'skill':
             cls._validate_post_commit_status_is_public(item)
         else:
             cls._validate_post_commit_is_private(item)
