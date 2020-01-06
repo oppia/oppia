@@ -723,14 +723,16 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
     """
-    if exploration_ids:
-        subscription_models = user_models.UserSubscriptionsModel.query(
-            user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
-        ).fetch()
-        for model in subscription_models:
-            model.activity_ids = [
-                id_ for id_ in model.activity_ids if id_ not in exploration_ids]
-        user_models.UserSubscriptionsModel.put_multi(subscription_models)
+    if not exploration_ids:
+        return
+
+    subscription_models = user_models.UserSubscriptionsModel.query(
+        user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
+    ).fetch()
+    for model in subscription_models:
+        model.activity_ids = [
+            id_ for id_ in model.activity_ids if id_ not in exploration_ids]
+    user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
 # Operations on exploration snapshots.
