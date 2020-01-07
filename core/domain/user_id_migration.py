@@ -33,6 +33,9 @@ import feconf
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
+SEPARATE_MODEL_CLASSES = [exp_models.ExplorationCommitLogEntryModel,
+                          exp_models.ExplorationSnapshotMetadataModel]
+
 
 class MissingUserException(Exception):
     """Exception for cases when the user doesn't exist."""
@@ -421,9 +424,9 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, status)
 
 
-class ModelsUserIdsHaveUserSettingsVerificationJob(
+class ModelsUserIdsHaveUserSettingsBaseVerificationJob(
         jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for going through all the models that contain user IDs. This
+    """Base one-off job for going through the models that contain user IDs. This
     job checks that all the user IDs used in the model have their corresponding
     UserSettingsModel defined.
     """
@@ -463,21 +466,13 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             return True
         return user_models.UserSettingsModel.get_by_id(user_id) is not None
 
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [model_class for model_class in
-                models.Registry.get_all_storage_model_classes()
-                if model_class.get_user_id_migration_policy() !=
-                base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE]
-
     @staticmethod
     def map(model):
         """Implements the map function for this job."""
         model_class = model.__class__
         if (model_class.get_user_id_migration_policy() ==
                 base_models.USER_ID_MIGRATION_POLICY.COPY):
-            if (ModelsUserIdsHaveUserSettingsVerificationJob
+            if (ModelsUserIdsHaveUserSettingsBaseVerificationJob
                     ._does_user_settings_model_exist(model.id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
@@ -487,7 +482,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             user_id = model.user_id
             if user_id is None:
                 yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
-            elif (ModelsUserIdsHaveUserSettingsVerificationJob
+            elif (ModelsUserIdsHaveUserSettingsBaseVerificationJob
                     ._check_id_and_user_id_exist(model.id, user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
@@ -503,7 +498,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
                 model_class.get_user_id_migration_field()._name]  # pylint: disable=protected-access
             if user_id is None:
                 yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
-            elif (ModelsUserIdsHaveUserSettingsVerificationJob
+            elif (ModelsUserIdsHaveUserSettingsBaseVerificationJob
                     ._does_user_settings_model_exist(user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
@@ -522,3 +517,35 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             yield (key, len(status))
         else:
             yield (key, status)
+
+
+class ModelsUserIdsHaveUserSettingsVerificationJob(
+        ModelsUserIdsHaveUserSettingsBaseVerificationJob):
+    """One-off job for going through all the models (except these listed in
+    SEPARATE_MODEL_CLASSES) that contain user IDs. This job checks that all
+    the user IDs used in the model have their corresponding UserSettingsModel
+    defined.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        model_classes = [model_class for model_class in
+                         models.Registry.get_all_storage_model_classes()
+                         if model_class.get_user_id_migration_policy() !=
+                         base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE]
+        return [model_class for model_class in model_classes if
+                model_class not in SEPARATE_MODEL_CLASSES]
+
+
+class ModelsUserIdsHaveUserSettingsExplorationsVerificationJob(
+        ModelsUserIdsHaveUserSettingsBaseVerificationJob):
+    """One-off job for going through the models listed in SEPARATE_MODEL_CLASSES
+    that contain user IDs. This job checks that all the user IDs used in
+    the model have their corresponding UserSettingsModel defined.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return SEPARATE_MODEL_CLASSES

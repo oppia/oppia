@@ -73,6 +73,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.StoryMigrationOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_id_migration.GaeIdNotInModelsVerificationJob,
+    user_id_migration.ModelsUserIdsHaveUserSettingsExplorationsVerificationJob,
     user_id_migration.ModelsUserIdsHaveUserSettingsVerificationJob,
     user_id_migration.SnapshotsUserIdMigrationJob,
     user_id_migration.UserIdMigrationJob,

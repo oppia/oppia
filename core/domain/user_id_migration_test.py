@@ -1010,18 +1010,6 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             score_category='category',
             score=1.5,
             has_email_been_sent=False).put()
-        exp_models.ExplorationSnapshotMetadataModel(
-            id='exp_1_id',
-            committer_id=self.USER_2_GAE_ID,
-            commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}]).put()
-        exp_models.ExplorationSnapshotMetadataModel(
-            id='exp_2_id',
-            committer_id=feconf.SYSTEM_COMMITTER_ID,
-            commit_type='create',
-            commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}]).put()
         feedback_models.GeneralFeedbackThreadModel(
             id='type.id.generated',
             entity_type='type',
@@ -1057,11 +1045,6 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
              ['%s.%s' % ('category', self.USER_2_GAE_ID)]],
             output)
         self.assertIn(
-            ['FAILURE - ExplorationSnapshotMetadataModel', ['exp_1_id']],
-            output)
-        self.assertIn(
-            ['SUCCESS - ExplorationSnapshotMetadataModel', 1], output)
-        self.assertIn(
             ['SUCCESS_NONE - GeneralFeedbackThreadModel', 1], output)
         self.assertIn(
             ['SUCCESS_NONE - GeneralFeedbackThreadUserModel', 1], output)
@@ -1069,3 +1052,100 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             ['FAILURE - TopicRightsModel', ['topic_1_id']], output)
         self.assertIn(['SUCCESS - TopicRightsModel', 1], output)
         self.assertIn(['SUCCESS - UserSettingsModel', 3], output)
+
+
+class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
+        test_utils.GenericTestBase):
+    """Tests for ModelsUserIdsHaveUserSettingsExplorationsVerificationJob."""
+    USER_1_USER_ID = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    USER_1_GAE_ID = 'gae_id_1'
+    USER_1_USERNAME = 'username_1'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            user_id_migration
+            .ModelsUserIdsHaveUserSettingsExplorationsVerificationJob
+            .create_new())
+        (user_id_migration
+         .ModelsUserIdsHaveUserSettingsExplorationsVerificationJob
+         .enqueue(job_id))
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            user_id_migration
+            .ModelsUserIdsHaveUserSettingsExplorationsVerificationJob
+            .get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
+
+    def setUp(self):
+        def empty(*_):
+            """Function that takes any number of arguments and does nothing."""
+            pass
+
+        # We don't want to signup the superadmin user.
+        with self.swap(test_utils.TestBase, 'signup_superadmin_user', empty):
+            super(
+                ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests,
+                self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_1_USER_ID,
+            gae_id=self.USER_1_GAE_ID,
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+
+    def test_one_user_one_model_full_id(self):
+
+        exp_models.ExplorationCommitLogEntryModel(
+            id='exp_1_id_1',
+            user_id=self.USER_1_GAE_ID,
+            username=self.USER_1_USERNAME,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}],
+            post_commit_status='private',
+            post_commit_community_owned=False,
+            post_commit_is_private=True,
+            version=2,
+            exploration_id='exp_1_id').put()
+        exp_models.ExplorationCommitLogEntryModel(
+            id='exp_2_id_1',
+            user_id=feconf.SYSTEM_COMMITTER_ID,
+            username=feconf.SYSTEM_COMMITTER_ID,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}],
+            post_commit_status='private',
+            post_commit_community_owned=False,
+            post_commit_is_private=True,
+            version=2,
+            exploration_id='exp_2_id').put()
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='exp_1_id',
+            committer_id=self.USER_1_GAE_ID,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]).put()
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='exp_2_id',
+            committer_id=feconf.SYSTEM_COMMITTER_ID,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]).put()
+
+        output = self._run_one_off_job()
+        self.assertIn(
+            ['FAILURE - ExplorationCommitLogEntryModel', ['exp_1_id_1']],
+            output)
+        self.assertIn(
+            ['SUCCESS - ExplorationCommitLogEntryModel', 1], output)
+        self.assertIn(
+            ['FAILURE - ExplorationSnapshotMetadataModel', ['exp_1_id']],
+            output)
+        self.assertIn(
+            ['SUCCESS - ExplorationSnapshotMetadataModel', 1], output)
