@@ -100,6 +100,10 @@ angular.module('oppia').directive('questionOpportunities', [
             ctrl.opportunitiesAreLoading = false;
           };
 
+          var onSubmitSuggestionSuccess = function() {
+            AlertsService.addSuccessMessage('Submitted question suggestion.');
+          };
+
           ctrl.onLoadMoreOpportunities = function() {
             if (!ctrl.opportunitiesAreLoading &&
                 ctrl.moreOpportunitiesAvailable) {
@@ -165,11 +169,10 @@ angular.module('oppia').directive('questionOpportunities', [
                         'correspond to a correct answer';
                       return;
                     }
-                    QuestionSuggestionService.submitSuggestion($scope.question,
-                      $scope.associatedSkill, opportunity.subheading);
+                    QuestionSuggestionService.submitSuggestion(
+                      $scope.question, $scope.associatedSkill,
+                      opportunity.subheading, onSubmitSuggestionSuccess);
                     $uibModalInstance.close();
-                    AlertsService.addSuccessMessage(
-                      'Submitted question suggestion.');
                   };
                   // Checking if Question contains all requirements to enable
                   // Save and Publish Question

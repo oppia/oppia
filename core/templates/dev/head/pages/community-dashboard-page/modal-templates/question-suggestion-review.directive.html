@@ -21,29 +21,11 @@
     <div class="oppia-suggestion-review-message" ng-show="reviewable">
       <div class="oppia-difficulty-message">Please select an appropriate difficulty for the question.</div>
       <md-radio-group ng-model="difficulty">
-        <md-radio-button value="0.3">
-          <strong> Easy </strong>
-          <angular-html-bind html-data="skillRubrics[0].getExplanation()">
+        <md-radio-button ng-repeat="rubric in skillRubrics track by $index" value="rubric.difficulty">
+          <strong> <[skillDifficulties[$index]]> </strong>
+          <angular-html-bind html-data="rubric.explanation">
           </angular-html-bind>
-          <div ng-if="skillRubrics[0].getExplanation() === ''">
-            <span class="oppia-placeholder"> This rubric has not yet been specified </span>
-          </div>
-        </md-radio-button>
-
-        <md-radio-button value="0.6">
-          <strong> Medium </strong>
-          <angular-html-bind html-data="skillRubrics[1].getExplanation()">
-          </angular-html-bind>
-          <div ng-if="skillRubrics[1].getExplanation() === ''">
-            <span class="oppia-placeholder"> This rubric has not yet been specified </span>
-          </div>
-        </md-radio-button>
-
-        <md-radio-button value="0.9">
-          <strong> Hard </strong>
-          <angular-html-bind html-data="skillRubrics[2].getExplanation()">
-          </angular-html-bind>
-          <div ng-if="skillRubrics[2].getExplanation() === ''">
+          <div ng-if="rubric.explanation === ''">
             <span class="oppia-placeholder"> This rubric has not yet been specified </span>
           </div>
         </md-radio-button>
@@ -82,7 +64,7 @@
     border-top: 1px solid #e5e5e5;
     margin-left: -15px;
     margin-right: -15px;
-    padding: 0px 15px;
+    padding: 0 15px;
   }
   .oppia-difficulty-message {
     margin-bottom: 0.5em;

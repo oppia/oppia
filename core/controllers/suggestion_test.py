@@ -26,6 +26,7 @@ from core.domain import feedback_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import rights_manager
+from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_domain
@@ -682,7 +683,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'action': u'accept',
                     'commit_message': u'commit message',
                     'review_message': u'This looks good!',
-                    'skill_id': self.SKILL_ID
+                    'skill_id': self.SKILL_ID,
+                    'skill_difficulty': 0.3
                 }, csrf_token=csrf_token)
 
         suggestion_post_accept = self.get_json(
@@ -938,7 +940,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
                     'action': u'accept',
                     'commit_message': u'commit message',
                     'review_message': u'Accepted!',
-                    'skill_id': self.skill_id
+                    'skill_id': self.skill_id,
+                    'skill_difficulty': 0.6
                 }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
@@ -996,8 +999,17 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 'new_value': self.EXP_ID
             })], 'Changes.')
 
+        self.rubrics = [
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
+            skill_domain.Rubric(
+                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
+        self.rubric_dicts = [rubric.to_dict() for rubric in self.rubrics]
         self.save_new_skill(
-            self.SKILL_ID, self.owner_id, self.SKILL_DESCRIPTION)
+            self.SKILL_ID, self.owner_id, self.SKILL_DESCRIPTION,
+            rubrics=self.rubrics)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1095,6 +1107,10 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
             '/getsubmittedsuggestions/skill/add_question')
         self.assertEqual(len(response['suggestions']), 1)
         self.assertEqual(len(response['target_id_to_opportunity_dict']), 1)
+        self.assertEqual(
+            response['target_id_to_opportunity_dict'][self.SKILL_ID][
+                'skill_rubrics'],
+            self.rubric_dicts)
         response = self.get_json(
             '/getsubmittedsuggestions/topic/add_question')
         self.assertEqual(response, {})

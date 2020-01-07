@@ -150,7 +150,8 @@ angular.module('oppia').directive('contributionsAndReview', [
             return translationContributionsSummaryList;
           };
 
-          var removeContributionToReview = function(suggestionId) {
+          var resolveSuggestionSuccess = function(suggestionId) {
+            AlertsService.addSuccessMessage('Submitted suggestion review.');
             ctrl.contributionSummaries = (
               ctrl.contributionSummaries.filter(function(suggestion) {
                 if (suggestion.id === suggestionId) {
@@ -202,8 +203,10 @@ angular.module('oppia').directive('contributionsAndReview', [
               controller: [
                 '$scope', '$uibModalInstance', 'SuggestionModalService',
                 'question', 'reviewable', 'DEFAULT_SKILL_DIFFICULTY',
+                'SKILL_DIFFICULTIES',
                 function($scope, $uibModalInstance, SuggestionModalService,
-                    question, reviewable, DEFAULT_SKILL_DIFFICULTY) {
+                    question, reviewable, DEFAULT_SKILL_DIFFICULTY,
+                    SKILL_DIFFICULTIES) {
                   $scope.authorName = authorName;
                   $scope.contentHtml = contentHtml;
                   $scope.reviewable = reviewable;
@@ -215,6 +218,7 @@ angular.module('oppia').directive('contributionsAndReview', [
                   $scope.questionId = question.getId();
                   $scope.canEditQuestion = false;
                   $scope.misconceptionsBySkill = [];
+                  $scope.skillDifficulties = SKILL_DIFFICULTIES;
                   $scope.skillRubrics = skillRubrics;
                   $scope.difficulty = DEFAULT_SKILL_DIFFICULTY;
 
@@ -231,8 +235,6 @@ angular.module('oppia').directive('contributionsAndReview', [
                         reviewMessage: $scope.reviewMessage,
                         skillDifficulty: $scope.difficulty
                       });
-                    AlertsService.addSuccessMessage(
-                      'Accepted question suggestion.');
                   };
 
                   $scope.reject = function() {
@@ -242,8 +244,6 @@ angular.module('oppia').directive('contributionsAndReview', [
                         action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
                         reviewMessage: $scope.reviewMessage
                       });
-                    AlertsService.addSuccessMessage(
-                      'Rejected question suggestion.');
                   };
 
                   $scope.cancel = function() {
@@ -255,7 +255,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               ContributionAndReviewService.resolveSuggestiontoSkill(
                 targetId, suggestionId, result.action, result.reviewMessage,
                 result.commitMessage, parseFloat(result.skillDifficulty),
-                removeContributionToReview);
+                resolveSuggestionSuccess);
             });
           };
 
@@ -318,7 +318,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             }).result.then(function(result) {
               ContributionAndReviewService.resolveSuggestiontoExploration(
                 targetId, suggestionId, result.action, result.reviewMessage,
-                result.commitMessage, removeContributionToReview);
+                result.commitMessage, resolveSuggestionSuccess);
             });
           };
 
