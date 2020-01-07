@@ -172,6 +172,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             var question = QuestionObjectFactory.createFromBackendDict(
               suggestion.change.question_dict);
             var contentHtml = question.getStateData().content.getHtml();
+            var skillRubrics = contributionDetails.skill_rubrics;
 
             $uibModal.open({
               templateUrl: _templateUrl,
@@ -192,13 +193,16 @@ angular.module('oppia').directive('contributionsAndReview', [
                 },
                 reviewable: function() {
                   return reviewable;
+                },
+                skillRubrics: function() {
+                  return skillRubrics;
                 }
               },
               controller: [
                 '$scope', '$uibModalInstance', 'SuggestionModalService',
-                'question', 'reviewable',
+                'question', 'reviewable', 'DEFAULT_SKILL_DIFFICULTY',
                 function($scope, $uibModalInstance, SuggestionModalService,
-                    question, reviewable) {
+                    question, reviewable, DEFAULT_SKILL_DIFFICULTY) {
                   $scope.authorName = authorName;
                   $scope.contentHtml = contentHtml;
                   $scope.reviewable = reviewable;
@@ -210,6 +214,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                   $scope.questionId = question.getId();
                   $scope.canEditQuestion = false;
                   $scope.misconceptionsBySkill = [];
+                  $scope.skillRubrics = skillRubrics;
+                  $scope.difficulty = DEFAULT_SKILL_DIFFICULTY;
 
                   $scope.questionChanged = function() {
                     $scope.validationError = null;
@@ -221,7 +227,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                       {
                         action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
                         commitMessage: $scope.commitMessage,
-                        reviewMessage: $scope.reviewMessage
+                        reviewMessage: $scope.reviewMessage,
+                        skillDifficulty: $scope.difficulty
                       });
                   };
 
@@ -242,7 +249,8 @@ angular.module('oppia').directive('contributionsAndReview', [
             }).result.then(function(result) {
               ContributionAndReviewService.resolveSuggestiontoSkill(
                 targetId, suggestionId, result.action, result.reviewMessage,
-                result.commitMessage, removeContributionToReview);
+                result.commitMessage, parseFloat(result.skillDifficulty),
+                removeContributionToReview);
             });
           };
 

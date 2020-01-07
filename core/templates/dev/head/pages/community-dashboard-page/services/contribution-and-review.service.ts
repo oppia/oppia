@@ -106,7 +106,7 @@ angular.module('oppia').factory('ContributionAndReviewService', [
       },
       resolveSuggestiontoSkill: function(
           targetId, suggestionId, action, reviewMessage, commitMessage,
-          onSuccess) {
+          skillDifficulty, onSuccess) {
         var url = UrlInterpolationService.interpolateUrl(
           _SUGGESTION_TO_SKILL_ACTION_HANDLER_URL, {
             skill_id: targetId,
@@ -116,7 +116,8 @@ angular.module('oppia').factory('ContributionAndReviewService', [
           action: action,
           review_message: reviewMessage,
           commit_message: (
-            action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null)
+            action === ACTION_ACCEPT_SUGGESTION ? commitMessage : null),
+          skill_difficulty: skillDifficulty
         }).then(function() {
           onSuccess(suggestionId);
         });

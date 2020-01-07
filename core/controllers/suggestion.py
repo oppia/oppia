@@ -22,6 +22,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import opportunity_services
+from core.domain import skill_services
 from core.domain import suggestion_services
 from core.platform import models
 import feconf
@@ -81,7 +82,15 @@ def _get_target_id_to_skill_opportunity_dict(suggestions):
     target_ids = set([s.target_id for s in suggestions])
     opportunities = (
         opportunity_services.get_skill_opportunities_by_ids(list(target_ids)))
-    return {opp.id: opp.to_dict() for opp in opportunities}
+    id_to_opportunity = {}
+    for opp in opportunities:
+        opp_dict = opp.to_dict()
+        skill = skill_services.get_skill_by_id(opp.id, strict=False)
+        if skill is not None:
+            opp_dict['skill_rubrics'] = [
+                rubric.to_dict() for rubric in skill.rubrics]
+        id_to_opportunity[opp.id] = opp_dict
+    return id_to_opportunity
 
 
 class SuggestionHandler(base.BaseHandler):
@@ -182,6 +191,7 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
                 # The skill_id is passed only at the time of accepting the
                 # suggestion.
                 suggestion.change.skill_id = target_id
+            suggestion.skill_difficulty = self.payload.get('skill_difficulty')
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))

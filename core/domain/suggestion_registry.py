@@ -483,6 +483,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             the suggestion.
         change_cmd: QuestionChange. The change associated with the suggestion.
         score_category: str. The scoring category for the suggestion.
+        skill_difficulty: float. The skill difficulty of the question
+            suggestion.
         last_updated: datetime.datetime. Date and time when the suggestion
             was last updated.
     """
@@ -508,6 +510,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         self.change.question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
+        self.skill_difficulty = constants.DEFAULT_SKILL_DIFFICULTY
         self.last_updated = last_updated
 
     def validate(self):
@@ -607,7 +610,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
             self.author_id, question_dict['id'], self.change.skill_id,
-            constants.DEFAULT_SKILL_DIFFICULTY)
+            self.skill_difficulty)
 
     def populate_old_value_of_change(self):
         """Populates old value of the change."""

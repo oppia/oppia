@@ -166,7 +166,7 @@ angular.module('oppia').directive('questionOpportunities', [
                       return;
                     }
                     QuestionSuggestionService.submitSuggestion($scope.question,
-                      $scope.associatedSkill, opportunity.heading);
+                      $scope.associatedSkill, opportunity.subheading);
                     $uibModalInstance.close();
                   };
                   // Checking if Question contains all requirements to enable

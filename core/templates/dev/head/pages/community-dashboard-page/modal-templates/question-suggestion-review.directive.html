@@ -17,14 +17,47 @@
       </question-editor>
     </div>
   </section>
-  <div ng-show="reviewable" class="oppia-suggestion-review-message">
-    Review message (required if rejecting):
-    <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
-  </div>
-  <div ng-show="reviewable" class="oppia-suggestion-review-message">
-    Brief Description of Changes (required if accepting):
-    <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" style="width: 100%">
-  </div>
+  <section class="oppia-reviewer-actions">
+    <div class="oppia-suggestion-review-message" ng-show="reviewable">
+      <div class="oppia-difficulty-message">Please select an appropriate difficulty for the question.</div>
+      <md-radio-group ng-model="difficulty">
+        <md-radio-button value="0.3">
+          <strong> Easy </strong>
+          <angular-html-bind html-data="skillRubrics[0].getExplanation()">
+          </angular-html-bind>
+          <div ng-if="skillRubrics[0].getExplanation() === ''">
+            <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+          </div>
+        </md-radio-button>
+
+        <md-radio-button value="0.6">
+          <strong> Medium </strong>
+          <angular-html-bind html-data="skillRubrics[1].getExplanation()">
+          </angular-html-bind>
+          <div ng-if="skillRubrics[1].getExplanation() === ''">
+            <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+          </div>
+        </md-radio-button>
+
+        <md-radio-button value="0.9">
+          <strong> Hard </strong>
+          <angular-html-bind html-data="skillRubrics[2].getExplanation()">
+          </angular-html-bind>
+          <div ng-if="skillRubrics[2].getExplanation() === ''">
+            <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+          </div>
+        </md-radio-button>
+      </md-radio-group>
+    </div>
+    <div ng-show="reviewable" class="oppia-suggestion-review-message">
+      Review message (required if rejecting):
+      <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
+    </div>
+    <div ng-show="reviewable" class="oppia-suggestion-review-message">
+      Brief Description of Changes (required if accepting):
+      <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" style="width: 100%">
+    </div>
+  </section>
 </div>
 
 <div class="modal-footer">
@@ -44,6 +77,15 @@
   .oppia-question-suggestion {
     height: 100%;
     overflow: scroll;
+  }
+  .oppia-reviewer-actions {
+    border-top: 1px solid #e5e5e5;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding: 0px 15px;
+  }
+  .oppia-difficulty-message {
+    margin-bottom: 0.5em;
   }
   .oppia-suggestion-review-message {
     margin-left: 10px;
