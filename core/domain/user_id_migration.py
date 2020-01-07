@@ -262,48 +262,6 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         rights_snapshot_model.put(update_last_updated_time=False)
 
     @staticmethod
-    def _migrate_question(rights_snapshot_model):
-        """Migrate QuestionRightsSnapshotContentModel to use the new user ID in
-        the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
-
-        Args:
-            rights_snapshot_model: QuestionRightsSnapshotContentModel. The
-                model that contains the old user IDs.
-        """
-        reconstituted_rights_model = question_models.QuestionRightsModel(
-            **rights_snapshot_model.content)
-        if reconstituted_rights_model.creator_id != feconf.SYSTEM_COMMITTER_ID:
-            user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-                reconstituted_rights_model.creator_id)
-            if not user_settings_model:
-                raise MissingUserException(
-                    reconstituted_rights_model.creator_id)
-            reconstituted_rights_model.creator_id = user_settings_model.id
-            rights_snapshot_model.content = reconstituted_rights_model.to_dict()
-            rights_snapshot_model.put(update_last_updated_time=False)
-
-    @staticmethod
-    def _migrate_skill(rights_snapshot_model):
-        """Migrate SkillRightsSnapshotContentModel to use the new user ID in
-        the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
-
-        Args:
-            rights_snapshot_model: SkillRightsSnapshotContentModel. The model
-            that contains the old user IDs.
-        """
-        reconstituted_rights_model = skill_models.SkillRightsModel(
-            **rights_snapshot_model.content)
-        if reconstituted_rights_model.creator_id != feconf.SYSTEM_COMMITTER_ID:
-            user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-                reconstituted_rights_model.creator_id)
-            if not user_settings_model:
-                raise MissingUserException(
-                    reconstituted_rights_model.creator_id)
-            reconstituted_rights_model.creator_id = user_settings_model.id
-            rights_snapshot_model.content = reconstituted_rights_model.to_dict()
-            rights_snapshot_model.put(update_last_updated_time=False)
-
-    @staticmethod
     def _migrate_topic(rights_snapshot_model):
         """Migrate TopicRightsSnapshotContentModel to use the new user ID in
         the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
@@ -325,8 +283,6 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         """Return a list of datastore class references to map over."""
         return [collection_models.CollectionRightsSnapshotContentModel,
                 exp_models.ExplorationRightsSnapshotContentModel,
-                question_models.QuestionRightsSnapshotContentModel,
-                skill_models.SkillRightsSnapshotContentModel,
                 topic_models.TopicRightsSnapshotContentModel]
 
     @staticmethod
@@ -343,16 +299,6 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                     rights_snapshot_model,
                     exp_models.ExplorationRightsSnapshotContentModel):
                 SnapshotsUserIdMigrationJob._migrate_exploration(
-                    rights_snapshot_model)
-            elif isinstance(
-                    rights_snapshot_model,
-                    question_models.QuestionRightsSnapshotContentModel):
-                SnapshotsUserIdMigrationJob._migrate_question(
-                    rights_snapshot_model)
-            elif isinstance(
-                    rights_snapshot_model,
-                    skill_models.SkillRightsSnapshotContentModel):
-                SnapshotsUserIdMigrationJob._migrate_skill(
                     rights_snapshot_model)
             elif isinstance(
                     rights_snapshot_model,
