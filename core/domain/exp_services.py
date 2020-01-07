@@ -723,6 +723,9 @@ def delete_explorations_from_subscribed_users(exploration_ids):
     Args:
         exploration_ids: list(str). The ids of the explorations to delete.
     """
+    if not exploration_ids:
+        return
+
     subscription_models = user_models.UserSubscriptionsModel.query(
         user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
     ).fetch()
