@@ -109,15 +109,6 @@ describe('Learner dashboard activity ids object factory', () => {
 
   it('should fetch the learner dashboard activity ids domain object from ' +
      'the backend summary dict', () => {
-    var learnerDashboardActivityIdsDict = {
-      incomplete_exploration_ids: ['0', '1'],
-      incomplete_collection_ids: ['2', '3'],
-      completed_exploration_ids: ['4', '5'],
-      completed_collection_ids: ['6', '7'],
-      exploration_playlist_ids: ['8', '9'],
-      collection_playlist_ids: ['10', '11']
-    };
-
     var learnerDashboardActivityIds = (
       learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
@@ -136,7 +127,7 @@ describe('Learner dashboard activity ids object factory', () => {
       ['10', '11']);
   });
 
-  it('should check if collectionId belongs to exploration playlist', () => {
+  it('should check if explorationId belongs to exploration playlist', () => {
     var learnerDashboardActivityIds = (
       learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
@@ -146,7 +137,13 @@ describe('Learner dashboard activity ids object factory', () => {
     expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('9'))
       .toBe(true);
 
-    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('7'))
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('6'))
       .toBe(false);
     expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('10'))
       .toBe(false);
@@ -162,13 +159,19 @@ describe('Learner dashboard activity ids object factory', () => {
     expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('11'))
       .toBe(true);
 
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('8'))
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('0'))
       .toBe(false);
-    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('9'))
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('6'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('8'))
       .toBe(false);
   });
 
-  it('should check if collectionId belongs to completed explorations', () => {
+  it('should check if explorationId belongs to completed explorations', () => {
     var learnerDashboardActivityIds = (
       learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
@@ -178,9 +181,15 @@ describe('Learner dashboard activity ids object factory', () => {
     expect(learnerDashboardActivityIds.belongsToCompletedExplorations('5'))
       .toBe(true);
 
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('2'))
+      .toBe(false);
     expect(learnerDashboardActivityIds.belongsToCompletedExplorations('6'))
       .toBe(false);
-    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('7'))
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('10'))
       .toBe(false);
   });
 
@@ -194,13 +203,19 @@ describe('Learner dashboard activity ids object factory', () => {
     expect(learnerDashboardActivityIds.belongsToCompletedCollections('7'))
       .toBe(true);
 
-    expect(learnerDashboardActivityIds.belongsToCompletedCollections('5'))
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('4'))
       .toBe(false);
     expect(learnerDashboardActivityIds.belongsToCompletedCollections('8'))
       .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('10'))
+      .toBe(false);
   });
 
-  it('should check if collectionId belongs to incomplete explorations', () => {
+  it('should check if explorationId belongs to incomplete explorations', () => {
     var learnerDashboardActivityIds = (
       learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
@@ -212,7 +227,13 @@ describe('Learner dashboard activity ids object factory', () => {
 
     expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('2'))
       .toBe(false);
-    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('3'))
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('6'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('10'))
       .toBe(false);
   });
 
@@ -226,9 +247,15 @@ describe('Learner dashboard activity ids object factory', () => {
     expect(learnerDashboardActivityIds.belongsToIncompleteCollections('3'))
       .toBe(true);
 
-    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('1'))
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('0'))
       .toBe(false);
     expect(learnerDashboardActivityIds.belongsToIncompleteCollections('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('6'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('10'))
       .toBe(false);
   });
 });
