@@ -32,7 +32,7 @@ RELEVANT_LCOV_LINE_PREFIXES = ['SF', 'LH', 'LF']
 # Please keep the list in alphabetical order.
 # NOTE TO REVIEWERS: Please be circumspect about any PRs which delete elements
 # from this list.
-fully_covered_filenames = [
+FULLY_COVERED_FILENAMES = [
     'AnswerDetailsImprovementTaskObjectFactory.ts',
     'CodeRepl.ts',
     'Continue.ts',
@@ -202,7 +202,9 @@ fully_covered_filenames = [
     'wrap-text-with-ellipsis.filter.ts',
 ]
 
-class LcovStanzaRelevantLines:
+
+class LcovStanzaRelevantLines(python_utils.OBJECT):
+    """Gets the relevant lines from a lcov stanza."""
 
     def __init__(self, stanza):
         """Initialize the object which provides relevant data of a lcov
@@ -225,7 +227,7 @@ class LcovStanzaRelevantLines:
         _, file_name = os.path.split(match.group(1))
         self.file_name = file_name
 
-        match = re.search('LF:(\d+)\n', stanza)
+        match = re.search(r'LF:(\d+)\n', stanza)
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the total lines of {} file.'
@@ -233,7 +235,7 @@ class LcovStanzaRelevantLines:
                 .format(file_name))
         self.total_lines = int(match.group(1))
 
-        match = re.search('LH:(\d+)\n', stanza)
+        match = re.search(r'LH:(\d+)\n', stanza)
         if match is None:
             raise Exception(
                 'It wasn\'t possible to get the covered lines of {} file.'
@@ -251,7 +253,7 @@ def run_frontend_tests_script():
             'python', '-m', 'scripts.run_frontend_tests'])
     except subprocess.CalledProcessError:
         sys.exit('The frontend tests failed. Please fix it before running the'
-        ' test coverage check.')
+                 ' test coverage check.')
 
 
 def get_stanzas_from_lcov_file():
@@ -283,10 +285,10 @@ def get_stanzas_from_lcov_file():
 
 
 def check_fully_covered_filenames_list_is_sorted():
-    """Check if fully_covered_filenames list is in alphabetical order."""
-    if fully_covered_filenames != sorted(fully_covered_filenames):
-        sys.exit('The \033[1mfully_covered_filenames\033[0m list must be kept'
-            ' in alphabetical order.')
+    """Check if FULLY_COVERED_FILENAMES list is in alphabetical order."""
+    if FULLY_COVERED_FILENAMES != sorted(FULLY_COVERED_FILENAMES):
+        sys.exit('The \033[1mFULLY_COVERED_FILENAMES\033[0m list must be kept'
+                 ' in alphabetical order.')
 
 
 def check_coverage_changes():
@@ -300,10 +302,10 @@ def check_coverage_changes():
     """
     if not os.path.exists(LCOV_FILE_PATH):
         raise Exception('Expected lcov file to be available at {}, but the'
-            ' file does not exist.'.format(LCOV_FILE_PATH))
+                        ' file does not exist.'.format(LCOV_FILE_PATH))
 
     stanzas = get_stanzas_from_lcov_file()
-    whitelist = list(fully_covered_filenames)
+    whitelist = list(FULLY_COVERED_FILENAMES)
     errors = ''
 
     for stanza in stanzas:
@@ -314,26 +316,26 @@ def check_coverage_changes():
         if file_name in whitelist:
             if total_lines != covered_lines:
                 errors += ('\033[1m{}\033[0m file is in the whitelist but its'
-                ' coverage decreased. Make sure it is fully covered'
-                ' by Karma unit tests.\n'.format(file_name))
+                           ' coverage decreased. Make sure it is fully covered'
+                           ' by Karma unit tests.\n'.format(file_name))
 
             whitelist.remove(file_name)
         else:
             if total_lines == covered_lines:
                 errors += ('\033[1m{}\033[0m file is fully covered but it\'s'
-                ' not in the "100% coverage" whitelist. Please add the file'
-                ' name in the whitelist in the file'
-                ' scripts/check_frontend_test_coverage.py.\n'
-                .format(file_name))
+                           ' not in the "100% coverage" whitelist. Please add'
+                           ' the file name in the whitelist in the file'
+                           ' scripts/check_frontend_test_coverage.py.\n'
+                           .format(file_name))
 
     if whitelist:
         for test_name in whitelist:
             errors += ('\033[1m{}\033[0m is in the frontend test coverage'
-            ' whitelist but it doesn\'t exist anymore. If you have renamed it,'
-            ' please make sure to remove the old file name and add the new file' 
-            ' name in the whitelist in the file'
-            ' scripts/check_frontend_test_coverage.py.\n'
-            .format(test_name))
+                       ' whitelist but it doesn\'t exist anymore. If you have'
+                       ' renamed it, please make sure to remove the old file'
+                       ' name and add the new file name in the whitelist in'
+                       ' the file scripts/check_frontend_test_coverage.py.\n'
+                       .format(test_name))
 
     if errors:
         python_utils.PRINT('------------------------------------')
@@ -355,6 +357,7 @@ def main():
     run_frontend_tests_script()
 
     check_coverage_changes()
+
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when wrap_up_release.py is used as a script.
