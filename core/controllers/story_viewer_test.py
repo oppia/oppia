@@ -94,7 +94,9 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             'prerequisite_skill_ids': [],
             'outline': '',
             'outline_is_finalized': False,
-            'exploration_id': None
+            'exploration_id': self.EXP_ID,
+            'exp_summary_dict': exp_summary_dict,
+            'completed': False
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),
@@ -188,7 +190,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             expected_dict = {
                 'story_title': 'Title',
                 'story_description': 'Description',
-                'story_nodes': [self.node_2, self.node_1]
+                'story_nodes': [self.node_2, self.node_1, self.node_3]
             }
             self.assertDictContainsSubset(expected_dict, json_response)
 
