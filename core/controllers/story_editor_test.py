@@ -44,8 +44,8 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
             self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description',
-            [self.story_id], [], [], [], 1)
+            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
+            'Description', [self.story_id], [], [], [], 1)
 
 
 class StoryPublicationTests(BaseStoryEditorControllerTests):
@@ -186,8 +186,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             expected_status_int=404)
 
         self.save_new_topic(
-            'topic_id_new', self.admin_id, 'Name 2', 'Description',
-            [], [], [], [], 1)
+            'topic_id_new', self.admin_id, 'Name 2', 'abbrev', None,
+            'Description', [], [], [], [], 1)
 
         # An error would be raised here also as the story is not in the given
         # topic.
@@ -260,8 +260,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # Raises error 404 even when topic is saved as the story id is not
         # associated with the new topic.
         self.save_new_topic(
-            'topic_id_new', self.admin_id, 'Name 2', 'Description',
-            [], [], [], [], 1)
+            'topic_id_new', self.admin_id, 'Name 2', 'abbrev', None,
+            'Description', [], [], [], [], 1)
         csrf_token = self.get_new_csrf_token()
 
         self.put_json(

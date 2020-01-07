@@ -15,5 +15,3 @@ jobs:
           architecture: 'x64'
       - name: Install third party
         run: python -m scripts.install_third_party_libs
-      - name: Run frontend tests
-        run: python -m scripts.run_frontend_tests --run_minified_tests --skip_install

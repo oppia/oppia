@@ -47,8 +47,13 @@ class ConfigPropertyModel(base_models.VersionedModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Config property is not related to users."""
+        """ConfigPropertyModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ConfigPropertyModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     def commit(self, committer_id, commit_cmds):
         super(ConfigPropertyModel, self).commit(committer_id, '', commit_cmds)

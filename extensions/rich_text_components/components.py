@@ -46,7 +46,8 @@ class BaseRteComponent(python_utils.OBJECT):
         'MathLatexString': objects.MathLatexString,
         'ListOfTabs': objects.ListOfTabs,
         'int': objects.Int,
-        'bool': objects.Boolean
+        'bool': objects.Boolean,
+        'SkillSelector': objects.SkillSelector
     }
 
     @classmethod
@@ -123,6 +124,10 @@ class Link(BaseRteComponent):
 
 class Math(BaseRteComponent):
     """Class for Math component."""
+
+
+class Skillreview(BaseRteComponent):
+    """Class for Skillreview component."""
 
 
 class Tabs(BaseRteComponent):

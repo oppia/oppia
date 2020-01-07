@@ -111,7 +111,7 @@ class AudioUploadHandler(base.BaseHandler):
         fs = fs_domain.AbstractFileSystem(file_system_class(
             feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(
-            self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
+            '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)
 
         self.render_json({'filename': filename})

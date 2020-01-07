@@ -38,7 +38,6 @@ import jinja_utils
 import python_utils
 import utils
 
-from google.appengine.api import users
 import webapp2
 
 current_user_services = models.Registry.import_current_user_services()
@@ -52,8 +51,13 @@ CSRF_SECRET = config_domain.ConfigProperty(
 
 
 def _clear_login_cookies(response_headers):
-    """Clears login cookies from the given response headers."""
+    """Clears login cookies from the given response headers.
 
+    Args:
+        response_headers: webapp2.ResponseHeaders.
+            Response headers are used to give a more detailed
+            context of the response.
+    """
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
     # for https:// . We just unset both below.
     cookie = http.cookies.SimpleCookie()
@@ -79,7 +83,8 @@ class LogoutPage(webapp2.RequestHandler):
         url_to_redirect_to = '/'
 
         if constants.DEV_MODE:
-            self.redirect(users.create_logout_url(url_to_redirect_to))
+            self.redirect(
+                current_user_services.create_logout_url(url_to_redirect_to))
         else:
             self.redirect(url_to_redirect_to)
 
@@ -139,24 +144,28 @@ class BaseHandler(webapp2.RequestHandler):
         # Initializes the return dict for the handlers.
         self.values = {}
 
-        self.user_id = current_user_services.get_current_user_id()
+        self.gae_id = current_user_services.get_current_gae_id()
+        self.user_id = None
         self.username = None
         self.partially_logged_in = False
+        self.user_is_scheduled_for_deletion = False
 
-        if self.user_id:
-            user_settings = user_services.get_user_settings(
-                self.user_id, strict=False)
+        if self.gae_id:
+            user_settings = user_services.get_user_settings_by_gae_id(
+                self.gae_id, strict=False)
             if user_settings is None:
                 email = current_user_services.get_current_user_email()
                 user_settings = user_services.create_new_user(
-                    self.user_id, email)
+                    self.gae_id, email)
             self.values['user_email'] = user_settings.email
+            self.user_id = user_settings.user_id
+
+            self.user_is_scheduled_for_deletion = user_settings.deleted
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                    user_services.has_fully_registered(self.user_id)):
+                    user_services.has_fully_registered(user_settings.user_id)):
                 _clear_login_cookies(self.response.headers)
                 self.partially_logged_in = True
-                self.user_id = None
             else:
                 self.username = user_settings.username
                 self.values['username'] = self.username
@@ -206,8 +215,10 @@ class BaseHandler(webapp2.RequestHandler):
 
         # In DEV_MODE, clearing cookies does not log out the user, so we
         # force-clear them by redirecting to the logout URL.
-        if constants.DEV_MODE and self.partially_logged_in:
-            self.redirect(users.create_logout_url(self.request.uri))
+        if ((constants.DEV_MODE and self.partially_logged_in) or
+                self.user_is_scheduled_for_deletion):
+            self.redirect(
+                current_user_services.create_logout_url(self.request.uri))
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
@@ -243,19 +254,35 @@ class BaseHandler(webapp2.RequestHandler):
         super(BaseHandler, self).dispatch()
 
     def get(self, *args, **kwargs):  # pylint: disable=unused-argument
-        """Base method to handle GET requests."""
+        """Base method to handle GET requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def post(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle POST requests."""
+        """Base method to handle POST requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def put(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle PUT requests."""
+        """Base method to handle PUT requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def delete(self, *args):  # pylint: disable=unused-argument
-        """Base method to handle DELETE requests."""
+        """Base method to handle DELETE requests.
+
+        Raises:
+            PageNotFoundException: Page not found error (error code 404).
+        """
         raise self.PageNotFoundException
 
     def render_json(self, values):
@@ -276,7 +303,13 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.write('%s%s' % (feconf.XSSI_PREFIX, json_output))
 
     def render_downloadable_file(self, values, filename, content_type):
-        """Prepares downloadable content to be sent to the client."""
+        """Prepares downloadable content to be sent to the client.
+
+        Args:
+            values: dict. The key-value pairs to include in the response.
+            filename: str. The name of the file to be rendered.
+            content_type: str. The type of file to be rendered.
+        """
         self.response.headers[b'Content-Type'] = python_utils.convert_to_bytes(
             content_type)
         self.response.headers[

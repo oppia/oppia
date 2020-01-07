@@ -367,17 +367,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             expected_skill_mastery_dict,
             observed_skill_mastery.to_dict())
 
-    def test_skill_rights_to_dict(self):
-        expected_dict = {
-            'creator_id': 'user',
-            'skill_is_private': True,
-            'skill_id': 'skill_id'
-        }
-        skill_rights = skill_domain.SkillRights('skill_id', True, 'user')
-        self.assertDictEqual(expected_dict, skill_rights.to_dict())
-
     def test_update_worked_examples(self):
-        worked_examples_dict = [{
+        worked_examples_dict_list = [{
             'content_id': 'worked_example_1',
             'html': '<p>Worked example</p>'
         }, {
@@ -385,19 +376,18 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'html': '<p>Another worked example</p>'
         }]
 
-        self.skill.update_worked_examples(worked_examples_dict)
+        worked_examples_object_list = [
+            state_domain.SubtitledHtml.from_dict(worked_example)
+            for worked_example in worked_examples_dict_list]
+
+        self.skill.update_worked_examples(worked_examples_object_list)
         self.skill.validate()
 
         # Delete the last worked_example.
-        worked_examples_dict.pop()
+        worked_examples_object_list.pop()
 
-        self.skill.update_worked_examples(worked_examples_dict)
+        self.skill.update_worked_examples(worked_examples_object_list)
         self.skill.validate()
-
-    def test_skill_rights_is_creator(self):
-        skill_rights = skill_domain.SkillRights(self.SKILL_ID, True, 'user')
-        self.assertTrue(skill_rights.is_creator('user'))
-        self.assertFalse(skill_rights.is_creator('fakeuser'))
 
     def test_require_valid_description_with_empty_description_raise_error(self):
         with self.assertRaisesRegexp(
@@ -623,51 +613,6 @@ class SkillChangeTests(test_utils.GenericTestBase):
         }
         skill_change_object = skill_domain.SkillChange(skill_change_dict)
         self.assertEqual(skill_change_object.to_dict(), skill_change_dict)
-
-
-class SkillRightsChangeTests(test_utils.GenericTestBase):
-
-    def test_skill_rights_change_object_with_missing_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Missing cmd key in change dict'):
-            skill_domain.SkillRightsChange({'invalid': 'data'})
-
-    def test_skill_change_rights_object_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Command invalid is not allowed'):
-            skill_domain.SkillRightsChange({'cmd': 'invalid'})
-
-    def test_skill_rights_change_object_with_extra_attribute_in_cmd(self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'The following extra attributes are present: invalid')):
-            skill_domain.SkillRightsChange({
-                'cmd': 'publish_skill',
-                'invalid': 'invalid'
-            })
-
-    def test_skill_rights_change_object_with_create_new(self):
-        skill_rights_change_object = skill_domain.SkillRightsChange({
-            'cmd': 'create_new'
-        })
-
-        self.assertEqual(skill_rights_change_object.cmd, 'create_new')
-
-    def test_skill_rights_change_object_with_publish_skill(self):
-        skill_rights_change_object = skill_domain.SkillRightsChange({
-            'cmd': 'publish_skill'
-        })
-
-        self.assertEqual(skill_rights_change_object.cmd, 'publish_skill')
-
-    def test_to_dict(self):
-        skill_rights_change_dict = {
-            'cmd': 'publish_skill'
-        }
-        skill_rights_change_object = skill_domain.SkillRightsChange(
-            skill_rights_change_dict)
-        self.assertEqual(
-            skill_rights_change_object.to_dict(), skill_rights_change_dict)
 
 
 class SkillSummaryTests(test_utils.GenericTestBase):
