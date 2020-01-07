@@ -180,7 +180,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         def mock_sys_exit(error_message): # pylint: disable=unused-argument
             check_function_calls['sys_exit_is_called'] = True
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
-        with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap:
+        with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap: # pylint: disable=line-too-long
             with fully_covered_tests_swap:
                 check_frontend_coverage.check_coverage_changes()
             self.assertEqual(
@@ -307,7 +307,7 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         def mock_sys_exit(error_message): # pylint: disable=unused-argument
             check_function_calls['sys_exit_is_called'] = True
         sys_exit_swap = self.swap(sys, 'exit', mock_sys_exit)
-        with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap:
+        with sys_exit_swap, self.exists_swap, self.open_file_swap, self.print_swap: # pylint: disable=line-too-long
             with fully_covered_tests_swap:
                 (check_frontend_coverage
                  .check_fully_covered_filenames_list_is_sorted())
