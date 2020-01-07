@@ -20,7 +20,7 @@ angular.module('oppia').factory('QuestionSuggestionService', [
   '$http', function($http) {
     return {
       submitSuggestion: function(
-        question, associatedSkill, topicName, onSuccess) {
+          question, associatedSkill, topicName, onSuccess) {
         var url = '/suggestionhandler/';
         var data = {
           suggestion_type: 'add_question',
