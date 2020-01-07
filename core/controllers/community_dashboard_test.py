@@ -74,7 +74,6 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.skill_ids = [self.skill_id_0, self.skill_id_1]
         for skill_id in self.skill_ids:
             self.save_new_skill(skill_id, self.admin_id, 'skill_description')
-            skill_services.publish_skill(skill_id, self.admin_id)
             topic_services.add_uncategorized_skill(
                 self.admin_id, '0', skill_id)
 
