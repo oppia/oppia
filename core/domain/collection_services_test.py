@@ -888,6 +888,10 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_models.CollectionRightsSnapshotContentModel.get_by_id(
                 collection_rights_snapshot_id))
 
+    def test_deletion_of_multiple_collections_empty(self):
+        """Test that delete_collections with empty list works correctly."""
+        collection_services.delete_collections(self.owner_id, [])
+
     def test_soft_deletion_of_multiple_collections(self):
         """Test that soft deletion of multiple collections works correctly."""
         # TODO(sll): Add tests for deletion of states and version snapshots.

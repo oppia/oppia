@@ -62,6 +62,7 @@ class UserDeletionOneOffJobTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_repeated_migration(self):
         output = self._run_one_off_job()
@@ -123,6 +124,7 @@ class VerifyUserDeletionOneOffJobTests(test_utils.GenericTestBase):
             id=self.user_1_id, exploration_ids=[], collection_ids=[]
         ).put()
         wipeout_service.pre_delete_user(self.user_1_id)
+        self.process_and_flush_pending_tasks()
 
     def test_not_deleted(self):
         output = self._run_one_off_job()
