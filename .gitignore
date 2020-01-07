@@ -32,6 +32,7 @@ venv/
 .idea
 .vagrant/*
 .lock
+.local/*
 yarn-error.log
 
 # Oppia uses cache slugs for various resources and we need separate resource
