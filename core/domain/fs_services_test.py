@@ -38,7 +38,7 @@ class FileSystemServicesTests(test_utils.GenericTestBase):
             file_system = fs_services.get_entity_file_system_class()
             self.assertIsInstance(
                 file_system(feconf.ENTITY_TYPE_EXPLORATION, 'entity_id'),
-                fs_domain.DatastoreBackedFileSystem)
+                fs_domain.GcsFileSystem)
 
     def test_get_exploration_file_system_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -70,7 +70,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             encoding=None) as f:
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
         self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
         self.assertEqual(
@@ -78,7 +78,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
         self.assertEqual(
             fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
         fs_services.save_original_and_compressed_versions_of_image(
-            self.USER, self.FILENAME, 'exploration', self.EXPLORATION_ID,
+            self.FILENAME, 'exploration', self.EXPLORATION_ID,
             original_image_content, 'image')
         self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
         self.assertEqual(
@@ -110,7 +110,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
             fs_services.save_original_and_compressed_versions_of_image(
-                self.USER, self.FILENAME, 'exploration', self.EXPLORATION_ID,
+                self.FILENAME, 'exploration', self.EXPLORATION_ID,
                 original_image_content, 'image')
 
             self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
@@ -155,7 +155,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
             self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
             fs_services.save_original_and_compressed_versions_of_image(
-                self.USER, self.FILENAME, 'exploration', self.EXPLORATION_ID,
+                self.FILENAME, 'exploration', self.EXPLORATION_ID,
                 original_image_content, 'image')
 
             self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
@@ -182,3 +182,34 @@ class SaveOriginalAndCompressedVersionsOfImageTests(test_utils.GenericTestBase):
                 gae_image_services.get_image_dimensions(
                     micro_image_content),
                 (22, 22))
+
+class FileSystemClassifierDataTests(test_utils.GenericTestBase):
+    """Unit tests for storing, reading and deleting classifier data."""
+    
+    def setUp(self):
+        super(FileSystemClassifierDataTests, self).setUp()
+        self.fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, 'exp_id'))
+        self.classifier_data = {
+            'param1': 40,
+            'param2': [34.2, 54.13, 95.23],
+            'submodel': {
+                'param1': 12
+            }
+        }
+
+    def test_save_and_get_classifier_data(self):
+        """Test that classifier data is stored and retrieved correctly."""
+        fs_services.save_classifier_data(
+            'exp_id', 'job_id', self.classifier_data)
+        classifier_data = fs_services.read_classifier_data('exp_id', 'job_id')
+        self.assertEqual(classifier_data, self.classifier_data)
+    
+    def test_remove_classifier_data(self):
+        """Test that classifier data is removed upon deletion."""
+        fs_services.save_classifier_data(
+            'exp_id', 'job_id', self.classifier_data)
+        self.assertTrue(self.fs.isfile('job_id-classifier-data.json'))
+        fs_services.delete_classifier_data('exp_id', 'job_id')
+        self.assertFalse(self.fs.isfile('job_id-classifier-data.json'))
