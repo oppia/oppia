@@ -145,7 +145,7 @@ angular.module('oppia').directive('questionOpportunities', [
                               .createFromBackendDict(misconceptionsBackendDict);
                           });
                     }, function(error) {
-                      AlertsService.addWarning();
+                      AlertsService.addWarning('Error populating skill.');
                     });
                   $scope.removeErrors = function() {
                     $scope.validationError = null;
@@ -168,6 +168,8 @@ angular.module('oppia').directive('questionOpportunities', [
                     QuestionSuggestionService.submitSuggestion($scope.question,
                       $scope.associatedSkill, opportunity.subheading);
                     $uibModalInstance.close();
+                    AlertsService.addSuccessMessage(
+                      'Submitted question suggestion.');
                   };
                   // Checking if Question contains all requirements to enable
                   // Save and Publish Question

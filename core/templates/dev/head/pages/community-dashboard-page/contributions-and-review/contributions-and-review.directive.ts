@@ -34,6 +34,7 @@ require(
 require(
   'pages/community-dashboard-page/services/' +
   'contribution-and-review.service.ts');
+require('services/alerts.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').directive('contributionsAndReview', [
@@ -48,10 +49,10 @@ angular.module('oppia').directive('contributionsAndReview', [
         'contributions-and-review.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$uibModal', 'ContributionAndReviewService',
+        '$filter', '$uibModal', 'AlertsService', 'ContributionAndReviewService',
         'QuestionObjectFactory', 'UserService',
         function(
-            $filter, $uibModal, ContributionAndReviewService,
+            $filter, $uibModal, AlertsService, ContributionAndReviewService,
             QuestionObjectFactory, UserService) {
           var SUGGESTION_LABELS = {
             review: {
@@ -230,6 +231,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                         reviewMessage: $scope.reviewMessage,
                         skillDifficulty: $scope.difficulty
                       });
+                    AlertsService.addSuccessMessage(
+                      'Accepted question suggestion.');
                   };
 
                   $scope.reject = function() {
@@ -239,6 +242,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                         action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
                         reviewMessage: $scope.reviewMessage
                       });
+                    AlertsService.addSuccessMessage(
+                      'Rejected question suggestion.');
                   };
 
                   $scope.cancel = function() {
