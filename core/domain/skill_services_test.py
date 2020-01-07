@@ -362,52 +362,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
 
-    def test_get_multi_skill_rights(self):
-        skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_1, self.USER_ID, 'Description')
-        skill_rights = skill_services.get_multi_skill_rights(
-            [self.SKILL_ID, skill_id_1])
-        self.assertEqual(skill_rights[0].id, self.SKILL_ID)
-        self.assertEqual(skill_rights[1].id, skill_id_1)
-
-    def test_get_multi_skill_rights_when_skill_doesnt_exist(self):
-        skill_id_1 = skill_services.get_new_skill_id()
-        skill_rights = skill_services.get_multi_skill_rights(
-            [self.SKILL_ID, skill_id_1])
-        self.assertEqual(skill_rights[0].id, self.SKILL_ID)
-        self.assertEqual(skill_rights[1], None)
-
-    def test_get_unpublished_skill_rights_by_creator(self):
-        self.save_new_skill(
-            'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-        self.save_new_skill(
-            'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
-            skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-                state_domain.RecordedVoiceovers.from_dict(
-                    {'voiceovers_mapping': {'1': {}, '2': {}}}),
-                state_domain.WrittenTranslations.from_dict(
-                    {'translations_mapping': {'1': {}, '2': {}}})))
-
-        skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
-            self.user_id_admin)
-        skill_ids = [skill_rights_obj.id for skill_rights_obj in skill_rights]
-        self.assertListEqual(skill_ids, ['skill_a', 'skill_b'])
-
-        skill_services.publish_skill(self.SKILL_ID, self.user_id_admin)
-        skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
-            self.user_id_admin)
-        skill_ids = [skill_rights_obj.id for skill_rights_obj in skill_rights]
-        self.assertListEqual(skill_ids, ['skill_a', 'skill_b'])
-
     def test_get_multi_skills(self):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
@@ -446,7 +400,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_skill_from_model_with_invalid_skill_contents_schema_version(
             self):
-        skill_services.create_new_skill_rights('skill_id', self.user_id_admin)
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -474,7 +427,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_skill_from_model_with_invalid_misconceptions_schema_version(
             self):
-        skill_services.create_new_skill_rights('skill_id', self.user_id_admin)
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -501,7 +453,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_from_model(model)
 
     def test_get_skill_from_model_with_invalid_rubric_schema_version(self):
-        skill_services.create_new_skill_rights('skill_id', self.user_id_admin)
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -561,28 +512,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected a commit message, received none.'):
             skill_services.update_skill(
                 self.USER_ID, self.SKILL_ID, changelist, '')
-
-    def test_get_skill_rights_with_invalid_skill_id(self):
-        skill_rights = skill_services.get_skill_rights(
-            'invalid_skill_id', strict=False)
-        self.assertIsNone(skill_rights)
-
-    def test_cannot_publish_skill_with_invalid_skill_id(self):
-        with self.assertRaisesRegexp(
-            Exception, 'The given skill does not exist.'):
-            skill_services.publish_skill('invalid_skill_id', self.USER_ID)
-
-    def test_cannot_publish_already_published_skill(self):
-        skill_services.publish_skill(self.SKILL_ID, self.user_id_admin)
-        with self.assertRaisesRegexp(
-            Exception, 'The skill is already published.'):
-            skill_services.publish_skill(self.SKILL_ID, self.user_id_admin)
-
-    def test_normal_user_cannot_publish_skill(self):
-        with self.assertRaisesRegexp(
-            Exception,
-            'The user does not have enough rights to publish the skill.'):
-            skill_services.publish_skill(self.SKILL_ID, self.USER_ID)
 
     def test_cannot_update_skill_with_empty_changelist(self):
         with self.assertRaisesRegexp(
@@ -973,7 +902,6 @@ class MockSkillObject(skill_domain.Skill):
 class SkillMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_skill_contents_to_latest_schema(self):
-        skill_services.create_new_skill_rights('skill_id', 'user_id_admin')
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -1018,7 +946,6 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(skill.skill_contents_schema_version, 2)
 
     def test_migrate_misconceptions_to_latest_schema(self):
-        skill_services.create_new_skill_rights('skill_id', 'user_id_admin')
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })
@@ -1068,7 +995,6 @@ class SkillMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(skill.misconceptions[0].must_be_addressed, True)
 
     def test_migrate_rubrics_to_latest_schema(self):
-        skill_services.create_new_skill_rights('skill_id', 'user_id_admin')
         commit_cmd = skill_domain.SkillChange({
             'cmd': skill_domain.CMD_CREATE_NEW
         })

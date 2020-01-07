@@ -1,24 +1,10 @@
 <div role="form" class="form-horizontal topic-editor">
   <md-card class="oppia-page-card oppia-long-text">
-    <div class="form-group">
-      <label class="form-heading">Topic Thumbnail</label>
-      <h4 ng-if="!topic.getThumbnailFilename()" style="color: gray;">
-        Upload a 150 x 150 px thumbnail image for the topic
-      </h4>
-      <div>
-        <div class="oppia-editable-section float-left" title="Change Topic Thumbnail"
-             style="height: 150px; width: 150px">
-          <div class="oppia-click-to-start-editing protractor-test-photo-clickable"
-               ng-click="showEditThumbnailModal()">
-          </div>
-          <i class="material-icons oppia-editor-edit-icon" style="top: 8px; right: 8px;">&#xE254;</i>
-          <img ng-if="editableThumbnailDataUrl"
-               ng-src="<[editableThumbnailDataUrl]>"
-               class="img-thumbnail protractor-test-custom-photo">
-          <img ng-if="!editableThumbnailDataUrl" ng-src="<[getStaticImageUrl('/general/no_profile_picture.png')]>" class="img-thumbnail">
-        </div>
-      </div>
-    </div>
+    <!-- Move this form into a separate directive -->
+    <thumbnail-uploader disabled="!topicRights.canEditTopic()"
+                        editable-thumbnail-data-url="editableThumbnailDataUrl"
+                        update-filename="updateTopicThumbnailFilename">
+    </thumbnail-uploader>
 
     <div class="topic-name">
       <label for="topicName" class="form-heading">Topic Name</label>
@@ -77,6 +63,10 @@
 </div>
 
 <style>
+  thumbnail-uploader {
+    margin-bottom: 15px;
+  }
+
   .topic-editor textarea {
     resize: vertical;
   }

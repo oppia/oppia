@@ -66,15 +66,11 @@ angular.module('oppia').directive('stateHintsEditor', [
             UrlInterpolationService, HintObjectFactory, StateSolutionService) {
           $scope.EditabilityService = EditabilityService;
           $scope.StateHintsService = StateHintsService;
-          $scope.activeHintIndex = null;
+          StateHintsService.setActiveHintIndex(null);
           $scope.canEdit = EditabilityService.isEditable();
 
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
-
-          $scope.$on('stateEditorInitialized', function(evt, stateData) {
-            $scope.activeHintIndex = null;
-          });
 
           var _getExistingHintsContentIds = function() {
             var existingContentIds = [];
@@ -102,7 +98,7 @@ angular.module('oppia').directive('stateHintsEditor', [
           };
 
           $scope.changeActiveHintIndex = function(newIndex) {
-            var currentActiveIndex = $scope.activeHintIndex;
+            var currentActiveIndex = StateHintsService.getActiveHintIndex();
             if (currentActiveIndex !== null && (
               !StateHintsService.displayed[currentActiveIndex]
                 .hintContent.getHtml())) {
@@ -118,10 +114,10 @@ angular.module('oppia').directive('stateHintsEditor', [
               }
             }
             // If the current hint is being clicked on again, close it.
-            if (newIndex === $scope.activeHintIndex) {
-              $scope.activeHintIndex = null;
+            if (newIndex === StateHintsService.getActiveHintIndex()) {
+              StateHintsService.setActiveHintIndex(null);
             } else {
-              $scope.activeHintIndex = newIndex;
+              StateHintsService.setActiveHintIndex(newIndex);
             }
           };
 
@@ -195,7 +191,7 @@ angular.module('oppia').directive('stateHintsEditor', [
             tolerance: 'pointer',
             start: function(e, ui) {
               $rootScope.$broadcast('externalSave');
-              $scope.activeHintIndex = null;
+              StateHintsService.setActiveHintIndex(null);
               ui.placeholder.height(ui.item.height());
             },
             stop: function() {
@@ -276,8 +272,8 @@ angular.module('oppia').directive('stateHintsEditor', [
                 $scope.onSaveHints(StateHintsService.displayed);
               }
 
-              if (index === $scope.activeHintIndex) {
-                $scope.activeHintIndex = null;
+              if (index === StateHintsService.getActiveHintIndex()) {
+                StateHintsService.setActiveHintIndex(null);
               }
             });
           };
