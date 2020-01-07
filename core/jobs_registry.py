@@ -141,14 +141,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileMetadataModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .FileMetadataSnapshotMetadataModelAuditOneOffJob),
-    prod_validation_jobs_one_off.FileMetadataSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionModelAuditOneOffJob,

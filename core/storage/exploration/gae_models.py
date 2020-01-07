@@ -24,6 +24,7 @@ from constants import constants
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
+import python_utils
 
 from google.appengine.ext import ndb
 
@@ -166,6 +167,48 @@ class ExplorationModel(base_models.VersionedModel):
         )
         exploration_commit_log.exploration_id = self.id
         exploration_commit_log.put()
+
+    @classmethod
+    def delete_multi(cls, entity_ids, committer_id,
+                     commit_message, force_deletion=False):
+        """Deletes the given cls instances with the given entity_ids.
+
+        Note that this extends the superclass method.
+
+        Args:
+            entity_ids: list(str). Ids of entities to delete.
+            committer_id: str. The user_id of the user who committed the change.
+            commit_message: str. The commit description message.
+            force_deletion: bool. If True these models are deleted completely
+                from storage, otherwise there are only marked as deleted.
+                Default is False.
+        """
+        super(ExplorationModel, cls).delete_multi(
+            entity_ids, committer_id,
+            commit_message, force_deletion=force_deletion)
+
+        if not force_deletion:
+            committer_user_settings_model = (
+                user_models.UserSettingsModel.get_by_id(committer_id))
+            committer_username = (
+                committer_user_settings_model.username
+                if committer_user_settings_model else '')
+
+            commit_log_models = []
+            exp_rights_models = ExplorationRightsModel.get_multi(
+                entity_ids, include_deleted=True)
+            versioned_models = cls.get_multi(entity_ids, include_deleted=True)
+            for model, rights_model in python_utils.ZIP(versioned_models,
+                                                        exp_rights_models):
+                exploration_commit_log = ExplorationCommitLogEntryModel.create(
+                    model.id, model.version, committer_id, committer_username,
+                    cls._COMMIT_TYPE_DELETE,
+                    commit_message, [{'cmd': cls.CMD_DELETE_COMMIT}],
+                    rights_model.status, rights_model.community_owned
+                )
+                exploration_commit_log.exploration_id = model.id
+                commit_log_models.append(exploration_commit_log)
+            ndb.put_multi_async(commit_log_models)
 
 
 class ExplorationRightsSnapshotMetadataModel(
