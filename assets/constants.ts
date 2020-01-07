@@ -561,7 +561,7 @@ export = {
   // This is split up so as to access the viewers in production without
   // exposing the POST and PUT endpoints just yet.
   "ENABLE_NEW_STRUCTURE_PLAYERS": true,
-  "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": true,
+  "ENABLE_NEW_STRUCTURE_VIEWER_UPDATES": false,
 
   "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": true,
 

@@ -104,11 +104,12 @@
             translate="I18N_PLAYER_RECOMMEND_EXPLORATIONS">
       </span>
 
-      <div ng-if="!inStoryMode" class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
+      <div class="oppia-exp-summary-tiles-container conversation-skin-recommended-activities-container">
         <exploration-summary-tile ng-repeat="exp in (recommendedExplorationSummaries|limitTo:3) track by $index"
                                   collection-id="collectionId"
                                   exploration-id="exp.id"
                                   exploration-title="exp.title"
+                                  node-id="nextNodeId"
                                   parent-exploration-ids="parentExplorationIds"
                                   last-updated-msec="exp.last_updated_msec"
                                   objective="exp.objective"

@@ -822,7 +822,10 @@ angular.module('oppia').directive('conversationSkin', [
                         if (storyNodes[i].isCompleted()) {
                           completedStoryNodes.push(storyNodes[i]);
                         } else {
-                          $scope.nextStoryNode = storyNodes[i];
+                          var nextStoryNode = storyNodes[i];
+                          $scope.nextNodeId = nextStoryNode.getId();
+                          $scope.recommendedExplorationSummaries = [
+                            nextStoryNode.getExplorationSummaryObject()];
                           break;
                         }
                       }
