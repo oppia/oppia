@@ -227,11 +227,7 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
         """Dispatches an incoming event to the ContinuousComputation
         classes which listen to events of that type.
 
-<<<<<<< HEAD
-        Args: 
-=======
         Args :
->>>>>>> 750bb3c9fc9db3dc6b36242d8c6ac0515c81c8a8
             event_id: str. The id of event.
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
