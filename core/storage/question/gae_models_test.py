@@ -536,16 +536,12 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         question_summary_model = question_models.QuestionSummaryModel(
             id='question',
-            creator_id='user_id',
             question_content='Question',
             question_model_created_on=datetime.datetime.utcnow(),
             question_model_last_updated=datetime.datetime.utcnow()
         )
         question_summary_model.put()
 
-        self.assertTrue(
-            question_models.QuestionSummaryModel
-            .has_reference_to_user_id('user_id'))
         self.assertFalse(
             question_models.QuestionSummaryModel
             .has_reference_to_user_id('user_id_x'))
@@ -553,109 +549,4 @@ class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             question_models.QuestionSummaryModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                question_models.QuestionSummaryModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                question_models.QuestionSummaryModel.creator_id))
-
-    def test_get_by_creator_id(self):
-        question_summary_model_1 = question_models.QuestionSummaryModel(
-            id='question_1',
-            creator_id='user',
-            question_content='Question 1',
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_model_last_updated=datetime.datetime.utcnow()
-        )
-        question_summary_model_2 = question_models.QuestionSummaryModel(
-            id='question_2',
-            creator_id='user',
-            question_content='Question 2',
-            question_model_created_on=datetime.datetime.utcnow(),
-            question_model_last_updated=datetime.datetime.utcnow()
-        )
-        question_summary_model_1.put()
-        question_summary_model_2.put()
-
-        question_summaries = (
-            question_models.QuestionSummaryModel.get_by_creator_id('user'))
-        self.assertEqual(len(question_summaries), 2)
-        self.assertEqual(question_summaries[0].id, 'question_1')
-        self.assertEqual(question_summaries[1].id, 'question_2')
-
-
-class QuestionRightsModelUnitTest(test_utils.GenericTestBase):
-    """Test the QuestionRightsModel class."""
-
-    def test_get_deletion_policy(self):
-        self.assertEqual(
-            question_models.QuestionRightsModel.get_deletion_policy(),
-            base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE)
-
-    def test_has_reference_to_user_id(self):
-        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
-            question_services.create_new_question_rights(
-                'question_id', 'owner_id')
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('owner_id'))
-            # The question_rights.creator_id is by default the same as
-            # committer_id, we change it to different value so that we really
-            # check all separate fields.
-            question_rights = question_models.QuestionRightsModel.get(
-                'question_id')
-            question_rights.creator_id = 'creator_id'
-            question_rights.commit(
-                'committer_id',
-                'Update question rights',
-                [{'cmd': question_domain.CMD_CREATE_NEW}])
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('owner_id'))
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('creator_id'))
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('committer_id'))
-            self.assertFalse(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('x_id'))
-
-            # We change the creator_id to to see that the creator_id is still
-            # found in QuestionRightsSnapshotContentModel.
-            question_rights = question_models.QuestionRightsModel.get(
-                'question_id')
-            question_rights.creator_id = 'different_creator_id'
-            question_rights.commit(
-                'committer_id',
-                'Update question rights again',
-                [{'cmd': question_domain.CMD_CREATE_NEW}])
-
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('creator_id'))
-            self.assertTrue(
-                question_models.QuestionRightsModel
-                .has_reference_to_user_id('different_creator_id'))
-
-    def test_get_user_id_migration_policy(self):
-        self.assertEqual(
-            question_models.QuestionRightsModel.get_user_id_migration_policy(),
-            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
-
-    def test_get_user_id_migration_field(self):
-        # We need to compare the field types not the field values, thus using
-        # python_utils.UNICODE.
-        self.assertEqual(
-            python_utils.UNICODE(
-                question_models.QuestionRightsModel
-                .get_user_id_migration_field()),
-            python_utils.UNICODE(
-                question_models.QuestionRightsModel.creator_id))
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)

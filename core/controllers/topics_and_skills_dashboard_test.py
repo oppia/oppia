@@ -46,7 +46,6 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
             self.linked_skill_id, self.admin_id, 'Description 3')
-        skill_services.publish_skill(self.linked_skill_id, self.admin_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'abbrev', None,
             'Description', [], [], [self.linked_skill_id], [], 1)
@@ -59,10 +58,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         # Check that non-admins or non-topic managers cannot access the
         # topics and skills dashboard data.
         skill_id = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, 'Description')
-        skill_services.publish_skill(skill_id, self.admin_id)
-        self.save_new_skill(skill_id_2, self.admin_id, 'Description 2')
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
@@ -89,11 +85,6 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
-        self.assertEqual(
-            len(json_response['unpublished_skill_summary_dicts']), 1)
-        self.assertEqual(
-            json_response['unpublished_skill_summary_dicts'][0]['id'],
-            skill_id_2)
         self.assertEqual(
             json_response['can_delete_topic'], True)
         self.assertEqual(
@@ -128,8 +119,6 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
-        self.assertEqual(
-            len(json_response['unpublished_skill_summary_dicts']), 0)
         self.assertEqual(
             json_response['can_delete_topic'], False)
         self.assertEqual(

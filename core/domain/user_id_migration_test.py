@@ -624,7 +624,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             ['FAILURE - ExplorationRightsSnapshotContentModel',
              [self.WRONG_GAE_ID]],
             output)
-    
+
     def test_migrate_exp_rights_snapshot_model_wrong_field(self):
         original_rights_model = exp_models.ExplorationRightsModel(
             id=self.SNAPSHOT_ID,
@@ -672,89 +672,6 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
         self.assertEqual(
             [self.USER_1_USER_ID, self.USER_3_USER_ID],
             migrated_rights_model.viewer_ids)
-
-
-    def test_migrate_question_rights_snapshot_model(self):
-        original_rights_model = question_models.QuestionRightsModel(
-            id=self.SNAPSHOT_ID,
-            creator_id=self.USER_1_GAE_ID)
-        original_rights_snapshot_model = (
-            question_models.QuestionRightsSnapshotContentModel(
-                id=self.SNAPSHOT_ID,
-                content=original_rights_model.to_dict()))
-        original_rights_snapshot_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(
-            output[0], [u'SUCCESS - QuestionRightsSnapshotContentModel', 1])
-
-        migrated_rights_snapshot_model = (
-            question_models.QuestionRightsSnapshotContentModel.get_by_id(
-                self.SNAPSHOT_ID))
-        self.assertEqual(
-            original_rights_snapshot_model.last_updated,
-            migrated_rights_snapshot_model.last_updated)
-
-        migrated_rights_model = question_models.QuestionRightsModel(
-            **migrated_rights_snapshot_model.content)
-        self.assertEqual(self.USER_1_USER_ID, migrated_rights_model.creator_id)
-
-    def test_migrate_question_rights_snapshot_model_wrong_id(self):
-        original_rights_model = question_models.QuestionRightsModel(
-            id=self.SNAPSHOT_ID,
-            creator_id=self.WRONG_GAE_ID)
-        original_rights_snapshot_model = (
-            question_models.QuestionRightsSnapshotContentModel(
-                id=self.SNAPSHOT_ID,
-                content=original_rights_model.to_dict()))
-        original_rights_snapshot_model.put()
-
-        output = self._run_one_off_job()
-        self.assertIn(
-            ['FAILURE - QuestionRightsSnapshotContentModel',
-             [self.WRONG_GAE_ID]],
-            output)
-
-    def test_migrate_skill_rights_snapshot_model(self):
-        original_rights_model = skill_models.SkillRightsModel(
-            id=self.SNAPSHOT_ID,
-            creator_id=self.USER_1_GAE_ID)
-        original_rights_snapshot_model = (
-            skill_models.SkillRightsSnapshotContentModel(
-                id=self.SNAPSHOT_ID,
-                content=original_rights_model.to_dict()))
-        original_rights_snapshot_model.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(
-            output[0], [u'SUCCESS - SkillRightsSnapshotContentModel', 1])
-
-        migrated_rights_snapshot_model = (
-            skill_models.SkillRightsSnapshotContentModel.get_by_id(
-                self.SNAPSHOT_ID))
-        self.assertEqual(
-            original_rights_snapshot_model.last_updated,
-            migrated_rights_snapshot_model.last_updated)
-
-        migrated_rights_model = skill_models.SkillRightsModel(
-            **migrated_rights_snapshot_model.content)
-        self.assertEqual(self.USER_1_USER_ID, migrated_rights_model.creator_id)
-
-    def test_migrate_skill_rights_snapshot_model_wrong_id(self):
-        original_rights_model = skill_models.SkillRightsModel(
-            id=self.SNAPSHOT_ID,
-            creator_id=self.WRONG_GAE_ID)
-        original_rights_snapshot_model = (
-            skill_models.SkillRightsSnapshotContentModel(
-                id=self.SNAPSHOT_ID,
-                content=original_rights_model.to_dict()))
-        original_rights_snapshot_model.put()
-
-        output = self._run_one_off_job()
-        self.assertIn(
-            ['FAILURE - SkillRightsSnapshotContentModel',
-             [self.WRONG_GAE_ID]],
-            output)
 
     def test_migrate_topic_rights_snapshot_model(self):
         original_rights_model = topic_models.TopicRightsModel(
@@ -895,13 +812,6 @@ class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
             last_played_state_name='start'
         ).put()
 
-        original_rights_model = skill_models.SkillRightsModel(
-            id='1', creator_id=self.USER_1_GAE_ID)
-        original_rights_snapshot_model = (
-            skill_models.SkillRightsSnapshotContentModel(
-                id='1', content=original_rights_model.to_dict()))
-        original_rights_snapshot_model.put()
-
         # Model with DELETION_POLICY equal to NOT_APPLICABLE.
         activity_models.ActivityReferencesModel(id='some_id').put()
 
@@ -910,8 +820,7 @@ class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
         output = [
             key[1] for key in output
             if key[0] == 'FAILURE - HAS REFERENCE TO GAE ID'][0]
-        self.assertEqual(len(output), 4)
-        self.assertIn((self.USER_1_GAE_ID, 'SkillRightsModel'), output)
+        self.assertEqual(len(output), 3)
         self.assertIn((self.USER_1_GAE_ID, 'CompletedActivitiesModel'), output)
         self.assertIn((self.USER_2_GAE_ID, 'CompletedActivitiesModel'), output)
         self.assertIn(

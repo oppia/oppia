@@ -1593,7 +1593,6 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
-        question_services.create_new_question_rights(question_id, owner_id)
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=self.VERSION_27_STATE_DICT,
@@ -1694,7 +1693,6 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
         """
-        skill_services.create_new_skill_rights(skill_id, owner_id)
         if rubrics is None:
             rubrics = [
                 skill_domain.Rubric(

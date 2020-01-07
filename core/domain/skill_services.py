@@ -415,7 +415,6 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
             given skill.
     """
     skill.validate()
-    create_new_skill_rights(skill.id, committer_id)
     model = skill_models.SkillModel(
         id=skill.id,
         description=skill.description,
@@ -648,55 +647,6 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     create_skill_summary(skill.id)
 
 
-def publish_skill(skill_id, committer_id):
-    """Marks the given skill as published.
-
-    Args:
-        skill_id: str. The id of the given skill.
-        committer_id: str. The user id of the committer.
-
-    Raises:
-        Exception. The given skill does not exist.
-        Exception. The skill is already published.
-        Exception. The user does not have permissions to publish the skill.
-    """
-    skill_rights = get_skill_rights(skill_id, strict=False)
-    if skill_rights is None:
-        raise Exception('The given skill does not exist.')
-    user = user_services.UserActionsInfo(committer_id)
-    if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
-        raise Exception(
-            'The user does not have enough rights to publish the skill.')
-
-    if not skill_rights.skill_is_private:
-        raise Exception('The skill is already published.')
-    skill_rights.skill_is_private = False
-    commit_cmds = [skill_domain.SkillRightsChange({
-        'cmd': skill_domain.CMD_PUBLISH_SKILL
-    })]
-    save_skill_rights(
-        skill_rights, committer_id, 'Published the skill', commit_cmds)
-
-
-def save_skill_rights(skill_rights, committer_id, commit_message, commit_cmds):
-    """Saves a SkillRights domain object to the datastore.
-
-    Args:
-        skill_rights: SkillRights. The rights object for the given skill.
-        committer_id: str. ID of the committer.
-        commit_message: str. Descriptive message for the commit.
-        commit_cmds: list(SkillRightsChange). A list of commands describing
-            what kind of commit was done.
-    """
-
-    model = skill_models.SkillRightsModel.get(skill_rights.id, strict=False)
-
-    model.skill_is_private = skill_rights.skill_is_private
-    model.creator_id = skill_rights.creator_id
-    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmd_dicts)
-
-
 def delete_skill(committer_id, skill_id, force_deletion=False):
     """Deletes the skill with the given skill_id.
 
@@ -709,11 +659,6 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
-    skill_rights_model = skill_models.SkillRightsModel.get(skill_id)
-    skill_rights_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
-        force_deletion=force_deletion)
-
     skill_model = skill_models.SkillModel.get(skill_id)
     skill_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
@@ -798,115 +743,6 @@ def save_skill_summary(skill_summary):
     )
 
     skill_summary_model.put()
-
-
-def create_new_skill_rights(skill_id, committer_id):
-    """Creates a new skill rights object and saves it to the datastore.
-
-    Args:
-        skill_id: str. ID of the skill.
-        committer_id: str. ID of the committer.
-    """
-    skill_rights = skill_domain.SkillRights(skill_id, True, committer_id)
-    commit_cmds = [{'cmd': skill_domain.CMD_CREATE_NEW}]
-    skill_models.SkillRightsModel(
-        id=skill_rights.id,
-        creator_id=skill_rights.creator_id,
-        skill_is_private=skill_rights.skill_is_private
-    ).commit(committer_id, 'Created new skill rights', commit_cmds)
-
-
-def get_skill_rights_from_model(skill_rights_model):
-    """Constructs a SkillRights object from the given skill rights model.
-
-    Args:
-        skill_rights_model: SkillRightsModel. Skill rights from the datastore.
-
-    Returns:
-        SkillRights. The rights object created from the model.
-    """
-
-    return skill_domain.SkillRights(
-        skill_rights_model.id,
-        skill_rights_model.skill_is_private,
-        skill_rights_model.creator_id
-    )
-
-
-def get_skill_rights(skill_id, strict=True):
-    """Retrieves the rights object for the given skill.
-
-    Args:
-        skill_id: str. ID of the skill.
-        strict: bool. Whether to fail noisily if no skill with the given id
-            exists in the datastore.
-
-    Returns:
-        SkillRights. The rights object associated with the given skill.
-
-    Raises:
-        EntityNotFoundError. The skill with ID skill_id was not found
-            in the datastore.
-    """
-
-    model = skill_models.SkillRightsModel.get(skill_id, strict=strict)
-
-    if model is None:
-        return None
-
-    return get_skill_rights_from_model(model)
-
-
-def get_multi_skill_rights(skill_ids):
-    """Retrieves the rights objects for the given skills.
-
-    Args:
-        skill_ids: list(str). Skill IDs of the skills for which rights are
-            requested.
-
-    Returns:
-        list(SkillRights). The list of skill rights objects.
-    """
-
-    skill_rights_models = skill_models.SkillRightsModel.get_multi(skill_ids)
-    skill_rights_list = [
-        get_skill_rights_from_model(skill_rights_model)
-        if skill_rights_model else None
-        for skill_rights_model in skill_rights_models]
-    return skill_rights_list
-
-
-def get_unpublished_skill_rights_by_creator(user_id):
-    """Retrives the rights objects that are private and were created by the
-    user with the provided user ID.
-
-    Args:
-        user_id: str. The user ID of the user that created the skills being
-            fetched.
-
-    Returns:
-        list(SkillRights). The list of skill rights objects that are private
-        and created by the provided user.
-    """
-
-    skill_rights_models = (
-        skill_models.SkillRightsModel.get_unpublished_by_creator_id(
-            user_id))
-    return [get_skill_rights_from_model(skill_rights_model)
-            for skill_rights_model in skill_rights_models]
-
-
-def get_all_unpublished_skill_rights():
-    """Retrieves the rights objects that are private.
-
-    Returns:
-        list(SkillRights). The list of skill rights objects that are private.
-    """
-
-    skill_rights_models = (
-        skill_models.SkillRightsModel.get_unpublished())
-    return [get_skill_rights_from_model(skill_rights_model)
-            for skill_rights_model in skill_rights_models]
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):

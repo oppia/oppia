@@ -515,24 +515,6 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.skill_id)
         self.logout()
 
-    def test_get_with_editor_email_allows_question_fetching(self):
-        self.login(self.EDITOR_EMAIL)
-        response_dict = self.get_json('%s/%s' % (
-            feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id))
-        self.assertEqual(
-            response_dict['question_dict']['id'], self.question_id)
-        self.assertEqual(
-            response_dict['question_dict']['version'], 1)
-        self.assertEqual(
-            response_dict['question_dict']['question_state_data'],
-            self.question.question_state_data.to_dict())
-        self.assertEqual(
-            len(response_dict['associated_skill_dicts']), 1)
-        self.assertEqual(
-            response_dict['associated_skill_dicts'][0]['id'],
-            self.skill_id)
-        self.logout()
-
     def test_get_with_invalid_question_id_returns_404_status(self):
         def _mock_get_question_by_id(unused_question_id, **unused_kwargs):
             """Mocks '_get_question_by_id'. Returns None."""
@@ -624,44 +606,6 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         payload['commit_message'] = 'update question data'
 
         self.login(self.TOPIC_MANAGER_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        payload = {}
-        new_question_data = self._create_valid_question_data('GHI')
-        change_list = [{
-            'cmd': 'update_question_property',
-            'property_name': 'question_state_data',
-            'new_value': new_question_data.to_dict(),
-            'old_value': self.question.question_state_data.to_dict()
-        }]
-        payload['change_list'] = change_list
-        payload['commit_message'] = 'update question data'
-        response_json = self.put_json(
-            '%s/%s' % (
-                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
-            payload, csrf_token=csrf_token)
-
-        self.assertEqual(
-            response_json['question_dict']['language_code'], 'en')
-        self.assertEqual(
-            response_json['question_dict']['question_state_data'],
-            new_question_data.to_dict())
-        self.assertEqual(
-            response_json['question_dict']['id'], self.question_id)
-        self.logout()
-
-    def test_put_with_editor_email_allows_question_editing(self):
-        payload = {}
-        new_question_data = self._create_valid_question_data('DEF')
-        change_list = [{
-            'cmd': 'update_question_property',
-            'property_name': 'question_state_data',
-            'new_value': new_question_data.to_dict(),
-            'old_value': self.question.question_state_data.to_dict()
-        }]
-        payload['change_list'] = change_list
-        payload['commit_message'] = 'update question data'
-
-        self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_new_csrf_token()
         payload = {}
         new_question_data = self._create_valid_question_data('GHI')

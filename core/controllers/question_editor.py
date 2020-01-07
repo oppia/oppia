@@ -170,10 +170,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
         question = question_services.get_question_by_id(
             question_id, strict=False)
 
-        if question is None:
-            raise self.PageNotFoundException(
-                'The question with the given id doesn\'t exist.')
-
         associated_skill_dicts = [
             skill.to_dict() for skill in skill_services.get_multi_skills(
                 question.linked_skill_ids)]

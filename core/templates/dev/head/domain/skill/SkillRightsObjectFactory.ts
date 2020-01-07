@@ -22,16 +22,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class SkillRights {
   _skillId: string;
-  _creatorId: string;
-  _skillIsPrivate: boolean;
   _skillDescriptionIsEditable: boolean;
 
   constructor(
-      skillId: string, creatorId: string,
-      skillIsPrivate: boolean, canEditSkillDescription: boolean) {
+      skillId: string, canEditSkillDescription: boolean) {
     this._skillId = skillId;
-    this._creatorId = creatorId;
-    this._skillIsPrivate = skillIsPrivate;
     this._skillDescriptionIsEditable = canEditSkillDescription;
   }
 
@@ -39,33 +34,14 @@ export class SkillRights {
     return this._skillId;
   }
 
-  getCreatorId(): string {
-    return this._creatorId;
-  }
-
-  isPrivate(): boolean {
-    return this._skillIsPrivate;
-  }
-
-  isPublic(): boolean {
-    return !this._skillIsPrivate;
-  }
-
   canEditSkillDescription(): boolean {
     return this._skillDescriptionIsEditable;
   }
 
-  setPublic(): void {
-    this._skillIsPrivate = false;
-  }
-
   copyFromSkillRights(otherSkillRights: {
-      getSkillId: () => string; getCreatorId: () => string;
-      isPrivate: () => boolean; canEditSkillDescription: () => boolean;
+      getSkillId: () => string; canEditSkillDescription: () => boolean;
     }): void {
     this._skillId = otherSkillRights.getSkillId();
-    this._creatorId = otherSkillRights.getCreatorId();
-    this._skillIsPrivate = otherSkillRights.isPrivate();
     this._skillDescriptionIsEditable =
       otherSkillRights.canEditSkillDescription();
   }
@@ -82,12 +58,10 @@ export class SkillRightsObjectFactory {
   createFromBackendDict(skillRightsBackendDict: any): SkillRights {
     return new SkillRights(
       skillRightsBackendDict.skill_id,
-      skillRightsBackendDict.creator_id,
-      skillRightsBackendDict.skill_is_private,
       skillRightsBackendDict.can_edit_skill_description);
   }
   createInterstitialSkillRights(): SkillRights {
-    return new SkillRights(null, null, true, false);
+    return new SkillRights(null, false);
   }
 }
 
