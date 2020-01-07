@@ -10,5 +10,10 @@
   <span ng-if="getLatestMessage().author !== null">
     by <strong><[getLatestMessage().author]></strong>
   </span>
-  <span>at <[getLocaleAbbreviatedDatetimeString()]></span>
+  <span ng-if="getLocaleAbbreviatedDatetimeString().updatedToday">
+    at <[getLocaleAbbreviatedDatetimeString().feedbackTime]>
+  </span>
+  <span ng-if="!getLocaleAbbreviatedDatetimeString().updatedToday">
+    on <[getLocaleAbbreviatedDatetimeString().feedbackDate]>
+  </span>
 </div>
