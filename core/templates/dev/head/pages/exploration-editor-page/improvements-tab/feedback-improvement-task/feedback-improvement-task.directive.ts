@@ -62,20 +62,18 @@ angular.module('oppia').directive('feedbackImprovementTask', [
           };
 
           $scope.getLocaleAbbreviatedDatetimeString = function() {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              $scope.getLatestMessage().updatedOn);
+          };
+
+          $scope.wasUpdatedAtMost24HoursAgo = function() {
             var feedbackDateOrTime =
             DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLatestMessage().updatedOn);
-            // For only time, Date.parse() will return NaN
             if (Date.parse(feedbackDateOrTime)) {
-              return {
-                feedbackDate: feedbackDateOrTime,
-                updatedToday: false
-              };
+              return false;
             } else {
-              return {
-                feedbackTime: feedbackDateOrTime,
-                updatedToday: true
-              };
+              return true;
             }
           };
         }

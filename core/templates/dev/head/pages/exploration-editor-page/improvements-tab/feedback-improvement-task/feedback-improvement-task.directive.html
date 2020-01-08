@@ -10,10 +10,9 @@
   <span ng-if="getLatestMessage().author !== null">
     by <strong><[getLatestMessage().author]></strong>
   </span>
-  <span ng-if="getLocaleAbbreviatedDatetimeString().updatedToday">
-    at <[getLocaleAbbreviatedDatetimeString().feedbackTime]>
-  </span>
-  <span ng-if="!getLocaleAbbreviatedDatetimeString().updatedToday">
-    on <[getLocaleAbbreviatedDatetimeString().feedbackDate]>
+  <span ng-if="wasUpdatedAtMost24HoursAgo()">at </span>
+  <span ng-if="!wasUpdatedAtMost24HoursAgo()">on </span>
+  <span>
+    <[getLocaleAbbreviatedDatetimeString()]>
   </span>
 </div>
