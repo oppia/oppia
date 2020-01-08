@@ -225,6 +225,19 @@ export class ContextService {
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR);
   }
+
+  canAddOrEditComponents(): boolean {
+    var currentPageContext = this.getPageContext();
+    var allowedPageContext = [
+      ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR,
+      ServicesConstants.PAGE_CONTEXT.QUESTION_EDITOR,
+      ServicesConstants.PAGE_CONTEXT.COLLECTION_EDITOR,
+      ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR,
+      ServicesConstants.PAGE_CONTEXT.STORY_EDITOR,
+      ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR
+    ];
+    return (allowedPageContext.includes(currentPageContext));
+  }
 }
 
 angular.module('oppia').factory(
