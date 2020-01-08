@@ -28,6 +28,7 @@ require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('pages/library-page/search-bar/search-bar.directive.ts');
 
 angular.module('oppia').directive('classroomPage', [
   'UrlInterpolationService', function(
@@ -57,14 +58,10 @@ angular.module('oppia').directive('classroomPage', [
 
           $rootScope.loadingMessage = 'Loading';
           ClassroomBackendApiService.fetchClassroomData(
-            ctrl.classroomName).then(function(topicSummaryDicts) {
-            ctrl.topicSummaries = topicSummaryDicts.map(
-              function(summaryDict) {
-                return TopicSummaryObjectFactory.createFromBackendDict(
-                  summaryDict);
-              }
-            );
+            ctrl.classroomName).then(function(topicSummaryObjects) {
+            ctrl.topicSummaries = topicSummaryObjects;
             $rootScope.loadingMessage = '';
+            $rootScope.$broadcast('initializeTranslation');
           },
           function(errorResponse) {
             if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {

@@ -18,6 +18,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import re
 
+from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import email_manager
@@ -25,6 +26,7 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import utils
@@ -161,7 +163,7 @@ class PreferencesHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_own_profile
     def put(self):
-        """Handles POST requests."""
+        """Handles PUT requests."""
         update_type = self.payload.get('update_type')
         data = self.payload.get('data')
 
@@ -327,6 +329,30 @@ class SignupHandler(base.BaseHandler):
                 self.user_id, default_dashboard)
 
         self.render_json({})
+
+
+class DeleteAccountPage(base.BaseHandler):
+    """The delete account page."""
+
+    @acl_decorators.can_manage_own_profile
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+        self.render_template('delete-account-page.mainpage.html')
+
+
+class DeleteAccountHandler(base.BaseHandler):
+    """Provides data for the delete account page."""
+
+    @acl_decorators.can_manage_own_profile
+    def delete(self):
+        """Handles DELETE requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+
+        wipeout_service.pre_delete_user(self.user_id)
+        self.render_json({'success': True})
 
 
 class UsernameCheckHandler(base.BaseHandler):

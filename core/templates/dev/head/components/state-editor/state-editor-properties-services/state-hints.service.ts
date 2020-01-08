@@ -15,11 +15,38 @@
 /**
  * @fileoverview A data service that stores the current interaction hints.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StateHintsService', [
-  'StatePropertyService', function(StatePropertyService) {
-    var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveHints';
-    return child;
+import { AlertsService } from 'services/alerts.service';
+import { StatePropertyService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-property.service';
+import { UtilsService } from 'services/utils.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class StateHintsService extends StatePropertyService {
+  private activeHintIndex: number;
+  constructor(alertsService: AlertsService, utilsService: UtilsService) {
+    super(alertsService, utilsService);
+    this.setterMethodKey = 'saveHints';
   }
-]);
+
+  getActiveHintIndex(): number {
+    return this.activeHintIndex;
+  }
+
+  setActiveHintIndex(index: number): void {
+    this.activeHintIndex = index;
+  }
+
+  init(stateName: string, value: any): void {
+    super.init(stateName, value);
+    this.setActiveHintIndex(null);
+  }
+}
+
+angular.module('oppia').factory(
+  'StateHintsService', downgradeInjectable(StateHintsService));

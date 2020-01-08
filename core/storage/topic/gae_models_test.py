@@ -26,8 +26,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(base_models, topic_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.topic])
+(base_models, topic_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.topic, models.NAMES.user])
 
 
 class TopicModelUnitTests(test_utils.GenericTestBase):
@@ -43,11 +43,17 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
 
     def test_has_reference_to_user_id(self):
         self.save_new_topic(
-            'topic_id', 'owner_id', 'name', 'description', [], [], [], [], 0)
+            'topic_id', 'owner_id', 'name', 'abbrev', None,
+            'description', [], [], [], [], 0)
         self.assertTrue(
             topic_models.TopicModel.has_reference_to_user_id('owner_id'))
         self.assertFalse(
             topic_models.TopicModel.has_reference_to_user_id('x_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            topic_models.TopicModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_that_subsidiary_models_are_created_when_new_model_is_saved(self):
         """Tests the _trusted_commit() method."""
@@ -61,6 +67,7 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
         topic = topic_models.TopicModel(
             id=self.TOPIC_ID,
             name=self.TOPIC_NAME,
+            abbreviated_name='abbrev',
             canonical_name=self.TOPIC_CANONICAL_NAME,
             subtopic_schema_version=feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             story_reference_schema_version=(
@@ -91,7 +98,8 @@ class TopicModelUnitTests(test_utils.GenericTestBase):
     def test_get_by_name(self):
         topic = topic_domain.Topic.create_default_topic(
             topic_id=self.TOPIC_ID,
-            name=self.TOPIC_NAME
+            name=self.TOPIC_NAME,
+            abbreviated_name='abbrev'
         )
         topic_services.save_new_topic(feconf.SYSTEM_COMMITTER_ID, topic)
         self.assertEqual(
@@ -158,6 +166,11 @@ class TopicSummaryModelUnitTests(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             topic_models.TopicSummaryModel.has_reference_to_user_id('any_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            topic_models.TopicSummaryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
 
 class SubtopicPageModelUnitTest(test_utils.GenericTestBase):
@@ -269,23 +282,126 @@ class SubtopicPageCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     """Tests the TopicRightsModel class."""
 
+    TOPIC_1_ID = 'topic_1_id'
+    TOPIC_2_ID = 'topic_2_id'
+    TOPIC_3_ID = 'topic_3_id'
+    MANAGER_1_ID_OLD = 'manager_1_id_old'
+    MANAGER_1_ID_NEW = 'manager_1_id_new'
+    MANAGER_2_ID_OLD = 'manager_2_id_old'
+    MANAGER_2_ID_NEW = 'manager_2_id_new'
+    MANAGER_3_ID_OLD = 'manager_3_id_old'
+    MANAGER_3_ID_NEW = 'manager_3_id_old'
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             topic_models.TopicRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        topic_rights = topic_models.TopicRightsModel(
-            id='topic_id', manager_ids=['manager_id'])
-        topic_rights.commit(
+        with self.swap(base_models, 'FETCH_BATCH_SIZE', 1):
+            topic_rights = topic_models.TopicRightsModel(
+                id=self.TOPIC_1_ID, manager_ids=['manager_id'])
+            topic_rights.commit(
+                'committer_id',
+                'New topic rights',
+                [{'cmd': topic_domain.CMD_CREATE_NEW}])
+            self.assertTrue(
+                topic_models.TopicRightsModel
+                .has_reference_to_user_id('manager_id'))
+            self.assertTrue(
+                topic_models.TopicRightsModel
+                .has_reference_to_user_id('committer_id'))
+            self.assertFalse(
+                topic_models.TopicRightsModel.has_reference_to_user_id('x_id'))
+
+            # We remove the manager_id form manager_ids to to verify that the
+            # manager_id is still found in TopicRightsSnapshotContentModel.
+            topic_rights = topic_models.TopicRightsModel.get_by_id(
+                self.TOPIC_1_ID)
+            topic_rights.manager_ids = ['different_manager_id']
+            topic_rights.commit(
+                'committer_id',
+                'Change topic rights',
+                [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
+            self.assertTrue(
+                topic_models.TopicRightsModel
+                .has_reference_to_user_id('manager_id'))
+            self.assertTrue(
+                topic_models.TopicRightsModel
+                .has_reference_to_user_id('different_manager_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            topic_models.TopicRightsModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_migrate_model(self):
+        original_model_1 = topic_models.TopicRightsModel(
+            id=self.TOPIC_1_ID, manager_ids=[self.MANAGER_1_ID_OLD])
+        original_model_1.commit(
             'committer_id',
             'New topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}])
-        self.assertTrue(
-            topic_models.TopicRightsModel
-            .has_reference_to_user_id('manager_id'))
-        self.assertTrue(
-            topic_models.TopicRightsModel
-            .has_reference_to_user_id('committer_id'))
-        self.assertFalse(
-            topic_models.TopicRightsModel.has_reference_to_user_id('x_id'))
+        original_model_2 = topic_models.TopicRightsModel(
+            id=self.TOPIC_2_ID,
+            manager_ids=[self.MANAGER_1_ID_OLD, self.MANAGER_2_ID_OLD])
+        original_model_2.commit(
+            'committer_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+        original_model_3 = topic_models.TopicRightsModel(
+            id=self.TOPIC_3_ID,
+            manager_ids=[self.MANAGER_2_ID_OLD, self.MANAGER_3_ID_OLD])
+        original_model_3.commit(
+            'committer_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
+        topic_models.TopicRightsModel.migrate_model(
+            self.MANAGER_1_ID_OLD, self.MANAGER_1_ID_NEW)
+        topic_models.TopicRightsModel.migrate_model(
+            self.MANAGER_2_ID_OLD, self.MANAGER_2_ID_NEW)
+        topic_models.TopicRightsModel.migrate_model(
+            self.MANAGER_3_ID_OLD, self.MANAGER_3_ID_NEW)
+
+        migrated_model_1 = topic_models.TopicRightsModel.get_by_id(
+            self.TOPIC_1_ID)
+        self.assertEqual([self.MANAGER_1_ID_NEW], migrated_model_1.manager_ids)
+        migrated_model_2 = topic_models.TopicRightsModel.get_by_id(
+            self.TOPIC_2_ID)
+        self.assertEqual(
+            [self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_NEW],
+            migrated_model_2.manager_ids)
+        migrated_model_3 = topic_models.TopicRightsModel.get_by_id(
+            self.TOPIC_3_ID)
+        self.assertEqual(
+            [self.MANAGER_2_ID_NEW, self.MANAGER_3_ID_NEW],
+            migrated_model_3.manager_ids)
+
+    def test_verify_model_user_ids_exist(self):
+        user_models.UserSettingsModel(
+            id=self.MANAGER_1_ID_NEW,
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.MANAGER_2_ID_NEW,
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_COLLECTION_EDITOR
+        ).put()
+        model = topic_models.TopicRightsModel(
+            id=self.TOPIC_1_ID,
+            manager_ids=[self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_NEW])
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.author_id = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.manager_ids = [self.MANAGER_1_ID_NEW, 'user_non_id']
+        self.assertFalse(model.verify_model_user_ids_exist())
+
+        model.manager_ids = ['user_non_id']
+        self.assertFalse(model.verify_model_user_ids_exist())

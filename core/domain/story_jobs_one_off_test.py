@@ -43,6 +43,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         super(StoryMigrationOneOffJobTests, self).setUp()
 
         # Setup user who will own the test stories.
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.story_id_1 = 'story_id_1'
@@ -51,11 +52,11 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.skill_id_1 = 'skill_id_1'
         self.skill_id_2 = 'skill_id_2'
         self.save_new_topic(
-            self.TOPIC_ID, self.albert_id, 'Name', 'Description',
-            [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id_1, self.skill_id_2], [], 1
+            self.TOPIC_ID, self.albert_id, 'Name', 'abbrev', None,
+            'Description', [self.story_id_1, self.story_id_2],
+            [self.story_id_3], [self.skill_id_1, self.skill_id_2],
+            [], 1
         )
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_story(self):

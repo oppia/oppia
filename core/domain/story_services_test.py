@@ -46,8 +46,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.TOPIC_ID, self.USER_ID, 'Topic', 'A new topic', [], [], [], [],
-            0)
+            self.TOPIC_ID, self.USER_ID, 'Topic', 'abbrev', None,
+            'A new topic', [], [], [], [], 0)
         self.save_new_story(
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
             self.TOPIC_ID)
@@ -227,8 +227,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_update_story_which_not_corresponding_topic_id(self):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.USER_ID, 'A New Topic', 'A new topic description.',
-            [], [], [], [], 0)
+            topic_id, self.USER_ID, 'A New Topic', 'abbrev', None,
+            'A new topic description.', [], [], [], [], 0)
         story_id = story_services.get_new_story_id()
         self.save_new_story(
             story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
@@ -478,8 +478,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_topic(
-            topic_id, self.USER_ID, 'A different topic', 'A new topic', [], [],
-            [], [], 0)
+            topic_id, self.USER_ID, 'A different topic', 'abbrev', None,
+            'A new topic', [], [], [], [], 0)
         self.save_new_story(
             story_id, self.USER_ID, 'new title', 'Description', 'Notes',
             topic_id)
@@ -748,8 +748,8 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.owner_id = 'owner'
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.TOPIC_ID, self.USER_ID, 'New Topic', 'A new topic', [], [], [],
-            [], 0)
+            self.TOPIC_ID, self.USER_ID, 'New Topic', 'abbrev', None,
+            'A new topic', [], [], [], [], 0)
         story = story_domain.Story.create_default_story(
             self.STORY_1_ID, 'Title', self.TOPIC_ID)
         story.description = ('Description')
@@ -978,8 +978,8 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         user_id = 'user_id'
         self.save_new_topic(
-            topic_id, user_id, 'Topic', 'A new topic', [], [], [], [],
-            0)
+            topic_id, user_id, 'Topic', 'abbrev', None,
+            'A new topic', [], [], [], [], 0)
         self.save_new_story(
             story_id, user_id, 'Title', 'Description', 'Notes',
             topic_id)

@@ -115,22 +115,47 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     """A handler for linking and unlinking questions to or from a skill."""
 
     @acl_decorators.can_manage_question_skill_status
-    def put(self, question_id, skill_id):
-        """Updates the difficulty of the question with respect to the given
-        skill.
+    def put(self, question_id):
+        """Updates the QuestionSkillLink models with respect to the given
+        question.
         """
-        new_difficulty = float(self.payload.get('new_difficulty'))
+        if self.payload.get('action') == 'update_difficulty':
+            new_difficulty = self.payload.get('new_difficulty')
+            skill_id = self.payload.get('skill_id')
+            if skill_id is None:
+                raise self.InvalidInputException(
+                    'The \'skill_id\' field is missing in payload')
+            if new_difficulty is None:
+                raise self.InvalidInputException(
+                    'The \'new_difficulty\' field is missing in payload')
+            question_services.update_question_skill_link_difficulty(
+                question_id, skill_id, float(new_difficulty))
+        elif self.payload.get('action') == 'edit_links':
+            difficulty = self.payload.get('difficulty')
+            skill_ids_task_list = self.payload.get('skill_ids_task_list')
+            if skill_ids_task_list is None:
+                raise self.InvalidInputException(
+                    'Missing fields \'skill_ids_task_list\'in payload')
 
-        question_services.update_question_skill_link_difficulty(
-            question_id, skill_id, new_difficulty)
+            for task_dict in skill_ids_task_list:
+                if not 'id' in task_dict:
+                    raise self.InvalidInputException(
+                        'Missing skill ID for edit_links.')
+                if task_dict['task'] == 'remove':
+                    question_services.delete_question_skill_link(
+                        self.user_id, question_id, task_dict['id'])
+                elif task_dict['task'] == 'add':
+                    if difficulty is None:
+                        raise self.InvalidInputException(
+                            'Missing field \'difficulty\' in payload')
+                    question_services.create_new_question_skill_link(
+                        self.user_id, question_id, task_dict['id'], difficulty)
+                else:
+                    raise self.InvalidInputException(
+                        'Invalid task for edit_links.')
+        else:
+            raise self.InvalidInputException('Invalid action in payload.')
 
-        self.render_json(self.values)
-
-    @acl_decorators.can_manage_question_skill_status
-    def delete(self, question_id, skill_id):
-        """Unlinks a question from a skill."""
-        question_services.delete_question_skill_link(
-            self.user_id, question_id, skill_id)
         self.render_json(self.values)
 
 
@@ -144,10 +169,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
         """Gets the data for the question overview page."""
         question = question_services.get_question_by_id(
             question_id, strict=False)
-
-        if question is None:
-            raise self.PageNotFoundException(
-                'The question with the given id doesn\'t exist.')
 
         associated_skill_dicts = [
             skill.to_dict() for skill in skill_services.get_multi_skills(

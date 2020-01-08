@@ -50,7 +50,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.story.description = 'story_description'
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'public_topic_name')
+            self.topic_id, 'public_topic_name', 'abbrev')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2]))
@@ -62,7 +62,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story)
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name')
+            self.topic_id_1, 'private_topic_name', 'abbrev')
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -87,12 +87,17 @@ class TopicViewerPageTests(BaseTopicViewerControllerTests):
                 '%s/%s' % (feconf.TOPIC_VIEWER_URL_PREFIX, 'public_topic_name'))
 
 
-    def test_no_user_can_access_unpublished_topic_viewer_page(self):
+    def test_accessibility_of_unpublished_topic_viewer_page(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_html_response(
                 '%s/%s' % (
                     feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'),
                 expected_status_int=404)
+            self.login(self.ADMIN_EMAIL)
+            self.get_html_response(
+                '%s/%s' % (
+                    feconf.TOPIC_VIEWER_URL_PREFIX, 'private_topic_name'))
+            self.logout()
 
 
     def test_get_fails_when_new_structures_not_enabled(self):

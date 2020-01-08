@@ -49,7 +49,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1
         })]
         self.save_new_topic(
-            self.TOPIC_ID, self.user_id, 'Name', 'Description',
+            self.TOPIC_ID, self.user_id, 'Name', 'abbrev',
+            'img.png', 'Description',
             [self.story_id_1, self.story_id_2], [self.story_id_3],
             [self.skill_id_1, self.skill_id_2], [], 1
         )
@@ -100,6 +101,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model = topic_models.TopicModel(
             id='topic_id',
             name='name',
+            abbreviated_name='abbrev',
             canonical_name='canonical_name',
             next_subtopic_id=1,
             language_code='en',
@@ -121,6 +123,7 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         model = topic_models.TopicModel(
             id='topic_id_2',
             name='name 2',
+            abbreviated_name='abbrev',
             canonical_name='canonical_name_2',
             next_subtopic_id=1,
             language_code='en',
@@ -146,8 +149,8 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_topic_by_version(self):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.user_id, 'topic name', 'Description',
-            [], [], [], [], 1)
+            topic_id, self.user_id, 'topic name',
+            'abbrev', 'img.png', 'Description', [], [], [], [], 1)
 
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
@@ -174,6 +177,12 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topics[0].to_dict(), expected_topic)
         self.assertIsNone(topics[1])
         self.assertEqual(len(topics), 2)
+
+    def test_get_all_topics_with_skills(self):
+        expected_topic = self.topic.to_dict()
+        topics = topic_fetchers.get_all_topics_with_skills()
+        self.assertEqual(topics[0].to_dict(), expected_topic)
+        self.assertEqual(len(topics), 1)
 
     def test_commit_log_entry(self):
         topic_commit_log_entry = (

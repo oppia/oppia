@@ -29,6 +29,7 @@ import subprocess
 import threading
 
 import python_utils
+from scripts import common
 
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
@@ -71,18 +72,22 @@ WEBPACK_DIRNAMES_TO_DIRPATHS = {
     'out_dir': os.path.join('build', 'webpack_bundles', '')
 }
 
+# This json file contains a json object. The object's keys are file paths and
+# the values are corresponded hash value. The paths need to be in posix style,
+# as it is interpreted by the `url-interpolation` service, which which
+# interprets the paths in this file as URLs.
 HASHES_JSON_FILENAME = 'hashes.json'
 HASHES_JSON_FILEPATH = os.path.join('assets', HASHES_JSON_FILENAME)
 MANIFEST_FILE_PATH = os.path.join('manifest.json')
 
 REMOVE_WS = re.compile(r'\s{2,}').sub
+
 YUICOMPRESSOR_DIR = os.path.join(
-    '..', 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
+    os.pardir, 'oppia_tools', 'yuicompressor-2.4.8', 'yuicompressor-2.4.8.jar')
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-NODE_FILE = os.path.join(
-    PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
 WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
+TSC_BIN_FILE = os.path.join('node_modules', 'typescript', 'bin', 'tsc')
 WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
@@ -94,15 +99,12 @@ JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
 JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
-# These files are present in both extensions and local_compiled_js/extensions.
-# They are required in local_compiled_js since they contain code used in
-# other ts files and excluding them from compilation will create compile
-# errors due to missing variables. So, the files should be built only from
-# one location instead of both the locations.
 JS_FILEPATHS_NOT_TO_BUILD = (
-    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
-    'extensions/interactions/LogicProof/static/js/generatedParser.js',
-    'core/templates/dev/head/expressions/expression-parser.service.js')
+    os.path.join(
+        'core', 'templates', 'dev', 'head', 'expressions',
+        'expression-parser.service.js'),
+    os.path.join('extensions', 'ckeditor_plugins', 'pre', 'plugin.js')
+)
 
 # These filepaths shouldn't be renamed (i.e. the filepath shouldn't contain
 # hash).
@@ -150,6 +152,31 @@ _PARSER.add_argument(
     dest='minify_third_party_libs_only')
 _PARSER.add_argument(
     '--enable_watcher', action='store_true', default=False)
+
+
+def convert_filepath_to_hashed_url(filepath, hashes):
+    """Convert the original filepath to url with hash inserted.
+
+    Args:
+        filepath: str. The original file path.
+        hashes: str. The calculated hash for this file.
+
+    Returns:
+        str. Generated url style path with hash inserted.
+    """
+    return _insert_hash(common.convert_to_posixpath(filepath), hashes)
+
+
+def convert_filepath_to_url(filepath):
+    """Convert the original filepath to url path.
+
+    Args:
+        filepath: str. The original file path.
+
+    Returns:
+        str. Generated url style path.
+    """
+    return common.convert_to_posixpath(filepath)
 
 
 def generate_app_yaml():
@@ -202,8 +229,16 @@ def _minify(source_path, target_path):
     # experiments, 18m seems to work, but 12m is too small and results in an
     # out-of-memory error.
     # https://circleci.com/blog/how-to-handle-java-oom-errors/
+    # Use relative path to avoid java command line parameter parse error on
+    # Windows. Convert to posix style path because the java program requires
+    # the filepath arguments to be in posix path style.
+    target_path = common.convert_to_posixpath(
+        os.path.relpath(target_path))
+    source_path = common.convert_to_posixpath(
+        os.path.relpath(source_path))
+    yuicompressor_dir = common.convert_to_posixpath(YUICOMPRESSOR_DIR)
     cmd = 'java -Xmx24m -jar %s -o %s %s' % (
-        YUICOMPRESSOR_DIR, target_path, source_path)
+        yuicompressor_dir, target_path, source_path)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -240,7 +275,7 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
     python_utils.PRINT('Minifying and creating sourcemap for %s' % source_path)
     source_map_properties = 'includeSources,url=\'third_party.min.js.map\''
     cmd = '%s %s %s -c -m --source-map %s -o %s ' % (
-        NODE_FILE, UGLIFY_FILE, source_path,
+        common.NODE_BIN_PATH, UGLIFY_FILE, source_path,
         source_map_properties, target_file_path)
     subprocess.check_call(cmd, shell=True)
 
@@ -406,23 +441,40 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
         # This is because html paths are used by backend and we work with
         # paths without hash part in backend.
         if not filepath.endswith('.html'):
-            filepath_with_hash = _insert_hash(filepath, file_hash)
+            # This reconstructs the hashed version of the URL, so that it can
+            # be used to substitute the raw URL in the HTML file stream.
+            filepath_with_hash = convert_filepath_to_hashed_url(
+                filepath, file_hash)
             content = content.replace(
-                '%s%s' % (TEMPLATES_DEV_DIR, filepath),
+                # This and the following lines, convert the original file paths
+                # to URL paths, so the URLs in HTML files can be replaced.
                 '%s%s' % (
-                    TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir'],
+                    convert_filepath_to_url(TEMPLATES_DEV_DIR),
+                    filepath),
+                '%s%s' % (
+                    convert_filepath_to_url(
+                        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS['out_dir']),
                     filepath_with_hash))
             content = content.replace(
-                '%s%s' % (ASSETS_DEV_DIR, filepath),
-                '%s%s' % (ASSETS_OUT_DIR, filepath_with_hash))
-            content = content.replace(
-                '%s%s' % (EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir'], filepath),
                 '%s%s' % (
-                    EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
+                    convert_filepath_to_url(ASSETS_DEV_DIR), filepath),
+                '%s%s' % (
+                    convert_filepath_to_url(ASSETS_OUT_DIR),
                     filepath_with_hash))
             content = content.replace(
-                '%s%s' % (THIRD_PARTY_GENERATED_DEV_DIR, filepath),
-                '%s%s' % (THIRD_PARTY_GENERATED_OUT_DIR, filepath_with_hash))
+                '%s%s' % (
+                    convert_filepath_to_url(
+                        EXTENSIONS_DIRNAMES_TO_DIRPATHS['dev_dir']), filepath),
+                '%s%s' % (
+                    convert_filepath_to_url(
+                        EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']),
+                    filepath_with_hash))
+            content = content.replace(
+                '%s%s' % (convert_filepath_to_url(
+                    THIRD_PARTY_GENERATED_DEV_DIR), filepath),
+                '%s%s' % (
+                    convert_filepath_to_url(
+                        THIRD_PARTY_GENERATED_OUT_DIR), filepath_with_hash))
     content = REMOVE_WS(' ', content)
     write_to_file_stream(target_file_stream, content)
 
@@ -613,8 +665,8 @@ def build_using_webpack():
 
     python_utils.PRINT('Building webpack')
 
-    cmd = '%s --config %s' % (
-        WEBPACK_FILE, WEBPACK_PROD_CONFIG)
+    cmd = '%s %s --config %s' % (
+        common.NODE_BIN_PATH, WEBPACK_FILE, WEBPACK_PROD_CONFIG)
     subprocess.check_call(cmd, shell=True)
 
 
@@ -650,8 +702,8 @@ def should_file_be_built(filepath):
         bool. True if filepath should be built, else False.
     """
     if filepath.endswith('.js'):
-        return filepath not in JS_FILEPATHS_NOT_TO_BUILD and not any(
-            filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
+        return all(
+            not filepath.endswith(p) for p in JS_FILENAME_SUFFIXES_TO_IGNORE)
     elif filepath.endswith('_test.py'):
         return False
     elif filepath.endswith('.ts'):
@@ -691,7 +743,10 @@ def generate_copy_tasks_to_copy_from_source_to_target(
             if not any(
                     source_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
                 target_path = source_path
-                relative_path = os.path.relpath(source_path, source)
+                # The path in hashes.json file is in posix style,
+                # see the comment above HASHES_JSON_FILENAME for details.
+                relative_path = common.convert_to_posixpath(
+                    os.path.relpath(source_path, source))
                 if (hash_should_be_inserted(source + relative_path) and
                         relative_path in file_hashes):
                     relative_path = (
@@ -783,9 +838,12 @@ def get_file_hashes(directory_path):
             filepath = os.path.join(root, filename)
             if should_file_be_built(filepath) and not any(
                     filename.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                complete_filepath = os.path.join(root, filename)
-                relative_filepath = os.path.relpath(
-                    complete_filepath, directory_path)
+                # The path in hashes.json file is in posix style,
+                # see the comment above HASHES_JSON_FILENAME for details.
+                complete_filepath = common.convert_to_posixpath(
+                    os.path.join(root, filename))
+                relative_filepath = common.convert_to_posixpath(os.path.relpath(
+                    complete_filepath, directory_path))
                 file_hashes[relative_filepath] = generate_md5_hash(
                     complete_filepath)
 
@@ -975,7 +1033,11 @@ def generate_delete_tasks_to_remove_deleted_files(
             # Ignore files with certain extensions.
             if not any(
                     target_path.endswith(p) for p in FILE_EXTENSIONS_TO_IGNORE):
-                relative_path = os.path.relpath(target_path, staging_directory)
+                # On Windows the path is on Windows-Style, while the path in
+                # hashes is in posix style, we need to convert it so the check
+                # can run correctly.
+                relative_path = common.convert_to_posixpath(
+                    os.path.relpath(target_path, staging_directory))
                 # Remove file found in staging directory but not in source
                 # directory, i.e. file not listed in hash dict.
                 if relative_path not in source_dir_hashes:
@@ -1185,13 +1247,20 @@ def _verify_hashes(output_dirnames, file_hashes):
     hash_final_filename = _insert_hash(
         HASHES_JSON_FILENAME, file_hashes[HASHES_JSON_FILENAME])
 
+
+    # The path in hashes.json (generated via file_hashes) file is in posix
+    # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_js_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH])
+        file_hashes[common.convert_to_posixpath(
+            MINIFIED_THIRD_PARTY_JS_RELATIVE_FILEPATH)])
 
+    # The path in hashes.json (generated via file_hashes) file is in posix
+    # style, see the comment above HASHES_JSON_FILENAME for details.
     third_party_css_final_filename = _insert_hash(
         MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH,
-        file_hashes[MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH])
+        file_hashes[common.convert_to_posixpath(
+            MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH)])
 
     _ensure_files_exist([
         os.path.join(ASSETS_OUT_DIR, hash_final_filename),
@@ -1309,7 +1378,9 @@ def compile_typescript_files(project_dir):
     require_compiled_js_dir_to_be_valid()
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files...')
-    cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
+    cmd = [
+        common.NODE_BIN_PATH, TSC_BIN_FILE, '--project',
+        project_dir]
     subprocess.check_call(cmd)
 
 
@@ -1325,8 +1396,8 @@ def compile_typescript_files_continuously(project_dir):
     safe_delete_directory_tree(COMPILED_JS_DIR)
     python_utils.PRINT('Compiling ts files in watch mode...')
     cmd = [
-        './node_modules/typescript/bin/tsc', '--project', project_dir,
-        '--watch']
+        common.NODE_BIN_PATH, './node_modules/typescript/bin/tsc', '--project',
+        project_dir, '--watch']
 
     with python_utils.open_file('tsc_output_log.txt', 'w') as out:
         subprocess.Popen(cmd, stdout=out)

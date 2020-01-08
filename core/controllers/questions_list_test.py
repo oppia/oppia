@@ -45,8 +45,8 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
             self.skill_id_2, self.admin_id, 'Skill Description 2')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
-            [self.skill_id, self.skill_id_2], [], 1)
+            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
+            'Description', [], [], [self.skill_id, self.skill_id_2], [], 1)
         self.skill_id_3 = skill_services.get_new_skill_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
@@ -98,10 +98,32 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                     question_summary_dicts_2[i]['skill_descriptions'],
                     ['Skill Description 2', 'Skill Description'])
                 self.assertEqual(
+                    question_summary_dicts[i]['skill_ids'],
+                    [self.skill_id_2, self.skill_id])
+                self.assertEqual(
+                    question_summary_dicts_2[i]['skill_ids'],
+                    [self.skill_id_2, self.skill_id])
+                self.assertEqual(
                     question_summary_dicts[i]['skill_difficulties'], [0.3, 0.5])
                 self.assertEqual(
                     question_summary_dicts_2[i]['skill_difficulties'],
                     [0.3, 0.5])
+            json_response = self.get_json(
+                '%s/%s?cursor=' % (
+                    feconf.QUESTIONS_LIST_URL_PREFIX,
+                    self.skill_id
+                ))
+            question_summary_dicts_3 = (
+                json_response['question_summary_dicts'])
+            self.assertEqual(len(question_summary_dicts_3), 2)
+            for i in python_utils.RANGE(0, 2):
+                self.assertEqual(
+                    question_summary_dicts_3[i]['skill_description'],
+                    'Skill Description')
+                self.assertEqual(
+                    question_summary_dicts_3[i]['skill_id'], self.skill_id)
+                self.assertEqual(
+                    question_summary_dicts_3[i]['skill_difficulty'], 0.5)
             self.assertNotEqual(
                 question_summary_dicts[0]['summary']['id'],
                 question_summary_dicts_2[0]['summary']['id'])

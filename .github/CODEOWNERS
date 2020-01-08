@@ -38,13 +38,13 @@
 
 
 # Collection project.
-/core/controllers/collection*.py @kevinlee12
-/core/domain/collection*.py @kevinlee12
-/core/storage/collection/ @kevinlee12
-/core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @kevinlee12
-/core/templates/dev/head/domain/collection/ @kevinlee12
-/core/templates/dev/head/pages/collection-editor-page/ @kevinlee12
-/core/templates/dev/head/pages/collection-player-page/ @kevinlee12
+/core/controllers/collection*.py @aks681 @kevintab95
+/core/domain/collection*.py @aks681 @kevintab95
+/core/storage/collection/ @aks681 @kevintab95
+/core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @aks681 @kevintab95
+/core/templates/dev/head/domain/collection/ @aks681 @kevintab95
+/core/templates/dev/head/pages/collection-editor-page/ @aks681 @kevintab95
+/core/templates/dev/head/pages/collection-player-page/ @aks681 @kevintab95
 
 
 # Community contribution project
@@ -52,6 +52,7 @@
 /core/domain/opportunity*.py @DubeySandeep
 /core/domain/voiceover_services*.py @DubeySandeep
 /core/storage/opportunity/ @DubeySandeep
+/core/templates/dev/head/domain/opportunity @DubeySandeep
 /core/templates/dev/head/pages/community-dashboard-page/ @DubeySandeep
 
 
@@ -97,10 +98,53 @@
 /.stylelintrc @kevinlee12
 /.travis.yml @kevinlee12
 /.yarnrc @kevinlee12
-/codecov.yml @lilithxxx
+/codecov.yml @kevinlee12
 /core/templates/dev/head/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
-/scripts/ @kevinlee12
+/scripts/__init__.py @kevinlee12
+/scripts/build.py @kevinlee12
+/scripts/build_test.py @kevinlee12
+/scripts/clean.py @kevinlee12
+/scripts/clean_test.py @kevinlee12
+/scripts/common.py @kevinlee12
+/scripts/common_test.py @kevinlee12
+/scripts/create_expression_parser.py @kevinlee12
+/scripts/create_topological_sort_of_all_services.py @bansalnitish @kevinlee12
+/scripts/create_topological_sort_of_all_services_test.py @bansalnitish @kevinlee12
+/scripts/docstrings_checker.py @kevinlee12
+/scripts/docstrings_checker_test.py @kevinlee12
+/scripts/install_chrome_on_travis.py @kevinlee12
+/scripts/install_prerequisites.sh @kevinlee12
+/scripts/install_third_party.py @kevinlee12
+/scripts/install_third_party_libs.py @kevinlee12
+/scripts/install_third_party_libs_test.py @kevinlee12
+/scripts/install_third_party_test.py @kevinlee12
+/scripts/linter_utils.py @kevinlee12
+/scripts/linter_utils_test.py @kevinlee12
+/scripts/pre_commit_hook.py @kevinlee12
+/scripts/pre_commit_hook_test.py @kevinlee12
+/scripts/pre_commit_linter.py @kevinlee12
+/scripts/pre_push_hook.py @kevinlee12
+/scripts/pre_push_hook_test.py @kevinlee12
+/scripts/pylint_extensions.py @kevinlee12
+/scripts/pylint_extensions_test.py @kevinlee12
+/scripts/release_scripts/deploy.py @ankita240796 @kevinlee12
+/scripts/release_scripts/deploy_test.py @ankita24079 @kevinlee12
+/scripts/run_backend_tests.py @kevinlee12
+/scripts/run_e2e_tests.sh @kevinlee12
+/scripts/run_frontend_tests.py @kevinlee12
+/scripts/run_performance_tests.py @kevinlee12
+/scripts/run_presubmit_checks.py @kevinlee12
+/scripts/run_tests.py @kevinlee12
+/scripts/script_import_test.py @kevinlee12
+/scripts/setup.py @kevinlee12
+/scripts/setup_gae.py @kevinlee12
+/scripts/setup_gae_test.py @kevinlee12
+/scripts/setup_test.py @kevinlee12
+/scripts/start.py @kevinlee12
+/scripts/third_party_size_check.py @kevinlee12
+/scripts/typescript_checks.py @ankita240796 @kevinlee12
+/scripts/typescript_checks_test.py @ankita240796 @kevinlee12
 /ubuntu_dockerfile @ezl-13 @kevinlee12
 
 
@@ -133,9 +177,11 @@
 /core/templates/dev/head/components/state-editor/ @aks681
 /core/templates/dev/head/services/compute-graph.service.ts @aks681
 /core/templates/dev/head/services/context.service*.ts @aks681
+/core/templates/dev/head/services/debug-info-tracker.service*.ts @aks681
 /core/templates/dev/head/services/editability.service*.ts @aks681
 /core/templates/dev/head/services/exploration-features*.ts @aks681
 /core/templates/dev/head/services/exploration-html-formatter.service*.ts @aks681
+/core/templates/dev/head/services/image-upload-helper.service*.ts @aks681
 /core/templates/dev/head/services/validators.service*.ts @aks681
 
 
@@ -199,7 +245,7 @@
 /core/templates/dev/head/services/contextual/url.service*.ts @ankita240796
 /core/templates/dev/head/services/contextual/device-info.service*.ts @ankita240796
 /core/templates/dev/head/services/contextual/window-dimensions.service*.ts @ankita240796
-/core/templates/dev/head/services/contextual/window-ref.service.ts @YashJipkate
+/core/templates/dev/head/services/contextual/window-ref.service.ts @ankita240796
 
 
 # Global stylesheet.
@@ -210,49 +256,50 @@
 /core/domain/customization_args_util*.py @seanlip
 /core/domain/interaction_registry*.py @aks681
 /core/domain/obj_services*.py @aks681
-/core/templates/dev/head/components/version-diff-visualization/codemirror-mergeview.directive.ts @kevinlee12
-/core/templates/dev/head/domain/objects/ @kevinlee12
+/core/templates/dev/head/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
+/core/templates/dev/head/domain/objects/ @aks681
 /core/templates/dev/head/expressions/ @seanlip
-/core/templates/dev/head/services/code-normalizer.service*.ts @kevinlee12
+/core/templates/dev/head/services/code-normalizer.service*.ts @aks681
 /extensions/domain*.py @seanlip
-/extensions/interactions/ @kevinlee12 @vojtechjelinek
+/extensions/interactions/ @aks681 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @vojtechjelinek
-/extensions/__init__.py @kevinlee12
+/extensions/__init__.py @aks681
 
 
 # Lesson Analytics team.
-/core/controllers/features*.py @brianrodri
-/core/domain/action_registry*.py @brianrodri
-/core/domain/calculation_registry*.py @brianrodri
-/core/domain/event_services*.py @brianrodri
-/core/domain/playthrough_issue_registry*.py @brianrodri
-/core/domain/stats*.py @brianrodri
-/core/domain/visualization_registry*.py @brianrodri
-/core/storage/statistics/ @brianrodri
-/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
-/core/templates/dev/head/domain/statistics/ @brianrodri
-/core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
-/core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
-/core/templates/dev/head/services/improvement-task.service*.ts @brianrodri
-/core/templates/dev/head/services/improvements.service*.ts @brianrodri
-/core/templates/dev/head/services/messenger.service.ts @brianrodri
-/core/templates/dev/head/services/playthrough*.ts @brianrodri
-/core/templates/dev/head/services/state-rules-stats.service*.ts @brianrodri
-/core/templates/dev/head/services/state-top-answers-stats*.ts @brianrodri
-/extensions/actions/ @brianrodri
-/extensions/answer_summarizers/ @brianrodri
-/extensions/issues/ @brianrodri
-/extensions/visualizations/ @brianrodri
+# Temporarily handed off from @brianrodri to @seanlip while on leave.
+/core/controllers/features*.py @seanlip
+/core/domain/action_registry*.py @seanlip
+/core/domain/calculation_registry*.py @seanlip
+/core/domain/event_services*.py @seanlip
+/core/domain/playthrough_issue_registry*.py @seanlip
+/core/domain/stats*.py @seanlip
+/core/domain/visualization_registry*.py @seanlip
+/core/storage/statistics/ @seanlip
+/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @seanlip
+/core/templates/dev/head/domain/statistics/ @seanlip
+/core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @seanlip
+/core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @seanlip
+/core/templates/dev/head/services/improvement-task.service*.ts @seanlip
+/core/templates/dev/head/services/improvements.service*.ts @seanlip
+/core/templates/dev/head/services/messenger.service.ts @seanlip
+/core/templates/dev/head/services/playthrough*.ts @seanlip
+/core/templates/dev/head/services/state-rules-stats.service*.ts @seanlip
+/core/templates/dev/head/services/state-top-answers-stats*.ts @seanlip
+/extensions/actions/ @seanlip
+/extensions/answer_summarizers/ @seanlip
+/extensions/issues/ @seanlip
+/extensions/visualizations/ @seanlip
 
 
 # Library page.
-/core/controllers/library*.py @kevinlee12
-/core/domain/recommendations*.py @kevinlee12
-/core/domain/search_services*.py @kevinlee12
-/core/templates/dev/head/pages/library-page/ @kevinlee12
-/core/templates/dev/head/services/construct-translation-ids.service.ts @kevinlee12
-/core/templates/dev/head/services/search.service*.ts @kevinlee12
+/core/controllers/library*.py @aks681
+/core/domain/recommendations*.py @aks681
+/core/domain/search_services*.py @aks681
+/core/templates/dev/head/pages/library-page/ @aks681
+/core/templates/dev/head/services/construct-translation-ids.service.ts @aks681
+/core/templates/dev/head/services/search.service*.ts @aks681
 
 
 # Navigation bar project.
@@ -276,6 +323,7 @@
 /core/templates/dev/head/components/skill-mastery/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/components/skills-mastery-list/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681 @vinitamurthi
+/core/templates/dev/head/domain/review_test/ @nishantwrp @sophiewu6 @vinitamurthi
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi
 /core/templates/dev/head/services/questions-list.service.ts @sophiewu6 @vinitamurthi
@@ -314,7 +362,7 @@
 /core/domain/subtopic_page_services*.py @aks681
 /core/domain/topic*.py @aks681
 /core/storage/topic/ @aks681
-/core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts.ts @aks681
+/core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts @aks681
 /core/templates/dev/head/domain/classroom/ @aks681
 /core/templates/dev/head/domain/subtopic_viewer/ @aks681
 /core/templates/dev/head/domain/topic/ @aks681
@@ -351,11 +399,12 @@
 /core/templates/dev/head/app.constants.ts @ankita240796
 /core/templates/dev/head/app.constants.ajs.ts @ankita240796
 /core/templates/dev/head/combined-tests.spec.ts @ankita240796
-/core/templates/dev/head/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @Jamesjay4199
+/core/templates/dev/head/pages/interaction-specs.constants.ajs.ts @vojtechjelinek @jameesjohn
+/core/templates/dev/head/pages/interaction-specs.constants.ts @bansalnitish
 /core/templates/dev/head/I18nFooter.ts @nithusha21
 /core/templates/dev/head/i18n-footer.directive.html @nithusha21
-/core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @YashJipkate
-/core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @YashJipkate
+/core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @bansalnitish
+/core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @bansalnitish
 /core/templates/dev/head/services/translation-file-hash-loader.service.ts @nithusha21
 /release_constants.py @ankita240796 @nithusha21 @seanlip
 
@@ -371,7 +420,7 @@
 /core/templates/dev/head/domain/utilities/ @bansalnitish
 /schema_utils*.py @seanlip
 /utils*.py @aks681
-/python_utils*.py @lilithxxx
+/python_utils*.py @kevinlee12
 
 
 # Restricted pages.
@@ -387,6 +436,10 @@
 /core/tests/ @kevinlee12 @nithusha21
 /assets/ @nithusha21
 /data/ @nithusha21
+
+
+# Release team.
+/scripts/release_scripts/ @ankita240796
 
 
 # Rich text editor team.
@@ -410,6 +463,7 @@
 /core/templates/dev/head/domain/suggestion/ @nithusha21
 /core/templates/dev/head/services/suggestion-modal.service.ts @nithusha21
 
+
 # Feedback project.
 /core/controllers/feedback*.py @nithusha21
 /core/domain/feedback*.py @nithusha21
@@ -422,55 +476,63 @@
 
 
 # Simple pages.
-/core/controllers/pages*.py @jamesjay4199 @vojtechjelinek
-/core/controllers/custom_landing_pages*.py @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/contact-page/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/donate-page/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/error-pages/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/get-started-page/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/landing-pages/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/maintenance-page/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/preferences-page/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/signup-page/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/splash-page/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/teach-page/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/thanks-page/ @jamesjay4199 @vojtechjelinek
+/core/controllers/pages*.py @jameesjohn @vojtechjelinek
+/core/controllers/custom_landing_pages*.py @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/contact-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/delete-account-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/donate-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/error-pages/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/get-started-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/landing-pages/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/maintenance-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/preferences-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/signup-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/splash-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/teach-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/thanks-page/ @jameesjohn @vojtechjelinek
 
 
 # Speed Improvement team.
-/app_dev.yaml @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/google-analytics.initializer.ts @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/base-components/ @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/Base.ts @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/oppia_footer_directive.html @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/OppiaFooterDirective.ts @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/footer_js_libs.html @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/header_css_libs.html @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/pages/header_js_libs.html @jamesjay4199 @vojtechjelinek
-/core/templates/dev/head/services/csrf-token.service*.ts @jamesjay4199 @vojtechjelinek
-/gulpfile.js @jamesjay4199 @vojtechjelinek
-/jinja_utils*.py @jamesjay4199 @vojtechjelinek
-/webpack.common.config.ts @jamesjay4199 @vojtechjelinek
-/webpack.dev.config.ts @jamesjay4199 @vojtechjelinek
-/webpack.prod.config.ts @jamesjay4199 @vojtechjelinek
+/app_dev.yaml @jameesjohn @vojtechjelinek
+/core/templates/dev/head/google-analytics.initializer.ts @jameesjohn @vojtechjelinek
+/core/templates/dev/head/base-components/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/Base.ts @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/oppia_footer_directive.html @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/OppiaFooterDirective.ts @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/footer_js_libs.html @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/header_css_libs.html @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/header_js_libs.html @jameesjohn @vojtechjelinek
+/core/templates/dev/head/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
+/gulpfile.js @jameesjohn @vojtechjelinek
+/jinja_utils*.py @jameesjohn @vojtechjelinek
+/webpack.common.config.ts @jameesjohn @vojtechjelinek
+/webpack.common.macros.ts @jameesjohn @vojtechjelinek
+/webpack.dev.config.ts @jameesjohn @vojtechjelinek
+/webpack.prod.config.ts @jameesjohn @vojtechjelinek
 
 
 # Typings.
 /typings @ankita240796
 
 
-# User’s profile page.
-/core/controllers/profile*.py @kevinlee12
-/core/templates/dev/head/domain/user/ @kevinlee12
-/core/templates/dev/head/pages/profile-page/ @kevinlee12
-/core/templates/dev/head/services/user.service*.ts @kevinlee12
+# User Data Takeout.
+/core/domain/takeout_service*.py @vojtechjelinek @seanlip
+/core/domain/wipeout_jobs_one_off*.py @vojtechjelinek @seanlip
+/core/domain/wipeout_service*.py @vojtechjelinek @seanlip
 
-/core/templates/dev/head/services/services.constants.ajs.ts @kevinlee12
-/core/templates/dev/head/services/services.constants.ts @kevinlee12
+
+# User’s profile page.
+/core/controllers/profile*.py @vojtechjelinek
+/core/templates/dev/head/domain/user/ @vojtechjelinek
+/core/templates/dev/head/pages/profile-page/ @vojtechjelinek
+/core/templates/dev/head/services/user.service*.ts @vojtechjelinek
+
+/core/templates/dev/head/services/services.constants.ajs.ts @vojtechjelinek
+/core/templates/dev/head/services/services.constants.ts @vojtechjelinek
 
 
 # Draft version upgrade.
-/core/domain/draft_upgrade_services*.py @sshou14
+/core/domain/draft_upgrade_services*.py @seanlip
 
 # Critical files.
 #

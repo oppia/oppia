@@ -1,0 +1,29 @@
+<div class="list-group">
+  <md-card layout="row" class="list-view-item protractor-test-skill-select-header">
+    Search By Skill
+    <input type="text" class="form-control protractor-test-skill-name-input" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
+  </md-card>
+  <div style="max-height: 50vh; overflow-y: auto;">
+    <div class="list-group-item protractor-test-rte-skill-selector-item"
+         ng-repeat="skill in $ctrl.skills | filter:skillFilterText"
+         ng-click="$ctrl.selectSkill(skill.id, skill.description)"
+         ng-class="{'list-group-item-success': (skill.id === $ctrl.value.id)}"
+         style="color: black;">
+      <label class="list-group-item-heading"><[skill.description]></label>
+      <div ng-if="skill.id === $ctrl.value.id" style="color: black;">
+        <strong> Explanation </strong>
+        <div style="padding-bottom: 10px; padding-top: 5px;">
+          <angular-html-bind html-data="skill.skill_contents.explanation.html">
+          </angular-html-bind>
+        </div>
+        <strong> Worked Examples </strong>
+        <ul>
+          <li ng-repeat="example in skill.skill_contents.worked_examples" style="padding-top: 5px;">
+            <angular-html-bind html-data="example.html">
+            </angular-html-bind>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -18,6 +18,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -47,9 +48,13 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(ContributionOpportunitiesHandlerTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.set_admins([self.ADMIN_USERNAME])
 
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
@@ -61,8 +66,29 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic')
+            topic_id='0', name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
+
+        self.skill_id_0 = 'skill_id_0'
+        self.skill_id_1 = 'skill_id_1'
+        self.skill_ids = [self.skill_id_0, self.skill_id_1]
+        for skill_id in self.skill_ids:
+            self.save_new_skill(skill_id, self.admin_id, 'skill_description')
+            topic_services.add_uncategorized_skill(
+                self.admin_id, '0', skill_id)
+
+        self.expected_skill_opportunity_dict_0 = {
+            'id': self.skill_id_0,
+            'skill_description': 'skill_description',
+            'question_count': 0,
+            'topic_name': 'topic'
+        }
+        self.expected_skill_opportunity_dict_1 = {
+            'id': self.skill_id_1,
+            'skill_description': 'skill_description',
+            'question_count': 0,
+            'topic_name': 'topic'
+        }
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -106,6 +132,21 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             'translation_counts': {}
         }
 
+    def test_get_skill_opportunity_data(self):
+        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
+            response = self.get_json(
+                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                params={})
+
+            self.assertEqual(
+                response['opportunities'], [
+                    self.expected_skill_opportunity_dict_0,
+                    self.expected_skill_opportunity_dict_1])
+
+            self.assertFalse(response['more'])
+            self.assertTrue(
+                isinstance(response['next_cursor'], python_utils.BASESTRING))
+
     def test_get_translation_opportunity_data(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True):
             response = self.get_json(
@@ -136,6 +177,33 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertFalse(response['more'])
             self.assertTrue(
                 isinstance(response['next_cursor'], python_utils.BASESTRING))
+
+    def test_get_skill_opportunity_data_pagination(self):
+        with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
+            feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
+            response = self.get_json(
+                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL, params={})
+            self.assertEqual(len(response['opportunities']), 1)
+            self.assertEqual(
+                response['opportunities'],
+                [self.expected_skill_opportunity_dict_0])
+            self.assertTrue(response['more'])
+            self.assertTrue(
+                isinstance(response['next_cursor'], python_utils.BASESTRING))
+
+            next_cursor = response['next_cursor']
+            next_response = self.get_json(
+                '%s/skill' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
+                params={'cursor': next_cursor})
+
+            self.assertEqual(len(response['opportunities']), 1)
+            self.assertEqual(
+                next_response['opportunities'],
+                [self.expected_skill_opportunity_dict_1])
+            self.assertFalse(next_response['more'])
+            self.assertTrue(
+                isinstance(
+                    next_response['next_cursor'], python_utils.BASESTRING))
 
     def test_get_translation_opportunity_data_pagination(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
@@ -190,7 +258,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
             self.assertTrue(isinstance(
                 next_response['next_cursor'], python_utils.BASESTRING))
 
-    def test_get_translation_opportunity_with_invlaid_language_code(self):
+    def test_get_translation_opportunity_with_invalid_language_code(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
@@ -205,7 +273,7 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
                 '%s/translation' % feconf.COMMUNITY_OPPORTUNITIES_DATA_URL,
                 expected_status_int=400)
 
-    def test_get_voiceover_opportunity_with_invlaid_language_code(self):
+    def test_get_voiceover_opportunity_with_invalid_language_code(self):
         with self.swap(feconf, 'COMMUNITY_DASHBOARD_ENABLED', True), self.swap(
             feconf, 'OPPORTUNITIES_PAGE_SIZE', 1):
             self.get_json(
@@ -248,7 +316,7 @@ class TranslatableTextHandlerTest(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id='0', name='topic')
+            topic_id='0', name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         stories = [story_domain.Story.create_default_story(

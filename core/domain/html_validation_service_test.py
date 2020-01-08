@@ -484,7 +484,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         for index, test_case in enumerate(test_cases_for_textangular):
             actual_output_for_textangular = (
-                html_validation_service._validate_soup_for_rte( # pylint: disable=protected-access
+                html_validation_service.validate_soup_for_rte(
                     bs4.BeautifulSoup(test_case, 'html.parser'),
                     feconf.RTE_FORMAT_TEXTANGULAR, err_dict))
 
@@ -512,7 +512,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         for index, test_case in enumerate(test_cases_for_ckeditor):
             actual_output_for_ckeditor = (
-                html_validation_service._validate_soup_for_rte( # pylint: disable=protected-access
+                html_validation_service.validate_soup_for_rte(
                     bs4.BeautifulSoup(test_case, 'html.parser'),
                     feconf.RTE_FORMAT_CKEDITOR, err_dict))
 
@@ -1268,7 +1268,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             soup = bs4.BeautifulSoup(
                 html_string.encode(encoding='utf-8'), 'html.parser')
             actual_output.append(list(
-                html_validation_service._validate_customization_args_in_tag( # pylint: disable=protected-access
+                html_validation_service.validate_customization_args_in_tag(
                     soup.find(name=tag_name))))
 
         self.assertEqual(actual_output, expected_output)
@@ -1351,11 +1351,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc2.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc2.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
@@ -1389,9 +1389,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
 
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags(
@@ -1456,10 +1456,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/img.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+        fs.commit('image/img.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(

@@ -144,6 +144,10 @@ angular.module('oppia').directive('stateInteractionEditor', [
           };
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
+            if (stateData === undefined || $.isEmptyObject(stateData)) {
+              throw new Error('Expected stateData to be defined but ' +
+                'received ' + stateData);
+            }
             $scope.hasLoaded = false;
             InteractionDetailsCacheService.reset();
             $rootScope.$broadcast('initializeAnswerGroups', {
@@ -249,8 +253,12 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     $scope.StateCustomizationArgsService = (
                       StateCustomizationArgsService);
 
-                    $scope.getInteractionThumbnailImageUrl = (
-                      UrlInterpolationService.getInteractionThumbnailImageUrl);
+                    $scope.getInteractionThumbnailImageUrl = function(
+                        interactionId) {
+                      return (
+                        UrlInterpolationService.getInteractionThumbnailImageUrl(
+                          interactionId));
+                    };
 
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 

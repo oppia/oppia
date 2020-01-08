@@ -473,8 +473,8 @@ class SuggestionAddQuestion(BaseSuggestion):
         suggestion_id: str. The ID of the suggestion.
         suggestion_type: str. The type of the suggestion.
         target_type: str. The type of target entity being edited, for this
-            subclass, target type is 'topic'.
-        target_id: str. The ID of the topic the question was submitted to.
+            subclass, target type is 'skill'.
+        target_id: str. The ID of the skill the question was submitted to.
         target_version_at_submission: int. The version number of the target
             topic at the time of creation of the suggestion.
         status: str. The status of the suggestion.
@@ -496,13 +496,17 @@ class SuggestionAddQuestion(BaseSuggestion):
         """
         self.suggestion_id = suggestion_id
         self.suggestion_type = suggestion_models.SUGGESTION_TYPE_ADD_QUESTION
-        self.target_type = suggestion_models.TARGET_TYPE_TOPIC
+        self.target_type = suggestion_models.TARGET_TYPE_SKILL
         self.target_id = target_id
         self.target_version_at_submission = target_version_at_submission
         self.status = status
         self.author_id = author_id
         self.final_reviewer_id = final_reviewer_id
         self.change = question_domain.QuestionChange(change)
+        # Update question_state_data_schema_version here instead of surfacing
+        # the version in the frontend.
+        self.change.question_dict['question_state_data_schema_version'] = (
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         self.score_category = score_category
         self.last_updated = last_updated
 
@@ -560,7 +564,6 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
-
         if self.change.skill_id is None:
             raise utils.ValidationError('Expected change to contain skill_id')
         question_dict = self.change.question_dict

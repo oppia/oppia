@@ -6,7 +6,7 @@
           ng-repeat="(tabName, tabDetails) in $ctrl.tabsDetails"
           aria-label="<[tabDetails.ariaLabel]>"
           role="button">
-        <a ng-click="$ctrl.onTabClick(tabName)" href="" class="oppia-opportunities-tabs-text"><[tabDetails.tabName]></a>
+        <a ng-click="$ctrl.onTabClick(tabName)" href="" class="oppia-opportunities-tabs-text protractor-test-<[tabName]>"><[tabDetails.tabName]></a>
         <div class="oppia-active-tab-hilighter"></div>
       </li>
     </ul>
@@ -36,7 +36,7 @@
       </div>
       <div class="oppia-dashboard-langauge-container" ng-if="$ctrl.showLanguageSelector()">
         <span class="oppia-dashboard-langauge-container-label"><[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]> in:</span>
-        <select class="oppia-opportunity-language-selector"
+        <select class="oppia-opportunity-language-selector protractor-test-language-selector"
                 ng-change="$ctrl.onChangeLanguage()"
                 ng-model="$ctrl.languageCode"
                 ng-options="language.id as language.description for language in $ctrl.languageCodesAndDescriptions">
@@ -46,6 +46,9 @@
   </div>
   <div ng-if="$ctrl.activeTabName === 'myContributionTab' || !$ctrl.activeTabName">
     <contributions-and-review></contributions-and-review>
+  </div>
+  <div ng-if="$ctrl.activeTabName === 'questionTab'">
+    <question-opportunities></question-opportunities>
   </div>
   <div ng-if="$ctrl.activeTabName === 'translationTab'">
     <translation-opportunities></translation-opportunities>

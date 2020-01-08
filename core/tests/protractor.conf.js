@@ -29,8 +29,16 @@ var suites = {
       'protractor_desktop/adminTabFeatures.js'
     ],
 
+    classroomPage: [
+      'protractor_desktop/classroomPage.js'
+    ],
+
     collections: [
       'protractor_desktop/collections.js'
+    ],
+
+    communityDashboard: [
+      'protractor_desktop/communityDashboard.js'
     ],
 
     coreEditorAndPlayerFeatures: [

@@ -25,6 +25,7 @@ from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import opportunity_jobs_one_off
 from core.domain import opportunity_services
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -42,7 +43,7 @@ taskqueue_services = models.Registry.import_taskqueue_services()
 
 class ExplorationOpportunitySummaryModelRegenerationJobTest(
         test_utils.GenericTestBase):
-    """Tests for the one-off dashboard subscriptions job."""
+    """Tests for the exploration opportunity summary model regenration job."""
 
     def setUp(self):
         super(
@@ -67,11 +68,11 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         topic_1 = topic_domain.Topic.create_default_topic(
-            topic_id=self.topic_id_1, name='topic1')
+            topic_id=self.topic_id_1, name='topic1', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic_1)
 
         topic_2 = topic_domain.Topic.create_default_topic(
-            topic_id=self.topic_id_2, name='topic2')
+            topic_id=self.topic_id_2, name='topic2', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic_2)
 
         story_1 = story_domain.Story.create_default_story(
@@ -143,7 +144,9 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
             opportunity_services.get_translation_opportunities('hi', None))
         self.assertFalse(more)
 
-        self.assertEqual(old_opportunities, new_opportunities)
+        old_opportunity_dicts = [opp.to_dict() for opp in old_opportunities]
+        new_opportunity_dicts = [opp.to_dict() for opp in new_opportunities]
+        self.assertEqual(old_opportunity_dicts, new_opportunity_dicts)
 
     def test_regeneration_job_returns_correct_output(self):
         exp_opp_summary_model_regen_job_class = (
@@ -353,4 +356,107 @@ class ExplorationOpportunitySummaryModelRegenerationJobTest(
         self.process_and_flush_pending_tasks()
 
         output = exp_opp_summary_model_regen_job_class.get_output(job_id)
+        self.assertEqual(output, [])
+
+
+class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
+    """Tests for the Skill opportunity model regeneration job."""
+
+    def setUp(self):
+        super(SkillOpportunityModelRegenerationJobTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.skill_id_1 = 'skill_1'
+        self.skill_desc_1 = 'skill 1'
+        self.skill_id_2 = 'skill_2'
+        self.skill_desc_2 = 'skill 2'
+
+        self.save_new_skill(self.skill_id_1, self.admin_id, self.skill_desc_1)
+        self.save_new_skill(self.skill_id_2, self.admin_id, self.skill_desc_2)
+
+    def test_regeneration_job_returns_the_initial_opportunity(self):
+        skill_opp_model_regen_job_class = (
+            opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        old_opportunities, _, more = (
+            opportunity_services.get_skill_opportunities(None))
+
+        job_id = skill_opp_model_regen_job_class.create_new()
+        skill_opp_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_opp_model_regen_job_class.get_output(job_id)
+
+        expected = [['SUCCESS', 2]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        new_opportunities, _, more = (
+            opportunity_services.get_skill_opportunities(None))
+        self.assertFalse(more)
+
+        old_opportunity_dicts = [opp.to_dict() for opp in old_opportunities]
+        new_opportunity_dicts = [opp.to_dict() for opp in new_opportunities]
+        self.assertEqual(old_opportunity_dicts, new_opportunity_dicts)
+
+    def test_regeneration_job_creates_new_models(self):
+        skill_opp_model_regen_job_class = (
+            opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob)
+
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        old_creation_time = all_opportunity_models[0].created_on
+
+        job_id = skill_opp_model_regen_job_class.create_new()
+        skill_opp_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_opp_model_regen_job_class.get_output(job_id)
+        expected = [['SUCCESS', 2]]
+        self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+        all_opportunity_models = list(
+            opportunity_models.SkillOpportunityModel.get_all())
+        self.assertEqual(len(all_opportunity_models), 2)
+
+        new_creation_time = all_opportunity_models[0].created_on
+
+        self.assertLess(old_creation_time, new_creation_time)
+
+    def test_regeneration_job_for_deleted_skill_returns_empty_list_output(self):
+        skill_opp_model_regen_job_class = (
+            opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob)
+
+        skill_services.delete_skill(self.admin_id, self.skill_id_1)
+        skill_services.delete_skill(self.admin_id, self.skill_id_2)
+
+        job_id = skill_opp_model_regen_job_class.create_new()
+        skill_opp_model_regen_job_class.enqueue(job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        output = skill_opp_model_regen_job_class.get_output(job_id)
         self.assertEqual(output, [])

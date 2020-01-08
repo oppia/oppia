@@ -21,57 +21,39 @@
 // needs to be imported explicitly.
 import $ from 'jquery';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-require('services/csrf-token.service.ts');
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 describe('Csrf Token Service', function() {
-  var $httpBackend = null;
-  var $q = null;
-  var $rootScope = null;
-  var CsrfTokenService = null;
-
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-  beforeEach(angular.mock.inject(function(
-      _$httpBackend_, _$q_, _$rootScope_, _CsrfTokenService_) {
-    $httpBackend = _$httpBackend_;
-    $q = _$q_;
-    $rootScope = _$rootScope_;
-    CsrfTokenService = _CsrfTokenService_;
-
-    this.scope = $rootScope.$new();
-
-    spyOn($, 'ajax').and.returnValue($q.resolve({token: 'sample-csrf-token'}));
-  }));
-
-  it('should correctly set the csrf token', function(done) {
-    CsrfTokenService.initializeToken();
-
-    CsrfTokenService.getTokenAsync().then(function(token) {
-      expect(token).toEqual('sample-csrf-token');
-    }).then(done, done.fail);
-
-    this.scope.$digest(); // Force all promises to evaluate.
+  let csrfTokenService: CsrfTokenService = null;
+  beforeEach(() => {
+    csrfTokenService = new CsrfTokenService();
+    // TODO(#8035): Remove the use of $.ajax in csrf-token.service
+    // and hence this ts-ignore once all the services are migrated
+    // @ts-ignore
+    spyOn($, 'ajax').and.returnValue(Promise.resolve(
+      {token: 'sample-csrf-token'}));
   });
 
-  it('should error if initialize is called more than once', function() {
-    CsrfTokenService.initializeToken();
+  it('should correctly set the csrf token', (done) => {
+    csrfTokenService.initializeToken();
 
-    expect(CsrfTokenService.initializeToken)
+    csrfTokenService.getTokenAsync().then(function(token) {
+      expect(token).toEqual('sample-csrf-token');
+    }).then(done, done.fail);
+  });
+
+  it('should error if initialize is called more than once', () => {
+    csrfTokenService.initializeToken();
+
+    expect(csrfTokenService.initializeToken)
       .toThrowError('Token request has already been made');
   });
 
-  it('should error if getTokenAsync is called before initialize', function() {
-    expect(CsrfTokenService.getTokenAsync)
-      .toThrowError('Token needs to be initialized');
+  it('should error if getTokenAsync is called before initialize', () => {
+    try {
+      csrfTokenService.getTokenAsync();
+    } catch (e) {
+      expect(e).toEqual(new Error('Token needs to be initialized'));
+    }
   });
 });

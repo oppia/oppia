@@ -2,7 +2,6 @@ var argv = require('yargs').argv;
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
-const isDocker = require('is-docker')();
 if (argv.prodEnv) {
   generatedJs = (
     'third_party/generated/js/third_party.min.js');
@@ -32,7 +31,6 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
-      'local_compiled_js/extensions/**/*.js',
       'core/templates/dev/head/AppInit.ts',
       // This is a file that is generated on running the run_frontend_tests.py
       // script. This generated file is a combination of all the spec files
@@ -91,7 +89,7 @@ module.exports = function(config) {
       }
     },
     autoWatch: true,
-    browsers: ['Chrome_Travis'],
+    browsers: ['CI_Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
     browserConsoleLogOptions: {
@@ -99,21 +97,19 @@ module.exports = function(config) {
       format: '%b %T: %m',
       terminal: true
     },
-    browserNoActivityTimeout: 60000,
+    browserNoActivityTimeout: 120000,
     // Continue running in the background after running tests.
     singleRun: true,
     customLaunchers: {
-      Chrome_Travis: {
-        // Karma can only connect to ChromeHeadless when inside Docker.
-        base: isDocker ? 'ChromeHeadless' : 'Chrome',
+      CI_Chrome: {
+        base: 'ChromeHeadless',
         // Discussion of the necessity of extra flags can be found here:
         // https://github.com/karma-runner/karma-chrome-launcher/issues/154
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
-        flags: isDocker ? [
+        flags: [
           '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-web-security'
-        ] : ['--no-sandbox']
+          '--disable-gpu'
+        ]
       }
     },
 
@@ -154,9 +150,17 @@ module.exports = function(config) {
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
-      devtool: 'inline-source-map',
       module: {
         rules: [
+          {
+            // Exclude all the spec files from the report.
+            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
+            enforce: 'post',
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              options: { esModules: true }
+            }
+          },
           {
             test: /\.ts$/,
             use: [
@@ -174,14 +178,6 @@ module.exports = function(config) {
           {
             test: /\.html$/,
             loader: 'underscore-template-loader'
-          },
-          {
-            test: /\.ts$/,
-            enforce: 'post',
-            use: {
-              loader: 'istanbul-instrumenter-loader',
-              options: { esModules: true }
-            }
           },
           {
             test: /\.css$/,
