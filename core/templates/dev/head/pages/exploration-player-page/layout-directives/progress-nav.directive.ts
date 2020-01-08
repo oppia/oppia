@@ -133,6 +133,12 @@ angular.module('oppia').directive('progressNav', [
           };
 
           $scope.shouldGenericSubmitButtonBeShown = function() {
+            // Special cases to show submit button:
+            // 1. ItemSelectionInput interaction with maximum selectable
+            //    choices > 1 in desktop/mobile mode.
+            // 2. ItemSelectionInput interaction with maximum selectable
+            //    choices == 1 in mobile mode.
+            // 3. MultipleChoiceInput interaction in mobile mode.
             if ((BrowserCheckerService.isMobileDevice() &&
                 ($scope.interactionId === 'ItemSelectionInput' ||
                 $scope.interactionId === 'MultipleChoiceInput')) ||
