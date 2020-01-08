@@ -19,7 +19,7 @@
 require(
   'pages/exploration-player-page/learner-experience/' +
   'continue-button.directive.ts');
-
+require('domain/utilities/browser-checker.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
@@ -49,12 +49,14 @@ angular.module('oppia').directive('progressNav', [
         '/pages/exploration-player-page/layout-directives/' +
         'progress-nav.directive.html'),
       controller: [
-        '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
+        '$scope', '$rootScope', 'BrowserCheckerService',
+        'PlayerPositionService', 'UrlService',
         'PlayerTranscriptService', 'ExplorationEngineService',
         'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
         'ExplorationPlayerStateService',
-        function($scope, $rootScope, PlayerPositionService, UrlService,
+        function($scope, $rootScope, BrowserCheckerService,
+            PlayerPositionService, UrlService,
             PlayerTranscriptService, ExplorationEngineService,
             WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
@@ -131,9 +133,12 @@ angular.module('oppia').directive('progressNav', [
           };
 
           $scope.shouldGenericSubmitButtonBeShown = function() {
-            if ($scope.interactionId === 'ItemSelectionInput' &&
+            if ((BrowserCheckerService.isMobileDevice() &&
+                ($scope.interactionId === 'ItemSelectionInput' ||
+                $scope.interactionId === 'MultipleChoiceInput')) ||
+                ($scope.interactionId === 'ItemSelectionInput' &&
                 $scope.interactionCustomizationArgs
-                  .maxAllowableSelectionCount.value > 1) {
+                  .maxAllowableSelectionCount.value > 1)) {
               return true;
             }
 
