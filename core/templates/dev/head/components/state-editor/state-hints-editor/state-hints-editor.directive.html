@@ -16,7 +16,7 @@
             <!-- Note that adding "track by $index" here seems to mess up the final
             index in the stop() event handler. -->
             <li ng-repeat="hint in StateHintsService.displayed"
-                ng-class="{'active': activeHintIndex === $index}"
+                ng-class="{'active': StateHintsService.getActiveHintIndex() === $index}"
                 class="oppia-rule-block oppia-sortable-hint oppia-prevent-selection"
                 style="margin-top: 0;">
               <span class="oppia-hint-sort-handle"
@@ -26,16 +26,16 @@
               </span>
               <a ng-click="changeActiveHintIndex($index)"
                  class="oppia-rule-tab protractor-test-hint-tab"
-                 ng-class="{'oppia-rule-tab-active': activeHintIndex === $index}">
+                 ng-class="{'oppia-rule-tab-active': StateHintsService.getActiveHintIndex() === $index}">
                 <response-header index="$index"
                                  summary="getHintSummary(hint)"
                                  short-summary="getHintSummary(hint)"
-                                 is-active="$index === activeHintIndex"
+                                 is-active="$index === StateHintsService.getActiveHintIndex()"
                                  on-delete-fn="deleteHint">
                 </response-header>
               </a>
 
-              <div ng-if="activeHintIndex === $index">
+              <div ng-if="StateHintsService.getActiveHintIndex() === $index">
                 <div class="oppia-editor-card-section protractor-test-hint-body-<[$index]>">
                   <hint-editor hint="hint"
                                index-plus-one="$index + 1"

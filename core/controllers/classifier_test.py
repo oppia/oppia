@@ -29,6 +29,7 @@ from core.domain import config_domain
 from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -265,8 +266,8 @@ class NextJobHandlerTest(test_utils.GenericTestBase):
         self.job_id = classifier_models.ClassifierTrainingJobModel.create(
             self.algorithm_id, interaction_id, self.exp_id, 1,
             datetime.datetime.utcnow(), self.training_data, 'Home',
-            feconf.TRAINING_JOB_STATUS_NEW, None, 1
-        )
+            feconf.TRAINING_JOB_STATUS_NEW, 1)
+        fs_services.save_classifier_data(self.exp_id, self.job_id, {})
 
         self.expected_response = {
             u'job_id': self.job_id,

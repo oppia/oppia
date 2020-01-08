@@ -37,18 +37,16 @@ angular.module('oppia').directive('skillEditorNavbar', [
       controller: [
         '$scope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
-        'SkillRightsBackendApiService', 'SkillEditorRoutingService',
+        'SkillEditorRoutingService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $uibModal, $window, AlertsService,
             UndoRedoService, SkillEditorStateService,
-            SkillRightsBackendApiService, SkillEditorRoutingService,
+            SkillEditorRoutingService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.skill = SkillEditorStateService.getSkill();
-          $scope.skillRights = (
-            SkillEditorStateService.getSkillRights());
           $scope.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
           $scope.selectMainTab = SkillEditorRoutingService.navigateToMainTab;
           $scope.isLoadingSkill = SkillEditorStateService.isLoadingSkill;
@@ -107,13 +105,6 @@ angular.module('oppia').directive('skillEditorNavbar', [
             return (
               $scope.getChangeListCount() > 0 &&
               $scope.validationIssues.length === 0);
-          };
-
-          $scope.isSkillPublishable = function() {
-            return (
-              $scope.skillRights.isPrivate() &&
-              $scope.validationIssues.length === 0 &&
-              $scope.getChangeListCount() === 0);
           };
 
           $scope.saveChanges = function() {
