@@ -187,7 +187,7 @@ class RecentUpdatesMRJobManager(
                 'subject': (
                     delete_commit_message if activity_model.deleted else
                     metadata_obj['commit_message']
-                ),
+                )
             })
 
             # If the user subscribes to this activity, he/she is automatically
@@ -272,7 +272,7 @@ class RecentUpdatesMRJobManager(
                     'last_updated_ms': utils.get_time_in_millisecs(
                         last_message.created_on),
                     'subject': feedback_services.get_thread(
-                        last_message.thread_id).subject,
+                        last_message.thread_id).subject
                 })
 
     @staticmethod
@@ -486,7 +486,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         return {
             'total_plays': total_plays,
             'num_ratings': num_ratings,
-            'average_ratings': average_ratings,
+            'average_ratings': average_ratings
         }
 
 
@@ -499,12 +499,12 @@ class UserStatsMRJobManager(
         - Sum of total plays of all explorations owned by the user.
         - Impact score for all explorations contributed to by the user.
 
-    The impact of user is defined as `S ** (2 / 3)` where S is the sum over all
+    The impact of user is defined as `S ^ (2 / 3)` where S is the sum over all
     explorations this user has contributed to determined by the value (rounded
     to nearest integer):
         `per_user * reach * fractional_contribution`, where:
             per_user: average rating - 2.
-            reach: sum(card.answers_given for card in all_cards) ** (2 / 3).
+            reach: sum(card.answers_given for card in all_cards) ^ (2 / 3).
             fractional_contribution: percent of commits by this user.
     """
     @classmethod
@@ -598,7 +598,7 @@ class UserStatsMRJobManager(
                 # Find score for this specific exploration.
                 exploration_data.update({
                     'exploration_impact_score': (
-                        value_per_user * reach * contribution),
+                        value_per_user * reach * contribution)
                 })
 
             # If the user is an owner for the exploration, then update dict with
@@ -607,13 +607,13 @@ class UserStatsMRJobManager(
                 mapped_owner_ids.append(contrib_id)
                 # Get number of starts (total plays) for the exploration.
                 exploration_data.update({
-                    'total_plays_for_owned_exp': num_starts,
+                    'total_plays_for_owned_exp': num_starts
                 })
                 # Update data with average rating only if it is not None.
                 if average_rating is not None:
                     exploration_data.update({
                         'average_rating_for_owned_exp': average_rating,
-                        'num_ratings_for_owned_exp': sum_of_ratings,
+                        'num_ratings_for_owned_exp': sum_of_ratings
                     })
             yield (contrib_id, exploration_data)
 
@@ -622,13 +622,13 @@ class UserStatsMRJobManager(
                 mapped_owner_ids.append(owner_id)
                 # Get number of starts (total plays) for the exploration.
                 exploration_data = {
-                    'total_plays_for_owned_exp': num_starts,
+                    'total_plays_for_owned_exp': num_starts
                 }
                 # Update data with average rating only if it is not None.
                 if average_rating is not None:
                     exploration_data.update({
                         'average_rating_for_owned_exp': average_rating,
-                        'num_ratings_for_owned_exp': sum_of_ratings,
+                        'num_ratings_for_owned_exp': sum_of_ratings
                     })
                 yield (owner_id, exploration_data)
 

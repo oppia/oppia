@@ -825,7 +825,8 @@ def _send_feedback_thread_status_change_emails(
             add to each email buffer.
         old_status: str. One of STATUS_CHOICES.
         new_status: str. One of STATUS_CHOICES.
-        exploration_id: str. The id of exploration that received new message.
+        exploration_id: str. The id of the exploration that received a new
+            message.
         has_suggestion: bool. Whether this thread has a related learner
             suggestion.
     """
@@ -852,8 +853,8 @@ def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
         email_models.GeneralFeedbackEmailReplyToIdModel.get_multi_by_user_ids(
             user_ids, thread_id))
 
-    # Users are added to thread incrementally. Therefore at any time there can
-    # be at most one user who does not have FeedbackEmailReplyToIdModel
+    # Users are added to the thread incrementally. Therefore at any time there
+    # can be at most one user who does not have FeedbackEmailReplyToIdModel
     # instance.
     for user_id in user_ids:
         if feedback_email_id_models[user_id] is None:
@@ -868,9 +869,9 @@ def _add_message_to_email_buffer(
     has changed, notify the recipients as well.
 
     Args:
-        author_id: str. The id of author of message.
-        thread_id: str. The id of thread that received new message.
-        message_id: int. The id of new message.
+        author_id: str. The id of the author of message.
+        thread_id: str. The id of the thread that received new message.
+        message_id: int. The id of the new message.
         message_length: int. Length of the feedback message to be sent.
         old_status: str. One of STATUS_CHOICES. Value of old thread status.
         new_status: str. One of STATUS_CHOICES. Value of new thread status.
@@ -892,8 +893,8 @@ def _add_message_to_email_buffer(
             new_status, exploration_id, has_suggestion)
 
     if message_length:
-        # Send feedback message email only if message text is non empty. It can
-        # be empty in the case when only status is changed.
+        # Send feedback message email only if message text is non empty (the
+        # message text can be empty in the case when only status is changed).
         _send_batch_emails(
             batch_recipient_ids, feedback_message_reference, exploration_id,
             has_suggestion)
