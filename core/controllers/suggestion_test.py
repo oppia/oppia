@@ -698,7 +698,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 question_services.get_displayable_question_skill_link_details(
                     1, [self.SKILL_ID], ''))
         self.assertEqual(len(questions), 1)
-        self.assertEqual(questions[0].creator_id, self.author_id)
         self.assertEqual(
             merged_question_skill_links[0].skill_descriptions,
             [self.SKILL_DESCRIPTION])
@@ -973,7 +972,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
+            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -1145,7 +1144,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
+            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(

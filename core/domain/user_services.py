@@ -100,7 +100,7 @@ class UserSettings(python_utils.OBJECT):
                 constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD']),
             user_bio='', subject_interests=None, first_contribution_msec=None,
             preferred_language_codes=None, preferred_site_language_code=None,
-            preferred_audio_language_code=None):
+            preferred_audio_language_code=None, deleted=False):
         """Constructs a UserSettings domain object.
 
         Args:
@@ -138,6 +138,8 @@ class UserSettings(python_utils.OBJECT):
                 preference.
             preferred_audio_language_code: str or None. Default language used
                 for audio translations preference.
+            deleted: bool. Whether the user has requested removal of their
+                account.
         """
         self.user_id = user_id
         self.gae_id = gae_id
@@ -163,6 +165,7 @@ class UserSettings(python_utils.OBJECT):
             preferred_language_codes if preferred_language_codes else [])
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
+        self.deleted = deleted
 
     def validate(self):
         """Checks that user_id and email fields of this UserSettings domain
@@ -399,7 +402,7 @@ def get_users_settings(user_ids):
         if user_ids[i] == feconf.SYSTEM_COMMITTER_ID:
             result.append(UserSettings(
                 user_id=feconf.SYSTEM_COMMITTER_ID,
-                gae_id=None,
+                gae_id=feconf.SYSTEM_COMMITTER_ID,
                 email=feconf.SYSTEM_EMAIL_ADDRESS,
                 role=feconf.ROLE_ID_ADMIN,
                 username='admin',
@@ -643,7 +646,8 @@ def _save_user_settings(user_settings):
         preferred_site_language_code=(
             user_settings.preferred_site_language_code),
         preferred_audio_language_code=(
-            user_settings.preferred_audio_language_code)
+            user_settings.preferred_audio_language_code),
+        deleted=user_settings.deleted
     ).put()
 
 
@@ -687,7 +691,8 @@ def _transform_user_settings(user_settings_model):
             preferred_site_language_code=(
                 user_settings_model.preferred_site_language_code),
             preferred_audio_language_code=(
-                user_settings_model.preferred_audio_language_code)
+                user_settings_model.preferred_audio_language_code),
+            deleted=user_settings_model.deleted
         )
     else:
         return None
@@ -1014,6 +1019,29 @@ def update_user_role(user_id, role):
     _save_user_settings(user_settings)
 
 
+def mark_user_for_deletion(
+        user_id, exploration_ids, collection_ids):
+    """Set deleted of the user with given user_id to True and create
+    PendingDeletionRequestModel for that user.
+
+    Args:
+        user_id: str. The unique ID of the user who should be deleted.
+        exploration_ids: list(str). List of exploration ids that were soft
+            deleted and should be hard deleted later.
+        collection_ids: list(str). List of collection ids that were soft
+            deleted and should be hard deleted later.
+    """
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.deleted = True
+    _save_user_settings(user_settings)
+
+    user_models.PendingDeletionRequestModel(
+        id=user_id,
+        exploration_ids=exploration_ids,
+        collection_ids=collection_ids,
+    ).put()
+
+
 def get_human_readable_user_ids(user_ids):
     """Converts the given ids to usernames, or truncated email addresses.
     Requires all users to be known.
@@ -1085,6 +1113,20 @@ def record_user_logged_in(user_id):
 
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_logged_in = datetime.datetime.utcnow()
+    _save_user_settings(user_settings)
+
+
+def update_last_logged_in(user_settings, new_last_logged_in):
+    """Updates last_logged_in to the new given datetime for the user with
+    given user_settings. Should only be used by tests.
+
+    Args:
+        user_settings: UserSettings. The UserSettings domain object.
+        new_last_logged_in: datetime or None. The new datetime of the last
+            logged in session.
+    """
+
+    user_settings.last_logged_in = new_last_logged_in
     _save_user_settings(user_settings)
 
 

@@ -115,6 +115,15 @@ def get_redirect_route(regex_route, handler, defaults=None):
 
     Warning: this method strips off parameters after the trailing slash. URLs
     with parameters should be formulated without the trailing slash.
+
+    Args:
+        regex_route: unicode. A raw string representing a route.
+        handler: BaseHandler. A callable to handle the route.
+        defaults: dict. Optional defaults parameter to be passed
+            into the RedirectRoute object.
+
+    Returns:
+        RedirectRoute. A RedirectRoute object for redirects.
     """
     if defaults is None:
         defaults = {}
@@ -317,7 +326,7 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/assetsdevhandler/<page_context>/<page_identifier>/'
-        'assets/<asset_type:(image|audio)>/<encoded_filename>',
+        'assets/<asset_type:(image|audio|thumbnail)>/<encoded_filename>',
         resources.AssetDevHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
@@ -386,6 +395,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
+    get_redirect_route(
+        feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
