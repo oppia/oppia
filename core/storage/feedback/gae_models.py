@@ -78,7 +78,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     message_count = ndb.IntegerProperty(indexed=True, default=0)
     # Cached text of the last message in the thread with non-empty content, or
     # None if there is no such message.
-    last_nonempty_message_text = ndb.StringProperty(indexed=True)
+    last_nonempty_message_text = ndb.StringProperty(indexed=False)
     # Cached ID for the user of the last message in the thread with non-empty
     # content, or None if the message was made anonymously or if there is no
     # such message.
