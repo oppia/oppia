@@ -338,8 +338,8 @@ def get_thread_analytics_multi(exploration_ids):
 
     Returns:
         list(FeedbackAnalytics). Analytics in the the same order as the input
-            list. If an exploration id is invalid, the number of threads in the
-            corresponding FeedbackAnalytics object will be zero.
+        list. If an exploration id is invalid, the number of threads in the
+        corresponding FeedbackAnalytics object will be zero.
     """
     return feedback_jobs_continuous.FeedbackAnalyticsAggregator.get_thread_analytics_multi( # pylint: disable=line-too-long
         exploration_ids)
@@ -367,7 +367,7 @@ def get_total_open_threads(feedback_analytics):
 
     Returns:
         int. The count of all open threads for the given FeedbackAnalytics
-            domain object.
+        domain object.
     """
     return sum(feedback.num_open_threads for feedback in feedback_analytics)
 
@@ -615,7 +615,7 @@ def get_feedback_message_references(user_id):
 
     Returns:
         list(FeedbackMessageReference). The resulting FeedbackMessageReference
-            domain objects.
+        domain objects.
     """
     model = feedback_models.UnsentFeedbackEmailModel.get(user_id, strict=False)
     feedback_message_references = (
