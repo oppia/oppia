@@ -580,7 +580,7 @@ def enqueue_feedback_message_instant_email_task(user_id, reference):
     """
     payload = {
         'user_id': user_id,
-        'reference_dict': reference.to_dict(),
+        'reference_dict': reference.to_dict()
     }
     taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS, payload, 0)
@@ -600,7 +600,7 @@ def _enqueue_feedback_thread_status_change_email_task(
         'user_id': user_id,
         'reference_dict': reference.to_dict(),
         'old_status': old_status,
-        'new_status': new_status,
+        'new_status': new_status
     }
     taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_FEEDBACK_STATUS_EMAILS, payload, 0)
