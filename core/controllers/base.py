@@ -84,12 +84,8 @@ class LogoutPage(webapp2.RequestHandler):
         url_to_redirect_to = (
             python_utils.convert_to_bytes(
                 self.request.get('redirect_url', '/')))
-
-        if constants.DEV_MODE:
-            self.redirect(
-                current_user_services.create_logout_url(url_to_redirect_to))
-        else:
-            self.redirect(url_to_redirect_to)
+        self.redirect(
+            current_user_services.create_logout_url(url_to_redirect_to))
 
 
 class UserFacingExceptions(python_utils.OBJECT):
@@ -222,11 +218,8 @@ class BaseHandler(webapp2.RequestHandler):
                 '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
             return
 
-        # In DEV_MODE, clearing cookies does not log out the user, so we
-        # force-clear them by redirecting to the logout URL.
-        if constants.DEV_MODE and self.partially_logged_in:
-            self.redirect(
-                current_user_services.create_logout_url(self.request.uri))
+        if self.partially_logged_in:
+            self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
