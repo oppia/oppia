@@ -2335,11 +2335,12 @@ def can_access_story_viewer_page(handler):
             if the user can access the given story viewer page.
     """
 
-    def test_can_access(self, story_id, **kwargs):
+    def test_can_access(self, story_id, *args, **kwargs):
         """Checks if the user can access story viewer page.
 
         Args:
             story_id: str. The unique id of the story.
+            *args: *. Arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2370,7 +2371,7 @@ def can_access_story_viewer_page(handler):
                 (story_is_published and topic_is_published) or
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
                 user_actions_info.actions):
-            return handler(self, story_id, **kwargs)
+            return handler(self, story_id, *args, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_access.__wrapped__ = True

@@ -19,7 +19,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 from constants import constants
 from core.domain import rights_manager
 from core.domain import story_domain
-from core.domain import story_fetchers
 from core.domain import story_services
 from core.domain import summary_services
 from core.domain import topic_services
@@ -199,65 +198,3 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
             self.get_json(
                 '%s/%s' % (feconf.STORY_DATA_HANDLER, 'story_id_1'),
                 expected_status_int=404)
-
-
-class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
-
-    def test_post_fails_when_new_structures_not_enabled(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            csrf_token = self.get_new_csrf_token()
-
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
-            self.post_json(
-                '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, 'story_id_1',
-                    'node_1'),
-                {}, csrf_token=csrf_token, expected_status_int=404)
-
-    def test_post_succeeds_when_story_and_node_exist(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID_1,
-                    self.NODE_ID_1),
-                {}, csrf_token=csrf_token, expected_status_int=200)
-        completed_nodes = story_fetchers.get_completed_node_ids(
-            self.viewer_id, self.STORY_ID_1)
-        self.assertEqual(completed_nodes[1], self.NODE_ID_1)
-
-    def test_post_fails_when_story_does_not_exist(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, 'story_id_2',
-                    self.NODE_ID_1),
-                {}, csrf_token=csrf_token, expected_status_int=404)
-
-    def test_post_fails_when_node_does_not_exist(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID_1,
-                    'node_4'),
-                {}, csrf_token=csrf_token, expected_status_int=404)
-
-    def test_post_fails_when_story_is_not_published(self):
-        new_story_id = 'new_story_id'
-        story = story_domain.Story.create_default_story(
-            new_story_id, 'Title', self.TOPIC_ID)
-        story_services.save_new_story(self.admin_id, story)
-
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            csrf_token = self.get_new_csrf_token()
-
-            self.post_json(
-                '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, new_story_id,
-                    'node_4'),
-                {}, csrf_token=csrf_token, expected_status_int=404)

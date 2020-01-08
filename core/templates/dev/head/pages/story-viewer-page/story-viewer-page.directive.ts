@@ -23,8 +23,8 @@ require(
   'pages/story-viewer-page/navbar-breadcrumb/' +
   'story-viewer-navbar-breadcrumb.directive.ts');
 require(
-  'pages/story-viewer-page/chapters-list/' +
-  'story-viewer-chapters-list.directive.ts');
+  'pages/story-viewer-page/main-page/' +
+  'story-viewer-main-page.directive.ts');
 
 require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');

@@ -39,7 +39,7 @@ angular.module('oppia').animation('.oppia-story-animate-slide', function() {
   };
 });
 
-angular.module('oppia').directive('storyViewerChaptersList', [
+angular.module('oppia').directive('storyViewerMainPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -50,8 +50,8 @@ angular.module('oppia').directive('storyViewerChaptersList', [
         getDescription: '&storyDescription'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story-viewer-page/chapters-list' +
-        '/story-viewer-chapters-list.directive.html'),
+        '/pages/story-viewer-page/main-page' +
+        '/story-viewer-main-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$anchorScroll', '$http', '$location', 'AlertsService',
@@ -81,46 +81,28 @@ angular.module('oppia').directive('storyViewerChaptersList', [
           ctrl.ICON_Y_INCREMENT_PX = 110;
           ctrl.ICON_X_MIDDLE_PX = 225;
           ctrl.ICON_X_LEFT_PX = 55;
-          ctrl.ICON_X_RIGHT_PX = 395;
+          ctrl.ICON_X_RIGHT_PX = 410;
           ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
           ctrl.nextExplorationId = null;
 
           $anchorScroll.yOffset = -80;
 
-          ctrl.isVisibleCard = function(storyNode) {
+          ctrl.isSummaryTileVisible = function(storyNode) {
             if (!storyNode) {
               return false;
             }
-            var isNextPendingNode = (
-              ctrl.storyPlaythroughObject.getNextPendingNodeId() ===
-              storyNode.getId());
-            return storyNode.isCompleted() || isNextPendingNode;
-          };
-
-          ctrl.getIconTitle = function(node, isMobile, index) {
-            var prefix = '';
-            if (isMobile) {
-              prefix = (index + 1) + '. ';
-            }
-            if (ctrl.isVisibleCard(node)) {
-              if (node.isCompleted()) {
-                return prefix + node.getTitle() + ' - Completed!';
-              } else {
-                return prefix + node.getTitle();
-              }
-            } else {
-              return 'LOCKED';
-            }
+            return (
+              storyNode.isCompleted() || (
+                ctrl.storyPlaythroughObject.getNextPendingNodeId() ===
+                storyNode.getId()));
           };
 
           ctrl.togglePreviewCard = function(storyNode) {
-            if (ctrl.isVisibleCard(storyNode)) {
-              ctrl.explorationCardIsShown = !ctrl.explorationCardIsShown;
-            }
+            ctrl.explorationCardIsShown = !ctrl.explorationCardIsShown;
           };
 
           ctrl.setIconHighlight = function(node, index) {
-            if (ctrl.isVisibleCard(node)) {
+            if (ctrl.isSummaryTileVisible(node)) {
               ctrl.activeHighlightedIconIndex = index;
             }
           };
@@ -130,9 +112,13 @@ angular.module('oppia').directive('storyViewerChaptersList', [
           };
 
           ctrl.updateExplorationPreview = function(storyNode) {
-            ctrl.explorationCardIsShown = ctrl.isVisibleCard(storyNode);
+            ctrl.currentNode = storyNode;
+            ctrl.explorationCardIsShown = true;
             ctrl.currentExplorationId = storyNode.getExplorationId();
             ctrl.summaryToPreview = storyNode.getExplorationSummaryObject();
+            if (!ctrl.isSummaryTileVisible(storyNode)) {
+              ctrl.summaryToPreview.thumbnail_bg_color = 'grey';
+            }
             ctrl.completedNode = storyNode.isCompleted();
             ctrl.currentNodeId = storyNode.getId();
           };
@@ -250,7 +236,7 @@ angular.module('oppia').directive('storyViewerChaptersList', [
           };
 
           ctrl.getExplorationUrl = function(node) {
-            if (!ctrl.isVisibleCard(node)) {
+            if (!ctrl.isSummaryTileVisible(node)) {
               return null;
             }
             var result = '/explore/' + node.getExplorationId();

@@ -8,7 +8,7 @@
       <[$ctrl.getDescription()]>
     </div>
 
-    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-path-section d-none d-md-block">
+    <div class="oppia-story-path-section d-none d-md-block">
       <svg width="540px" ng-attr-height="<[$ctrl.svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
         <path fill="none"
               stroke="#296E5F"
@@ -47,7 +47,12 @@
          ng-href="<[$ctrl.getExplorationUrl(node)]>"
          ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
         <div ng-style="{width: '160px',position: 'absolute',left: '<[$ctrl.getExplorationTitlePosition($index)]>',color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '18px',bottom: '65%'}">
-          <[$ctrl.getIconTitle(node, false)]>
+          <span ng-if="$ctrl.isSummaryTileVisible(node) && node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}">
+          </span>
+          <span ng-if="!$ctrl.isSummaryTileVisible(node)" aria-live="assertive" translate="I18N_STORY_VIEWER_LOCKED_CHAPTER" translate-values="{title: node.getTitle()}">
+          </span>
+          <span ng-if="$ctrl.isSummaryTileVisible(node) && !node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_PENDING_CHAPTER" translate-values="{title: node.getTitle()}">
+          </span>
         </div>
 
         <svg width="100"
@@ -111,12 +116,18 @@
       </a>
     </div>
 
-    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-story-table d-md-none d-lg-none d-xl-none">
+    <div class="oppia-story-table d-md-none d-lg-none d-xl-none">
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.storyPlaythroughObject.getStoryNodes()" id="mobile-path-anchor-<[$index]>">
         <a href=""
-           title-data="<[$ctrl.getIconTitle(node, true, $index)]>"
            class="oppia-story-node-small-screen">
+           <[$index + 1]>
+           <span ng-if="$ctrl.isSummaryTileVisible(node) && node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}">
+           </span>
+           <span ng-if="!$ctrl.isSummaryTileVisible(node)" aria-live="assertive" translate="I18N_STORY_VIEWER_LOCKED_CHAPTER" translate-values="{title: node.getTitle()}">
+           </span>
+           <span ng-if="$ctrl.isSummaryTileVisible(node) && !node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_PENDING_CHAPTER" translate-values="{title: node.getTitle()}">
+           </span>
           <svg width="100"
                height="150"
                xmlns="http://www.w3.org/2000/svg"
@@ -190,10 +201,11 @@
         </a>
         <img ng-src="<[$ctrl.getStaticImageUrl('/general/mobile_path_segment.svg')]>">
         <div style="position: fixed; z-index: 100; top: 0; left: 0;">
-          <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': $ctrl.explorationCardIsShown}" ng-click="$ctrl.closeOnClickingOutside()">
+          <div ng-class="{'oppia-activity-summary-tile-mobile-background-mask': $ctrl.explorationCardIsShown}"
+               ng-click="$ctrl.closeOnClickingOutside()">
             <exploration-summary-tile ng-if="$ctrl.explorationCardIsShown"
                                       ng-click="$ctrl.onClickStopPropagation($event)"
-                                      exploration-id="$ctrl.currentExplorationId"
+                                      exploration-id="$ctrl.isSummaryTileVisible($ctrl.currentNode) ? $ctrl.currentExplorationId : null"
                                       exploration-title="$ctrl.summaryToPreview.title"
                                       node-id="$ctrl.currentNodeId"
                                       last-updated-msec="$ctrl.summaryToPreview.last_updated_msec"
@@ -212,7 +224,7 @@
       </div>
     </div>
 
-    <div ng-if="$ctrl.storyPlaythroughObject" class="oppia-card-preview-panel d-none d-md-block">
+    <div class="oppia-card-preview-panel d-none d-md-block">
       <md-card class="oppia-activity-summary-tile md-default-theme">
         <div class="title-section" style="background-color: grey; z-index: 1;">
           <img ng-src="<[$ctrl.getStaticImageUrl('/subjects/Lightbulb.svg')]>" class="thumbnail-image">
