@@ -147,6 +147,11 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(user_data, test_data)
 
+    def test_message_cache_supports_huge_text(self):
+        self.feedback_thread_model.last_nonempty_message_text = 'X' * 2000
+        # Storing the model should not throw.
+        self.feedback_thread_model.put()
+
 
 class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
     """Tests for the GeneralFeedbackMessageModel class."""
