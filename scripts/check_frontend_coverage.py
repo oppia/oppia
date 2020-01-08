@@ -306,7 +306,7 @@ def check_coverage_changes():
 
             whitelist.remove(file_name)
         else:
-            if total_lines and total_lines == covered_lines:
+            if total_lines == covered_lines:
                 errors += ('\033[1m{}\033[0m file is fully covered but it\'s'
                            ' not in the "100% coverage" whitelist. Please add'
                            ' the file name in the whitelist in the file'
