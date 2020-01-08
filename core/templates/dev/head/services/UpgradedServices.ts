@@ -134,6 +134,8 @@ import { PlaythroughIssueObjectFactory } from
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+import { ReadOnlyStoryNodeObjectFactory } from
+  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
@@ -180,8 +182,12 @@ import { StateWrittenTranslationsService } from
   'components/state-editor/state-editor-properties-services/state-written-translations.service';
 import { StopwatchObjectFactory } from
   'domain/utilities/StopwatchObjectFactory';
+import { StoryPlaythroughObjectFactory } from
+  'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
+import { StorySummaryObjectFactory } from
+  'domain/story/StorySummaryObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicObjectFactory } from
@@ -283,9 +289,13 @@ export class UpgradedServices {
       new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
       new PlaythroughIssueObjectFactory();
+    upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
+      new ReadOnlyStoryNodeObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
+    upgradedServices['StorySummaryObjectFactory'] =
+      new StorySummaryObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();
@@ -359,6 +369,10 @@ export class UpgradedServices {
       new StateClassifierMappingService(
         upgradedServices['ClassifierObjectFactory']);
     upgradedServices['StateEditorService'] =
+      new StateEditorService(upgradedServices['SolutionValidityService']);
+    upgradedServices['StoryPlaythroughObjectFactory'] =
+      new StoryPlaythroughObjectFactory(
+        upgradedServices['ReadOnlyStoryNodeObjectFactory']);
     new StateEditorService(upgradedServices['SolutionValidityService']);
     upgradedServices['StoryReferenceObjectFactory'] =
         new StoryReferenceObjectFactory();

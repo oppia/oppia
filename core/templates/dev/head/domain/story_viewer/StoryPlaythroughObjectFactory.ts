@@ -17,62 +17,73 @@
  * story playthrough domain objects.
  */
 
-require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StoryPlaythroughObjectFactory', [
-  'ReadOnlyStoryNodeObjectFactory', function(ReadOnlyStoryNodeObjectFactory) {
-    // Stores information about a current playthrough of a story for a
-    // user.
-    var StoryPlaythrough = function(nodes) {
-      this._nodes = nodes;
-    };
+import { ReadOnlyStoryNodeObjectFactory, ReadOnlyStoryNode } from
+  'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 
-    StoryPlaythrough.prototype.getInitialNode = function() {
-      return this._nodes[0];
-    };
+export class StoryPlaythrough {
+  _nodes: Array<ReadOnlyStoryNode>;
 
-    StoryPlaythrough.prototype.getStoryNodeCount = function() {
-      return this._nodes.length;
-    };
+  constructor(nodes: Array<ReadOnlyStoryNode>) {
+    this._nodes = nodes;
+  }
 
-    StoryPlaythrough.prototype.getStoryNodes = function() {
-      return this._nodes;
-    };
+  getInitialNode(): ReadOnlyStoryNode {
+    return this._nodes[0];
+  }
 
-    StoryPlaythrough.prototype.hasFinishedStory = function() {
-      return this._nodes.slice(-1)[0].isCompleted();
-    };
+  getStoryNodeCount(): Number {
+    return this._nodes.length;
+  }
 
-    StoryPlaythrough.prototype.getNextPendingNodeId = function() {
-      for (var i = 0; i < this._nodes.length; i++) {
-        if (!this._nodes[i].isCompleted()) {
-          return this._nodes[i].getId();
-        }
+  getStoryNodes(): Array<ReadOnlyStoryNode> {
+    return this._nodes;
+  }
+
+  hasFinishedStory(): boolean {
+    return this._nodes.slice(-1)[0].isCompleted();
+  }
+
+  getNextPendingNodeId(): string {
+    for (var i = 0; i < this._nodes.length; i++) {
+      if (!this._nodes[i].isCompleted()) {
+        return this._nodes[i].getId();
       }
-    };
+    }
+  }
 
-    StoryPlaythrough.prototype.hasStartedStory = function() {
-      return this._nodes[0].isCompleted();
-    };
+  hasStartedStory(): boolean {
+    return this._nodes[0].isCompleted();
+  }
+}
 
-    // Static class methods. Note that "this" is not available in static
-    // contexts. This function takes a JSON object which represents a backend
-    // story playthrough python dict.
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    StoryPlaythrough['createFromBackendDict'] = function(
-    /* eslint-enable dot-notation */
-        storyPlaythroughBackendObject) {
-      var nodeObjects = [];
+@Injectable({
+  providedIn: 'root'
+})
+export class StoryPlaythroughObjectFactory {
+  constructor(private readOnlyStoryNodeObjectFactory:
+      ReadOnlyStoryNodeObjectFactory) {}
 
-      nodeObjects = storyPlaythroughBackendObject.story_nodes.map(
-        function(node) {
-          return ReadOnlyStoryNodeObjectFactory.createFromBackendDict(node);
-        }
-      );
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  createFromBackendDict(storyPlaythroughBackendDict: any): StoryPlaythrough {
+    var nodeObjects = [];
+    var readOnlyStoryNodeObjectFactory = this.readOnlyStoryNodeObjectFactory;
 
-      return new StoryPlaythrough(nodeObjects);
-    };
+    nodeObjects = storyPlaythroughBackendDict.story_nodes.map(
+      function(node) {
+        return readOnlyStoryNodeObjectFactory.createFromBackendDict(node);
+      }
+    );
 
-    return StoryPlaythrough;
-  }]);
+    return new StoryPlaythrough(nodeObjects);
+  }
+}
+
+angular.module('oppia').factory(
+  'StoryPlaythroughObjectFactory',
+  downgradeInjectable(StoryPlaythroughObjectFactory));

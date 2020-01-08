@@ -37,6 +37,12 @@ require(
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-name.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-param-changes.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -68,15 +74,15 @@ angular.module('oppia').directive('stateEditor', [
       controller: [
         '$rootScope', '$scope', 'StateContentService',
         'StateCustomizationArgsService', 'StateEditorService',
-        'StateHintsService', 'StateInteractionIdService',
-        'StateSolicitAnswerDetailsService', 'StateSolutionService',
-        'INTERACTION_SPECS',
+        'StateHintsService', 'StateInteractionIdService', 'StateNameService',
+        'StateParamChangesService', 'StateSolicitAnswerDetailsService',
+        'StateSolutionService', 'INTERACTION_SPECS',
         function(
             $rootScope, $scope, StateContentService,
             StateCustomizationArgsService, StateEditorService,
-            StateHintsService, StateInteractionIdService,
-            StateSolicitAnswerDetailsService, StateSolutionService,
-            INTERACTION_SPECS) {
+            StateHintsService, StateInteractionIdService, StateNameService,
+            StateParamChangesService, StateSolicitAnswerDetailsService,
+            StateSolutionService, INTERACTION_SPECS) {
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
           $scope.currentStateIsTerminal = false;
@@ -102,6 +108,10 @@ angular.module('oppia').directive('stateEditor', [
           });
 
           $scope.$on('stateEditorInitialized', function(evt, stateData) {
+            if (stateData === undefined || $.isEmptyObject(stateData)) {
+              throw new Error('Expected stateData to be defined but ' +
+                'received ' + stateData);
+            }
             $scope.stateData = stateData;
             $scope.stateName = StateEditorService.getActiveStateName();
             StateEditorService.setInteraction(stateData.interaction);
@@ -113,6 +123,9 @@ angular.module('oppia').directive('stateEditor', [
               $scope.stateName, stateData.interaction.id);
             StateCustomizationArgsService.init(
               $scope.stateName, stateData.interaction.customizationArgs);
+            StateNameService.init($scope.stateName, stateData.name);
+            StateParamChangesService.init(
+              $scope.stateName, stateData.paramChanges);
             StateSolicitAnswerDetailsService.init(
               $scope.stateName, stateData.solicitAnswerDetails);
             StateSolutionService.init(
