@@ -241,8 +241,6 @@ describe('Skill editor state service', function() {
 
     skillRightsObject = {
       skill_id: 'skill_id_1',
-      creator_id: '0',
-      skill_is_private: true,
       can_edit_skill_description: true
     };
     fakeSkillRightsBackendApiService.backendSkillRightsObject = (
@@ -388,8 +386,6 @@ describe('Skill editor state service', function() {
   it('should initially return an interstitial skill rights object', function() {
     var skillRights = SkillEditorStateService.getSkillRights();
     expect(skillRights.getSkillId()).toEqual(null);
-    expect(skillRights.getCreatorId()).toEqual(null);
-    expect(skillRights.isPrivate()).toEqual(true);
     expect(skillRights.canEditSkillDescription()).toEqual(false);
   });
 

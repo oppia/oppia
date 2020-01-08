@@ -78,7 +78,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     message_count = ndb.IntegerProperty(indexed=True, default=0)
     # Cached text of the last message in the thread with non-empty content, or
     # None if there is no such message.
-    last_nonempty_message_text = ndb.StringProperty(indexed=True)
+    last_nonempty_message_text = ndb.TextProperty(indexed=False)
     # Cached ID for the user of the last message in the thread with non-empty
     # content, or None if the message was made anonymously or if there is no
     # such message.
@@ -99,7 +99,18 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.original_author_id == user_id).get() is not None
+        return cls.query(cls.original_author_id == user_id).get(
+            keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralFeedbackThreadModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.original_author_id
 
     @classmethod
     def export_data(cls, user_id):
@@ -217,6 +228,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # rest of the thread, should exist only when the subject changes.
     updated_subject = ndb.StringProperty(indexed=False)
     # Message text. Allowed not to exist (e.g. post only to update the status).
+    # TODO(#8368): String properties have a size limit of 1500 bytes according
+    # to the GAE API. We should investigate the effort required to use
+    # ndb.TextProperty instead.
     text = ndb.StringProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
     # the web).
@@ -238,7 +252,18 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.author_id == user_id).get() is not None
+        return cls.query(cls.author_id == user_id).get(
+            keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralFeedbackMessageModel has one field that contains user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD
+
+    @classmethod
+    def get_user_id_migration_field(cls):
+        """Return field that contains user ID."""
+        return cls.author_id
 
     @classmethod
     def export_data(cls, user_id):
@@ -455,7 +480,14 @@ class GeneralFeedbackThreadUserModel(base_models.BaseModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return cls.query(cls.user_id == user_id).get() is not None
+        return cls.query(cls.user_id == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralFeedbackThreadUserModel has ID that contains user ID and one
+        field that contains user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY_AND_UPDATE_ONE_FIELD
 
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
@@ -575,6 +607,11 @@ class FeedbackAnalyticsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return False
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """FeedbackAnalyticsModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def create(cls, model_id, num_open_threads, num_total_threads):
         """Creates a new FeedbackAnalyticsModel entry.
@@ -631,3 +668,10 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """UnsentFeedbackEmailModel has ID that contains user ID and needs to be
+        replaced.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.COPY
