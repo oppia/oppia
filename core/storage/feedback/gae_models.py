@@ -78,7 +78,7 @@ class GeneralFeedbackThreadModel(base_models.BaseModel):
     message_count = ndb.IntegerProperty(indexed=True, default=0)
     # Cached text of the last message in the thread with non-empty content, or
     # None if there is no such message.
-    last_nonempty_message_text = ndb.StringProperty(indexed=True)
+    last_nonempty_message_text = ndb.TextProperty(indexed=False)
     # Cached ID for the user of the last message in the thread with non-empty
     # content, or None if the message was made anonymously or if there is no
     # such message.
@@ -228,6 +228,9 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # rest of the thread, should exist only when the subject changes.
     updated_subject = ndb.StringProperty(indexed=False)
     # Message text. Allowed not to exist (e.g. post only to update the status).
+    # TODO(#8368): String properties have a size limit of 1500 bytes according
+    # to the GAE API. We should investigate the effort required to use
+    # ndb.TextProperty instead.
     text = ndb.StringProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
     # the web).
