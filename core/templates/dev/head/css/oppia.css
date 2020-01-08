@@ -2179,6 +2179,11 @@ pre.oppia-pre-wrapped-text {
   padding-top: 3px;
 }
 
+.oppia-small-tag-pb {
+  display: block;
+  padding-bottom: 10px;
+}
+
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
   background: none;
