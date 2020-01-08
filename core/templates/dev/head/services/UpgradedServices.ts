@@ -189,6 +189,8 @@ import { StoryPlaythroughObjectFactory } from
   'domain/story_viewer/StoryPlaythroughObjectFactory';
 import { StoryReferenceObjectFactory } from
   'domain/topic/StoryReferenceObjectFactory';
+import { StorySummaryObjectFactory } from
+  'domain/story/StorySummaryObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SubtopicObjectFactory } from
@@ -297,6 +299,8 @@ export class UpgradedServices {
       new StateImprovementSuggestionService();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
+    upgradedServices['StorySummaryObjectFactory'] =
+      new StorySummaryObjectFactory();
     upgradedServices['SubtitledHtmlObjectFactory'] =
       new SubtitledHtmlObjectFactory();
     upgradedServices['SuggestionModalService'] = new SuggestionModalService();

@@ -109,10 +109,19 @@ class UserSettingsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User settings can be deleted since it only contains information
+        """UserSettingsModel can be deleted since it only contains information
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserSettingsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -219,7 +228,7 @@ class UserSettingsModel(base_models.BaseModel):
             UserSettingsModel. The UserSettingsModel instance which has the same
             GAE user ID.
         """
-        return cls.get_all().filter(cls.gae_id == gae_id).get()
+        return cls.query(cls.gae_id == gae_id).get()
 
     @classmethod
     def get_by_normalized_username(cls, normalized_username):
@@ -262,10 +271,19 @@ class CompletedActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Completed activities can be deleted since it only contains
+        """CompletedActivitiesModel can be deleted since it only contains
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of CompletedActivitiesModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -323,10 +341,19 @@ class IncompleteActivitiesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Incomplete activities can be deleted since it only contains
+        """IncompleteActivitiesModel can be deleted since it only contains
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of IncompleteActivitiesModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -390,10 +417,20 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration user last playthrough can be deleted since it only
-        contains information relevant to the one user.
+        """ExpUserLastPlaythroughModel can be deleted since it only contains
+        information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of ExpUserLastPlaythroughModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        ndb.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -501,10 +538,19 @@ class LearnerPlaylistModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Learner playlist can be deleted since it only contains information
-        relevant to the one user.
+        """LearnerPlaylistModel can be deleted since it only contains
+        information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of LearnerPlaylistModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -566,10 +612,19 @@ class UserContributionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User contributions can be deleted since it only contains information
-        relevant to the one user.
+        """UserContributionsModel can be deleted since it only contains
+        information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserContributionsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -635,10 +690,19 @@ class UserEmailPreferencesModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User email preferences can be deleted since it only contains
+        """UserEmailPreferencesModel can be deleted since it only contains
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserEmailPreferencesModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -682,10 +746,19 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User subscription can be deleted since it only contains information
-        relevant to the one user.
+        """UserSubscriptionsModel can be deleted since it only contains
+        information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserSubscriptionsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -744,10 +817,19 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User subscribers can be deleted since it only contains information
-        relevant to the one user.
+        """UserSubscribersModel can be deleted since it only contains
+        information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserSubscribersModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -783,10 +865,19 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User recent changes batch can be deleted since it only contains
+        """UserRecentChangesBatchModel can be deleted since it only contains
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserRecentChangesBatchModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -860,10 +951,19 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User stats can be deleted since it only contains information relevant
-        to the one user.
+        """UserStatsModel can be deleted since it only contains information
+        relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instance of UserStatsModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        cls.delete_by_id(user_id)
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -977,10 +1077,20 @@ class ExplorationUserDataModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Exploration user data need to be copied to new model to preserve the
-        ratings.
+        """ExplorationUserDataModel can be deleted since it only contains
+        information relevant to the one user.
         """
-        return base_models.DELETION_POLICY.ANONYMIZE
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of ExplorationUserDataModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        ndb.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1126,10 +1236,20 @@ class CollectionProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Collection progress can be deleted since it only contains information
-        relevant to the one user.
+        """CollectionProgressModel can be deleted since it only contains
+        information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of CollectionProgressModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        ndb.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1282,10 +1402,20 @@ class StoryProgressModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Story progress can be deleted since it only contains information
+        """StoryProgressModel can be deleted since it only contains information
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of StoryProgressModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        ndb.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1464,10 +1594,20 @@ class UserQueryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User query can be deleted since it only contains information
+        """UserQueryModel can be deleted since it only contains information
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserQueryModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        ndb.delete_multi(
+            cls.query(cls.submitter_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1533,10 +1673,8 @@ class UserBulkEmailsModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User bulk emails can be deleted since it only contains information
-        relevant to the one user.
-        """
-        return base_models.DELETION_POLICY.DELETE
+        """UserBulkEmailsModel should be kept for audit purposes."""
+        return base_models.DELETION_POLICY.KEEP
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1575,10 +1713,20 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User skill mastery can be deleted since it only contains information
-        relevant to the one user.
+        """UserSkillMasteryModel can be deleted since it only contains
+        information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserSkillMasteryModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        ndb.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1653,10 +1801,20 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """User bulk emails can be deleted since it only contains information
-        relevant to the one user.
+        """UserContributionScoringModel can be deleted since it only contains
+        information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def apply_deletion_policy(cls, user_id):
+        """Delete instances of UserContributionScoringModel for the user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be deleted.
+        """
+        ndb.delete_multi(
+            cls.query(cls.user_id == user_id).fetch(keys_only=True))
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1793,3 +1951,46 @@ class UserContributionScoringModel(base_models.BaseModel):
         else:
             model.score += increment_by
             model.put()
+
+
+class PendingDeletionRequestModel(base_models.BaseModel):
+    """Model for storing pending deletion requests.
+
+    Model contains activity ids that were marked as deleted and should be
+    force deleted in the deletion process.
+
+    Instances of this class are keyed by the user id.
+    """
+
+    # Whether the deletion is completed.
+    deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
+    # IDs of all the private explorations created by this user.
+    exploration_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of all the private collections created by this user.
+    collection_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """PendingDeletionRequestModel should be deleted after the user is
+        deleted.
+        """
+        return base_models.DELETION_POLICY.KEEP
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether PendingDeletionRequestModel exists for the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether the model for user_id exists.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """PendingDeletionRequestModel is going to be used later and only as
+        a temporary model, so it doesn't need to be migrated.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

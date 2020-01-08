@@ -75,7 +75,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           var ctrl = this;
           ctrl.TAB_NAME_TOPICS = 'topics';
           ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
-          ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
 
           var _initDashboard = function() {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
@@ -90,8 +89,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   response.data.untriaged_skill_summary_dicts;
                 ctrl.mergeableSkillSummaries =
                   response.data.mergeable_skill_summary_dicts;
-                ctrl.unpublishedSkillSummaries =
-                  response.data.unpublished_skill_summary_dicts;
                 ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 ctrl.userCanCreateTopic = response.data.can_create_topic;
                 ctrl.userCanCreateSkill = response.data.can_create_skill;
@@ -104,10 +101,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 if (ctrl.topicSummaries.length === 0 &&
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
-                } else if (
-                  ctrl.topicSummaries.length === 0 &&
-                  ctrl.unpublishedSkillSummaries.length !== 0) {
-                  ctrl.activeTab = ctrl.TAB_NAME_UNPUBLISHED_SKILLS;
                 }
               },
               function(errorResponse) {
@@ -124,14 +117,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           ctrl.isTopicTabHelpTextVisible = function() {
             return (
               (ctrl.topicSummaries.length === 0) &&
-              (ctrl.untriagedSkillSummaries.length > 0 ||
-              ctrl.unpublishedSkillSummaries.length > 0));
+              (ctrl.untriagedSkillSummaries.length > 0));
           };
           ctrl.isSkillsTabHelpTextVisible = function() {
             return (
               (ctrl.untriagedSkillSummaries.length === 0) &&
-              (ctrl.topicSummaries.length > 0) &&
-              (ctrl.unpublishedSkillSummaries.length === 0));
+              (ctrl.topicSummaries.length > 0));
           };
           ctrl.setActiveTab = function(tabName) {
             ctrl.activeTab = tabName;
