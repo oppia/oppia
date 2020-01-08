@@ -46,7 +46,7 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 def get_exp_id_from_thread_id(thread_id):
     """Returns the exploration_id part of the thread_id.
 
-    TODO(nithesh): Once feedback threads are generalized, this function needs to
+    TODO(#8370): Once feedback threads are generalized, this function needs to
     be updated to get the id from any general entity, not just explorations. At
     the moment, it still assumes that the thread id is associated to an
     exploration.
@@ -422,28 +422,7 @@ def get_thread_summaries(user_id, thread_ids):
 
     Returns:
         tuple(thread_summaries, number_of_unread_threads), where:
-            thread_summaries: list(dict). Each dict has the keys:
-                status: str. The status of the thread.
-                original_author_id: str. The id of the original author of the
-                    thread.
-                last_updated: datetime.datetime. When was the thread last
-                    updated.
-                last_message_text: str. The text of the last message.
-                total_message_count: int. The total number of messages in the
-                    thread.
-                last_message_is_read: bool. Whether the last message is read by
-                    the user.
-                second_last_message_is_read: bool. Whether the second last
-                    message is read by the user,
-                author_last_message: str. The name of the author of the last
-                    message.
-                author_second_last_message: str. The name of the author of the
-                    second last message.
-                exploration_title: str. The title of the exploration to which
-                    exploration belongs.
-                exploration_id: str. The id of the exploration associated to the
-                    thread.
-                thread_id: str. The id of the thread this dict is describing.
+            thread_summaries: list(FeedbackThreadSummary).
             number_of_unread_threads: int. The number of threads not read by the
                 user.
     """
@@ -502,20 +481,13 @@ def get_thread_summaries(user_id, thread_ids):
 
         if not last_message_is_read:
             number_of_unread_threads += 1
-        thread_summaries.append({
-            'status': thread.status,
-            'original_author_id': thread.original_author_id,
-            'last_updated': utils.get_time_in_millisecs(thread.last_updated),
-            'last_message_text': last_message_model.text,
-            'total_message_count': thread.message_count,
-            'last_message_is_read': last_message_is_read,
-            'second_last_message_is_read': second_last_message_is_read,
-            'author_last_message': author_last_message,
-            'author_second_last_message': author_second_last_message,
-            'exploration_title': exp_model.title,
-            'exploration_id': exp_model.id,
-            'thread_id': thread.id,
-        })
+        thread_summaries.append(
+            feedback_domain.FeedbackThreadSummary(
+                thread.status, thread.original_author_id, thread.last_updated,
+                last_message_model.text, thread.message_count,
+                last_message_is_read, second_last_message_is_read,
+                author_last_message, author_second_last_message,
+                exp_model.title, exp_model.id, thread.id))
     return thread_summaries, number_of_unread_threads
 
 
