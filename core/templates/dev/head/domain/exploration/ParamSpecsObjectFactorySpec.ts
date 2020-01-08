@@ -52,7 +52,7 @@ describe('ParamSpecs', () => {
     // No longer empty.
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(paramSpec);
     expect(emptyParamSpecs.getParamSpec(paramName)).toBe(paramSpec);
-    expect(emptyParamSpecs.getParamNames()).toEqual([ paramName ]);
+    expect(emptyParamSpecs.getParamNames()).toEqual([paramName]);
   });
 
   it('should not overwrite existing params', () => {
@@ -84,7 +84,7 @@ describe('ParamSpecs', () => {
     });
 
     expect(nonEmptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBe(false);
-    expect(nonEmptyParamSpecs.getParamNames()).toEqual([ paramName ]);
+    expect(nonEmptyParamSpecs.getParamNames()).toEqual([paramName]);
     expect(nonEmptyParamSpecs.getParamSpec(paramName)).toBeDefined();
   });
 });
