@@ -67,15 +67,6 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         """Mocks skill updates. Always fails by raising a validation error."""
         raise utils.ValidationError()
 
-    def _mock_get_skill_rights(self, unused_skill_id, **unused_kwargs):
-        """Mocks get_skill_rights. Returns None."""
-        return None
-
-    def _mock_publish_skill_raise_exception(
-            self, unused_skill_id, unused_committer_id):
-        """Mocks publishing skills. Always fails by raising an exception."""
-        raise Exception()
-
 
 class SkillEditorTest(BaseSkillEditorControllerTests):
     """Tests for SkillEditorPage."""
@@ -127,15 +118,6 @@ class SkillRightsHandlerTest(BaseSkillEditorControllerTests):
         with self.swap(role_services, 'get_all_actions', mock_get_all_actions):
             json_response = self.get_json(self.url)
             self.assertEqual(json_response['can_edit_skill_description'], False)
-        self.logout()
-
-    def test_skill_rights_handler_fails(self):
-        self.login(self.ADMIN_EMAIL)
-        # Check GET returns 404 when the returned skill rights is None.
-        skill_services_swap = self.swap(
-            skill_services, 'get_skill_rights', self._mock_get_skill_rights)
-        with skill_services_swap:
-            self.get_json(self.url, expected_status_int=404)
         self.logout()
 
 
