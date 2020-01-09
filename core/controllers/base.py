@@ -59,9 +59,9 @@ def _clear_login_cookies(response_headers):
             context of the response.
     """
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
-    # for https:// . We just unset both below.
-    cookie = http.cookies.SimpleCookie()
-    for cookie_name in [b'ACSID', b'SACSID']:
+    # for https:// . We just unset both below. We also unset dev_appserver_login
+    # cookie used in local server.
+    for cookie_name in [b'ACSID', b'SACSID', b'dev_appserver_login']:
         cookie = http.cookies.SimpleCookie()
         cookie[cookie_name] = ''
         cookie[cookie_name]['expires'] = (
@@ -80,12 +80,10 @@ class LogoutPage(webapp2.RequestHandler):
         """
 
         _clear_login_cookies(self.response.headers)
-
         url_to_redirect_to = (
             python_utils.convert_to_bytes(
                 self.request.get('redirect_url', '/')))
-        self.redirect(
-            current_user_services.create_logout_url(url_to_redirect_to))
+        self.redirect(url_to_redirect_to)
 
 
 class UserFacingExceptions(python_utils.OBJECT):
@@ -160,11 +158,9 @@ class BaseHandler(webapp2.RequestHandler):
             self.user_id = user_settings.user_id
 
             if user_settings.deleted:
-                _clear_login_cookies(self.response.headers)
                 self.user_is_scheduled_for_deletion = user_settings.deleted
             elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
                     user_services.has_fully_registered(user_settings.user_id)):
-                _clear_login_cookies(self.response.headers)
                 self.partially_logged_in = True
             else:
                 self.username = user_settings.username
