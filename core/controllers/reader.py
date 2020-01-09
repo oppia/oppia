@@ -923,7 +923,6 @@ class RecommendationsHandler(base.BaseHandler):
             PageNotFoundException. If the ENABLE_NEW_STRUCTURE_VIEWER_UPDATES
                 flag is not set.
 
-
         Returns:
             str|None. The exploration ID of the next chapter in the story, or
                 None if the user completed the story.
