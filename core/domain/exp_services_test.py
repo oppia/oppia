@@ -53,7 +53,7 @@ transaction_services = models.Registry.import_transaction_services()
 # reverted, deleted, created, rights changed.
 
 
-def _count_at_least_editable_exploration_summaries(user_id):
+def count_at_least_editable_exploration_summaries(user_id):
     """Counts exp summaries that are at least editable by the given user.
 
     Args:
@@ -63,7 +63,7 @@ def _count_at_least_editable_exploration_summaries(user_id):
         int. The number of exploration summaries that are at least editable
             by the given user.
     """
-    return len(exp_fetchers.get_exploration_summaries_from_models(  # pylint: disable=protected-access
+    return len(exp_fetchers.get_exploration_summaries_from_models(
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id)))
 
@@ -519,7 +519,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
         # The exploration shows up in queries.
         self.assertEqual(
-            _count_at_least_editable_exploration_summaries(self.owner_id), 1)
+            count_at_least_editable_exploration_summaries(self.owner_id), 1)
 
         exp_services.delete_exploration(self.owner_id, self.EXP_0_ID)
         with self.assertRaises(Exception):
@@ -527,7 +527,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration does not show up in any queries.
         self.assertEqual(
-            _count_at_least_editable_exploration_summaries(self.owner_id), 0)
+            count_at_least_editable_exploration_summaries(self.owner_id), 0)
 
         # But the model still exists in the backend.
         self.assertIsNotNone(
@@ -572,7 +572,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
         # The explorations show up in queries.
         self.assertEqual(
-            _count_at_least_editable_exploration_summaries(self.owner_id), 2)
+            count_at_least_editable_exploration_summaries(self.owner_id), 2)
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID])
@@ -583,7 +583,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration does not show up in any queries.
         self.assertEqual(
-            _count_at_least_editable_exploration_summaries(self.owner_id), 0)
+            count_at_least_editable_exploration_summaries(self.owner_id), 0)
 
         # But the models still exist in the backend.
         self.assertIsNotNone(
@@ -642,7 +642,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_0_ID, self.owner_id)
         # The exploration shows up in queries.
         self.assertEqual(
-            _count_at_least_editable_exploration_summaries(self.owner_id), 1)
+            count_at_least_editable_exploration_summaries(self.owner_id), 1)
 
         exp_services.delete_exploration(
             self.owner_id, self.EXP_0_ID, force_deletion=True)
@@ -651,7 +651,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration does not show up in any queries.
         self.assertEqual(
-            _count_at_least_editable_exploration_summaries(self.owner_id), 0)
+            count_at_least_editable_exploration_summaries(self.owner_id), 0)
 
         # The exploration model has been purged from the backend.
         self.assertIsNone(
@@ -663,7 +663,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_1_ID, self.owner_id)
         # The explorations show up in queries.
         self.assertEqual(
-            _count_at_least_editable_exploration_summaries(self.owner_id), 2)
+            count_at_least_editable_exploration_summaries(self.owner_id), 2)
 
         exp_services.delete_explorations(
             self.owner_id, [self.EXP_0_ID, self.EXP_1_ID], force_deletion=True)
@@ -674,7 +674,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted explorations does not show up in any queries.
         self.assertEqual(
-            _count_at_least_editable_exploration_summaries(self.owner_id), 0)
+            count_at_least_editable_exploration_summaries(self.owner_id), 0)
 
         # The exploration models have been purged from the backend.
         self.assertIsNone(
@@ -701,7 +701,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration summary does not show up in any queries.
         self.assertEqual(
-            _count_at_least_editable_exploration_summaries(self.owner_id), 0)
+            count_at_least_editable_exploration_summaries(self.owner_id), 0)
 
         # The exploration summary model has been purged from the backend.
         self.assertIsNone(
