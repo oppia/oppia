@@ -709,9 +709,13 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['topic_summary_dicts']), 0)
             self.save_new_topic(
-                'topic_id', self.owner_id, 'Name', 'abbrev', None,
-                'Description', ['story_id_1', 'story_id_2'],
-                ['story_id_3'], ['skill_id_1', 'skill_id_2'], [], 1)
+                'topic_id', self.owner_id, name='Name',
+                abbreviated_name='abbrev', thumbnail_filename=None,
+                description='Description',
+                canonical_story_ids=['story_id_1', 'story_id_2'],
+                additional_story_ids=['story_id_3'],
+                uncategorized_skill_ids=['skill_id_1', 'skill_id_2'],
+                subtopics=[], next_subtopic_id=1)
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['topic_summary_dicts']), 1)
             self.assertTrue(isinstance(response['topic_summary_dicts'], list))
