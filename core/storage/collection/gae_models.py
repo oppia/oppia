@@ -271,8 +271,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether CollectionRightsModel or its snapshots references the
-        given user.
+        """Check whether CollectionRightsModel references the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.

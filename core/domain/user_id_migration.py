@@ -33,8 +33,12 @@ import feconf
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
-SEPARATE_MODEL_CLASSES = [exp_models.ExplorationCommitLogEntryModel,
-                          exp_models.ExplorationSnapshotMetadataModel]
+# These models have arounn hundred thousand datastore entries on production and
+# need to be in a separate one-off job in order to make the one-off jobs more
+# efficient.
+SEPARATE_MODEL_CLASSES = [
+    exp_models.ExplorationCommitLogEntryModel,
+    exp_models.ExplorationSnapshotMetadataModel]
 
 
 class MissingUserException(Exception):
@@ -424,7 +428,7 @@ class GaeIdNotInModelsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, status)
 
 
-class ModelsUserIdsHaveUserSettingsBaseVerificationJob(
+class BaseModelsUserIdsHaveUserSettingsVerificationJob(
         jobs.BaseMapReduceOneOffJobManager):
     """Base one-off job for going through the models that contain user IDs. This
     job checks that all the user IDs used in the model have their corresponding
@@ -466,13 +470,23 @@ class ModelsUserIdsHaveUserSettingsBaseVerificationJob(
             return True
         return user_models.UserSettingsModel.get_by_id(user_id) is not None
 
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in derived
+                classes.
+        """
+        raise NotImplementedError
+
     @staticmethod
     def map(model):
         """Implements the map function for this job."""
         model_class = model.__class__
         if (model_class.get_user_id_migration_policy() ==
                 base_models.USER_ID_MIGRATION_POLICY.COPY):
-            if (ModelsUserIdsHaveUserSettingsBaseVerificationJob
+            if (BaseModelsUserIdsHaveUserSettingsVerificationJob
                     ._does_user_settings_model_exist(model.id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
@@ -482,7 +496,7 @@ class ModelsUserIdsHaveUserSettingsBaseVerificationJob(
             user_id = model.user_id
             if user_id is None:
                 yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
-            elif (ModelsUserIdsHaveUserSettingsBaseVerificationJob
+            elif (BaseModelsUserIdsHaveUserSettingsVerificationJob
                     ._check_id_and_user_id_exist(model.id, user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
@@ -498,7 +512,7 @@ class ModelsUserIdsHaveUserSettingsBaseVerificationJob(
                 model_class.get_user_id_migration_field()._name]  # pylint: disable=protected-access
             if user_id is None:
                 yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
-            elif (ModelsUserIdsHaveUserSettingsBaseVerificationJob
+            elif (BaseModelsUserIdsHaveUserSettingsVerificationJob
                     ._does_user_settings_model_exist(user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
@@ -520,7 +534,7 @@ class ModelsUserIdsHaveUserSettingsBaseVerificationJob(
 
 
 class ModelsUserIdsHaveUserSettingsVerificationJob(
-        ModelsUserIdsHaveUserSettingsBaseVerificationJob):
+        BaseModelsUserIdsHaveUserSettingsVerificationJob):
     """One-off job for going through all the models (except these listed in
     SEPARATE_MODEL_CLASSES) that contain user IDs. This job checks that all
     the user IDs used in the model have their corresponding UserSettingsModel
@@ -539,7 +553,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
 
 
 class ModelsUserIdsHaveUserSettingsExplorationsVerificationJob(
-        ModelsUserIdsHaveUserSettingsBaseVerificationJob):
+        BaseModelsUserIdsHaveUserSettingsVerificationJob):
     """One-off job for going through the models listed in SEPARATE_MODEL_CLASSES
     that contain user IDs. This job checks that all the user IDs used in
     the model have their corresponding UserSettingsModel defined.
