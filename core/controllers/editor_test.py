@@ -2467,7 +2467,6 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def setUp(self):
         super(LearnerAnswerInfoHandlerTests, self).setUp()
-        self.login(self.OWNER_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.exp_id = exp_fetchers.get_new_exploration_id()
         self.save_new_valid_exploration(self.exp_id, self.owner_id)
@@ -2490,6 +2489,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
             self.answer, self.answer_details)
 
     def test_get_learner_answer_details_of_exploration_states(self):
+        self.login(self.OWNER_EMAIL)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
             response = self.get_json(
@@ -2516,8 +2516,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id))
             self.assertEqual(response, learner_answer_info_data)
+        self.logout()
 
     def test_get_learner_answer_details_of_question_states(self):
+        self.login(self.OWNER_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,
@@ -2551,8 +2553,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_QUESTION, question_id))
             self.assertEqual(response, learner_answer_info_data)
+        self.logout()
 
     def test_delete_learner_answer_info_of_exploration_states(self):
+        self.login(self.OWNER_EMAIL)
         with self.swap(
             constants, 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE', False):
             self.delete_json(
@@ -2589,8 +2593,10 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                     feconf.LEARNER_ANSWER_INFO_HANDLER_URL,
                     feconf.ENTITY_TYPE_EXPLORATION, self.exp_id,
                     self.state_name), expected_status_int=404)
+        self.logout()
 
     def test_delete_learner_answer_info_of_question_states(self):
+        self.login(self.ADMIN_EMAIL)
         question_id = question_services.get_new_question_id()
         question = self.save_new_question(
             question_id, self.owner_id,
@@ -2620,6 +2626,7 @@ class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
                 feconf.ENTITY_TYPE_QUESTION, state_reference)
             self.assertEqual(
                 len(learner_answer_details.learner_answer_info_list), 0)
+        self.logout()
 
 
 class UserExplorationPermissionsHandlerTests(BaseEditorControllerTests):

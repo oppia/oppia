@@ -670,8 +670,7 @@ class ImageUploadHandler(EditorHandler):
                 'different name.' % filename)
 
         fs_services.save_original_and_compressed_versions_of_image(
-            self.user_id, filename, entity_type, entity_id,
-            raw, filename_prefix)
+            filename, entity_type, entity_id, raw, filename_prefix)
 
         self.render_json({'filename': filename})
 

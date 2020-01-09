@@ -20,6 +20,8 @@ require(
   'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 
 require('components/entity-creation-services/story-creation.service.ts');
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
@@ -50,8 +52,6 @@ angular.module('oppia').directive('topicEditorTab', [
             UrlInterpolationService, StoryCreationService,
             EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
-          var tempImageName = '';
-
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
@@ -84,125 +84,6 @@ angular.module('oppia').directive('topicEditorTab', [
           };
 
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-
-          var saveTopicThumbnailImageData = function(imageURI) {
-            let resampledFile = null;
-            resampledFile = (
-              ImageUploadHelperService.convertImageDataToImageFile(
-                imageURI));
-            if (resampledFile === null) {
-              AlertsService.addWarning('Could not get resampled file.');
-              return;
-            }
-            postImageToServer(resampledFile);
-          };
-
-          var postImageToServer = function(resampledFile) {
-            let form = new FormData();
-            form.append('image', resampledFile);
-            form.append('payload', JSON.stringify({
-              filename: tempImageName,
-              filename_prefix: 'thumbnail'
-            }));
-            var imageUploadUrlTemplate = '/createhandler/imageupload/' +
-              '<entity_type>/<entity_id>';
-            CsrfTokenService.getTokenAsync().then(function(token) {
-              form.append('csrf_token', token);
-              $.ajax({
-                url: UrlInterpolationService.interpolateUrl(
-                  imageUploadUrlTemplate, {
-                    entity_type: ContextService.getEntityType(),
-                    entity_id: ContextService.getEntityId()
-                  }
-                ),
-                data: form,
-                processData: false,
-                contentType: false,
-                type: 'POST',
-                dataFilter: function(data) {
-                  // Remove the XSSI prefix.
-                  var transformedData = data.substring(5);
-                  return JSON.parse(transformedData);
-                },
-                dataType: 'text'
-              }).done(function(data) {
-                $scope.editableThumbnailDataUrl = (
-                  ImageUploadHelperService
-                    .getTrustedResourceUrlForThumbnailFilename(
-                      data.filename, ContextService.getEntityType(),
-                      ContextService.getEntityId()));
-              }).fail(function(data) {
-                // Remove the XSSI prefix.
-                var transformedData = data.responseText.substring(5);
-                var parsedResponse = JSON.parse(transformedData);
-                AlertsService.addWarning(
-                  parsedResponse.error || 'Error communicating with server.');
-              });
-            });
-          };
-
-          $scope.showEditThumbnailModal = function() {
-            if (!$scope.topicRights.canEditTopic()) {
-              return;
-            }
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                'edit-topic-thumbnail-modal.template.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.uploadedImage = null;
-                  $scope.croppedImageDataUrl = '';
-                  $scope.invalidImageWarningIsShown = false;
-
-                  $scope.onFileChanged = function(file) {
-                    tempImageName = (
-                      ImageUploadHelperService.generateImageFilename(
-                        150, 150, 'png'));
-                    $('.oppia-thumbnail-uploader').fadeOut(function() {
-                      $scope.invalidImageWarningIsShown = false;
-
-                      var reader = new FileReader();
-                      reader.onload = function(e) {
-                        $scope.$apply(function() {
-                          $scope.uploadedImage = (<FileReader>e.target).result;
-                        });
-                      };
-                      reader.readAsDataURL(file);
-                      setTimeout(function() {
-                        $('.oppia-thumbnail-uploader').fadeIn();
-                      }, 100);
-                    });
-                  };
-
-                  $scope.reset = function() {
-                    $scope.uploadedImage = null;
-                    $scope.croppedImageDataUrl = '';
-                  };
-
-                  $scope.onInvalidImageLoaded = function() {
-                    $scope.uploadedImage = null;
-                    $scope.croppedImageDataUrl = '';
-                    $scope.invalidImageWarningIsShown = true;
-                  };
-
-                  $scope.confirm = function() {
-                    $uibModalInstance.close($scope.croppedImageDataUrl);
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            }).result.then(function(newThumbnailDataUrl) {
-              $scope.editableThumbnailDataUrl = newThumbnailDataUrl;
-              $scope.updateTopicThumbnailFilename(tempImageName);
-              saveTopicThumbnailImageData(newThumbnailDataUrl);
-            });
-          };
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
