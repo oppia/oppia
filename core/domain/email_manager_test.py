@@ -2286,13 +2286,13 @@ class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
 
 
-class AccoundDeletionEmailUnitTest(test_utils.GenericTestBase):
+class AccountDeletionEmailUnitTest(test_utils.GenericTestBase):
     """Unit test related to account deletion application emails."""
     APPLICANT_USERNAME = 'applicant'
     APPLICANT_EMAIL = 'applicant@example.com'
 
     def setUp(self):
-        super(AccoundDeletionEmailUnitTest, self).setUp()
+        super(AccountDeletionEmailUnitTest, self).setUp()
         self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
         self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
         self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
