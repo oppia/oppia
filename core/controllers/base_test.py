@@ -1086,7 +1086,7 @@ class SignUpTests(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
-        self.assertIn('Logout', response.location)
+        self.assertIn('logout', response.location)
         self.logout()
 
         response = self.post_json(

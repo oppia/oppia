@@ -581,7 +581,7 @@ class SignupTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response(feconf.SIGNUP_URL)
         response = self.get_html_response('/create/0', expected_status_int=302)
-        self.assertIn('Logout', response.headers['location'])
+        self.assertIn('logout', response.headers['location'])
         self.assertIn('create', response.headers['location'])
 
         self.logout()

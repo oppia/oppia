@@ -282,9 +282,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTests):
 
         response = self.get_html_response('/logout', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
-        self.assertEqual(
-            response.headers['location'], 'https://www.google.com/accounts' +
-            '/Logout?continue=http%3A//localhost/')
+        self.assertEqual(response.headers['location'], 'http://localhost/')
         self.logout()
 
     def test_logout_from_published_exploration_editor(self):
@@ -307,8 +305,7 @@ class ExplorationEditorLogoutTest(BaseEditorControllerTests):
         response = self.get_html_response('/logout', expected_status_int=302)
         self.assertEqual(response.status_int, 302)
         self.assertEqual(
-            response.headers['location'], 'https://www.google.com/accounts' +
-            '/Logout?continue=http%3A//localhost/')
+            response.headers['location'], 'http://localhost/')
         self.logout()
 
 
