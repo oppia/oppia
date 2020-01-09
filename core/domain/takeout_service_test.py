@@ -643,11 +643,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         models_to_export = takeout_service.get_models_should_be_exported()
         for model in all_models:
             export_policy = model.get_export_policy()
-            # Split the model name by uppercase characters.
-            split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
-            # Join the split name with underscores and add _data for final name.
-            final_name = ('_').join([x.lower() for x in split_name]) + '_data'
-            if final_name in models_to_export:
+            if model in models_to_export:
                 self.assertEqual(
                     base_models.EXPORT_POLICY.CONTAINS_USER_DATA,
                     export_policy

@@ -33,33 +33,33 @@ from core.platform import models
 
 
 def get_models_should_be_exported():
-    """Returns set of strings representing models to export.
+    """Returns list of classes of models to export.
 
     Returns:
-        set of str. Set of strings representing models whose data should be
+        list of cls. List of classes of models whose data should be
         exported.
     """
-    return {
-        'collection_rights_data',
-        'general_feedback_email_reply_to_id_data',
-        'exploration_rights_data',
-        'general_feedback_message_data',
-        'general_feedback_thread_data',
-        'general_feedback_thread_user_data',
-        'general_suggestion_data',
-        'collection_progress_data',
-        'completed_activities_data',
-        'exp_user_last_playthrough_data',
-        'exploration_user_data_data',
-        'incomplete_activities_data',
-        'learner_playlist_data',
-        'story_progress_data',
-        'user_contributions_data',
-        'user_settings_data',
-        'user_skill_mastery_data',
-        'user_stats_data',
-        'user_subscriptions_data'
-    }
+    return [
+        collection_models.CollectionRightsModel,
+        email_models.GeneralFeedbackEmailReplyToIdModel,
+        exploration_models.ExplorationRightsModel,
+        feedback_models.GeneralFeedbackMessageModel,
+        feedback_models.GeneralFeedbackThreadModel,
+        feedback_models.GeneralFeedbackThreadUserModel,
+        suggestion_models.GeneralSuggestionModel,
+        user_models.CollectionProgressModel,
+        user_models.CompletedActivitiesModel,
+        user_models.ExpUserLastPlaythroughModel,
+        user_models.ExplorationUserDataModel,
+        user_models.IncompleteActivitiesModel,
+        user_models.LearnerPlaylistModel,
+        user_models.StoryProgressModel,
+        user_models.UserContributionsModel,
+        user_models.UserSettingsModel,
+        user_models.UserSkillMasteryModel,
+        user_models.UserStatsModel,
+        user_models.UserSubscriptionsModel
+    ]
 
 
 def export_data_for_user(user_id):
@@ -75,25 +75,13 @@ def export_data_for_user(user_id):
                                 model export policy>
         }
     """
-    all_models = []
-    model_names_list = [
-        model_name for model_name in dir(models.NAMES)
-        if not model_name.startswith('__') and not model_name == 'base_model'
-    ]
-    model_modules = models.Registry.import_models(model_names_list)
-    for model_module in model_modules:
-        for _, obj in inspect.getmembers(model_module):
-            if inspect.isclass(obj):
-                all_models.append(obj)
-
     exported_data = dict()
     models_to_export = get_models_should_be_exported()
-    for model in all_models:
-        # Split the model name by uppercase characters.
+    for model in models_to_export:
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
         # Join the split name with underscores and add _data for final name.
         final_name = ('_').join([x.lower() for x in split_name]) + '_data'
-        if final_name in models_to_export:
-            exported_data[final_name] = model.export_data(user_id)
+        exported_data[final_name] = model.export_data(user_id)
+
     # Combine the data into a single dictionary.
     return exported_data
