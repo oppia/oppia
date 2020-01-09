@@ -1264,6 +1264,142 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                     'no-capital-letter-at-beginning', line=line_num + 1)
 
 
+class DocstringChecker(checkers.BaseChecker):
+    """Checks if comments follow correct style."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'invalid-docstring-format'
+    priority = -1
+    msgs = {
+        'C0019': (
+            'Period is not used at the end of the docstring.',
+            'no-period-used',
+            'Please use a period at the end of the docstring,'
+        ),
+        'C0020': (
+            'Multiline docstring should end with a new line.',
+            'no-newline-used-at-end',
+            'Please end multiline docstring with a new line.'
+        ),
+        'C0021': (
+            'Single line docstring should not span two lines.',
+            'single-line-docstring-span-two-lines',
+            'Please do not use two lines for a single line docstring. '
+            'If line length exceeds 80 characters, '
+            'convert the single line docstring to a multiline docstring.'
+        ),
+        'C0022': (
+            'Empty line before the end of multi-line docstring.',
+            'empty-line-before-end',
+            'Please do not use empty line before '
+            'the end of the multi-line docstring.'
+        ),
+        'C0023': (
+            'Space after """ in docstring.',
+            'space-after-triple-quote',
+            'Please do not use space after """ in docstring.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that docstring end in a period and the
+        arguments order in the function definition matches the order in the
+        docstring.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        is_docstring = False
+        is_class_or_function = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        allowed_terminating_punctuations = ['.', '?', '}', ']', ')']
+        excluded_phrases = [
+            'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+        data_types = ['int', 'str', 'float', 'bool']
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+            prev_line = ''
+
+            if line_num > 0:
+                prev_line = file_content[line_num - 1].strip()
+
+            # Check if it is a docstring and not some multi-line string.
+            if (prev_line.startswith(b'class ') or
+                    prev_line.startswith(b'def ')) or (is_class_or_function):
+                is_class_or_function = True
+                if prev_line.endswith(b'):') and line.startswith(b'"""'):
+                    is_docstring = True
+                    is_class_or_function = False
+
+            # Check for space after """ in docstring.
+            if re.search(br'^""".+$', line) and is_docstring and (
+                    line[3] == b' '):
+                self.add_message(
+                    'space-after-triple-quote', line=line_num + 1)
+
+            # Check if single line docstring span two lines.
+            if line == b'"""' and prev_line.startswith(b'"""') and is_docstring:
+                self.add_message(
+                    'single-line-docstring-span-two-lines', line=line_num + 1)
+
+            # Check for single line docstring.
+            elif re.search(br'^""".+"""$', line) and is_docstring:
+                # Check for punctuation at line[-4] since last three
+                # characters are double quotes.
+                if (len(line) > 6) and (
+                        line[-4] not in allowed_terminating_punctuations):
+                    self.add_message(
+                        'no-period-used', line=line_num + 1)
+
+            # Check for mutliline docstring.
+            elif line.endswith(b'"""') and is_docstring:
+                # Case 1: line is """. This is correct for multiline docstring.
+                if line == b'"""':
+                    # Check for empty line before the end of docstring.
+                    if prev_line == b'':
+                        self.add_message(
+                            'empty-line-before-end', line=line_num + 1)
+                    # Check for punctuation at the end of docstring.
+                    else:
+                        last_char_is_invalid = prev_line[-1] not in (
+                            allowed_terminating_punctuations)
+                        no_word_is_present_in_excluded_phrases = (not any(
+                            word in prev_line for word in excluded_phrases))
+                        if last_char_is_invalid and (
+                                no_word_is_present_in_excluded_phrases):
+                            self.add_message(
+                                'no-period-used', line=line_num + 1)
+
+                # Case 2: line contains some words before """. """
+                # should shift to next line.
+                elif not any(word in line for word in excluded_phrases):
+                    self.add_message(
+                        'no-newline-used-at-end', line=line_num + 1)
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multiline comment.
+            if in_multi_line_comment:
+                continue
+
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1283,3 +1419,4 @@ def register(linter):
     linter.register_checker(SingleNewlineAboveArgsChecker(linter))
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
+    linter.register_checker(DocstringChecker(linter))
