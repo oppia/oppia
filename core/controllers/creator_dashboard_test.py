@@ -870,7 +870,7 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def _get_recent_notifications_mock_by_viewer(self, unused_user_id):
+    def _get_recent_user_changes_mock_by_viewer(self, unused_user_id):
         """Returns a single feedback thread by VIEWER_ID."""
         return (
             100000, [{
@@ -882,7 +882,7 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }])
 
-    def _get_recent_notifications_mock_by_anonymous_user(self, unused_user_id):
+    def _get_recent_user_changes_mock_by_anonymous_user(self, unused_user_id):
         """Returns a single feedback thread by an anonymous user."""
         return (
             200000, [{
@@ -900,8 +900,8 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
         """
         with self.swap(
             user_jobs_continuous.DashboardRecentUpdatesAggregator,
-            'get_recent_notifications',
-            self._get_recent_notifications_mock_by_viewer):
+            'get_recent_user_changes',
+            self._get_recent_user_changes_mock_by_viewer):
 
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(self.DASHBOARD_DATA_URL)
@@ -913,8 +913,8 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
 
         with self.swap(
             user_jobs_continuous.DashboardRecentUpdatesAggregator,
-            'get_recent_notifications',
-            self._get_recent_notifications_mock_by_anonymous_user):
+            'get_recent_user_changes',
+            self._get_recent_user_changes_mock_by_anonymous_user):
 
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(self.DASHBOARD_DATA_URL)
@@ -926,8 +926,8 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
     def test_get_unseen_notifications_data(self):
         with self.swap(
             user_jobs_continuous.DashboardRecentUpdatesAggregator,
-            'get_recent_notifications',
-            self._get_recent_notifications_mock_by_anonymous_user):
+            'get_recent_user_changes',
+            self._get_recent_user_changes_mock_by_anonymous_user):
             self.login(self.VIEWER_EMAIL)
             response = self.get_json('/notificationshandler')
             self.assertEqual(response['num_unseen_notifications'], 1)

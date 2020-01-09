@@ -72,18 +72,18 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
 
     # Public query methods.
     @classmethod
-    def get_recent_notifications(cls, user_id):
+    def get_recent_user_changes(cls, user_id):
         """Gets a list of recent notifications to show on the user's dashboard.
 
         Args:
             user_id: str. The unique id of the user.
 
         Returns:
-            tuple(job_queued_msec, user_recent_changes), where:
+            tuple(job_queued_msec, recent_user_changes), where:
                 job_queued_msec: float or None. The time when the job was
                     queued in milliseconds since the epoch, or None if the job
                     does not exist.
-                user_recent_changes: list(dict). Each dict has the keys:
+                recent_user_changes: list(dict). Each dict has the keys:
                     type: str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
                         feconf.UPDATE_TYPE_FEEDBACK_MESSAGE.
                     activity_id: str. The id of the exploration being committed
@@ -94,15 +94,15 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
                     author_id: str. The id of the author who made the update.
                     subject: str. A brief description of the notification.
         """
-        user_recent_changes_model = (
+        recent_user_changes_model = (
             user_models.UserRecentChangesBatchModel.get(user_id, strict=False))
         job_queued_msec = (
-            user_recent_changes_model and
-            user_recent_changes_model.job_queued_msec)
-        user_recent_changes = (
-            [] if user_recent_changes_model is None else
-            user_recent_changes_model.output)
-        return (job_queued_msec, user_recent_changes)
+            recent_user_changes_model and
+            recent_user_changes_model.job_queued_msec)
+        recent_user_changes = (
+            [] if recent_user_changes_model is None else
+            recent_user_changes_model.output)
+        return (job_queued_msec, recent_user_changes)
 
 
 class RecentUpdatesMRJobManager(
