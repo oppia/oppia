@@ -1531,7 +1531,7 @@ def get_user_exploration_data(
     for index, state_name in enumerate(exploration.states):
         if classifier_training_jobs[index] is not None:
             state_classifier_mapping[state_name] = (
-            classifier_training_jobs[index].to_player_dict())
+                classifier_training_jobs[index].to_player_dict())
 
     editor_dict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
