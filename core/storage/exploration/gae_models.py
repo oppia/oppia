@@ -180,8 +180,8 @@ class ExplorationModel(base_models.VersionedModel):
         exploration_commit_log.put()
 
     @classmethod
-    def delete_multi(cls, entity_ids, committer_id,
-                     commit_message, force_deletion=False):
+    def delete_multi(
+        cls, entity_ids, committer_id, commit_message, force_deletion=False):
         """Deletes the given cls instances with the given entity_ids.
 
         Note that this extends the superclass method.
@@ -209,8 +209,8 @@ class ExplorationModel(base_models.VersionedModel):
             exp_rights_models = ExplorationRightsModel.get_multi(
                 entity_ids, include_deleted=True)
             versioned_models = cls.get_multi(entity_ids, include_deleted=True)
-            for model, rights_model in python_utils.ZIP(versioned_models,
-                                                        exp_rights_models):
+            for model, rights_model in python_utils.ZIP(
+                versioned_models, exp_rights_models):
                 exploration_commit_log = ExplorationCommitLogEntryModel.create(
                     model.id, model.version, committer_id, committer_username,
                     cls._COMMIT_TYPE_DELETE,

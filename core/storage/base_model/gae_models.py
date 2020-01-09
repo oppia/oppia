@@ -744,8 +744,8 @@ class VersionedModel(BaseModel):
                 commit_cmds)
 
     @classmethod
-    def delete_multi(cls, entity_ids, committer_id,
-                     commit_message, force_deletion=False):
+    def delete_multi(
+        cls, entity_ids, committer_id, commit_message, force_deletion=False):
         """Deletes the given cls instancies with the given entity_ids.
 
         Args:
@@ -1112,8 +1112,9 @@ class BaseSnapshotMetadataModel(BaseModel):
             keys_only=True) is not None
 
     @classmethod
-    def create(cls, snapshot_id, committer_id, commit_type,
-               commit_message, commit_cmds):
+    def create(
+        cls, snapshot_id, committer_id, commit_type, commit_message,
+        commit_cmds):
         """This method returns an instance of the BaseSnapshotMetadataModel for
         a construct with the common fields filled.
 

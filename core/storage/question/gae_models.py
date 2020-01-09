@@ -489,7 +489,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         question_skill_link_models = cls.query().filter(
             cls.skill_id == skill_id,
-            cls.deleted == False)
+            not cls.deleted)
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
@@ -627,7 +627,7 @@ class QuestionSummaryModel(base_models.BaseModel):
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def has_reference_to_user_id(cls, user_id):
+    def has_reference_to_user_id(cls, unused_user_id):
         """Check whether any existing QuestionSummaryModel refers to the given
         user_id.
 
