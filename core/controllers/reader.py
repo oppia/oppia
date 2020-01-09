@@ -919,8 +919,14 @@ class RecommendationsHandler(base.BaseHandler):
             current_node_id: str. The node ID of the chapter that the user just
                 completed.
 
+        Raises:
+            PageNotFoundException. If the ENABLE_NEW_STRUCTURE_VIEWER_UPDATES
+                flag is not set.
+
+
         Returns:
-            str. The exploration ID of the next chapter in the story.
+            str|None. The exploration ID of the next chapter in the story, or
+                None if the user completed the story.
         """
         if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
             raise self.PageNotFoundException
@@ -945,13 +951,12 @@ class RecommendationsHandler(base.BaseHandler):
         for node in ordered_nodes:
             if node.id not in completed_node_ids:
                 return node.exploration_id
+        return None
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
         collection_id = self.request.get('collection_id')
-        story_id = self.request.get('story_id')
-        current_node_id = self.request.get('current_node_id')
 
         include_system_recommendations = self.request.get(
             'include_system_recommendations')
@@ -975,9 +980,6 @@ class RecommendationsHandler(base.BaseHandler):
                 next_exp_id = (
                     collection.get_next_exploration_id_in_sequence(
                         exploration_id))
-        elif story_id and current_node_id:
-            next_exp_id = self._record_completion_and_get_next_exp_id(
-                story_id, current_node_id)
         elif include_system_recommendations:
             system_chosen_exp_ids = (
                 recommendations_services.get_exploration_recommendations(
@@ -992,6 +994,30 @@ class RecommendationsHandler(base.BaseHandler):
             author_recommended_exp_ids + system_recommended_exp_ids)
         if next_exp_id is not None:
             recommended_exp_ids.add(next_exp_id)
+
+        self.values.update({
+            'summaries': (
+                summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                    recommended_exp_ids)),
+        })
+        self.render_json(self.values)
+
+    @acl_decorators.can_play_exploration
+    def put(self, _):
+        """Handles PUT requests."""
+        story_id = self.payload.get('story_id')
+        current_node_id = self.payload.get('current_node_id')
+
+        recommended_exp_ids = []
+
+        if story_id and current_node_id:
+            next_exp_id = self._record_completion_and_get_next_exp_id(
+                story_id, current_node_id)
+        else:
+            raise self.InvalidInputException
+
+        if next_exp_id is not None:
+            recommended_exp_ids = [next_exp_id]
 
         self.values.update({
             'summaries': (

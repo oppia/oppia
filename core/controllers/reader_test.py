@@ -1104,58 +1104,98 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
             }, expected_status_int=404
         )
 
-    def test_get_fails_when_new_structures_not_enabled_in_story_mode(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
-            self.get_json(
-                '/explorehandler/recommendations/%s' % self.EXP_ID_0, params={
-                    'story_id': self.STORY_ID,
-                    'current_node_id': self.NODE_ID_2,
-                    'include_system_recommendations': False
-                }, expected_status_int=404
-            )
-
-    def test_get_succeeds_when_story_and_node_exist(self):
+    def test_put_fails_when_new_structures_not_enabled_in_story_mode(self):
         self.login(self.NEW_USER_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            recommendation_ids = self._get_recommendation_ids(
-                self.EXP_ID_0, story_id=self.STORY_ID,
-                current_node_id=self.NODE_ID_2)
-
-        self.assertEqual(recommendation_ids[0], self.EXP_ID_1)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
+            self.put_json(
+                '/explorehandler/recommendations/%s' % self.EXP_ID_0, {
+                    'story_id': self.STORY_ID,
+                    'current_node_id': self.NODE_ID_2
+                }, csrf_token=csrf_token, expected_status_int=404
+            )
         self.logout()
 
-    def test_get_fails_when_story_does_not_exist_in_story_mode(self):
+    def test_put_fails_when_incomplete_payload_provided(self):
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            self.get_json(
-                '/explorehandler/recommendations/%s' % self.EXP_ID_0, params={
-                    'story_id': 'invalid_story',
-                    'current_node_id': self.NODE_ID_2,
-                    'include_system_recommendations': False
-                }, expected_status_int=404
+            self.put_json(
+                '/explorehandler/recommendations/%s' % self.EXP_ID_0, {
+                    'current_node_id': self.NODE_ID_2
+                }, csrf_token=csrf_token, expected_status_int=400
             )
+        self.logout()
 
-    def test_get_fails_when_node_does_not_exist_in_story_mode(self):
+    def test_put_succeeds_when_story_and_node_exist(self):
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            self.get_json(
-                '/explorehandler/recommendations/%s' % self.EXP_ID_0, params={
+            json_response = self.put_json(
+                '/explorehandler/recommendations/%s' % self.EXP_ID_0, {
                     'story_id': self.STORY_ID,
-                    'current_node_id': 'invalid_node',
-                    'include_system_recommendations': False
-                }, expected_status_int=404
+                    'current_node_id': self.NODE_ID_2
+                }, csrf_token=csrf_token
             )
 
-    def test_get_fails_when_story_is_not_published_in_story_mode(self):
+        self.assertEqual(json_response['summaries'][0]['id'], self.EXP_ID_1)
+        self.logout()
+
+    def test_put_fails_when_story_does_not_exist_in_story_mode(self):
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.put_json(
+                '/explorehandler/recommendations/%s' % self.EXP_ID_0, {
+                    'story_id': 'invalid_story',
+                    'current_node_id': self.NODE_ID_2
+                }, csrf_token=csrf_token, expected_status_int=404
+            )
+        self.logout()
+
+    def test_put_fails_when_node_does_not_exist_in_story_mode(self):
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            self.put_json(
+                '/explorehandler/recommendations/%s' % self.EXP_ID_0, {
+                    'story_id': self.STORY_ID,
+                    'current_node_id': 'invalid_node'
+                }, csrf_token=csrf_token, expected_status_int=404
+            )
+        self.logout()
+
+
+    def test_put_fails_when_story_is_not_published_in_story_mode(self):
         topic_services.unpublish_story(
             self.TOPIC_ID, self.STORY_ID, self.admin_id)
-
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
-            self.get_json(
-                '/explorehandler/recommendations/%s' % self.EXP_ID_0, params={
+            self.put_json(
+                '/explorehandler/recommendations/%s' % self.EXP_ID_0, {
                     'story_id': self.STORY_ID,
-                    'current_node_id': self.NODE_ID_2,
-                    'include_system_recommendations': False
-                }, expected_status_int=404
+                    'current_node_id': self.NODE_ID_2
+                }, csrf_token=csrf_token, expected_status_int=404
             )
+        self.logout()
+
+    def test_put_returns_empty_string_when_user_completes_story(self):
+        self.login(self.NEW_USER_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        story_services.record_completed_node_in_story_context(
+            self.new_user_id, self.STORY_ID, self.NODE_ID_2)
+        story_services.record_completed_node_in_story_context(
+            self.new_user_id, self.STORY_ID, self.NODE_ID_1)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
+            json_response = self.put_json(
+                '/explorehandler/recommendations/%s' % self.EXP_ID_0, {
+                    'story_id': self.STORY_ID,
+                    'current_node_id': self.NODE_ID_3
+                }, csrf_token=csrf_token
+            )
+        self.assertEqual(len(json_response['summaries']), 0)
+        self.logout()
 
 
 class FlagExplorationHandlerTests(test_utils.GenericTestBase):
