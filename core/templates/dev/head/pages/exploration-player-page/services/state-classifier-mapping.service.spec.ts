@@ -44,8 +44,9 @@ describe('State classifier mapping service', () => {
       var stateName = 'stateName1';
       var stateNameNonexistent = 'stateName2';
       var retrievedClassifier = mappingService.getClassifier(stateName);
-      var nonExistentClassifier = mappingService.getClassifier(stateNameNonexistent);
-      
+      var nonExistentClassifier = mappingService.getClassifier(
+        stateNameNonexistent);
+
       expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
       expect(retrievedClassifier.classifierData).toEqual({});
       expect(retrievedClassifier.dataSchemaVersion).toEqual(1);
@@ -54,10 +55,10 @@ describe('State classifier mapping service', () => {
 
     it('should not return correct classifier details when init is not ' +
       'called', () => {
-        var stateName = 'stateName1';
-        var retrievedClassifier = mappingService.getClassifier(stateName);
+      var stateName = 'stateName1';
+      var retrievedClassifier = mappingService.getClassifier(stateName);
 
-        expect(retrievedClassifier).toBe(null);
-      });
+      expect(retrievedClassifier).toBe(null);
+    });
   });
 });

@@ -22,7 +22,7 @@ import { AudioTranslationLanguageService } from
   'pages/exploration-player-page/services/audio-translation-language.service';
 
 describe('Audio translation language service', () => {
-  const atls: AudioTranslationLanguageService;
+  let atls: AudioTranslationLanguageService;
   beforeEach(() => {
     atls = TestBed.get(AudioTranslationLanguageService);
 
@@ -160,7 +160,7 @@ describe('Audio translation language service', () => {
   });
 
   it('should initialize the current audio language when exploration has ' +
-    'audio language codes and audio is available and automatic ' + 
+    'audio language codes and audio is available and automatic ' +
     'Text-to-speech is enabled in it', () => {
     const allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     const explorationLanguageCode = 'en';
@@ -197,8 +197,8 @@ describe('Audio translation language service', () => {
       expect(atls.getLanguageOptionsForDropdown()).toEqual([{
         value: 'en-auto',
         displayed: 'English (auto)',
-      }])
-  });
+      }]);
+    });
 
   it('should change current audio language after initialization', () => {
     const allAudioLanguageCodesInExploration = ['hi-en', 'en'];
