@@ -47,7 +47,10 @@ export class States {
       newStateName);
   }
   setState(stateName: string, stateData: any): void {
-    this._states[stateName] = Object.assign({}, stateData);
+    // We use the copy method defined in the StateObjectFactory to make
+    // sure that this._states[stateName] remains a State object as opposed to
+    // Object.assign(..) which returns an object with the content of stateData.
+    this._states[stateName].copy(stateData);
   }
   hasState(stateName: string): boolean {
     return this._states.hasOwnProperty(stateName);

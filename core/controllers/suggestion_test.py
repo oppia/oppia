@@ -698,7 +698,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 question_services.get_displayable_question_skill_link_details(
                     1, [self.SKILL_ID], ''))
         self.assertEqual(len(questions), 1)
-        self.assertEqual(questions[0].creator_id, self.author_id)
         self.assertEqual(
             merged_question_skill_links[0].skill_descriptions,
             [self.SKILL_DESCRIPTION])

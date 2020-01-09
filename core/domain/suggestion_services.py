@@ -231,7 +231,6 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         raise Exception('The suggestion has already been accepted/rejected.')
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
-
     suggestion.pre_accept_validate()
 
     author_name = user_services.get_username(suggestion.author_id)

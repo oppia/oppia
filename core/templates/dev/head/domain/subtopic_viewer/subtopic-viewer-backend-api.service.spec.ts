@@ -20,7 +20,11 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
+
+import { ReadOnlySubtopicPageObjectFactory } from
+  'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
 
 describe('Subtopic viewer backend API service', function() {
   var SubtopicViewerBackendApiService = null;
@@ -29,6 +33,9 @@ describe('Subtopic viewer backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
   var UndoRedoService = null;
+  var sampleDataResultsObjects = null;
+  let readOnlySubtopicPageObjectFactory: ReadOnlySubtopicPageObjectFactory =
+    null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -44,12 +51,33 @@ describe('Subtopic viewer backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    readOnlySubtopicPageObjectFactory = TestBed.get(
+      ReadOnlySubtopicPageObjectFactory);
 
     // Sample subtopic page contents object returnable from the backend
     sampleDataResults = {
       subtopic_title: 'Subtopic Title',
-      page_contents: {}
+      page_contents: {
+        subtitled_html: {
+          html: 'test content',
+          content_id: 'content'
+        },
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {
+              en: {
+                filename: 'test.mp3',
+                file_size_bytes: 100,
+                needs_update: false
+              }
+            }
+          }
+        }
+      }
     };
+
+    sampleDataResultsObjects = readOnlySubtopicPageObjectFactory.
+      createFromBackendDict(sampleDataResults);
   }));
 
   afterEach(function() {
@@ -68,7 +96,7 @@ describe('Subtopic viewer backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResultsObjects);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

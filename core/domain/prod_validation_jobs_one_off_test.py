@@ -32,6 +32,7 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import fs_services
 from core.domain import learner_playlist_services
 from core.domain import learner_progress_services
 from core.domain import prod_validation_jobs_one_off
@@ -52,6 +53,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_query_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -72,7 +74,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, file_models, job_models,
+    feedback_models, job_models,
     opportunity_models, question_models,
     recommendations_models, skill_models,
     story_models, suggestion_models, topic_models,
@@ -81,7 +83,7 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
+            models.NAMES.feedback, models.NAMES.job,
             models.NAMES.opportunity, models.NAMES.question,
             models.NAMES.recommendations, models.NAMES.skill,
             models.NAMES.story, models.NAMES.suggestion, models.NAMES.topic,
@@ -496,20 +498,23 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         next_scheduled_check_time = datetime.datetime.utcnow()
+        classifier_data = {'classifier_data': 'data'}
         id0 = classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', '0', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'StateTest0', feconf.TRAINING_JOB_STATUS_NEW,
-            None, 1)
+            'StateTest0', feconf.TRAINING_JOB_STATUS_NEW, 1)
+        fs_services.save_classifier_data(
+            'TextClassifier', id0, classifier_data)
         self.model_instance_0 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id0))
         id1 = classifier_models.ClassifierTrainingJobModel.create(
             'CodeClassifier', 'CodeRepl', '1', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'StateTest1', feconf.TRAINING_JOB_STATUS_NEW,
-            None, 1)
+            'StateTest1', feconf.TRAINING_JOB_STATUS_NEW, 1)
+        fs_services.save_classifier_data(
+            'CodeClassifier', id1, classifier_data)
         self.model_instance_1 = (
             classifier_models.ClassifierTrainingJobModel.get_by_id(id1))
 
@@ -2456,8 +2461,8 @@ class SkillOpportunityModelValidatorTests(test_utils.GenericTestBase):
 
         for i in python_utils.RANGE(3):
             skill_id = '%s' % i
-            self.save_new_skill(skill_id, self.admin_id, 'description %d' % i)
-            skill_services.publish_skill(skill_id, self.admin_id)
+            self.save_new_skill(
+                skill_id, self.admin_id, description='description %d' % i)
 
         self.QUESTION_ID = question_services.get_new_question_id()
         self.save_new_question(
@@ -5276,725 +5281,6 @@ class UnsentFeedbackEmailModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
-class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileMetadataModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        self.model_instance_0 = file_models.FileMetadataModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        self.model_instance_0.commit(self.owner_id, [])
-
-        self.model_instance_1 = file_models.FileMetadataModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        self.model_instance_1.commit(self.owner_id, [])
-
-        self.job_class = (
-            prod_validation_jobs_one_off.FileMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of FileMetadataModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id,
-                    self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated
-                ),
-            u'[u\'fully-validated FileMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('exp1').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for exploration_ids field '
-                'check of FileMetadataModel\', '
-                '[u"Entity id %s: based on field exploration_ids having '
-                'value exp1, expect model ExplorationModel with id exp1 but it '
-                'doesn\'t exist"]]') % self.model_instance_1.id,
-            u'[u\'fully-validated FileMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_metadata_model_failure(self):
-        file_models.FileMetadataSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.model_instance_0.id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_metadata_ids '
-                'field check of FileMetadataModel\', '
-                '[u"Entity id %s: based on field snapshot_metadata_ids '
-                'having value %s-1, expect model '
-                'FileMetadataSnapshotMetadataModel '
-                'with id %s-1 but it doesn\'t exist"]]') % (
-                    self.model_instance_0.id, self.model_instance_0.id,
-                    self.model_instance_0.id),
-            u'[u\'fully-validated FileMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_content_model_failure(self):
-        file_models.FileMetadataSnapshotContentModel.get_by_id(
-            '%s-1' % self.model_instance_0.id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_content_ids '
-                'field check of FileMetadataModel\', '
-                '[u"Entity id %s: based on field snapshot_content_ids having '
-                'value %s-1, expect model FileMetadataSnapshotContentModel '
-                'with id %s-1 but it doesn\'t exist"]]') % (
-                    self.model_instance_0.id, self.model_instance_0.id,
-                    self.model_instance_0.id),
-            u'[u\'fully-validated FileMetadataModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileMetadataSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileMetadataSnapshotMetadataModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        file_metadata_model_0 = file_models.FileMetadataModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        file_metadata_model_0.commit(self.owner_id, [])
-
-        file_metadata_model_1 = file_models.FileMetadataModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        file_metadata_model_1.commit(self.user_id, [])
-
-        self.id_0 = file_metadata_model_0.id
-        self.id_1 = file_metadata_model_1.id
-
-        self.model_instance_0 = (
-            file_models.FileMetadataSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.id_0))
-        self.model_instance_1 = (
-            file_models.FileMetadataSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.id_1))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .FileMetadataSnapshotMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileMetadataSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of FileMetadataSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'FileMetadataSnapshotMetadataModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileMetadataSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_file_metadata_model_failure(self):
-        file_models.FileMetadataModel.get_by_id(self.id_0).delete(
-            self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for file_metadata_ids '
-                'field check of FileMetadataSnapshotMetadataModel\', '
-                '[u"Entity id %s-1: based on field file_metadata_ids '
-                'having value %s, expect model FileMetadataModel with '
-                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field file_metadata_ids having value %s, expect model '
-                'FileMetadataModel with id %s but it doesn\'t exist"]]'
-            ) % (
-                self.id_0, self.id_0, self.id_0, self.id_0,
-                self.id_0, self.id_0
-            ),
-            u'[u\'fully-validated FileMetadataSnapshotMetadataModel\', 1]']
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
-
-    def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for committer_ids field '
-                'check of FileMetadataSnapshotMetadataModel\', '
-                '[u"Entity id %s-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]'
-            ) % (self.id_1, self.user_id, self.user_id), (
-                u'[u\'fully-validated '
-                'FileMetadataSnapshotMetadataModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_invalid_file_metadata_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            file_models.FileMetadataSnapshotMetadataModel(
-                id='%s-3' % self.id_0, committer_id=self.owner_id,
-                commit_type='edit', commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for file metadata model '
-                'version check of FileMetadataSnapshotMetadataModel\', '
-                '[u\'Entity id %s-3: FileMetadata model corresponding to '
-                'id %s has a version 1 which is less than the version 3 in '
-                'snapshot metadata model id\']]'
-            ) % (self.id_0, self.id_0), (
-                u'[u\'fully-validated FileMetadataSnapshotMetadataModel\', '
-                '2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileMetadataSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileMetadataSnapshotContentModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        file_metadata_model_0 = file_models.FileMetadataModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        file_metadata_model_0.commit(self.owner_id, [])
-
-        file_metadata_model_1 = file_models.FileMetadataModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        file_metadata_model_1.commit(self.owner_id, [])
-
-        self.id_0 = file_metadata_model_0.id
-        self.id_1 = file_metadata_model_1.id
-
-        self.model_instance_0 = (
-            file_models.FileMetadataSnapshotContentModel.get_by_id(
-                '%s-1' % self.id_0))
-        self.model_instance_1 = (
-            file_models.FileMetadataSnapshotContentModel.get_by_id(
-                '%s-1' % self.id_1))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .FileMetadataSnapshotContentModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileMetadataSnapshotContentModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of FileMetadataSnapshotContentModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'FileMetadataSnapshotContentModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileMetadataSnapshotContentModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_file_metadata_model_failure(self):
-        file_models.FileMetadataModel.get_by_id(
-            self.id_0).delete(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for file_metadata_ids '
-                'field check of FileMetadataSnapshotContentModel\', '
-                '[u"Entity id %s-1: based on field file_metadata_ids '
-                'having value %s, expect model FileMetadataModel with '
-                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field file_metadata_ids having value %s, expect model '
-                'FileMetadataModel with id %s but it doesn\'t exist"]]'
-            ) % (
-                self.id_0, self.id_0, self.id_0, self.id_0, self.id_0,
-                self.id_0),
-            u'[u\'fully-validated FileMetadataSnapshotContentModel\', 1]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
-
-    def test_invalid_file_metadata_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            file_models.FileMetadataSnapshotContentModel(
-                id='%s-3' % self.id_0))
-        model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for file metadata model '
-                'version check of FileMetadataSnapshotContentModel\', '
-                '[u\'Entity id %s-3: FileMetadata model corresponding to '
-                'id %s has a version 1 which is less than '
-                'the version 3 in snapshot content model id\']]'
-            ) % (self.id_0, self.id_0), (
-                u'[u\'fully-validated FileMetadataSnapshotContentModel\', '
-                '2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        self.model_instance_0 = file_models.FileModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        self.model_instance_0.commit(self.owner_id, [])
-
-        self.model_instance_1 = file_models.FileModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        self.model_instance_1.commit(self.owner_id, [])
-
-        self.job_class = (
-            prod_validation_jobs_one_off.FileModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.commit(feconf.SYSTEM_COMMITTER_ID, [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for time field relation check '
-                'of FileModel\', '
-                '[u\'Entity id %s: The created_on field has a value '
-                '%s which is greater than the value '
-                '%s of last_updated field\']]') % (
-                    self.model_instance_0.id,
-                    self.model_instance_0.created_on,
-                    self.model_instance_0.last_updated
-                ),
-            u'[u\'fully-validated FileModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_exploration_model_failure(self):
-        exp_models.ExplorationModel.get_by_id('exp1').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for exploration_ids field '
-                'check of FileModel\', '
-                '[u"Entity id %s: based on field exploration_ids having '
-                'value exp1, expect model ExplorationModel with id exp1 '
-                'but it doesn\'t exist"]]') % self.model_instance_1.id,
-            u'[u\'fully-validated FileModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_metadata_model_failure(self):
-        file_models.FileSnapshotMetadataModel.get_by_id(
-            '%s-1' % self.model_instance_0.id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_metadata_ids '
-                'field check of FileModel\', '
-                '[u"Entity id %s: based on field snapshot_metadata_ids '
-                'having value %s-1, expect model FileSnapshotMetadataModel '
-                'with id %s-1 but it doesn\'t exist"]]') % (
-                    self.model_instance_0.id, self.model_instance_0.id,
-                    self.model_instance_0.id),
-            u'[u\'fully-validated FileModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_content_model_failure(self):
-        file_models.FileSnapshotContentModel.get_by_id(
-            '%s-1' % self.model_instance_0.id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_content_ids '
-                'field check of FileModel\', '
-                '[u"Entity id %s: based on field snapshot_content_ids having '
-                'value %s-1, expect model FileSnapshotContentModel '
-                'with id %s-1 but it doesn\'t exist"]]') % (
-                    self.model_instance_0.id, self.model_instance_0.id,
-                    self.model_instance_0.id),
-            u'[u\'fully-validated FileModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileSnapshotMetadataModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        file_model_0 = file_models.FileModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        file_model_0.commit(self.owner_id, [])
-
-        file_model_1 = file_models.FileModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        file_model_1.commit(self.user_id, [])
-
-        self.id_0 = file_model_0.id
-        self.id_1 = file_model_1.id
-
-        self.model_instance_0 = (
-            file_models.FileSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.id_0))
-        self.model_instance_1 = (
-            file_models.FileSnapshotMetadataModel.get_by_id(
-                '%s-1' % self.id_1))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .FileSnapshotMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of FileSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'FileSnapshotMetadataModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_file_model_failure(self):
-        file_models.FileModel.get_by_id(self.id_0).delete(
-            self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for file_ids '
-                'field check of FileSnapshotMetadataModel\', '
-                '[u"Entity id %s-1: based on field file_ids '
-                'having value %s, expect model FileModel with '
-                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field file_ids having value %s, expect model '
-                'FileModel with id %s but it doesn\'t exist"]]'
-            ) % (
-                self.id_0, self.id_0, self.id_0, self.id_0,
-                self.id_0, self.id_0),
-            u'[u\'fully-validated FileSnapshotMetadataModel\', 1]']
-        run_job_and_check_output(
-            self, expected_output, literal_eval=True)
-
-    def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for committer_ids field '
-                'check of FileSnapshotMetadataModel\', '
-                '[u"Entity id %s-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]'
-            ) % (self.id_1, self.user_id, self.user_id), (
-                u'[u\'fully-validated '
-                'FileSnapshotMetadataModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_invalid_file_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            file_models.FileSnapshotMetadataModel(
-                id='%s-3' % self.id_0, committer_id=self.owner_id,
-                commit_type='edit', commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for file model '
-                'version check of FileSnapshotMetadataModel\', '
-                '[u\'Entity id %s-3: File model corresponding to '
-                'id %s has a version 1 which is less than the version 3 in '
-                'snapshot metadata model id\']]'
-            ) % (self.id_0, self.id_0), (
-                u'[u\'fully-validated FileSnapshotMetadataModel\', '
-                '2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(FileSnapshotContentModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        explorations = [exp_domain.Exploration.create_default_exploration(
-            'exp%s' % i,
-            title='title %d' % i,
-            category='category%d' % i,
-        ) for i in python_utils.RANGE(2)]
-
-        for exp in explorations:
-            exp_services.save_new_exploration(self.owner_id, exp)
-
-        file_model_0 = file_models.FileModel.create(
-            'exploration/exp0', 'assets/image/img0.png')
-        file_model_0.commit(self.owner_id, [])
-
-        file_model_1 = file_models.FileModel.create(
-            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
-        file_model_1.commit(self.owner_id, [])
-
-        self.id_0 = file_model_0.id
-        self.id_1 = file_model_1.id
-
-        self.model_instance_0 = (
-            file_models.FileSnapshotContentModel.get_by_id(
-                '%s-1' % self.id_0))
-        self.model_instance_1 = (
-            file_models.FileSnapshotContentModel.get_by_id(
-                '%s-1' % self.id_1))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .FileSnapshotContentModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated FileSnapshotContentModel\', 2]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of FileSnapshotContentModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'FileSnapshotContentModel\', 1]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'FileSnapshotContentModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_file_model_failure(self):
-        file_models.FileModel.get_by_id(
-            self.id_0).delete(self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for file_ids '
-                'field check of FileSnapshotContentModel\', '
-                '[u"Entity id %s-1: based on field file_ids '
-                'having value %s, expect model FileModel with '
-                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
-                'field file_ids having value %s, expect model '
-                'FileModel with id %s but it doesn\'t exist"]]'
-            ) % (
-                self.id_0, self.id_0, self.id_0, self.id_0, self.id_0,
-                self.id_0),
-            u'[u\'fully-validated FileSnapshotContentModel\', 1]']
-        run_job_and_check_output(self, expected_output, literal_eval=True)
-
-    def test_invalid_file_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            file_models.FileSnapshotContentModel(
-                id='%s-3' % self.id_0))
-        # We are using the b' prefix here as NDB datastore models don't accept
-        # unicode.
-        model_with_invalid_version_in_id.content = b'content'
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for file model '
-                'version check of FileSnapshotContentModel\', '
-                '[u\'Entity id %s-3: File model corresponding to '
-                'id %s has a version 1 which is less than '
-                'the version 3 in snapshot content model id\']]'
-            ) % (self.id_0, self.id_0), (
-                u'[u\'fully-validated FileSnapshotContentModel\', '
-                '2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
 class JobModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -6389,20 +5675,6 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: based on field question_summary_ids having '
                 'value 0, expect model QuestionSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
-            u'[u\'fully-validated QuestionModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_question_rights_model_failure(self):
-        question_models.QuestionRightsModel.get_by_id(
-            '0').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for question_rights_ids '
-                'field check of QuestionModel\', '
-                '[u"Entity id 0: based on field question_rights_ids having '
-                'value 0, expect model QuestionRightsModel with id 0 but '
-                'it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -6875,440 +6147,6 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
-class QuestionRightsModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(QuestionRightsModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.signup(USER_EMAIL, USER_NAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
-        ) for i in python_utils.RANGE(6)]
-        for skill in skills:
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        language_codes = ['ar', 'en', 'en']
-        questions = [question_domain.Question.create_default_question(
-            '%s' % i,
-            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
-        ) for i in python_utils.RANGE(3)]
-
-        for index, question in enumerate(questions):
-            question.language_code = language_codes[index]
-            question.question_state_data = self._create_valid_question_data(
-                'Test')
-            if index == 0:
-                question_services.create_new_question(
-                    self.user_id, question, 'test question')
-            else:
-                question_services.create_new_question(
-                    self.owner_id, question, 'test question')
-
-        self.model_instance_0 = question_models.QuestionRightsModel.get_by_id(
-            '0')
-        self.model_instance_1 = question_models.QuestionRightsModel.get_by_id(
-            '1')
-        self.model_instance_2 = question_models.QuestionRightsModel.get_by_id(
-            '2')
-
-        self.job_class = (
-            prod_validation_jobs_one_off.QuestionRightsModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated QuestionRightsModel\', 3]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.commit(
-            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of QuestionRightsModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), u'[u\'fully-validated QuestionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'QuestionRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_question_model_failure(self):
-        question_models.QuestionModel.get_by_id('0').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for question_ids '
-                'field check of QuestionRightsModel\', '
-                '[u"Entity id 0: based on field question_ids having '
-                'value 0, expect model QuestionModel with id 0 but '
-                'it doesn\'t exist"]]'),
-            u'[u\'fully-validated QuestionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_creator_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for creator_user_ids '
-                'field check of QuestionRightsModel\', '
-                '[u"Entity id 0: based on field creator_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]') % (
-                    self.user_id, self.user_id),
-            u'[u\'fully-validated QuestionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_metadata_model_failure(self):
-        question_models.QuestionRightsSnapshotMetadataModel.get_by_id(
-            '0-1').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_metadata_ids '
-                'field check of QuestionRightsModel\', '
-                '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model '
-                'QuestionRightsSnapshotMetadataModel '
-                'with id 0-1 but it doesn\'t exist"]]'
-            ),
-            u'[u\'fully-validated QuestionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_content_model_failure(self):
-        question_models.QuestionRightsSnapshotContentModel.get_by_id(
-            '0-1').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_content_ids '
-                'field check of QuestionRightsModel\', '
-                '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model QuestionRightsSnapshotContentModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated QuestionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class QuestionRightsSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(QuestionRightsSnapshotMetadataModelValidatorTests, self).setUp(
-            )
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        self.signup(USER_EMAIL, USER_NAME)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
-        ) for i in python_utils.RANGE(6)]
-        for skill in skills:
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        language_codes = ['ar', 'en', 'en']
-        questions = [question_domain.Question.create_default_question(
-            '%s' % i,
-            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
-        ) for i in python_utils.RANGE(3)]
-
-        for index, question in enumerate(questions):
-            question.language_code = language_codes[index]
-            question.question_state_data = self._create_valid_question_data(
-                'Test')
-            if index == 0:
-                question_services.create_new_question(
-                    self.user_id, question, 'test question')
-            else:
-                question_services.create_new_question(
-                    self.owner_id, question, 'test question')
-
-        self.model_instance_0 = (
-            question_models.QuestionRightsSnapshotMetadataModel.get_by_id(
-                '0-1'))
-        self.model_instance_1 = (
-            question_models.QuestionRightsSnapshotMetadataModel.get_by_id(
-                '1-1'))
-        self.model_instance_2 = (
-            question_models.QuestionRightsSnapshotMetadataModel.get_by_id(
-                '2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .QuestionRightsSnapshotMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated QuestionRightsSnapshotMetadataModel\', 3]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of QuestionRightsSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'QuestionRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'QuestionRightsSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_question_rights_model_failure(self):
-        question_models.QuestionRightsModel.get_by_id('0').delete(
-            self.user_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for question_rights_ids '
-                'field check of QuestionRightsSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: based on field question_rights_ids '
-                'having value 0, expect model QuestionRightsModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'question_rights_ids having value 0, expect model '
-                'QuestionRightsModel with id 0 but it doesn\'t exist"]]'
-            ), (
-                u'[u\'fully-validated '
-                'QuestionRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for committer_ids field '
-                'check of QuestionRightsSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]'
-            ) % (self.user_id, self.user_id), (
-                u'[u\'fully-validated '
-                'QuestionRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_invalid_question_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            question_models.QuestionRightsSnapshotMetadataModel(
-                id='0-3', committer_id=self.owner_id, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for question rights model '
-                'version check of QuestionRightsSnapshotMetadataModel\', '
-                '[u\'Entity id 0-3: QuestionRights model corresponding to '
-                'id 0 has a version 1 which is less than the version 3 in '
-                'snapshot metadata model id\']]'
-            ), (
-                u'[u\'fully-validated '
-                'QuestionRightsSnapshotMetadataModel\', 3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_commit_cmd_schmea(self):
-        self.model_instance_0.commit_cmds = [{
-            'cmd': 'create_new',
-            'invalid_attribute': 'invalid'
-        }]
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for commit cmd '
-                'create_new check of '
-                'QuestionRightsSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: Commit command domain validation '
-                'for command: {u\'cmd\': u\'create_new\', '
-                'u\'invalid_attribute\': u\'invalid\'} failed with error: '
-                'The following extra attributes are present: '
-                'invalid_attribute"]]'
-            ), u'[u\'fully-validated QuestionRightsSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class QuestionRightsSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(QuestionRightsSnapshotContentModelValidatorTests, self).setUp(
-            )
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
-        ) for i in python_utils.RANGE(6)]
-        for skill in skills:
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        language_codes = ['ar', 'en', 'en']
-        questions = [question_domain.Question.create_default_question(
-            '%s' % i,
-            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
-        ) for i in python_utils.RANGE(3)]
-
-        for index, question in enumerate(questions):
-            question.language_code = language_codes[index]
-            question.question_state_data = self._create_valid_question_data(
-                'Test')
-            question_services.create_new_question(
-                self.owner_id, question, 'test question')
-
-        self.model_instance_0 = (
-            question_models.QuestionRightsSnapshotContentModel.get_by_id(
-                '0-1'))
-        self.model_instance_1 = (
-            question_models.QuestionRightsSnapshotContentModel.get_by_id(
-                '1-1'))
-        self.model_instance_2 = (
-            question_models.QuestionRightsSnapshotContentModel.get_by_id(
-                '2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .QuestionRightsSnapshotContentModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated QuestionRightsSnapshotContentModel\', 3]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of QuestionRightsSnapshotContentModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'QuestionRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'QuestionRightsSnapshotContentModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_question_model_failure(self):
-        question_models.QuestionRightsModel.get_by_id('0').delete(
-            self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for question_rights_ids '
-                'field check of QuestionRightsSnapshotContentModel\', '
-                '[u"Entity id 0-1: based on field question_rights_ids '
-                'having value 0, expect model QuestionRightsModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'question_rights_ids having value 0, expect model '
-                'QuestionRightsModel with id 0 but it doesn\'t exist"]]'
-            ), (
-                u'[u\'fully-validated '
-                'QuestionRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_invalid_question_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            question_models.QuestionRightsSnapshotContentModel(
-                id='0-3'))
-        model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for question rights model '
-                'version check of QuestionRightsSnapshotContentModel\', '
-                '[u\'Entity id 0-3: QuestionRights model corresponding to '
-                'id 0 has a version 1 which is less than the version 3 in '
-                'snapshot content model id\']]'
-            ), (
-                u'[u\'fully-validated QuestionRightsSnapshotContentModel\', '
-                '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
 class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -7482,34 +6320,16 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_true_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'public'
-        self.model_instance_0.post_commit_is_private = True
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit is private '
-                'check of QuestionCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'public but post_commit_is_private is True\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_false_post_commit_is_private(self):
+    def test_model_with_private_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'private'
-        self.model_instance_0.post_commit_is_private = False
         self.model_instance_0.put()
-
         expected_output = [
             (
-                u'[u\'failed validation check for post commit is private '
-                'check of QuestionCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'private but post_commit_is_private is False\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
+                u'[u\'failed validation check for post commit status check '
+                'of QuestionCommitLogEntryModel\', '
+                '[u\'Entity id question-0-1: Post commit status private '
+                'is invalid\']]'
+            ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
@@ -7678,19 +6498,6 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'entity: %s does not match corresponding question '
                 'created_on field: %s\']]'
             ) % (self.model_instance_0.id, mock_time, actual_time),
-            u'[u\'fully-validated QuestionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_question_rights_related_property(self):
-        self.model_instance_0.creator_id = self.user_id
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for creator_id field '
-                'check of QuestionSummaryModel\', [u\'Entity id 0: creator_id '
-                'field in entity: %s does not match corresponding '
-                'question rights creator_id field: %s\']]'
-            ) % (self.user_id, self.owner_id),
             u'[u\'fully-validated QuestionSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -8159,20 +6966,6 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated SkillModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_missing_skill_rights_model_failure(self):
-        skill_models.SkillRightsModel.get_by_id(
-            '0').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_rights_ids '
-                'field check of SkillModel\', '
-                '[u"Entity id 0: based on field skill_rights_ids having '
-                'value 0, expect model SkillRightsModel with id 0 but '
-                'it doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillModel\', 4]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
     def test_missing_snapshot_metadata_model_failure(self):
         skill_models.SkillSnapshotMetadataModel.get_by_id(
             '0-1').delete()
@@ -8530,450 +7323,6 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
 
-class SkillRightsModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(SkillRightsModelValidatorTests, self).setUp()
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        language_codes = ['ar', 'en', 'en']
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
-        ) for i in python_utils.RANGE(3)]
-
-        skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict = {
-            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-
-        for index, skill in enumerate(skills):
-            skill.language_code = language_codes[index]
-            skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
-            if index == 0:
-                skill_services.save_new_skill(self.user_id, skill)
-            else:
-                skill_services.save_new_skill(self.owner_id, skill)
-
-        self.model_instance_0 = skill_models.SkillRightsModel.get_by_id('0')
-        self.model_instance_1 = skill_models.SkillRightsModel.get_by_id('1')
-        self.model_instance_2 = skill_models.SkillRightsModel.get_by_id('2')
-
-        self.job_class = (
-            prod_validation_jobs_one_off.SkillRightsModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated SkillRightsModel\', 3]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.commit(
-            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of SkillRightsModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), u'[u\'fully-validated SkillRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillRightsModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('0').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_ids '
-                'field check of SkillRightsModel\', '
-                '[u"Entity id 0: based on field skill_ids having '
-                'value 0, expect model SkillModel with id 0 but '
-                'it doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_creator_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for creator_user_ids '
-                'field check of SkillRightsModel\', '
-                '[u"Entity id 0: based on field creator_user_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]') % (
-                    self.user_id, self.user_id),
-            u'[u\'fully-validated SkillRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_metadata_model_failure(self):
-        skill_models.SkillRightsSnapshotMetadataModel.get_by_id(
-            '0-1').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_metadata_ids '
-                'field check of SkillRightsModel\', '
-                '[u"Entity id 0: based on field snapshot_metadata_ids having '
-                'value 0-1, expect model '
-                'SkillRightsSnapshotMetadataModel '
-                'with id 0-1 but it doesn\'t exist"]]'
-            ),
-            u'[u\'fully-validated SkillRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_snapshot_content_model_failure(self):
-        skill_models.SkillRightsSnapshotContentModel.get_by_id(
-            '0-1').delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for snapshot_content_ids '
-                'field check of SkillRightsModel\', '
-                '[u"Entity id 0: based on field snapshot_content_ids having '
-                'value 0-1, expect model SkillRightsSnapshotContentModel '
-                'with id 0-1 but it doesn\'t exist"]]'),
-            u'[u\'fully-validated SkillRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class SkillRightsSnapshotMetadataModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(SkillRightsSnapshotMetadataModelValidatorTests, self).setUp(
-            )
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
-
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        language_codes = ['ar', 'en', 'en']
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
-        ) for i in python_utils.RANGE(3)]
-
-        skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict = {
-            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-
-        for index, skill in enumerate(skills):
-            skill.language_code = language_codes[index]
-            skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
-            if index == 0:
-                skill_services.save_new_skill(self.user_id, skill)
-            else:
-                skill_services.save_new_skill(self.owner_id, skill)
-
-        self.model_instance_0 = (
-            skill_models.SkillRightsSnapshotMetadataModel.get_by_id(
-                '0-1'))
-        self.model_instance_1 = (
-            skill_models.SkillRightsSnapshotMetadataModel.get_by_id(
-                '1-1'))
-        self.model_instance_2 = (
-            skill_models.SkillRightsSnapshotMetadataModel.get_by_id(
-                '2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .SkillRightsSnapshotMetadataModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated SkillRightsSnapshotMetadataModel\', 3]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of SkillRightsSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'SkillRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillRightsSnapshotMetadataModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_skill_rights_model_failure(self):
-        skill_models.SkillRightsModel.get_by_id('0').delete(
-            self.user_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_rights_ids '
-                'field check of SkillRightsSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: based on field skill_rights_ids '
-                'having value 0, expect model SkillRightsModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'skill_rights_ids having value 0, expect model '
-                'SkillRightsModel with id 0 but it doesn\'t exist"]]'
-            ), (
-                u'[u\'fully-validated '
-                'SkillRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_committer_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for committer_ids field '
-                'check of SkillRightsSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: based on field committer_ids having '
-                'value %s, expect model UserSettingsModel with id %s '
-                'but it doesn\'t exist"]]'
-            ) % (self.user_id, self.user_id), (
-                u'[u\'fully-validated '
-                'SkillRightsSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_invalid_skill_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            skill_models.SkillRightsSnapshotMetadataModel(
-                id='0-3', committer_id=self.owner_id, commit_type='edit',
-                commit_message='msg', commit_cmds=[{}]))
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill rights model '
-                'version check of SkillRightsSnapshotMetadataModel\', '
-                '[u\'Entity id 0-3: SkillRights model corresponding to '
-                'id 0 has a version 1 which is less than the version 3 in '
-                'snapshot metadata model id\']]'
-            ), (
-                u'[u\'fully-validated '
-                'SkillRightsSnapshotMetadataModel\', 3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_commit_cmd_schmea(self):
-        self.model_instance_0.commit_cmds = [{
-            'cmd': 'publish_skill',
-            'invalid_attribute': 'invalid'
-        }]
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for commit cmd publish_skill '
-                'check of SkillRightsSnapshotMetadataModel\', '
-                '[u"Entity id 0-1: Commit command domain validation '
-                'for command: {u\'cmd\': u\'publish_skill\', '
-                'u\'invalid_attribute\': u\'invalid\'} failed with error: '
-                'The following extra attributes are present: '
-                'invalid_attribute"]]'
-            ), u'[u\'fully-validated SkillRightsSnapshotMetadataModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
-class SkillRightsSnapshotContentModelValidatorTests(
-        test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(SkillRightsSnapshotContentModelValidatorTests, self).setUp(
-            )
-
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        language_codes = ['ar', 'en', 'en']
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skills = [skill_domain.Skill.create_default_skill(
-            '%s' % i,
-            description='description %d' % i,
-            rubrics=rubrics
-        ) for i in python_utils.RANGE(3)]
-
-        skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>'), [
-                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
-            state_domain.RecordedVoiceovers.from_dict(
-                {'voiceovers_mapping': {'1': {}, '2': {}}}),
-            state_domain.WrittenTranslations.from_dict(
-                {'translations_mapping': {'1': {}, '2': {}}}))
-        misconception_dict = {
-            'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
-            'feedback': '<p>default_feedback</p>',
-            'must_be_addressed': True}
-
-        for index, skill in enumerate(skills):
-            skill.language_code = language_codes[index]
-            skill.skill_contents = skill_contents
-            skill.add_misconception(misconception_dict)
-            skill_services.save_new_skill(self.owner_id, skill)
-
-        self.model_instance_0 = (
-            skill_models.SkillRightsSnapshotContentModel.get_by_id(
-                '0-1'))
-        self.model_instance_1 = (
-            skill_models.SkillRightsSnapshotContentModel.get_by_id(
-                '1-1'))
-        self.model_instance_2 = (
-            skill_models.SkillRightsSnapshotContentModel.get_by_id(
-                '2-1'))
-
-        self.job_class = (
-            prod_validation_jobs_one_off
-            .SkillRightsSnapshotContentModelAuditOneOffJob)
-
-    def test_standard_operation(self):
-        expected_output = [
-            u'[u\'fully-validated SkillRightsSnapshotContentModel\', 3]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_created_on_greater_than_last_updated(self):
-        self.model_instance_0.created_on = (
-            self.model_instance_0.last_updated + datetime.timedelta(days=1))
-        self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for time field relation check '
-            'of SkillRightsSnapshotContentModel\', '
-            '[u\'Entity id %s: The created_on field has a value '
-            '%s which is greater than the value '
-            '%s of last_updated field\']]') % (
-                self.model_instance_0.id,
-                self.model_instance_0.created_on,
-                self.model_instance_0.last_updated
-            ), (
-                u'[u\'fully-validated '
-                'SkillRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance_1.delete()
-        self.model_instance_2.delete()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'SkillRightsSnapshotContentModel\', '
-            '[u\'Entity id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
-
-        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
-            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
-            update_datastore_types_for_mock_datetime()
-            run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_skill_model_failure(self):
-        skill_models.SkillRightsModel.get_by_id('0').delete(
-            self.owner_id, '', [])
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill_rights_ids '
-                'field check of SkillRightsSnapshotContentModel\', '
-                '[u"Entity id 0-1: based on field skill_rights_ids '
-                'having value 0, expect model SkillRightsModel with '
-                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
-                'skill_rights_ids having value 0, expect model '
-                'SkillRightsModel with id 0 but it doesn\'t exist"]]'
-            ), (
-                u'[u\'fully-validated '
-                'SkillRightsSnapshotContentModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_invalid_skill_version_in_model_id(self):
-        model_with_invalid_version_in_id = (
-            skill_models.SkillRightsSnapshotContentModel(
-                id='0-3'))
-        model_with_invalid_version_in_id.content = {}
-        model_with_invalid_version_in_id.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for skill rights model '
-                'version check of SkillRightsSnapshotContentModel\', '
-                '[u\'Entity id 0-3: SkillRights model corresponding to '
-                'id 0 has a version 1 which is less than the version 3 in '
-                'snapshot content model id\']]'
-            ), (
-                u'[u\'fully-validated SkillRightsSnapshotContentModel\', '
-                '3]')]
-        run_job_and_check_output(self, expected_output, sort=True)
-
-
 class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -9027,15 +7376,6 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_2 = (
             skill_models.SkillCommitLogEntryModel.get_by_id(
                 'skill-2-1'))
-        self.rights_model_instance_0 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'rights-0-1'))
-        self.rights_model_instance_1 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'rights-1-1'))
-        self.rights_model_instance_2 = (
-            skill_models.SkillCommitLogEntryModel.get_by_id(
-                'rights-2-1'))
 
         self.job_class = (
             prod_validation_jobs_one_off
@@ -9050,7 +7390,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'old_value': 'description 0'
             })], 'Changes.')
         expected_output = [
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 7]']
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_created_on_greater_than_last_updated(self):
@@ -9066,15 +7406,13 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.id,
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
         self.model_instance_2.delete()
-        self.rights_model_instance_0.delete()
-        self.rights_model_instance_1.delete()
-        self.rights_model_instance_2.delete()
+
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'SkillCommitLogEntryModel\', '
@@ -9098,11 +7436,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'having value 0, expect model SkillModel with id '
                 '0 but it doesn\'t exist", u"Entity id skill-0-2: '
                 'based on field skill_ids having value 0, expect '
-                'model SkillModel with id 0 but it doesn\'t exist", '
-                'u"Entity id rights-0-1: based on field skill_ids '
-                'having value 0, expect model SkillModel with id 0 '
-                'but it doesn\'t exist"]]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 4]']
+                'model SkillModel with id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, literal_eval=True)
 
     def test_invalid_skill_version_in_model_id(self):
@@ -9121,7 +7456,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'to id 0 has a version 1 which is less than '
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 6]']
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_id(self):
@@ -9144,7 +7479,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'SkillCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
                 'No commit command domain object defined for entity with '
                 'commands: [{}]\']]'),
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 6]']
+            u'[u\'fully-validated SkillCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_type(self):
@@ -9156,7 +7491,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'SkillCommitLogEntryModel\', '
                 '[u\'Entity id skill-0-1: Commit type invalid is '
                 'not allowed\']]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_post_commit_status(self):
@@ -9168,37 +7503,19 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'of SkillCommitLogEntryModel\', '
                 '[u\'Entity id skill-0-1: Post commit status invalid '
                 'is invalid\']]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_true_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'public'
-        self.model_instance_0.post_commit_is_private = True
-        self.model_instance_0.put()
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for post commit is private '
-                'check of SkillCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'public but post_commit_is_private is True\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_false_post_commit_is_private(self):
+    def test_model_with_private_post_commit_status(self):
         self.model_instance_0.post_commit_status = 'private'
-        self.model_instance_0.post_commit_is_private = False
         self.model_instance_0.put()
-
         expected_output = [
             (
-                u'[u\'failed validation check for post commit is private '
-                'check of SkillCommitLogEntryModel\', '
-                '[u\'Entity id %s: Post commit status is '
-                'private but post_commit_is_private is False\']]'
-            ) % self.model_instance_0.id,
-            u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+                u'[u\'failed validation check for post commit status check '
+                'of SkillCommitLogEntryModel\', '
+                '[u\'Entity id skill-0-1: Post commit status private '
+                'is invalid\']]'
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
@@ -9227,7 +7544,7 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'The following required attributes are missing: '
                 'misconception_id, The following extra attributes are present: '
                 'invalid_attribute"]]'
-            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
+            ), u'[u\'fully-validated SkillCommitLogEntryModel\', 2]']
 
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -10563,7 +8880,6 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -10831,8 +9147,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for abbreviated name check '
                 'of TopicModel\', '
-                '[u\'Entity id 0: Expected nonempty abbreviated name '
-                'received None.\']]'
+                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
+                'abbreviated name, but received None.\']]'
             ), (
                 u'[u\'failed validation check for domain object check '
                 'of TopicModel\', [u\'Entity id 0: Entity fails domain '
@@ -10848,8 +9164,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for abbreviated name check '
                 'of TopicModel\', '
-                '[u\'Entity id 0: Expected nonempty abbreviated name '
-                'received .\']]'
+                '[u\'Entity id 0 : Topic name Topic0: Expected nonempty '
+                'abbreviated name, but received .\']]'
             ), (
                 u'[u\'failed validation check for domain object check '
                 'of TopicModel\', [u\'Entity id 0: Entity fails domain '
@@ -10892,7 +9208,6 @@ class TopicSnapshotMetadataModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11085,7 +9400,6 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11246,7 +9560,6 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11422,7 +9735,6 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11627,7 +9939,6 @@ class TopicRightsSnapshotContentModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -11786,7 +10097,6 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -12069,7 +10379,6 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -12293,7 +10602,6 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -12505,7 +10813,6 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -12712,7 +11019,6 @@ class SubtopicPageSnapshotContentModelValidatorTests(
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -12880,7 +11186,6 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         for skill in skills:
             skill_services.save_new_skill(self.owner_id, skill)
-            skill_services.publish_skill(skill.id, self.admin_id)
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -15506,7 +13811,6 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
         skill = skill_domain.Skill.create_default_skill(
             'skill', description='description', rubrics=rubrics)
         skill_services.save_new_skill(self.owner_id, skill)
-        skill_services.publish_skill(skill.id, self.owner_id)
         skill_services.create_user_skill_mastery(
             self.user_id, 'skill', 0.8)
 
@@ -15574,28 +13878,6 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
                 'with id skill but it doesn\'t exist"]]') % (
                     self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
-
-    def test_private_skill(self):
-        rubrics = [
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[0], 'Explanation 1'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
-            skill_domain.Rubric(
-                constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        skill = skill_domain.Skill.create_default_skill(
-            'privateskill', 'description', rubrics)
-        skill_services.save_new_skill(self.owner_id, skill)
-        skill_services.create_user_skill_mastery(
-            self.user_id, skill.id, 0.4)
-        expected_output = [
-            (
-                u'[u\'failed validation check for public skill check of '
-                'UserSkillMasteryModel\', [u\'Entity id %s.privateskill: '
-                'skill with id privateskill corresponding to entity is '
-                'private\']]') % self.user_id,
-            u'[u\'fully-validated UserSkillMasteryModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_invalid_skill_mastery(self):
         self.model_instance.degree_of_mastery = 10
@@ -15692,4 +13974,132 @@ class UserContributionScoringModelValidatorTests(test_utils.GenericTestBase):
             'UserContributionScoringModel\', [u\'Entity id %s: '
             'Expected score to be non-negative, received -1.0\']]') % (
                 self.model_instance.id)]
+        run_job_and_check_output(self, expected_output)
+
+
+class PendingDeletionRequestModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(PendingDeletionRequestModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        self.save_new_valid_exploration('exp_id', self.user_id)
+        self.save_new_valid_collection(
+            'col_id', self.user_id, exploration_id='exp_id')
+
+        user_services.update_user_role(
+            self.user_id, feconf.ROLE_ID_TOPIC_MANAGER)
+        self.user_actions = user_services.UserActionsInfo(self.user_id)
+
+        wipeout_service.pre_delete_user(self.user_id)
+        self.process_and_flush_pending_tasks()
+
+        self.model_instance = (
+            user_models.PendingDeletionRequestModel.get_by_id(self.user_id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .PendingDeletionRequestModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated PendingDeletionRequestModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of PendingDeletionRequestModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'PendingDeletionRequestModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted '
+                'user settings of PendingDeletionRequestModel\', '
+                '[u\'Entity id %s: User settings model '
+                'is not marked as deleted\']]') % (self.model_instance.id)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_user_settings_model_not_marked_deleted_failure(self):
+        user_model = user_models.UserSettingsModel.get_by_id(self.user_id)
+        user_model.deleted = False
+        user_model.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted '
+                'user settings of PendingDeletionRequestModel\', '
+                '[u\'Entity id %s: User settings model '
+                'is not marked as deleted\']]') % (self.model_instance.id)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_exploration_not_marked_deleted_failure(self):
+        exp = exp_models.ExplorationModel.get_by_id('exp_id')
+        exp.deleted = False
+        exp_models.ExplorationModel.put_multi([exp])
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted exploration check '
+                'of PendingDeletionRequestModel\', '
+                '[u"Entity id %s: Explorations with ids [u\'exp_id\'] are '
+                'not marked as deleted"]]') % self.user_id]
+        run_job_and_check_output(self, expected_output)
+
+    def test_collection_not_marked_deleted_failure(self):
+        col = collection_models.CollectionModel.get_by_id('col_id')
+        col.deleted = False
+        collection_models.CollectionModel.put_multi([col])
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted collection check '
+                'of PendingDeletionRequestModel\', '
+                '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
+                'not marked as deleted"]]') % self.user_id]
+        run_job_and_check_output(self, expected_output)
+
+    def test_exploration_deleted_failure(self):
+        exp = exp_models.ExplorationModel.get_by_id('exp_id')
+        exp.delete(self.user_id, '', force_deletion=True)
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted exploration check '
+                'of PendingDeletionRequestModel\', '
+                '[u"Entity id %s: Explorations with ids [u\'exp_id\'] are '
+                'not marked as deleted"]]') % self.user_id]
+        run_job_and_check_output(self, expected_output)
+
+    def test_collection_deleted_failure(self):
+        col = collection_models.CollectionModel.get_by_id('col_id')
+        col.delete(self.user_id, '', force_deletion=True)
+        expected_output = [
+            (
+                u'[u\'failed validation check for deleted collection check '
+                'of PendingDeletionRequestModel\', '
+                '[u"Entity id %s: Collections with ids [u\'col_id\'] are '
+                'not marked as deleted"]]') % self.user_id]
         run_job_and_check_output(self, expected_output)

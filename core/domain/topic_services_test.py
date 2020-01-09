@@ -474,6 +474,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.name, 'New Name')
+        self.assertEqual(topic.canonical_name, 'new name')
         self.assertEqual(topic.version, 4)
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 4)
@@ -699,16 +700,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_commit_log_entry.commit_message,
             'Added skill_id_3 to uncategorized skill ids')
-
-    def test_add_unpublished_skill_throws_exception(self):
-        self.save_new_skill(
-            'skill_a', self.user_id_a, 'Description A', misconceptions=[])
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Cannot assign unpublished skills to a topic'):
-            topic_services.add_uncategorized_skill(
-                self.user_id_a, self.TOPIC_ID, 'skill_a')
 
     def test_delete_uncategorized_skill(self):
         topic_services.delete_uncategorized_skill(

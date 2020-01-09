@@ -285,8 +285,8 @@ def apply_change_list(topic_id, change_list):
             elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
                 topic.delete_additional_story(change.story_id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
-                _add_uncategorized_skill_id_to_topic(
-                    topic, change.new_uncategorized_skill_id)
+                topic.add_uncategorized_skill_id(
+                    change.new_uncategorized_skill_id)
             elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
                 topic.remove_uncategorized_skill_id(
                     change.uncategorized_skill_id)
@@ -364,21 +364,6 @@ def apply_change_list(topic_id, change_list):
         raise
 
 
-def _add_uncategorized_skill_id_to_topic(topic, uncategorized_skill_id):
-    """Adds an uncategorized skill_id to a topic.
-
-    Args:
-        topic: Topic. Topic to be modified.
-        uncategorized_skill_id: str. Skill ID to be added.
-    """
-    skill_ids_for_unpublished_skills = [
-        skill_rights.id for skill_rights in (
-            skill_services.get_all_unpublished_skill_rights())]
-    if uncategorized_skill_id in skill_ids_for_unpublished_skills:
-        raise Exception('Cannot assign unpublished skills to a topic')
-    topic.add_uncategorized_skill_id(uncategorized_skill_id)
-
-
 def _save_topic(committer_id, topic, commit_message, change_list):
     """Validates a topic and commits it to persistent storage. If
     successful, increments the version number of the incoming topic domain
@@ -420,6 +405,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
 
     topic_model.description = topic.description
     topic_model.name = topic.name
+    topic_model.canonical_name = topic.canonical_name
     topic_model.abbreviated_name = topic.abbreviated_name
     topic_model.thumbnail_filename = topic.thumbnail_filename
     topic_model.canonical_story_references = [

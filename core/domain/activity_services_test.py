@@ -138,6 +138,24 @@ class ActivityServicesTests(test_utils.GenericTestBase):
         self._compare_lists(
             activity_services.get_featured_activity_references(), [])
 
+    def test_deleted_activity_is_removed_from_featured_list_multiple(self):
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
+        exploration_references = [
+            self._create_exploration_reference(self.EXP_ID_0),
+            self._create_exploration_reference(self.EXP_ID_1)]
+        activity_services.update_featured_activity_references(
+            exploration_references)
+
+        self._compare_lists(
+            activity_services.get_featured_activity_references(),
+            exploration_references)
+
+        exp_services.delete_explorations(
+            self.owner_id, [self.EXP_ID_0, self.EXP_ID_1])
+        self._compare_lists(
+            activity_services.get_featured_activity_references(), [])
+
     def test_unpublished_activity_is_removed_from_featured_list(self):
         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
         rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
