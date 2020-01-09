@@ -543,8 +543,8 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.mark_user_for_deletion(
             user_id, exploration_ids, collection_ids)
 
-        user_settings = user_services.get_user_settings(user_id)
-        self.assertTrue(user_settings.to_be_deleted)
+        user_settings = user_services.get_user_settings_by_gae_id(gae_id)
+        self.assertTrue(user_settings.deleted)
 
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(user_id))

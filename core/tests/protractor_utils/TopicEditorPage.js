@@ -97,7 +97,7 @@ var TopicEditorPage = function() {
   var topicThumbnailUploadInput = element(
     by.css('.protractor-test-photo-upload-input'));
   var topicThumbnailCropper = element(
-    by.css('.protractor-test-photo-crop'));
+    by.css('.cropper-container'));
   var topicThumbnailSubmitButton = element(
     by.css('.protractor-test-photo-upload-submit'));
 
