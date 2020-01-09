@@ -66,15 +66,10 @@ angular.module('oppia').directive('feedbackImprovementTask', [
               $scope.getLatestMessage().updatedOn);
           };
 
-          $scope.wasUpdatedAtMost24HoursAgo = function() {
-            var feedbackDateOrTime =
-            DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-              $scope.getLatestMessage().updatedOn);
-            if (Date.parse(feedbackDateOrTime)) {
-              return false;
-            } else {
-              return true;
-            }
+          $scope.wasUpdatedToday = function() {
+            var millisUptillToday = new Date().setHours(0,0,0,0);
+            return ($scope.getLatestMessage().updatedOn - millisUptillToday >= 0
+              ? true : false);
           };
         }
       ]
