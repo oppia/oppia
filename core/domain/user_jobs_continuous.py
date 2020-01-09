@@ -79,11 +79,11 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
             user_id: str. The unique id of the user.
 
         Returns:
-            tuple(job_queued_msec, recent_notifications), where:
+            tuple(job_queued_msec, user_recent_changes), where:
                 job_queued_msec: float or None. The time when the job was
                     queued in milliseconds since the epoch, or None if the job
                     does not exist.
-                recent_notifications: list(dict). Each dict has the keys:
+                user_recent_changes: list(dict). Each dict has the keys:
                     type: str. Either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
                         feconf.UPDATE_TYPE_FEEDBACK_MESSAGE.
                     activity_id: str. The id of the exploration being committed
@@ -94,11 +94,15 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
                     author_id: str. The id of the author who made the update.
                     subject: str. A brief description of the notification.
         """
-        user_model = (
+        user_recent_changes_model = (
             user_models.UserRecentChangesBatchModel.get(user_id, strict=False))
-        job_queued_msec = user_model and user_model.job_queued_msec
-        recent_notifications = [] if user_model is None else user_model.output
-        return (job_queued_msec, recent_notifications)
+        job_queued_msec = (
+            user_recent_changes_model and
+            user_recent_changes_model.job_queued_msec)
+        user_recent_changes = (
+            [] if user_recent_changes_model is None else
+            user_recent_changes_model.output)
+        return (job_queued_msec, user_recent_changes)
 
 
 class RecentUpdatesMRJobManager(
