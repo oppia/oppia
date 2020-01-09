@@ -294,6 +294,21 @@ class ClassifierTrainingJob(python_utils.OBJECT):
             'data_schema_version': self._data_schema_version
         }
 
+    def to_player_dict(self):
+        """Constructs a dict containing a training job domain object's
+        algorithm_id, classifier_data and data_schema_version.
+
+        Returns:
+            A dict containing training job domain object's algorithm_id,
+            classifier_data and data_schema_version.
+        """
+
+        return {
+            'algorithm_id': self._algorithm_id,
+            'classifier_data': self._classifier_data,
+            'data_schema_version': self._data_schema_version
+        }
+
     def validate(self):
         """Validates the training job before it is saved to storage."""
 
