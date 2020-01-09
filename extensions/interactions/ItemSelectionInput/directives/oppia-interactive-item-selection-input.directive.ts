@@ -90,7 +90,12 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
               ctrl.selectionCount < ctrl.minAllowableSelectionCount);
           };
 
-          ctrl.submitMultipleChoiceAnswer = function(index) {
+          ctrl.submitMultipleChoiceAnswer = function(event, index) {
+            // Deselect previously selected option.
+            $('button.multiple-choice-option.selected')
+              .removeClass('selected');
+            // Selected current option.
+            $(event.currentTarget).addClass('selected');
             ctrl.userSelections = {};
             ctrl.userSelections[ctrl.choices[index]] = true;
             ctrl.notEnoughSelections = false;

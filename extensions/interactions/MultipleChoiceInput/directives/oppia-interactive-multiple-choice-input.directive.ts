@@ -51,10 +51,15 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
             $attrs.choicesWithValue);
           ctrl.answer = null;
 
-          ctrl.selectAnswer = function(answer) {
+          ctrl.selectAnswer = function(event, answer) {
             if (answer === null) {
               return;
             }
+            // Deselect previously selected option.
+            $('button.multiple-choice-option.selected')
+              .removeClass('selected');
+            // Selected current option.
+            $(event.currentTarget).addClass('selected');
             ctrl.answer = parseInt(answer, 10);
             if (!BrowserCheckerService.isMobileDevice()) {
               ctrl.submitAnswer();
