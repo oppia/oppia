@@ -232,7 +232,8 @@ class ExplorationHandler(base.BaseHandler):
                 list(exploration.states.keys())))
         for index, state_name in enumerate(exploration.states.keys()):
             if classifier_training_jobs[index] is not None:
-                state_classifier_mapping[state_name] = classifier_training_jobs[index].to_player_dict()
+                state_classifier_mapping[state_name] = (
+                classifier_training_jobs[index].to_player_dict())
 
         self.values.update({
             'can_edit': (
