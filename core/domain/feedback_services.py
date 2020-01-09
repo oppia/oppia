@@ -357,18 +357,18 @@ def get_thread_analytics(exploration_id):
         exploration_id)
 
 
-def get_total_open_threads(feedback_analytics):
-    """Gets the count of all open threads for the given FeedbackAnalytics domain
-    object.
+def get_total_open_threads(feedback_analytics_list):
+    """Gets the count of all open threads from the given list of
+    FeedbackAnalytics domain objects.
 
     Args:
-        feedback_analytics: FeedbackAnalytics.
+        feedback_analytics_list: list(FeedbackAnalytics).
 
     Returns:
-        int. The count of all open threads for the given FeedbackAnalytics
-        domain object.
+        int. The count of all open threads for the given the given list of
+        FeedbackAnalytics domain objects.
     """
-    return sum(feedback.num_open_threads for feedback in feedback_analytics)
+    return sum(a.num_open_threads for a in feedback_analytics_list)
 
 
 def get_multiple_threads(thread_ids):
