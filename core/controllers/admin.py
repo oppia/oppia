@@ -436,9 +436,6 @@ class AdminHandler(base.BaseHandler):
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
             topic_services.publish_topic(topic_id_1, self.user_id)
-            skill_services.publish_skill(skill_id_1, self.user_id)
-            skill_services.publish_skill(skill_id_2, self.user_id)
-            skill_services.publish_skill(skill_id_3, self.user_id)
         else:
             raise Exception('Cannot load new structures data in production.')
 
