@@ -30,7 +30,7 @@ angular.module('oppia').factory('PlaythroughIssuesBackendApiService', [
       UrlInterpolationService, FETCH_ISSUES_URL, FETCH_PLAYTHROUGH_URL,
       RESOLVE_ISSUE_URL) {
     /** @type {PlaythroughIssue[]} */
-    var cachedIssues = null;
+    var cachedIssues = [];
 
     var getFullIssuesUrl = function(explorationId) {
       return UrlInterpolationService.interpolateUrl(
@@ -55,7 +55,7 @@ angular.module('oppia').factory('PlaythroughIssuesBackendApiService', [
     };
     return {
       fetchIssues: function(explorationId, explorationVersion) {
-        if (cachedIssues !== null) {
+        if (cachedIssues.length !== 0) {
           return $q.resolve(cachedIssues);
         } else {
           return $http.get(getFullIssuesUrl(explorationId), {
