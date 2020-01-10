@@ -33,7 +33,7 @@ import feconf
 datastore_services = models.Registry.import_datastore_services()
 transaction_services = models.Registry.import_transaction_services()
 
-# These models have arounn hundred thousand datastore entries on production and
+# These models have around hundred thousand datastore entries on production and
 # need to be in a separate one-off job in order to make the one-off jobs more
 # efficient.
 SEPARATE_MODEL_CLASSES = [
