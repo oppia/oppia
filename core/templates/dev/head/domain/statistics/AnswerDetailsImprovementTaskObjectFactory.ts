@@ -71,6 +71,10 @@ angular.module('oppia').factory('AnswerDetailsImprovementTaskObjectFactory', [
       return this._learnerAnswerDetails.learnerAnswerInfoData.length === 0;
     };
 
+    AnswerDetailsImprovementTask.prototype.getLastUpdatedTime = function() {
+      return this._learnerAnswerDetails.getLastUpdatedTime();
+    };
+
     return {
       createNew: function(learnerAnswerDetails) {
         return new AnswerDetailsImprovementTask(learnerAnswerDetails);
