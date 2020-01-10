@@ -38,11 +38,13 @@ require('domain/statistics/SuggestionImprovementTaskObjectFactory.ts');
 angular.module('oppia').factory('ImprovementTaskService', [
   '$q', 'AnswerDetailsImprovementTaskObjectFactory',
   'FeedbackImprovementTaskObjectFactory',
+  'ImprovementsDisplayService',
   'PlaythroughImprovementTaskObjectFactory',
   'SuggestionImprovementTaskObjectFactory',
   function(
       $q, AnswerDetailsImprovementTaskObjectFactory,
       FeedbackImprovementTaskObjectFactory,
+      ImprovementsDisplayService,
       PlaythroughImprovementTaskObjectFactory,
       SuggestionImprovementTaskObjectFactory) {
     /** @type {Object[]} */
@@ -52,7 +54,7 @@ angular.module('oppia').factory('ImprovementTaskService', [
       PlaythroughImprovementTaskObjectFactory,
       SuggestionImprovementTaskObjectFactory,
     ]);
-
+    var tasksPromise = null;
     return {
       /** @returns {Object[]} */
       getImprovementTaskObjectFactoryRegistry: function() {
@@ -69,15 +71,23 @@ angular.module('oppia').factory('ImprovementTaskService', [
        * the future.
        */
       fetchTasks: function() {
-        return $q.all(
-          improvementTaskObjectFactoryRegistry.map(function(taskFactory) {
-            return taskFactory.fetchTasks();
-          })
-        ).then(function(tasksFromFactories) {
+        tasksPromise = $q.all(
+          improvementTaskObjectFactoryRegistry.map(
+            taskFactory => taskFactory.fetchTasks())
+        ).then(tasksFromFactories => {
           // Flatten the tasks into a single array before returning.
           return [].concat.apply([], tasksFromFactories);
         });
+        return tasksPromise;
       },
+      fetchOpenTaskCount: function() {
+        var isTaskOpen = function(task) {
+          return ImprovementsDisplayService.isOpen(task.getStatus());
+        };
+        return this.fetchTasks().then(allTasks => {
+          return allTasks.filter(task => isTaskOpen(task)).length;
+        });
+      }
     };
   }
 ]);
