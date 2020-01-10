@@ -75,7 +75,7 @@ def export_data_for_user(user_id):
         }
     """
     exported_data = dict()
-    models_to_export = get_models_should_be_exported()
+    models_to_export = get_models_which_should_be_exported()
     for model in models_to_export:
         split_name = re.findall('[A-Z][^A-Z]*', model.__name__)[:-1]
         # Join the split name with underscores and add _data for final name.
