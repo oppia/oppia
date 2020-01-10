@@ -43,7 +43,7 @@ PROTRACTOR_BIN_PATH = os.path.join(
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
-WAIT_PORT_TIMEOUT = 1000
+SECONDS_TO_WAIT_PORT = 1000
 WEBDRIVER_HOME_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'webdriver-manager')
 WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
@@ -136,11 +136,10 @@ def check_screenshot():
     screeenshots_dir = os.path.join(os.pardir, 'protractor-screenshots')
     if not os.path.isdir(screeenshots_dir):
         return
-    python_utils.PRINT("""
-Note: If ADD_SCREENSHOT_REPORTER is set to true in
-core/tests/protractor.conf.js, you can view screenshots
-of the failed tests in ../protractor-screenshots/
-""")
+    python_utils.PRINT(
+        'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
+        'core/tests/protractor.conf.js, you can view screenshots'
+        'of the failed tests in ../protractor-screenshots/')
     os.rmdir(screeenshots_dir)
 
 
@@ -174,11 +173,10 @@ def check_running_instance(*ports):
     running = False
     for port in ports:
         if common.is_port_open(port):
-            python_utils.PRINT("""
-There is already a server running on localhost:%s.
-Please terminate it before running the end-to-end tests.
-    Exiting.
-            """ % port)
+            python_utils.PRINT(
+                'There is already a server running on localhost:%s.'
+                'Please terminate it before running the end-to-end tests.'
+                'Exiting.' % port)
             running = True
             break
     return running
@@ -190,11 +188,12 @@ def wait_for_port(port):
     Args:
         port: int. The port number to wait.
     """
-    current_time = 0
-    while not common.is_port_open(port) and current_time < WAIT_PORT_TIMEOUT:
+    waited_seconds = 0
+    while (not common.is_port_open(port) and
+           waited_seconds < SECONDS_TO_WAIT_PORT):
         time.sleep(1)
-        current_time += 1
-    if current_time == WAIT_PORT_TIMEOUT and not common.is_port_open(port):
+        waited_seconds += 1
+    if waited_seconds == SECONDS_TO_WAIT_PORT and not common.is_port_open(port):
         python_utils.PRINT(
             'Failed to start server on port %s, exiting ...' % port)
         sys.exit(1)
