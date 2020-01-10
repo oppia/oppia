@@ -168,7 +168,7 @@ def check_running_instance(*ports):
         ports: list(int). A list of ports that oppia instances may be running.
 
     Return:
-        bool: Whether the ports are open.
+        bool: Whether the ports are all open.
     """
     running = False
     for port in ports:
