@@ -69,9 +69,7 @@ describe('Skill rights backend API service', function() {
     // Cache a skill.
     SkillRightsBackendApiService.cacheSkillRights('0', {
       skill_id: '0',
-      can_edit_skill: true,
-      skill_is_private: true,
-      creator_id: 'a'
+      can_edit_skill: true
     });
 
     // It should now be cached.
@@ -85,9 +83,7 @@ describe('Skill rights backend API service', function() {
 
     expect(successHandler).toHaveBeenCalledWith({
       skill_id: '0',
-      can_edit_skill: true,
-      skill_is_private: true,
-      creator_id: 'a'
+      can_edit_skill: true
     });
     expect(failHandler).not.toHaveBeenCalled();
   });

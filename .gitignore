@@ -33,6 +33,7 @@ venv/
 .idea
 .vagrant/*
 .lock
+.local/*
 yarn-error.log
 .env
 

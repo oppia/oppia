@@ -15,12 +15,15 @@ workflows:
       - backend_tests:
           requires:
             - setup
+      - e2e_classroom_page:
+          requires:
+            - typescript_tests
       - e2e_file_upload_features:
           requires:
-            - setup
+            - typescript_tests
       - e2e_topic_and_story_editor:
           requires:
-            - setup
+            - typescript_tests
 
 var_for_docker_image: &docker_image circleci/python:2.7.17-browsers
 
@@ -111,6 +114,19 @@ jobs:
           name: Run backend tests
           command: |
             python -m scripts.run_backend_tests --generate_coverage_report --exclude_load_tests
+
+  e2e_classroom_page:
+    <<: *job_defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/
+      - run:
+          <<: *install_dependencies
+      - run:
+          name: Run e2e classroom page test
+          command: |
+            bash scripts/run_e2e_tests.sh --suite="classroomPage"
 
   e2e_file_upload_features:
     <<: *job_defaults
