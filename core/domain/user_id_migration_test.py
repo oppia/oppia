@@ -927,6 +927,15 @@ class GaeIdNotInModelsVerificationJobTests(test_utils.GenericTestBase):
         self.assertIn((self.USER_3_GAE_ID, self.USER_3_USER_ID), output)
 
 
+class BaseModelsUserIdsHaveUserSettingsVerificationJobTests(
+        test_utils.GenericTestBase):
+
+    def test_entity_classes_to_map_over(self):
+        with self.assertRaises(NotImplementedError):
+            (user_id_migration.BaseModelsUserIdsHaveUserSettingsVerificationJob
+             .entity_classes_to_map_over())
+
+
 class ModelsUserIdsHaveUserSettingsVerificationJobTests(
         test_utils.GenericTestBase):
     """Tests for ModelsUserIdsHaveUserSettingsVerificationJob."""
