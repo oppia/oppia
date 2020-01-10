@@ -68,7 +68,7 @@ angular.module('oppia').directive('feedbackImprovementTask', [
 
           $scope.wasUpdatedToday = function() {
             var msecsUntilToday = new Date().setHours(0, 0, 0, 0);
-            return ( $scope.getLatestMessage().updatedOn >= msecsUntilToday );
+            return ($scope.getLatestMessage().updatedOn >= msecsUntilToday);
           };
         }
       ]
