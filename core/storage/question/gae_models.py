@@ -491,7 +491,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         question_skill_link_models = cls.query().filter(
             cls.skill_id == skill_id,
-            not cls.deleted)
+            cls.deleted == False)
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
