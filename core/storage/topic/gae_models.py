@@ -30,6 +30,7 @@ from google.appengine.ext import ndb
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -38,6 +39,7 @@ class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -283,6 +285,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
 class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a subtopic page snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -291,6 +294,7 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a subtopic page snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -421,6 +425,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic rights snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -429,6 +434,7 @@ class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a topic rights snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""

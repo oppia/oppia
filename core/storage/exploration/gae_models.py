@@ -31,6 +31,7 @@ from google.appengine.ext import ndb
 
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -39,6 +40,7 @@ class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -226,6 +228,7 @@ class ExplorationModel(base_models.VersionedModel):
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -235,6 +238,7 @@ class ExplorationRightsSnapshotMetadataModel(
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""

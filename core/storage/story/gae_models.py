@@ -27,6 +27,7 @@ from google.appengine.ext import ndb
 
 class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a story snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -35,6 +36,7 @@ class StorySnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a story snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""

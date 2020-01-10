@@ -29,6 +29,7 @@ from google.appengine.ext import ndb
 
 class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file metadata snapshot commit history."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -37,6 +38,7 @@ class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Class for storing the content of the file metadata snapshots."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
@@ -183,6 +185,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
 class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Class for storing the file snapshot commit history."""
+
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
