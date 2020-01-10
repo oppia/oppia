@@ -28,10 +28,17 @@ require('services/user.service.ts');
 describe('User Service', function() {
   var UserService, $httpBackend, UrlInterpolationService;
   var userInfoObjectFactory;
+  var CsrfService = null;
+  var UrlService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
+    $provide.value('$window', {
+      location: {
+        pathname: 'home'
+      }
+    });
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -40,10 +47,12 @@ describe('User Service', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     UserService = $injector.get('UserService');
     UrlInterpolationService = $injector.get(
       'UrlInterpolationService');
+    UrlService = $injector.get(
+      'UrlService');
     // The injector is required because this service is directly used in this
     // spec, therefore even though UserInfoObjectFactory is upgraded to
     // Angular, it cannot be used just by instantiating it by its class but
@@ -54,7 +63,20 @@ describe('User Service', function() {
     userInfoObjectFactory = $injector.get(
       'UserInfoObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
+
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
   }));
+
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
 
   it('should return userInfo data', function() {
     // creating a test user for checking profile picture of user.
@@ -92,6 +114,65 @@ describe('User Service', function() {
     $httpBackend.flush();
   });
 
+  it('should return new userInfo data when url path is signup', function() {
+    spyOn(UrlService, 'getPathname').and.returnValue('/signup');
+    var sampleUserInfo = userInfoObjectFactory.createDefault();
+
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      expect(userInfo).toEqual(sampleUserInfo);
+    });
+  });
+
+  it('should not fetch userInfo if it is was fetched before', function() {
+    var sampleUserInfoBackendObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      user_is_logged_in: true
+    };
+
+    $httpBackend.expect('GET', '/userinfohandler').respond(
+      200, sampleUserInfoBackendObject);
+    var sampleUserInfo = userInfoObjectFactory.createFromBackendDict(
+      sampleUserInfoBackendObject);
+
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      expect(userInfo).toEqual(sampleUserInfo);
+      // Fetch userInfo again
+      UserService.getUserInfoAsync().then(function(sameUserInfo) {
+        expect(sameUserInfo).toEqual(userInfo);
+      });
+    });
+    $httpBackend.flush(1);
+  });
+
+  it('should return new userInfo data if user is not logged', function() {
+    var sampleUserInfoBackendObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      user_is_logged_in: false
+    };
+
+    $httpBackend.expect('GET', '/userinfohandler').respond(
+      200, sampleUserInfoBackendObject);
+    var sampleUserInfo = userInfoObjectFactory.createDefault();
+
+    UserService.getUserInfoAsync().then(function(userInfo) {
+      expect(userInfo).toEqual(sampleUserInfo);
+    });
+
+    $httpBackend.flush();
+  });
+
   it('should return image data', function() {
     var requestUrl = '/preferenceshandler/profile_picture';
     // Create a test user for checking profile picture of user.
@@ -124,6 +205,69 @@ describe('User Service', function() {
       expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.png'));
     });
+    $httpBackend.flush();
+  });
+
+  it('should return the default profile image path when user is not logged',
+    function() {
+      var sampleUserInfoBackendObject = {
+        is_moderator: false,
+        is_admin: false,
+        is_super_admin: false,
+        is_topic_manager: false,
+        can_create_collections: true,
+        preferred_site_language_code: null,
+        username: 'tester',
+        user_is_logged_in: false
+      };
+
+      $httpBackend.expect('GET', '/userinfohandler').respond(
+        200, sampleUserInfoBackendObject);
+      UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+        expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
+          '/avatar/user_blue_72px.png'));
+      });
+      $httpBackend.flush();
+    });
+
+  it('should return the login url', function() {
+    var loginUrl = '/login';
+    var currentUrl = 'home';
+
+    $httpBackend.expect('GET', '/url_handler?current_url=' + currentUrl)
+      .respond({login_url: loginUrl});
+    UserService.getLoginUrlAsync().then(function(dataUrl) {
+      expect(dataUrl).toBe(loginUrl);
+    });
+    $httpBackend.flush();
+  });
+
+  it('should set a profile image data url', function() {
+    var newProfileImageDataurl = '/avatar/x.png';
+    $httpBackend.expect('PUT', '/preferenceshandler/data')
+      .respond({profile_picture_data_url: newProfileImageDataurl});
+
+    UserService.setProfileImageDataUrlAsync(newProfileImageDataurl).then(
+      function(response) {
+        expect(response.data.profile_picture_data_url).toBe(
+          newProfileImageDataurl);
+      }
+    );
+    $httpBackend.flush();
+  });
+
+  it('should handle when set profile image data url is reject', function() {
+    var newProfileImageDataurl = '/avatar/x.png';
+    var errorMessage = 'It\'s not possible to set a new profile image data';
+    $httpBackend.expect('PUT', '/preferenceshandler/data')
+      .respond(500, errorMessage);
+
+    UserService.setProfileImageDataUrlAsync(newProfileImageDataurl)
+      /* eslint-disable dot-notation */
+      .catch(function(error) {
+      /* eslint-enable dot-notation */
+        expect(error.data).toEqual(errorMessage);
+      });
     $httpBackend.flush();
   });
 });
