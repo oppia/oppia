@@ -430,7 +430,7 @@ def check_prs_for_current_release_are_released(repo):
 
 
 def kill_processes_based_on_regex(pattern):
-    """Kill processes based on provided regex.
+    """Kill any processes whose command line matches the provided regex.
 
     Args:
         pattern: str. Pattern for searching processes.
@@ -445,6 +445,10 @@ def kill_processes_based_on_regex(pattern):
             if regex.match(cmdline) and process.is_running():
                 python_utils.PRINT('Killing %s ...' % cmdline)
                 process.kill()
+        # Possible exception raised by psutil includes: AccessDenied,
+        # NoSuchProcess, ZombieProcess, TimeoutExpired. We can safely ignore
+        # those ones and continue.
+        # https://psutil.readthedocs.io/en/latest/#exceptions
         except psutil.Error:
             continue
 
@@ -465,7 +469,12 @@ def convert_to_posixpath(file_path):
 
 
 def inplace_replace_file(filename, regex_pattern, replace):
-    """Replace the file content inplace with regex pattern.
+    """Replace the file content inplace with regex pattern. The pattern is used
+    to replace the file's content line by line.
+
+    Note:
+        This function was not designed to achive a comprehensive task. Instead,
+        it should only be used with some trivial tasks.
 
     Args:
         filename: str. The name of the file to be changed.
@@ -475,6 +484,8 @@ def inplace_replace_file(filename, regex_pattern, replace):
     regex = re.compile(regex_pattern)
     for line in fileinput.input(
             files=[filename], inplace=True, backup='.bak'):
+        # As PRINT is going to add a new line symbol, if we do not remove the
+        # origin \n, there would be a lot of redundant empty lines in the file.
         line = line.rstrip()
         line = regex.sub(replace, line)
         python_utils.PRINT(line)
