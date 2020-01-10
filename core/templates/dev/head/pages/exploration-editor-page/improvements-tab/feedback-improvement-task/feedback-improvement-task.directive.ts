@@ -65,6 +65,11 @@ angular.module('oppia').directive('feedbackImprovementTask', [
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLatestMessage().updatedOn);
           };
+
+          $scope.wasUpdatedToday = function() {
+            var msecsUntilToday = new Date().setHours(0, 0, 0, 0);
+            return ($scope.getLatestMessage().updatedOn >= msecsUntilToday);
+          };
         }
       ]
     };
