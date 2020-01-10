@@ -22,6 +22,7 @@ import datetime
 import itertools
 
 from core.domain import email_manager
+from core.domain import event_services
 from core.domain import feedback_domain
 from core.domain import feedback_jobs_continuous
 from core.domain import rights_manager
@@ -31,7 +32,7 @@ from core.platform import models
 import feconf
 import python_utils
 
-(feedback_models, email_models, suggestion_models) = (
+feedback_models, email_models, suggestion_models = (
     models.Registry.import_models(
         [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
 datastore_services = models.Registry.import_datastore_services()
@@ -59,10 +60,10 @@ def get_exp_id_from_thread_id(thread_id):
     return thread_id.split('.')[1]
 
 
-def _create_models_for_thread_and_first_message(
+def create_thread(
         entity_type, entity_id, original_author_id, subject, text,
-        has_suggestion):
-    """Creates a feedback thread and its first message.
+        has_suggestion=False):
+    """Creates a thread and its first message.
 
     Args:
         entity_type: str. The type of entity the feedback thread is linked to.
@@ -70,8 +71,8 @@ def _create_models_for_thread_and_first_message(
         original_author_id: str. The author id who starts this thread.
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
-        has_suggestion: bool. Whether this thread has a related learner
-            suggestion.
+        has_suggestion: bool. Whether the thread has a suggestion attached to
+            it.
 
     Returns:
         str. The id of the new thread.
@@ -97,28 +98,6 @@ def _create_models_for_thread_and_first_message(
     return thread_id
 
 
-def create_thread(
-        entity_type, entity_id, original_author_id, subject, text,
-        has_suggestion=False):
-    """Creates a thread and its first message.
-
-    Args:
-        entity_type: str. The type of entity the feedback thread is linked to.
-        entity_id: str. The id of the entity.
-        original_author_id: str. The author id who starts this thread.
-        subject: str. The subject of this thread.
-        text: str. The text of the feedback message. This may be ''.
-        has_suggestion: bool. Whether the thread has a suggestion attached to
-            it.
-
-    Returns:
-        str. The id of the new thread.
-    """
-    return _create_models_for_thread_and_first_message(
-        entity_type, entity_id, original_author_id, subject, text,
-        has_suggestion)
-
-
 def create_message(
         thread_id, author_id, updated_status, updated_subject, text,
         received_via_email=False):
@@ -128,9 +107,9 @@ def create_message(
     Args:
         thread_id: str. The thread id the message belongs to.
         author_id: str. The author id who creates this message.
-        updated_status: str. One of STATUS_CHOICES. New thread status.
-            Must be supplied if this is the first message of a thread. For the
-            rest of the thread, should exist only when the status changes.
+        updated_status: str. One of STATUS_CHOICES. New thread status. Must be
+            supplied if this is the first message of a thread. For the rest of
+            the thread, should exist only when the status changes.
         updated_subject: str. New thread subject. Must be supplied if this is
             the first message of a thread. For the rest of the thread, should
             exist only when the subject changes.
@@ -138,79 +117,67 @@ def create_message(
         received_via_email: bool. Whether new message is received via email or
             web.
     """
-    from core.domain import event_services
-    # Get the thread at the outset, in order to check that the thread_id passed
-    # in is valid.
     thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
+    updated_status = (
+        None if thread.status == updated_status else updated_status)
+    updated_subject = (
+        None if thread.subject == updated_subject else updated_subject)
 
     message_id = feedback_models.GeneralFeedbackMessageModel.get_message_count(
         thread_id)
+    thread_is_new = message_id == 0
+
+    # Create and populate a new message model.
     message = feedback_models.GeneralFeedbackMessageModel.create(
         thread_id, message_id)
-    message.thread_id = thread_id
     message.message_id = message_id
+    message.thread_id = thread_id
     message.author_id = author_id
+    message.updated_status = updated_status
+    message.updated_subject = updated_subject
     message.text = text
     message.received_via_email = received_via_email
-    if updated_status:
-        message.updated_status = updated_status
-        if message_id == 0:
-            # New thread.
-            if thread.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                event_services.FeedbackThreadCreatedEventHandler.record(
-                    thread.entity_id)
-        else:
-            # Thread status changed.
-            if thread.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                event_services.FeedbackThreadStatusChangedEventHandler.record(
-                    thread.entity_id, thread.status, updated_status)
-    if updated_subject:
-        message.updated_subject = updated_subject
     message.put()
 
-    # Update the message data cache of the thread.
+    # Update the thread model.
+    new_status, old_status = updated_status or thread.status, thread.status
+    new_subject = updated_subject or thread.subject
+    thread.message_count = (
+        feedback_models.GeneralFeedbackMessageModel.get_message_count(thread_id)
+        if thread.message_count is None else thread.message_count + 1)
+    if not thread_is_new:
+        thread.status = new_status
+        thread.subject = new_subject
+        if thread.has_suggestion:
+            # We call put on the suggestion model linked to the thread, so that
+            # the last_updated time changes to show that there is activity in
+            # the thread.
+            suggestion_id = thread_id
+            suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
+                suggestion_id)
+            suggestion.put()
     if text:
         thread.last_nonempty_message_text = text
         thread.last_nonempty_message_author_id = author_id
-    if thread.message_count is not None:
-        thread.message_count += 1
-    else:
-        thread.message_count = (
-            feedback_models.GeneralFeedbackMessageModel.get_message_count(
-                thread_id))
-
-    # We do a put() even if the status and subject are not updated, so that the
-    # last_updated time of the thread reflects the last time a message was added
-    # to it.
-    old_status = thread.status
-    if message_id != 0 and (updated_status or updated_subject):
-        if updated_status and updated_status != thread.status:
-            thread.status = updated_status
-        if updated_subject and updated_subject != thread.subject:
-            thread.subject = updated_subject
-    new_status = thread.status
     thread.put()
-
-    # We do a put on the suggestion linked (if it exists) to the thread, so that
-    # the last_updated time changes to show that there is activity in the
-    # thread.
-    if thread.has_suggestion:
-        suggestion_id = thread_id
-        suggestion = (
-            suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id))
-        # As the thread is created before the suggestion, for the first message
-        # we need not update the suggestion.
-        if suggestion:
-            suggestion.put()
-
-    if (feconf.CAN_SEND_EMAILS and feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS and
-            user_services.is_user_registered(author_id)):
-        _add_message_to_email_buffer(
-            author_id, thread_id, message_id, len(text), old_status, new_status)
 
     if author_id:
         subscription_services.subscribe_to_thread(author_id, thread_id)
         add_message_id_to_read_by_list(thread_id, author_id, message_id)
+        if (user_services.is_user_registered(author_id) and
+                feconf.CAN_SEND_EMAILS and
+                feconf.CAN_SEND_FEEDBACK_MESSAGE_EMAILS):
+            _add_message_to_email_buffer(
+                author_id, thread_id, message_id, len(text), old_status,
+                new_status)
+
+    if thread.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+        if thread_is_new:
+            event_services.FeedbackThreadCreatedEventHandler.record(
+                thread.entity_id)
+        elif updated_status:
+            event_services.FeedbackThreadStatusChangedEventHandler.record(
+                thread.entity_id, old_status, new_status)
 
 
 def update_messages_read_by_the_user(user_id, thread_id, message_ids):
