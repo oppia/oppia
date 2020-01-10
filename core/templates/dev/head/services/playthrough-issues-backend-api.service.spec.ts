@@ -107,26 +107,26 @@ describe('PlaythroughIssuesBackendApiService', function() {
     });
 
     it('should not fetch an issue when another issue was already fetched',
-      function() {  
+      function() {
         var successHandler = jasmine.createSpy('success');
         var failureHandler = jasmine.createSpy('failure');
         $httpBackend.expectGET(
           '/issuesdatahandler/7?exp_version=1'
         ).respond(backendIssues);
-  
+
         PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
           successHandler, failureHandler);
         $httpBackend.flush();
-  
+
         expect(successHandler).toHaveBeenCalledWith(
           backendIssues.map(
             PlaythroughIssueObjectFactory.createFromBackendDict));
         expect(failureHandler).not.toHaveBeenCalled();
-  
+
         // Try to fetch another issue
         PlaythroughIssuesBackendApiService.fetchIssues('8', 1).then(
           successHandler, failureHandler);
-  
+
         expect(successHandler).toHaveBeenCalledWith(
           backendIssues.map(
             PlaythroughIssueObjectFactory.createFromBackendDict));
@@ -185,13 +185,13 @@ describe('PlaythroughIssuesBackendApiService', function() {
       ).respond(backendIssues);
       $httpBackend.expectPOST('/resolveissuehandler/' + explorationId)
         .respond(200);
-  
+
       PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
         function() {
           PlaythroughIssuesBackendApiService.resolveIssue(
             playthroughIssue, explorationId, 1).then(
-              successHandler, failureHandler);
-        
+            successHandler, failureHandler);
+
           // resolveIssue does not return any resolve promise method.
           expect(successHandler).not.toHaveBeenCalled();
           expect(failureHandler).not.toHaveBeenCalled();
@@ -207,7 +207,7 @@ describe('PlaythroughIssuesBackendApiService', function() {
 
         var successHandler = jasmine.createSpy('success');
         var failHandler = jasmine.createSpy('fail');
-        
+
         $httpBackend.expectPOST('/resolveissuehandler/' + explorationId)
           .respond(200);
         PlaythroughIssuesBackendApiService.resolveIssue(

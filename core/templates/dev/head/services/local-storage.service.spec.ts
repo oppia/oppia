@@ -24,8 +24,8 @@ import { LocalStorageService } from 'services/local-storage.service';
 
 describe('LocalStorageService', () => {
   describe('behavior in editor', () => {
-    const localStorageService = null;
-    const explorationDraftObjectFactory = null;
+    let localStorageService = null;
+    let explorationDraftObjectFactory = null;
     const explorationIdOne = '100';
     const draftChangeListIdOne = 2;
     const changeList = [];
@@ -75,10 +75,11 @@ describe('LocalStorageService', () => {
         explorationIdOne)).toEqual(draftOne);
 
       const draftChangeListIdOneChanged = 3;
-      const draftOneChanged =  explorationDraftObjectFactory.createFromLocalStorageDict({
-        draftChanges: changeList,
-        draftChangeListId: draftChangeListIdOneChanged
-      });
+      const draftOneChanged = explorationDraftObjectFactory
+        .createFromLocalStorageDict({
+          draftChanges: changeList,
+          draftChangeListId: draftChangeListIdOneChanged
+        });
       localStorageService.saveExplorationDraft(explorationIdOne,
         changeList, draftChangeListIdOneChanged);
       expect(localStorageService.getExplorationDraft(
