@@ -319,18 +319,18 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     for root in os.listdir(base_path):
         if any([s in root for s in excluded_dirs]):
             continue
-        if root.endswith('captured_in_ci_test.py'):
+        if root.endswith('_test.py'):
             result = result + (
                 _get_test_target_classes(os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             if _LOAD_TESTS_DIR in subroot and include_load_tests:
                 for f in files:
-                    if f.endswith('captured_in_ci_test.py'):
+                    if f.endswith('_test.py'):
                         result = result + (
                             _get_test_target_classes(os.path.join(subroot, f)))
 
             for f in files:
-                if (f.endswith('captured_in_ci_test.py') and
+                if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
                     result = result + (
                         _get_test_target_classes(os.path.join(subroot, f)))
