@@ -50,16 +50,6 @@ describe('PlaythroughIssuesBackendApiService', function() {
     is_valid: true
   }];
 
-  beforeEach(angular.mock.module('oppia'));
-  // beforeEach(angular.mock.module('oppia', function($provide) {
-  //   $provide.value(
-  //     'LearnerActionObjectFactory', new LearnerActionObjectFactory());
-  //   $provide.value(
-  //     'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
-  //   $provide.value(
-  //     'PlaythroughObjectFactory', new PlaythroughObjectFactory(
-  //       new LearnerActionObjectFactory()));
-  // }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
