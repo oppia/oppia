@@ -219,8 +219,6 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
 
         Args:
              event_type: str. The type of the event.
-             *args: Variable length argument list.
-             **kwargs: Arbitrary keyword arguments.
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
             if event_type in klass.get_event_types_listened_to():
