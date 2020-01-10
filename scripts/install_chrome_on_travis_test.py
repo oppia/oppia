@@ -52,31 +52,31 @@ class InstallChromeOnTravisTests(test_utils.GenericTestBase):
 
         isdir_swap = self.swap_with_checks(
             os.path, 'isdir', mock_isdir,
-            expected_args=(os.path.join('HOME', '.cache/TravisChrome/'),))
+            expected_args=[(os.path.join('HOME', '.cache/TravisChrome/'),)])
         makedirs_swap = self.swap_with_checks(
             os, 'makedirs', mock_makedirs,
-            expected_args=(os.path.join('HOME', '.cache/TravisChrome/'),))
+            expected_args=[(os.path.join('HOME', '.cache/TravisChrome/'),)])
         isfile_swap = self.swap_with_checks(
             os.path, 'isfile', mock_isfile,
-            expected_args=(os.path.join(
+            expected_args=[(os.path.join(
                 'HOME', '.cache/TravisChrome/',
-                'google-chrome-stable_77.0.3865.75-1_amd64.deb'),))
+                'google-chrome-stable_77.0.3865.75-1_amd64.deb'),)])
         chdir_swap = self.swap_with_checks(
             os, 'chdir', mock_chdir, expected_args=[
                 (os.path.join('HOME', '.cache/TravisChrome/'),),
                 (os.getcwd(),)])
         url_retrieve_swap = self.swap_with_checks(
             python_utils, 'url_retrieve', mock_url_retrieve,
-            expected_args=(chrome_source_url,),
-            expected_kwargs={
+            expected_args=[(chrome_source_url,)],
+            expected_kwargs=[{
                 'filename': 'google-chrome-stable_77.0.3865.75-1_amd64.deb'
-            })
+            }])
         check_call_swap = self.swap_with_checks(
-            subprocess, 'check_call', mock_check_call, expected_args=(
+            subprocess, 'check_call', mock_check_call, expected_args=[(
                 ['sudo', 'dpkg', '-i', os.path.join(
                     'HOME', '.cache/TravisChrome/',
                     'google-chrome-stable_77.0.3865.75-1_amd64.deb')
-                ],))
+                ],)])
         environ_swap = self.swap(
             os, 'environ', {
                 'CHROME_SOURCE_URL': chrome_source_url,

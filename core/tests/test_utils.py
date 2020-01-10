@@ -1846,8 +1846,7 @@ tags: []
     @contextlib.contextmanager
     def swap_with_checks(
             self, obj, attr, newvalue, expected_args=None, expected_kwargs=None,
-            called=True, called_times=None,
-            expected_exception=IntendedException):
+            called=True):
         """Swap an object's function value within the context of a
         'with' statement. The object can be anything that supports
         getattr and setattr, such as class instances, modules, ...
@@ -1865,44 +1864,27 @@ tags: []
 
                 popen_swap = self.swap_with_checks(
                     subprocess, 'Popen', mock_popen, expected_args=[
-                        (['python'],), (['python2'],)], expected_kwargs={
-                            'shell': True,
-                            'shell': False
-                        })
+                        (['python'],), (['python2'],)], expected_kwargs=[
+                            {'shell': True,}, {'shell': False}])
                 with popen_swap:
-                    function_will_invoke_popen()
-
-        Note:
-            Currently the function does not support specify the ordered invoke
-            args. Also, as the example above, if the actual code invoked
-            `subprocess.Popen(['python2'], shell=True)` and
-            `subprocess.Popen(['python'], shell=False), the check will still
-            pass. Use with caution.
+                    function_that_invokes_popen()
 
         Args:
             obj: *. the Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
             newvalue: Function. The new function you want to use.
-            expected_args: None|tuple|list(tuple). The expected args that you
+            expected_args: None|list(tuple). The expected args that you
                 want this function to be invoked with. When its value is None,
-                args will not be checked. If the value type is tuple, means
-                everytime the function is invoked should by the args in this
-                tuple. If the value type is list, the function will check
-                whether the called args is in the list. If the invoking args
-                tuple is in the list, this tuple will be removed from the list.
-            expected_kwargs: None|dict|list(dict). The expected key word args
+                args will not be checked.If the value type is list, the function
+                will check whether the called args is the first element in the
+                list. If matched, this tuple will be removed from the list.
+            expected_kwargs: None|list(dict). The expected key word args
                 you want this function to be invoked with. Similar to
                 expected_args.
             called: bool. Whether the function is invoked. This will always be
                 checked.
-            called_times: int|None. How many times this function will be called.
-                If the value is None, this will not be checked.
-            expected_exception: Exceptiono. The exception that you expect to be
-                raised in this function. By default the exception is
-                IntendedException.
         """
         original = getattr(obj, attr)
-        newvalue.called_times = 0
         msg = 'Failed in check function %s.%s' % (obj.__name__, attr)
         def wrapper(*args, **kwargs):
             """Wrapper function for the new value. This function will do the
@@ -1917,32 +1899,21 @@ tags: []
             Returns:
                 Result of `newvalue`.
             """
+            wrapper.called = True
             if expected_args is not None:
-                if isinstance(expected_args, tuple):
-                    self.assertEqual(args, expected_args, msg=msg)
-                elif isinstance(expected_args, list):
-                    self.assertIn(args, expected_args, msg=msg)
-                    expected_args.remove(args)
-                else:
-                    raise Exception()
+                self.assertEqual(args, expected_args[0], msg=msg)
+                expected_args.pop(0)
             if expected_kwargs is not None:
-                if isinstance(expected_kwargs, dict):
-                    self.assertEqual(kwargs, expected_kwargs, msg=msg)
-                elif isinstance(expected_kwargs, list):
-                    self.assertIn(kwargs, expected_kwargs, msg=msg)
-                    expected_kwargs.remove(kwargs)
-                else:
-                    raise Exception()
-            try:
-                result = newvalue(*args, **kwargs)
-                newvalue.called_times += 1
-                return result
-            except expected_exception as error:
-                newvalue.called_times += 1
-                raise error
+                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
+                expected_kwargs.pop(0)
+            result = newvalue(*args, **kwargs)
+            return result
+        wrapper.called = False
         setattr(obj, attr, wrapper)
         error_occurred = False
         try:
+            # This will show the detailed assert message.
+            self.longMessage = True
             yield
         except Exception as exception:
             # Use this flag to indicate whether there was an error in the
@@ -1950,15 +1921,13 @@ tags: []
             error_occurred = True
             raise exception
         finally:
+            self.longMessage = False
             setattr(obj, attr, original)
             # Only do the rest of the checks when there was no error.
             # Otherwise error in this check will overwrite the error raised
             # in above functions.
             if not error_occurred:
-                self.assertEqual(newvalue.called_times > 0, called, msg=msg)
-                if called_times is not None:
-                    self.assertEqual(
-                        called_times, newvalue.called_times, msg=msg)
+                self.assertEqual(wrapper.called, called, msg=msg)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
