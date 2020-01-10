@@ -15,16 +15,16 @@
   <div class="d-block d-xl-none oppia-content-wrapper oppia-audio-bar-info">
     <div class="padding-small-screen">
       <div ng-if="!cannotRecord && !checkingMicrophonePermission">
-        <span ng-if="canVoiceover"> Press <i class="material-icons">mic</i>  to start recording.</span>
+        <span ng-if="canVoiceover"> Press <i class="material-icons">mic</i>  to record.</span>
       </div>
       <div ng-if="checkingMicrophonePermission">
         Loading microphone.<loading-dots></loading-dots>
       </div>
       <div ng-if="recordingPermissionDenied && cannotRecord">
-        Grant permission to use your microphone.
+        Grant permission to record.
       </div>
       <div ng-if="unsupportedBrowser && cannotRecord">
-        Sorry, Recording feature is not supported.
+        Microphone is not supported.
       </div>
     </div>
   </div>
@@ -265,7 +265,7 @@
     text-align: center;
   }
   .oppia-audio-bar-info .padding-small-screen {
-    padding: 5px 5px;
+    padding: 5px 2px;
   }
   .oppia-audio-bar-info .padding-large-screen {
     padding: 5px 20px;
