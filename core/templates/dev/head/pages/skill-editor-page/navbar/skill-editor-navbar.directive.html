@@ -7,13 +7,7 @@
               style="float: left; width: 155px;"
               ng-disabled="!isSkillSaveable()">
         <span ng-if="!isSaveInProgress()">
-          <span ng-if="skillRights.isPrivate()">
-            <i class="material-icons md-18 md-dark oppia-save-publish-button-icon" alt="Save Skill">
-              &#xE161;
-            </i>
-            <span class="oppia-save-publish-button-label">Save Draft</span>
-          </span>
-          <span ng-if="skillRights.isPublic()" title="Publish Changes">
+          <span title="Publish Changes">
             <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
                alt="Publish Changes">
               &#xE161;
@@ -27,15 +21,14 @@
         </span>
 
         <span ng-if="isSaveInProgress()">
-          <span ng-if="skillRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
-          <span ng-if="skillRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
+          <span class="oppia-save-publish-button-label">Publishing</span>
           <loading-dots></loading-dots>
         </span>
       </button>
       <button type="button" style="height: 34px;" class="btn btn-light uib-dropdown-toggle dropdown-toggle"
               ng-disabled="!getChangeListCount()" uib-dropdown-toggle>
       </button>
-      <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListCount() && skillRights.isPublic() ? '150px' : '120px' }">
+      <ul uib-dropdown-menu role="menu" style="min-width: 125px; right: inherit;" ng-style="{ width: getChangeListCount() ? '150px' : '120px' }">
         <li title="Discard all pending changes"><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !getChangeListCount()}" class="dropdown-item">Discard Draft</a></li>
       </ul>
     </div>
