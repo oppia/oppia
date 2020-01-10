@@ -5,5 +5,9 @@ var suites = {
 
   twoWords: [
     'protractor_desktop/twoWords.js'
+  ],
+
+  extra: [
+    'protractor/extra.js'
   ]
 };

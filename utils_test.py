@@ -329,11 +329,9 @@ class UtilsTests(test_utils.GenericTestBase):
                 invalid_language_code)
 
     def test_snake_case_to_camel_case(self):
-        snake_case_str1 = utils.snake_case_to_camel_case('user_id_number')
-        snake_case_str2 = utils.snake_case_to_camel_case('hello_world')
-        snake_case_str3 = utils.snake_case_to_camel_case('test1')
-        test_string1 = utils.snake_case_to_camel_case('user-id-number')
-        self.assertEqual(snake_case_str1, 'userIdNumber')
-        self.assertEqual(snake_case_str2, 'helloWorld')
-        self.assertEqual(snake_case_str3, 'test1')
-        self.assertNotEqual(test_string1, 'userIdNumber')
+        camel_case_str1 = utils.snake_case_to_camel_case('user_id_number')
+        camel_case_str2 = utils.snake_case_to_camel_case('hello_world')
+        camel_case_str3 = utils.snake_case_to_camel_case('test1')
+        self.assertEqual(camel_case_str1, 'userIdNumber')
+        self.assertEqual(camel_case_str2, 'helloWorld')
+        self.assertEqual(camel_case_str3, 'test1')

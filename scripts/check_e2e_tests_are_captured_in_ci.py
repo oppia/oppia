@@ -36,7 +36,7 @@ def get_e2e_suite_names_from_jobs_travis_yml_file():
     suites_from_jobs = []
     # The following line extracts the test suite name from the jobs section that
     # is in the form RUN_E2E_TESTS_ACCESSIBILITY=true.
-    test_regex = re.compile(r'(?<=TESTS_)(.*)(?=\=)')
+    test_regex = re.compile(r'(?<=RUN_E2E_TESTS_)(.*)(?=\=)')
     for job in jobs_raw:
         matches = test_regex.finditer(job)
         for match in matches:
@@ -55,7 +55,7 @@ def get_e2e_suite_names_from_script_travis_yml_file():
     script_raw = travis_file['script']
     # The following line extracts the test suites from patterns like
     # --suite="accessibility" --
-    hyphen_between_regex = re.compile(r'(?<= --suite=")(.*)(?=")')
+    hyphen_between_regex = re.compile(r'(?<= bash scripts/run_e2e_tests.sh --suite=")(.*)(?=")')
     suites_from_script = []
 
     for script in script_raw:
