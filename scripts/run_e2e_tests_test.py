@@ -121,11 +121,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             os.path, 'isdir', mock_isdir, expected_args=[(screenshot_dir,)])
         rmdir_swap = self.swap_with_checks(
             os, 'rmdir', mock_rmdir, expected_args=[(screenshot_dir,)])
-        expected_output = """
-Note: If ADD_SCREENSHOT_REPORTER is set to true in
-core/tests/protractor.conf.js, you can view screenshots
-of the failed tests in ../protractor-screenshots/
-"""
+        expected_output = (
+            'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
+            'core/tests/protractor.conf.js, you can view screenshots'
+            'of the failed tests in ../protractor-screenshots/')
+
         print_swap = self.print_swap(expected_args=[(expected_output,)])
         with print_swap, exist_swap, rmdir_swap:
             run_e2e_tests.check_screenshot()
@@ -270,7 +270,7 @@ of the failed tests in ../protractor-screenshots/
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
             run_e2e_tests.wait_for_port(1)
-        self.assertEqual(mock_sleep.sleep_time, run_e2e_tests.WAIT_PORT_TIMEOUT)
+        self.assertEqual(mock_sleep.sleep_time, run_e2e_tests.SECONDS_TO_WAIT_PORT)
 
     def test_tweak_constant_file_in_dev_mode_without_change_file(self):
         constant_file = 'constant.js'

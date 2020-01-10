@@ -247,8 +247,12 @@ class SetupTests(test_utils.GenericTestBase):
     def test_package_install_with_darwin_x64(self):
         def mock_exists(unused_path):
             return False
+
+        def mock_is_x64():
+            return True
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
-        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86_64')
+        architecture_swap = self.swap(
+            common, 'is_x64_architecture', mock_is_x64)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
@@ -269,8 +273,11 @@ class SetupTests(test_utils.GenericTestBase):
     def test_package_install_with_darwin_x86(self):
         def mock_exists(unused_path):
             return False
+        def mock_is_x64():
+            return False
         os_name_swap = self.swap(common, 'OS_NAME', 'Darwin')
-        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
+        architecture_swap = self.swap(
+            common, 'is_x64_architecture', mock_is_x64)
         all_cmd_tokens = []
         def mock_check_call(cmd_tokens):
             all_cmd_tokens.extend(cmd_tokens)
@@ -296,8 +303,11 @@ class SetupTests(test_utils.GenericTestBase):
     def test_package_install_with_linux_x64(self):
         def mock_exists(unused_path):
             return False
+        def mock_is_x64():
+            return True
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
-        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86_64')
+        architecture_swap = self.swap(
+            common, 'is_x64_architecture', mock_is_x64)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
 
         with self.test_py_swap, self.create_swap, os_name_swap, exists_swap:
@@ -319,8 +329,11 @@ class SetupTests(test_utils.GenericTestBase):
     def test_package_install_with_linux_x86(self):
         def mock_exists(unused_path):
             return False
+        def mock_is_x64():
+            return False
         os_name_swap = self.swap(common, 'OS_NAME', 'Linux')
-        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
+        architecture_swap = self.swap(
+            common, 'is_x64_architecture', mock_is_x64)
         all_cmd_tokens = []
         def mock_check_call(cmd_tokens):
             all_cmd_tokens.extend(cmd_tokens)
@@ -353,8 +366,11 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_check_call(commands):
             mock_check_call.commands = commands
 
+        def mock_is_x64():
+            return False
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
-        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86')
+        architecture_swap = self.swap(
+            common, 'is_x64_architecture', mock_is_x64)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
             python_utils, 'url_retrieve', mock_url_retrieve)
@@ -393,8 +409,12 @@ class SetupTests(test_utils.GenericTestBase):
         def mock_check_call(commands):
             mock_check_call.commands = commands
 
+        def mock_is_x64():
+            return True
+
         os_name_swap = self.swap(common, 'OS_NAME', 'Windows')
-        architecture_swap = self.swap(common, 'ARCHITECTURE', 'x86_64')
+        architecture_swap = self.swap(
+            common, 'is_x64_architecture', mock_is_x64)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         url_retrieve_swap = self.swap(
             python_utils, 'url_retrieve', mock_url_retrieve)
