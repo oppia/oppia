@@ -270,7 +270,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
             run_e2e_tests.wait_for_port(1)
-        self.assertEqual(mock_sleep.sleep_time, run_e2e_tests.SECONDS_TO_WAIT_PORT)
+        self.assertEqual(
+            mock_sleep.sleep_time, run_e2e_tests.SECONDS_TO_WAIT_PORT)
 
     def test_tweak_constant_file_in_dev_mode_without_change_file(self):
         constant_file = 'constant.js'
@@ -351,7 +352,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         setup_swap = self.swap_with_checks(
             setup, 'main', mock_setup_main, expected_kwargs=[{'args': []}])
         setup_gae_swap = self.swap_with_checks(
-            setup_gae, 'main', mock_setup_gae_main, expected_kwargs=[{'args': []}]
+            setup_gae, 'main', mock_setup_gae_main,
+            expected_kwargs=[{'args': []}]
             )
         install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
@@ -381,7 +383,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         setup_swap = self.swap_with_checks(
             setup, 'main', mock_setup_main, expected_kwargs=[{'args': []}])
         setup_gae_swap = self.swap_with_checks(
-            setup_gae, 'main', mock_setup_gae_main, expected_kwargs=[{'args': []}]
+            setup_gae, 'main', mock_setup_gae_main,
+            expected_kwargs=[{'args': []}]
             )
         install_swap = self.swap_with_checks(
             install_third_party_libs, 'main',
@@ -499,7 +502,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'tweak_constant_file', mock_tweak_constant_file,
             expected_args=[(self.mock_constant_file_path, True)])
         run_cmd_swap = self.swap_with_checks(
-            common, 'run_cmd', mock_run_cmd, expected_args=[(expected_commands,)])
+            common, 'run_cmd', mock_run_cmd,
+            expected_args=[(expected_commands,)])
         # The mock exit will not actually exit the program, so the
         # build_js_files function will continue and build.main will still be
         # executed. But in actual case, this function will not be executed.
