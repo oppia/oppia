@@ -31,7 +31,7 @@ from core.platform import models
          models.NAMES.suggestion, models.NAMES.user])
 
 
-def get_models_should_be_exported():
+def get_models_which_should_be_exported():
     """Returns list of classes of models to export.
 
     Returns:
