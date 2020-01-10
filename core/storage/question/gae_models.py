@@ -632,7 +632,8 @@ class QuestionSummaryModel(base_models.BaseModel):
         user_id.
 
         Args:
-            user_id: str. The ID of the user whose data should be checked.
+            unused_user_id: str. The ID of the user whose data should be
+            checked.
 
         Returns:
             bool. Whether any models refer to the given user_id.

@@ -21,6 +21,8 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.platform import models
 
+import re
+
 (
     base_models, collection_models, email_models, exploration_models,
     feedback_models, suggestion_models,
