@@ -337,7 +337,7 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model does not contain data specific to the user."""
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
