@@ -152,7 +152,8 @@ class CollectionModel(base_models.VersionedModel):
 
     @classmethod
     def delete_multi(
-            cls, entity_ids, committer_id, commit_message, force_deletion=False):
+            cls, entity_ids, committer_id, commit_message,
+            force_deletion=False):
         """Deletes the given cls instances with the given entity_ids.
 
         Note that this extends the superclass method.
