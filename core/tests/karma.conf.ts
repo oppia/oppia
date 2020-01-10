@@ -150,17 +150,9 @@ module.exports = function(config) {
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
+      devtool: 'inline-source-map',
       module: {
         rules: [
-          {
-            // Exclude all the spec files from the report.
-            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
-            enforce: 'post',
-            use: {
-              loader: 'istanbul-instrumenter-loader',
-              options: { esModules: true }
-            }
-          },
           {
             test: /\.ts$/,
             use: [
@@ -178,6 +170,15 @@ module.exports = function(config) {
           {
             test: /\.html$/,
             loader: 'underscore-template-loader'
+          },
+          {
+            // Exclude all the spec files from the report.
+            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
+            enforce: 'post',
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              options: { esModules: true }
+            }
           },
           {
             test: /\.css$/,
