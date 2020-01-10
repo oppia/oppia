@@ -25,10 +25,8 @@ describe('Collection Creation backend service', function() {
   var $httpBackend = null;
   var $rootScope = null;
   var SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
+  var SUCCESS_STATUS_CODE = 200;
   var ERROR_STATUS_CODE = 500;
-  // var successfulResponse = {
-  //   collectionId: SAMPLE_COLLECTION_ID
-  // };
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -40,6 +38,7 @@ describe('Collection Creation backend service', function() {
   }));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
   beforeEach(angular.mock.inject(function($injector) {
     CollectionCreationBackendService = $injector.get(
       'CollectionCreationBackendService');
@@ -47,19 +46,44 @@ describe('Collection Creation backend service', function() {
     $rootScope = $injector.get('$rootScope');
   }));
 
+  afterEach(function() {
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
+  });
+
   it('should successfully create a new collection and obtain the collection ID',
-    function() {
+    (done) => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      CollectionCreationBackendService.createCollection();
       $httpBackend.expectPOST('/collection_editor_handler/create_new').respond(
-        {collectionId: SAMPLE_COLLECTION_ID}
-      );
+        SUCCESS_STATUS_CODE, {collectionId: SAMPLE_COLLECTION_ID});
+      CollectionCreationBackendService.createCollection().then(
+        successHandler, failHandler);
+
       $httpBackend.flush();
       $rootScope.$digest();
-      expect($rootScope.loadingMessage).toBe('Creating collection');
+
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
+      done();
+    });
+
+  it('should fail to create a new collection and call the fail handler',
+    (done) => {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expectPOST('/collection_editor_handler/create_new').respond(
+        ERROR_STATUS_CODE);
+      CollectionCreationBackendService.createCollection().then(
+        successHandler, failHandler);
+
+      $httpBackend.flush();
+      $rootScope.$digest();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+      done();
     });
 });

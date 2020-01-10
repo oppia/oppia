@@ -16,15 +16,12 @@
  * collection_id.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/site-analytics.service.ts');
-
 angular.module('oppia').factory('CollectionCreationBackendService', [
   '$http', '$q',
   function(
       $http, $q) {
     var _createCollection = function(successCallback, errorCallback) {
-      $http.post('/collection_editor_handler/create_new', {})
+      $http.post('/collection_editor_handler/create_new')
         .then(function(response) {
           if (successCallback) {
             successCallback(response.data);

@@ -19,6 +19,8 @@
 // eslint-disable-next-line max-len
 require('components/entity-creation-services/collection-creation-backend-api.service.ts');
 require('services/alerts.service.ts');
+require('domain/utilities/url-interpolation.service.ts');
+require('services/site-analytics.service.ts');
 
 // TODO(bhenning): Refactor this to match the frontend design spec and reduce
 // duplicated code between CollectionCreationService and
