@@ -64,7 +64,6 @@ angular.module('oppia').factory('EditableTopicBackendApiService', [
         TOPIC_EDITOR_STORY_URL_TEMPLATE, {
           topic_id: topicId
         });
-
       $http.get(storiesDataUrl).then(function(response) {
         var canonicalStorySummaries = angular.copy(
           response.data.canonical_story_summary_dicts);
