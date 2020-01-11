@@ -140,9 +140,7 @@ def create_message(
     thread_is_new = message_id == 0
     new_status, old_status = updated_status or thread.status, thread.status
     new_subject = updated_subject or thread.subject
-    thread.message_count = (
-        feedback_models.GeneralFeedbackMessageModel.get_message_count(thread_id)
-        if thread.message_count is None else thread.message_count + 1)
+    thread.message_count = message_id + 1
     if text:
         thread.last_nonempty_message_text = text
         thread.last_nonempty_message_author_id = author_id
