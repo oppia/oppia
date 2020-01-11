@@ -194,11 +194,6 @@ class URLFetchServiceMock(apiproxy_stub.APIProxyStub):
         self.response = response
 
 
-class IntendedException(Exception):
-    """Exception for intended failure in swap check."""
-    pass
-
-
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
@@ -1845,13 +1840,11 @@ tags: []
 
     @contextlib.contextmanager
     def swap_with_checks(
-            self, obj, attr, newvalue, expected_args=None, expected_kwargs=None,
-            called=True):
+            self, obj, attr, new_value, expected_args=None,
+            expected_kwargs=None, called=True):
         """Swap an object's function value within the context of a
         'with' statement. The object can be anything that supports
         getattr and setattr, such as class instances, modules, ...
-        Yields:
-            context: The context with function replaced.
 
         Examples:
             If you want to check subprocess.Popen is invoked twice
@@ -1872,20 +1865,27 @@ tags: []
         Args:
             obj: *. the Python object whose attribute you want to swap.
             attr: str. The name of the function to be swapped.
-            newvalue: Function. The new function you want to use.
+            new_value: function. The new function you want to use.
             expected_args: None|list(tuple). The expected args that you
                 want this function to be invoked with. When its value is None,
-                args will not be checked.If the value type is list, the function
-                will check whether the called args is the first element in the
-                list. If matched, this tuple will be removed from the list.
-            expected_kwargs: None|list(dict). The expected key word args
+                args will not be checked. If the value type is list, the
+                function will check whether the called args is the first element
+                in the list. If matched, this tuple will be removed from the
+                list.
+            expected_kwargs: None|list(dict). The expected keyword args
                 you want this function to be invoked with. Similar to
                 expected_args.
-            called: bool. Whether the function is invoked. This will always be
-                checked.
+            called: bool. Whether the function is expected to be invoked. This
+                will always be checked.
+
+        Yields:
+            context: The context with function replaced.
         """
         original = getattr(obj, attr)
+        # The actual error message will also include detail assert error message
+        # via the `self.longMessage` below.
         msg = 'Failed in check function %s.%s' % (obj.__name__, attr)
+
         def wrapper(*args, **kwargs):
             """Wrapper function for the new value. This function will do the
             check before the wrapped function is invoked. After the function
@@ -1897,7 +1897,7 @@ tags: []
                 kwargs: dict. The key word args passed into `attr` function.
 
             Returns:
-                Result of `newvalue`.
+                Result of `new_value`.
             """
             wrapper.called = True
             if expected_args is not None:
@@ -1906,28 +1906,19 @@ tags: []
             if expected_kwargs is not None:
                 self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
                 expected_kwargs.pop(0)
-            result = newvalue(*args, **kwargs)
+            result = new_value(*args, **kwargs)
             return result
+
         wrapper.called = False
         setattr(obj, attr, wrapper)
-        error_occurred = False
         try:
             # This will show the detailed assert message.
             self.longMessage = True
             yield
-        except Exception as exception:
-            # Use this flag to indicate whether there was an error in the
-            # checks.
-            error_occurred = True
-            raise exception
         finally:
             self.longMessage = False
             setattr(obj, attr, original)
-            # Only do the rest of the checks when there was no error.
-            # Otherwise error in this check will overwrite the error raised
-            # in above functions.
-            if not error_occurred:
-                self.assertEqual(wrapper.called, called, msg=msg)
+            self.assertEqual(wrapper.called, called, msg=msg)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
