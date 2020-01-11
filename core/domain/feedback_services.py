@@ -85,11 +85,11 @@ def create_thread(
     thread.original_author_id = original_author_id
     thread.subject = subject
     thread.has_suggestion = has_suggestion
+    thread.message_count = 0
     # The feedback analytics jobs relies on new thread having an initial status
     # of 'open' when a new thread is created. If this is changed, changes need
     # to be made there as well.
     thread.status = feedback_models.STATUS_CHOICES_OPEN
-    thread.message_count = 0
     thread.put()
     create_message(
         thread_id, original_author_id, feedback_models.STATUS_CHOICES_OPEN,
