@@ -83,12 +83,12 @@ def create_thread(
     thread.entity_type = entity_type
     thread.entity_id = entity_id
     thread.original_author_id = original_author_id
-    # The feedback analytics jobs rely on the thread status being set to 'open'
-    # when a new thread is created. If this is changed, changes need to be made
-    # there as well.
-    thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.subject = subject
     thread.has_suggestion = has_suggestion
+    # The feedback analytics jobs relies on new thread having an initial status
+    # of 'open' when a new thread is created. If this is changed, changes need
+    # to be made there as well.
+    thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.message_count = 0
     thread.put()
     create_message(
@@ -122,11 +122,9 @@ def create_message(
     updated_subject = (
         None if thread.subject == updated_subject else updated_subject)
 
+    # Create and populate a new message model.
     message_id = feedback_models.GeneralFeedbackMessageModel.get_message_count(
         thread_id)
-    thread_is_new = message_id == 0
-
-    # Create and populate a new message model.
     message = feedback_models.GeneralFeedbackMessageModel.create(
         thread_id, message_id)
     message.message_id = message_id
@@ -139,6 +137,7 @@ def create_message(
     message.put()
 
     # Update the thread model.
+    thread_is_new = message_id == 0
     new_status, old_status = updated_status or thread.status, thread.status
     new_subject = updated_subject or thread.subject
     thread.message_count = (
