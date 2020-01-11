@@ -137,13 +137,13 @@ def create_message(
     message.put()
 
     # Update the thread model.
-    thread_is_new = message_id == 0
+    is_thread_new = message_id == 0
     new_status, old_status = updated_status or thread.status, thread.status
     new_subject = updated_subject or thread.subject
     thread.message_count = (
         feedback_models.GeneralFeedbackMessageModel.get_message_count(thread_id)
         if thread.message_count is None else thread.message_count + 1)
-    if not thread_is_new:
+    if not is_thread_new:
         thread.status = new_status
         thread.subject = new_subject
         if thread.has_suggestion:
@@ -172,7 +172,7 @@ def create_message(
     if thread.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
         # This late import is necessary to avoid errors.
         from core.domain import event_services
-        if thread_is_new:
+        if is_thread_new:
             event_services.FeedbackThreadCreatedEventHandler.record(
                 thread.entity_id)
         elif updated_status:
