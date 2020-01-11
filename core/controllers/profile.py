@@ -356,7 +356,10 @@ class DeleteAccountHandler(base.BaseHandler):
 
 
 class PendingAccountDeletionPage(base.BaseHandler):
-    """The account pending deletion page."""
+    """The account pending deletion page. This page is accessible for all the
+    user even if they are not scheduled for deletion. This is because users that
+    are scheduled for deletion are logged out instantly when they try to login.
+    """
 
     @acl_decorators.open_access
     def get(self):
