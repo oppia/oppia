@@ -160,7 +160,7 @@ class BaseHandler(webapp2.RequestHandler):
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 
-            self.user_is_scheduled_for_deletion = user_settings.to_be_deleted
+            self.user_is_scheduled_for_deletion = user_settings.deleted
 
             if (self.REDIRECT_UNFINISHED_SIGNUPS and not
                     user_services.has_fully_registered(user_settings.user_id)):

@@ -38,13 +38,13 @@
 
 
 # Collection project.
-/core/controllers/collection*.py @kevinlee12
-/core/domain/collection*.py @kevinlee12
-/core/storage/collection/ @kevinlee12
-/core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @kevinlee12
-/core/templates/dev/head/domain/collection/ @kevinlee12
-/core/templates/dev/head/pages/collection-editor-page/ @kevinlee12
-/core/templates/dev/head/pages/collection-player-page/ @kevinlee12
+/core/controllers/collection*.py @aks681 @kevintab95
+/core/domain/collection*.py @aks681 @kevintab95
+/core/storage/collection/ @aks681 @kevintab95
+/core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @aks681 @kevintab95
+/core/templates/dev/head/domain/collection/ @aks681 @kevintab95
+/core/templates/dev/head/pages/collection-editor-page/ @aks681 @kevintab95
+/core/templates/dev/head/pages/collection-player-page/ @aks681 @kevintab95
 
 
 # Community contribution project
@@ -98,7 +98,7 @@
 /.stylelintrc @kevinlee12
 /.travis.yml @kevinlee12
 /.yarnrc @kevinlee12
-/codecov.yml @lilithxxx
+/codecov.yml @kevinlee12
 /core/templates/dev/head/css/.stylelintrc @kevinlee12
 /tox.ini @kevinlee12
 /scripts/__init__.py @kevinlee12
@@ -245,7 +245,7 @@
 /core/templates/dev/head/services/contextual/url.service*.ts @ankita240796
 /core/templates/dev/head/services/contextual/device-info.service*.ts @ankita240796
 /core/templates/dev/head/services/contextual/window-dimensions.service*.ts @ankita240796
-/core/templates/dev/head/services/contextual/window-ref.service.ts @YashJipkate
+/core/templates/dev/head/services/contextual/window-ref.service.ts @ankita240796
 
 
 # Global stylesheet.
@@ -256,15 +256,15 @@
 /core/domain/customization_args_util*.py @seanlip
 /core/domain/interaction_registry*.py @aks681
 /core/domain/obj_services*.py @aks681
-/core/templates/dev/head/components/version-diff-visualization/codemirror-mergeview.directive.ts @kevinlee12
-/core/templates/dev/head/domain/objects/ @kevinlee12
+/core/templates/dev/head/components/version-diff-visualization/codemirror-mergeview.directive.ts @aks681
+/core/templates/dev/head/domain/objects/ @aks681
 /core/templates/dev/head/expressions/ @seanlip
-/core/templates/dev/head/services/code-normalizer.service*.ts @kevinlee12
+/core/templates/dev/head/services/code-normalizer.service*.ts @aks681
 /extensions/domain*.py @seanlip
-/extensions/interactions/ @kevinlee12 @vojtechjelinek
+/extensions/interactions/ @aks681 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @vojtechjelinek
-/extensions/__init__.py @kevinlee12
+/extensions/__init__.py @aks681
 
 
 # Lesson Analytics team.
@@ -294,12 +294,12 @@
 
 
 # Library page.
-/core/controllers/library*.py @kevinlee12
-/core/domain/recommendations*.py @kevinlee12
-/core/domain/search_services*.py @kevinlee12
-/core/templates/dev/head/pages/library-page/ @kevinlee12
-/core/templates/dev/head/services/construct-translation-ids.service.ts @kevinlee12
-/core/templates/dev/head/services/search.service*.ts @kevinlee12
+/core/controllers/library*.py @aks681
+/core/domain/recommendations*.py @aks681
+/core/domain/search_services*.py @aks681
+/core/templates/dev/head/pages/library-page/ @aks681
+/core/templates/dev/head/services/construct-translation-ids.service.ts @aks681
+/core/templates/dev/head/services/search.service*.ts @aks681
 
 
 # Navigation bar project.
@@ -403,8 +403,8 @@
 /core/templates/dev/head/pages/interaction-specs.constants.ts @bansalnitish
 /core/templates/dev/head/I18nFooter.ts @nithusha21
 /core/templates/dev/head/i18n-footer.directive.html @nithusha21
-/core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @YashJipkate
-/core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @YashJipkate
+/core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @bansalnitish
+/core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @bansalnitish
 /core/templates/dev/head/services/translation-file-hash-loader.service.ts @nithusha21
 /release_constants.py @ankita240796 @nithusha21 @seanlip
 
@@ -420,7 +420,7 @@
 /core/templates/dev/head/domain/utilities/ @bansalnitish
 /schema_utils*.py @seanlip
 /utils*.py @aks681
-/python_utils*.py @lilithxxx
+/python_utils*.py @kevinlee12
 
 
 # Restricted pages.
@@ -517,21 +517,22 @@
 
 # User Data Takeout.
 /core/domain/takeout_service*.py @vojtechjelinek @seanlip
+/core/domain/wipeout_jobs_one_off*.py @vojtechjelinek @seanlip
 /core/domain/wipeout_service*.py @vojtechjelinek @seanlip
 
 
 # User’s profile page.
-/core/controllers/profile*.py @kevinlee12
-/core/templates/dev/head/domain/user/ @kevinlee12
-/core/templates/dev/head/pages/profile-page/ @kevinlee12
-/core/templates/dev/head/services/user.service*.ts @kevinlee12
+/core/controllers/profile*.py @vojtechjelinek
+/core/templates/dev/head/domain/user/ @vojtechjelinek
+/core/templates/dev/head/pages/profile-page/ @vojtechjelinek
+/core/templates/dev/head/services/user.service*.ts @vojtechjelinek
 
-/core/templates/dev/head/services/services.constants.ajs.ts @kevinlee12
-/core/templates/dev/head/services/services.constants.ts @kevinlee12
+/core/templates/dev/head/services/services.constants.ajs.ts @vojtechjelinek
+/core/templates/dev/head/services/services.constants.ts @vojtechjelinek
 
 
 # Draft version upgrade.
-/core/domain/draft_upgrade_services*.py @sshou14
+/core/domain/draft_upgrade_services*.py @seanlip
 
 # Critical files.
 #
