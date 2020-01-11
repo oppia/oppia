@@ -107,17 +107,8 @@ describe('Learner dashboard activity ids object factory', () => {
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual([]);
   });
 
-  it('should fetch the learner dashboard activity ids domain object from the ' +
-     ' backend summary dict', () => {
-    var learnerDashboardActivityIdsDict = {
-      incomplete_exploration_ids: ['0', '1'],
-      incomplete_collection_ids: ['2', '3'],
-      completed_exploration_ids: ['4', '5'],
-      completed_collection_ids: ['6', '7'],
-      exploration_playlist_ids: ['8', '9'],
-      collection_playlist_ids: ['10', '11']
-    };
-
+  it('should fetch the learner dashboard activity ids domain object from ' +
+     'the backend summary dict', () => {
     var learnerDashboardActivityIds = (
       learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
         learnerDashboardActivityIdsDict));
@@ -134,5 +125,137 @@ describe('Learner dashboard activity ids object factory', () => {
       ['8', '9']);
     expect(learnerDashboardActivityIds.collectionPlaylistIds).toEqual(
       ['10', '11']);
+  });
+
+  it('should check if explorationId belongs to exploration playlist', () => {
+    var learnerDashboardActivityIds = (
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('8'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('9'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('6'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToExplorationPlaylist('10'))
+      .toBe(false);
+  });
+
+  it('should check if collectionId belongs to collection playlist', () => {
+    var learnerDashboardActivityIds = (
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('10'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('11'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('6'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCollectionPlaylist('8'))
+      .toBe(false);
+  });
+
+  it('should check if explorationId belongs to completed explorations', () => {
+    var learnerDashboardActivityIds = (
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('4'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('5'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('6'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedExplorations('10'))
+      .toBe(false);
+  });
+
+  it('should check if collectionId belongs to completed collections', () => {
+    var learnerDashboardActivityIds = (
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('6'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('7'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToCompletedCollections('10'))
+      .toBe(false);
+  });
+
+  it('should check if explorationId belongs to incomplete explorations', () => {
+    var learnerDashboardActivityIds = (
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('0'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('1'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('2'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('6'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteExplorations('10'))
+      .toBe(false);
+  });
+
+  it('should check if collectionId belongs to incomplete collections', () => {
+    var learnerDashboardActivityIds = (
+      learnerDashboardActivityIdsObjectFactory.createFromBackendDict(
+        learnerDashboardActivityIdsDict));
+
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('2'))
+      .toBe(true);
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('3'))
+      .toBe(true);
+
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('0'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('4'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('6'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('8'))
+      .toBe(false);
+    expect(learnerDashboardActivityIds.belongsToIncompleteCollections('10'))
+      .toBe(false);
   });
 });
