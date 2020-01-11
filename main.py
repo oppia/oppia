@@ -262,8 +262,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
     get_redirect_route(
-        r'%s/<story_id>/<node_id>' % feconf.STORY_NODE_COMPLETION_URL_PREFIX,
-        story_viewer.StoryNodeCompletionHandler),
+        r'%s/<story_id>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
+        story_viewer.StoryProgressHandler),
     get_redirect_route(
         r'%s/<topic_name>/<subtopic_id>' %
         feconf.SUBTOPIC_DATA_HANDLER,

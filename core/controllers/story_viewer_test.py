@@ -201,14 +201,14 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
                 expected_status_int=404)
 
 
-class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
+class StoryProgressHandlerTests(BaseStoryViewerControllerTests):
 
     def test_post_fails_when_new_structures_not_enabled(self):
         csrf_token = self.get_new_csrf_token()
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', False):
             self.post_json(
                 '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
@@ -218,7 +218,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_1
                 ), {}, csrf_token=csrf_token
             )
@@ -232,7 +232,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token
             )
@@ -246,7 +246,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, 'invalid_story',
+                    feconf.STORY_PROGRESS_URL_PREFIX, 'invalid_story',
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
@@ -256,7 +256,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     'invalid_node'
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
@@ -269,7 +269,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             self.post_json(
                 '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_2
                 ), {}, csrf_token=csrf_token, expected_status_int=404
             )
@@ -283,7 +283,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_VIEWER_UPDATES', True):
             json_response = self.post_json(
                 '%s/%s/%s' % (
-                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID,
+                    feconf.STORY_PROGRESS_URL_PREFIX, self.STORY_ID,
                     self.NODE_ID_3
                 ), {}, csrf_token=csrf_token
             )

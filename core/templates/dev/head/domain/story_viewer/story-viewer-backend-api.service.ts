@@ -21,9 +21,9 @@ require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('StoryViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'STORY_DATA_URL_TEMPLATE',
-  'STORY_NODE_COMPLETION_URL_TEMPLATE', function(
+  'STORY_PROGRESS_URL_TEMPLATE', function(
       $http, $q, UrlInterpolationService, STORY_DATA_URL_TEMPLATE,
-      STORY_NODE_COMPLETION_URL_TEMPLATE) {
+      STORY_PROGRESS_URL_TEMPLATE) {
     var storyDataDict = null;
     var _fetchStoryData = function(storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
@@ -46,7 +46,7 @@ angular.module('oppia').factory('StoryViewerBackendApiService', [
     var _recordChapterCompletion = function(
         storyId, nodeId, successCallback, errorCallback) {
       var chapterCompletionUrl = UrlInterpolationService.interpolateUrl(
-        STORY_NODE_COMPLETION_URL_TEMPLATE, {
+        STORY_PROGRESS_URL_TEMPLATE, {
           story_id: storyId,
           node_id: nodeId
         });

@@ -80,7 +80,7 @@ class StoryPageDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class StoryNodeCompletionHandler(base.BaseHandler):
+class StoryProgressHandler(base.BaseHandler):
     """Marks a story node as completed after completing and returns exp ID of
     next chapter (if applicable).
     """

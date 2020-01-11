@@ -26,5 +26,5 @@ angular.module('oppia').constant(
   StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant(
-  'STORY_NODE_COMPLETION_URL_TEMPLATE',
-  StoryViewerDomainConstants.STORY_NODE_COMPLETION_URL_TEMPLATE);
+  'STORY_PROGRESS_URL_TEMPLATE',
+  StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE);
