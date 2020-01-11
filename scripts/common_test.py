@@ -73,6 +73,16 @@ class MockPsutilProcess(python_utils.OBJECT):
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
 
+    def test_is_x64_architecture_in_x86(self):
+        maxsize_swap = self.swap(sys, 'maxsize', 1)
+        with maxsize_swap:
+            self.assertFalse(common.is_x64_architecture())
+
+    def test_is_x64_architecture_in_x64(self):
+        maxsize_swap = self.swap(sys, 'maxsize', 2**32 + 1)
+        with maxsize_swap:
+            self.assertTrue(common.is_x64_architecture())
+
     def test_run_cmd(self):
         self.assertEqual(
             common.run_cmd(('echo Test for common.py ').split(' ')),

@@ -74,7 +74,7 @@ def is_linux_os():
 def is_x64_architecture():
     """Check if the architecture is on X64."""
     # https://docs.python.org/2/library/platform.html#platform.architecture
-    return sys.maxsize > 2**32  # pragma: no cover
+    return sys.maxsize > 2**32
 
 
 NODE_BIN_PATH = os.path.join(
