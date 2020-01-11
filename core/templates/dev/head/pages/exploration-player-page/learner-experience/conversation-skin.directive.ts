@@ -731,40 +731,21 @@ angular.module('oppia').directive('conversationSkin', [
                   STORY_VIEWER_URL_TEMPLATE, {
                     story_id: storyId
                   });
-                ExplorationRecommendationsService.
-                  recordCompletionAndGetNextExplorationSummary(
-                    function(summaries) {
-                      $scope.recommendedExplorationSummaries = summaries;
-                      StoryViewerBackendApiService.fetchStoryData(storyId).then(
-                        function(storyDataDict) {
-                          var storyNodes = storyDataDict.story_nodes.map(
-                            function(storyNodeDict) {
-                              return ReadOnlyStoryNodeObjectFactory
-                                .createFromBackendDict(storyNodeDict);
-                            });
-                          var completedStoryNodes = [];
-                          for (var i = 0; i < storyNodes.length; i++) {
-                            if (storyNodes[i].isCompleted()) {
-                              completedStoryNodes.push(storyNodes[i]);
-                            } else {
-                              $scope.nextNodeId = storyNodes[i].getId();
-                              break;
-                            }
-                          }
-                          if (completedStoryNodes.length %
-                            NUM_EXPLORATIONS_PER_REVIEW_TEST === 0 ||
-                            completedStoryNodes.length === storyNodes.length) {
-                            var REVIEW_TEST_URL_TEMPLATE = (
-                              '/review_test/<story_id>');
-                            $window.location =
-                              UrlInterpolationService.interpolateUrl(
-                                REVIEW_TEST_URL_TEMPLATE, {
-                                  story_id: storyId
-                                });
-                          }
+                StoryViewerBackendApiService.recordChapterCompletion(
+                  storyId, nodeId).then(function(returnObject) {
+                  $scope.recommendedExplorationSummaries =
+                    returnObject.summaries;
+                  $scope.nextNodeId = returnObject.nextNodeId;
+                  if (returnObject.readyForReviewTest) {
+                    var REVIEW_TEST_URL_TEMPLATE = (
+                      '/review_test/<story_id>');
+                    $window.location =
+                      UrlInterpolationService.interpolateUrl(
+                        REVIEW_TEST_URL_TEMPLATE, {
+                          story_id: storyId
                         });
-                    }
-                  );
+                  }
+                });
               } else {
                 ExplorationRecommendationsService.getRecommendedSummaryDicts(
                   recommendedExplorationIds,

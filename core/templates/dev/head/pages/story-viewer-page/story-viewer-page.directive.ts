@@ -44,11 +44,11 @@ angular.module('oppia').directive('storyViewerPage', [
         '/pages/story-viewer-page/story-viewer-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$rootScope', '$window', 'AlertsService',
+        '$anchorScroll', '$location', '$rootScope', '$window', 'AlertsService',
         'PageTitleService', 'StoryPlaythroughObjectFactory',
         'StoryViewerBackendApiService', 'UrlService', 'FATAL_ERROR_CODES',
         function(
-            $anchorScroll, $rootScope, $window, AlertsService,
+            $anchorScroll, $location, $rootScope, $window, AlertsService,
             PageTitleService, StoryPlaythroughObjectFactory,
             StoryViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
           var ctrl = this;

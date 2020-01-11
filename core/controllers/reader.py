@@ -41,7 +41,6 @@ from core.domain import rights_manager
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_fetchers
-from core.domain import story_services
 from core.domain import summary_services
 from core.domain import user_services
 from core.platform import models
@@ -904,54 +903,6 @@ class RecommendationsHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_access_story_viewer_page
-    def _record_completion_and_get_next_exp_id(
-            self, story_id, current_node_id):
-        """This part is split into a separate function so as to reuse the
-        'can_access_story_viewer_page' decorator to verify whether the user is
-        indeed playing an exploration in a published story and topic.
-        This function records the chapter corresponding to current_node_id as
-        completed and returns the exploration ID of the next chapter in the
-        story.
-
-        Args:
-            story_id: str. The story ID in which the chapter exists.
-            current_node_id: str. The node ID of the chapter that the user just
-                completed.
-
-        Raises:
-            PageNotFoundException. If the ENABLE_NEW_STRUCTURE_VIEWER_UPDATES
-                flag is not set.
-
-        Returns:
-            str|None. The exploration ID of the next chapter in the story, or
-                None if the user completed the story.
-        """
-        if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
-            raise self.PageNotFoundException
-
-        try:
-            story_fetchers.get_node_index_by_story_id_and_node_id(
-                story_id, current_node_id)
-        except Exception as e:
-            raise self.PageNotFoundException(e)
-        story_services.record_completed_node_in_story_context(
-            self.user_id, story_id, current_node_id)
-        story = story_fetchers.get_story_by_id(story_id)
-
-        completed_node_ids = [
-            completed_node.id for completed_node in
-            story_fetchers.get_completed_nodes_in_story(
-                self.user_id, story_id)]
-
-        ordered_nodes = [
-            node for node in story.story_contents.get_ordered_nodes()
-        ]
-        for node in ordered_nodes:
-            if node.id not in completed_node_ids:
-                return node.exploration_id
-        return None
-
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -993,30 +944,6 @@ class RecommendationsHandler(base.BaseHandler):
             author_recommended_exp_ids + system_recommended_exp_ids)
         if next_exp_id is not None:
             recommended_exp_ids.add(next_exp_id)
-
-        self.values.update({
-            'summaries': (
-                summary_services.get_displayable_exp_summary_dicts_matching_ids(
-                    recommended_exp_ids)),
-        })
-        self.render_json(self.values)
-
-    @acl_decorators.can_play_exploration
-    def put(self, _):
-        """Handles PUT requests."""
-        story_id = self.payload.get('story_id')
-        current_node_id = self.payload.get('current_node_id')
-
-        recommended_exp_ids = []
-
-        if story_id and current_node_id:
-            next_exp_id = self._record_completion_and_get_next_exp_id(
-                story_id, current_node_id)
-        else:
-            raise self.InvalidInputException
-
-        if next_exp_id is not None:
-            recommended_exp_ids = [next_exp_id]
 
         self.values.update({
             'summaries': (

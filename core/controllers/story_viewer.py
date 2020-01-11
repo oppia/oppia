@@ -20,6 +20,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import story_fetchers
+from core.domain import story_services
 from core.domain import summary_services
 import feconf
 
@@ -77,3 +78,65 @@ class StoryPageDataHandler(base.BaseHandler):
             'story_nodes': ordered_node_dicts
         })
         self.render_json(self.values)
+
+
+class StoryNodeCompletionHandler(base.BaseHandler):
+    """Marks a story node as completed after completing and returns exp ID of
+    next chapter (if applicable).
+    """
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_story_viewer_page
+    def post(self, story_id, node_id):
+        if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
+            raise self.PageNotFoundException
+
+        try:
+            story_fetchers.get_node_index_by_story_id_and_node_id(
+                story_id, node_id)
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        story = story_fetchers.get_story_by_id(story_id)
+        completed_node_ids = [
+            completed_node.id for completed_node in
+            story_fetchers.get_completed_nodes_in_story(
+                self.user_id, story_id)]
+        ordered_nodes = [
+            node for node in story.story_contents.get_ordered_nodes()
+        ]
+
+        next_exp_ids = []
+        completed_nodes = []
+        next_node_id = None
+
+        if not node_id in completed_node_ids:
+            story_services.record_completed_node_in_story_context(
+                self.user_id, story_id, node_id)
+
+            completed_nodes = story_fetchers.get_completed_nodes_in_story(
+                self.user_id, story_id)
+            completed_node_ids = [
+                completed_node.id for completed_node in completed_nodes]
+
+            for node in ordered_nodes:
+                if node.id not in completed_node_ids:
+                    next_exp_ids = [node.exploration_id]
+                    next_node_id = node.id
+
+        ready_for_review_test = False
+        exp_summaries = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                next_exp_ids))
+        if (
+                (len(exp_summaries) != 0 and
+                 len(completed_nodes) %
+                 constants.NUM_EXPLORATIONS_PER_REVIEW_TEST == 0) or
+                (len(completed_nodes) == len(ordered_nodes))):
+            ready_for_review_test = True
+
+        return self.render_json({
+            'summaries': exp_summaries,
+            'ready_for_review_test': ready_for_review_test,
+            'next_node_id': next_node_id
+        })
