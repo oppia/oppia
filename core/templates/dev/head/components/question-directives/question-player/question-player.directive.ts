@@ -550,38 +550,38 @@ angular.module('oppia').directive('questionPlayer', [
             });
           };
 
-          $rootScope.$on('currentQuestionChanged', function(event, result) {
-            updateCurrentQuestion(result + 1);
-          });
-
-          $rootScope.$on('totalQuestionsReceived', function(event, result) {
-            updateTotalQuestions(result);
-          });
-
-          $rootScope.$on('questionSessionCompleted', function(event, result) {
-            $location.hash(HASH_PARAM +
-              encodeURIComponent(JSON.stringify(result)));
-          });
-
-          $scope.$on('$locationChangeSuccess', function(event) {
-            var hashContent = $location.hash();
-            if (!hashContent || hashContent.indexOf(HASH_PARAM) === -1) {
-              return;
-            }
-            var resultHashString = decodeURIComponent(
-              hashContent.substring(hashContent.indexOf(
-                HASH_PARAM) + HASH_PARAM.length));
-            if (resultHashString) {
-              initResults();
-              var questionStateData = JSON.parse(resultHashString);
-              calculateScores(questionStateData);
-              if (ctrl.userIsLoggedIn) {
-                calculateMasteryDegrees(questionStateData);
-              }
-              ctrl.testIsPassed = hasUserPassedTest();
-            }
-          });
           ctrl.$onInit = function() {
+            $rootScope.$on('currentQuestionChanged', function(event, result) {
+              updateCurrentQuestion(result + 1);
+            });
+
+            $rootScope.$on('totalQuestionsReceived', function(event, result) {
+              updateTotalQuestions(result);
+            });
+
+            $rootScope.$on('questionSessionCompleted', function(event, result) {
+              $location.hash(HASH_PARAM +
+                encodeURIComponent(JSON.stringify(result)));
+            });
+
+            $scope.$on('$locationChangeSuccess', function(event) {
+              var hashContent = $location.hash();
+              if (!hashContent || hashContent.indexOf(HASH_PARAM) === -1) {
+                return;
+              }
+              var resultHashString = decodeURIComponent(
+                hashContent.substring(hashContent.indexOf(
+                  HASH_PARAM) + HASH_PARAM.length));
+              if (resultHashString) {
+                initResults();
+                var questionStateData = JSON.parse(resultHashString);
+                calculateScores(questionStateData);
+                if (ctrl.userIsLoggedIn) {
+                  calculateMasteryDegrees(questionStateData);
+                }
+                ctrl.testIsPassed = hasUserPassedTest();
+              }
+            });
             ctrl.userIsLoggedIn = null;
             UserService.getUserInfoAsync().then(function(userInfo) {
               ctrl.canCreateCollections = userInfo.canCreateCollections();

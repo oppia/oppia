@@ -72,13 +72,13 @@ angular.module('oppia').directive('hintEditor', [
             ctrl.hintEditorIsOpen = false;
           };
 
-          $scope.$on('externalSave', function() {
-            if (ctrl.hintEditorIsOpen &&
-                ctrl.editHintForm.$valid) {
-              ctrl.saveThisHint();
-            }
-          });
           ctrl.$onInit = function() {
+            $scope.$on('externalSave', function() {
+              if (ctrl.hintEditorIsOpen &&
+                  ctrl.editHintForm.$valid) {
+                ctrl.saveThisHint();
+              }
+            });
             ctrl.isEditable = EditabilityService.isEditable();
             ctrl.StateHintsService = StateHintsService;
             ctrl.editHintForm = {};

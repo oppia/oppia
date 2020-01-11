@@ -62,21 +62,6 @@ angular.module('oppia').directive('aboutPage', [
               visibleContent
             );
           };
-          window.onhashchange = function() {
-            var hashChange = window.location.hash.slice(1);
-            if (hashChange === ctrl.TAB_ID_FOUNDATION || (
-              hashChange === 'license')) {
-              activateTab(ctrl.TAB_ID_FOUNDATION);
-              // Ensure page goes to the license section
-              if (hashChange === 'license') {
-                $window.reload(true);
-              }
-            } else if (hashChange === ctrl.TAB_ID_CREDITS) {
-              activateTab(ctrl.TAB_ID_CREDITS);
-            } else if (hashChange === ctrl.TAB_ID_ABOUT) {
-              activateTab(ctrl.TAB_ID_ABOUT);
-            }
-          };
 
           ctrl.onTabClick = function(tabName) {
             // Update hash
@@ -116,6 +101,21 @@ angular.module('oppia').directive('aboutPage', [
               ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
             ctrl.aboutPageMascotImgUrl = UrlInterpolationService
               .getStaticImageUrl('/general/about_page_mascot.png');
+            window.onhashchange = function() {
+              var hashChange = window.location.hash.slice(1);
+              if (hashChange === ctrl.TAB_ID_FOUNDATION || (
+                hashChange === 'license')) {
+                activateTab(ctrl.TAB_ID_FOUNDATION);
+                // Ensure page goes to the license section
+                if (hashChange === 'license') {
+                  $window.reload(true);
+                }
+              } else if (hashChange === ctrl.TAB_ID_CREDITS) {
+                activateTab(ctrl.TAB_ID_CREDITS);
+              } else if (hashChange === ctrl.TAB_ID_ABOUT) {
+                activateTab(ctrl.TAB_ID_ABOUT);
+              }
+            };
           };
         }
       ]

@@ -223,8 +223,6 @@ angular.module('oppia').directive('explorationEditorPage', [
             }
           };
 
-          $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
-
           /** ******************************************
           * Methods affecting the graph visualization.
           ********************************************/
@@ -232,11 +230,6 @@ angular.module('oppia').directive('explorationEditorPage', [
             ctrl.areExplorationWarningsVisible = (
               !ctrl.areExplorationWarningsVisible);
           };
-
-          $scope.$on('refreshGraph', function() {
-            GraphDataService.recompute();
-            ExplorationWarningsService.updateWarnings();
-          });
 
           ctrl.getExplorationUrl = function(explorationId) {
             return explorationId ? ('/explore/' + explorationId) : '';
@@ -403,11 +396,6 @@ angular.module('oppia').directive('explorationEditorPage', [
             return RouterService.getActiveTabName();
           };
 
-          $scope.$on('initExplorationPage', function(
-              unusedEvtData, successCallback) {
-            ctrl.initExplorationPage(successCallback);
-          });
-
           var leaveTutorial = function() {
             EditabilityService.onEndTutorial();
             $scope.$apply();
@@ -490,11 +478,19 @@ angular.module('oppia').directive('explorationEditorPage', [
             });
           };
 
-          $scope.$on(
-            'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
-          $scope.$on('openEditorTutorial', ctrl.startTutorial);
-
           ctrl.$onInit = function() {
+            $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
+            $scope.$on('refreshGraph', function() {
+              GraphDataService.recompute();
+              ExplorationWarningsService.updateWarnings();
+            });
+            $scope.$on('initExplorationPage', function(
+                unusedEvtData, successCallback) {
+              ctrl.initExplorationPage(successCallback);
+            });
+            $scope.$on(
+              'enterEditorForTheFirstTime', ctrl.showWelcomeExplorationModal);
+            $scope.$on('openEditorTutorial', ctrl.startTutorial);
             ctrl.EditabilityService = EditabilityService;
             ctrl.StateEditorService = StateEditorService;
 

@@ -49,15 +49,15 @@ angular.module('oppia').directive('conceptCard', [
             ctrl.numberOfWorkedExamplesShown++;
           };
 
-          $scope.$watch('$ctrl.index', function(newIndex) {
-            ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
-            ctrl.numberOfWorkedExamplesShown = 0;
-          });
           ctrl.$onInit = function() {
             ctrl.conceptCards = [];
             ctrl.currentConceptCard = null;
             ctrl.numberOfWorkedExamplesShown = 0;
             ctrl.loadingMessage = 'Loading';
+            $scope.$watch('$ctrl.index', function(newIndex) {
+              ctrl.currentConceptCard = ctrl.conceptCards[newIndex];
+              ctrl.numberOfWorkedExamplesShown = 0;
+            });
             ConceptCardBackendApiService.loadConceptCards(
               ctrl.getSkillIds()
             ).then(function(conceptCardBackendDicts) {

@@ -56,13 +56,9 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
             ImprovementsService, StateEditorService,
             StateInteractionIdService, StateTopAnswersStatsService,
             INTERACTION_SPECS, SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
+          var ctrl = this;
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
-
-          $scope.unresolvedAnswersOverviewIsShown = false;
-
-          $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-            SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
 
           var isStateRequiredToBeResolved = function(stateName) {
             return ImprovementsService
@@ -263,6 +259,11 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
           $scope.getUnresolvedStateStats = function() {
             return StateTopAnswersStatsService.getUnresolvedStateStats(
               StateEditorService.getActiveStateName());
+          };
+          ctrl.$onInit = function() {
+            $scope.unresolvedAnswersOverviewIsShown = false;
+            $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
+              SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           };
         }
       ]

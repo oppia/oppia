@@ -87,12 +87,6 @@ angular.module('oppia').directive('collectionEditorNavbar', [
               });
           };
 
-          $scope.$on(
-            EVENT_COLLECTION_INITIALIZED, _validateCollection);
-          $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
-          $scope.$on(
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
-
           ctrl.getWarningsCount = function() {
             return ctrl.validationIssues.length;
           };
@@ -284,6 +278,11 @@ angular.module('oppia').directive('collectionEditorNavbar', [
             RouterService.navigateToHistoryTab();
           };
           ctrl.$onInit = function() {
+            $scope.$on(
+              EVENT_COLLECTION_INITIALIZED, _validateCollection);
+            $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
+            $scope.$on(
+              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
             ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.collectionRights = (

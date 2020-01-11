@@ -65,13 +65,13 @@ angular.module('oppia').directive('solutionExplanationEditor', [
             ctrl.explanationEditorIsOpen = false;
           };
 
-          $scope.$on('externalSave', function() {
-            if (ctrl.explanationEditorIsOpen &&
-              ctrl.editSolutionForm.$valid) {
-              ctrl.saveThisExplanation();
-            }
-          });
           ctrl.$onInit = function() {
+            $scope.$on('externalSave', function() {
+              if (ctrl.explanationEditorIsOpen &&
+                ctrl.editSolutionForm.$valid) {
+                ctrl.saveThisExplanation();
+              }
+            });
             ctrl.isEditable = EditabilityService.isEditable();
             ctrl.editSolutionForm = {};
             ctrl.explanationEditorIsOpen = false;

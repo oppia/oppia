@@ -160,8 +160,6 @@ angular.module('oppia').directive('settingsTab', [
             });
           };
 
-          $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
-
           ctrl.saveExplorationTitle = function() {
             ExplorationTitleService.saveDisplayedValue();
           };
@@ -209,13 +207,14 @@ angular.module('oppia').directive('settingsTab', [
             ExplorationFeaturesService.enableParameters();
           };
 
-          ctrl.isAutomaticTextToSpeechEnabled = (
-            ExplorationAutomaticTextToSpeechService
-              .isAutomaticTextToSpeechEnabled);
-          ctrl.toggleAutomaticTextToSpeech = (
-            ExplorationAutomaticTextToSpeechService
-              .toggleAutomaticTextToSpeech
-          );
+          ctrl.isAutomaticTextToSpeechEnabled = function() {
+            return ExplorationAutomaticTextToSpeechService
+              .isAutomaticTextToSpeechEnabled();
+          };
+          ctrl.toggleAutomaticTextToSpeech = function() {
+            return ExplorationAutomaticTextToSpeechService
+              .toggleAutomaticTextToSpeech();
+          };
 
           ctrl.isCorrectnessFeedbackEnabled = function() {
             return ExplorationCorrectnessFeedbackService.isEnabled();
@@ -442,6 +441,7 @@ angular.module('oppia').directive('settingsTab', [
           };
 
           ctrl.$onInit = function() {
+            $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
             ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
               EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
             ctrl.EditabilityService = EditabilityService;

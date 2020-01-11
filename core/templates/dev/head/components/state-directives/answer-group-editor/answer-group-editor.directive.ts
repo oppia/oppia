@@ -175,24 +175,9 @@ angular.module('oppia').directive('answerGroupEditor', [
             return ResponsesService.getAnswerChoices();
           };
 
-          // Updates answer choices when the interaction requires it -- e.g.,
-          // the rules for multiple choice need to refer to the multiple choice
-          // interaction's customization arguments.
-          // TODO(sll): Remove the need for this watcher, or make it less
-          // ad hoc.
-          $scope.$on('updateAnswerChoices', function() {
-            ctrl.answerChoices = ctrl.getAnswerChoices();
-          });
-
           ctrl.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;
           };
-
-          $scope.$on('externalSave', function() {
-            if (ctrl.isRuleEditorOpen()) {
-              ctrl.saveRules();
-            }
-          });
 
           var getDefaultInputValue = function(varType) {
             // TODO(bhenning): Typed objects in the backend should be required
@@ -384,14 +369,27 @@ angular.module('oppia').directive('answerGroupEditor', [
             return ENABLE_ML_CLASSIFIERS;
           };
 
-          $scope.$on('onInteractionIdChanged', function() {
-            if (ctrl.isRuleEditorOpen()) {
-              ctrl.saveRules();
-            }
-            $scope.$broadcast('updateAnswerGroupInteractionId');
-            ctrl.answerChoices = ctrl.getAnswerChoices();
-          });
           ctrl.$onInit = function() {
+            // Updates answer choices when the interaction requires it -- e.g.,
+            // the rules for multiple choice need to refer to the multiple choice
+            // interaction's customization arguments.
+            // TODO(sll): Remove the need for this watcher, or make it less
+            // ad hoc.
+            $scope.$on('updateAnswerChoices', function() {
+              ctrl.answerChoices = ctrl.getAnswerChoices();
+            });
+            $scope.$on('externalSave', function() {
+              if (ctrl.isRuleEditorOpen()) {
+                ctrl.saveRules();
+              }
+            });
+            $scope.$on('onInteractionIdChanged', function() {
+              if (ctrl.isRuleEditorOpen()) {
+                ctrl.saveRules();
+              }
+              $scope.$broadcast('updateAnswerGroupInteractionId');
+              ctrl.answerChoices = ctrl.getAnswerChoices();
+            });
             ctrl.rulesMemento = null;
             ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
             ctrl.editAnswerGroupForm = {};

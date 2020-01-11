@@ -164,16 +164,16 @@ angular.module('oppia').directive('previewTab', [
             }, 200);
           };
 
-          // This allows the active state to be kept up-to-date whilst
-          // navigating in preview mode, ensuring that the state does not change
-          // when toggling between editor and preview.
-          $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
-            StateEditorService.setActiveStateName(stateName);
-          });
-          $scope.$on('playerStateChange', function() {
-            ctrl.allParams = LearnerParamsService.getAllParams();
-          });
           ctrl.$onInit = function() {
+            // This allows the active state to be kept up-to-date whilst
+            // navigating in preview mode, ensuring that the state does not change
+            // when toggling between editor and preview.
+            $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
+              StateEditorService.setActiveStateName(stateName);
+            });
+            $scope.$on('playerStateChange', function() {
+              ctrl.allParams = LearnerParamsService.getAllParams();
+            });
             ctrl.isExplorationPopulated = false;
             ExplorationDataService.getData().then(function() {
               var initStateNameForPreview = StateEditorService

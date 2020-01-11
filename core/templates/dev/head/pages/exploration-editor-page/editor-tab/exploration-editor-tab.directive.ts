@@ -76,17 +76,6 @@ angular.module('oppia').directive('explorationEditorTab', [
             ExplorationWarningsService, GraphDataService, RouterService,
             StateEditorService, UrlInterpolationService) {
           var ctrl = this;
-          $scope.$on('refreshStateEditor', function() {
-            ctrl.initStateEditor();
-          });
-
-          $scope.$watch(ExplorationStatesService.getStates, function() {
-            if (ExplorationStatesService.getStates()) {
-              StateEditorService.setStateNames(
-                ExplorationStatesService.getStateNames());
-            }
-          }, true);
-
           ctrl.getStateContentPlaceholder = function() {
             if (
               StateEditorService.getActiveStateName() ===
@@ -269,6 +258,16 @@ angular.module('oppia').directive('explorationEditorTab', [
             return ExplorationFeaturesService.areParametersEnabled();
           };
           ctrl.$onInit = function() {
+            $scope.$on('refreshStateEditor', function() {
+              ctrl.initStateEditor();
+            });
+
+            $scope.$watch(ExplorationStatesService.getStates, function() {
+              if (ExplorationStatesService.getStates()) {
+                StateEditorService.setStateNames(
+                  ExplorationStatesService.getStateNames());
+              }
+            }, true);
             ctrl.interactionIsShown = false;
           };
         }

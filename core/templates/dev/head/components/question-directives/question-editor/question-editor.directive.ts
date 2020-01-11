@@ -199,19 +199,18 @@ angular.module('oppia').directive('questionEditor', [
             }
           };
 
-          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
-            _init();
-          });
-
-          $scope.$on('interactionEditorInitialized', function(evt) {
-            _init();
-          });
-
-          $scope.$on('onInteractionIdChanged', function(evt) {
-            _init();
-          });
-
           ctrl.$onInit = function() {
+            $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+              _init();
+            });
+
+            $scope.$on('interactionEditorInitialized', function(evt) {
+              _init();
+            });
+
+            $scope.$on('onInteractionIdChanged', function(evt) {
+              _init();
+            });
             if (ctrl.canEditQuestion()) {
               EditabilityService.markEditable();
             } else {

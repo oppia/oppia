@@ -64,14 +64,7 @@ angular.module('oppia').directive('stateHintsEditor', [
             StateHintsService, COMPONENT_NAME_HINT, StateEditorService,
             EditabilityService, StateInteractionIdService,
             UrlInterpolationService, HintObjectFactory, StateSolutionService) {
-          $scope.EditabilityService = EditabilityService;
-          $scope.StateHintsService = StateHintsService;
-          StateHintsService.setActiveHintIndex(null);
-          $scope.canEdit = EditabilityService.isEditable();
-
-          $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/drag_dots.png');
-
+          var ctrl = this;
           var _getExistingHintsContentIds = function() {
             var existingContentIds = [];
             StateHintsService.displayed.forEach(function(hint) {
@@ -181,28 +174,6 @@ angular.module('oppia').directive('stateHintsEditor', [
             });
           };
 
-          // When the page is scrolled so that the top of the page is above the
-          // browser viewport, there are some bugs in the positioning of the
-          // helper. This is a bug in jQueryUI that has not been fixed yet. For
-          // more details, see http://stackoverflow.com/q/5791886
-          $scope.HINT_LIST_SORTABLE_OPTIONS = {
-            axis: 'y',
-            cursor: 'move',
-            handle: '.oppia-hint-sort-handle',
-            items: '.oppia-sortable-hint',
-            revert: 100,
-            tolerance: 'pointer',
-            start: function(e, ui) {
-              $rootScope.$broadcast('externalSave');
-              StateHintsService.setActiveHintIndex(null);
-              ui.placeholder.height(ui.item.height());
-            },
-            stop: function() {
-              StateHintsService.saveDisplayedValue();
-              $scope.onSaveHints(StateHintsService.displayed);
-            }
-          };
-
           var openDeleteLastHintModal = function() {
             AlertsService.clearWarnings();
 
@@ -291,8 +262,37 @@ angular.module('oppia').directive('stateHintsEditor', [
             StateHintsService.saveDisplayedValue();
             $scope.onSaveHints(StateHintsService.displayed);
           };
+          ctrl.$onInit = function() {
+            $scope.EditabilityService = EditabilityService;
+            $scope.StateHintsService = StateHintsService;
+            StateHintsService.setActiveHintIndex(null);
+            $scope.canEdit = EditabilityService.isEditable();
 
-          StateEditorService.updateStateHintsEditorInitialised();
+            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/drag_dots.png');
+            // When the page is scrolled so that the top of the page is above the
+            // browser viewport, there are some bugs in the positioning of the
+            // helper. This is a bug in jQueryUI that has not been fixed yet. For
+            // more details, see http://stackoverflow.com/q/5791886
+            $scope.HINT_LIST_SORTABLE_OPTIONS = {
+              axis: 'y',
+              cursor: 'move',
+              handle: '.oppia-hint-sort-handle',
+              items: '.oppia-sortable-hint',
+              revert: 100,
+              tolerance: 'pointer',
+              start: function(e, ui) {
+                $rootScope.$broadcast('externalSave');
+                StateHintsService.setActiveHintIndex(null);
+                ui.placeholder.height(ui.item.height());
+              },
+              stop: function() {
+                StateHintsService.saveDisplayedValue();
+                $scope.onSaveHints(StateHintsService.displayed);
+              }
+            };
+            StateEditorService.updateStateHintsEditorInitialised();
+          };
         }
       ]
     };

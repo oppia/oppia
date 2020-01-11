@@ -86,15 +86,6 @@ angular.module('oppia').directive(
             ctrl.opportunitiesAreLoading = false;
           };
 
-          $scope.$on('activeLanguageChanged', function() {
-            ctrl.opportunities = [];
-            ctrl.opportunitiesAreLoading = true;
-            ctrl.moreOpportunitiesAvailable = true;
-            ContributionOpportunitiesService.getTranslationOpportunities(
-              TranslationLanguageService.getActiveLanguageCode(),
-              updateWithNewOpportunities);
-          });
-
           ctrl.onLoadMoreOpportunities = function() {
             if (
               !ctrl.opportunitiesAreLoading &&
@@ -195,6 +186,14 @@ angular.module('oppia').directive(
             });
           };
           ctrl.$onInit = function() {
+            $scope.$on('activeLanguageChanged', function() {
+              ctrl.opportunities = [];
+              ctrl.opportunitiesAreLoading = true;
+              ctrl.moreOpportunitiesAvailable = true;
+              ContributionOpportunitiesService.getTranslationOpportunities(
+                TranslationLanguageService.getActiveLanguageCode(),
+                updateWithNewOpportunities);
+            });
             ctrl.opportunities = [];
             ctrl.opportunitiesAreLoading = true;
             ctrl.moreOpportunitiesAvailable = true;

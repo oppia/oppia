@@ -113,14 +113,6 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             });
           };
 
-          $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
-            ctrl.displayedCard = newCard;
-            HintsAndSolutionManagerService.reset(
-              newCard.getHints(), newCard.getSolution()
-            );
-            resetLocalHintsArray();
-          });
-
           ctrl.isTooltipVisible = function() {
             return HintsAndSolutionManagerService.isHintTooltipOpen();
           };
@@ -133,15 +125,6 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             return HintsAndSolutionManagerService.isSolutionConsumed();
           };
 
-          $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
-            var displayedCardIndex =
-              PlayerPositionService.getDisplayedCardIndex();
-            ctrl.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
-              displayedCardIndex);
-            if (ctrl.currentlyOnLatestCard) {
-              resetLocalHintsArray();
-            }
-          });
           ctrl.$onInit = function() {
             ctrl.hintIndexes = [];
             // Represents the index of the currently viewed hint.
@@ -150,6 +133,22 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             ctrl.solutionModalIsActive = false;
             ctrl.currentlyOnLatestCard = true;
             resetLocalHintsArray();
+            $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
+              ctrl.displayedCard = newCard;
+              HintsAndSolutionManagerService.reset(
+                newCard.getHints(), newCard.getSolution()
+              );
+              resetLocalHintsArray();
+            });
+            $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
+              var displayedCardIndex =
+                PlayerPositionService.getDisplayedCardIndex();
+              ctrl.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
+                displayedCardIndex);
+              if (ctrl.currentlyOnLatestCard) {
+                resetLocalHintsArray();
+              }
+            });
           };
         }
       ]

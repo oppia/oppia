@@ -60,14 +60,6 @@ angular.module('oppia').directive('voiceoverOpportunities', [
             ctrl.opportunitiesAreLoading = false;
           };
 
-          $scope.$on('activeLanguageChanged', function() {
-            ctrl.opportunities = [];
-            ctrl.opportunitiesAreLoading = true;
-            ContributionOpportunitiesService.getVoiceoverOpportunities(
-              TranslationLanguageService.getActiveLanguageCode(),
-              updateWithNewOpportunities);
-          });
-
           ctrl.onLoadMoreOpportunities = function() {
             if (
               !ctrl.opportunitiesAreLoading &&
@@ -79,6 +71,13 @@ angular.module('oppia').directive('voiceoverOpportunities', [
             }
           };
           ctrl.$onInit = function() {
+            $scope.$on('activeLanguageChanged', function() {
+              ctrl.opportunities = [];
+              ctrl.opportunitiesAreLoading = true;
+              ContributionOpportunitiesService.getVoiceoverOpportunities(
+                TranslationLanguageService.getActiveLanguageCode(),
+                updateWithNewOpportunities);
+            });
             ctrl.opportunities = [];
             ctrl.opportunitiesAreLoading = true;
             ctrl.moreOpportunitiesAvailable = true;

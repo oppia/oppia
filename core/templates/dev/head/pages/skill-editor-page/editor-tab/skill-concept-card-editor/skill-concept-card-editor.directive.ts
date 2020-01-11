@@ -55,10 +55,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
       controller: [
         '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
         function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/drag_dots.png');
-
+          var ctrl = this;
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
@@ -78,34 +75,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             SkillUpdateService.setConceptCardExplanation(
               $scope.skill, explanationObject);
             initBindableFieldsDict();
-          };
-
-          initBindableFieldsDict();
-          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-            initBindableFieldsDict();
-          });
-
-          // When the page is scrolled so that the top of the page is above the
-          // browser viewport, there are some bugs in the positioning of the
-          // helper. This is a bug in jQueryUI that has not been fixed yet.
-          // For more details, see http://stackoverflow.com/q/5791886
-          $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
-            axis: 'y',
-            cursor: 'move',
-            handle: '.oppia-worked-example-sort-handle',
-            items: '.oppia-sortable-worked-example',
-            revert: 100,
-            tolerance: 'pointer',
-            start: function(e, ui) {
-              $scope.activeWorkedExampleIndex = null;
-              ui.placeholder.height(ui.item.height());
-            },
-            stop: function() {
-              var newWorkedExamples =
-                $scope.bindableFieldsDict.displayedWorkedExamples;
-              SkillUpdateService.updateWorkedExamples(
-                $scope.skill, newWorkedExamples);
-            }
           };
 
           $scope.changeActiveWorkedExampleIndex = function(idx) {
@@ -193,6 +162,38 @@ angular.module('oppia').directive('skillConceptCardEditor', [
           $scope.onWorkedExampleSaved = function() {
             $scope.bindableFieldsDict.displayedWorkedExamples =
               $scope.skill.getConceptCard().getWorkedExamples();
+          };
+          ctrl.$onInit = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/drag_dots.png');
+            initBindableFieldsDict();
+            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+              initBindableFieldsDict();
+            });
+
+            // When the page is scrolled so that the top of the page is above the
+            // browser viewport, there are some bugs in the positioning of the
+            // helper. This is a bug in jQueryUI that has not been fixed yet.
+            // For more details, see http://stackoverflow.com/q/5791886
+            $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
+              axis: 'y',
+              cursor: 'move',
+              handle: '.oppia-worked-example-sort-handle',
+              items: '.oppia-sortable-worked-example',
+              revert: 100,
+              tolerance: 'pointer',
+              start: function(e, ui) {
+                $scope.activeWorkedExampleIndex = null;
+                ui.placeholder.height(ui.item.height());
+              },
+              stop: function() {
+                var newWorkedExamples =
+                  $scope.bindableFieldsDict.displayedWorkedExamples;
+                SkillUpdateService.updateWorkedExamples(
+                  $scope.skill, newWorkedExamples);
+              }
+            };
           };
         }
       ]

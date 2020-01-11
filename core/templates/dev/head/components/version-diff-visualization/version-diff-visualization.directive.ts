@@ -87,12 +87,6 @@ angular.module('oppia').directive('versionDiffVisualization', [
         // 'true' or false depending on whether the state property is used in
         // the diff graph. (Will be used to generate legend)
         var _stateTypeUsed = {};
-        _stateTypeUsed[NODE_TYPE_ADDED] = false;
-        _stateTypeUsed[NODE_TYPE_DELETED] = false;
-        _stateTypeUsed[NODE_TYPE_CHANGED] = false;
-        _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
-        _stateTypeUsed[NODE_TYPE_RENAMED] = false;
-        _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
         var diffGraphNodes = {};
         var nodesData = ctrl.getDiffData().nodes;
         // Opens the modal showing the history diff for a given state.
@@ -235,6 +229,12 @@ angular.module('oppia').directive('versionDiffVisualization', [
           });
         };
         ctrl.$onInit = function() {
+          _stateTypeUsed[NODE_TYPE_ADDED] = false;
+          _stateTypeUsed[NODE_TYPE_DELETED] = false;
+          _stateTypeUsed[NODE_TYPE_CHANGED] = false;
+          _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
+          _stateTypeUsed[NODE_TYPE_RENAMED] = false;
+          _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
           ctrl.LEGEND_GRAPH_COLORS = {};
           ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_ADDED] = COLOR_ADDED;
           ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_DELETED] = COLOR_DELETED;

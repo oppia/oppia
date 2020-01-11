@@ -91,12 +91,6 @@ angular.module('oppia').directive('stateNameEditor', [
             }
           };
 
-          $scope.$on('externalSave', function() {
-            if (StateNameService.isStateNameEditorShown()) {
-              ctrl.saveStateName(ctrl.tmpStateName);
-            }
-          });
-
           ctrl._getNormalizedStateName = function(newStateName) {
             return $filter('normalizeWhitespace')(newStateName);
           };
@@ -118,6 +112,11 @@ angular.module('oppia').directive('stateNameEditor', [
             }
           };
           ctrl.$onInit = function() {
+            $scope.$on('externalSave', function() {
+              if (StateNameService.isStateNameEditorShown()) {
+                ctrl.saveStateName(ctrl.tmpStateName);
+              }
+            });
             StateNameService.init();
             ctrl.EditabilityService = EditabilityService;
             ctrl.StateEditorService = StateEditorService;

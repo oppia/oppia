@@ -62,16 +62,6 @@ angular.module('oppia').directive('historyTab', [
           // 'newestStateName', 'originalStateName' and 'stateProperty'.
           var nodesData = null;
           var currentPage = 0;
-          $scope.$on('refreshVersionHistory', function(evt, data) {
-            // Uncheck all checkboxes when page is refreshed
-            angular.forEach(ctrl.versionCheckboxArray, function(
-                versionCheckbox) {
-              versionCheckbox.selected = false;
-            });
-            if (data.forceRefresh || ctrl.explorationVersionMetadata === null) {
-              ctrl.refreshVersionHistory();
-            }
-          });
 
           // Compares the two selected versions and displays the comparison
           // results.
@@ -292,6 +282,16 @@ angular.module('oppia').directive('historyTab', [
             }
           };
           ctrl.$onInit = function() {
+            $scope.$on('refreshVersionHistory', function(evt, data) {
+              // Uncheck all checkboxes when page is refreshed
+              angular.forEach(ctrl.versionCheckboxArray, function(
+                  versionCheckbox) {
+                versionCheckbox.selected = false;
+              });
+              if (data.forceRefresh || ctrl.explorationVersionMetadata === null) {
+                ctrl.refreshVersionHistory();
+              }
+            });
             ctrl.EditabilityService = EditabilityService;
             ctrl.explorationId = ExplorationDataService.explorationId;
             ctrl.explorationAllSnapshotsUrl =

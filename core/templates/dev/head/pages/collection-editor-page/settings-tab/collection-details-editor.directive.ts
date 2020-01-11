@@ -79,9 +79,6 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             }
           };
 
-          $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
-          $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
-
           ctrl.updateCollectionTitle = function() {
             CollectionUpdateService.setCollectionTitle(
               ctrl.collection, ctrl.displayedCollectionTitle);
@@ -127,6 +124,8 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             return CollectionEditorStateService.hasLoadedCollection();
           };
           ctrl.$onInit = function() {
+            $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
+            $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
             ctrl.collection = CollectionEditorStateService.getCollection();
             ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
               COLLECTION_TITLE_INPUT_FOCUS_LABEL);

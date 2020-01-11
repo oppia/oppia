@@ -226,11 +226,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
               return '-40px';
             }
           };
-          $scope.$watch('$ctrl.collection', function(newValue) {
-            if (newValue !== null) {
-              ctrl.generatePathParameters();
-            }
-          }, true);
 
           ctrl.scrollToLocation = function(id) {
             $location.hash(id);
@@ -245,6 +240,11 @@ angular.module('oppia').directive('collectionPlayerPage', [
             $evt.stopPropagation();
           };
           ctrl.$onInit = function() {
+            $scope.$watch('$ctrl.collection', function(newValue) {
+              if (newValue !== null) {
+                ctrl.generatePathParameters();
+              }
+            }, true);
             $rootScope.loadingMessage = 'Loading';
             ctrl.collection = null;
             ctrl.collectionPlaythrough = null;

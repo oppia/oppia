@@ -52,6 +52,15 @@ angular.module('oppia').directive('topNavigationBar', [
             'create', 'explore', 'collection', 'collection_editor',
             'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
             'story_editor'];
+          var currentWindowWidth = WindowDimensionsService.getWidth();
+          // The order of the elements in this array specifies the order in
+          // which they will be hidden. Earlier elements will be hidden first.
+          var NAV_ELEMENTS_ORDER = [
+            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
+            'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+          var truncateNavbarDebounced =
+            DebouncerService.debounce(truncateNavbar, 500);
+
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
@@ -114,20 +123,6 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.activeMenuName = NavigationService.activeMenuName;
           };
 
-          // Close the submenu if focus or click occurs anywhere outside of
-          // the menu or outside of its parent (which opens submenu on hover).
-          angular.element(document).on('click', function(evt) {
-            if (!angular.element(evt.target).closest('li').length) {
-              ctrl.activeMenuName = '';
-              $scope.$applyAsync();
-            }
-          });
-          var currentWindowWidth = WindowDimensionsService.getWidth();
-          // The order of the elements in this array specifies the order in
-          // which they will be hidden. Earlier elements will be hidden first.
-          var NAV_ELEMENTS_ORDER = [
-            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
-            'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
           ctrl.isSidebarShown = function() {
             if (SidebarStatusService.isSidebarShown()) {
               angular.element(document.body).addClass('oppia-stop-scroll');
@@ -200,12 +195,6 @@ angular.module('oppia').directive('topNavigationBar', [
             }
           };
 
-          var truncateNavbarDebounced =
-            DebouncerService.debounce(truncateNavbar, 500);
-
-          $scope.$on('searchBarLoaded', function() {
-            setTimeout(truncateNavbar, 100);
-          });
           ctrl.$onInit = function() {
             ctrl.isModerator = null;
             ctrl.isAdmin = null;
@@ -228,6 +217,19 @@ angular.module('oppia').directive('topNavigationBar', [
             NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
             ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             ctrl.navElementsVisibilityStatus = {};
+
+            // Close the submenu if focus or click occurs anywhere outside of
+            // the menu or outside of its parent (which opens submenu on hover).
+            angular.element(document).on('click', function(evt) {
+              if (!angular.element(evt.target).closest('li').length) {
+                ctrl.activeMenuName = '';
+                $scope.$applyAsync();
+              }
+            });
+
+            $scope.$on('searchBarLoaded', function() {
+              setTimeout(truncateNavbar, 100);
+            });
 
             UserService.getUserInfoAsync().then(function(userInfo) {
               if (userInfo.getPreferredSiteLanguageCode()) {

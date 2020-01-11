@@ -75,9 +75,6 @@ angular.module('oppia').directive('statisticsTab', [
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               millisSinceEpoch);
           };
-          $scope.$on('refreshStatisticsTab', function() {
-            ctrl.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
-          });
           ctrl.refreshExplorationStatistics = function(version) {
             ctrl.explorationStatisticsUrl = (
               '/createhandler/statistics/' +
@@ -268,6 +265,9 @@ angular.module('oppia').directive('statisticsTab', [
             });
           };
           ctrl.$onInit = function() {
+            $scope.$on('refreshStatisticsTab', function() {
+              ctrl.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
+            });
             ctrl.COMPLETION_RATE_CHART_OPTIONS = {
               chartAreaWidth: 300,
               colors: ['green', 'firebrick'],

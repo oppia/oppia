@@ -72,10 +72,10 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
             ctrl.statusMessage = statusMessage;
           };
 
-          $scope.$on('$locationChangeSuccess', function() {
-            AdminRouterService.showTab($location.path().replace('/', '#'));
-          });
           ctrl.$onInit = function() {
+            $scope.$on('$locationChangeSuccess', function() {
+              AdminRouterService.showTab($location.path().replace('/', '#'));
+            });
             ctrl.userEmail = '';
             AdminDataService.getDataAsync().then(function(response) {
               ctrl.userEmail = response.user_email;

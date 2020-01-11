@@ -105,14 +105,6 @@ angular.module('oppia').directive('outcomeEditor', [
             }
           };
 
-          $scope.$on('externalSave', function() {
-            onExternalSave();
-          });
-
-          $scope.$on('onInteractionIdChanged', function() {
-            onExternalSave();
-          });
-
           ctrl.isSelfLoop = function(outcome) {
             return (
               outcome &&
@@ -217,6 +209,13 @@ angular.module('oppia').directive('outcomeEditor', [
           };
 
           ctrl.$onInit = function() {
+            $scope.$on('externalSave', function() {
+              onExternalSave();
+            });
+
+            $scope.$on('onInteractionIdChanged', function() {
+              onExternalSave();
+            });
             ctrl.editOutcomeForm = {};
             ctrl.canAddPrerequisiteSkill = (
               ENABLE_PREREQUISITE_SKILLS &&

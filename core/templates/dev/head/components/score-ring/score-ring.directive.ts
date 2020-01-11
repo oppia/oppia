@@ -35,21 +35,11 @@ angular.module('oppia').directive('scoreRing', [
             document.querySelector('.score-ring-circle'));
           const radius = circle.r.baseVal.value;
           const circumference = (radius * 2 * Math.PI);
-          circle.style.strokeDasharray = `${circumference} ${circumference}`;
-          circle.style.strokeDashoffset = circumference.toString();
 
           var setScore = function(percent) {
             const offset = circumference - percent / 100 * circumference;
             circle.style.strokeDashoffset = offset.toString();
           };
-
-          $scope.$watch(function() {
-            return ctrl.getScore();
-          }, function(newScore) {
-            if (newScore && newScore > 0) {
-              setScore(newScore);
-            }
-          });
 
           ctrl.getScoreRingColor = function() {
             if (ctrl.testIsPassed()) {
@@ -67,6 +57,17 @@ angular.module('oppia').directive('scoreRing', [
               // return color orange when failed.
               return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
             }
+          };
+          ctrl.$onInit = function() {
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference.toString();
+            $scope.$watch(function() {
+              return ctrl.getScore();
+            }, function(newScore) {
+              if (newScore && newScore > 0) {
+                setScore(newScore);
+              }
+            });
           };
         }
       ]

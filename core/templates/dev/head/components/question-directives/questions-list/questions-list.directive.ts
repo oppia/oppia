@@ -701,10 +701,10 @@ angular.module('oppia').directive('questionsList', [
             return QuestionsListService.getCurrentPageNumber();
           };
 
-          $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
-            _initTab(false);
-          });
           ctrl.$onInit = function() {
+            $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
+              _initTab(false);
+            });
             ctrl.skillIds = [];
             ctrl.selectedSkillIds = [];
             ctrl.associatedSkillSummaries = [];
