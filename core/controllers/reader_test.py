@@ -617,30 +617,22 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         return sorted([summary['id'] for summary in summaries])
 
     def _get_recommendation_ids(
-            self, exploration_id, collection_id=None, story_id=None,
-            current_node_id=None,
+            self, exploration_id, collection_id=None,
             include_system_recommendations=None,
             author_recommended_ids_str='[]'):
         """Gets the recommended exploration ids from the summaries."""
         collection_id_param = (
             '&collection_id=%s' % collection_id
             if collection_id is not None else '')
-        story_id_param = (
-            '&story_id=%s' % story_id
-            if story_id is not None else '')
-        current_node_id_param = (
-            '&current_node_id=%s' % current_node_id
-            if current_node_id is not None else '')
         include_recommendations_param = (
             '&include_system_recommendations=%s' % (
                 include_system_recommendations)
             if include_system_recommendations is not None else '')
         recommendations_url = (
             '/explorehandler/recommendations/%s?'
-            'stringified_author_recommended_ids=%s%s%s%s%s' % (
+            'stringified_author_recommended_ids=%s%s%s' % (
                 exploration_id, author_recommended_ids_str, collection_id_param,
-                include_recommendations_param, story_id_param,
-                current_node_id_param))
+                include_recommendations_param))
 
         summaries = self.get_json(recommendations_url)['summaries']
         return self._get_exploration_ids_from_summaries(summaries)

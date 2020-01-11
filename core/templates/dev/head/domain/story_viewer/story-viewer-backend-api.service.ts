@@ -68,7 +68,7 @@ angular.module('oppia').factory('StoryViewerBackendApiService', [
         return $q(function(resolve, reject) {
           _recordChapterCompletion(storyId, nodeId, resolve, reject);
         });
-      },
+      }
     };
   }
 ]);
