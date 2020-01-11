@@ -2124,9 +2124,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_param_changes(self):
         """Test updating of param_changes."""
         exploration = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        exploration.param_specs = {
-            'myParam': param_domain.ParamSpec('UnicodeString')}
-        exp_services._save_exploration(self.owner_id, exploration, '', [])
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                self.init_state_name, 'param_specs',
+                {'myParam': param_domain.ParamSpec('UnicodeString')}), '')
+        
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'param_changes', self.param_changes), '')
