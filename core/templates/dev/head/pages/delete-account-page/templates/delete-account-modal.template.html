@@ -1,12 +1,16 @@
 <div class="modal-header">
-  <h3>Delete Account</h3>
+  <h3 translate="I18N_DELETE_ACCOUNT_PAGE_HEADING"></h3>
 </div>
 
 <div class="modal-body">
-  <p>Really delete your account? <strong>This action cannot be reversed.</strong></p>
+  <p translate="I18N_DELETE_ACCOUNT_PAGE_MODAL_TEXT"></p>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-danger" ng-click="reallyDelete()">Delete Account</button>
+  <button translate="I18N_MODAL_CANCEL_BUTTON" class="btn btn-secondary"
+          ng-click="cancel()">
+  </button>
+  <button translate="I18N_DELETE_ACCOUNT_PAGE_BUTTON" class="btn btn-danger"
+          ng-click="reallyDelete()">
+  </button>
 </div>

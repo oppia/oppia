@@ -34,7 +34,6 @@ export class ServiceBootstrapComponent {}
 
 import { AppConstants } from 'app.constants';
 
-
 @NgModule({
   imports: [
     BrowserModule,
@@ -67,10 +66,7 @@ const downgradedModule = downgradeModule(bootstrapFn);
 declare var angular: any;
 
 angular.module('oppia', [
-  'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-  'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
-  'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
+  'ngCookies', 'pascalprecht.translate', 'toastr', 'ui.bootstrap',
   downgradedModule
 ])
   // This directive is the downgraded version of the Angular component to

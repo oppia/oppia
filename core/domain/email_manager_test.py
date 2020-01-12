@@ -2286,6 +2286,65 @@ class VoiceoverApplicationEmailUnitTest(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES)
 
 
+class AccountDeletionEmailUnitTest(test_utils.GenericTestBase):
+    """Unit test related to account deletion application emails."""
+    APPLICANT_USERNAME = 'applicant'
+    APPLICANT_EMAIL = 'applicant@example.com'
+
+    def setUp(self):
+        super(AccountDeletionEmailUnitTest, self).setUp()
+        self.signup(self.APPLICANT_EMAIL, self.APPLICANT_USERNAME)
+        self.applicant_id = self.get_user_id_from_email(self.APPLICANT_EMAIL)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        self.can_not_send_emails_ctx = self.swap(
+            feconf, 'CAN_SEND_EMAILS', False)
+
+    def test_that_email_not_sent_if_can_send_emails_is_false(self):
+        with self.can_not_send_emails_ctx:
+            email_manager.send_account_deleted_email(
+                self.applicant_id, self.APPLICANT_EMAIL)
+
+        messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+        self.assertEqual(len(messages), 0)
+
+    def test_that_correct_account_deleted_email_is_sent(self):
+        expected_email_subject = 'Account deleted'
+        expected_email_html_body = (
+            'Hi applicant@example.com,<br><br>'
+            'Your account was successfully deleted.'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_account_deleted_email(
+                self.applicant_id, self.APPLICANT_EMAIL)
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.APPLICANT_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.applicant_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.APPLICANT_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent, feconf.EMAIL_INTENT_ACCOUNT_DELETED)
+
+
 class BulkEmailsTests(test_utils.GenericTestBase):
     SENDER_EMAIL = 'sender@example.com'
     SENDER_USERNAME = 'sender'

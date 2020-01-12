@@ -1037,6 +1037,7 @@ def mark_user_for_deletion(
 
     user_models.PendingDeletionRequestModel(
         id=user_id,
+        email=user_settings.email,
         exploration_ids=exploration_ids,
         collection_ids=collection_ids,
     ).put()
