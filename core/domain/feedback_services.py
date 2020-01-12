@@ -127,8 +127,8 @@ def create_message(
     message.message_id = message_id
     message.thread_id = thread_id
     message.author_id = author_id
-    message.updated_status = updated_status
-    message.updated_subject = updated_subject
+    message.updated_status = updated_status or None
+    message.updated_subject = updated_subject or None
     message.text = text
     message.received_via_email = received_via_email
     message.put()
