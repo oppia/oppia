@@ -1268,7 +1268,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
 
 
 class DocstringChecker(checkers.BaseChecker):
-    """Checks if comments follow correct style."""
+    """Checks if docstring follow correct style."""
 
     __implements__ = interfaces.IRawChecker
     name = 'invalid-docstring-format'
