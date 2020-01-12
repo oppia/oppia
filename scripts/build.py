@@ -403,8 +403,6 @@ def process_html(source_file_stream, target_file_stream):
             read from.
         target_file_stream: file. The stream object to write the minified HTML
             file to.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
     """
     write_to_file_stream(
         target_file_stream, REMOVE_WS(' ', source_file_stream.read()))
@@ -821,7 +819,7 @@ def save_hashes_to_file(file_hashes):
         hashes_json_file.write(u'\n')
 
 
-def minify_func(source_path, target_path, file_hashes, filename):
+def minify_func(source_path, target_path, filename):
     """Call the appropriate functions to handle different types of file
     formats:
         - HTML files: Remove whitespaces, interpolates paths in HTML to include
@@ -900,7 +898,7 @@ def generate_build_tasks_to_build_all_files_in_directory(
             if should_file_be_built(source_path):
                 task = threading.Thread(
                     target=minify_func,
-                    args=(source_path, target_path, file_hashes, filename,))
+                    args=(source_path, target_path, filename,))
                 build_tasks.append(task)
     return build_tasks
 
@@ -932,7 +930,7 @@ def generate_build_tasks_to_build_files_from_filepaths(
             task = threading.Thread(
                 target=minify_func,
                 args=(
-                    source_file_path, target_file_path, file_hashes, filepath,))
+                    source_file_path, target_file_path, filepath,))
             build_tasks.append(task)
     return build_tasks
 

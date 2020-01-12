@@ -262,8 +262,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Build base.html file.
         with python_utils.open_file(
             BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
-            build.process_html(
-                source_base_file, minified_html_file_stream, file_hashes)
+            build.process_html(source_base_file, minified_html_file_stream)
 
         minified_html_file_content = minified_html_file_stream.getvalue()
         self.assertNotRegexpMatches(
