@@ -907,6 +907,7 @@ class RecommendationsHandler(base.BaseHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         collection_id = self.request.get('collection_id')
+
         include_system_recommendations = self.request.get(
             'include_system_recommendations')
         try:
