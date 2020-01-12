@@ -144,31 +144,6 @@ _PARSER.add_argument(
     dest='minify_third_party_libs_only')
 
 
-def convert_filepath_to_hashed_url(filepath, hashes):
-    """Convert the original filepath to url with hash inserted.
-
-    Args:
-        filepath: str. The original file path.
-        hashes: str. The calculated hash for this file.
-
-    Returns:
-        str. Generated url style path with hash inserted.
-    """
-    return _insert_hash(common.convert_to_posixpath(filepath), hashes)
-
-
-def convert_filepath_to_url(filepath):
-    """Convert the original filepath to url path.
-
-    Args:
-        filepath: str. The original file path.
-
-    Returns:
-        str. Generated url style path.
-    """
-    return common.convert_to_posixpath(filepath)
-
-
 def generate_app_yaml():
     """Generate app.yaml from app_dev.yaml."""
     prod_file_prefix = 'build/'
