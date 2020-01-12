@@ -866,8 +866,7 @@ def _execute_tasks(tasks, batch_size=24):
                 raise OSError('threads can only be started once')
 
 
-def generate_build_tasks_to_build_all_files_in_directory(
-        source, target, file_hashes):
+def generate_build_tasks_to_build_all_files_in_directory(source, target):
     """This function queues up tasks to build all files in a directory,
     excluding files that should not be built.
 
@@ -876,8 +875,6 @@ def generate_build_tasks_to_build_all_files_in_directory(
             files and directories to be built.
         target: str. Path relative to /oppia of directory where the built files
             and directories will be saved to.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
@@ -904,7 +901,7 @@ def generate_build_tasks_to_build_all_files_in_directory(
 
 
 def generate_build_tasks_to_build_files_from_filepaths(
-        source_path, target_path, filepaths, file_hashes):
+        source_path, target_path, filepaths):
     """This function queues up build tasks to build files from a list of
     filepaths, excluding files that should not be built.
 
@@ -914,8 +911,6 @@ def generate_build_tasks_to_build_files_from_filepaths(
         target_path: str. Path relative to /oppia directory of directory where
             to copy the files and directories.
         filepaths: list(str). List of filepaths to be built.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
@@ -1016,7 +1011,7 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     return recently_changed_filenames
 
 
-def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
+def generate_build_tasks_to_build_directory(dirnames_dict):
     """This function queues up build tasks to build all files in source
     directory if there is no existing staging directory. Otherwise, selectively
     queue up build tasks to build recently changed files.
@@ -1029,8 +1024,6 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
                 for final copy process.
             - 'out_dir': the final directory that contains built files with hash
                 inserted into filenames.
-        file_hashes: dict(str, str). Dictionary with filepaths as keys and
-            hashes of file content as values.
 
     Returns:
         deque(Thread). A deque that contains all build tasks queued
@@ -1045,7 +1038,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         python_utils.PRINT('Creating new %s folder' % staging_dir)
         ensure_directory_exists(staging_dir)
         build_tasks += generate_build_tasks_to_build_all_files_in_directory(
-            source_dir, staging_dir, file_hashes)
+            source_dir, staging_dir)
     else:
         # If staging dir exists, rebuild all HTML and Python files.
         file_extensions_to_always_rebuild = ('.html', '.py',)
@@ -1056,7 +1049,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
         filenames_to_always_rebuild = get_filepaths_by_extensions(
             source_dir, file_extensions_to_always_rebuild)
         build_tasks += generate_build_tasks_to_build_files_from_filepaths(
-            source_dir, staging_dir, filenames_to_always_rebuild, file_hashes)
+            source_dir, staging_dir, filenames_to_always_rebuild)
 
         dev_dir_hashes = get_file_hashes(source_dir)
 
@@ -1077,8 +1070,7 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
             python_utils.PRINT(
                 'Re-building recently changed files at %s' % source_dir)
             build_tasks += generate_build_tasks_to_build_files_from_filepaths(
-                source_dir, staging_dir, recently_changed_filenames,
-                file_hashes)
+                source_dir, staging_dir, recently_changed_filenames)
         else:
             python_utils.PRINT(
                 'No changes detected. Using previously built files.')
@@ -1216,10 +1208,10 @@ def generate_build_directory(hashes):
 
     # Build files in /extensions and copy them into staging directory.
     build_tasks += generate_build_tasks_to_build_directory(
-        EXTENSIONS_DIRNAMES_TO_DIRPATHS, hashes)
+        EXTENSIONS_DIRNAMES_TO_DIRPATHS)
     # Minify all template files and copy them into staging directory.
     build_tasks += generate_build_tasks_to_build_directory(
-        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS, hashes)
+        TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS)
     _execute_tasks(build_tasks)
 
     # Copy all files from staging directory to production directory.

@@ -235,20 +235,13 @@ class BuildTests(test_utils.GenericTestBase):
             build._verify_filepath_hash(hashed_base_filename, file_hashes)
 
     def test_process_html(self):
-        """Test process_html removes whitespaces and adds hash to filepaths."""
+        """Test process_html removes whitespaces."""
         BASE_HTML_SOURCE_PATH = (
             os.path.join(MOCK_TEMPLATES_DEV_DIR, 'base.html'))
 
         build._ensure_files_exist([BASE_HTML_SOURCE_PATH])
         # Prepare a file_stream object from python_utils.string_io().
         minified_html_file_stream = python_utils.string_io()
-        # Obtain actual file hashes of /templates to add hash to all filepaths
-        # within the HTML file. The end result will look like:
-        # E.g <script ... App.js></script>
-        # --> <script ... App.[hash].js></script>.
-        # Only need to hash Base.js.
-        with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
-            file_hashes = build.get_file_hashes(MOCK_TEMPLATES_DEV_DIR)
 
         # Assert that base.html has white spaces and has original filepaths.
         with python_utils.open_file(
@@ -484,13 +477,12 @@ class BuildTests(test_utils.GenericTestBase):
         the same number of build tasks as the number of files in the source
         directory.
         """
-        asset_hashes = build.get_file_hashes(MOCK_ASSETS_DEV_DIR)
         tasks = collections.deque()
 
         self.assertEqual(len(tasks), 0)
         # Build all files.
         tasks = build.generate_build_tasks_to_build_all_files_in_directory(
-            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, asset_hashes)
+            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR)
         total_file_count = build.get_file_count(MOCK_ASSETS_DEV_DIR)
         self.assertEqual(len(tasks), total_file_count)
 
@@ -501,13 +493,12 @@ class BuildTests(test_utils.GenericTestBase):
         new_filename = 'manifest.json'
         recently_changed_filenames = [
             os.path.join(MOCK_ASSETS_DEV_DIR, new_filename)]
-        asset_hashes = build.get_file_hashes(MOCK_ASSETS_DEV_DIR)
         build_tasks = collections.deque()
 
         self.assertEqual(len(build_tasks), 0)
         build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
             MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR,
-            recently_changed_filenames, asset_hashes)
+            recently_changed_filenames)
         self.assertEqual(len(build_tasks), len(recently_changed_filenames))
 
         build_tasks.clear()
@@ -518,8 +509,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(build_tasks), 0)
         build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
-            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, svg_filepaths,
-            asset_hashes)
+            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, svg_filepaths)
         self.assertEqual(len(build_tasks), len(svg_filepaths))
 
     def test_generate_build_tasks_to_build_directory(self):
@@ -537,14 +527,13 @@ class BuildTests(test_utils.GenericTestBase):
         build_all_files_tasks = (
             build.generate_build_tasks_to_build_all_files_in_directory(
                 MOCK_EXTENSIONS_DEV_DIR,
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
-                file_hashes))
+                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']))
         self.assertGreater(len(build_all_files_tasks), 0)
 
         # Test for building all files when staging dir does not exist.
         self.assertEqual(len(build_dir_tasks), 0)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, file_hashes)
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
@@ -555,9 +544,8 @@ class BuildTests(test_utils.GenericTestBase):
             EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'])
         self.assertEqual(len(build_dir_tasks), 0)
 
-        source_hashes = file_hashes
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, source_hashes)
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
@@ -577,7 +565,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Test for only building files that need to be rebuilt.
         self.assertEqual(len(build_dir_tasks), 0)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, build_dir_tasks)
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         file_extensions_to_always_rebuild = ('.html', '.py',)
         always_rebuilt_filepaths = build.get_filepaths_by_extensions(
             MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
@@ -601,19 +589,17 @@ class BuildTests(test_utils.GenericTestBase):
             'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', '')
         }
 
-        file_hashes = build.get_file_hashes(MOCK_EXTENSIONS_DEV_DIR)
         build_dir_tasks = collections.deque()
         build_all_files_tasks = (
             build.generate_build_tasks_to_build_all_files_in_directory(
                 MOCK_EXTENSIONS_DEV_DIR,
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
-                file_hashes))
+                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']))
         self.assertGreater(len(build_all_files_tasks), 0)
 
         # Test for building all files when staging dir does not exist.
         self.assertEqual(len(build_dir_tasks), 0)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, file_hashes)
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
@@ -625,7 +611,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(len(build_dir_tasks), 0)
 
         build_dir_tasks = build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, {})
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         file_extensions_to_always_rebuild = ('.py', '.js', '.html')
         always_rebuilt_filepaths = build.get_filepaths_by_extensions(
             MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
