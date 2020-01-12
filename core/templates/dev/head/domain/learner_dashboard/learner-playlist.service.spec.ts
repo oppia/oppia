@@ -24,6 +24,8 @@ require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;
@@ -39,7 +41,7 @@ describe('Learner playlist service factory', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

@@ -21,13 +21,14 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
 require('components/ratings/rating-display/rating-display.directive.ts');
 
 describe('Rating display directive', function() {
   var outerScope, ctrlScope;
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {

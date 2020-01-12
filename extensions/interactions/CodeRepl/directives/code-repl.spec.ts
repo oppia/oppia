@@ -22,6 +22,8 @@ import { CodeNormalizerService } from 'services/code-normalizer.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 describe('CodeRepl interaction', function() {
   describe('CodeRepl tests', function() {
     var $httpBackend, $templateCache;
@@ -29,7 +31,7 @@ describe('CodeRepl interaction', function() {
 
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value('CodeNormalizerService', new CodeNormalizerService());
     }));

@@ -65,6 +65,8 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require('App.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
@@ -86,7 +88,7 @@ describe('TrainingDataService', function() {
   var mockExplorationData;
 
   beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
