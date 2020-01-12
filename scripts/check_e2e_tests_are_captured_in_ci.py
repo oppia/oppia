@@ -40,7 +40,8 @@ def get_e2e_suite_names_from_jobs_travis_yml_file():
     for job in jobs_raw:
         matches = test_regex.finditer(job)
         for match in matches:
-            suites_from_jobs.append(utils.snake_case_to_camel_case(match.group().lower()))
+            suites_from_jobs.append(
+                utils.snake_case_to_camel_case(match.group().lower()))
 
     return sorted(suites_from_jobs)
 
@@ -54,8 +55,9 @@ def get_e2e_suite_names_from_script_travis_yml_file():
     travis_file = read_and_parse_travis_yml_file()
     script_raw = travis_file['script']
     # The following line extracts the test suites from patterns like
-    # --suite="accessibility" --
-    hyphen_between_regex = re.compile(r'(?<= bash scripts/run_e2e_tests.sh --suite=")(.*)(?=")')
+    # bash scripts/run_e2e_tests.sh --suite="accessibility"
+    hyphen_between_regex = re.compile(
+        r'(?<= bash scripts/run_e2e_tests.sh --suite=")(.*)(?=")')
     suites_from_script = []
 
     for script in script_raw:
@@ -74,7 +76,8 @@ def get_e2e_suite_names_from_protractor_file():
     """
     protractor_config_file = read_protractor_conf_file()
     # The following line extracts suite object from protractor.conf.js.
-    suite_object_string = re.compile(r'suites = {([^}]+)}').findall(protractor_config_file)[0]
+    suite_object_string = re.compile(
+        r'suites = {([^}]+)}').findall(protractor_config_file)[0]
 
     # The following line extracts the keys/test suites from the key: value pair
     # from the suites object.
@@ -111,18 +114,28 @@ def read_and_parse_travis_yml_file():
     return travis_ci_dict
 
 
+def get_e2e_test_suites_to_exclude_from_travis_ci():
+    """Returns the names of test suites to exclude from Travis CI.
+
+    Returns:
+        list(str). A list of test suites that are excluded from Travis CI.
+    """
+    # These 4 test suites are not present in travis ci.
+    # One is extra ie. (full: [*.js]), and three other tests that
+    # are being run by circleCi.
+    return ['full', 'classroomPage', 'fileUploadFeatures', 'topicAndStoryEditor']
+
+
 def main():
-    """Test the travis ci file and protractor.conf.js have same e2e test suites."""
+    """Test the travis ci file and protractor.conf.js to have same
+    e2e test suites.
+    """
     python_utils.PRINT('Checking e2e tests are captured in travis.yml started')
     protractor_test_suites = get_e2e_suite_names_from_protractor_file()
     yaml_jobs = get_e2e_suite_names_from_jobs_travis_yml_file()
     yaml_scripts = get_e2e_suite_names_from_script_travis_yml_file()
 
-    # These 4 test suites are not present in travis ci.
-    # One is extra ie. (full: [*.js]), and three other tests that
-    # are being run by circleCi.
-    excluded_travis_tests = [
-        'full', 'classroomPage', 'fileUploadFeatures', 'topicAndStoryEditor']
+    excluded_travis_tests = get_e2e_test_suites_to_exclude_from_travis_ci()
     for excluded_test in excluded_travis_tests:
         protractor_test_suites.remove(excluded_test)
 
@@ -131,12 +144,15 @@ def main():
         raise Exception('The tests suites that have been extracted from '
                         'protractor.conf.js or travis.ci are empty.')
 
-    if not (protractor_test_suites.sort() == yaml_jobs.sort()
-            and (yaml_jobs.sort() == yaml_scripts.sort())):
-        raise Exception('Protractor test suites and Travis Ci test suites are not in sync.')
+    if not protractor_test_suites == yaml_jobs and (yaml_jobs == yaml_scripts):
+        raise Exception(
+            'Protractor test suites and Travis Ci test suites are not in sync.')
 
     python_utils.PRINT('Done!')
 
 
-if __name__ == "__main__":
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when check_e2e_tests_are_captured_in_ci.py
+# is used as a script.
+if __name__ == "__main__":  # pragma: no cover
     main()
