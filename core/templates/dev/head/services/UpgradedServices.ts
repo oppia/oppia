@@ -157,6 +157,9 @@ import { StateContentService } from
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
+import { StateImprovementSuggestionService } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
 import { StateHintsService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-hints.service';
@@ -292,6 +295,8 @@ export class UpgradedServices {
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
       new ReadOnlyStoryNodeObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
+    upgradedServices['StateImprovementSuggestionService'] =
+      new StateImprovementSuggestionService();
     upgradedServices['SolutionValidityService'] = new SolutionValidityService();
     upgradedServices['StopwatchObjectFactory'] = new StopwatchObjectFactory();
     upgradedServices['StorySummaryObjectFactory'] =
@@ -401,12 +406,21 @@ export class UpgradedServices {
         new AudioTranslationLanguageService(
           upgradedServices['BrowserCheckerService'],
           upgradedServices['LanguageUtilService']);
+    upgradedServices['CodeReplPredictionService'] =
+      new CodeReplPredictionService(
+        upgradedServices['CountVectorizerService'],
+        upgradedServices['PythonProgramTokenizer'],
+        upgradedServices['SVMPredictionService'],
+        upgradedServices['WinnowingPreprocessingService']);
     upgradedServices['CodeReplRulesService'] = new CodeReplRulesService(
       upgradedServices['NormalizeWhitespacePipe'],
       upgradedServices['CodeNormalizerService']);
     upgradedServices['ConceptCardObjectFactory'] = new ConceptCardObjectFactory(
       upgradedServices['SubtitledHtmlObjectFactory'],
       upgradedServices['RecordedVoiceoversObjectFactory']);
+    upgradedServices['ContextService'] = new ContextService(
+      upgradedServices['UrlService'],
+      upgradedServices['EntityContextObjectFactory']);
     upgradedServices['EditorFirstTimeEventsService'] =
       new EditorFirstTimeEventsService(
         upgradedServices['SiteAnalyticsService']);
@@ -454,15 +468,6 @@ export class UpgradedServices {
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
-    upgradedServices['CodeReplPredictionService'] =
-      new CodeReplPredictionService(
-        upgradedServices['CountVectorizerService'],
-        upgradedServices['PythonProgramTokenizer'],
-        upgradedServices['SVMPredictionService'],
-        upgradedServices['WinnowingPreprocessingService']);
-    upgradedServices['ContextService'] = new ContextService(
-      upgradedServices['UrlService'],
-      upgradedServices['EntityContextObjectFactory']);
 
     // Group 4: Services depending on groups 1,2 and 3.
     upgradedServices['ExplorationHtmlFormatterService'] =
