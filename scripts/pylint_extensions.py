@@ -1264,6 +1264,70 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                     'no-capital-letter-at-beginning', line=line_num + 1)
 
 
+class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
+    """Checks if comments follow correct style."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'space_between_imports_and_file-overview'
+    priority = -1
+    msgs = {
+        'C0020': (
+            'No space used between file overview and import.',
+            'no space used between file overview and import',
+            'please provide a space between file overview and imports.'
+        ),
+        'C0021': (
+            'Single space should be provided above imports.',
+            'single space should be provided above imports',
+            'please provide a single new line above imports.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that comments follow correct style.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+            # Single line comment, ignore it.
+            if line.startswith(b'#'):
+                continue
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multiline comment.
+            if in_multi_line_comment:
+                continue
+            previous_line = file_content[line_num - 1].strip()
+            if line.startswith(b'import') or line.startswith(b'from'):
+                if previous_line.endswith(b'"""'):
+                    self.add_message(
+                        'no space used between file overview and import',
+                        line=line_num + 1)
+                if (file_content[line_num - 1] == b'\n' and
+                        file_content[line_num - 2] == b'\n'):
+                    self.add_message(
+                        'single space should be provided above imports',
+                        line=line_num + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1283,3 +1347,4 @@ def register(linter):
     linter.register_checker(SingleNewlineAboveArgsChecker(linter))
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
+    linter.register_checker(SpaceBelowFileOverviewChecker(linter))
