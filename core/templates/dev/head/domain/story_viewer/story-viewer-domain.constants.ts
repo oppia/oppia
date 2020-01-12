@@ -19,6 +19,6 @@
 export class StoryViewerDomainConstants {
   public static STORY_DATA_URL_TEMPLATE = '/story_data_handler/<story_id>';
 
-  public static STORY_NODE_COMPLETION_URL_TEMPLATE =
-    '/story_node_completion_handler/<story_id>/<node_id>';
+  public static STORY_PROGRESS_URL_TEMPLATE =
+    '/story_progress_handler/<story_id>/<node_id>';
 }

@@ -21,9 +21,9 @@ require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('StoryViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'STORY_DATA_URL_TEMPLATE',
-  'STORY_NODE_COMPLETION_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, STORY_DATA_URL_TEMPLATE,
-      STORY_NODE_COMPLETION_URL_TEMPLATE) {
+  'STORY_PROGRESS_URL_TEMPLATE', function(
+      $http, $q, UrlInterpolationService, STORY_DATA_URL_TEMPLATE,
+      STORY_PROGRESS_URL_TEMPLATE) {
     var storyDataDict = null;
     var _fetchStoryData = function(storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
@@ -43,22 +43,18 @@ angular.module('oppia').factory('StoryViewerBackendApiService', [
       });
     };
 
-    var _recordStoryNodeCompletion = function(
+    var _recordChapterCompletion = function(
         storyId, nodeId, successCallback, errorCallback) {
-      var storyNodeCompletionUrl = UrlInterpolationService.interpolateUrl(
-        STORY_NODE_COMPLETION_URL_TEMPLATE, {
+      var chapterCompletionUrl = UrlInterpolationService.interpolateUrl(
+        STORY_PROGRESS_URL_TEMPLATE, {
           story_id: storyId,
           node_id: nodeId
         });
-
-      $http.post(storyNodeCompletionUrl).then(function(response) {
-        if (successCallback) {
-          successCallback();
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
+      $http.post(chapterCompletionUrl).then(function(response) {
+        successCallback({
+          summaries: response.data.summaries,
+          nextNodeId: response.data.next_node_id,
+          readyForReviewTest: response.data.ready_for_review_test});
       });
     };
 
@@ -68,10 +64,9 @@ angular.module('oppia').factory('StoryViewerBackendApiService', [
           _fetchStoryData(storyId, resolve, reject);
         });
       },
-
-      recordStoryNodeCompletion: function(storyId, nodeId) {
+      recordChapterCompletion: function(storyId, nodeId) {
         return $q(function(resolve, reject) {
-          _recordStoryNodeCompletion(storyId, nodeId, resolve, reject);
+          _recordChapterCompletion(storyId, nodeId, resolve, reject);
         });
       }
     };
