@@ -36,8 +36,6 @@ describe('Collection Creation backend service', function() {
       $provide.value(key, value);
     }
   }));
-  beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
   beforeEach(angular.mock.inject(function($injector) {
     CollectionCreationBackendService = $injector.get(
