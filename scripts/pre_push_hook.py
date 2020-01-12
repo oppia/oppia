@@ -366,19 +366,19 @@ def main(args=None):
         with ChangedBranch(branch):
             if not modified_files and not files_to_lint:
                 continue
-            if files_to_lint:
-                lint_status = start_linter(files_to_lint)
-                if lint_status != 0:
-                    python_utils.PRINT(
-                        'Push failed, please correct the linting issues above.')
-                    sys.exit(1)
-            frontend_status = 0
-            if does_diff_include_js_or_ts_files(files_to_lint):
-                frontend_status = start_python_script(FRONTEND_TEST_SCRIPT)
-            if frontend_status != 0:
-                python_utils.PRINT(
-                    'Push aborted due to failing frontend tests.')
-                sys.exit(1)
+            # if files_to_lint:
+                # lint_status = start_linter(files_to_lint)
+                # if lint_status != 0:
+                #     python_utils.PRINT(
+                #         'Push failed, please correct the linting issues above.')
+                #     sys.exit(1)
+            # frontend_status = 0
+            # if does_diff_include_js_or_ts_files(files_to_lint):
+            #     frontend_status = start_python_script(FRONTEND_TEST_SCRIPT)
+            # if frontend_status != 0:
+            #     python_utils.PRINT(
+            #         'Push aborted due to failing frontend tests.')
+            #     sys.exit(1)
     return
 
 
