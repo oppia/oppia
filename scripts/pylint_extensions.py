@@ -31,6 +31,13 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 sys.path.insert(0, _PYLINT_PATH)
 
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
+
+EXCLUDED_PHRASES = [
+    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+
+DATA_TYPES = ['int', 'str', 'float', 'bool']
+
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 import astroid  # isort:skip
@@ -1192,10 +1199,6 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         multi_line_indicator = b'"""'
         file_content = read_from_node(node)
         file_length = len(file_content)
-        allowed_terminating_punctuations = ['.', '?', '}', ']', ')']
-        excluded_phrases = [
-            'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
-        data_types = ['int', 'str', 'float', 'bool']
 
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()
@@ -1227,7 +1230,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             if line.startswith(b'#'):
                 # Check if comment contains any excluded phrase.
                 word_is_present_in_excluded_phrases = any(
-                    word in line for word in excluded_phrases)
+                    word in line for word in EXCLUDED_PHRASES)
 
                 # Check if variable name is used.
                 underscore_is_present = any('_' in word for word in line)
@@ -1239,7 +1242,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                 # Check that the comment ends with the proper
                 # punctuation.
                 last_char_is_invalid = line[-1] not in (
-                    allowed_terminating_punctuations)
+                    ALLOWED_TERMINATING_PUNCTUATIONS)
                 if last_char_is_invalid:
                     self.add_message(
                         'invalid-punctuation-used', line=line_num + 1)
@@ -1253,7 +1256,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
 
             # Check if comment contains version info or data type.
             if not previous_line.startswith(b'#'):
-                data_type_is_present = any(word in line for word in data_types)
+                data_type_is_present = any(word in line for word in DATA_TYPES)
                 if data_type_is_present or re.search(br'^# v[0-9]+ .*$', line):
                     continue
 
@@ -1310,16 +1313,10 @@ class DocstringChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
-        in_multi_line_comment = False
         is_docstring = False
         is_class_or_function = False
-        multi_line_indicator = b'"""'
         file_content = read_from_node(node)
         file_length = len(file_content)
-        allowed_terminating_punctuations = ['.', '?', '}', ']', ')']
-        excluded_phrases = [
-            'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
-        data_types = ['int', 'str', 'float', 'bool']
 
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()
@@ -1339,11 +1336,13 @@ class DocstringChecker(checkers.BaseChecker):
             # Check for space after """ in docstring.
             if re.search(br'^""".+$', line) and is_docstring and (
                     line[3] == b' '):
+                is_docstring = False
                 self.add_message(
                     'space-after-triple-quote', line=line_num + 1)
 
             # Check if single line docstring span two lines.
             if line == b'"""' and prev_line.startswith(b'"""') and is_docstring:
+                is_docstring = False
                 self.add_message(
                     'single-line-docstring-span-two-lines', line=line_num + 1)
 
@@ -1352,9 +1351,10 @@ class DocstringChecker(checkers.BaseChecker):
                 # Check for punctuation at line[-4] since last three
                 # characters are double quotes.
                 if (len(line) > 6) and (
-                        line[-4] not in allowed_terminating_punctuations):
+                        line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
                     self.add_message(
                         'no-period-used', line=line_num + 1)
+                is_docstring = False
 
             # Check for mutliline docstring.
             elif line.endswith(b'"""') and is_docstring:
@@ -1367,9 +1367,9 @@ class DocstringChecker(checkers.BaseChecker):
                     # Check for punctuation at the end of docstring.
                     else:
                         last_char_is_invalid = prev_line[-1] not in (
-                            allowed_terminating_punctuations)
+                            ALLOWED_TERMINATING_PUNCTUATIONS)
                         no_word_is_present_in_excluded_phrases = (not any(
-                            word in prev_line for word in excluded_phrases))
+                            word in prev_line for word in EXCLUDED_PHRASES))
                         if last_char_is_invalid and (
                                 no_word_is_present_in_excluded_phrases):
                             self.add_message(
@@ -1377,27 +1377,10 @@ class DocstringChecker(checkers.BaseChecker):
 
                 # Case 2: line contains some words before """. """
                 # should shift to next line.
-                elif not any(word in line for word in excluded_phrases):
+                elif not any(word in line for word in EXCLUDED_PHRASES):
                     self.add_message(
                         'no-newline-used-at-end', line=line_num + 1)
-
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multiline comment.
-            if in_multi_line_comment:
-                continue
-
+                is_docstring = False
 
 
 def register(linter):
