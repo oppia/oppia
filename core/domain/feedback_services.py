@@ -91,9 +91,7 @@ def create_thread(
     # to be made there as well.
     thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.put()
-    create_message(
-        thread_id, original_author_id, feedback_models.STATUS_CHOICES_OPEN,
-        subject, text)
+    create_message(thread_id, original_author_id, thread.status, subject, text)
     return thread_id
 
 
