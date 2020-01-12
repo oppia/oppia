@@ -116,11 +116,8 @@ def create_message(
         received_via_email: bool. Whether new message is received via email or
             web.
     """
+    # Fetch the test immediately to make sure thread_id is valid.
     thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
-    updated_status = (
-        None if thread.status == updated_status else updated_status)
-    updated_subject = (
-        None if thread.subject == updated_subject else updated_subject)
 
     # Create and populate a new message model.
     message_id = feedback_models.GeneralFeedbackMessageModel.get_message_count(
@@ -138,6 +135,10 @@ def create_message(
 
     # Update the thread model.
     thread_is_new = message_id == 0
+    updated_status = (
+        None if thread.status == updated_status else updated_status)
+    updated_subject = (
+        None if thread.subject == updated_subject else updated_subject)
     new_status, old_status = updated_status or thread.status, thread.status
     new_subject = updated_subject or thread.subject
     thread.message_count = message_id + 1
