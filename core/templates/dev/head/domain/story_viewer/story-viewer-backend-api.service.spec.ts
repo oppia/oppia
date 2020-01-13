@@ -74,32 +74,4 @@ describe('Story viewer backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
-
-  it('should successfully complete an existing story node', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'POST', '/story_node_completion_handler/0/1').respond(200);
-    StoryViewerBackendApiService.recordStoryNodeCompletion('0', '1').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should fail to complete a node when it does not exist', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'POST', '/story_node_completion_handler/0/1').respond(404);
-    StoryViewerBackendApiService.recordStoryNodeCompletion('0', '1').then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  });
 });

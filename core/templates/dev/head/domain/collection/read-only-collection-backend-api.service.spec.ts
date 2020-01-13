@@ -22,6 +22,8 @@ require('domain/collection/read-only-collection-backend-api.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 describe('Read only collection backend API service', function() {
   var ReadOnlyCollectionBackendApiService = null;
   var sampleDataResults = null;
@@ -31,7 +33,7 @@ describe('Read only collection backend API service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
-    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    'oppia', TranslatorProviderForTests));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
