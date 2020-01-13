@@ -1104,8 +1104,13 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # We now manually reset the user's first_contribution_msec to None.
         # This is to test that the one off job skips over the unpublished
         # exploration and does not reset the user's first_contribution_msec.
-        user_services._update_first_contribution_msec(  # pylint: disable=protected-access
-            self.owner_id, None)
+        user_models.UserSettingsModel(
+            id=self.owner_id,
+            gae_id='gae_id',
+            email='email@email.com',
+            username='username',
+            first_contribution_msec=None
+        ).put()
         rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
 
         # Test that first contribution time is not set for unpublished
