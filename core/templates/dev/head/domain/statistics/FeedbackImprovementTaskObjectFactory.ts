@@ -81,6 +81,11 @@ angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
       return this._actionButtons;
     };
 
+    /** @returns {number} - The time that the task was last updated. */
+    FeedbackImprovementTask.prototype.getLastUpdatedTime = function() {
+      return this._feedbackThread.last_updated;
+    };
+
     return {
       /**
        * @returns {FeedbackImprovementTask}

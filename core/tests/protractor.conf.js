@@ -1,7 +1,6 @@
 var HtmlScreenshotReporter = require('protractor-jasmine2-screenshot-reporter');
-var glob = require('glob');
-var path = require('path');
-var failFast = require('protractor-fail-fast');
+var glob = require('glob')
+var path = require('path')
 
 var suites = {
     // The tests on Travis are run individually to parallelize
@@ -28,6 +27,14 @@ var suites = {
 
     adminPage: [
       'protractor_desktop/adminTabFeatures.js'
+    ],
+
+    classroomPage: [
+      'protractor_desktop/classroomPage.js'
+    ],
+
+    classroomPageFileUploadFeatures: [
+      'protractor_desktop/classroomPageFileUploadFeatures.js'
     ],
 
     collections: [
@@ -116,6 +123,10 @@ var suites = {
 
     topicAndStoryEditor: [
       'protractor_desktop/topicAndStoryEditor.js'
+    ],
+
+    topicAndStoryEditorFileUploadFeatures: [
+      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
     ],
 
     topicsAndSkillsDashboard: [
@@ -339,15 +350,6 @@ exports.config = {
     tags: '@dev',
     // How to format features (default: progress)
     format: 'summary'
-  },
-
-  plugins: [
-    failFast.init()
-  ],
-
-  afterLaunch: function() {
-    // Removes the fail file once all test runners have completed.
-    failFast.clean();
   },
 
   // ----- The cleanup step -----

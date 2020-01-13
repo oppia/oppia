@@ -42,6 +42,8 @@ angular.module('oppia').factory('ExplorationRecommendationsService', [
           stringified_author_recommended_ids: JSON.stringify(
             authorRecommendedExpIds),
           collection_id: UrlService.getCollectionIdFromExplorationUrl(),
+          story_id: UrlService.getUrlParams().story_id,
+          current_node_id: UrlService.getUrlParams().node_id,
           include_system_recommendations: null
         };
 
