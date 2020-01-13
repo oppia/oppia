@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for story viewer domain.
+ * @fileoverview File to import necessary scripts for get_started page.
  */
 
-export class StoryViewerDomainConstants {
-  public static STORY_DATA_URL_TEMPLATE = '/story_data_handler/<story_id>';
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/pending-account-deletion-page/' +
+        'pending-account-deletion-page.module.ts');
+require('App.ts');
 
-  public static STORY_PROGRESS_URL_TEMPLATE =
-    '/story_progress_handler/<story_id>/<node_id>';
-}
+require('base-components/base-content.directive.ts');
+require('components/common-layout-directives/common-elements/' +
+        'background-banner.directive.ts');
