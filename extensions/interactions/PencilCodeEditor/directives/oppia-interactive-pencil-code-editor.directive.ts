@@ -76,6 +76,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             }).result.then(function() {
               pce.setCode(ctrl.initialCode);
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });

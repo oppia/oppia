@@ -155,6 +155,7 @@ angular.module('oppia').directive('skillsList', [
                 }
               }
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
@@ -198,6 +199,7 @@ angular.module('oppia').directive('skillsList', [
                 }, 100);
               });
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });

@@ -222,6 +222,7 @@ describe('Static Pages Tour', function() {
       expect(element(
         by.css('.protractor-test-error-page')).isPresent()).toBe(true);
     }, function() {
+      // Note to developers:
       // Promise is returned by getCurrentUrl which is handled here.
       // No further action is needed.
     });

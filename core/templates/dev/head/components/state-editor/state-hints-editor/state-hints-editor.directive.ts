@@ -169,6 +169,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
@@ -208,6 +209,7 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
@@ -253,6 +255,7 @@ angular.module('oppia').directive('stateHintsEditor', [
                 StateHintsService.setActiveHintIndex(null);
               }
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });

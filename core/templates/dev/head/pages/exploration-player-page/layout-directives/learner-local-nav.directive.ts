@@ -132,10 +132,12 @@ angular.module('oppia').directive('learnerLocalNav', [
                   }
                 ]
               }).result.then(function() {}, function() {
+                // Note to developers:
                 // This callback is triggered when the Cancel button is
                 // clicked. No further action is needed.
               });
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });

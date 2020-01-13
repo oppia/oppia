@@ -70,6 +70,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
                 ExplorationStatesService.saveRecordedVoiceovers(
                   stateName, recordedVoiceovers);
               }, function() {
+                // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
               });

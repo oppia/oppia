@@ -498,6 +498,7 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
               ctrl.value.labeledRegions = [];
               ctrl.initializeEditor();
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });

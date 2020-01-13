@@ -85,6 +85,7 @@ var _getExplorationId = function(currentUrlPrefix) {
           currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
         return callbackFunction(explorationId);
       }, function() {
+        // Note to developers:
         // Promise is returned by getCurrentUrl which is handled here.
         // No further action is needed.
       });

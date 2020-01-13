@@ -166,6 +166,7 @@ angular.module('oppia').directive('answerGroupEditor', [
               _getTaggedMisconceptionName(
                 misconceptionSkillId + '-' + misconception.getId());
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });

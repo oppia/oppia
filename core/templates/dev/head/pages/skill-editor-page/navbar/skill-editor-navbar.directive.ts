@@ -85,6 +85,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
                   }
                 ]
               }).result.then(null, function() {
+                // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.
                 // No further action is needed.
               });
@@ -135,6 +136,7 @@ angular.module('oppia').directive('skillEditorNavbar', [
               SkillEditorStateService.saveSkill(commitMessage);
               AlertsService.addSuccessMessage('Changes Saved.');
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });

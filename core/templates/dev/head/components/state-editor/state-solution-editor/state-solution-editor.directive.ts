@@ -250,6 +250,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
                 }
               }
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
@@ -283,6 +284,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
               $scope.onSaveSolution(StateSolutionService.displayed);
               StateEditorService.deleteCurrentSolutionValidity();
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });

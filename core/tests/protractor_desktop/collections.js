@@ -113,6 +113,7 @@ describe('Collections', function() {
         // in the url a # is added at the end that is not part of collection ID
         collectionId = pathname[5].slice(0, -1);
       }, function() {
+        // Note to developers:
         // Promise is returned by getCurrentUrl which is handled here.
         // No further action is needed.
       });

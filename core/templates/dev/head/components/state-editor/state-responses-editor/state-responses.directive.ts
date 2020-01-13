@@ -379,6 +379,7 @@ angular.module('oppia').directive('stateResponses', [
                 $scope.openAddAnswerGroupModal();
               }
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
@@ -415,6 +416,7 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.refreshWarnings()();
                 });
             }, function() {
+              // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
             });
