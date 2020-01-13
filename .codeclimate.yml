@@ -22,10 +22,6 @@ checks:
     enabled: false
 
 plugins:
-  # pylint:
-  #   enabled: true
-  #   channel: "beta"
-  # 
   eslint:
     enabled: true
     channel: "eslint-6"
@@ -400,4 +396,3 @@ exclude_patterns:
 - "core/tests/services_sources/*"
 - "core/tests/release_sources/tmp_unzip.zip"
 - "core/tests/release_sources/tmp_unzip.tar.gz"
-- "ubuntu_dockerfile"

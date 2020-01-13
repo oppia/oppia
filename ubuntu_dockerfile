@@ -34,9 +34,9 @@
 #
 # STEP 1
 # Download Docker Desktop for Windows.
-# Windows Enterprise and Pro: 
+# Windows Enterprise and Pro:
 #   https://hub.docker.com/editions/community/docker-ce-desktop-windows
-# Windows 10 Home: 
+# Windows 10 Home:
 #   https://docs.docker.com/toolbox/toolbox_install_windows/
 #
 # STEP 2
@@ -61,7 +61,7 @@
 # STEP 4
 # Create a Docker container using the Docker image:
 #
-#   docker run -u 0 -it -p 8181:8181 --name {container_name} 
+#   docker run -u 0 -it -p 8181:8181 --name {container_name}
 #   -v {path_to_oppia_parent_dir}:/home {image_name}:latest bash
 #      where you should replace {container_name} with whatever you want to
 #      call your Docker container (say oppia_container),
@@ -156,7 +156,7 @@
 
 FROM ubuntu:latest
 
-# To bypass tzdata configuration. 
+# To bypass tzdata configuration.
 ENV DEBIAN_FRONTEND noninteractive
 ENV TZ "UTC"
 

@@ -695,7 +695,11 @@ def _lint_all_files(
         Stylelint outputs.
     """
 
-    python_utils.PRINT('Starting Js, Ts, Python, HTML, and CSS linter...')
+    if CIRCLECI_ENV:
+        python_utils.PRINT('Starting Python linter...')
+    else:
+        python_utils.PRINT(
+            'Starting Js, Ts, Python, HTML, and CSS linter...')
 
     pylintrc_path = os.path.join(os.getcwd(), '.pylintrc')
 
@@ -727,34 +731,35 @@ def _lint_all_files(
 
     linting_processes = []
 
-    js_and_ts_result = multiprocessing.Queue()
+    if not CIRCLECI_ENV:
+        js_and_ts_result = multiprocessing.Queue()
 
-    linting_processes.append(multiprocessing.Process(
-        target=_lint_js_and_ts_files, args=(
-            node_path, eslint_path, js_and_ts_files_to_lint,
-            js_and_ts_result, verbose_mode_enabled)))
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_js_and_ts_files, args=(
+                node_path, eslint_path, js_and_ts_files_to_lint,
+                js_and_ts_result, verbose_mode_enabled)))
 
-    css_in_html_result = multiprocessing.Queue()
-    css_in_html_stdout = multiprocessing.Queue()
+        css_in_html_result = multiprocessing.Queue()
+        css_in_html_stdout = multiprocessing.Queue()
 
-    linting_processes.append(multiprocessing.Process(
-        target=_lint_css_files, args=(
-            node_path,
-            stylelint_path,
-            config_path_for_css_in_html,
-            html_filepaths, css_in_html_stdout,
-            css_in_html_result, verbose_mode_enabled)))
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_css_files, args=(
+                node_path,
+                stylelint_path,
+                config_path_for_css_in_html,
+                html_filepaths, css_in_html_stdout,
+                css_in_html_result, verbose_mode_enabled)))
 
-    css_result = multiprocessing.Queue()
-    css_stdout = multiprocessing.Queue()
+        css_result = multiprocessing.Queue()
+        css_stdout = multiprocessing.Queue()
 
-    linting_processes.append(multiprocessing.Process(
-        target=_lint_css_files, args=(
-            node_path,
-            stylelint_path,
-            config_path_for_oppia_css,
-            css_filepaths, css_stdout,
-            css_result, verbose_mode_enabled)))
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_css_files, args=(
+                node_path,
+                stylelint_path,
+                config_path_for_oppia_css,
+                css_filepaths, css_stdout,
+                css_result, verbose_mode_enabled)))
 
     py_result = multiprocessing.Queue()
 
@@ -776,14 +781,20 @@ def _lint_all_files(
         process.daemon = False
         process.start()
 
-    result_queues = [
-        js_and_ts_result, css_in_html_result, css_result, py_result,
-        py_result_for_python3_compatibility
-    ]
+    if CIRCLECI_ENV:
+        result_queues = [py_result, py_result_for_python3_compatibility]
+    else:
+        result_queues = [
+            js_and_ts_result, css_in_html_result, css_result, py_result,
+            py_result_for_python3_compatibility
+        ]
 
-    stdout_queus = [
-        css_in_html_stdout, css_stdout
-    ]
+    if not CIRCLECI_ENV:
+        stdout_queus = [
+            css_in_html_stdout, css_stdout
+        ]
+    else:
+        stdout_queus = []
     return linting_processes, result_queues, stdout_queus
 
 
