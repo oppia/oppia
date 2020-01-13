@@ -35,6 +35,7 @@ from . import setup
 
 RELEASE_TEST_DIR = os.path.join('core', 'tests', 'release_sources', '')
 MOCK_TMP_UNTAR_PATH = os.path.join(RELEASE_TEST_DIR, 'tmp_unzip.tar.gz')
+MOCK_YARN_PATH = os.path.join(RELEASE_TEST_DIR, 'yarn-' + common.YARN_VERSION)
 
 
 class MockCD(python_utils.OBJECT):
@@ -225,6 +226,16 @@ class SetupTests(test_utils.GenericTestBase):
             with remove_swap:
                 setup.download_and_install_package('url', 'filename')
         self.assertEqual(check_function_calls, expected_check_function_calls)
+
+    def test_rename_folder(self):
+        # Creates a dummy yarn folder and then checks if `v` was removed
+        # upon function call.
+        os.mkdir(MOCK_YARN_PATH)
+        setup.rename_folder('yarn-' + common.YARN_VERSION, RELEASE_TEST_DIR)
+        target = os.path.join(
+            RELEASE_TEST_DIR, 'yarn-' + common.YARN_VERSION[1:])
+        self.assertTrue(os.path.exists(target))
+        os.rmdir(target)
 
     def test_invalid_dir(self):
         def mock_getcwd():

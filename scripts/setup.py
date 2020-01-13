@@ -82,14 +82,21 @@ def download_and_install_package(url_to_retrieve, filename):
     tar = tarfile.open(name=filename)
     tar.extractall(path=common.OPPIA_TOOLS_DIR)
     tar.close()
+    rename_folder(filename, common.OPPIA_TOOLS_DIR)
+    os.remove(filename)
 
-    # Removing the `v` from the yarn folder name.
+
+def rename_folder(filename, path):
+    """Removes the `v` from the yarn folder name.
+
+    Args:
+        filename: string. The name of the tar file.
+        path: string. The path of the yarn file.
+    """
     if 'yarn' in filename:
-        path = common.OPPIA_TOOLS_DIR
         old_name = filename.split('.tar.gz')[0]
         new_name = ''.join(old_name.split('v'))
         os.rename(path + '/' + old_name, path + '/' + new_name)
-    os.remove(filename)
 
 
 def download_and_install_node():
