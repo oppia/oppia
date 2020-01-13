@@ -17,7 +17,7 @@
         font-size: 3em;
         margin-top: 0;
         margin-bottom: 25px;
-        padding-top: 66.5px;
+        padding-top: 30px;
         text-align: center;
       }
       .oppia-story-viewer-container .oppia-story-description {
@@ -38,7 +38,6 @@
       .oppia-story-table {
         margin: 0 auto;
         max-width: 90%;
-        padding: 50px 20px 420px 20px;
         position: relative;
         text-align: left;
         top: 35px;
@@ -76,6 +75,12 @@
         left: 50%;
         transform: translate(-50%, -50%);
         width: 100px;
+      }
+
+      @media (min-width: 768px) {
+        .oppia-story-description {
+          padding-bottom: 4vh;
+        }
       }
 
       @media only screen and (max-width: 998px) {

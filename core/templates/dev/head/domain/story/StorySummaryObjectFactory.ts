@@ -17,44 +17,55 @@
  * story summary domain objects.
  */
 
-angular.module('oppia').factory('StorySummaryObjectFactory', [function() {
-  var StorySummary = function(id, title, nodeCount, storyIsPublished) {
-    this._id = id;
-    this._title = title;
-    this._nodeCount = nodeCount;
-    this._storyIsPublished = storyIsPublished;
-  };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-  // Instance methods
+export class StorySummary {
+  constructor(
+    private _id: string,
+    private _title: string,
+    private _nodeCount: number,
+    private _storyIsPublished: boolean
+  ) {}
 
-  StorySummary.prototype.getId = function() {
+  getId(): string {
     return this._id;
-  };
+  }
 
-  StorySummary.prototype.getTitle = function() {
+  getTitle(): string {
     return this._title;
-  };
+  }
 
-  StorySummary.prototype.getNodeCount = function() {
+  getNodeCount(): number {
     return this._nodeCount;
-  };
+  }
 
-  StorySummary.prototype.isStoryPublished = function() {
+  isStoryPublished(): boolean {
     return this._storyIsPublished;
-  };
+  }
+}
 
-
-  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  StorySummary['createFromBackendDict'] = function(storySummaryBackendDict) {
-  /* eslint-enable dot-notation */
+@Injectable({
+  providedIn: 'root'
+})
+export class StorySummaryObjectFactory {
+  createFromBackendDict(storySummaryBackendDict: {
+    id: string;
+    title: string;
+    // eslint-disable-next-line camelcase
+    node_count: number;
+    // eslint-disable-next-line camelcase
+    story_is_published: boolean;
+  }): StorySummary {
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
       storySummaryBackendDict.node_count,
       storySummaryBackendDict.story_is_published
     );
-  };
+  }
+}
 
-  return StorySummary;
-}]);
+angular.module('oppia').factory(
+  'StorySummaryObjectFactory', downgradeInjectable(StorySummaryObjectFactory)
+);

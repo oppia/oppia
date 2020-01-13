@@ -55,8 +55,8 @@ angular.module('oppia').directive('rubricsEditor', [
             $scope, $filter, $uibModal, $rootScope, ContextService,
             RubricObjectFactory, EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT) {
           var ctrl = this;
-          ctrl.activeRubricIndex = 0;
           ctrl.explanationEditorIsOpen = [false, false, false];
+          ctrl.editableExplanation = [null, null, null];
 
           var explanationMemento = [null, null, null];
 
@@ -68,15 +68,11 @@ angular.module('oppia').directive('rubricsEditor', [
             return explanation === '<p></p>' || explanation === '';
           };
 
-          ctrl.setActiveDifficultyIndex = function(index) {
-            ctrl.activeRubricIndex = index;
-          };
 
           ctrl.openExplanationEditor = function(index) {
-            ctrl.setActiveDifficultyIndex(index);
             explanationMemento[index] = angular.copy(
-              ctrl.getRubrics()[ctrl.activeRubricIndex].getExplanation());
-            ctrl.editableExplanation = explanationMemento[index];
+              ctrl.getRubrics()[index].getExplanation());
+            ctrl.editableExplanation[index] = explanationMemento[index];
             ctrl.explanationEditorIsOpen[index] = true;
           };
 
@@ -86,22 +82,22 @@ angular.module('oppia').directive('rubricsEditor', [
           };
 
           ctrl.saveExplanation = function(index) {
-            ctrl.explanationEditorIsOpen[ctrl.activeRubricIndex] = false;
+            ctrl.explanationEditorIsOpen[index] = false;
             var explanationHasChanged = (
-              ctrl.editableExplanation !==
-              ctrl.getRubrics()[ctrl.activeRubricIndex].getExplanation());
+              ctrl.editableExplanation[index] !==
+              ctrl.getRubrics()[index].getExplanation());
 
             if (explanationHasChanged) {
               ctrl.onSaveRubric(
-                ctrl.getRubrics()[ctrl.activeRubricIndex].getDifficulty(),
-                ctrl.editableExplanation);
-              explanationMemento[index] = ctrl.editableExplanation;
+                ctrl.getRubrics()[index].getDifficulty(),
+                ctrl.editableExplanation[index]);
+              explanationMemento[index] = ctrl.editableExplanation[index];
             }
           };
 
           ctrl.cancelEditExplanation = function(index) {
-            ctrl.editableExplanation = explanationMemento[index];
-            ctrl.explanationEditorIsOpen[ctrl.activeRubricIndex] = false;
+            ctrl.editableExplanation[index] = explanationMemento[index];
+            ctrl.explanationEditorIsOpen[index] = false;
           };
         }]
     };
