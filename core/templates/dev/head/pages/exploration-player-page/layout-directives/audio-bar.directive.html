@@ -27,7 +27,7 @@
               ng-change="onNewLanguageSelected()">
       </select>
     </div>
-    <button type="button" class="restart-button">Restart</button>
+   <button type="button" class="restart-button" ng-click="onPlayButtonClicked()">Restart</button>
     <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fas fa-sort-up"></i></div>
   </div>
   <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()"><span class="audio-expand-button-text" translate="I18N_PLAYER_AUDIO_EXPAND_TEXT"></span> <i class="audio-expand-icon fas fa-sort-down"></i></div>
