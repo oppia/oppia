@@ -149,9 +149,12 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             story_id, admin_id, 'Title', 'Description', 'Notes',
             topic_id)
         self.save_new_topic(
-            topic_id, admin_id, 'Name', 'abbrev', None,
-            'Description', [story_id], [], [], [subtopic], 2)
-        self.save_new_skill(skill_id, admin_id, 'Description')
+            topic_id, admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[story_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
+        self.save_new_skill(skill_id, admin_id, description='Description')
 
         # Page context: Exploration.
         self.login(self.EDITOR_EMAIL)

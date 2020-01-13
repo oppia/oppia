@@ -18,7 +18,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -73,7 +72,8 @@ class ContributionOpportunitiesHandlerTest(test_utils.GenericTestBase):
         self.skill_id_1 = 'skill_id_1'
         self.skill_ids = [self.skill_id_0, self.skill_id_1]
         for skill_id in self.skill_ids:
-            self.save_new_skill(skill_id, self.admin_id, 'skill_description')
+            self.save_new_skill(
+                skill_id, self.admin_id, description='skill_description')
             topic_services.add_uncategorized_skill(
                 self.admin_id, '0', skill_id)
 

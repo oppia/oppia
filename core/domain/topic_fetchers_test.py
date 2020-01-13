@@ -49,11 +49,13 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1
         })]
         self.save_new_topic(
-            self.TOPIC_ID, self.user_id, 'Name', 'abbrev',
-            'img.png', 'Description',
-            [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id_1, self.skill_id_2], [], 1
-        )
+            self.TOPIC_ID, self.user_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename='img.png',
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         self.save_new_story(
             self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
             self.TOPIC_ID)
@@ -149,8 +151,11 @@ class TopicFetchersUnitTests(test_utils.GenericTestBase):
     def test_get_topic_by_version(self):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.user_id, 'topic name',
-            'abbrev', 'img.png', 'Description', [], [], [], [], 1)
+            topic_id, self.user_id, name='topic name',
+            abbreviated_name='abbrev', thumbnail_filename='img.png',
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,

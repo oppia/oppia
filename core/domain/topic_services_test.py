@@ -54,10 +54,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1
         })]
         self.save_new_topic(
-            self.TOPIC_ID, self.user_id, 'Name', 'abbrev', None, 'Description',
-            [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id_1, self.skill_id_2], [], 1
-        )
+            self.TOPIC_ID, self.user_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         self.save_new_story(
             self.story_id_1, self.user_id, 'Title', 'Description', 'Notes',
             self.TOPIC_ID)
@@ -226,9 +229,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'Moved skill to subtopic.')
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.user_id, 'Name 2', 'abbrev', None, 'Description',
-            [], [], [self.skill_id_1, 'skill_3'], [], 1
-        )
+            topic_id, self.user_id, name='Name 2',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description',
+            canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id_1, 'skill_3'],
+            subtopics=[], next_subtopic_id=1)
         self.assertEqual(
             topic_services.get_all_skill_ids_assigned_to_some_topic(),
             set([self.skill_id_1, self.skill_id_2, 'skill_3']))
@@ -1042,8 +1049,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Topic with name \'Name\' already exists'):
             self.save_new_topic(
-                'topic_2', self.user_id, 'Name', 'abbrev', None,
-                'Description 2', [], [], [], [], 1)
+                'topic_2', self.user_id, name='Name',
+                abbreviated_name='abbrev', thumbnail_filename=None,
+                description='Description 2', canonical_story_ids=[],
+                additional_story_ids=[], uncategorized_skill_ids=[],
+                subtopics=[], next_subtopic_id=1)
 
     def test_update_topic_language_code(self):
         topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
@@ -1148,11 +1158,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
-            'topic_2', self.user_id, 'Name 2', 'abbrev', None, 'Description 2',
-            [], [], [], [], 1)
+            'topic_2', self.user_id, name='Name 2',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description 2', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         self.save_new_topic(
-            'topic_3', self.user_id, 'Name 3', 'abbrev', None, 'Description 3',
-            [], [], [], [], 1)
+            'topic_3', self.user_id, name='Name 3',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description 3', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
         topic_services.assign_role(
             self.user_admin, self.user_a,

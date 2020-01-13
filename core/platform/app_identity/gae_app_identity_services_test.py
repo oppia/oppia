@@ -24,6 +24,7 @@ from core.tests import test_utils
 
 from google.appengine.api import app_identity
 
+
 class GaeAppIdentityServicesTests(test_utils.GenericTestBase):
 
     def setUp(self):

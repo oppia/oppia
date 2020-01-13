@@ -1099,7 +1099,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
     def test_save_and_retrieve_collection(self):
         collection = self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id)
-        collection_services._save_collection(
+        collection_services._save_collection(  # pylint: disable=protected-access
             self.owner_id, collection, '',
             _get_collection_change_list('title', ''))
 
@@ -1112,7 +1112,7 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
     def test_save_and_retrieve_collection_summary(self):
         collection = self.save_new_valid_collection(
             self.COLLECTION_0_ID, self.owner_id)
-        collection_services._save_collection(
+        collection_services._save_collection(  # pylint: disable=protected-access
             self.owner_id, collection, '',
             _get_collection_change_list('title', ''))
 
@@ -1485,9 +1485,10 @@ class CommitMessageHandlingTests(CollectionServicesUnitTests):
             'received none.'
             ):
             collection_services.update_collection(
-                self.owner_id, self.COLLECTION_0_ID, _get_collection_change_list(
-                    collection_domain.COLLECTION_PROPERTY_TITLE,
-                    'New Title'), '')
+                self.owner_id, self.COLLECTION_0_ID,
+                _get_collection_change_list(
+                    collection_domain.COLLECTION_PROPERTY_TITLE, 'New Title'),
+                '')
 
     def test_unpublished_collections_can_accept_commit_message(self):
         """Test unpublished collections can accept optional commit messages."""
@@ -1602,7 +1603,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
         # Using the old version of the collection should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
-            collection_services._save_collection(
+            collection_services._save_collection(  # pylint: disable=protected-access
                 second_committer_id, v1_collection, '',
                 _get_collection_change_list('title', ''))
 
@@ -1655,7 +1656,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
             self.COLLECTION_0_ID, self.owner_id)
 
         collection.title = 'First title'
-        collection_services._save_collection(
+        collection_services._save_collection(  # pylint: disable=protected-access
             self.owner_id, collection, 'Changed title.',
             _get_collection_change_list('title', 'First title'))
         commit_dict_2 = {
@@ -1673,7 +1674,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
         collection.add_node(
             self.save_new_valid_exploration(
                 'new_exploration_id', self.owner_id).id)
-        collection_services._save_collection(
+        collection_services._save_collection(  # pylint: disable=protected-access
             'committer_id_2', collection, 'Added new exploration',
             _get_added_exploration_change_list('new_exploration_id'))
 
@@ -1703,7 +1704,7 @@ class CollectionSnapshotUnitTests(CollectionServicesUnitTests):
 
         # Now delete the newly added exploration.
         collection.delete_node('new_exploration_id')
-        collection_services._save_collection(
+        collection_services._save_collection(  # pylint: disable=protected-access
             'committer_id_3', collection, 'Deleted exploration',
             _get_deleted_exploration_change_list('new_exploration_id'))
 

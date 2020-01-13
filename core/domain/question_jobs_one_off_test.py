@@ -45,7 +45,8 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
         self.skill_id = 'skill_id'
-        self.save_new_skill(self.skill_id, self.albert_id, 'Skill Description')
+        self.save_new_skill(
+            self.skill_id, self.albert_id, description='Skill Description')
 
         self.question = self.save_new_question(
             self.QUESTION_ID, self.albert_id,

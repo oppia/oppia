@@ -18,7 +18,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
-from constants import constants
 from core import jobs
 from core.platform import models
 import feconf
@@ -434,7 +433,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             if user_id is None:
                 yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
             elif (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_id_and_user_id_exist(model.id, user_id)):
+                  ._check_id_and_user_id_exist(model.id, user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
@@ -450,7 +449,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
             if user_id is None:
                 yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
             elif (ModelsUserIdsHaveUserSettingsVerificationJob
-                    ._does_user_settings_model_exist(user_id)):
+                  ._does_user_settings_model_exist(user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)

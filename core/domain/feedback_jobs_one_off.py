@@ -18,7 +18,6 @@ from __future__ import unicode_literals # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import feedback_services
-from core.domain import user_services
 from core.platform import models
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])

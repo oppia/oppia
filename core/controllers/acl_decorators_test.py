@@ -1859,8 +1859,11 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.save_new_topic(
-            self.topic_id, self.viewer_id, 'Name', 'abbrev', None,
-            'Description', [], [], [], [], 1)
+            self.topic_id, self.viewer_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         topic_services.assign_role(
             self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
@@ -1926,8 +1929,11 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
-            'Description', [self.story_id], [], [], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[self.story_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_can_not_edit_story_with_invalid_story_id(self):
@@ -2015,8 +2021,11 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.save_new_topic(
-            self.topic_id, self.viewer_id, 'Name', 'abbrev', None,
-            'Description', [], [], [], [], 1)
+            self.topic_id, self.viewer_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         topic_services.assign_role(
             self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
@@ -2099,8 +2108,11 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
-            'Description', [self.story_id], [], [], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[self.story_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
     def test_cannot_access_non_existent_story(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2807,8 +2819,11 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.admin_id, 'Name', 'abbrev', None,
-            'Description', [], [], [], [], 1)
+            topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_TOPIC, topic_id))
@@ -2819,7 +2834,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     def test_can_edit_skill(self):
         self.login(self.ADMIN_EMAIL)
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.admin_id, 'Description')
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_SKILL, skill_id))
@@ -2835,8 +2850,11 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             story_id, self.admin_id, 'Title', 'Description', 'Notes',
             topic_id)
         self.save_new_topic(
-            topic_id, self.admin_id, 'Name', 'abbrev', None,
-            'Description', [story_id], [], [], [], 1)
+            topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[story_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_STORY, story_id))

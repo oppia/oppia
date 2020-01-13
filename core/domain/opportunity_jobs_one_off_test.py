@@ -373,8 +373,10 @@ class SkillOpportunityModelRegenerationJobTest(test_utils.GenericTestBase):
         self.skill_id_2 = 'skill_2'
         self.skill_desc_2 = 'skill 2'
 
-        self.save_new_skill(self.skill_id_1, self.admin_id, self.skill_desc_1)
-        self.save_new_skill(self.skill_id_2, self.admin_id, self.skill_desc_2)
+        self.save_new_skill(
+            self.skill_id_1, self.admin_id, description=self.skill_desc_1)
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, description=self.skill_desc_2)
 
     def test_regeneration_job_returns_the_initial_opportunity(self):
         skill_opp_model_regen_job_class = (

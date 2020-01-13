@@ -19,10 +19,8 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from constants import constants
-from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
-import python_utils
 
 (base_models, skill_models) = models.Registry.import_models(
     [models.NAMES.base_model, models.NAMES.skill])
@@ -37,7 +35,7 @@ class SkillModelUnitTest(test_utils.GenericTestBase):
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
     def test_has_reference_to_user_id(self):
-        self.save_new_skill('skill_id', 'owner_id', 'description')
+        self.save_new_skill('skill_id', 'owner_id', description='description')
         self.assertTrue(
             skill_models.SkillModel.has_reference_to_user_id('owner_id'))
         self.assertFalse(

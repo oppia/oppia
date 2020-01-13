@@ -55,7 +55,8 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
 
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
@@ -271,10 +272,11 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         """Completes the setup for QuestionSkillLinkHandlerTest."""
         super(QuestionSkillLinkHandlerTest, self).setUp()
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id_2, self.admin_id, 'Skill Description 2')
+            self.skill_id_2, self.admin_id, description='Skill Description 2')
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, self.editor_id,

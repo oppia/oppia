@@ -44,13 +44,18 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
 
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Description')
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id_2, self.admin_id, 'Description')
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, description='Description')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
-            'Description', [], [], [self.skill_id], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
 
     def delete_skill_model_and_memcache(self, user_id, skill_id):
         """Deletes skill model and memcache corresponding to the given skill

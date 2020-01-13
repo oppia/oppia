@@ -66,7 +66,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.user_admin_2 = user_services.UserActionsInfo(self.user_id_admin_2)
 
         self.skill = self.save_new_skill(
-            self.SKILL_ID, self.USER_ID, 'Description',
+            self.SKILL_ID, self.USER_ID, description='Description',
             misconceptions=misconceptions,
             skill_contents=skill_contents,
             prerequisite_skill_ids=['skill_id_1', 'skill_id_2'])
@@ -101,7 +101,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_descriptions_of_skills(self):
         self.save_new_skill(
-            'skill_id_1', self.user_id_admin, 'Description 1',
+            'skill_id_1', self.user_id_admin, description='Description 1',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
@@ -111,7 +111,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
-            'skill_id_2', self.user_id_admin, 'Description 2',
+            'skill_id_2', self.user_id_admin, description='Description 2',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
@@ -135,7 +135,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_rubrics_of_linked_skills(self):
         self.save_new_skill(
-            'skill_id_1', self.user_id_admin, 'Description 1',
+            'skill_id_1', self.user_id_admin, description='Description 1',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
@@ -145,7 +145,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
-            'skill_id_2', self.user_id_admin, 'Description 2',
+            'skill_id_2', self.user_id_admin, description='Description 2',
             misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
@@ -364,7 +364,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_multi_skills(self):
         self.save_new_skill(
-            'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
+            'skill_a', self.user_id_admin, description='Description A',
+            misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
@@ -373,7 +374,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
-            'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
+            'skill_b', self.user_id_admin, description='Description B',
+            misconceptions=[],
             skill_contents=skill_domain.SkillContents(
                 state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                     state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
