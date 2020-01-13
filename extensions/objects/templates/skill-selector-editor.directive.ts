@@ -46,10 +46,10 @@ angular.module('oppia').directive('skillSelectorEditor', [
               description: skillDescription
             };
           };
-          $scope.$on('$destroy', function() {
-            ContextService.removeCustomEntityContext();
-          });
           ctrl.$onInit = function() {
+            $scope.$on('$destroy', function() {
+              ContextService.removeCustomEntityContext();
+            });
             ctrl.skills = [];
             if (ctrl.value) {
               ContextService.setCustomEntityContext(

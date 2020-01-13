@@ -63,10 +63,10 @@ angular.module('oppia').directive('topicEditorPage', [
             PageTitleService.setPageTitle(
               TopicEditorStateService.getTopic().getName() + ' - Oppia');
           };
-          $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
           ctrl.$onInit = function() {
             TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+            $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
+            $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
           };
         }
       ]

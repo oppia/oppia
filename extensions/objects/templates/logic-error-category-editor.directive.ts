@@ -34,10 +34,10 @@ angular.module('oppia').directive('logicErrorCategoryEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        $scope.$watch('$ctrl.localValue.category', function() {
-          ctrl.value = ctrl.localValue.category.name;
-        });
         ctrl.$onInit = function() {
+          $scope.$watch('$ctrl.localValue.category', function() {
+            ctrl.value = ctrl.localValue.category.name;
+          });
           ctrl.alwaysEditable = true;
           ctrl.errorCategories = [{
             name: 'parsing',

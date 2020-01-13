@@ -349,16 +349,6 @@ angular.module('oppia').directive('filepathEditor', [
               ctrl.entityType, ctrl.entityId, encodedFilepath));
         };
 
-        /** Scope variables and functions (visibles to the view) */
-
-        // Reset the component each time the value changes
-        // (e.g. if this is part of an editable list).
-        $scope.$watch('$ctrl.value', function(newValue) {
-          if (newValue) {
-            ctrl.setSavedImageFilename(newValue, false);
-          }
-        });
-
         ctrl.resetFilePathEditor = function() {
           ctrl.data = {
             mode: MODE_EMPTY,
@@ -791,6 +781,15 @@ angular.module('oppia').directive('filepathEditor', [
           });
         };
         ctrl.$onInit = function() {
+          /** Scope variables and functions (visibles to the view) */
+
+          // Reset the component each time the value changes
+          // (e.g. if this is part of an editable list).
+          $scope.$watch('$ctrl.value', function(newValue) {
+            if (newValue) {
+              ctrl.setSavedImageFilename(newValue, false);
+            }
+          });
           // This variable holds information about the image upload flow.
           // It's always guaranteed to have the 'mode' and 'metadata'
           // properties.

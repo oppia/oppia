@@ -150,18 +150,6 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             });
           };
 
-          $scope.$on('focusOn', function(e, name) {
-            if (!labelForFocusTarget) {
-              return;
-            }
-
-            if (name === labelForFocusTarget) {
-              guppyInstance.activate();
-            } else if (name === LABEL_FOR_CLEARING_FOCUS) {
-              guppyInstance.deactivate();
-            }
-          });
-
           ctrl.isCurrentAnswerValid = function() {
             var latexAnswer = guppyInstance.latex();
             try {
@@ -226,6 +214,17 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             guppyInstance.render();
             CurrentInteractionService.registerCurrentInteraction(
               ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
+            $scope.$on('focusOn', function(e, name) {
+              if (!labelForFocusTarget) {
+                return;
+              }
+
+              if (name === labelForFocusTarget) {
+                guppyInstance.activate();
+              } else if (name === LABEL_FOR_CLEARING_FOCUS) {
+                guppyInstance.deactivate();
+              }
+            });
           };
         }
       ]

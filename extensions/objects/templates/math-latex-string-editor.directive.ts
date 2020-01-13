@@ -39,22 +39,22 @@ angular.module('oppia').directive('mathLatexStringEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        // Reset the component each time the value changes (e.g. if this is part
-        // of an editable list).
-        $scope.$watch('$ctrl.value', function() {
-          ctrl.localValue = {
-            label: ctrl.value || ''
-          };
-        }, true);
-        $scope.$on('externalSave', function() {
-          if (ctrl.active) {
-            ctrl.replaceValue(ctrl.localValue.label);
-            // The $scope.$apply() call is needed to propagate the replaced
-            // value.
-            $scope.$apply();
-          }
-        });
         ctrl.$onInit = function() {
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
+          $scope.$watch('$ctrl.value', function() {
+            ctrl.localValue = {
+              label: ctrl.value || ''
+            };
+          }, true);
+          $scope.$on('externalSave', function() {
+            if (ctrl.active) {
+              ctrl.replaceValue(ctrl.localValue.label);
+              // The $scope.$apply() call is needed to propagate the replaced
+              // value.
+              $scope.$apply();
+            }
+          });
           ctrl.placeholderText = '\\frac{x}{y}';
           ctrl.alwaysEditable = ctrl.getAlwaysEditable();
 

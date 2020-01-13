@@ -23,24 +23,23 @@ angular.module('oppia').directive('coordTwoDimEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        $scope.$on('leafletDirectiveMap.coordTwoDimEditor.click',
-          function(evt, args) {
-            var newLat = args.leafletEvent.latlng.lat;
-            var newLng = args.leafletEvent.latlng.lng;
-            ctrl.value = [newLat, newLng];
-            updateMarker(newLat, newLng);
-          });
-
-        $scope.$on('leafletDirectiveMarker.coordTwoDimEditor.dragend',
-          function(evt, args) {
-            ctrl.value = [args.model.lat, args.model.lng];
-          });
-
         var updateMarker = function(lat, lng) {
           ctrl.mapMarkers.mainMarker.lat = lat;
           ctrl.mapMarkers.mainMarker.lng = lng;
         };
         ctrl.$onInit = function() {
+          $scope.$on('leafletDirectiveMap.coordTwoDimEditor.click',
+            function(evt, args) {
+              var newLat = args.leafletEvent.latlng.lat;
+              var newLng = args.leafletEvent.latlng.lng;
+              ctrl.value = [newLat, newLng];
+              updateMarker(newLat, newLng);
+            });
+
+          $scope.$on('leafletDirectiveMarker.coordTwoDimEditor.dragend',
+            function(evt, args) {
+              ctrl.value = [args.model.lat, args.model.lng];
+            });
           ctrl.mapCenter = {
             lat: ctrl.value[0],
             lng: ctrl.value[1],

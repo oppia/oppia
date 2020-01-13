@@ -165,24 +165,6 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
               encodeURIComponent(imageUrl));
           };
 
-          // Called when the image is changed to calculate the required
-          // width and height, especially for large images.
-          $scope.$watch('$ctrl.value.imagePath', function(newVal) {
-            if (newVal !== '') {
-              // Loads the image in hanging <img> tag so as to get the
-              // width and height.
-              $('<img/>').attr('src', ctrl.getPreviewUrl(newVal)).on(
-                'load', function() {
-                  ctrl.originalImageWidth = (
-                    <HTMLCanvasElement><any> this).width;
-                  ctrl.originalImageHeight = (
-                    <HTMLCanvasElement><any> this).height;
-                  $scope.$apply();
-                }
-              );
-            }
-          });
-
           var hasDuplicates = function(originalArray) {
             var array = originalArray.slice(0).sort();
             for (var i = 1; i < array.length; i++) {
@@ -534,6 +516,23 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
             ctrl.value.labeledRegions.splice(index, 1);
           };
           ctrl.$onInit = function() {
+            // Called when the image is changed to calculate the required
+            // width and height, especially for large images.
+            $scope.$watch('$ctrl.value.imagePath', function(newVal) {
+              if (newVal !== '') {
+                // Loads the image in hanging <img> tag so as to get the
+                // width and height.
+                $('<img/>').attr('src', ctrl.getPreviewUrl(newVal)).on(
+                  'load', function() {
+                    ctrl.originalImageWidth = (
+                      <HTMLCanvasElement><any> this).width;
+                    ctrl.originalImageHeight = (
+                      <HTMLCanvasElement><any> this).height;
+                    $scope.$apply();
+                  }
+                );
+              }
+            });
             ctrl.alwaysEditable = true;
             // The initializeEditor function is written separately since it
             // is also called in resetEditor function.

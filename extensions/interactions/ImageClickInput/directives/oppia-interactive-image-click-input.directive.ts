@@ -93,12 +93,6 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             }
             return 'inline';
           };
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-            ctrl.lastAnswer = {
-              clickPosition: [ctrl.mouseX, ctrl.mouseY]
-            };
-          });
           ctrl.getDotLocation = function() {
             var image = $($element).find('.oppia-image-click-img');
             var dotLocation = {
@@ -138,6 +132,12 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
               answer, ImageClickInputRulesService);
           };
           ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
+              ctrl.lastAnswer = {
+                clickPosition: [ctrl.mouseX, ctrl.mouseY]
+              };
+            });
             ctrl.highlightRegionsOnHover =
               ($attrs.highlightRegionsOnHoverWithValue === 'true');
             ctrl.filepath = imageAndRegions.imagePath;

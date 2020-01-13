@@ -215,8 +215,8 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
               heading: 'Choose a Card to Translate',
               text: ('Then, choose a card from the exploration overview by ' +
               'clicking on the card. The selected card will have ' +
-              'a bolded border. Cards that have missing translations ' +
-              'are coloured yellow or red, and these are good places to start.'),
+              'a bolded border. Cards that have missing translations are ' +
+              'coloured yellow or red, and these are good places to start.'),
               placement: 'left'
             }, {
               type: 'function',
@@ -270,7 +270,8 @@ angular.module('oppia').directive('translationTab', ['UrlInterpolationService',
                 '  </li>' +
                 '</ol>' +
                 '<p>Alternatively, you can use the ' +
-                '<i class="material-icons" style="color:#009688" >&#xE2C6;</i>' +
+                '<i class="material-icons" style="color:#009688" >' +
+                '&#xE2C6;</i>' +
                 'button to <b>upload</b> audio files from your computer.</p>')
             }, {
               type: 'function',

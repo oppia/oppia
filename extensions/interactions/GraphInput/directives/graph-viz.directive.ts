@@ -64,9 +64,6 @@ angular.module('oppia').directive('graphViz', [
             DELETE: 3
           };
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.state.currentMode = null;
-          });
           // Styling functions
           var DELETE_COLOR = 'red';
           var HOVER_COLOR = 'aqua';
@@ -532,6 +529,9 @@ angular.module('oppia').directive('graphViz', [
             ctrl.state.selectedEdge = null;
           };
           ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.state.currentMode = null;
+            });
             // The current state of the UI and stuff like that.
             ctrl.state = {
               currentMode: _MODES.MOVE,

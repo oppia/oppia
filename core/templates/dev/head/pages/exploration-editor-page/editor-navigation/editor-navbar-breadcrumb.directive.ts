@@ -65,9 +65,11 @@ angular.module('oppia').directive('editorNavbarBreadcrumb', [
             $scope.$on('explorationPropertyChanged', function() {
               var _MAX_TITLE_LENGTH = 20;
               $scope.navbarTitle = ExplorationTitleService.savedMemento;
-              if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
+              if (
+                $scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
                 $scope.navbarTitle = (
-                  $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
+                  $scope.navbarTitle.substring(
+                    0, _MAX_TITLE_LENGTH - 3) + '...');
               }
             });
           };

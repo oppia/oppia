@@ -63,13 +63,16 @@ angular.module('oppia').directive('questionsTab', [
             QuestionUndoRedoService, UndoRedoService,
             NUM_QUESTIONS_PER_PAGE, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
-          $scope.getQuestionSummariesAsync =
-            QuestionsListService.getQuestionSummariesAsync;
-          $scope.getGroupedSkillSummaries =
-            TopicEditorStateService.getGroupedSkillSummaries;
-          $scope.isLastQuestionBatch =
-            QuestionsListService.isLastQuestionBatch;
-          $scope.selectedSkillId = null;
+          var ctrl = this;
+          $scope.getQuestionSummariesAsync = function() {
+            return QuestionsListService.getQuestionSummariesAsync();
+          };
+          $scope.getGroupedSkillSummaries = function() {
+            return TopicEditorStateService.getGroupedSkillSummaries();
+          };
+          $scope.isLastQuestionBatch = function() {
+            return QuestionsListService.isLastQuestionBatch();
+          };
           var _initTab = function() {
             $scope.question = null;
             $scope.skillId = null;
@@ -99,9 +102,12 @@ angular.module('oppia').directive('questionsTab', [
               [skillId], true, true
             );
           };
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _initTab);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initTab);
-          _initTab();
+          ctrl.$onInit = function() {
+            $scope.selectedSkillId = null;
+            $scope.$on(EVENT_TOPIC_INITIALIZED, _initTab);
+            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initTab);
+            _initTab();
+          };
         }
       ]
     };

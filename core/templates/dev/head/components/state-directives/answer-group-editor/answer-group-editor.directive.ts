@@ -371,8 +371,8 @@ angular.module('oppia').directive('answerGroupEditor', [
 
           ctrl.$onInit = function() {
             // Updates answer choices when the interaction requires it -- e.g.,
-            // the rules for multiple choice need to refer to the multiple choice
-            // interaction's customization arguments.
+            // the rules for multiple choice need to refer to the multiple
+            // choice interaction's customization arguments.
             // TODO(sll): Remove the need for this watcher, or make it less
             // ad hoc.
             $scope.$on('updateAnswerChoices', function() {

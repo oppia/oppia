@@ -61,41 +61,6 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
             return errorMessage;
           };
 
-          /**
-           * Disables the input box if the data entered is not a valid prefix
-           * for a fraction.
-           * Examples of valid prefixes:
-           * -- 1
-           * -- 1 2
-           * -- 1 2/
-           * -- 2/
-           * -- 1 2/3
-           */
-          $scope.$watch('$ctrl.answer', function(newValue) {
-            var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
-            // Accepts incomplete fraction inputs
-            // (see examples above except last).
-            var PARTIAL_FRACTION_REGEX =
-              /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
-            // Accepts complete fraction inputs.
-            var FRACTION_REGEX =
-              /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
-            if (INVALID_CHARS_REGEX.test(newValue)) {
-              errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS;
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            } else if (!(FRACTION_REGEX.test(newValue) ||
-                PARTIAL_FRACTION_REGEX.test(newValue))) {
-              errorMessage = FRACTION_PARSING_ERRORS.INVALID_FORMAT;
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            } else {
-              errorMessage = '';
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, true);
-            }
-          });
-
           ctrl.submitAnswer = function(answer) {
             try {
               var fraction = FractionObjectFactory.fromRawInputString(
@@ -145,6 +110,40 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
             ctrl.submitAnswer(ctrl.answer);
           };
           ctrl.$onInit = function() {
+            /**
+             * Disables the input box if the data entered is not a valid prefix
+             * for a fraction.
+             * Examples of valid prefixes:
+             * -- 1
+             * -- 1 2
+             * -- 1 2/
+             * -- 2/
+             * -- 1 2/3
+             */
+            $scope.$watch('$ctrl.answer', function(newValue) {
+              var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
+              // Accepts incomplete fraction inputs
+              // (see examples above except last).
+              var PARTIAL_FRACTION_REGEX =
+                /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
+              // Accepts complete fraction inputs.
+              var FRACTION_REGEX =
+                /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
+              if (INVALID_CHARS_REGEX.test(newValue)) {
+                errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS;
+                ctrl.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              } else if (!(FRACTION_REGEX.test(newValue) ||
+                  PARTIAL_FRACTION_REGEX.test(newValue))) {
+                errorMessage = FRACTION_PARSING_ERRORS.INVALID_FORMAT;
+                ctrl.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              } else {
+                errorMessage = '';
+                ctrl.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, true);
+              }
+            });
             ctrl.answer = '';
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
             ctrl.allowNonzeroIntegerPart = (

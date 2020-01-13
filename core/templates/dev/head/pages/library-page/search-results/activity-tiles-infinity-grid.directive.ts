@@ -50,8 +50,8 @@ angular.module('oppia').directive('activityTilesInfinityGrid', [
             }
           };
           ctrl.$onInit = function() {
-            // Called when the first batch of search results is retrieved from the
-            // server.
+            // Called when the first batch of search results is retrieved from
+            // the server.
             $scope.$on(
               'initialSearchResultsLoaded', function(evt, activityList) {
                 ctrl.allActivitiesInOrder = activityList;

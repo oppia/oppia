@@ -416,6 +416,14 @@ angular.module('oppia').directive('conversationSkin', [
           var TIME_SCROLL_MSEC = 600;
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
 
+          var initLearnerAnswerInfoService = function(
+              entityId, state, answer, interactionRulesService,
+              alwaysAskLearnerForAnswerInfo) {
+            LearnerAnswerInfoService.initLearnerAnswerInfoService(
+              entityId, state, answer, interactionRulesService,
+              alwaysAskLearnerForAnswerInfo);
+          };
+
           $scope.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
               FEEDBACK_POPOVER_PATH);
@@ -1126,7 +1134,8 @@ angular.module('oppia').directive('conversationSkin', [
               $scope.isLoggedIn = userInfo.isLoggedIn();
             });
 
-            $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl();
+            $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl(
+            );
             if ($scope.collectionId) {
               ReadOnlyCollectionBackendApiService
                 .loadCollection($scope.collectionId)
@@ -1138,9 +1147,6 @@ angular.module('oppia').directive('conversationSkin', [
             }
             $scope.canAskLearnerForAnswerInfo = (
               LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
-
-            var initLearnerAnswerInfoService = (
-              LearnerAnswerInfoService.initLearnerAnswerInfoService);
             $scope.answerIsBeingProcessed = false;
             $scope.explorationId = ExplorationEngineService.getExplorationId();
             $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
@@ -1190,8 +1196,8 @@ angular.module('oppia').directive('conversationSkin', [
                   newStateName, LearnerParamsService.getAllParams());
 
                 // If the user is a guest, has completed this exploration within
-                // the context of a collection, and the collection is whitelisted,
-                // record their temporary progress.
+                // the context of a collection, and the collection is
+                // whitelisted, record their temporary progress.
                 var collectionAllowsGuestProgress = (
                   WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
                     $scope.collectionId) !== -1);
@@ -1237,9 +1243,9 @@ angular.module('oppia').directive('conversationSkin', [
                   );
                 }
 
-                // For single state explorations, when the exploration reaches the
-                // terminal state and explorationActuallyStarted is false, record
-                // exploration actual start event.
+                // For single state explorations, when the exploration reaches
+                // the terminal state and explorationActuallyStarted is false,
+                // record exploration actual start event.
                 if (!explorationActuallyStarted) {
                   StatsReportingService.recordExplorationActuallyStarted(
                     newStateName);
@@ -1297,7 +1303,8 @@ angular.module('oppia').directive('conversationSkin', [
                 },
                 function() {
                   AlertsService.addWarning(
-                    'There was an error while fetching the collection summary.');
+                    'There was an error while fetching the ' +
+                    'collection summary.');
                 }
               );
             }

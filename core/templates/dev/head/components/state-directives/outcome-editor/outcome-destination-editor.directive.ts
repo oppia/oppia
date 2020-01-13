@@ -101,9 +101,9 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
                 StateGraphLayoutService.getLastComputedArrangement());
               var allStateNames = StateEditorService.getStateNames();
 
-              // It is possible that lastComputedArrangement is null if the graph
-              // has never been rendered at the time this computation is being
-              // carried out.
+              // It is possible that lastComputedArrangement is null if the
+              // graph has never been rendered at the time this computation is
+              // being carried out.
               var stateNames = angular.copy(allStateNames);
               var stateName = null;
               if (lastComputedArrangement) {
@@ -123,7 +123,8 @@ angular.module('oppia').directive('outcomeDestinationEditor', [
                   stateName = allStateNames[i];
                   if (lastComputedArrangement.hasOwnProperty(stateName)) {
                     allStateScores[stateName] = (
-                      lastComputedArrangement[stateName].depth * (maxOffset + 1) +
+                      lastComputedArrangement[stateName].depth *
+                      (maxOffset + 1) +
                       lastComputedArrangement[stateName].offset);
                   } else {
                     // States that have just been added in the rule 'create new'

@@ -143,7 +143,8 @@ angular.module('oppia').directive('misconceptionEditor', [
 
           ctrl.$onInit = function() {
             $scope.skill = SkillEditorStateService.getSkill();
-            $scope.MISCONCEPTION_NAME_CHAR_LIMIT = MISCONCEPTION_NAME_CHAR_LIMIT;
+            $scope.MISCONCEPTION_NAME_CHAR_LIMIT = (
+              MISCONCEPTION_NAME_CHAR_LIMIT);
             $scope.nameEditorIsOpen = false;
             $scope.notesEditorIsOpen = false;
             $scope.feedbackEditorIsOpen = false;

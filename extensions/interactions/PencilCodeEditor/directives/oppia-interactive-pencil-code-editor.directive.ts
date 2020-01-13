@@ -85,13 +85,13 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
             // Converts tabs to spaces.
             return pce.getCode().replace(/\t/g, '  ');
           };
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-            pce.hideMiddleButton();
-            pce.hideToggleButton();
-            pce.setReadOnly();
-          });
           ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
+              pce.hideMiddleButton();
+              pce.hideToggleButton();
+              pce.setReadOnly();
+            });
             iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
             pce = new PencilCodeEmbed(iframeDiv);
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);

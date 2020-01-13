@@ -40,6 +40,7 @@ angular.module('oppia').directive('subtopicsListTab', [
             UndoRedoService, SubtopicPageObjectFactory,
             UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
             EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
+          var ctrl = this;
           var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
@@ -253,10 +254,11 @@ angular.module('oppia').directive('subtopicsListTab', [
             });
           };
 
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
-
-          _initEditor();
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
+            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+            _initEditor();
+          };
         }
       ]
     };

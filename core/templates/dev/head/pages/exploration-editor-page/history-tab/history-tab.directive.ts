@@ -288,7 +288,8 @@ angular.module('oppia').directive('historyTab', [
                   versionCheckbox) {
                 versionCheckbox.selected = false;
               });
-              if (data.forceRefresh || ctrl.explorationVersionMetadata === null) {
+              if (
+                data.forceRefresh || ctrl.explorationVersionMetadata === null) {
                 ctrl.refreshVersionHistory();
               }
             });

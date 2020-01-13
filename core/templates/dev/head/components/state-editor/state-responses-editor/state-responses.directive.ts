@@ -582,9 +582,9 @@ angular.module('oppia').directive('stateResponses', [
               $scope.answerGroups = ResponsesService.getAnswerGroups();
               $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
-              // If the creator selects an interaction which has only one possible
-              // answer, automatically expand the default response. Otherwise,
-              // default to having no responses initially selected.
+              // If the creator selects an interaction which has only one
+              // possible answer, automatically expand the default response.
+              // Otherwise, default to having no responses initially selected.
               if ($scope.isCurrentInteractionLinear()) {
                 ResponsesService.changeActiveAnswerGroupIndex(0);
               }
@@ -608,15 +608,16 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.answerGroups = ResponsesService.getAnswerGroups();
                   $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
-                  // Reinitialize training data if the interaction ID is changed.
+                  // Reinitialize training data if the interaction ID is
+                  // changed.
                   _initializeTrainingData();
 
                   $scope.activeAnswerGroupIndex = (
                     ResponsesService.getActiveAnswerGroupIndex());
                 });
 
-              // Prompt the user to create a new response if it is not a linear or
-              // non-terminal interaction and if an actual interaction is
+              // Prompt the user to create a new response if it is not a linear
+              // or non-terminal interaction and if an actual interaction is
               // specified (versus one being deleted).
               if (newInteractionId &&
                   !INTERACTION_SPECS[newInteractionId].is_linear &&
@@ -639,10 +640,10 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.refreshWarnings()();
                 });
             });
-            // When the page is scrolled so that the top of the page is above the
-            // browser viewport, there are some bugs in the positioning of the
-            // helper. This is a bug in jQueryUI that has not been fixed yet. For
-            // more details, see http://stackoverflow.com/q/5791886
+            // When the page is scrolled so that the top of the page is above
+            // the browser viewport, there are some bugs in the positioning of
+            // the helper. This is a bug in jQueryUI that has not been fixed
+            // yet. For more details, see http://stackoverflow.com/q/5791886
             $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
               axis: 'y',
               cursor: 'move',

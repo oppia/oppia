@@ -270,10 +270,10 @@ angular.module('oppia').directive('stateHintsEditor', [
 
             $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/drag_dots.png');
-            // When the page is scrolled so that the top of the page is above the
-            // browser viewport, there are some bugs in the positioning of the
-            // helper. This is a bug in jQueryUI that has not been fixed yet. For
-            // more details, see http://stackoverflow.com/q/5791886
+            // When the page is scrolled so that the top of the page is above
+            // the browser viewport, there are some bugs in the positioning of
+            // the helper. This is a bug in jQueryUI that has not been fixed
+            // yet. For more details, see http://stackoverflow.com/q/5791886
             $scope.HINT_LIST_SORTABLE_OPTIONS = {
               axis: 'y',
               cursor: 'move',

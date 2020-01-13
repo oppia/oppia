@@ -57,9 +57,6 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
             WindowDimensionsService, UrlService,
             CurrentInteractionService) {
           var ctrl = this;
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-          });
           // NOTE: for information on integrating angular and code-mirror see
           // http://github.com/angular-ui/ui-codemirror
           ctrl.codeEditor = function(editor) {
@@ -244,6 +241,9 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
             });
           };
           ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
+            });
             ctrl.localQuestionData = HtmlEscaperService.escapedJsonToObj(
               $attrs.questionWithValue);
 

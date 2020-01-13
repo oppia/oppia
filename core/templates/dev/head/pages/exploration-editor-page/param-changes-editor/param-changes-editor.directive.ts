@@ -211,11 +211,11 @@ angular.module('oppia').directive('paramChangesEditor', [
                 $scope.saveParamChanges();
               }
             });
-            // This is a local variable that is used by the select2 dropdowns for
-            // choosing parameter names. It may not accurately reflect the content
-            // of ExplorationParamSpecsService, since it's possible that temporary
-            // parameter names may be added and then deleted within the course
-            // of a single "parameter changes" edit.
+            // This is a local variable that is used by the select2 dropdowns
+            // for choosing parameter names. It may not accurately reflect the
+            // content of ExplorationParamSpecsService, since it's possible that
+            // temporary parameter names may be added and then deleted within
+            // the course of a single "parameter changes" edit.
             $scope.paramNameChoices = [];
             $scope.HUMAN_READABLE_ARGS_RENDERERS = {
               Copier: function(customizationArgs) {
@@ -246,10 +246,10 @@ angular.module('oppia').directive('paramChangesEditor', [
                 ui.placeholder.height(ui.item.height());
               },
               stop: function() {
-                // This ensures that any new parameter names that have been added
-                // before the swap are added to the list of possible names in the
-                // select2 dropdowns. Otherwise, after the swap, the dropdowns may
-                // turn blank.
+                // This ensures that any new parameter names that have been
+                // added before the swap are added to the list of possible names
+                // in the select2 dropdowns. Otherwise, after the swap, the
+                // dropdowns may turn blank.
                 $scope.paramChangesService.displayed.forEach(
                   function(paramChange) {
                     ExplorationParamSpecsService.displayed.addParamIfNew(

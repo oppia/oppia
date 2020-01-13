@@ -52,19 +52,6 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
           ctrl.getWarningText = function() {
             return errorMessage;
           };
-          $scope.$watch('$ctrl.answer', function(newValue) {
-            try {
-              var numberWithUnits =
-                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-              errorMessage = '';
-              ctrl.NumberWithUnitsForm.answer.$setValidity(
-                FORM_ERROR_TYPE, true);
-            } catch (parsingError) {
-              errorMessage = parsingError.message;
-              ctrl.NumberWithUnitsForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            }
-          });
 
           ctrl.submitAnswer = function(answer) {
             try {
@@ -109,6 +96,19 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
             });
           };
           ctrl.$onInit = function() {
+            $scope.$watch('$ctrl.answer', function(newValue) {
+              try {
+                var numberWithUnits =
+                  NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+                errorMessage = '';
+                ctrl.NumberWithUnitsForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, true);
+              } catch (parsingError) {
+                errorMessage = parsingError.message;
+                ctrl.NumberWithUnitsForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              }
+            });
             ctrl.answer = '';
             ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 

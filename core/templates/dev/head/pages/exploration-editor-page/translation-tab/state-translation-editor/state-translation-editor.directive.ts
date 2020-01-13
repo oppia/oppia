@@ -178,7 +178,6 @@ angular.module('oppia').directive('stateTranslationEditor', [
               }
             });
           };
-
         }
       ]
     };

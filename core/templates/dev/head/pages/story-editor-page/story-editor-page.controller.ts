@@ -88,10 +88,11 @@ angular.module('oppia').directive('storyEditorPage', [
             PageTitleService.setPageTitle(
               StoryEditorStateService.getStory().getTitle() + ' - Oppia');
           };
-          $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
-          $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
+
           ctrl.$onInit = function() {
             StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
+            $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
+            $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
           };
         }
       ]

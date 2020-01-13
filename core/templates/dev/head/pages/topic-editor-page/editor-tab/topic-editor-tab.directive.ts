@@ -52,6 +52,7 @@ angular.module('oppia').directive('topicEditorTab', [
             UrlInterpolationService, StoryCreationService,
             EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
+          var ctrl = this;
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
@@ -83,7 +84,9 @@ angular.module('oppia').directive('topicEditorTab', [
               TopicEditorStateService.getCanonicalStorySummaries();
           };
 
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
@@ -146,12 +149,14 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
-          $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
+            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+            $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
 
-          _initEditor();
-          _initStorySummaries();
+            _initEditor();
+            _initStorySummaries();
+          };
         }
       ]
     };

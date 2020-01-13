@@ -52,9 +52,6 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             $scope, $attrs, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-          });
           ctrl.initCodeEditor = function(editor) {
             editor.setValue(ctrl.code);
             // Options for the ui-codemirror display.
@@ -202,6 +199,9 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             $scope.$apply();
           };
           ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
+            });
             ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
             ctrl.language = HtmlEscaperService.escapedJsonToObj(
               $attrs.languageWithValue);

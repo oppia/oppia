@@ -192,9 +192,9 @@ angular.module('oppia').directive('schemaBasedListEditor', [
             $scope._onChildFormSubmit = function(evt) {
               if (!$scope.isAddItemButtonPresent) {
                 /**
-                 * If form submission happens on last element of the set (i.e the
-                 * add item button is absent) then automatically add the element
-                 * to the list.
+                 * If form submission happens on last element of the set (i.e
+                 * the add item button is absent) then automatically add the
+                 * element to the list.
                  */
                 if (($scope.maxListLength === null ||
                      $scope.localValue.length < $scope.maxListLength) &&
@@ -211,7 +211,8 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               evt.stopPropagation();
             };
 
-            $scope.$on('submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
+            $scope.$on(
+              'submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
             $scope.$on(
               'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
             $scope.$on(
@@ -227,8 +228,8 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               throw 'Invalid length for list editor: ' + $scope.len;
             }
             if ($scope.len !== $scope.localValue.length) {
-              throw 'List editor length does not match length of input value: ' +
-                $scope.len + ' ' + $scope.localValue;
+              throw 'List editor length does not match length of input ' +
+              'value: ' + $scope.len + ' ' + $scope.localValue;
             }
           }
         };

@@ -104,9 +104,10 @@ angular.module('oppia').directive('stateEditor', [
             $scope.interactionIdIsSet = false;
             $scope.servicesInitialized = false;
             $scope.stateName = StateEditorService.getActiveStateName();
-            $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
-              updateInteractionVisibility(newInteractionId);
-            });
+            $scope.$on(
+              'onInteractionIdChanged', function(evt, newInteractionId) {
+                updateInteractionVisibility(newInteractionId);
+              });
 
             $scope.$on('stateEditorInitialized', function(evt, stateData) {
               if (stateData === undefined || $.isEmptyObject(stateData)) {

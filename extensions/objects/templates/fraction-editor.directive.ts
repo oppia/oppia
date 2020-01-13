@@ -33,22 +33,22 @@ angular.module('oppia').directive('fractionEditor', [
         var ctrl = this;
         var errorMessage = '';
         var fractionString = '0';
-        $scope.$watch('$ctrl.localValue.label', function(newValue) {
-          try {
-            var INTERMEDIATE_REGEX = /^\s*-?\s*$/;
-            if (!INTERMEDIATE_REGEX.test(newValue)) {
-              ctrl.value = FractionObjectFactory.fromRawInputString(newValue);
-            }
-            errorMessage = '';
-          } catch (parsingError) {
-            errorMessage = parsingError.message;
-          }
-        });
 
         ctrl.getWarningText = function() {
           return errorMessage;
         };
         ctrl.$onInit = function() {
+          $scope.$watch('$ctrl.localValue.label', function(newValue) {
+            try {
+              var INTERMEDIATE_REGEX = /^\s*-?\s*$/;
+              if (!INTERMEDIATE_REGEX.test(newValue)) {
+                ctrl.value = FractionObjectFactory.fromRawInputString(newValue);
+              }
+              errorMessage = '';
+            } catch (parsingError) {
+              errorMessage = parsingError.message;
+            }
+          });
           if (ctrl.value !== null) {
             var defaultFraction = FractionObjectFactory.fromDict(ctrl.value);
             fractionString = defaultFraction.toString();

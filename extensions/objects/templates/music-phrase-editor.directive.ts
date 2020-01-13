@@ -32,41 +32,41 @@ angular.module('oppia').directive('musicPhraseEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        // The maximum number of notes allowed in a music phrase.
-        var _MAX_NOTES_IN_PHRASE = 8;
-        // Reset the component each time the value changes (e.g. if this is part
-        // of an editable list).
-        $scope.$watch('$ctrl.value', function(newValue) {
-          // TODO(sll): Check that $ctrl.value is a list.
-          ctrl.localValue = [];
-          if (newValue) {
-            for (var i = 0; i < newValue.length; i++) {
-              ctrl.localValue.push(newValue[i].readableNoteName);
-            }
-          }
-        }, true);
-
-        $scope.$watch('$ctrl.localValue', function(newValue, oldValue) {
-          if (newValue && oldValue) {
-            if (newValue.length > _MAX_NOTES_IN_PHRASE) {
-              AlertsService.addWarning(
-                'There are too many notes on the staff.');
-            } else {
-              var parentValues = [];
-              for (var i = 0; i < newValue.length; i++) {
-                parentValues.push({
-                  readableNoteName: newValue[i],
-                  noteDuration: {
-                    num: 1,
-                    den: 1
-                  }
-                });
-              }
-              ctrl.value = parentValues;
-            }
-          }
-        }, true);
         ctrl.$onInit = function() {
+          // The maximum number of notes allowed in a music phrase.
+          var _MAX_NOTES_IN_PHRASE = 8;
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
+          $scope.$watch('$ctrl.value', function(newValue) {
+            // TODO(sll): Check that $ctrl.value is a list.
+            ctrl.localValue = [];
+            if (newValue) {
+              for (var i = 0; i < newValue.length; i++) {
+                ctrl.localValue.push(newValue[i].readableNoteName);
+              }
+            }
+          }, true);
+
+          $scope.$watch('$ctrl.localValue', function(newValue, oldValue) {
+            if (newValue && oldValue) {
+              if (newValue.length > _MAX_NOTES_IN_PHRASE) {
+                AlertsService.addWarning(
+                  'There are too many notes on the staff.');
+              } else {
+                var parentValues = [];
+                for (var i = 0; i < newValue.length; i++) {
+                  parentValues.push({
+                    readableNoteName: newValue[i],
+                    noteDuration: {
+                      num: 1,
+                      den: 1
+                    }
+                  });
+                }
+                ctrl.value = parentValues;
+              }
+            }
+          }, true);
           ctrl.schema = {
             type: 'list',
             items: {

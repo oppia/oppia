@@ -58,17 +58,6 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
             CurrentInteractionService.onSubmit(
               angular.copy(ctrl.graph), GraphInputRulesService);
           };
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-
-            ctrl.canAddVertex = false;
-            ctrl.canDeleteVertex = false;
-            ctrl.canEditVertexLabel = false;
-            ctrl.canMoveVertex = false;
-            ctrl.canAddEdge = false;
-            ctrl.canDeleteEdge = false;
-            ctrl.canEditEdgeWeight = false;
-          });
 
           ctrl.resetGraph = function() {
             var newGraph = HtmlEscaperService.escapedJsonToObj(
@@ -114,6 +103,17 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
             return checkValidGraph(ctrl.graph);
           };
           ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
+
+              ctrl.canAddVertex = false;
+              ctrl.canDeleteVertex = false;
+              ctrl.canEditVertexLabel = false;
+              ctrl.canMoveVertex = false;
+              ctrl.canAddEdge = false;
+              ctrl.canDeleteEdge = false;
+              ctrl.canEditEdgeWeight = false;
+            });
             ctrl.errorMessage = '';
             ctrl.graph = {
               vertices: [],

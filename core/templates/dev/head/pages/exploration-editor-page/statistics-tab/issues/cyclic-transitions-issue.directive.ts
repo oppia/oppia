@@ -37,6 +37,7 @@ angular.module('oppia').directive('cyclicTransitionsIssue', [
         '$scope', '$uibModal', 'AlertsService', 'PlaythroughIssuesService',
         function($scope, $uibModal, AlertsService, PlaythroughIssuesService) {
           var ctrl = this;
+          var issue = $scope.issue();
           var getPlaythroughIndex = function(playthroughId) {
             return $scope.playthroughIds.indexOf(playthroughId);
           };
@@ -65,8 +66,6 @@ angular.module('oppia').directive('cyclicTransitionsIssue', [
           };
           ctrl.$onInit = function() {
             $scope.currentIssueIdentifier = $scope.index() + 1;
-
-            var issue = $scope.issue();
             $scope.issueStatement =
               PlaythroughIssuesService.renderIssueStatement(issue);
             $scope.suggestions =

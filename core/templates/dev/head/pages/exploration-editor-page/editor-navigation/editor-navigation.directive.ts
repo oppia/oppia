@@ -164,16 +164,18 @@ angular.module('oppia').directive('editorNavigation', [
           };
 
           ctrl.$onInit = function() {
-            ImprovementTaskService.fetchOpenTaskCount().then(countOfOpenTasks => {
-              taskCount = countOfOpenTasks;
-            });
+            ImprovementTaskService.fetchOpenTaskCount().then(
+              countOfOpenTasks => {
+                taskCount = countOfOpenTasks;
+              });
             $scope.popoverControlObject = {
               postTutorialHelpPopoverIsShown: false
             };
             $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
             $scope.$on('openPostTutorialHelpPopover', function() {
               if ($scope.isLargeScreen) {
-                $scope.popoverControlObject.postTutorialHelpPopoverIsShown = true;
+                $scope.popoverControlObject.postTutorialHelpPopoverIsShown = (
+                  true);
                 $timeout(function() {
                   $scope.popoverControlObject
                     .postTutorialHelpPopoverIsShown = false;
@@ -190,7 +192,8 @@ angular.module('oppia').directive('editorNavigation', [
             });
             $scope.ExplorationRightsService = ExplorationRightsService;
             WindowDimensionsService.registerOnResizeHook(function() {
-              $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
+              $scope.isLargeScreen = (
+                WindowDimensionsService.getWidth() >= 1024);
             });
           };
         }
