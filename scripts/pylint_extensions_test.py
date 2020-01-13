@@ -1757,17 +1757,17 @@ class SingleLineCommentCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
+class DocstringCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(SpaceBelowFileOverviewCheckerTests, self).setUp()
+        super(DocstringCheckerTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.SpaceBelowFileOverviewChecker)
+            pylint_extensions.DocstringChecker)
         self.checker_test_object.setup_method()
 
-    def test_no_space_above_import(self):
-        node_no_space_above_import = astroid.scoped_nodes.Module(
+    def test_space_after_docstring(self):
+        node_space_after_docstring = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -1775,26 +1775,52 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""
-                    \"\"\" this file does something \"\"\"
-                    import something
-                    import random
+                u"""class ABC(something):
+                        \"\"\" Hello world.\"\"\"
+                        Something
                 """)
-        node_no_space_above_import.file = filename
-        node_no_space_above_import.path = filename
+        node_space_after_docstring.file = filename
+        node_space_after_docstring.path = filename
 
         self.checker_test_object.checker.process_module(
-            node_no_space_above_import)
+            node_space_after_docstring)
 
         message = testutils.Message(
-            msg_id='no space used between file overview and import',
+            msg_id='space-after-triple-quote',
+            line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_single_line_docstring_span_two_lines(self):
+        node_single_line_docstring_span_two_lines = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                        \"\"\"
+                        Something
+                """)
+        node_single_line_docstring_span_two_lines.file = filename
+        node_single_line_docstring_span_two_lines.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_single_line_docstring_span_two_lines)
+
+        message = testutils.Message(
+            msg_id='single-line-docstring-span-two-lines',
             line=3)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_no_space_above_import_from(self):
-        node_no_space_above_import_from = astroid.scoped_nodes.Module(
+    def test_no_period_at_end(self):
+        node_no_period_at_end = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -1802,25 +1828,24 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""
-                    \"\"\" this file does something \"\"\"
-                    from something import random
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring\"\"\"
+                        Something
                 """)
-        node_no_space_above_import_from.file = filename
-        node_no_space_above_import_from.path = filename
+        node_no_period_at_end.file = filename
+        node_no_period_at_end.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_no_space_above_import_from)
+        self.checker_test_object.checker.process_module(node_no_period_at_end)
 
         message = testutils.Message(
-            msg_id='no space used between file overview and import',
-            line=3)
+            msg_id='no-period-used',
+            line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_extra_space_above_import(self):
-        node_extra_space_above_import = astroid.scoped_nodes.Module(
+    def test_empty_line_before_end_of_docstring(self):
+        node_empty_line_before_end = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -1828,27 +1853,27 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""
-                    \"\"\" this file does something \"\"\"
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
 
-
-                    import something
-                    import random
+                        \"\"\"
+                        Something
                 """)
-        node_extra_space_above_import.file = filename
-        node_extra_space_above_import.path = filename
+        node_empty_line_before_end.file = filename
+        node_empty_line_before_end.path = filename
 
         self.checker_test_object.checker.process_module(
-            node_extra_space_above_import)
+            node_empty_line_before_end)
 
         message = testutils.Message(
-            msg_id='single space should be provided above imports', line=5)
+            msg_id='empty-line-before-end',
+            line=4)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_extra_space_above_import_from(self):
-        node_extra_space_above_import_from = astroid.scoped_nodes.Module(
+    def test_no_period_at_end_of_a_multiline_docstring(self):
+        node_no_period_at_end = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -1856,20 +1881,95 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
         with python_utils.open_file(filename, 'w') as tmp:
             tmp.write(
-                u"""
-                    \"\"\" this file does something \"\"\"
-
-
-                    from something import random
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Args:
+                                arg: variable
+                        \"\"\"
+                        Something
                 """)
-        node_extra_space_above_import_from.file = filename
-        node_extra_space_above_import_from.path = filename
+        node_no_period_at_end.file = filename
+        node_no_period_at_end.path = filename
 
-        self.checker_test_object.checker.process_module(
-            node_extra_space_above_import_from)
+        self.checker_test_object.checker.process_module(node_no_period_at_end)
 
         message = testutils.Message(
-            msg_id='single space should be provided above imports', line=5)
+            msg_id='no-period-used',
+            line=5)
 
         with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_no_newline_at_end_of_multi_line_docstring(self):
+        node_no_newline_at_end = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Args:
+                                arg: variable.\"\"\"
+                        Something
+                """)
+        node_no_newline_at_end.file = filename
+        node_no_newline_at_end.path = filename
+
+        self.checker_test_object.checker.process_module(node_no_newline_at_end)
+
+        message = testutils.Message(
+            msg_id='no-newline-used-at-end',
+            line=4)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_well_formed_single_line_docstring(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.\"\"\"
+                        Something
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_well_formed_multi_line_docstring(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""class ABC(arg):
+                        \"\"\"This is a docstring.
+                            Args:
+                                arg: variable.
+                        \"\"\"
+                        Something
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+
+        with self.checker_test_object.assertNoMessages():
             temp_file.close()
