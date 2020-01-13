@@ -486,6 +486,7 @@
 /core/templates/dev/head/pages/get-started-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/landing-pages/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/maintenance-page/ @jameesjohn @vojtechjelinek
+/core/templates/dev/head/pages/pending-account-deletion-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/preferences-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/signup-page/ @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/splash-page/ @jameesjohn @vojtechjelinek
