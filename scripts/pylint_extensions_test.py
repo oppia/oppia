@@ -18,6 +18,7 @@
 # https://github.com/oppia/oppia/wiki/Writing-Tests-For-Pylint
 
 """Unit tests for scripts/pylint_extensions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -1972,4 +1973,122 @@ class DocstringCheckerTests(unittest.TestCase):
             node_with_no_error_message)
 
         with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+
+class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
+
+    def setUp(self):
+        super(SpaceBelowFileOverviewCheckerTests, self).setUp()
+        self.checker_test_object = testutils.CheckerTestCase()
+        self.checker_test_object.CHECKER_CLASS = (
+            pylint_extensions.SpaceBelowFileOverviewChecker)
+        self.checker_test_object.setup_method()
+
+    def test_no_space_above_import(self):
+        node_no_space_above_import = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\" this file does something \"\"\"
+                    import something
+                    import random
+                """)
+        node_no_space_above_import.file = filename
+        node_no_space_above_import.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_no_space_above_import)
+
+        message = testutils.Message(
+            msg_id='no-space-provided-below-fileoverview',
+            line=3)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_no_space_above_import_from(self):
+        node_no_space_above_import_from = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\" this file does something \"\"\"
+                    from something import random
+                """)
+        node_no_space_above_import_from.file = filename
+        node_no_space_above_import_from.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_no_space_above_import_from)
+
+        message = testutils.Message(
+            msg_id='no-space-provided-below-fileoverview',
+            line=3)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_extra_space_above_import(self):
+        node_extra_space_above_import = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\" this file does something \"\"\"
+
+
+                    import something
+                    import random
+                """)
+        node_extra_space_above_import.file = filename
+        node_extra_space_above_import.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_extra_space_above_import)
+
+        message = testutils.Message(
+            msg_id='only-single-space-should-be-provided', line=5)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_extra_space_above_import_from(self):
+        node_extra_space_above_import_from = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\" this file does something \"\"\"
+
+
+                    from something import random
+                """)
+        node_extra_space_above_import_from.file = filename
+        node_extra_space_above_import_from.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_extra_space_above_import_from)
+
+        message = testutils.Message(
+            msg_id='only-single-space-should-be-provided', line=5)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
