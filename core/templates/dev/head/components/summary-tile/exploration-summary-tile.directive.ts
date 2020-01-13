@@ -147,6 +147,11 @@ angular.module('oppia').directive('explorationSummaryTile', [
                 $scope.getStoryNodeId()) {
                 storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
                 storyNodeIdToAdd = $scope.getStoryNodeId();
+              } else if (
+                urlParams.hasOwnProperty('story_id') &&
+                urlParams.hasOwnProperty('node_id')) {
+                storyIdToAdd = urlParams.story_id;
+                storyNodeIdToAdd = $scope.getStoryNodeId();
               }
 
               if (collectionIdToAdd) {

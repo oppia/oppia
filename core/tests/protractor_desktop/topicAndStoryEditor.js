@@ -65,30 +65,6 @@ describe('Topic editor functionality', function() {
     topicEditorPage.get(topicId);
   });
 
-  it('should edit topic name, abbreviated topic name, ' +
-    'thumbnail and description correctly', function() {
-    topicEditorPage.changeTopicName('Topic 1 edited');
-    expect(topicEditorPage.getTopicThumbnailSource())
-      .not
-      .toEqual(
-        topicEditorPage.submitTopicThumbnail('../data/img.png')
-          .then(function() {
-            return topicEditorPage.getTopicThumbnailSource();
-          })
-      );
-    topicEditorPage.changeAbbreviatedTopicName('short name');
-    topicEditorPage.changeTopicDescription('Topic Description');
-    topicEditorPage.saveTopic('Changed topic name and description.');
-
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectTopicNameToBe('Topic 1 edited', 0);
-
-    topicEditorPage.get(topicId);
-    topicEditorPage.expectTopicNameToBe('Topic 1 edited');
-    topicEditorPage.expectAbbreviatedTopicNameToBe('short name');
-    topicEditorPage.expectTopicDescriptionToBe('Topic Description');
-  });
-
   it('should add and delete subtopics correctly', function() {
     topicEditorPage.moveToSubtopicsTab();
     topicEditorPage.addSubtopic('Subtopic 1');

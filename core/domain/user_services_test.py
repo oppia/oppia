@@ -549,6 +549,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         pending_deletion_model = (
             user_models.PendingDeletionRequestModel.get_by_id(user_id))
         self.assertEqual(
+            pending_deletion_model.email, user_settings.email)
+        self.assertFalse(
+            pending_deletion_model.deletion_complete)
+        self.assertEqual(
             pending_deletion_model.exploration_ids, exploration_ids)
         self.assertEqual(
             pending_deletion_model.collection_ids, collection_ids)
