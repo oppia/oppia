@@ -32,10 +32,10 @@ require('services/debouncer.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
-  'MathExpressionInputRulesService',
+  '$timeout', 'MathExpressionInputRulesService',
   'UrlInterpolationService',
   function(
-      MathExpressionInputRulesService,
+      $timeout, MathExpressionInputRulesService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -87,7 +87,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
 
               // If the guppy div hasn't rendered yet, retry after 100ms.
               if (guppySize.width === 0 || guppySize.height === 0) {
-                setTimeout(positionButtonOverlay, 100);
+                $timeout(positionButtonOverlay, 100);
               } else {
                 $('#startMathInputButton').css({
                   top: guppyOffset.top,
@@ -215,7 +215,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
                     // false to not start a new digest cycle.
                     // A new cycle is not needed since no angular variables
                     // are changed within the function.
-                    setTimeout(makeGuppyMobileFriendly, 0, false);
+                    $timeout(makeGuppyMobileFriendly, 0, false);
                   }
                 }
               }

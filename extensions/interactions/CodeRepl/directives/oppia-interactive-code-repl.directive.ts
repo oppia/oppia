@@ -30,11 +30,11 @@ require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
-  'CodeReplRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  '$timeout', 'CodeReplRulesService', 'HtmlEscaperService',
+  'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
-      CodeReplRulesService, HtmlEscaperService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      $timeout, CodeReplRulesService, HtmlEscaperService,
+      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -74,7 +74,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             editor.setOption('theme', 'preview default');
 
             // NOTE: this is necessary to avoid the textarea being greyed-out.
-            setTimeout(function() {
+            $timeout(function() {
               editor.refresh();
               initMarkers(editor);
             }, 200);
@@ -86,7 +86,7 @@ angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
             // Without this, the editor does not show up correctly on small
             // screens when the user switches to the supplemental interaction.
             $scope.$on('showInteraction', function() {
-              setTimeout(function() {
+              $timeout(function() {
                 editor.refresh();
                 initMarkers(editor);
               }, 200);

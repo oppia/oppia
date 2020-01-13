@@ -37,12 +37,12 @@ angular.module('oppia').directive('topNavigationBar', [
         '!html-loader!./top-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$http', '$window', '$translate',
+        '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'SiteAnalyticsService', 'NavigationService', 'WindowDimensionsService',
         'DebouncerService', 'DeviceInfoService', 'LOGOUT_URL',
         function(
-            $scope, $http, $window, $translate,
+            $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
             DebouncerService, DeviceInfoService, LOGOUT_URL) {
@@ -69,7 +69,7 @@ angular.module('oppia').directive('topNavigationBar', [
             UserService.getLoginUrlAsync().then(
               function(loginUrl) {
                 if (loginUrl) {
-                  setTimeout(function() {
+                  $timeout(function() {
                     $window.location = loginUrl;
                   }, 150);
                 } else {
@@ -166,7 +166,7 @@ angular.module('oppia').directive('topNavigationBar', [
 
             // If i18n hasn't completed, retry after 100ms.
             if (!checkIfI18NCompleted()) {
-              setTimeout(truncateNavbar, 100);
+              $timeout(truncateNavbar, 100);
               return;
             }
 
@@ -186,9 +186,9 @@ angular.module('oppia').directive('topNavigationBar', [
                     false;
                   // Force a digest cycle to hide element immediately.
                   // Otherwise it would be hidden after the next call.
-                  // This is due to setTimeout use in debounce.
+                  // This is due to $timeout use in debounce.
                   $scope.$applyAsync();
-                  setTimeout(truncateNavbar, 50);
+                  $timeout(truncateNavbar, 50);
                   return;
                 }
               }
@@ -228,7 +228,7 @@ angular.module('oppia').directive('topNavigationBar', [
             });
 
             $scope.$on('searchBarLoaded', function() {
-              setTimeout(truncateNavbar, 100);
+              $timeout(truncateNavbar, 100);
             });
 
             UserService.getUserInfoAsync().then(function(userInfo) {
@@ -299,7 +299,7 @@ angular.module('oppia').directive('topNavigationBar', [
             // will check if i18n is complete and set a new timeout if it is
             // not. Since a timeout of 0 works for at least one browser,
             // it is used here.
-            setTimeout(truncateNavbar, 0);
+            $timeout(truncateNavbar, 0);
           };
         }
       ]

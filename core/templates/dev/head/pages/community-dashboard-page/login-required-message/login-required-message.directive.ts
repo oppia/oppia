@@ -20,8 +20,8 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 
 angular.module('oppia').directive('loginRequiredMessage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  '$timeout', 'UrlInterpolationService', function(
+      $timeout, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -41,7 +41,7 @@ angular.module('oppia').directive('loginRequiredMessage', [
             UserService.getLoginUrlAsync().then(
               function(loginUrl) {
                 if (loginUrl) {
-                  setTimeout(function() {
+                  $timeout(function() {
                     $window.location = loginUrl;
                   }, 150);
                 } else {

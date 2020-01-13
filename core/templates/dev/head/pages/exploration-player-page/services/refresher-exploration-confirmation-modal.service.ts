@@ -23,11 +23,11 @@ require('services/contextual/url.service.ts');
 
 angular.module('oppia').factory(
   'RefresherExplorationConfirmationModalService', [
-    '$uibModal', 'ExplorationEngineService', 'UrlInterpolationService',
-    'UrlService',
+    '$timeout', '$uibModal', 'ExplorationEngineService',
+    'UrlInterpolationService', 'UrlService',
     function(
-        $uibModal, ExplorationEngineService, UrlInterpolationService,
-        UrlService) {
+        $timeout, $uibModal, ExplorationEngineService,
+        UrlInterpolationService, UrlService) {
       return {
         displayRedirectConfirmationModal: function(
             refresherExplorationId, redirectConfirmationCallback) {
@@ -65,7 +65,7 @@ angular.module('oppia').factory(
                   // time to complete.
                   // TODO(bhenning): Find a reliable way to send events that
                   // does not get interrupted with browser redirection.
-                  setTimeout(function() {
+                  $timeout(function() {
                     $window.open(url, '_self');
                   }, 150);
 

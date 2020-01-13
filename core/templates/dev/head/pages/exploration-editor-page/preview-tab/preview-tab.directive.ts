@@ -59,7 +59,7 @@ angular.module('oppia').directive('previewTab', [
         'preview-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$q', '$scope', '$uibModal', 'ContextService',
+        '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
         'DebugInfoTrackerService', 'EditableExplorationBackendApiService',
         'ExplorationDataService', 'ExplorationEngineService',
         'ExplorationFeaturesService', 'ExplorationInitStateNameService',
@@ -68,7 +68,7 @@ angular.module('oppia').directive('previewTab', [
         'PlayerCorrectnessFeedbackEnabledService', 'StateEditorService',
         'UrlInterpolationService',
         function(
-            $q, $scope, $uibModal, ContextService,
+            $q, $scope, $timeout, $uibModal, ContextService,
             DebugInfoTrackerService, EditableExplorationBackendApiService,
             ExplorationDataService, ExplorationEngineService,
             ExplorationFeaturesService, ExplorationInitStateNameService,
@@ -147,7 +147,7 @@ angular.module('oppia').directive('previewTab', [
             ctrl.isExplorationPopulated = false;
             var initStateNameForPreview = (
               ExplorationInitStateNameService.savedMemento);
-            setTimeout(function() {
+            $timeout(function() {
               var explorationId = ContextService.getExplorationId();
               EditableExplorationBackendApiService.fetchApplyDraftExploration(
                 explorationId).then(function(returnDict) {

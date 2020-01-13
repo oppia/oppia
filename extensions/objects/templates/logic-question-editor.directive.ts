@@ -29,8 +29,8 @@ import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
 
 
 angular.module('oppia').directive('logicQuestionEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  '$timeout', 'UrlInterpolationService',
+  function($timeout, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -65,7 +65,7 @@ angular.module('oppia').directive('logicQuestionEditor', [
           ctrl.buildQuestion();
           // NOTE: angular will reset the position of the cursor after this
           // function runs, so we need to delay our re-resetting.
-          setTimeout(function() {
+          $timeout(function() {
             (<HTMLInputElement>element).selectionEnd = cursorPosition;
           }, 2);
         };

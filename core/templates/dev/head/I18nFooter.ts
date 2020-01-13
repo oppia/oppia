@@ -29,10 +29,10 @@ angular.module('oppia').directive('i18nFooter', [
       template: require('!html-loader!./i18n-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$translate', 'UserService',
+        '$http', '$timeout', '$translate', 'UserService',
         'SUPPORTED_SITE_LANGUAGES',
         function(
-            $http, $translate, UserService,
+            $http, $timeout, $translate, UserService,
             SUPPORTED_SITE_LANGUAGES) {
           var ctrl = this;
           // Changes the language of the translations.
@@ -51,10 +51,10 @@ angular.module('oppia').directive('i18nFooter', [
           ctrl.$onInit = function() {
             ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
 
-            // The setTimeout seems to be necessary for the dropdown
+            // The $timeout seems to be necessary for the dropdown
             // to show anything at the outset, if the default language
             // is not English.
-            setTimeout(function() {
+            $timeout(function() {
               // $translate.use() returns undefined until the language
               // file is fully loaded, which causes a blank field
               // in the dropdown, hence we use $translate.proposedLanguage()

@@ -36,12 +36,12 @@ angular.module('oppia').directive('signupPage', [
         '/pages/signup-page/signup-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', '$uibModal', 'AlertsService',
+        '$http', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
         'FocusManagerService', 'SiteAnalyticsService',
         'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
         'DASHBOARD_TYPE_LEARNER', 'SITE_NAME',
         function(
-            $http, $rootScope, $uibModal, AlertsService,
+            $http, $rootScope, $timeout, $uibModal, AlertsService,
             FocusManagerService, SiteAnalyticsService,
             UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
             DASHBOARD_TYPE_LEARNER, SITE_NAME) {
@@ -200,7 +200,7 @@ angular.module('oppia').directive('signupPage', [
                     UserService.getLoginUrlAsync().then(
                       function(loginUrl) {
                         if (loginUrl) {
-                          setTimeout(function() {
+                          $timeout(function() {
                             $window.location = loginUrl;
                           }, 150);
                         } else {

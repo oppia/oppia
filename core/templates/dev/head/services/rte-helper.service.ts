@@ -23,11 +23,11 @@ require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').factory('RteHelperService', [
-  '$document', '$log', '$uibModal',
+  '$document', '$log', '$timeout', '$uibModal',
   'FocusManagerService', 'HtmlEscaperService',
   'UrlInterpolationService', 'INLINE_RTE_COMPONENTS', 'RTE_COMPONENT_SPECS',
   function(
-      $document, $log, $uibModal,
+      $document, $log, $timeout, $uibModal,
       FocusManagerService, HtmlEscaperService,
       UrlInterpolationService, INLINE_RTE_COMPONENTS, RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
@@ -103,7 +103,7 @@ angular.module('oppia').factory('RteHelperService', [
               // modal instead.
               $scope.modalIsLoading = true;
               FocusManagerService.setFocus('tmpFocusPoint');
-              setTimeout(function() {
+              $timeout(function() {
                 $scope.modalIsLoading = false;
               });
 

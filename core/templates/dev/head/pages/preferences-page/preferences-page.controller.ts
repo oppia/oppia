@@ -46,14 +46,14 @@ angular.module('oppia').directive('preferencesPage', [
         '/pages/preferences-page/preferences-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$q', '$rootScope', '$scope', '$translate',
+        '$http', '$q', '$rootScope', '$scope', '$translate', '$timeout',
         '$window', '$uibModal', 'AlertsService', 'LanguageUtilService',
         'UrlInterpolationService', 'UserService', 'UtilsService',
         'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
         'ENABLE_ACCOUNT_DELETION', 'SUPPORTED_AUDIO_LANGUAGES',
         'SUPPORTED_SITE_LANGUAGES',
         function(
-            $http, $q, $rootScope, $scope, $translate,
+            $http, $q, $rootScope, $scope, $translate, $timeout,
             $window, $uibModal, AlertsService, LanguageUtilService,
             UrlInterpolationService, UserService, UtilsService,
             DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
@@ -78,7 +78,7 @@ angular.module('oppia').directive('preferencesPage', [
           // and this function to force it to reload
           var _forceSelect2Refresh = function() {
             ctrl.select2DropdownIsShown = false;
-            setTimeout(function() {
+            $timeout(function() {
               ctrl.select2DropdownIsShown = true;
             }, 100);
           };
@@ -194,7 +194,7 @@ angular.module('oppia').directive('preferencesPage', [
                       };
                       reader.readAsDataURL(file);
 
-                      setTimeout(function() {
+                      $timeout(function() {
                         $('.oppia-profile-image-uploader').fadeIn();
                       }, 100);
                     });

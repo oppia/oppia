@@ -159,7 +159,7 @@ angular.module('oppia').directive('explorationEditorPage', [
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache',
-        '$uibModal', '$window', 'AutosaveInfoModalsService',
+        '$timeout', '$uibModal', '$window', 'AutosaveInfoModalsService',
         'ChangeListService', 'ContextService', 'EditabilityService',
         'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
         'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
@@ -179,7 +179,7 @@ angular.module('oppia').directive('explorationEditorPage', [
         'EVENT_EXPLORATION_PROPERTY_CHANGED',
         function(
             $http, $log, $q, $rootScope, $scope, $templateCache,
-            $uibModal, $window, AutosaveInfoModalsService,
+            $timeout, $uibModal, $window, AutosaveInfoModalsService,
             ChangeListService, ContextService, EditabilityService,
             ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
             ExplorationCorrectnessFeedbackService, ExplorationDataService,
@@ -416,10 +416,10 @@ angular.module('oppia').directive('explorationEditorPage', [
 
           ctrl.startTutorial = function() {
             RouterService.navigateToMainTab();
-            // The setTimeout wrapper is needed for all components on the page
+            // The $timeout wrapper is needed for all components on the page
             // to load, otherwise elements within ng-if's are not guaranteed to
             // be present on the page.
-            setTimeout(function() {
+            $timeout(function() {
               EditabilityService.onStartTutorial();
               ctrl.tutorialInProgress = true;
             });

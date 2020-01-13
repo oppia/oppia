@@ -34,14 +34,14 @@ angular.module('oppia').directive('searchResults', [
         '/pages/library-page/search-results/search-results.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$q', '$window',
+        '$scope', '$rootScope', '$q', '$timeout', '$window',
         'SiteAnalyticsService', 'UserService',
-        function($scope, $rootScope, $q, $window,
+        function($scope, $rootScope, $q, $timeout, $window,
             SiteAnalyticsService, UserService) {
           var ctrl = this;
           ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
-            setTimeout(function() {
+            $timeout(function() {
               $window.location = destinationUrl;
             }, 150);
             return false;

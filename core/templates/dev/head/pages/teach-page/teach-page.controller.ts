@@ -35,10 +35,10 @@ angular.module('oppia').directive('teachPage', [
         '/pages/teach-page/teach-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$window', 'SiteAnalyticsService',
+        '$window', '$timeout', 'SiteAnalyticsService',
         'UrlInterpolationService',
         function(
-            $window, SiteAnalyticsService,
+            $window, $timeout, SiteAnalyticsService,
             UrlInterpolationService) {
           var ctrl = this;
           var activeTabClass = 'oppia-about-tabs-active';
@@ -63,7 +63,7 @@ angular.module('oppia').directive('teachPage', [
 
           ctrl.onApplyToTeachWithOppia = function() {
             SiteAnalyticsService.registerApplyToTeachWithOppiaEvent();
-            setTimeout(function() {
+            $timeout(function() {
               $window.location = ctrl.TEACH_FORM_URL;
             }, 150);
             return false;

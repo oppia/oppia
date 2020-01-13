@@ -25,16 +25,16 @@ require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/local-storage.service.ts');
 
 angular.module('oppia').factory('AutosaveInfoModalsService', [
-  '$log', '$uibModal', '$window',
+  '$log', '$timeout', '$uibModal', '$window',
   'ChangesInHumanReadableFormService', 'ExplorationDataService',
   'LocalStorageService', 'UrlInterpolationService',
   function(
-      $log, $uibModal, $window,
+      $log, $timeout, $uibModal, $window,
       ChangesInHumanReadableFormService, ExplorationDataService,
       LocalStorageService, UrlInterpolationService) {
     var _isModalOpen = false;
     var _refreshPage = function(delay) {
-      setTimeout(function() {
+      $timeout(function() {
         $window.location.reload();
       }, delay);
     };

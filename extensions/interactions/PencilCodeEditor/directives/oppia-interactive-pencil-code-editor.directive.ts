@@ -31,9 +31,11 @@ require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
-  'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  '$timeout', 'HtmlEscaperService', 'UrlInterpolationService',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
-      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
+      $timeout, HtmlEscaperService, UrlInterpolationService,
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -185,7 +187,7 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
                 error: error.message
               }, PencilCodeEditorRulesService);
 
-              setTimeout(function() {
+              $timeout(function() {
                 errorIsHappening = false;
               }, 1000);
             });

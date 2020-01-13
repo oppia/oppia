@@ -55,11 +55,11 @@ angular.module('oppia').directive('ruleEditor', [
         '/components/state-directives/rule-editor/rule-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', 'StateEditorService',
+        '$scope', '$timeout', 'StateEditorService',
         'ValidatorsService', 'INTERACTION_SPECS',
         'ResponsesService', 'StateInteractionIdService',
         function(
-            $scope, StateEditorService,
+            $scope, $timeout, StateEditorService,
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
           var ctrl = this;
@@ -191,7 +191,7 @@ angular.module('oppia').directive('ruleEditor', [
             // interaction, where the rule inputs can sometimes be integers and
             // sometimes be lists of music notes.
             ctrl.ruleDescriptionFragments = [];
-            setTimeout(function() {
+            $timeout(function() {
               ctrl.ruleDescriptionFragments = result;
             }, 10);
 

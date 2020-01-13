@@ -39,11 +39,11 @@ angular.module('oppia').directive('topicLandingPage', [
         'topic-landing-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$filter', '$window', 'PageTitleService',
+        '$filter', '$timeout', '$window', 'PageTitleService',
         'SiteAnalyticsService', 'UrlInterpolationService',
         'TOPIC_LANDING_PAGE_DATA',
         function(
-            $filter, $window, PageTitleService,
+            $filter, $timeout, $window, PageTitleService,
             SiteAnalyticsService, UrlInterpolationService,
             TOPIC_LANDING_PAGE_DATA) {
           var ctrl = this;
@@ -86,7 +86,7 @@ angular.module('oppia').directive('topicLandingPage', [
             var collectionId = topicData.collection_id;
             SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
               collectionId);
-            setTimeout(function() {
+            $timeout(function() {
               $window.location = UrlInterpolationService.interpolateUrl(
                 '/collection/<collection_id>', {
                   collection_id: collectionId
@@ -95,13 +95,13 @@ angular.module('oppia').directive('topicLandingPage', [
           };
 
           ctrl.onClickLearnMoreButton = function() {
-            setTimeout(function() {
+            $timeout(function() {
               $window.location = '/splash';
             }, 150);
           };
 
           ctrl.onClickExploreLessonsButton = function() {
-            setTimeout(function() {
+            $timeout(function() {
               $window.location = '/library';
             }, 150);
           };

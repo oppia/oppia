@@ -23,11 +23,11 @@ require('services/csrf-token.service.ts');
 require('services/site-analytics.service.ts');
 
 angular.module('oppia').factory('ExplorationCreationService', [
-  '$http', '$rootScope', '$uibModal', '$window',
+  '$http', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'CsrfTokenService', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(
-      $http, $rootScope, $uibModal, $window,
+      $http, $rootScope, $timeout, $uibModal, $window,
       AlertsService, CsrfTokenService, SiteAnalyticsService,
       UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
@@ -48,7 +48,7 @@ angular.module('oppia').factory('ExplorationCreationService', [
         }).then(function(response) {
           SiteAnalyticsService.registerCreateNewExplorationEvent(
             response.data.explorationId);
-          setTimeout(function() {
+          $timeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(
               CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
                 exploration_id: response.data.explorationId

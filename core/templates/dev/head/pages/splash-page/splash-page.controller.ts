@@ -30,9 +30,9 @@ angular.module('oppia').directive('splashPage', [function() {
     template: require('!html-loader!./splash-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$rootScope', '$window', 'SiteAnalyticsService',
+      '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
       'UrlInterpolationService', 'UserService',
-      function($rootScope, $window, SiteAnalyticsService,
+      function($rootScope, $timeout, $window, SiteAnalyticsService,
           UrlInterpolationService, UserService) {
         var ctrl = this;
         ctrl.getStaticImageUrl = function(imagePath) {
@@ -46,7 +46,7 @@ angular.module('oppia').directive('splashPage', [function() {
         ctrl.onRedirectToLogin = function(destinationUrl) {
           SiteAnalyticsService.registerStartLoginEvent(
             'splashPageCreateExplorationButton');
-          setTimeout(function() {
+          $timeout(function() {
             $window.location = destinationUrl;
           }, 150);
           return false;
@@ -54,7 +54,7 @@ angular.module('oppia').directive('splashPage', [function() {
 
         ctrl.onClickBrowseLibraryButton = function() {
           SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-          setTimeout(function() {
+          $timeout(function() {
             $window.location = '/library';
           }, 150);
           return false;
@@ -62,7 +62,7 @@ angular.module('oppia').directive('splashPage', [function() {
 
         ctrl.onClickCreateExplorationButton = function() {
           SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
-          setTimeout(function() {
+          $timeout(function() {
             $window.location = '/creator_dashboard?mode=create';
           }, 150);
           return false;

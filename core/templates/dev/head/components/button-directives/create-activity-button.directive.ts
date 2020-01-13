@@ -33,12 +33,12 @@ angular.module('oppia').directive('createActivityButton', [
         '!html-loader!./create-activity-button.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$window', '$uibModal',
+        '$timeout', '$window', '$uibModal',
         'ExplorationCreationService', 'CollectionCreationService',
         'SiteAnalyticsService', 'UrlService', 'UserService',
         'ALLOW_YAML_FILE_UPLOAD',
         function(
-            $window, $uibModal,
+            $timeout, $window, $uibModal,
             ExplorationCreationService, CollectionCreationService,
             SiteAnalyticsService, UrlService, UserService,
             ALLOW_YAML_FILE_UPLOAD) {
@@ -46,7 +46,7 @@ angular.module('oppia').directive('createActivityButton', [
           ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent(
               'createActivityButton');
-            setTimeout(function() {
+            $timeout(function() {
               $window.location = destinationUrl;
             }, 150);
             return false;

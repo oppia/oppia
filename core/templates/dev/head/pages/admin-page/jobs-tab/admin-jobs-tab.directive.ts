@@ -22,10 +22,10 @@ require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminJobsTab', [
-  '$http', 'AdminDataService', 'UrlInterpolationService',
+  '$http', '$timeout', 'AdminDataService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', 'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
   function(
-      $http, AdminDataService, UrlInterpolationService,
+      $http, $timeout, AdminDataService, UrlInterpolationService,
       ADMIN_HANDLER_URL, ADMIN_JOB_OUTPUT_URL_TEMPLATE) {
     return {
       restrict: 'E',
@@ -47,7 +47,7 @@ angular.module('oppia').directive('adminJobsTab', [
             ctrl.showingJobOutput = true;
             ctrl.jobOutput = response.data.output || [];
             ctrl.jobOutput.sort();
-            setTimeout(function() {
+            $timeout(function() {
               document.querySelector('#job-output').scrollIntoView();
             });
           });

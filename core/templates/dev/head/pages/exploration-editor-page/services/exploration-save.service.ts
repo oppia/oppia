@@ -52,7 +52,7 @@ require('services/site-analytics.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').factory('ExplorationSaveService', [
-  '$log', '$q', '$rootScope', '$uibModal', '$window',
+  '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
   'ExplorationCategoryService', 'ExplorationDataService',
   'ExplorationDiffService', 'ExplorationInitStateNameService',
@@ -63,7 +63,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
   'SiteAnalyticsService', 'StatesObjectFactory', 'UrlInterpolationService',
   'DEFAULT_LANGUAGE_CODE',
   function(
-      $log, $q, $rootScope, $uibModal, $window,
+      $log, $q, $rootScope, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
       ExplorationCategoryService, ExplorationDataService,
       ExplorationDiffService, ExplorationInitStateNameService,
@@ -289,7 +289,7 @@ angular.module('oppia').factory('ExplorationSaveService', [
             controller: [
               '$scope', '$uibModalInstance',
               function($scope, $uibModalInstance) {
-                setTimeout(function() {
+                $timeout(function() {
                   $uibModalInstance.dismiss('cancel');
                 }, 2500);
               }
@@ -431,13 +431,13 @@ angular.module('oppia').factory('ExplorationSaveService', [
                   ExplorationLanguageCodeService.saveDisplayedValue();
                   ExplorationTagsService.saveDisplayedValue();
 
-                  // TODO(sll): Get rid of the setTimeout here.
+                  // TODO(sll): Get rid of the $timeout here.
                   // It's currently used because there is a race condition: the
                   // saveDisplayedValue() calls above result in autosave calls.
                   // These race with the discardDraft() call that
                   // will be called when the draft changes entered here
                   // are properly saved to the backend.
-                  setTimeout(function() {
+                  $timeout(function() {
                     $uibModalInstance.close(metadataList);
                   }, 500);
                 };
@@ -603,9 +603,9 @@ angular.module('oppia').factory('ExplorationSaveService', [
             if (onEndLoadingCallback) {
               onEndLoadingCallback();
             }
-            // The setTimeout seems to be needed
+            // The $timeout seems to be needed
             // in order to give the modal time to render.
-            setTimeout(function() {
+            $timeout(function() {
               FocusManagerService.setFocus('saveChangesModalOpened');
             });
           });

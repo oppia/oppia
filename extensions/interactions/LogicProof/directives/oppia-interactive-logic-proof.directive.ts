@@ -49,11 +49,11 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
         'logic-proof-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$uibModal', 'LogicProofRulesService',
+        '$scope', '$attrs', '$timeout', '$uibModal', 'LogicProofRulesService',
         'WindowDimensionsService', 'UrlService',
         'CurrentInteractionService',
         function(
-            $scope, $attrs, $uibModal, LogicProofRulesService,
+            $scope, $attrs, $timeout, $uibModal, LogicProofRulesService,
             WindowDimensionsService, UrlService,
             CurrentInteractionService) {
           var ctrl = this;
@@ -75,7 +75,7 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
 
             // NOTE: this is necessary to avoid the textarea being greyed-out.
             // See: http://stackoverflow.com/questions/8349571 for discussion.
-            setTimeout(function() {
+            $timeout(function() {
               editor.refresh();
             }, 500);
 

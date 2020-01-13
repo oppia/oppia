@@ -26,7 +26,8 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('versionDiffVisualization', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  '$timeout', 'UrlInterpolationService',
+  function($timeout, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -189,7 +190,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
                   // Note: the timeout is needed or the string will be sent
                   // before codemirror has fully loaded and will not be
                   // displayed. This causes issues with the e2e tests.
-                  setTimeout(function() {
+                  $timeout(function() {
                     $scope.yamlStrs.leftPane = '';
                   }, 200);
                 }
@@ -205,7 +206,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
                   // Note: the timeout is needed or the string will be sent
                   // before codemirror has fully loaded and will not be
                   // displayed. This causes issues with the e2e tests.
-                  setTimeout(function() {
+                  $timeout(function() {
                     $scope.yamlStrs.rightPane = '';
                   }, 200);
                 }

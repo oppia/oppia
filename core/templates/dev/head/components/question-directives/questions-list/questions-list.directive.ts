@@ -66,7 +66,7 @@ angular.module('oppia').directive('questionsList', [
         'questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$http', '$q', '$uibModal', '$window',
+        '$scope', '$filter', '$http', '$q', '$timeout', '$uibModal', '$window',
         '$location', 'AlertsService', 'QuestionCreationService', 'UrlService',
         'NUM_QUESTIONS_PER_PAGE', 'EditableQuestionBackendApiService',
         'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
@@ -76,7 +76,7 @@ angular.module('oppia').directive('questionsList', [
         'MODE_SELECT_SKILL', 'SKILL_DIFFICULTIES', 'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService', 'QuestionsListService',
         function(
-            $scope, $filter, $http, $q, $uibModal, $window,
+            $scope, $filter, $http, $q, $timeout, $uibModal, $window,
             $location, AlertsService, QuestionCreationService, UrlService,
             NUM_QUESTIONS_PER_PAGE, EditableQuestionBackendApiService,
             EditableSkillBackendApiService, MisconceptionObjectFactory,
@@ -478,7 +478,7 @@ angular.module('oppia').directive('questionsList', [
                     function() {
                       count++;
                       if (count === changedDifficultyCount) {
-                        setTimeout(function() {
+                        $timeout(function() {
                           QuestionsListService.resetPageNumber();
                           ctrl.getQuestionSummariesAsync(
                             ctrl.selectedSkillIds, true, true
@@ -676,7 +676,7 @@ angular.module('oppia').directive('questionsList', [
                 EditableQuestionBackendApiService.editQuestionSkillLinks(
                   questionId, array, questionDifficulty).then(
                   data => {
-                    setTimeout(function() {
+                    $timeout(function() {
                       QuestionsListService.resetPageNumber();
                       _reInitializeSelectedSkillIds();
                       ctrl.getQuestionSummariesAsync(

@@ -47,7 +47,7 @@ angular.module('oppia').directive('libraryPage', [
         '/pages/library-page/library-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$rootScope', '$scope', '$uibModal',
+        '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
         '$window', 'AlertsService', 'LearnerDashboardActivityIdsObjectFactory',
         'LearnerDashboardIdsBackendApiService', 'LearnerPlaylistService',
         'PageTitleService', 'SearchService',
@@ -55,7 +55,7 @@ angular.module('oppia').directive('libraryPage', [
         'WindowDimensionsService', 'ALL_CATEGORIES',
         'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES', 'LIBRARY_TILE_WIDTH_PX',
         function(
-            $http, $log, $rootScope, $scope, $uibModal,
+            $http, $log, $rootScope, $scope, $timeout, $uibModal,
             $window, AlertsService, LearnerDashboardActivityIdsObjectFactory,
             LearnerDashboardIdsBackendApiService, LearnerPlaylistService,
             PageTitleService, SearchService,
@@ -179,7 +179,7 @@ angular.module('oppia').directive('libraryPage', [
             if (ctrl.pageMode !== LIBRARY_PAGE_MODES.SEARCH) {
               $('.oppia-library-container').fadeOut(function() {
                 ctrl.pageMode = LIBRARY_PAGE_MODES.SEARCH;
-                setTimeout(function() {
+                $timeout(function() {
                   $('.oppia-library-container').fadeIn();
                 }, 50);
               });
@@ -317,12 +317,12 @@ angular.module('oppia').directive('libraryPage', [
 
                 // Initialize the carousel(s) on the library index page.
                 // Pause is necessary to ensure all elements have loaded.
-                setTimeout(initCarousels, 390);
+                $timeout(initCarousels, 390);
 
 
                 // Check if actual and expected widths are the same.
                 // If not produce an error that would be caught by e2e tests.
-                setTimeout(function() {
+                $timeout(function() {
                   var actualWidth = $('exploration-summary-tile').width();
                   if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
                     console.error(

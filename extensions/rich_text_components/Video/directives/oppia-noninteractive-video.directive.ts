@@ -26,8 +26,8 @@ require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveVideo', [
-  '$sce', 'HtmlEscaperService', 'UrlInterpolationService',
-  function($sce, HtmlEscaperService, UrlInterpolationService) {
+  '$sce', '$timeout', 'HtmlEscaperService', 'UrlInterpolationService',
+  function($sce, $timeout, HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -51,7 +51,7 @@ angular.module('oppia').directive('oppiaNoninteractiveVideo', [
             ctrl.timingParams = '&start=' + start + '&end=' + end;
             ctrl.autoplaySuffix = '&autoplay=0';
 
-            setTimeout(function() {
+            $timeout(function() {
               // Check whether creator wants to autoplay this video or not
               var autoplayVal = HtmlEscaperService.escapedJsonToObj(
                 $attrs.autoplayWithValue);

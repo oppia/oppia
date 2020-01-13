@@ -33,15 +33,15 @@ angular.module('oppia').directive('donatePage', [
         '/pages/donate-page/donate-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$window', 'SiteAnalyticsService',
+        '$http', '$timeout', '$window', 'SiteAnalyticsService',
         'UrlInterpolationService', 'WindowDimensionsService',
         function(
-            $http, $window, SiteAnalyticsService,
+            $http, $timeout, $window, SiteAnalyticsService,
             UrlInterpolationService, WindowDimensionsService) {
           var ctrl = this;
           ctrl.onDonateThroughAmazon = function() {
             SiteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
-            setTimeout(function() {
+            $timeout(function() {
               $window.location = 'https://smile.amazon.com/ch/81-1740068';
             }, 150);
             return false;

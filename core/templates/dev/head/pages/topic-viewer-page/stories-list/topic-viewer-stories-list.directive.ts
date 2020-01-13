@@ -22,7 +22,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('storiesList', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  '$timeout', 'UrlInterpolationService',
+  function($timeout, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -125,7 +126,7 @@ angular.module('oppia').directive('storiesList', [
           $scope.decrementLeftmostCardIndex = function() {
             $scope.leftmostCardIndices--;
           };
-          setTimeout(function() {
+          $timeout(function() {
             initCarousels();
           }, 390);
 

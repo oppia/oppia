@@ -20,10 +20,10 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
-  '$http', '$rootScope', '$uibModal', '$window', 'AlertsService',
+  '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'UrlInterpolationService',
   function(
-      $http, $rootScope, $uibModal, $window, AlertsService,
+      $http, $rootScope, $timeout, $uibModal, $window, AlertsService,
       UrlInterpolationService) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
@@ -78,7 +78,7 @@ angular.module('oppia').factory('TopicCreationService', [
             name: topic.topicName,
             abbreviated_name: topic.abbreviatedTopicName
           }).then(function(response) {
-            setTimeout(function() {
+            $timeout(function() {
               $window.location = UrlInterpolationService.interpolateUrl(
                 TOPIC_EDITOR_URL_TEMPLATE, {
                   topic_id: response.data.topicId

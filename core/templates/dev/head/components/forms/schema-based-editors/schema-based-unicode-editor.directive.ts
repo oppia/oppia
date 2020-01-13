@@ -44,8 +44,11 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
         'schema-based-unicode-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$sce', '$translate', 'DeviceInfoService',
-        function($scope, $filter, $sce, $translate, DeviceInfoService) {
+        '$scope', '$filter', '$sce', '$timeout', '$translate',
+        'DeviceInfoService',
+        function(
+            $scope, $filter, $sce, $timeout, $translate,
+            DeviceInfoService) {
           var ctrl = this;
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
@@ -121,7 +124,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
                 ctrl.codemirrorOptions.mode = ctrl.uiConfig().coding_mode;
               }
 
-              setTimeout(function() {
+              $timeout(function() {
                 ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
               }, 200);
 
@@ -129,7 +132,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
               // timeout seems to be needed for the line numbers etc. to display
               // properly.
               $scope.$on('schemaBasedFormsShown', function() {
-                setTimeout(function() {
+                $timeout(function() {
                   ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
                 }, 200);
               });

@@ -41,13 +41,13 @@ angular.module('oppia').directive('editorNavigation', [
         '/pages/exploration-editor-page/editor-navigation/' +
         'editor-navigation.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$uibModal', 'ContextService',
+        '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
         'ExplorationWarningsService', 'ImprovementTaskService', 'RouterService',
         'SiteAnalyticsService', 'StateTutorialFirstTimeService',
         'ThreadDataService', 'UserService', 'WindowDimensionsService',
         function(
-            $rootScope, $scope, $uibModal, ContextService,
+            $rootScope, $scope, $timeout, $uibModal, ContextService,
             ExplorationFeaturesService, ExplorationRightsService,
             ExplorationWarningsService, ImprovementTaskService, RouterService,
             SiteAnalyticsService, StateTutorialFirstTimeService,
@@ -174,7 +174,7 @@ angular.module('oppia').directive('editorNavigation', [
             $scope.$on('openPostTutorialHelpPopover', function() {
               if ($scope.isLargeScreen) {
                 $scope.popoverControlObject.postTutorialHelpPopoverIsShown = true;
-                setTimeout(function() {
+                $timeout(function() {
                   $scope.popoverControlObject
                     .postTutorialHelpPopoverIsShown = false;
                 }, 4000);
