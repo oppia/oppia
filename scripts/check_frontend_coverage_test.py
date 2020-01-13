@@ -64,25 +64,6 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         self.check_call_swap = self.swap(
             subprocess, 'check_call', mock_check_call)
 
-    def test_run_frontend_tests_script(self):
-        with self.check_call_swap:
-            check_frontend_coverage.run_frontend_tests_script()
-        self.assertEqual(
-            self.check_function_calls['check_call_is_called'],
-            True)
-
-    def test_run_frontend_tests_script_error(self):
-        def mock_check_call(test): # pylint: disable=unused-argument
-            raise subprocess.CalledProcessError(1, '')
-
-        check_call_swap = self.swap(subprocess, 'check_call', mock_check_call)
-        with check_call_swap:
-            with self.assertRaisesRegexp(
-                SystemExit,
-                'The frontend tests failed. Please fix it before running the'
-                ' test coverage check.'):
-                check_frontend_coverage.run_frontend_tests_script()
-
     def test_get_stanzas_from_lcov_file(self):
         self.lcov_items_list = (
             'SF:/opensource/oppia/file.ts\n'

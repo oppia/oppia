@@ -228,18 +228,6 @@ class LcovStanzaRelevantLines(python_utils.OBJECT):
         self.covered_lines = int(match.group(1))
 
 
-def run_frontend_tests_script():
-    """Run the frontend tests script using subprocess. If any test fails then
-    the coverage check won't happen.
-    """
-    try:
-        subprocess.check_call([
-            'python', '-m', 'scripts.run_frontend_tests'])
-    except subprocess.CalledProcessError:
-        sys.exit('The frontend tests failed. Please fix it before running the'
-                 ' test coverage check.')
-
-
 def get_stanzas_from_lcov_file():
     """Get all stanzas from a lcov file. The lcov file gather all the frontend
     files that has tests and each one has the following structure:
@@ -339,8 +327,6 @@ def main():
     """Runs all the steps for checking if there is any decrease of 100% covered
     files in the frontend.
     """
-    run_frontend_tests_script()
-
     check_coverage_changes()
 
 
