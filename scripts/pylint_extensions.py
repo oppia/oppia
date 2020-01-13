@@ -1385,26 +1385,27 @@ class DocstringChecker(checkers.BaseChecker):
 
 
 class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
-    """Checks if there is a single space between file overview and imports."""
+    """Checks if there is an empty line between file overview and imports."""
 
     __implements__ = interfaces.IRawChecker
     name = 'space_between_imports_and_file-overview'
     priority = -1
     msgs = {
         'C0024': (
-            'No space used between file overview and import.',
-            'no-space-provided-below-fileoverview',
-            'please provide a space between file overview and imports.'
+            'No empty line used between file overview and import.',
+            'no-empty-line-provided-below-fileoverview',
+            'please provide a line between file overview and imports.'
         ),
         'C0025': (
-            'Single space should be provided above imports.',
-            'only-single-space-should-be-provided',
+            'Single empty line should be provided above imports.',
+            'only-a-single-empty-line-should-be-provided',
             'please provide a single new line above imports.'
         )
     }
 
     def process_module(self, node):
-        """Process a module to ensure that comments follow correct style.
+        """Process a module to ensure that there is an empty line between
+        file overview and imports.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
@@ -1439,12 +1440,12 @@ class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
             if line.startswith(b'import') or line.startswith(b'from'):
                 if previous_line.endswith(b'"""'):
                     self.add_message(
-                        'no-space-provided-below-fileoverview',
+                        'no-empty-line-provided-below-fileoverview',
                         line=line_num + 1)
                 if (file_content[line_num - 1] == b'\n' and
                         file_content[line_num - 2] == b'\n'):
                     self.add_message(
-                        'only-single-space-should-be-provided',
+                        'only-a-single-empty-line-should-be-provided',
                         line=line_num + 1)
 
 

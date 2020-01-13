@@ -2006,7 +2006,7 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
             node_no_space_above_import)
 
         message = testutils.Message(
-            msg_id='no-space-provided-below-fileoverview',
+            msg_id='no-empty-line-provided-below-fileoverview',
             line=3)
 
         with self.checker_test_object.assertAddsMessages(message):
@@ -2032,7 +2032,7 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
             node_no_space_above_import_from)
 
         message = testutils.Message(
-            msg_id='no-space-provided-below-fileoverview',
+            msg_id='no-empty-line-provided-below-fileoverview',
             line=3)
 
         with self.checker_test_object.assertAddsMessages(message):
@@ -2061,7 +2061,7 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
             node_extra_space_above_import)
 
         message = testutils.Message(
-            msg_id='only-single-space-should-be-provided', line=5)
+            msg_id='only-a-single-empty-line-should-be-provided', line=5)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2088,7 +2088,7 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
             node_extra_space_above_import_from)
 
         message = testutils.Message(
-            msg_id='only-single-space-should-be-provided', line=5)
+            msg_id='only-a-single-empty-line-should-be-provided', line=5)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
