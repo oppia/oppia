@@ -111,7 +111,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             self.TOPIC_ID, 'user', name='Topic',
             abbreviated_name='abbrev', thumbnail_filename=None,
             description='A new topic', canonical_story_ids=[story.id],
-            additional_story_ids=[], uncategorized_skill_ids=[self.skill_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
         topic_services.publish_topic(self.TOPIC_ID, self.admin_id)
         topic_services.publish_story(
