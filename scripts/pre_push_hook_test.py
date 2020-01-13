@@ -509,7 +509,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
 
-    def test_does_diff_include_travis_yaml_or_protractor_conf_file_failure(self):
+    def test_invalid_travis_e2e_test_suites_failure(self):
         self.does_diff_include_travis_yaml_or_protractor_conf_file = True
 
         def mock_start_python_script(unused_script):

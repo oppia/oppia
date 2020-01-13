@@ -24,24 +24,30 @@ import re
 import python_utils
 import utils
 
+# These 4 test suites are not present in travis ci.
+# One is extra ie. (full: [*.js]), and three other tests that
+# are being run by circleCi.
+TEST_SUITES_NOT_RUN_ON_TRAVIS = ['full', 'classroomPage', 'fileUploadFeatures',
+    'topicAndStoryEditor']
+
 
 def get_e2e_suite_names_from_jobs_travis_yml_file():
     """Extracts the env/jobs section from the .travis.yml file.
 
     Returns:
-        list(str). A list of names of test suites in jobs section in travis.yml file.
+        list(str). A list of names of test suites in sorted alphabetical
+        order of jobs section in travis.yml file.
     """
-    travis_file = read_and_parse_travis_yml_file()
-    jobs_raw = travis_file['env']['jobs']
+    travis_file_content = read_and_parse_travis_yml_file()
+    jobs_str = python_utils.convert_to_bytes(travis_file_content['env']['jobs'])
     suites_from_jobs = []
-    # The following line extracts the test suite name from the jobs section that
-    # is in the form RUN_E2E_TESTS_ACCESSIBILITY=true.
-    test_regex = re.compile(r'(?<=RUN_E2E_TESTS_)(.*)(?=\=)')
-    for job in jobs_raw:
-        matches = test_regex.finditer(job)
-        for match in matches:
-            suites_from_jobs.append(
-                utils.snake_case_to_camel_case(match.group().lower()))
+    # The following line extracts the test suite name from the jobs section
+    # that is in the form RUN_E2E_TESTS_ACCESSIBILITY=true.
+    test_regex = re.compile(r'RUN_E2E_TESTS_([a-zA-Z_-]*)=')
+    jobs = test_regex.findall(jobs_str)
+    for job in jobs:
+        suites_from_jobs.append(
+            utils.snake_case_to_camel_case(job.lower()))
 
     return sorted(suites_from_jobs)
 
@@ -50,41 +56,38 @@ def get_e2e_suite_names_from_script_travis_yml_file():
     """Extracts the script section from the .travis.yml file.
 
     Returns:
-        list(str). A list of names of test suites in script section in travis.yml file.
+        list(str). A list of names of test suites in sorted alphabetical
+        order of script section in travis.yml file.
     """
-    travis_file = read_and_parse_travis_yml_file()
-    script_raw = travis_file['script']
+    travis_file_content = read_and_parse_travis_yml_file()
+    script_str = python_utils.convert_to_bytes(travis_file_content['script'])
     # The following line extracts the test suites from patterns like
     # bash scripts/run_e2e_tests.sh --suite="accessibility"
     hyphen_between_regex = re.compile(
-        r'(?<= bash scripts/run_e2e_tests.sh --suite=")(.*)(?=")')
-    suites_from_script = []
+        r'bash scripts/run_e2e_tests.sh --suite="([a-zA-Z_-]*)"')
+    suites_list = hyphen_between_regex.findall(script_str)
 
-    for script in script_raw:
-        matches = hyphen_between_regex.finditer(script)
-        for match in matches:
-            suites_from_script.append(match.group())
-
-    return sorted(suites_from_script)
+    return sorted(suites_list)
 
 
 def get_e2e_suite_names_from_protractor_file():
     """Extracts the test suites section from the .travis.yml file.
 
     Returns:
-        list(str). A list of all test suites in protractor.conf.js file.
+        list(str). A list of all test suites in sorted order
+        in protractor.conf.js file.
     """
-    protractor_config_file = read_protractor_conf_file()
+    protractor_config_file_content = read_protractor_conf_file()
     # The following line extracts suite object from protractor.conf.js.
     suite_object_string = re.compile(
-        r'suites = {([^}]+)}').findall(protractor_config_file)[0]
+        r'suites = {([^}]+)}').findall(protractor_config_file_content)[0]
 
-    # The following line extracts the keys/test suites from the key: value pair
-    # from the suites object.
-    key_regex = re.compile(r'\b(.*?)(?=:)')
+    # The following line extracts the keys/test suites from the key: value
+    # pair from the suites object.
+    key_regex = re.compile(r'\b([a-zA-Z_-]*)(?=:)')
     protractor_suites = []
     for match in key_regex.finditer(suite_object_string):
-        if len(match.group()) != 0:
+        if match.group():
             protractor_suites.append(match.group())
 
     return sorted(protractor_suites)
@@ -96,10 +99,10 @@ def read_protractor_conf_file():
     Returns:
         str. The contents of protractor.conf.js, as a string.
     """
-    protractor_config_file = python_utils.open_file(
+    protractor_config_file_content = python_utils.open_file(
         os.path.join(
             os.getcwd(), 'core', 'tests', 'protractor.conf.js'), 'r').read()
-    return protractor_config_file
+    return protractor_config_file_content
 
 
 def read_and_parse_travis_yml_file():
@@ -108,22 +111,10 @@ def read_and_parse_travis_yml_file():
     Returns:
         dict. Contents of the travis.yml file parsed as a dict.
     """
-    travis_ci_file = python_utils.open_file(
+    travis_ci_file_content = python_utils.open_file(
         os.path.join(os.getcwd(), '.travis.yml'), 'r').read()
-    travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
+    travis_ci_dict = utils.dict_from_yaml(travis_ci_file_content)
     return travis_ci_dict
-
-
-def get_e2e_test_suites_to_exclude_from_travis_ci():
-    """Returns the names of test suites to exclude from Travis CI.
-
-    Returns:
-        list(str). A list of test suites that are excluded from Travis CI.
-    """
-    # These 4 test suites are not present in travis ci.
-    # One is extra ie. (full: [*.js]), and three other tests that
-    # are being run by circleCi.
-    return ['full', 'classroomPage', 'fileUploadFeatures', 'topicAndStoryEditor']
 
 
 def main():
@@ -135,8 +126,7 @@ def main():
     yaml_jobs = get_e2e_suite_names_from_jobs_travis_yml_file()
     yaml_scripts = get_e2e_suite_names_from_script_travis_yml_file()
 
-    excluded_travis_tests = get_e2e_test_suites_to_exclude_from_travis_ci()
-    for excluded_test in excluded_travis_tests:
+    for excluded_test in TEST_SUITES_NOT_RUN_ON_TRAVIS:
         protractor_test_suites.remove(excluded_test)
 
     if not (len(yaml_jobs) > 0 and len(yaml_scripts) > 0

@@ -101,8 +101,8 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
                 DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
         expected_travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
         dummy_path = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
-            self._mock_read_travis_yml_file)
+            check_e2e_tests_are_captured_in_ci,
+            'read_and_parse_travis_yml_file', self._mock_read_travis_yml_file)
         with dummy_path:
             actual_travis_ci_dict = (
                 check_e2e_tests_are_captured_in_ci
@@ -111,28 +111,17 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
 
     def test_get_e2e_suite_names_from_jobs_travis_yml_file(self):
         dummy_path = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
-            self._mock_read_travis_yml_file)
+            check_e2e_tests_are_captured_in_ci,
+            'read_and_parse_travis_yml_file', self._mock_read_travis_yml_file)
         with dummy_path:
             actual_travis_jobs = (
                 check_e2e_tests_are_captured_in_ci
                 .get_e2e_suite_names_from_jobs_travis_yml_file())
         self.assertEqual(DUMMY_TEST_SUITES, actual_travis_jobs)
 
-    def test_get_e2e_suite_names_from_jobs_travis_yml_file_fail(self):
-        dummy_path = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
-            self._mock_read_travis_yml_file_fail)
-        with dummy_path:
-            actual_travis_jobs = (
-                check_e2e_tests_are_captured_in_ci
-                .get_e2e_suite_names_from_jobs_travis_yml_file())
-        self.assertNotEqual(DUMMY_TEST_SUITES, actual_travis_jobs)
-
     def test_get_e2e_suite_names_from_script_travis_yml_file(self):
-        dummy_path = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
-            self._mock_read_travis_yml_file)
+        dummy_path = self.swap(check_e2e_tests_are_captured_in_ci,
+           'read_and_parse_travis_yml_file',self._mock_read_travis_yml_file)
         with dummy_path:
             actual_travis_script = (
                 check_e2e_tests_are_captured_in_ci
@@ -140,9 +129,9 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
         self.assertEqual(DUMMY_TEST_SUITES, actual_travis_script)
 
     def test_get_e2e_suite_names_from_script_travis_yml_file_fail(self):
-        dummy_path = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
-            self._mock_read_travis_yml_file_fail)
+        dummy_path = self.swap(check_e2e_tests_are_captured_in_ci,
+                   'read_and_parse_travis_yml_file',
+                    self._mock_read_travis_yml_file_fail)
         with dummy_path:
             actual_travis_script = (
                 check_e2e_tests_are_captured_in_ci
@@ -159,30 +148,10 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
                 .get_e2e_suite_names_from_protractor_file())
         self.assertEqual(DUMMY_TEST_SUITES, actual_protractor_suites)
 
-    def test_get_e2e_suite_names_from_protractor_file_fail(self):
-        dummy_path = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
-            self._mock_read_protractor_conf_file_fail)
-        with dummy_path:
-            actual_protractor_suites = (
-                check_e2e_tests_are_captured_in_ci
-                .get_e2e_suite_names_from_protractor_file())
-        self.assertNotEqual(DUMMY_TEST_SUITES, actual_protractor_suites)
-
-    def test_get_e2e_test_suites_to_exclude_from_travis_ci(self):
-        actual_tests = [
-            'full', 'classroomPage', 'fileUploadFeatures', 'topicAndStoryEditor'
-        ]
-        observed_tests = (
-            check_e2e_tests_are_captured_in_ci.
-            get_e2e_test_suites_to_exclude_from_travis_ci())
-        self.assertEqual(actual_tests, observed_tests)
-
     def test_main_with_invalid_test_suites(self):
         def mock_get_e2e_suite_names_from_protractor_file():
             return ['fourWord', 'invalid', 'notPresent']
-        def mock_tests_to_remove_list():
-            return ['fourWord']
+
         mock_protractor_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_protractor_file',
@@ -190,8 +159,8 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_test_suites_to_exclude_from_travis_ci',
-            mock_tests_to_remove_list)
+            'TEST_SUITES_NOT_RUN_ON_TRAVIS',
+            ['fourWord'])
 
         with mock_protractor_test_suites, mock_tests_to_remove:
             with self.assertRaisesRegexp(Exception,
@@ -210,8 +179,8 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_test_suites_to_exclude_from_travis_ci',
-            self._return_empty_list)
+            'TEST_SUITES_NOT_RUN_ON_TRAVIS',
+            [])
 
         mock_e2e_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
@@ -235,7 +204,7 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_test_suites_to_exclude_from_travis_ci',
-            self._return_empty_list)
+            'TEST_SUITES_NOT_RUN_ON_TRAVIS',
+            [])
         with protractor_path_swap, travis_path_swap, mock_tests_to_remove:
             check_e2e_tests_are_captured_in_ci.main()
