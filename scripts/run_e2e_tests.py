@@ -327,6 +327,8 @@ def get_parameter_for_sharding(sharding_instances):
     Returns:
         list(str): A list of parameters to represent the sharding configuration.
     """
+    if sharding_instances <= 0:
+        raise ValueError('Sharding instance should be larger than 0')
     if sharding_instances == 1:
         return []
     else:

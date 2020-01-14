@@ -715,6 +715,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             ['--capabilities.shardTestFiles=True',
              '--capabilities.maxInstances=3'], result)
 
+    def test_get_parameter_for_negative_sharding_instances(self):
+        with self.assertRaises(ValueError):
+            run_e2e_tests.get_parameter_for_sharding(-3)
+
     def test_get_parameter_for_dev_mode(self):
         result = run_e2e_tests.get_parameter_for_dev_mode(True)
         self.assertEqual(result, '--params.devMode=True')
