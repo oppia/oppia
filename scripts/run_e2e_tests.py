@@ -385,7 +385,7 @@ def get_e2e_test_parameters(
 
 
 def start_google_app_engine_server(dev_mode_setting):
-    """Start the google engine server.
+    """Start the Google App Engine server.
 
     Args:
         dev_mode_setting: bool. Represents whether to run the related commands
