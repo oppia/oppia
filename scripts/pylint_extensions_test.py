@@ -2092,3 +2092,78 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
+
+    def test_extra_space_above_import_from_with_unicode_characters(self):
+        node_extra_space_above_import_from = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    #this comment has a unicode character \u2713
+                    \"\"\" this file does \u2715 something \"\"\"
+
+
+                    from something import random
+                """)
+        node_extra_space_above_import_from.file = filename
+        node_extra_space_above_import_from.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_extra_space_above_import_from)
+
+        message = testutils.Message(
+            msg_id='only-a-single-empty-line-should-be-provided', line=6)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_single_new_line_above_import(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\" this file does something \"\"\"
+
+                    import something
+                    import random
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_single_new_line_above_import_from(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\" this file does something \"\"\"
+
+                    from something import random
+                """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
