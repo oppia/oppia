@@ -146,21 +146,21 @@ def create_group_for_next_release():
     the next release.
     """
     common.open_new_tab_in_browser_if_possible(
-        'https://github.com/oppia/oppia/wiki/Release-Schedule#'
-        'release-coordinators-and-qa-coordinators-for-upcoming-releases')
+        release_constants.RELEASE_ROTA_URL)
     common.ask_user_to_confirm(
-        'Please check the Release co-ordinator & QA Lead for the next '
-        'release and create a new chat group for the next release. '
-        'Add the release co-ordinator, QA Lead, Sean, Ankita & Nithesh to '
-        'the group.')
-    common.ask_user_to_confirm(
-        'Please send the following message to the newly created group:\n\n'
+        'Please do the following two things:\n\n'
+        '1. Create a new chat group for the next release, '
+        'and add the release coordinator, QA lead, Ankita '
+        'and Nithesh to that group. You can find the release schedule '
+        'and coordinators here: %s\n\n'
+        '2. Please send the following message to the newly created group:\n\n'
         'Hi all, This is the group chat for the next release. '
         '[Release co-ordinator\'s name] and [QA Lead\'s name] will be '
         'the release co-ordinator & QA Lead for next release. '
         'Please follow the release process doc: '
         '[Add link to release process doc] to ensure the release '
-        'follows the schedule. Thanks!')
+        'follows the schedule. Thanks!\n' % (
+            release_constants.RELEASE_ROTA_URL))
 
 
 def main():
