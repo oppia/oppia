@@ -1,4 +1,4 @@
-This folder contains the scripts for various extensions & plugins used in Oppia codebase.
+This folder contains the frontend & backend code for various extensions & plugins used in Oppia codebase.
 
 - actions: Definitions of domain classes for various user actions on Oppia website.
 - answer_summarizers: Model definitions for answer summarizers.
