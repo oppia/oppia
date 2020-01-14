@@ -446,7 +446,7 @@ def create_readme(dir_path, readme_content):
             be created.
         readme_content: str. The content to be written in the README.
     """
-    with python_utils.open_file('%s/README.md' % dir_path, 'w') as f:
+    with python_utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
         f.write(readme_content)
 
 
