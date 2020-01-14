@@ -30,7 +30,9 @@ from scripts import install_chrome_on_travis
 class InstallChromeOnTravisTests(test_utils.GenericTestBase):
 
     def test_main(self):
-        chrome_source_url = 'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb/google-chrome-stable_77.0.3865.75-1_amd64.deb' # pylint:disable=line-too-long
+        chrome_source_url = (
+            'https://github.com/webnicer/chrome-downloads/raw/master/x64.deb'
+            '/google-chrome-stable_77.0.3865.75-1_amd64.deb')
 
         def mock_isfile(unused_path):
             return False
@@ -43,9 +45,11 @@ class InstallChromeOnTravisTests(test_utils.GenericTestBase):
 
         def mock_chdir(unused_path):
             return
+
         # pylint: disable=unused-argument
         def mock_url_retrieve(unused_url, filename):
             return
+
         # pylint: enable=unused-argument
         def mock_check_call(unused_commands):
             return
