@@ -205,18 +205,18 @@ def wait_for_port_to_be_open(port_number):
         sys.exit(1)
 
 
-def tweak_constant_file(constant_file, dev_mode):
+def update_dev_mode_in_constants_js(constant_file, dev_mode_setting):
     """Change constant file based on the running mode. Only the `DEV_MODE` line
     should be changed.
 
     Args:
         constant_file: str. File path to the constant file.
-        dev_mode: bool. Represents whether the program is running on dev
+        dev_mode_setting: bool. Represents whether the program is running on dev
             mode.
     """
     pattern = '"DEV_MODE": .*'
     replace = '"DEV_MODE": %s' % (
-        'true' if dev_mode else 'false')
+        'true' if dev_mode_setting else 'false')
     common.inplace_replace_file(constant_file, pattern, replace)
 
 
@@ -263,7 +263,7 @@ def build_js_files(dev_mode):
         dev_mode: bool. Represents whether run the related commands in dev
             mode.
     """
-    tweak_constant_file(CONSTANT_FILE_PATH, dev_mode)
+    update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode)
     if not dev_mode:
         python_utils.PRINT('  Generating files for production mode...')
     else:
