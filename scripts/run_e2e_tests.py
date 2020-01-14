@@ -163,17 +163,19 @@ def cleanup():
         common.kill_processes_based_on_regex(p)
 
 
-def check_running_instance(*ports):
-    """Check if exists running oppia instance.
+def is_any_port_open(*port_numbers):
+    """Check if the port is taken by any other processes. If the any one of them
+    is taken, it may indicate there is already one Oppia instance running.
 
     Args:
-        ports: list(int). A list of ports that oppia instances may be running.
+        port_numbers: list(int). A list of ports that Oppia instances may be
+            running.
 
     Return:
-        bool: Whether the ports are all open.
+        bool: Whether there is a running Oppia instance.
     """
     running = False
-    for port in ports:
+    for port in port_numbers:
         if common.is_port_open(port):
             python_utils.PRINT(
                 'There is already a server running on localhost:%s.'
@@ -439,7 +441,7 @@ def main(args=None):
     """Run the scripts to start end-to-end tests."""
 
     parsed_args = _PARSER.parse_args(args=args)
-    other_instance_running = check_running_instance(
+    other_instance_running = is_any_port_open(
         OPPIA_SERVER_PORT, GOOGLE_APP_ENGINE_PORT)
 
     if other_instance_running:
@@ -459,7 +461,7 @@ def main(args=None):
 
     wait_for_port(WEB_DRIVER_PORT)
     wait_for_port(GOOGLE_APP_ENGINE_PORT)
-    check_screenshot()
+    ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH]
     commands.extend(get_e2e_test_parameters(
         run_on_browserstack, parsed_args.sharding,

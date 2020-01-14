@@ -204,7 +204,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with swap_kill_process, subprocess_swap, swap_is_windows:
             run_e2e_tests.cleanup()
 
-    def test_check_running_instances_when_ports_closed(self):
+    def test_is_any_port_open_when_ports_closed(self):
         expected_ports = [1, 2, 3]
         def mock_is_port_open(unused_port):
             return False
@@ -213,10 +213,10 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_port_open', mock_is_port_open,
             expected_args=[(port,) for port in expected_ports])
         with is_port_open_swap:
-            result = run_e2e_tests.check_running_instance(*expected_ports)
+            result = run_e2e_tests.is_any_port_open(*expected_ports)
             self.assertFalse(result)
 
-    def test_check_running_instances_when_one_of_the_ports_is_open(self):
+    def test_is_any_port_open_when_one_of_the_ports_is_open(self):
         running_port = 2
         expected_ports = [1, running_port, 3]
         def mock_is_port_open(port):
@@ -228,7 +228,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             common, 'is_port_open', mock_is_port_open,
             expected_args=[(1,), (2,)])
         with is_port_open_swap:
-            result = run_e2e_tests.check_running_instance(*expected_ports)
+            result = run_e2e_tests.is_any_port_open(*expected_ports)
             self.assertTrue(result)
 
     def test_wait_for_port_when_port_successfully_opened(self):
@@ -772,12 +772,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_start_tests_when_other_instances_not_stopped(self):
         def mock_exit(unused_exit_code):
             raise Exception('sys.exit(1)')
-        def mock_check_running_instance(*unused_args):
+        def mock_is_any_port_open(*unused_args):
             return True
 
         check_swap = self.swap_with_checks(
-            run_e2e_tests, 'check_running_instance',
-            mock_check_running_instance,
+            run_e2e_tests, 'is_any_port_open',
+            mock_is_any_port_open,
             expected_args=[(8181, 9001)])
         exit_swap = self.swap(sys, 'exit', mock_exit)
         with check_swap, exit_swap:
@@ -786,7 +786,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_when_no_other_instance_running(self):
 
-        def mock_check_running_instance(*unused_args):
+        def mock_is_any_port_open(*unused_args):
             return False
 
         def mock_setup_and_install_dependencies(unused_arg):
@@ -830,8 +830,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         check_swap = self.swap_with_checks(
-            run_e2e_tests, 'check_running_instance',
-            mock_check_running_instance,
+            run_e2e_tests, 'is_any_port_open',
+            mock_is_any_port_open,
             expected_args=[(8181, 9001)])
 
         setup_and_install_swap = self.swap_with_checks(
@@ -871,6 +871,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap, start_google_engine_swap:
-                with wait_swap, ensure_screenshots_dir_is_removed_swap: :
+                with wait_swap, ensure_screenshots_dir_is_removed_swap:
                     with get_parameters_swap, popen_swap, exit_swap:
                         run_e2e_tests.main(args=[])
