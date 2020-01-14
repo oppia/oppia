@@ -43,7 +43,7 @@ PROTRACTOR_BIN_PATH = os.path.join(
 
 CONSTANT_FILE_PATH = os.path.join(common.CURR_DIR, 'assets', 'constants.ts')
 FECONF_FILE_PATH = os.path.join('feconf.py')
-SECONDS_TO_WAIT_PORT = 1000
+MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS = 1000
 WEBDRIVER_HOME_PATH = os.path.join(
     common.NODE_MODULES_PATH, 'webdriver-manager')
 WEBDRIVER_MANAGER_BIN_PATH = os.path.join(
@@ -186,20 +186,22 @@ def is_any_port_open(*port_numbers):
     return running
 
 
-def wait_for_port(port):
+def wait_for_port_to_be_open(port_number):
     """Wait until the port is open.
 
     Args:
-        port: int. The port number to wait.
+        port_number: int. The port number to wait.
     """
     waited_seconds = 0
-    while (not common.is_port_open(port) and
-           waited_seconds < SECONDS_TO_WAIT_PORT):
+    while (not common.is_port_open(port_number) and
+           waited_seconds < MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS):
         time.sleep(1)
         waited_seconds += 1
-    if waited_seconds == SECONDS_TO_WAIT_PORT and not common.is_port_open(port):
+    if (waited_seconds ==
+            MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS and
+            not common.is_port_open(port_number)):
         python_utils.PRINT(
-            'Failed to start server on port %s, exiting ...' % port)
+            'Failed to start server on port %s, exiting ...' % port_number)
         sys.exit(1)
 
 
@@ -459,8 +461,8 @@ def main(args=None):
 
     start_google_engine(dev_mode)
 
-    wait_for_port(WEB_DRIVER_PORT)
-    wait_for_port(GOOGLE_APP_ENGINE_PORT)
+    wait_for_port_to_be_open(WEB_DRIVER_PORT)
+    wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
     ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH]
     commands.extend(get_e2e_test_parameters(

@@ -231,7 +231,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             result = run_e2e_tests.is_any_port_open(*expected_ports)
             self.assertTrue(result)
 
-    def test_wait_for_port_when_port_successfully_opened(self):
+    def test_wait_for_port_to_be_open_when_port_successfully_opened(self):
         def mock_is_port_open(unused_port):
             mock_is_port_open.wait_time += 1
             if mock_is_port_open.wait_time > 10:
@@ -249,11 +249,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
 
         with is_port_open_swap, sleep_swap:
-            run_e2e_tests.wait_for_port(1)
+            run_e2e_tests.wait_for_port_to_be_open(1)
         self.assertEqual(mock_is_port_open.wait_time, 11)
         self.assertEqual(mock_sleep.called_times, 10)
 
-    def test_wait_for_port_when_port_failed_to_open(self):
+    def test_wait_for_port_to_be_open_when_port_failed_to_open(self):
         def mock_is_port_open(unused_port):
             return False
 
@@ -269,9 +269,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         sleep_swap = self.swap_with_checks(time, 'sleep', mock_sleep)
         exit_swap = self.swap_with_checks(sys, 'exit', mock_exit)
         with is_port_open_swap, sleep_swap, exit_swap:
-            run_e2e_tests.wait_for_port(1)
+            run_e2e_tests.wait_for_port_to_be_open(1)
         self.assertEqual(
-            mock_sleep.sleep_time, run_e2e_tests.SECONDS_TO_WAIT_PORT)
+            mock_sleep.sleep_time, run_e2e_tests.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
     def test_tweak_constant_file_in_dev_mode_without_change_file(self):
         constant_file = 'constant.js'
@@ -807,7 +807,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_start_google_engine(unused_arg):
             return
 
-        def mock_wait_for_port(unused_port):
+        def mock_wait_for_port_to_be_open(unused_port):
             return
 
         def mock_ensure_screenshots_dir_is_removed():
@@ -852,7 +852,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'start_google_engine', mock_start_google_engine,
             expected_args=[(True,)])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port', mock_wait_for_port,
+            run_e2e_tests, 'wait_for_port_to_be_open', mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
