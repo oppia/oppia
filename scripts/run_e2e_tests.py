@@ -95,13 +95,6 @@ _PARSER.add_argument(
     help='If true, skips installing dependencies. The default value is false.',
     action='store_true')
 _PARSER.add_argument(
-    '--sharding', default=True, type=bool,
-    help='Disables/Enables parallelization of protractor tests.'
-         'Sharding must be disabled (either by passing in false to --sharding'
-         ' or 1 to --sharding-instances) if running any tests in isolation'
-         ' (fit or fdescribe).',
-    )
-_PARSER.add_argument(
     '--sharding-instances', type=int, default=3,
     help='Sets the number of parallel browsers to open while sharding.'
          'Sharding must be disabled (either by passing in false to --sharding'
@@ -328,20 +321,20 @@ def start_webdriver_manager():
         undo_webdriver_tweak()
 
 
-def get_parameter_for_sharding(sharding, sharding_instances):
-    """Return the parameter for sharding. Based on the sharding instances
+def get_parameter_for_sharding(sharding_instances):
+    """Return the parameter for sharding, based on the given number of
+        sharding instances.
 
     Args:
-        sharding: bool. Whether run the test with sharding.
         sharding_instances: int. How many sharding instances to be running.
 
     Returns:
         list(str): A list of parameters to represent the sharding configuration.
     """
-    if not sharding or sharding_instances == 1:
+    if sharding_instances == 1:
         return []
     else:
-        return ['--capabilities.shardTestFiles=%s' % sharding,
+        return ['--capabilities.shardTestFiles=True',
                 '--capabilities.maxInstances=%s' % sharding_instances]
 
 
@@ -371,13 +364,10 @@ def get_parameter_for_suite(suite):
 
 
 def get_e2e_test_parameters(
-        sharding, sharding_instances, suite, dev_mode):
+        sharding_instances, suite, dev_mode):
     """Return parameters for the end-2-end tests.
 
     Args:
-        run_on_browserstack: bool. Represents whether the tests should run
-            on browserstack.
-        sharding: bool. Disables/Enables parallelization of protractor tests.
         sharding_instances: str. Sets the number of parallel browsers to open
             while sharding.
         suite: str. Performs test for different suites.
@@ -386,8 +376,7 @@ def get_e2e_test_parameters(
     Returns:
         list(str): Parameters for running the tests.
     """
-    sharding_parameters = get_parameter_for_sharding(
-        sharding, sharding_instances)
+    sharding_parameters = get_parameter_for_sharding(sharding_instances)
     dev_mode_parameters = get_parameter_for_dev_mode(dev_mode)
     suite_parameter = get_parameter_for_suite(suite)
 
@@ -443,7 +432,6 @@ def main(args=None):
     ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH]
     commands.extend(get_e2e_test_parameters(
-        parsed_args.sharding,
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 
     p = subprocess.Popen(commands)

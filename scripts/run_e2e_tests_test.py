@@ -698,11 +698,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.start_webdriver_manager()
 
     def test_get_parameter_for_one_sharding_instance(self):
-        result = run_e2e_tests.get_parameter_for_sharding(True, 1)
+        result = run_e2e_tests.get_parameter_for_sharding(1)
         self.assertEqual([], result)
 
     def test_get_parameter_for_three_sharding_instances(self):
-        result = run_e2e_tests.get_parameter_for_sharding(True, '3')
+        result = run_e2e_tests.get_parameter_for_sharding(3)
         self.assertEqual(
             ['--capabilities.shardTestFiles=True',
              '--capabilities.maxInstances=3'], result)
@@ -720,11 +720,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         self.assertEqual(result, ['--suite', 'Full'])
 
     def test_get_e2e_test_parameters(self):
-        result = run_e2e_tests.get_e2e_test_parameters(
-            True, True, 3, 'Full', False)
+        result = run_e2e_tests.get_e2e_test_parameters(3, 'Full', False)
         self.assertEqual(
             result, [
-                run_e2e_tests.BROWSER_STACK_CONFIG_FILE_PATH,
                 '--capabilities.shardTestFiles=True',
                 '--capabilities.maxInstances=3',
                 '--suite', 'Full', '--params.devMode=False'
@@ -806,7 +804,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         def mock_get_e2e_test_parameters(
-                unused_browser_stack, unused_sharding,
                 unused_sharding_instances, unused_suite, unused_dev_mode):
             return ['commands']
 
@@ -853,8 +850,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[(
-                False, True, 3, 'full', True)])
+            mock_get_e2e_test_parameters, expected_args=[( 3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
                 common.NODE_BIN_PATH, run_e2e_tests.PROTRACTOR_BIN_PATH,
