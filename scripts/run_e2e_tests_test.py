@@ -204,31 +204,28 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with swap_kill_process, subprocess_swap, swap_is_windows:
             run_e2e_tests.cleanup()
 
-    def test_is_any_port_open_when_ports_closed(self):
-        expected_ports = [1, 2, 3]
+    def test_is_oppia_server_already_running_when_ports_closed(self):
         def mock_is_port_open(unused_port):
             return False
 
         is_port_open_swap = self.swap_with_checks(
-            common, 'is_port_open', mock_is_port_open,
-            expected_args=[(port,) for port in expected_ports])
+            common, 'is_port_open', mock_is_port_open)
         with is_port_open_swap:
-            result = run_e2e_tests.is_any_port_open(*expected_ports)
+            result = run_e2e_tests.is_oppia_server_already_running()
             self.assertFalse(result)
 
-    def test_is_any_port_open_when_one_of_the_ports_is_open(self):
-        running_port = 2
-        expected_ports = [1, running_port, 3]
+    def test_is_oppia_server_already_running_when_one_of_the_ports_is_open(
+            self):
+        running_port = run_e2e_tests.GOOGLE_APP_ENGINE_PORT
         def mock_is_port_open(port):
             if port == running_port:
                 return True
             return False
 
         is_port_open_swap = self.swap_with_checks(
-            common, 'is_port_open', mock_is_port_open,
-            expected_args=[(1,), (2,)])
+            common, 'is_port_open', mock_is_port_open)
         with is_port_open_swap:
-            result = run_e2e_tests.is_any_port_open(*expected_ports)
+            result = run_e2e_tests.is_oppia_server_already_running()
             self.assertTrue(result)
 
     def test_wait_for_port_to_be_open_when_port_successfully_opened(self):
@@ -762,13 +759,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
     def test_start_tests_when_other_instances_not_stopped(self):
         def mock_exit(unused_exit_code):
             raise Exception('sys.exit(1)')
-        def mock_is_any_port_open(*unused_args):
+        def mock_is_oppia_server_already_running(*unused_args):
             return True
 
         check_swap = self.swap_with_checks(
-            run_e2e_tests, 'is_any_port_open',
-            mock_is_any_port_open,
-            expected_args=[(8181, 9001)])
+            run_e2e_tests, 'is_oppia_server_already_running',
+            mock_is_oppia_server_already_running)
         exit_swap = self.swap(sys, 'exit', mock_exit)
         with check_swap, exit_swap:
             with self.assertRaisesRegexp(Exception, r'sys\.exit\(1\)'):
@@ -776,7 +772,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_start_tests_when_no_other_instance_running(self):
 
-        def mock_is_any_port_open(*unused_args):
+        def mock_is_oppia_server_already_running(*unused_args):
             return False
 
         def mock_setup_and_install_dependencies(unused_arg):
@@ -819,9 +815,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             return
 
         check_swap = self.swap_with_checks(
-            run_e2e_tests, 'is_any_port_open',
-            mock_is_any_port_open,
-            expected_args=[(8181, 9001)])
+            run_e2e_tests, 'is_oppia_server_already_running',
+            mock_is_oppia_server_already_running)
 
         setup_and_install_swap = self.swap_with_checks(
             run_e2e_tests, 'setup_and_install_dependencies',
