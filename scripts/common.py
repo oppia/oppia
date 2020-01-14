@@ -22,6 +22,7 @@ import getpass
 import os
 import platform
 import re
+import shutil
 import socket
 import subprocess
 import sys
@@ -468,28 +469,32 @@ def convert_to_posixpath(file_path):
     return file_path.replace('\\', '/')
 
 
-def inplace_replace_file(filename, regex_pattern, replace):
-    """Replace the file content inplace with regex pattern. The pattern is used
+def inplace_replace_file(filename, regex_pattern, replacement_string):
+    """Replace the file content inp-lace with regex pattern. The pattern is used
     to replace the file's content line by line.
 
     Note:
-        This function was not designed to achive a comprehensive task. Instead,
+        This function was not designed to achieve a comprehensive task. Instead,
         it should only be used with some trivial tasks.
 
     Args:
         filename: str. The name of the file to be changed.
         regex_pattern: str. The pattern to check.
-        replace: str. The content to be replaced.
+        replacement_string: str. The content to be replaced.
     """
+    backup_filename = '%s.bak' % filename
+    shutil.move(filename, backup_filename)
+    new_contents = []
     regex = re.compile(regex_pattern)
-    for line in fileinput.input(
-            files=[filename], inplace=True, backup='.bak'):
-        # As PRINT is going to add a new line symbol, if we do not remove the
-        # origin \n, there would be a lot of redundant empty lines in the file.
-        line = line.rstrip()
-        line = regex.sub(replace, line)
-        python_utils.PRINT(line)
-    os.remove('%s.bak' % filename)
+    with python_utils.open_file(backup_filename, 'r') as f:
+        for line in f:
+            new_contents.append(regex.sub(replacement_string, line))
+
+    with python_utils.open_file(filename, 'w') as f:
+        for line in new_contents:
+            f.write(line)
+
+    os.remove(backup_filename)
 
 
 class CD(python_utils.OBJECT):

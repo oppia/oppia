@@ -648,39 +648,33 @@ class CommonTests(test_utils.GenericTestBase):
             common.kill_processes_based_on_regex('')
 
     def test_inplace_replace_file(self):
-        constant_file = 'constant.js'
-        origin_lines = [
-            '"RANDMON1" : "randomValue1"\n',
-            '"312RANDOM" : "ValueRanDom2"\n',
-            '"DEV_MODE": false\n',
-            '"RAN213DOM" : "raNdoVaLue3"\n'
+        origin_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json')
+        backup_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        expected_lines = [
+            '{\n',
+            '    "RANDMON1" : "randomValue1",\n',
+            '    "312RANDOM" : "ValueRanDom2",\n',
+            '    "DEV_MODE": true,\n',
+            '    "RAN213DOM" : "raNdoVaLue3"\n',
+            '}\n'
         ]
-        expected_lines = [line.replace('\n', '') for line in origin_lines]
-        expected_lines[2] = '"DEV_MODE": true'
-        # pylint: disable=unused-argument
-        def mock_input(files, inplace, backup):
-            return origin_lines
-        # pylint: enable=unused-argument
-        def mock_print(unused_output):
-            return
-        def mock_remove(unused_arg):
+
+        def mock_remove(unused_file):
             return
 
-        input_swap = self.swap_with_checks(
-            fileinput, 'input', mock_input,
-            expected_kwargs=[{
-                'files': [constant_file],
-                'inplace': True,
-                'backup': '.bak'}])
-
-        print_swap = self.swap_with_checks(
-            python_utils, 'PRINT', mock_print,
-            expected_args=[(line,) for line in expected_lines])
         remove_swap = self.swap_with_checks(
-            os, 'remove', mock_remove, expected_args=[('constant.js.bak',)])
-        with print_swap, input_swap, remove_swap:
+            os, 'remove', mock_remove, expected_args=[(backup_file,)]
+        )
+        with remove_swap:
             common.inplace_replace_file(
-                constant_file, '"DEV_MODE": .*', '"DEV_MODE": true')
+                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
+        with python_utils.open_file(origin_file, 'r') as f:
+            self.assertEqual(expected_lines, f.readlines())
+        # Revert the file
+        os.remove(origin_file)
+        shutil.move(backup_file, origin_file)
 
     def test_convert_to_posixpath_on_windows(self):
         def mock_is_windows():
