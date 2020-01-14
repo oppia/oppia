@@ -107,7 +107,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         )
         print_swap = self.print_swap(called=False)
         with print_swap, exist_swap:
-            run_e2e_tests.check_screenshot()
+            run_e2e_tests.ensure_screenshots_dir_is_removed()
 
     def test_check_screenhost_when_exist(self):
         screenshot_dir = os.path.join(os.pardir, 'protractor-screenshots')
@@ -128,7 +128,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         print_swap = self.print_swap(expected_args=[(expected_output,)])
         with print_swap, exist_swap, rmdir_swap:
-            run_e2e_tests.check_screenshot()
+            run_e2e_tests.ensure_screenshots_dir_is_removed()
 
     def test_cleanup_when_no_subprocess(self):
         def mock_is_windows_os():
@@ -810,7 +810,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         def mock_wait_for_port(unused_port):
             return
 
-        def mock_check_screenshot():
+        def mock_ensure_screenshots_dir_is_removed():
             return
 
         def mock_get_e2e_test_parameters(
@@ -856,8 +856,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
-        check_screenshot_swap = self.swap_with_checks(
-            run_e2e_tests, 'check_screenshot', mock_check_screenshot)
+        ensure_screenshots_dir_is_removed_swap = self.swap_with_checks(
+            run_e2e_tests, 'ensure_screenshots_dir_is_removed',
+            mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
             mock_get_e2e_test_parameters, expected_args=[(
@@ -870,6 +871,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
             with build_swap, start_webdriver_swap, start_google_engine_swap:
-                with wait_swap, check_screenshot_swap, get_parameters_swap:
-                    with popen_swap, exit_swap:
+                with wait_swap, ensure_screenshots_dir_is_removed_swap: :
+                    with get_parameters_swap, popen_swap, exit_swap:
                         run_e2e_tests.main(args=[])

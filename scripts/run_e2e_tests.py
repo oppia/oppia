@@ -133,16 +133,16 @@ _PARSER.add_argument(
 SUBPROCESSES = []
 
 
-def check_screenshot():
+def ensure_screenshots_dir_is_removed():
     """Check if screenshot directory exists, if so, delete it."""
-    screeenshots_dir = os.path.join(os.pardir, 'protractor-screenshots')
-    if not os.path.isdir(screeenshots_dir):
+    screenshots_dir = os.path.join(os.pardir, 'protractor-screenshots')
+    if not os.path.isdir(screenshots_dir):
         return
     python_utils.PRINT(
         'Note: If ADD_SCREENSHOT_REPORTER is set to true in'
         'core/tests/protractor.conf.js, you can view screenshots'
         'of the failed tests in ../protractor-screenshots/')
-    os.rmdir(screeenshots_dir)
+    os.rmdir(screenshots_dir)
 
 
 def cleanup():
