@@ -128,6 +128,8 @@ _PARSER.add_argument(
          'core/tests/protractor/accessibility.js use --suite=accessibility.'
          'For performing a full test, no argument is required.')
 
+# This list contains the sub process triggered by this script. This includes
+# the oppia web server.
 SUBPROCESSES = []
 
 
