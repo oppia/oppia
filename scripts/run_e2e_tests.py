@@ -257,15 +257,15 @@ def setup_and_install_dependencies(skip_install):
         install_chrome_on_travis.main(args=[])
 
 
-def build_js_files(dev_mode):
+def build_js_files(dev_mode_setting):
     """Build the javascript files.
 
     Args:
-        dev_mode: bool. Represents whether run the related commands in dev
+        dev_mode_setting: bool. Represents whether to run the related commands in dev
             mode.
     """
-    update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode)
-    if not dev_mode:
+    update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
+    if not dev_mode_setting:
         python_utils.PRINT('  Generating files for production mode...')
     else:
         # The 'hashes.json' file is used by the `url-interpolation` service.
@@ -279,20 +279,19 @@ def build_js_files(dev_mode):
         except subprocess.CalledProcessError as error:
             python_utils.PRINT(error.output)
             sys.exit(error.returncode)
-    build.main(args=(['--prod_env'] if not dev_mode else []))
+    build.main(args=(['--prod_env'] if not dev_mode_setting else []))
 
 
 def tweak_webdriver_manager():
     """webdriver-manager (version 13.0.0) uses `os.arch()` to determine the
-    architecture of the operation system, however, this function can only be
-    used to determine the architecture of the machine that compiled `node`
-    (great job!). In the case of Windows, we are using the portable version,
+    architecture of the operating system, however, this function can only be
+    used to determine the architecture of the machine that compiled `node`.
+    In the case of Windows, we are using the portable version,
     which was compiled on `ia32` machine so that is the value returned by this
-    `os.arch` function. While clearly the author of webdriver-manager never
-    considered windows would run on this architecture, so its own help function
-    will return null for this. This is causing the application has no idea
-    about where to download the correct version. So we need to change the
-    lines in webdriver-manager to explicitly tell the architecture.
+    `os.arch` function. Unfortunately, webdriver-manager seems to assume that
+    Windows wouldn't run on the ia32 architecture, so its help function used to
+    determine download link returns null for this, which means that the
+    application has no idea about where to download the correct version.
 
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L16
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/geckodriver.ts#L21
