@@ -246,8 +246,8 @@ def build_js_files(dev_mode_setting):
     """Build the javascript files.
 
     Args:
-        dev_mode_setting: bool. Represents whether to run the related commands in dev
-            mode.
+        dev_mode_setting: bool. Represents whether to run the related commands
+        in dev mode.
     """
     update_dev_mode_in_constants_js(CONSTANT_FILE_PATH, dev_mode_setting)
     if not dev_mode_setting:
@@ -416,7 +416,8 @@ def main(args=None):
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
-    update_community_dashboard_status_in_feconf_file(FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
+    update_community_dashboard_status_in_feconf_file(
+        FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
     build_js_files(dev_mode)
     start_webdriver_manager()
 

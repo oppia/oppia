@@ -268,9 +268,11 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with is_port_open_swap, sleep_swap, exit_swap:
             run_e2e_tests.wait_for_port_to_be_open(1)
         self.assertEqual(
-            mock_sleep.sleep_time, run_e2e_tests.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
+            mock_sleep.sleep_time,
+            run_e2e_tests.MAX_WAIT_TIME_FOR_PORT_TO_OPEN_SECS)
 
-    def test_update_dev_mode_in_constants_js_in_dev_mode_without_change_file(self):
+    def test_update_dev_mode_in_constants_js_in_dev_mode_without_change_file(
+            self):
         constant_file = 'constant.js'
         inplace_replace_swap = self.inplace_replace_swap(expected_args=[(
             constant_file, '"DEV_MODE": .*', '"DEV_MODE": true'
@@ -390,7 +392,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with setup_swap, setup_gae_swap, install_swap:
             run_e2e_tests.setup_and_install_dependencies(True)
 
-    def test_update_community_dashboard_status_in_feconf_file_with_dashboard_enabled(self):
+    def test_update_community_dashboard_status_with_dashboard_enabled(self):
         swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
             run_e2e_tests.FECONF_FILE_PATH,
             'COMMUNITY_DASHBOARD_ENABLED = .*',
@@ -401,7 +403,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests.update_community_dashboard_status_in_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, True)
 
-    def test_update_community_dashboard_status_in_feconf_file_with_dashboard_disabled(self):
+    def test_update_community_dashboard_status_with_dashboard_disabled(self):
         swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
             run_e2e_tests.FECONF_FILE_PATH,
             'COMMUNITY_DASHBOARD_ENABLED = .*',
@@ -413,7 +415,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self):
 
-        def mock_update_dev_mode_in_constants_js(unused_filename, unused_dev_mode):
+        def mock_update_dev_mode_in_constants_js(
+                unused_filename, unused_dev_mode):
             pass
 
         def mock_is_file(unused_path):
@@ -428,7 +431,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[(run_e2e_tests.HASHES_FILE_PATH,)])
 
         update_dev_mode_in_constants_js_swap = self.swap_with_checks(
-            run_e2e_tests, 'update_dev_mode_in_constants_js', mock_update_dev_mode_in_constants_js,
+            run_e2e_tests, 'update_dev_mode_in_constants_js',
+            mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
         run_cmd_swap = self.swap_with_checks(
             common, 'run_cmd', self.mock_run_cmd,
@@ -438,12 +442,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         print_swap = self.print_swap(called=False)
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with update_dev_mode_in_constants_js_swap, run_cmd_swap, build_main_swap:
-                    with is_file_swap:
+                with update_dev_mode_in_constants_js_swap, run_cmd_swap:
+                    with is_file_swap, build_main_swap:
                         run_e2e_tests.build_js_files(True)
 
     def test_build_js_files_in_dev_mode_with_hash_file_not_exist(self):
-        def mock_update_dev_mode_in_constants_js(unused_filename, unused_dev_mode):
+        def mock_update_dev_mode_in_constants_js(
+                unused_filename, unused_dev_mode):
             pass
 
         expected_commands = [
@@ -454,7 +459,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         hash_file_path_swap = self.swap(
             run_e2e_tests, 'HASHES_FILE_PATH', mock_hash_file_path)
         update_dev_mode_in_constants_js_swap = self.swap_with_checks(
-            run_e2e_tests, 'update_dev_mode_in_constants_js', mock_update_dev_mode_in_constants_js,
+            run_e2e_tests, 'update_dev_mode_in_constants_js',
+            mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
         run_cmd_swap = self.swap_with_checks(
             common, 'run_cmd', self.mock_run_cmd,
@@ -464,8 +470,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         print_swap = self.print_swap(called=False)
         with print_swap, self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with update_dev_mode_in_constants_js_swap, run_cmd_swap, build_main_swap:
-                    with hash_file_path_swap:
+                with update_dev_mode_in_constants_js_swap, run_cmd_swap:
+                    with hash_file_path_swap, build_main_swap:
                         run_e2e_tests.build_js_files(True)
         with python_utils.open_file(mock_hash_file_path, 'r') as f:
             content = f.readlines()
@@ -474,7 +480,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_build_js_files_in_dev_mode_with_exception_raised(self):
 
-        def mock_update_dev_mode_in_constants_js(unused_filename, unused_dev_mode):
+        def mock_update_dev_mode_in_constants_js(
+                unused_filename, unused_dev_mode):
             pass
 
         def mock_is_file(unused_path):
@@ -496,7 +503,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             expected_args=[(run_e2e_tests.HASHES_FILE_PATH,)])
 
         update_dev_mode_in_constants_js_swap = self.swap_with_checks(
-            run_e2e_tests, 'update_dev_mode_in_constants_js', mock_update_dev_mode_in_constants_js,
+            run_e2e_tests, 'update_dev_mode_in_constants_js',
+            mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, True)])
         run_cmd_swap = self.swap_with_checks(
             common, 'run_cmd', mock_run_cmd,
@@ -517,11 +525,13 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
     def test_build_js_files_in_prod_mode(self):
 
-        def mock_update_dev_mode_in_constants_js(unused_filename, unused_dev_mode):
+        def mock_update_dev_mode_in_constants_js(
+                unused_filename, unused_dev_mode):
             pass
 
         update_dev_mode_in_constants_js_swap = self.swap_with_checks(
-            run_e2e_tests, 'update_dev_mode_in_constants_js', mock_update_dev_mode_in_constants_js,
+            run_e2e_tests, 'update_dev_mode_in_constants_js',
+            mock_update_dev_mode_in_constants_js,
             expected_args=[(self.mock_constant_file_path, False)])
 
         run_cmd_swap = self.swap_with_checks(
@@ -533,8 +543,9 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         with self.constant_file_path_swap:
             with self.node_bin_path_swap, self.webpack_bin_path_swap:
-                with update_dev_mode_in_constants_js_swap, run_cmd_swap, build_main_swap:
-                    run_e2e_tests.build_js_files(False)
+                with update_dev_mode_in_constants_js_swap, run_cmd_swap:
+                    with build_main_swap:
+                        run_e2e_tests.build_js_files(False)
 
     def test_tweak_webdriver_manager_on_x64_machine(self):
         expected_replace = 'this.osArch = "x64";'
@@ -833,10 +844,12 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             run_e2e_tests, 'start_webdriver_manager',
             mock_start_webdriver_manager)
         start_google_app_engine_server_swap = self.swap_with_checks(
-            run_e2e_tests, 'start_google_app_engine_server', mock_start_google_app_engine_server,
+            run_e2e_tests, 'start_google_app_engine_server',
+            mock_start_google_app_engine_server,
             expected_args=[(True,)])
         wait_swap = self.swap_with_checks(
-            run_e2e_tests, 'wait_for_port_to_be_open', mock_wait_for_port_to_be_open,
+            run_e2e_tests, 'wait_for_port_to_be_open',
+            mock_wait_for_port_to_be_open,
             expected_args=[
                 (run_e2e_tests.WEB_DRIVER_PORT,),
                 (run_e2e_tests.GOOGLE_APP_ENGINE_PORT,)])
@@ -845,7 +858,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
             mock_ensure_screenshots_dir_is_removed)
         get_parameters_swap = self.swap_with_checks(
             run_e2e_tests, 'get_e2e_test_parameters',
-            mock_get_e2e_test_parameters, expected_args=[( 3, 'full', True)])
+            mock_get_e2e_test_parameters, expected_args=[(3, 'full', True)])
         popen_swap = self.swap_with_checks(
             subprocess, 'Popen', mock_popen, expected_args=[([
                 common.NODE_BIN_PATH, run_e2e_tests.PROTRACTOR_BIN_PATH,
@@ -853,7 +866,8 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         exit_swap = self.swap_with_checks(
             sys, 'exit', mock_exit, expected_args=[(0,)])
         with check_swap, setup_and_install_swap, register_swap, cleanup_swap:
-            with build_swap, start_webdriver_swap, start_google_app_engine_server_swap:
-                with wait_swap, ensure_screenshots_dir_is_removed_swap:
-                    with get_parameters_swap, popen_swap, exit_swap:
-                        run_e2e_tests.main(args=[])
+            with build_swap, start_webdriver_swap:
+                with start_google_app_engine_server_swap:
+                    with wait_swap, ensure_screenshots_dir_is_removed_swap:
+                        with get_parameters_swap, popen_swap, exit_swap:
+                            run_e2e_tests.main(args=[])

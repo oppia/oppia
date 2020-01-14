@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import contextlib
-import fileinput
 import getpass
 import http.server
 import os
@@ -672,7 +671,7 @@ class CommonTests(test_utils.GenericTestBase):
                 origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
         with python_utils.open_file(origin_file, 'r') as f:
             self.assertEqual(expected_lines, f.readlines())
-        # Revert the file
+        # Revert the file.
         os.remove(origin_file)
         shutil.move(backup_file, origin_file)
 
