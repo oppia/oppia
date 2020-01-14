@@ -1885,7 +1885,7 @@ tags: []
         # The actual error message will also include detail assert error message
         # via the `self.longMessage` below.
         msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
-                    obj.__name__, attr)
+            obj.__name__, attr)
 
         def wrapper(*args, **kwargs):
             """Wrapper function for the new value. This function will do the
