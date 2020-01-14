@@ -151,14 +151,14 @@ def main(args=None):
     common.create_readme(
         common.THIRD_PARTY_DIR,
         'This folder contains third party libraries used in Oppia codebase.\n'
-        'You can remove this folder by deleting it and add it '
-        'again by running the start.py script.\n')
+        'You can regenerate this folder by deleting it and then running '
+        'the start.py script.\n')
     create_directory(common.NODE_MODULES_PATH)
     common.create_readme(
         common.NODE_MODULES_PATH,
         'This folder contains node utilities used in Oppia codebase.\n'
-        'You can remove this folder by deleting it and add it '
-        'again by running the start.py script.\n')
+        'You can regenerate this folder by deleting it and then running '
+        'the start.py script.\n')
 
     # Download and install node.js.
     python_utils.PRINT(
