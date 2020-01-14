@@ -489,8 +489,8 @@ def main():
             release_constants.RELEASE_SUMMARY_FILEPATH))
 
     common.ask_user_to_confirm(
-        'Check emails and names for authors and contributors and '
-        'verify that the emails are '
+        'Check emails and names for authors and contributors in release '
+        'summary file and verify that the emails are '
         'correct through welcome emails sent from welcome@oppia.org '
         '(confirm with Sean in case of doubt).')
     common.open_new_tab_in_browser_if_possible(
@@ -500,14 +500,18 @@ def main():
         'to the contributor list in release summary file.')
     common.ask_user_to_confirm(
         'Categorize the PR titles in the Uncategorized section of the '
-        'changelog, and arrange the changelog to have user-facing '
-        'categories on top.')
+        'changelog in release summary file, and arrange the changelog '
+        'to have user-facing categories on top.')
     common.ask_user_to_confirm(
-        'Verify each item is in the correct section and remove '
-        'trivial changes like "Fix lint errors" from the changelog.')
+        'Verify each item is in the correct section in release summary '
+        'file and remove trivial changes like "Fix lint errors" '
+        'from the changelog.')
     common.ask_user_to_confirm(
-        'Ensure that all items in changelog start with a '
-        'verb in simple present tense.')
+        'Ensure that all items in changelog in release summary file '
+        'start with a verb in simple present tense.')
+    common.ask_user_to_confirm(
+        'Please save the release summary file with all the changes that '
+        'you have made.')
 
     release_summary_lines = []
     with python_utils.open_file(
