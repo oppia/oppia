@@ -1,47 +1,35 @@
 <background-banner></background-banner>
 <div class="oppia-static-header">
-  <h1 class="protractor-test-get-started-page">Delete account</h1>
+  <h1 translate="I18N_DELETE_ACCOUNT_PAGE_HEADING"></h1>
 </div>
 <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
-  <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
+  <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-delete-account">
 
-    <h2>Overview</h2>
-    <p>
-      This action will delete this user account and
-      also all the private data that are associated with this account.
-      Already published data will be anonymized,
-      so they can't be associated with this account and
-      the ownership of that data will be transferred to the community.
-      Summary of data tha will be deleted:
-    </p>
+    <h2 translate="I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1_HEADING"></h2>
+    <p translate="I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_1"></p>
     <ul style="margin-left: 40px">
-      <li>User and email settings</li>
-      <li>User statistics</li>
-      <li>Private explorations, collections, topics, stories, skills, questions</li>
+      <li translate="I18N_DELETE_ACCOUNT_PAGE_LIST_1_1"></li>
+      <li translate="I18N_DELETE_ACCOUNT_PAGE_LIST_1_2"></li>
+      <li translate="I18N_DELETE_ACCOUNT_PAGE_LIST_1_3"></li>
     </ul>
-    <p>
-      Summary of data that will be anonymized:
-    </p>
+
+    <p translate="I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_2"></p>
     <ul style="margin-left: 40px; margin-bottom: 24px;">
-      <li>Threads and suggestions</li>
-      <li>User statistics</li>
-      <li>Public explorations, collections, topics, stories, skills, questions</li>
+      <li translate="I18N_DELETE_ACCOUNT_PAGE_LIST_2_1"></li>
+      <li translate="I18N_DELETE_ACCOUNT_PAGE_LIST_2_2"></li>
+      <li translate="I18N_DELETE_ACCOUNT_PAGE_LIST_2_3"></li>
     </ul>
-    <p>
-      Summary of data that will be transfered to community:
-    </p>
+
+    <p translate="I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_3"></p>
     <ul style="margin-left: 40px; margin-bottom: 24px;">
-      <li>Public explorations, collections, topics, stories, skills, questions</li>
+      <li translate="I18N_DELETE_ACCOUNT_PAGE_LIST_2_3"></li>
     </ul>
-    <p>
-      If you have any questions or
-      concerns about the account removal process,
-      you can email to <strong>privacy@oppia.org</strong>.
-    </p>
+
+    <p translate="I18N_DELETE_ACCOUNT_PAGE_PARAGRAPH_4"></p>
     <div class="oppia-delete-button-container">
       <button type="button" class="btn btn-danger" title="Delete my account"
+              translate="I18N_DELETE_ACCOUNT_PAGE_BUTTON"
               ng-click="$ctrl.deleteAccount()">
-        Delete my account
       </button>
     </div>
   </div>
@@ -50,7 +38,7 @@
 </div>
 
 <style>
-  .oppia-get-started h2 {
+  .oppia-delete-account h2 {
     font-size: 1.17em;
     font-weight: bold;
     text-align: left;
