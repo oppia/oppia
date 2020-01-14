@@ -697,14 +697,6 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with tweak_swap, undo_swap, run_swap, is_windows_swap:
             run_e2e_tests.start_webdriver_manager()
 
-    def test_get_parameter_for_config_file_with_browserstack(self):
-        result = run_e2e_tests.get_parameter_for_config_file(True)
-        self.assertEqual(run_e2e_tests.BROWSER_STACK_CONFIG_FILE_PATH, result)
-
-    def test_get_parameter_for_config_file_without_browserstack(self):
-        result = run_e2e_tests.get_parameter_for_config_file(False)
-        self.assertEqual(run_e2e_tests.PROTRACTOR_CONFIG_FILE_PATH, result)
-
     def test_get_parameter_for_one_sharding_instance(self):
         result = run_e2e_tests.get_parameter_for_sharding(True, 1)
         self.assertEqual([], result)

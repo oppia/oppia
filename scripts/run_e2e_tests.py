@@ -89,11 +89,7 @@ Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
 single test or test suite.
 """)
 
-_PARSER.add_argument(
-    '--browserstack',
-    help='Run the tests on browserstack using the'
-         'protractor-browserstack.conf.js file.',
-    action='store_true')
+
 _PARSER.add_argument(
     '--skip-install',
     help='If true, skips installing dependencies. The default value is false.',
@@ -332,23 +328,6 @@ def start_webdriver_manager():
         undo_webdriver_tweak()
 
 
-def get_parameter_for_config_file(run_on_browserstack):
-    """Return the parameter for the target configuration file based on whether
-    the test is running on browserstack.
-
-    Args:
-        run_on_browserstack: bool. Whether run the test on browserstack.
-
-    Returns:
-        str: The config file path.
-    """
-    if not run_on_browserstack:
-        return PROTRACTOR_CONFIG_FILE_PATH
-    else:
-        python_utils.PRINT('Running the tests on browsertack...')
-        return BROWSER_STACK_CONFIG_FILE_PATH
-
-
 def get_parameter_for_sharding(sharding, sharding_instances):
     """Return the parameter for sharding. Based on the sharding instances
 
@@ -392,7 +371,7 @@ def get_parameter_for_suite(suite):
 
 
 def get_e2e_test_parameters(
-        run_on_browserstack, sharding, sharding_instances, suite, dev_mode):
+        sharding, sharding_instances, suite, dev_mode):
     """Return parameters for the end-2-end tests.
 
     Args:
@@ -407,13 +386,12 @@ def get_e2e_test_parameters(
     Returns:
         list(str): Parameters for running the tests.
     """
-    config_file = get_parameter_for_config_file(run_on_browserstack)
     sharding_parameters = get_parameter_for_sharding(
         sharding, sharding_instances)
     dev_mode_parameters = get_parameter_for_dev_mode(dev_mode)
     suite_parameter = get_parameter_for_suite(suite)
 
-    commands = [config_file]
+    commands = []
     commands.extend(sharding_parameters)
     commands.extend(suite_parameter)
     commands.append(dev_mode_parameters)
@@ -454,7 +432,6 @@ def main(args=None):
     atexit.register(cleanup)
 
     dev_mode = not parsed_args.prod_env
-    run_on_browserstack = parsed_args.browserstack
     update_community_dashboard_status_in_feconf_file(FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
     build_js_files(dev_mode)
     start_webdriver_manager()
@@ -466,7 +443,7 @@ def main(args=None):
     ensure_screenshots_dir_is_removed()
     commands = [common.NODE_BIN_PATH, PROTRACTOR_BIN_PATH]
     commands.extend(get_e2e_test_parameters(
-        run_on_browserstack, parsed_args.sharding,
+        parsed_args.sharding,
         parsed_args.sharding_instances, parsed_args.suite, dev_mode))
 
     p = subprocess.Popen(commands)
