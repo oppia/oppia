@@ -1911,14 +1911,20 @@ tags: []
 
         wrapper.called = False
         setattr(obj, attr, wrapper)
+        error_occurred = False
         try:
             # This will show the detailed assert message.
             self.longMessage = True
             yield
+        except Exception:
+            error_occurred = True
+            # Raise issues threw by the called function or assert error.
+            raise
         finally:
             self.longMessage = False
             setattr(obj, attr, original)
-            self.assertEqual(wrapper.called, called, msg=msg)
+            if not error_occurred:
+                self.assertEqual(wrapper.called, called, msg=msg)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
