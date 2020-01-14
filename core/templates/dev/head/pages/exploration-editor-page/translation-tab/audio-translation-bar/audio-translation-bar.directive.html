@@ -21,7 +21,7 @@
         Loading microphone.<loading-dots></loading-dots>
       </div>
       <div ng-if="recordingPermissionDenied && cannotRecord">
-        Grant permission to record.
+          Permission needed for recording.
       </div>
       <div ng-if="unsupportedBrowser && cannotRecord">
         Microphone is not supported.
@@ -252,7 +252,7 @@
     width: 0 !important;
   }
   .oppia-content-wrapper {
-    margin: 0 10px;
+    margin: 0 5px;
   }
   .oppia-audio-bar-info {
     background-color: #009688;
@@ -266,6 +266,7 @@
   }
   .oppia-audio-bar-info .padding-small-screen {
     padding: 5px 2px;
+    font-size: 11px;
   }
   .oppia-audio-bar-info .padding-large-screen {
     padding: 5px 20px;
