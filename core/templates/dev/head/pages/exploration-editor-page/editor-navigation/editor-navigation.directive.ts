@@ -152,7 +152,7 @@ angular.module('oppia').directive('editorNavigation', [
             RouterService.navigateToStatsTab();
           };
           $scope.selectImprovementsTab = function() {
-            RouterService.navigateToImprovementsTab;
+            RouterService.navigateToImprovementsTab();
           };
           $scope.selectHistoryTab = function() {
             RouterService.navigateToHistoryTab();

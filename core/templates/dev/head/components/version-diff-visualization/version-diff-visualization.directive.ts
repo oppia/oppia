@@ -89,7 +89,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
         // the diff graph. (Will be used to generate legend)
         var _stateTypeUsed = {};
         var diffGraphNodes = {};
-        var nodesData = ctrl.getDiffData().nodes;
+        var nodesData;
         // Opens the modal showing the history diff for a given state.
         // stateId is the unique ID assigned to a state during the
         // calculation of the state graph.
@@ -230,6 +230,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
           });
         };
         ctrl.$onInit = function() {
+          nodesData = ctrl.getDiffData().nodes;
           _stateTypeUsed[NODE_TYPE_ADDED] = false;
           _stateTypeUsed[NODE_TYPE_DELETED] = false;
           _stateTypeUsed[NODE_TYPE_CHANGED] = false;

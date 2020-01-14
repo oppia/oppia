@@ -570,7 +570,7 @@ angular.module('oppia').directive('audioTranslationBar', [
               // No further action is needed.
             });
           };
-          $scope.initAudioBar();
+
           ctrl.$onInit = function() {
             $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
             $scope.audioBlob = null;
@@ -631,6 +631,7 @@ angular.module('oppia').directive('audioTranslationBar', [
                 return AudioPlayerService.getProgress() * 100;
               }
             };
+            $scope.initAudioBar();
           };
         }]
     };
