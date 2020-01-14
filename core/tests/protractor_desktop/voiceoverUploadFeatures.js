@@ -89,10 +89,10 @@ describe('Voiceover upload features', function() {
       '../data/cafe-over-five-minutes.mp3');
     explorationEditorTranslationTab.expectSaveUploadedAudioButtonToBeDisabled();
     explorationEditorTranslationTab.closeUploadAudioModal();
+    explorationEditorTranslationTab.deleteAudioRecord();
   });
 
   it('should upload recorded file', function() {
-    explorationEditorTranslationTab.deleteAudioRecord();
     explorationEditorTranslationTab.confirmDeleteAudioRecord();
     explorationEditorTranslationTab.addAudioRecord();
     explorationEditorTranslationTab.stopAudioRecord();
@@ -102,41 +102,38 @@ describe('Voiceover upload features', function() {
     explorationEditorTranslationTab.playAudioRecord();
   });
 
-  it('should logout and login', function() {
+  it('should play recorded file after logging out', function() {
     users.logout();
     users.login(TEST_EMAIL);
     creatorDashboardPage.get();
     creatorDashboardPage.editExploration('Untitled');
     explorationEditorMainTab.exitTutorial();
-  });
 
-  it('should play recorded file', function() {
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.playAudioRecord();
+    explorationEditorTranslationTab.deleteAudioRecord();
   });
 
   it('should upload audio file from path', function() {
-    explorationEditorTranslationTab.deleteAudioRecord();
     explorationEditorTranslationTab.confirmDeleteAudioRecord();
     explorationEditorTranslationTab.uploadAudioRecord(
       '../../../data/explorations/audio_test/assets/audio/test_audio_1_en.mp3');
-    explorationEditorTranslationTab.saveUploadedAudio();
+    explorationEditorTranslationTab.saveAudioRecord();
     explorationEditorTranslationTab.playAudioRecord();
     browser.refresh();
     explorationEditorTranslationTab.playAudioRecord();
   });
 
-  it('should logout and login', function() {
+  it('should play recorded file from file after logging out', function() {
     users.logout();
     users.login(TEST_EMAIL);
     creatorDashboardPage.get();
     creatorDashboardPage.editExploration('Untitled');
     explorationEditorMainTab.exitTutorial();
-  });
 
-  it('should play recorded file', function() {
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.playAudioRecord();
+    explorationEditorTranslationTab.deleteAudioRecord();
   });
 
   afterAll(function() {
