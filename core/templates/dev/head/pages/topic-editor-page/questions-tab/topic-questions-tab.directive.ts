@@ -64,15 +64,12 @@ angular.module('oppia').directive('questionsTab', [
             NUM_QUESTIONS_PER_PAGE, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
           var ctrl = this;
-          $scope.getQuestionSummariesAsync = function() {
-            return QuestionsListService.getQuestionSummariesAsync();
-          };
-          $scope.getGroupedSkillSummaries = function() {
-            return TopicEditorStateService.getGroupedSkillSummaries();
-          };
-          $scope.isLastQuestionBatch = function() {
-            return QuestionsListService.isLastQuestionBatch();
-          };
+          $scope.getQuestionSummariesAsync =
+            QuestionsListService.getQuestionSummariesAsync;
+          $scope.getGroupedSkillSummaries =
+            TopicEditorStateService.getGroupedSkillSummaries;
+          $scope.isLastQuestionBatch =
+            QuestionsListService.isLastQuestionBatch;
           var _initTab = function() {
             $scope.question = null;
             $scope.skillId = null;
