@@ -388,7 +388,7 @@ def get_e2e_test_parameters(
     return commands
 
 
-def start_google_engine(dev_mode_setting):
+def start_google_app_engine_server(dev_mode_setting):
     """Start the google engine server.
 
     Args:
@@ -425,7 +425,7 @@ def main(args=None):
     build_js_files(dev_mode)
     start_webdriver_manager()
 
-    start_google_engine(dev_mode)
+    start_google_app_engine_server(dev_mode)
 
     wait_for_port_to_be_open(WEB_DRIVER_PORT)
     wait_for_port_to_be_open(GOOGLE_APP_ENGINE_PORT)
