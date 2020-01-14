@@ -1607,15 +1607,11 @@ def can_edit_question(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        question_rights = question_services.get_question_rights(
+        question = question_services.get_question_by_id(
             question_id, strict=False)
-
-        if question_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if (
-                role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions or
-                question_rights.is_creator(self.user_id)):
+        if question is None:
+            raise self.PageNotFoundException
+        if role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions:
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -1687,15 +1683,11 @@ def can_view_question_editor(handler):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        question_rights = question_services.get_question_rights(
+        question = question_services.get_question_by_id(
             question_id, strict=False)
-
-        if question_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if (
-                role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in
-                self.user.actions or question_rights.is_creator(self.user_id)):
+        if question is None:
+            raise self.PageNotFoundException
+        if role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in self.user.actions:
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -1883,20 +1875,8 @@ def can_edit_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        skill_rights = skill_services.get_skill_rights(
-            skill_id, strict=False)
-        if skill_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if role_services.ACTION_EDIT_PUBLIC_SKILLS in self.user.actions:
-            if not skill_rights.is_private():
-                return handler(self, skill_id, **kwargs)
-            elif skill_rights.is_private() and skill_rights.is_creator(
-                    self.user.user_id):
-                return handler(self, skill_id, **kwargs)
-            else:
-                raise self.UnauthorizedUserException(
-                    'You do not have credentials to edit this skill.')
+        if role_services.ACTION_EDIT_SKILLS in self.user.actions:
+            return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
@@ -2355,11 +2335,12 @@ def can_access_story_viewer_page(handler):
             if the user can access the given story viewer page.
     """
 
-    def test_can_access(self, story_id, **kwargs):
+    def test_can_access(self, story_id, *args, **kwargs):
         """Checks if the user can access story viewer page.
 
         Args:
             story_id: str. The unique id of the story.
+            *args: *. Arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -2390,7 +2371,7 @@ def can_access_story_viewer_page(handler):
                 (story_is_published and topic_is_published) or
                 role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
                 user_actions_info.actions):
-            return handler(self, story_id, **kwargs)
+            return handler(self, story_id, *args, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_access.__wrapped__ = True

@@ -42,18 +42,6 @@ def create_login_url(slug):
             feconf.SIGNUP_URL, 'return_url', slug))
 
 
-def create_logout_url(url_to_redirect):
-    """Creates a logout url.
-
-    Args:
-        url_to_redirect: str. The URL to redirect to after logout.
-
-    Returns:
-        str. The correct logout URL that includes the page to redirect to.
-    """
-    return users.create_logout_url(url_to_redirect)
-
-
 def get_current_user():
     """Returns the current user."""
     return users.get_current_user()

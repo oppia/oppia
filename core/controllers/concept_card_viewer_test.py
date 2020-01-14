@@ -60,11 +60,11 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id, self.admin_id, 'Description',
+            self.skill_id, self.admin_id, description='Description',
             skill_contents=self.skill_contents)
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id_1, self.admin_id, 'Description',
+            self.skill_id_1, self.admin_id, description='Description',
             skill_contents=self.skill_contents_1)
         self.skill_id_2 = skill_services.get_new_skill_id()
 
