@@ -180,7 +180,7 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-node-background'));
   var stateNodes = stateGraph.all(
     by.css('.protractor-test-node'));
-  var audioUploadInputElement = element(	
+  var audioUploadInputElement = element(
     by.css('.protractor-test-upload-audio'));
   var audioOverFiveMinutesErrorMessageElement = element(
     by.css('.protractor-test-audio-file-upload-field-error-message'));
