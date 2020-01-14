@@ -26,6 +26,7 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.domain import wipeout_service
 from core.platform import models
 import feconf
 import utils
@@ -339,6 +340,33 @@ class DeleteAccountPage(base.BaseHandler):
         if not constants.ENABLE_ACCOUNT_DELETION:
             raise self.PageNotFoundException
         self.render_template('delete-account-page.mainpage.html')
+
+
+class DeleteAccountHandler(base.BaseHandler):
+    """Provides data for the delete account page."""
+
+    @acl_decorators.can_manage_own_profile
+    def delete(self):
+        """Handles DELETE requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+
+        wipeout_service.pre_delete_user(self.user_id)
+        self.render_json({'success': True})
+
+
+class PendingAccountDeletionPage(base.BaseHandler):
+    """The account pending deletion page. This page is accessible by all users
+    even if they are not scheduled for deletion. This is because users that are
+    scheduled for deletion are logged out instantly when they try to login.
+    """
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        if not constants.ENABLE_ACCOUNT_DELETION:
+            raise self.PageNotFoundException
+        self.render_template('pending-account-deletion-page.mainpage.html')
 
 
 class UsernameCheckHandler(base.BaseHandler):

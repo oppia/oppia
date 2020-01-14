@@ -24,7 +24,8 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('deleteAccountPage', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  '$http', '$window', 'UrlInterpolationService',
+  function($http, $window, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -50,6 +51,11 @@ angular.module('oppia').directive('deleteAccountPage', [
                   };
                 }
               ]
+            }).result.then(function() {
+              $http['delete']('/delete-account-handler').then(function() {
+                $window.location = (
+                  '/logout?redirect_url=pending-account-deletion');
+              });
             });
           };
         }

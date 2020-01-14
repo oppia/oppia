@@ -29,6 +29,14 @@ var suites = {
       'protractor_desktop/adminTabFeatures.js'
     ],
 
+    classroomPage: [
+      'protractor_desktop/classroomPage.js'
+    ],
+
+    classroomPageFileUploadFeatures: [
+      'protractor_desktop/classroomPageFileUploadFeatures.js'
+    ],
+
     collections: [
       'protractor_desktop/collections.js'
     ],
@@ -115,6 +123,10 @@ var suites = {
 
     topicAndStoryEditor: [
       'protractor_desktop/topicAndStoryEditor.js'
+    ],
+
+    topicAndStoryEditorFileUploadFeatures: [
+      'protractor_desktop/topicAndStoryEditorFileUploadFeatures.js'
     ],
 
     topicsAndSkillsDashboard: [
