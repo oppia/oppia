@@ -1,3 +1,4 @@
+var path = require('path')
 var suites = {
   oneword: [
     'protractor/oneword.js'

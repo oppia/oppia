@@ -30,6 +30,10 @@ import utils
 TEST_SUITES_NOT_RUN_ON_TRAVIS = ['full', 'classroomPage', 'fileUploadFeatures',
     'topicAndStoryEditor']
 
+TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
+PROTRACTOR_CONF_FILE_PATH = os.path.join(
+    os.getcwd(), 'core', 'tests', 'protractor.conf.js')
+
 
 def get_e2e_suite_names_from_jobs_travis_yml_file():
     """Extracts the env/jobs section from the .travis.yml file.
@@ -63,9 +67,9 @@ def get_e2e_suite_names_from_script_travis_yml_file():
     script_str = python_utils.convert_to_bytes(travis_file_content['script'])
     # The following line extracts the test suites from patterns like
     # bash scripts/run_e2e_tests.sh --suite="accessibility"
-    hyphen_between_regex = re.compile(
+    e2e_test_suite_regex = re.compile(
         r'bash scripts/run_e2e_tests.sh --suite="([a-zA-Z_-]*)"')
-    suites_list = hyphen_between_regex.findall(script_str)
+    suites_list = e2e_test_suite_regex.findall(script_str)
 
     return sorted(suites_list)
 
@@ -84,11 +88,8 @@ def get_e2e_suite_names_from_protractor_file():
 
     # The following line extracts the keys/test suites from the key: value
     # pair from the suites object.
-    key_regex = re.compile(r'\b([a-zA-Z_-]*)(?=:)')
-    protractor_suites = []
-    for match in key_regex.finditer(suite_object_string):
-        if match.group():
-            protractor_suites.append(match.group())
+    key_regex = re.compile(r'\b([a-zA-Z_-]*):')
+    protractor_suites = key_regex.findall(suite_object_string)
 
     return sorted(protractor_suites)
 
@@ -100,8 +101,7 @@ def read_protractor_conf_file():
         str. The contents of protractor.conf.js, as a string.
     """
     protractor_config_file_content = python_utils.open_file(
-        os.path.join(
-            os.getcwd(), 'core', 'tests', 'protractor.conf.js'), 'r').read()
+        PROTRACTOR_CONF_FILE_PATH, 'r').read()
     return protractor_config_file_content
 
 
@@ -112,7 +112,7 @@ def read_and_parse_travis_yml_file():
         dict. Contents of the travis.yml file parsed as a dict.
     """
     travis_ci_file_content = python_utils.open_file(
-        os.path.join(os.getcwd(), '.travis.yml'), 'r').read()
+        TRAVIS_CI_FILE_PATH, 'r').read()
     travis_ci_dict = utils.dict_from_yaml(travis_ci_file_content)
     return travis_ci_dict
 
@@ -131,8 +131,15 @@ def main():
 
     if not (len(yaml_jobs) > 0 and len(yaml_scripts) > 0
             and len(protractor_test_suites) > 0):
-        raise Exception('The tests suites that have been extracted from '
-                        'protractor.conf.js or travis.ci are empty.')
+        if len(yaml_jobs) <= 0:
+            raise Exception('The e2e test suites that have been extracted from '
+                            'jobs section from travis.ci are empty.')
+        if len(yaml_scripts) <= 0:
+            raise Exception('The e2e test suites that have been extracted from '
+                            'script section from travis.ci are empty.')
+        if len(protractor_test_suites) <= 0:
+            raise Exception('The e2e test suites that have been extracted from '
+                            'protractor.conf.js are empty.')
 
     if not protractor_test_suites == yaml_jobs and (yaml_jobs == yaml_scripts):
         raise Exception(
