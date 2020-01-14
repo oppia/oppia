@@ -23,6 +23,7 @@ from core.domain import collection_jobs_one_off
 from core.domain import email_jobs_one_off
 from core.domain import exp_jobs_one_off
 from core.domain import feedback_jobs_continuous
+from core.domain import feedback_jobs_one_off
 from core.domain import opportunity_jobs_one_off
 from core.domain import prod_validation_jobs_one_off
 from core.domain import question_jobs_one_off
@@ -32,6 +33,7 @@ from core.domain import stats_jobs_continuous
 from core.domain import stats_jobs_one_off
 from core.domain import story_jobs_one_off
 from core.domain import topic_jobs_one_off
+from core.domain import user_id_migration
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_one_off
 import python_utils
@@ -54,7 +56,9 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
+    feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
+    opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
@@ -68,6 +72,10 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAudit,
     story_jobs_one_off.StoryMigrationOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
+    user_id_migration.GaeIdNotInModelsVerificationJob,
+    user_id_migration.ModelsUserIdsHaveUserSettingsVerificationJob,
+    user_id_migration.SnapshotsUserIdMigrationJob,
+    user_id_migration.UserIdMigrationJob,
     user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
@@ -75,8 +83,7 @@ ONE_OFF_JOB_MANAGERS = [
     user_jobs_one_off.UserFirstContributionMsecOneOffJob,
     user_jobs_one_off.UserLastExplorationActivityOneOffJob,
     user_jobs_one_off.UserProfilePictureOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
-    user_jobs_one_off.UserGaeIdOneOffJob
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob
 ]
 
 # List of all manager classes for prod validation one-off batch jobs for which
@@ -133,27 +140,12 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileMetadataModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .FileMetadataSnapshotMetadataModelAuditOneOffJob),
-    prod_validation_jobs_one_off.FileMetadataSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.JobModelAuditOneOffJob,
     prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionSkillLinkModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.QuestionRightsModelAuditOneOffJob,
-    (
-        prod_validation_jobs_one_off
-        .QuestionRightsSnapshotMetadataModelAuditOneOffJob),
-    (
-        prod_validation_jobs_one_off
-        .QuestionRightsSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
@@ -161,9 +153,6 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.SkillModelAuditOneOffJob,
     prod_validation_jobs_one_off.SkillSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.SkillSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SkillRightsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SkillRightsSnapshotMetadataModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SkillRightsSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.SkillCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.SkillSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StoryModelAuditOneOffJob,
@@ -204,7 +193,8 @@ AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserSkillMasteryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob
+    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
+    prod_validation_jobs_one_off.PendingDeletionRequestModelAuditOneOffJob
 ]
 
 # List of all ContinuousComputation managers to show controls for on the
@@ -226,6 +216,11 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
     def dispatch_event(cls, event_type, *args, **kwargs):
         """Dispatches an incoming event to the ContinuousComputation
         classes which listen to events of that type.
+
+        Args:
+            event_type: str. The type of the event.
+            args: *. Positional arguments to pass to on_incoming_event().
+            kwargs: *. Keyword arguments to pass to on_incoming_event().
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
             if event_type in klass.get_event_types_listened_to():

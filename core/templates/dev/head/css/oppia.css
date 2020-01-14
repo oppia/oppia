@@ -1554,16 +1554,10 @@ md-card.oppia-dashboard-tile {
 }
 
 @media(max-width: 1099px) {
-  .oppia-editor-publish-button {
-    padding-bottom: 3px;
-  }
-  .oppia-save-draft-button {
-    padding-bottom: 3px;
-    width: 40px;
-  }
+  .oppia-editor-publish-button,
+  .oppia-save-draft-button,
   .oppia-save-changes-button {
     padding-bottom: 3px;
-    width: 55px;
   }
 }
 
@@ -1573,16 +1567,10 @@ md-card.oppia-dashboard-tile {
     display: none;
   }
 
-  .oppia-editor-publish-button {
-    padding-bottom: 6px;
-  }
-  .oppia-save-draft-button {
-    padding-bottom: 6px;
-    width: 125px;
-  }
+  .oppia-editor-publish-button,
+  .oppia-save-draft-button,
   .oppia-save-changes-button {
     padding-bottom: 6px;
-    width: 136px;
   }
 }
 
@@ -3840,7 +3828,7 @@ md-card.preview-conversation-skin-supplemental-card {
   https://www.nczonline.net/blog/2013/04/01/making-accessible-icon-buttons/
   Use for all links and buttons that only use an icon */
 .oppia-icon-accessibility-label {
-  display: block;
+  display: inline-block;
   font-size: 0;
   height: 1px;
   overflow: hidden;

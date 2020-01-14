@@ -66,7 +66,7 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
+            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -385,7 +385,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 0)
 
-        self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
+        self.save_new_skill(
+            self.SKILL_ID, self.USER_ID, description='skill_description')
 
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
@@ -424,7 +425,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
                 self.SKILL_ID, 'description')
 
     def test_update_skill_description_updates_skill_opportunity(self):
-        self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
+        self.save_new_skill(
+            self.SKILL_ID, self.USER_ID, description='skill_description')
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
@@ -454,7 +456,8 @@ class OpportunityServicesIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(len(skill_opportunities), 0)
 
     def test_delete_skill_deletes_skill_opportunity(self):
-        self.save_new_skill(self.SKILL_ID, self.USER_ID, 'skill_description')
+        self.save_new_skill(
+            self.SKILL_ID, self.USER_ID, description='skill_description')
         skill_opportunities, _, _ = (
             opportunity_services.get_skill_opportunities(None))
         self.assertEqual(len(skill_opportunities), 1)
@@ -562,7 +565,7 @@ class OpportunityServicesUnitTest(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=self.TOPIC_ID, name='topic')
+            topic_id=self.TOPIC_ID, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(self.owner_id, topic)
 
         story = story_domain.Story.create_default_story(

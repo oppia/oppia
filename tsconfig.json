@@ -7,6 +7,8 @@
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es5",
+    "inlineSourceMap": true,
+    "sourceMap": false,
     "typeRoots": ["./node_modules/@types"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -24,10 +26,6 @@
       "filters/*": ["core/templates/dev/head/filters/*"]
     }
   },
-  "files_explanation": "These files are included separately since we still do not have webpack in extensions folder and these files are still included through scripts tags, so they need to be compiled separately.",
-  "files": [
-    "core/tests/karma-globals.ts"
-  ],
   "include": [
     "typings"
   ]

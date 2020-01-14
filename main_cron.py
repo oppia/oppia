@@ -33,6 +33,11 @@ URLS = [
     main.get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
     main.get_redirect_route(
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
+    main.get_redirect_route(
+        r'/cron/users/verify_user_deletion',
+        cron.CronVerifyUserDeletionHandler),
+    main.get_redirect_route(
         r'/cron/explorations/recommendations',
         cron.CronExplorationRecommendationsHandler),
     main.get_redirect_route(

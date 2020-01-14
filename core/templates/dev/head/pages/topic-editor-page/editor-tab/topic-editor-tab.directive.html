@@ -1,5 +1,11 @@
 <div role="form" class="form-horizontal topic-editor">
   <md-card class="oppia-page-card oppia-long-text">
+    <!-- Move this form into a separate directive -->
+    <thumbnail-uploader disabled="!topicRights.canEditTopic()"
+                        editable-thumbnail-data-url="editableThumbnailDataUrl"
+                        update-filename="updateTopicThumbnailFilename">
+    </thumbnail-uploader>
+
     <div class="topic-name">
       <label for="topicName" class="form-heading">Topic Name</label>
       <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
@@ -11,11 +17,21 @@
       </span>
     </div>
 
+    <div class="abbreviated-name">
+      <label for="abbreviatedName" class="form-heading">Abbreviated Topic Name</label>
+      <input id="abbreviatedName" type="text" class="form-control protractor-test-abbreviated-topic-name-field"
+             ng-disabled="!topicRights.canEditTopic()"
+             ng-model="editableAbbreviatedName" ng-blur="updateAbbreviatedName(editableAbbreviatedName)"
+             placeholder="Enter an abbreviated topic name." maxlength="12" ng-trim="false">
+      <span class="form-text" style="font-size: smaller; color: red;" ng-if="editableAbbreviatedName.length === 12">
+        <em>Please use at most 12 characters for the abbreviated topic name.</em>
+      </span>
+    </div>
+
     <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
       <label for="topicDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control protractor-test-topic-description-field"
-                ng-model="editableDescription"
-                maxlength="120"
+                ng-model="editableDescription" maxlength="120"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
                 placeholder="Enter the description of the topic">
@@ -47,6 +63,10 @@
 </div>
 
 <style>
+  thumbnail-uploader {
+    margin-bottom: 15px;
+  }
+
   .topic-editor textarea {
     resize: vertical;
   }

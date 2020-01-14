@@ -50,7 +50,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.story.description = 'story_description'
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'public_topic_name')
+            self.topic_id, 'public_topic_name', 'abbrev')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
             1, 'subtopic_name', [self.skill_id_2]))
@@ -62,7 +62,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story)
 
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id_1, 'private_topic_name')
+            self.topic_id_1, 'private_topic_name', 'abbrev')
         topic_services.save_new_topic(self.admin_id, self.topic)
 
         topic_services.publish_topic(self.topic_id, self.admin_id)
@@ -70,9 +70,9 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
             self.topic_id, self.story_id, self.admin_id)
 
         self.save_new_skill(
-            self.skill_id_1, self.user_id, 'Skill Description 1')
+            self.skill_id_1, self.user_id, description='Skill Description 1')
         self.save_new_skill(
-            self.skill_id_2, self.user_id, 'Skill Description 2')
+            self.skill_id_2, self.user_id, description='Skill Description 2')
         skill_services.create_user_skill_mastery(
             self.user_id, self.skill_id_1, 0.3)
         skill_services.create_user_skill_mastery(

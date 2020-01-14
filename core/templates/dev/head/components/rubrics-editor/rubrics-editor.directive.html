@@ -11,11 +11,11 @@
              title="Edit Rubric Explanation">&#xE254;
           </i>
         </div>
-        <span ng-if="$ctrl.isExplanationEmpty($ctrl.getRubrics()[$index].getExplanation()) && $index === 1"
+        <span ng-if="$ctrl.isExplanationEmpty($ctrl.getRubrics()[$index].getExplanation()) && $index === 1 && $ctrl.newSkillBeingCreated()"
               class="oppia-placeholder">
           The skill description will be autofilled here
         </span>
-        <span ng-if="$ctrl.isExplanationEmpty($ctrl.getRubrics()[$index].getExplanation()) && $index !== 1"
+        <span ng-if="$ctrl.isExplanationEmpty($ctrl.getRubrics()[$index].getExplanation()) && ($index !== 1 || !$ctrl.newSkillBeingCreated())"
               class="oppia-placeholder">
           This rubric has not yet been specified
         </span>
@@ -30,7 +30,7 @@
     <div class="oppia-rule-details-header">
       <schema-based-editor class="protractor-test-rubric-explanation-text"
                            schema="$ctrl.EXPLANATION_FORM_SCHEMA"
-                           local-value="$ctrl.editableExplanation">
+                           local-value="$ctrl.editableExplanation[$index]">
       </schema-based-editor>
     </div>
 
@@ -43,7 +43,6 @@
         </button>
         <button type="button"
                 class="btn btn-success protractor-test-save-rubric-explanation-button"
-                ng-disabled="!$ctrl.editableExplanation"
                 ng-click="$ctrl.saveExplanation($index)">
           Save
         </button>

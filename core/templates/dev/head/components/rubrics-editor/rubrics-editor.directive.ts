@@ -15,7 +15,6 @@
 /**
  * @fileoverview Directive for the rubric editor for skills.
  */
-
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('domain/skill/RubricObjectFactory.ts');
@@ -31,6 +30,8 @@ require('objects/objectComponentsRequires.ts');
 
 require('directives/angular-html-bind.directive.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
+require('services/context.service.ts');
+require('services/services.constants.ts');
 
 angular.module('oppia').directive('rubricsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -41,20 +42,22 @@ angular.module('oppia').directive('rubricsEditor', [
       // initialized.
       bindToController: {
         getRubrics: '&rubrics',
+        newSkillBeingCreated: '&',
         onSaveRubric: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/rubrics-editor/rubrics-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$uibModal', '$rootScope',
-        'RubricObjectFactory', 'EVENT_SKILL_REINITIALIZED',
+        '$scope', '$filter', '$uibModal', '$rootScope', 'ContextService',
+        'RubricObjectFactory', 'EVENT_SKILL_REINITIALIZED', 'PAGE_CONTEXT',
         function(
-            $scope, $filter, $uibModal, $rootScope,
-            RubricObjectFactory, EVENT_SKILL_REINITIALIZED) {
+            $scope, $filter, $uibModal, $rootScope, ContextService,
+            RubricObjectFactory, EVENT_SKILL_REINITIALIZED, PAGE_CONTEXT) {
           var ctrl = this;
-          ctrl.activeRubricIndex = 0;
           ctrl.explanationEditorIsOpen = [false, false, false];
+          ctrl.editableExplanation = [null, null, null];
+
           var explanationMemento = [null, null, null];
 
           ctrl.isEditable = function() {
@@ -65,15 +68,11 @@ angular.module('oppia').directive('rubricsEditor', [
             return explanation === '<p></p>' || explanation === '';
           };
 
-          ctrl.setActiveDifficultyIndex = function(index) {
-            ctrl.activeRubricIndex = index;
-          };
 
           ctrl.openExplanationEditor = function(index) {
-            ctrl.setActiveDifficultyIndex(index);
             explanationMemento[index] = angular.copy(
-              ctrl.getRubrics()[ctrl.activeRubricIndex].getExplanation());
-            ctrl.editableExplanation = explanationMemento[index];
+              ctrl.getRubrics()[index].getExplanation());
+            ctrl.editableExplanation[index] = explanationMemento[index];
             ctrl.explanationEditorIsOpen[index] = true;
           };
 
@@ -83,22 +82,22 @@ angular.module('oppia').directive('rubricsEditor', [
           };
 
           ctrl.saveExplanation = function(index) {
-            ctrl.explanationEditorIsOpen[ctrl.activeRubricIndex] = false;
+            ctrl.explanationEditorIsOpen[index] = false;
             var explanationHasChanged = (
-              ctrl.editableExplanation !==
-              ctrl.getRubrics()[ctrl.activeRubricIndex].getExplanation());
+              ctrl.editableExplanation[index] !==
+              ctrl.getRubrics()[index].getExplanation());
 
             if (explanationHasChanged) {
               ctrl.onSaveRubric(
-                ctrl.getRubrics()[ctrl.activeRubricIndex].getDifficulty(),
-                ctrl.editableExplanation);
-              explanationMemento[index] = ctrl.editableExplanation;
+                ctrl.getRubrics()[index].getDifficulty(),
+                ctrl.editableExplanation[index]);
+              explanationMemento[index] = ctrl.editableExplanation[index];
             }
           };
 
           ctrl.cancelEditExplanation = function(index) {
-            ctrl.editableExplanation = explanationMemento[index];
-            ctrl.explanationEditorIsOpen[ctrl.activeRubricIndex] = false;
+            ctrl.editableExplanation[index] = explanationMemento[index];
+            ctrl.explanationEditorIsOpen[index] = false;
           };
         }]
     };

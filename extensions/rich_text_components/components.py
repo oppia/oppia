@@ -105,10 +105,6 @@ class Collapsible(BaseRteComponent):
             raise Exception('Nested tabs and collapsible')
 
 
-class Concept(BaseRteComponent):
-    """Class for Concept component."""
-
-
 class Image(BaseRteComponent):
     """Class for Image component."""
 
@@ -128,6 +124,10 @@ class Link(BaseRteComponent):
 
 class Math(BaseRteComponent):
     """Class for Math component."""
+
+
+class Skillreview(BaseRteComponent):
+    """Class for Skillreview component."""
 
 
 class Tabs(BaseRteComponent):

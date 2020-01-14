@@ -1051,10 +1051,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.suggestion_dict = {
-            'suggestion_id': 'exploration.exp1.thread1',
+            'suggestion_id': 'skill1.thread1',
             'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
             'target_type': suggestion_models.TARGET_TYPE_SKILL,
-            'target_id': 'exp1',
+            'target_id': 'skill1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
             'author_name': 'author',
@@ -1069,7 +1069,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1']
                 },
-                'skill_id': 'skill_1'
+                'skill_id': 'skill_1',
+                'topic_name': 'topic_1'
             },
             'score_category': 'question.topic_1',
             'last_updated': utils.get_time_in_millisecs(self.fake_date)
@@ -1253,7 +1254,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1277,7 +1278,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1306,7 +1307,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()

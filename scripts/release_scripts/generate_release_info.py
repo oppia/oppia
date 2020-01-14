@@ -196,7 +196,8 @@ def get_changelog_categories(pulls):
         formatted_title = '%s (#%d)' % (pull.title, pull.number)
         for label in labels:
             if 'CHANGELOG:' in label.name:
-                category = label.name[label.name.find(':') + 2:]
+                category = label.name[
+                    label.name.find(':') + 2:label.name.find(' --')]
                 added_to_dict = True
                 result[category].append(formatted_title)
                 break

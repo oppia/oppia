@@ -356,7 +356,9 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
         model1 = user_models.UserSettingsModel(
-            id=user_id_a, email=self.USER_A_EMAIL)
+            id=user_id_a,
+            gae_id='gae_' + user_id_a,
+            email=self.USER_A_EMAIL)
         model1.put()
 
         result = self._run_one_off_job()
@@ -1102,8 +1104,13 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         # We now manually reset the user's first_contribution_msec to None.
         # This is to test that the one off job skips over the unpublished
         # exploration and does not reset the user's first_contribution_msec.
-        user_services._update_first_contribution_msec(  # pylint: disable=protected-access
-            self.owner_id, None)
+        user_models.UserSettingsModel(
+            id=self.owner_id,
+            gae_id='gae_id',
+            email='email@email.com',
+            username='username',
+            first_contribution_msec=None
+        ).put()
         rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
 
         # Test that first contribution time is not set for unpublished
@@ -1219,6 +1226,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.owner_id,
+            gae_id='gae_' + self.owner_id,
             email=self.OWNER_EMAIL,
             last_created_an_exploration=None
         ).put()
@@ -1249,6 +1257,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.editor_id,
+            gae_id='gae_' + self.editor_id,
             email=self.EDITOR_EMAIL,
             last_edited_an_exploration=None
         ).put()
@@ -1287,6 +1296,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.owner_id,
+            gae_id='gae_' + self.owner_id,
             email=self.OWNER_EMAIL,
             last_created_an_exploration=None,
             last_edited_an_exploration=None
@@ -1294,6 +1304,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
 
         user_models.UserSettingsModel(
             id=self.editor_id,
+            gae_id='gae_' + self.editor_id,
             email=self.EDITOR_EMAIL,
             last_edited_an_exploration=None
         ).put()
@@ -1319,6 +1330,7 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
     def test_that_last_edited_and_created_time_are_not_updated(self):
         user_models.UserSettingsModel(
             id=self.owner_id,
+            gae_id='gae_' + self.owner_id,
             email=self.OWNER_EMAIL,
             last_created_an_exploration=None,
             last_edited_an_exploration=None
@@ -1397,69 +1409,3 @@ class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
             'removed explorations 0, 1, 2\', 1]' %
             self.user_id]
         self.assertEqual(sorted(actual_output), sorted(expected_output))
-
-
-class UserGaeIdOneOffJobTests(test_utils.GenericTestBase):
-    """Tests for UserGaeIdOneOffJob migration."""
-
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
-        user_jobs_one_off.UserGaeIdOneOffJob]
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = user_jobs_one_off.UserGaeIdOneOffJob.create_new()
-        user_jobs_one_off.UserGaeIdOneOffJob.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        stringified_output = (
-            user_jobs_one_off.UserGaeIdOneOffJob.get_output(job_id))
-
-        eval_output = [ast.literal_eval(item) for item in stringified_output]
-        output = [(item[0], int(item[1])) for item in eval_output]
-        return output
-
-    def _check_model_validity(self, user_id, email):
-        """Checks if the model was migrated correctly."""
-        migrated_user_settings_model = (
-            user_models.UserSettingsModel.get(user_id))
-        self.assertEqual(migrated_user_settings_model.id, user_id)
-        self.assertEqual(migrated_user_settings_model.gae_id, user_id)
-        # Check that the other values didn't change.
-        self.assertEqual(migrated_user_settings_model.email, email)
-
-    def test_successful_migration(self):
-        user_id = 'user'
-        email = 'user@domain.com'
-        user_models.UserSettingsModel(
-            id=user_id, email=email, gae_id=None).put()
-
-        output = self._run_one_off_job()
-
-        # The reason why SUCCESS is returned twice and not once is that one
-        # additional UserSettingsModel is created by the TestBase and the
-        # migration is also performed on that user.
-        self.assertEqual(output, [(u'SUCCESS', 2)])
-
-        self._check_model_validity(user_id, email)
-
-    def test_multiple_user_settings(self):
-        user_1_id = 'user1'
-        user_1_email = 'user1@domain.com'
-        user_models.UserSettingsModel(
-            id=user_1_id, email=user_1_email, gae_id=None).put()
-
-        user_2_id = 'user2'
-        user_2_email = 'user2@domain.com'
-        user_models.UserSettingsModel(id=user_2_id, email=user_2_email).put()
-
-        output = self._run_one_off_job()
-
-        # The reason why SUCCESS is returned thrice and not twice is that one
-        # additional UserSettingsModel is created by the TestBase and the
-        # migration is also performed on that user.
-        self.assertEqual(output, [(u'SUCCESS', 3)])
-
-        self._check_model_validity(user_1_id, user_1_email)
-        self._check_model_validity(user_2_id, user_2_email)

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for using the Concept component during
+ * @fileoverview Utilities for using the Skillreview component during
  * end-to-end testing with Protractor.js
  */
 

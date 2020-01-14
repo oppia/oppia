@@ -290,7 +290,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=topic_id, name='topic')
+            topic_id=topic_id, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -872,7 +872,11 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, user_id, 'Name', 'Description', [], [], [], [], 1)
+            topic_id, user_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
