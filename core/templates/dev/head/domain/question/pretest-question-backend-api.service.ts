@@ -22,9 +22,11 @@ require('domain/question/question-domain.constants.ajs.ts');
 require('domain/question/QuestionObjectFactory.ts');
 
 angular.module('oppia').factory('PretestQuestionBackendApiService', [
-  '$http', '$q', 'QuestionObjectFactory', 'UrlInterpolationService', 'PRETEST_QUESTIONS_URL_TEMPLATE',
+  '$http', '$q', 'QuestionObjectFactory', 'UrlInterpolationService',
+  'PRETEST_QUESTIONS_URL_TEMPLATE',
   function(
-      $http, $q, QuestionObjectFactory, UrlInterpolationService, PRETEST_QUESTIONS_URL_TEMPLATE) {
+      $http, $q, QuestionObjectFactory, UrlInterpolationService,
+      PRETEST_QUESTIONS_URL_TEMPLATE) {
     var _cursor = '';
 
     var _fetchPretestQuestions = function(
@@ -43,12 +45,12 @@ angular.module('oppia').factory('PretestQuestionBackendApiService', [
       $http.get(pretestDataUrl).then(function(response) {
         var pretestQuestionDicts =
           angular.copy(response.data.pretest_question_dicts);
-          var pretestQuestionObjects = pretestQuestionDicts.map(
-            function(questionDict) {
-              return QuestionObjectFactory.createFromBackendDict(
-                questionDict);
-            }
-          );
+        var pretestQuestionObjects = pretestQuestionDicts.map(
+          function(questionDict) {
+            return QuestionObjectFactory.createFromBackendDict(
+              questionDict);
+          }
+        );
         _cursor = response.data.next_start_cursor;
         if (successCallback) {
           successCallback(pretestQuestionObjects);
