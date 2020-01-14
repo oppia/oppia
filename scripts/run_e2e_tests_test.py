@@ -393,7 +393,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with setup_swap, setup_gae_swap, install_swap:
             run_e2e_tests.setup_and_install_dependencies(True)
 
-    def test_tweak_feconf_file_with_dashboard_enabled(self):
+    def test_update_community_dashboard_status_in_feconf_file_with_dashboard_enabled(self):
         swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
             run_e2e_tests.FECONF_FILE_PATH,
             'COMMUNITY_DASHBOARD_ENABLED = .*',
@@ -401,17 +401,17 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         )])
 
         with swap_inplace_replace:
-            run_e2e_tests.tweak_feconf_file(
+            run_e2e_tests.update_community_dashboard_status_in_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, True)
 
-    def test_tweak_feconf_file_with_dashboard_disabled(self):
+    def test_update_community_dashboard_status_in_feconf_file_with_dashboard_disabled(self):
         swap_inplace_replace = self.inplace_replace_swap(expected_args=[(
             run_e2e_tests.FECONF_FILE_PATH,
             'COMMUNITY_DASHBOARD_ENABLED = .*',
             'COMMUNITY_DASHBOARD_ENABLED = False'
         )])
         with swap_inplace_replace:
-            run_e2e_tests.tweak_feconf_file(
+            run_e2e_tests.update_community_dashboard_status_in_feconf_file(
                 run_e2e_tests.FECONF_FILE_PATH, False)
 
     def test_build_js_files_in_dev_mode_with_hash_file_exists(self):

@@ -220,7 +220,8 @@ def update_dev_mode_in_constants_js(constant_file, dev_mode_setting):
     common.inplace_replace_file(constant_file, pattern, replace)
 
 
-def tweak_feconf_file(feconf_file_path, enable_community_dashboard):
+def update_community_dashboard_status_in_feconf_file(
+        feconf_file_path, enable_community_dashboard):
     """Change feconf.py file based on whether the community dashboard is
     enabled.
 
@@ -455,7 +456,7 @@ def main(args=None):
 
     dev_mode = not parsed_args.prod_env
     run_on_browserstack = parsed_args.browserstack
-    tweak_feconf_file(FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
+    update_community_dashboard_status_in_feconf_file(FECONF_FILE_PATH, parsed_args.community_dashboard_enabled)
     build_js_files(dev_mode)
     start_webdriver_manager()
 
