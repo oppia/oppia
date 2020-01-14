@@ -90,10 +90,10 @@ describe('Voiceover upload features', function() {
     explorationEditorTranslationTab.expectSaveUploadedAudioButtonToBeDisabled();
     explorationEditorTranslationTab.closeUploadAudioModal();
     explorationEditorTranslationTab.deleteAudioRecord();
+    explorationEditorTranslationTab.confirmDeleteAudioRecord();
   });
 
   it('should upload recorded file', function() {
-    explorationEditorTranslationTab.confirmDeleteAudioRecord();
     explorationEditorTranslationTab.addAudioRecord();
     explorationEditorTranslationTab.stopAudioRecord();
     explorationEditorTranslationTab.confirmAudioRecord();
@@ -112,10 +112,10 @@ describe('Voiceover upload features', function() {
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.playAudioRecord();
     explorationEditorTranslationTab.deleteAudioRecord();
+    explorationEditorTranslationTab.confirmDeleteAudioRecord();
   });
 
   it('should upload audio file from path', function() {
-    explorationEditorTranslationTab.confirmDeleteAudioRecord();
     explorationEditorTranslationTab.uploadAudioRecord(
       '../../../data/explorations/audio_test/assets/audio/test_audio_1_en.mp3');
     explorationEditorTranslationTab.saveAudioRecord();
@@ -134,6 +134,7 @@ describe('Voiceover upload features', function() {
     explorationEditorPage.navigateToTranslationTab();
     explorationEditorTranslationTab.playAudioRecord();
     explorationEditorTranslationTab.deleteAudioRecord();
+    explorationEditorTranslationTab.confirmDeleteAudioRecord();
   });
 
   afterAll(function() {
