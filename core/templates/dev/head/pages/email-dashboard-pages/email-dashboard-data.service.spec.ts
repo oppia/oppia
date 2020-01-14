@@ -24,7 +24,6 @@ import { CsrfTokenService } from
   'services/csrf-token.service';
 import { EmailDashboardDataService } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
-import { urlMatches } from 'selenium-webdriver/lib/until';
 
 describe('Email Dashboard Services', () => {
   describe('Email Dashboard Services', () => {
@@ -61,7 +60,8 @@ describe('Email Dashboard Services', () => {
 
         emailDashboardDataService.getNextQueries();
 
-        var req = httpTestingController.expectOne();
+        var req = httpTestingController.expectOne(
+          req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
         expect(req.request.method).toEqual('GET');
         req.flush({
           recent_queries: recentQueries,
@@ -125,7 +125,8 @@ describe('Email Dashboard Services', () => {
 
         emailDashboardDataService.getNextQueries();
 
-        var req = httpTestingController.expectOne(() => true);
+        var req = httpTestingController.expectOne(
+          req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
         expect(req.request.method).toEqual('GET');
         req.flush({
           recent_queries: recentQueries,
@@ -142,7 +143,9 @@ describe('Email Dashboard Services', () => {
           expect(query.status).toEqual('completed');
         });
 
-        req = httpTestingController.expectOne('/querystatuscheck');
+        var req = httpTestingController.expectOne(
+          req => (/.*?querystatuscheck?.*/g).test(req.url)
+        );
         expect(req.request.method).toEqual('GET');
         req.flush({
           query: {
@@ -163,7 +166,8 @@ describe('Email Dashboard Services', () => {
         // Get next page of queries.
         emailDashboardDataService.getNextQueries();
 
-        var req = httpTestingController.expectOne(() => true);
+        var req = httpTestingController.expectOne(
+          req => (/.*?emaildashboarddatahandler?.*/g).test(req.url));
         expect(req.request.method).toEqual('GET');
         req.flush({
           recent_queries: [],
