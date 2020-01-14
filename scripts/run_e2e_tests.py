@@ -338,47 +338,47 @@ def get_parameter_for_sharding(sharding_instances):
                 '--capabilities.maxInstances=%s' % sharding_instances]
 
 
-def get_parameter_for_dev_mode(dev_mode):
-    """Return parameter for whether the test should be running on dev_mode
+def get_parameter_for_dev_mode(dev_mode_setting):
+    """Return parameter for whether the test should be running on dev_mode.
 
     Args:
-        dev_mode: bool. Whether the test is running on dev_mode.
+        dev_mode_setting: bool. Whether the test is running on dev_mode.
 
     Returns:
         str: A string for the testing mode command line parameter.
     """
-    return '--params.devMode=%s' % dev_mode
+    return '--params.devMode=%s' % dev_mode_setting
 
 
-def get_parameter_for_suite(suite):
-    """Return parameter for which suite to be running on the tests.
+def get_parameter_for_suite(suite_name):
+    """Return a parameter for which suite to run the tests for.
 
     Args:
-        suite: str. The suite name to be running on the tests. If the value is
-            `full`, all tests will run.
+        suite_name: str. The suite name whose tests should be run. If the value
+            is `full`, all tests will run.
 
     Returns:
-        list(str): A list of command line parameter for suite.
+        list(str): A list of command line parameters for the suite.
     """
-    return ['--suite', suite]
+    return ['--suite', suite_name]
 
 
 def get_e2e_test_parameters(
-        sharding_instances, suite, dev_mode):
+        sharding_instances, suite_name, dev_mode_setting):
     """Return parameters for the end-2-end tests.
 
     Args:
         sharding_instances: str. Sets the number of parallel browsers to open
             while sharding.
-        suite: str. Performs test for different suites.
-        dev_mode: bool. Represents whether run the related commands in dev
-            mode.
+        suite_name: str. Performs test for different suites.
+        dev_mode_setting: bool. Represents whether run the related commands in
+            dev mode.
     Returns:
         list(str): Parameters for running the tests.
     """
     sharding_parameters = get_parameter_for_sharding(sharding_instances)
-    dev_mode_parameters = get_parameter_for_dev_mode(dev_mode)
-    suite_parameter = get_parameter_for_suite(suite)
+    dev_mode_parameters = get_parameter_for_dev_mode(dev_mode_setting)
+    suite_parameter = get_parameter_for_suite(suite_name)
 
     commands = []
     commands.extend(sharding_parameters)
@@ -388,14 +388,14 @@ def get_e2e_test_parameters(
     return commands
 
 
-def start_google_engine(dev_mode):
+def start_google_engine(dev_mode_setting):
     """Start the google engine server.
 
     Args:
-        dev_mode: bool. Represents whether run the related commands in dev
-            mode.
+        dev_mode_setting: bool. Represents whether to run the related commands
+            in dev mode.
     """
-    app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode else '')
+    app_yaml_filepath = 'app%s.yaml' % ('_dev' if dev_mode_setting else '')
 
     p = subprocess.Popen(
         '%s %s/dev_appserver.py --host 0.0.0.0 --port %s '
