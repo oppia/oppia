@@ -542,6 +542,11 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
     """
 
     @classmethod
+    def enqueue(cls, job_id, additional_job_params=None):
+        super(BaseModelsUserIdsHaveUserSettingsVerificationJob, cls).enqueue(
+            job_id, additional_job_params={"shards": 2})
+
+    @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of datastore class references to map over."""
         model_classes = [model_class for model_class in
