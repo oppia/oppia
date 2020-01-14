@@ -45,6 +45,7 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
+# Assuming YARN_VERSION starts with a `v`
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION[1:])
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
