@@ -1961,7 +1961,8 @@ class PendingDeletionRequestModel(base_models.BaseModel):
 
     Instances of this class are keyed by the user id.
     """
-
+    # The email of the user.
+    email = ndb.StringProperty(required=True)
     # Whether the deletion is completed.
     deletion_complete = ndb.BooleanProperty(default=False, indexed=True)
     # IDs of all the private explorations created by this user.

@@ -126,7 +126,7 @@ jobs:
       - run:
           name: Run e2e classroom page test
           command: |
-            python -m scripts.run_e2e_tests --suite="classroomPage"
+            python -m scripts.run_e2e_tests --suite="classroomPageFileUploadFeatures"
 
   e2e_file_upload_features:
     <<: *job_defaults
@@ -152,7 +152,7 @@ jobs:
       - run:
           name: Run e2e topic and story editor test
           command: |
-            python -m scripts.run_e2e_tests --suite="topicAndStoryEditor"
+            python -m scripts.run_e2e_tests --suite="topicAndStoryEditorFileUploadFeatures"
 notify:
   webhooks:
     # A list of hook hashes, containing the url field

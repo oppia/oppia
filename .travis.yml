@@ -20,6 +20,7 @@ env:
     - RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES=true
     - RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES=true
     - RUN_E2E_TESTS_ADMIN_PAGE=true
+    - RUN_E2E_TESTS_CLASSROOM_PAGE=true
     - RUN_E2E_TESTS_COLLECTIONS=true
     - RUN_E2E_TESTS_COMMUNITY_DASHBOARD=true
     - RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES=true
@@ -42,6 +43,7 @@ env:
     - RUN_E2E_TESTS_SKILL_EDITOR=true
     - RUN_E2E_TESTS_SUBSCRIPTIONS=true
     - RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD=true
+    - RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR=true
     - RUN_E2E_TESTS_USERS=true
 
 jobs:
@@ -85,6 +87,7 @@ script:
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_EDITOR_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalEditorFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADDITIONAL_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="additionalPlayerFeatures" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_ADMIN_PAGE" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="adminPage" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_CLASSROOM_PAGE" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="classroomPage" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_COLLECTIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="collections" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_COMMUNITY_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="communityDashboard" --community_dashboard_enabled --prod_env; fi
 - if [ "$RUN_E2E_TESTS_CORE_EDITOR_AND_PLAYER_FEATURES" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="coreEditorAndPlayerFeatures" --prod_env; fi
@@ -107,6 +110,7 @@ script:
 - if [ "$RUN_E2E_TESTS_SKILL_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="skillEditor" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_SUBSCRIPTIONS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="subscriptions" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="topicsAndSkillsDashboard" --prod_env; fi
+- if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="topicAndStoryEditor" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_USERS" == 'true' ]; then travis_retry python -m scripts.run_e2e_tests --suite="users" --prod_env; fi
 
 
