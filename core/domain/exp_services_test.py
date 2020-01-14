@@ -768,7 +768,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             })],
             '')
 
-        retrieved_exploration = exp_fetchers.get_exploration_by_id(self.EXP_0_ID)
+        retrieved_exploration = exp_fetchers.get_exploration_by_id(
+            self.EXP_0_ID)
         self.assertEqual(retrieved_exploration.title, 'A title')
         self.assertEqual(retrieved_exploration.category, 'A category')
         self.assertEqual(len(retrieved_exploration.states), 1)
@@ -2083,7 +2084,8 @@ written_translations:
                     'new_value': 'TextInput'
                 })], 'Add state name')
 
-        dict_output = exp_services.export_states_to_yaml(self.EXP_0_ID, width=50)
+        dict_output = exp_services.export_states_to_yaml(
+            self.EXP_0_ID, width=50)
 
         self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 

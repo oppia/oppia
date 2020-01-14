@@ -1254,7 +1254,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1278,7 +1278,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1307,7 +1307,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
