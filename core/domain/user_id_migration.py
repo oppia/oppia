@@ -18,7 +18,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import inspect
 
-from constants import constants
 from core import jobs
 from core.platform import models
 import feconf
@@ -269,48 +268,6 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         rights_snapshot_model.put(update_last_updated_time=False)
 
     @staticmethod
-    def _migrate_question(rights_snapshot_model):
-        """Migrate QuestionRightsSnapshotContentModel to use the new user ID in
-        the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
-
-        Args:
-            rights_snapshot_model: QuestionRightsSnapshotContentModel. The
-                model that contains the old user IDs.
-        """
-        reconstituted_rights_model = question_models.QuestionRightsModel(
-            **rights_snapshot_model.content)
-        if reconstituted_rights_model.creator_id != feconf.SYSTEM_COMMITTER_ID:
-            user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-                reconstituted_rights_model.creator_id)
-            if not user_settings_model:
-                raise MissingUserException(
-                    reconstituted_rights_model.creator_id)
-            reconstituted_rights_model.creator_id = user_settings_model.id
-            rights_snapshot_model.content = reconstituted_rights_model.to_dict()
-            rights_snapshot_model.put(update_last_updated_time=False)
-
-    @staticmethod
-    def _migrate_skill(rights_snapshot_model):
-        """Migrate SkillRightsSnapshotContentModel to use the new user ID in
-        the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
-
-        Args:
-            rights_snapshot_model: SkillRightsSnapshotContentModel. The model
-            that contains the old user IDs.
-        """
-        reconstituted_rights_model = skill_models.SkillRightsModel(
-            **rights_snapshot_model.content)
-        if reconstituted_rights_model.creator_id != feconf.SYSTEM_COMMITTER_ID:
-            user_settings_model = user_models.UserSettingsModel.get_by_gae_id(
-                reconstituted_rights_model.creator_id)
-            if not user_settings_model:
-                raise MissingUserException(
-                    reconstituted_rights_model.creator_id)
-            reconstituted_rights_model.creator_id = user_settings_model.id
-            rights_snapshot_model.content = reconstituted_rights_model.to_dict()
-            rights_snapshot_model.put(update_last_updated_time=False)
-
-    @staticmethod
     def _migrate_topic(rights_snapshot_model):
         """Migrate TopicRightsSnapshotContentModel to use the new user ID in
         the owner_ids, editor_ids, voice_artist_ids and viewer_ids.
@@ -332,8 +289,6 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         """Return a list of datastore class references to map over."""
         return [collection_models.CollectionRightsSnapshotContentModel,
                 exp_models.ExplorationRightsSnapshotContentModel,
-                question_models.QuestionRightsSnapshotContentModel,
-                skill_models.SkillRightsSnapshotContentModel,
                 topic_models.TopicRightsSnapshotContentModel]
 
     @staticmethod
@@ -350,16 +305,6 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                     rights_snapshot_model,
                     exp_models.ExplorationRightsSnapshotContentModel):
                 SnapshotsUserIdMigrationJob._migrate_exploration(
-                    rights_snapshot_model)
-            elif isinstance(
-                    rights_snapshot_model,
-                    question_models.QuestionRightsSnapshotContentModel):
-                SnapshotsUserIdMigrationJob._migrate_question(
-                    rights_snapshot_model)
-            elif isinstance(
-                    rights_snapshot_model,
-                    skill_models.SkillRightsSnapshotContentModel):
-                SnapshotsUserIdMigrationJob._migrate_skill(
                     rights_snapshot_model)
             elif isinstance(
                     rights_snapshot_model,
@@ -497,7 +442,7 @@ class BaseModelsUserIdsHaveUserSettingsVerificationJob(
             if user_id is None:
                 yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
             elif (BaseModelsUserIdsHaveUserSettingsVerificationJob
-                    ._check_id_and_user_id_exist(model.id, user_id)):
+                  ._check_id_and_user_id_exist(model.id, user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
@@ -513,7 +458,7 @@ class BaseModelsUserIdsHaveUserSettingsVerificationJob(
             if user_id is None:
                 yield ('SUCCESS_NONE - %s' % model_class.__name__, model.id)
             elif (BaseModelsUserIdsHaveUserSettingsVerificationJob
-                    ._does_user_settings_model_exist(user_id)):
+                  ._does_user_settings_model_exist(user_id)):
                 yield ('SUCCESS - %s' % model_class.__name__, model.id)
             else:
                 yield ('FAILURE - %s' % model_class.__name__, model.id)
@@ -543,8 +488,8 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
 
     @classmethod
     def enqueue(cls, job_id, additional_job_params=None):
-        super(BaseModelsUserIdsHaveUserSettingsVerificationJob, cls).enqueue(
-            job_id, additional_job_params={"shards": 2})
+        super(ModelsUserIdsHaveUserSettingsVerificationJob, cls).enqueue(
+            job_id, additional_job_params={'shards': 2})
 
     @classmethod
     def entity_classes_to_map_over(cls):
