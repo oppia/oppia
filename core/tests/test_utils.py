@@ -1884,7 +1884,8 @@ tags: []
         original = getattr(obj, attr)
         # The actual error message will also include detail assert error message
         # via the `self.longMessage` below.
-        msg = 'Failed in check function %s.%s' % (obj.__name__, attr)
+        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
+                    obj.__name__, attr)
 
         def wrapper(*args, **kwargs):
             """Wrapper function for the new value. This function will do the
@@ -1925,6 +1926,8 @@ tags: []
             setattr(obj, attr, original)
             if not error_occurred:
                 self.assertEqual(wrapper.called, called, msg=msg)
+                self.assertFalse(expected_args)
+                self.assertFalse(expected_kwargs)
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
