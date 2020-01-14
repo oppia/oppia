@@ -17,6 +17,7 @@
  */
 
 require('domain/question/pretest-question-backend-api.service.ts');
+require('domain/question/QuestionObjectFactory.ts');
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -26,10 +27,12 @@ import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Pretest question backend API service', function() {
   var PretestQuestionBackendApiService = null;
-  var sampleDataResults = null;
+  var responseDictionaries = null;
+  var sampleDataResultsObjects = null;
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
+  var QuestionObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
@@ -47,34 +50,52 @@ describe('Pretest question backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    QuestionObjectFactory = $injector.get('QuestionObjectFactory');
 
     // Sample question object returnable from the backend
-    sampleDataResults = {
+    responseDictionaries = {
       pretest_question_dicts: [{
-        id: '0',
+        id: 'question_id',
         question_state_data: {
           content: {
-            html: 'Question 1'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
+            html: 'Question 1',
+            content_id: 'content_1'
           },
           interaction: {
-            answer_groups: [],
+            answer_groups: [{
+              outcome: {
+                dest: 'outcome 1',
+                feedback: {
+                  content_id: 'content_5',
+                  html: ''
+                },
+                labelled_as_correct: true,
+                param_changes: [],
+                refresher_exploration_id: null
+              },
+              rule_specs: [{
+                inputs: {
+                  x: 10
+                },
+                rule_type: 'Equals'
+              }],
+            }],
             confirmed_unclassified_answers: [],
             customization_args: {},
             default_outcome: {
               dest: null,
               feedback: {
-                html: 'Correct Answer'
+                html: 'Correct Answer',
+                content_id: 'content_2'
               },
               param_changes: [],
-              labelled_as_correct: true
+              labelled_as_correct: false
             },
             hints: [
               {
                 hint_content: {
-                  html: 'Hint 1'
+                  html: 'Hint 1',
+                  content_id: 'content_3'
                 }
               }
             ],
@@ -82,18 +103,43 @@ describe('Pretest question backend API service', function() {
               correct_answer: 'This is the correct answer',
               answer_is_exclusive: false,
               explanation: {
-                html: 'Solution explanation'
+                html: 'Solution explanation',
+                content_id: 'content_4'
               }
             },
             id: 'TextInput'
           },
           param_changes: [],
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content_1: {},
+              content_2: {},
+              content_3: {},
+              content_4: {},
+              content_5: {}
+            }
+          },
+          written_translations: {
+            translations_mapping: {
+              content_1: {},
+              content_2: {},
+              content_3: {},
+              content_4: {},
+              content_5: {}
+            }
+          },
           solicit_answer_details: false
         },
         language_code: 'en',
         version: 1
       }],
       next_start_cursor: null
+    };
+    sampleDataResultsObjects = {
+      pretest_question_objects: [
+        QuestionObjectFactory.createFromBackendDict(
+          responseDictionaries.pretest_question_dicts[0])
+      ]
     };
   }));
 
@@ -109,13 +155,13 @@ describe('Pretest question backend API service', function() {
 
       $httpBackend.expect(
         'GET', '/pretest_handler/expId?story_id=storyId&cursor=').respond(
-        sampleDataResults);
+        responseDictionaries);
       PretestQuestionBackendApiService.fetchPretestQuestions(
         'expId', 'storyId').then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResults.pretest_question_dicts);
+        sampleDataResultsObjects.pretest_question_objects);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

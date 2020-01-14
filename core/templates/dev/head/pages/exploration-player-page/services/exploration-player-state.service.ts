@@ -99,9 +99,9 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
         arePretestsAvailable ? function() {} : callback);
     };
 
-    var initializePretestServices = function(pretestQuestionDicts, callback) {
+    var initializePretestServices = function(pretestQuestionObjects, callback) {
       PlayerCorrectnessFeedbackEnabledService.init(true);
-      QuestionPlayerEngineService.init(pretestQuestionDicts, callback);
+      QuestionPlayerEngineService.init(pretestQuestionObjects, callback);
     };
 
     var initializeQuestionPlayerServices = function(questionDicts, callback) {

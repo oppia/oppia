@@ -17,7 +17,6 @@
  */
 
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('domain/question/QuestionObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('expressions/expression-interpolation.service.ts');
 require(
@@ -36,14 +35,14 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
   'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
-  'QuestionObjectFactory', 'ReadOnlyExplorationBackendApiService',
+  'ReadOnlyExplorationBackendApiService',
   'StateCardObjectFactory', 'UrlService', 'INTERACTION_DISPLAY_MODE_INLINE',
   'INTERACTION_SPECS',
   function(
       AlertsService, AnswerClassificationService,
       ContextService, ExplorationHtmlFormatterService,
       ExpressionInterpolationService, FocusManagerService,
-      QuestionObjectFactory, ReadOnlyExplorationBackendApiService,
+      ReadOnlyExplorationBackendApiService,
       StateCardObjectFactory, UrlService, INTERACTION_DISPLAY_MODE_INLINE,
       INTERACTION_SPECS) {
     var _explorationId = ContextService.getExplorationId();
@@ -157,12 +156,10 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
        *   - initHtml {string}, an HTML string representing the content of the
        *       first state.
        */
-      init: function(questionDicts, successCallback) {
+      init: function(questionObjects, successCallback) {
         answerIsBeingProcessed = false;
-        for (var i = 0; i < questionDicts.length; i++) {
-          questions.push(
-            QuestionObjectFactory.createFromBackendDict(questionDicts[i])
-          );
+        for (var i = 0; i < questionObjects.length; i++) {
+          questions.push(questionObjects[i]);
         }
         _loadInitialQuestion(successCallback);
       },
