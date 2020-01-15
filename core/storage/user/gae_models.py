@@ -892,7 +892,9 @@ class UserSubscribersModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain data specific to the user."""
+        """This model is not included because it contains data about other
+        users.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod

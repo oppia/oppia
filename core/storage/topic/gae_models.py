@@ -33,7 +33,10 @@ class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -42,7 +45,10 @@ class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -209,7 +215,9 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -288,7 +296,10 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -297,7 +308,10 @@ class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -419,7 +433,9 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -428,7 +444,10 @@ class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -437,7 +456,10 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -582,5 +604,25 @@ class TopicRightsModel(base_models.VersionedModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain data specific to the user."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @classmethod
+    def export_data(cls, user_id):
+        """(Takeout) Export user-relevant properties of TopicRightsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+        
+        Returns:
+            dict. The user-relevant properties of TopicRightsModel in a dict
+            format. In this case, we are returning all the ids of the topics
+            this user manages.
+        """
+        managed_collections = cls.get_all().filter(cls.manager_ids == user_id)
+        managed_collection_ids = [col.key.id() for col in managed_collections]
+
+        return {
+            'managed_collection_ids': managed_collection_ids
+        }
+

@@ -32,7 +32,10 @@ class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -41,7 +44,10 @@ class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -188,7 +194,10 @@ class FileSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -202,7 +211,10 @@ class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 

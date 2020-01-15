@@ -38,7 +38,10 @@ class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """ 
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -47,7 +50,10 @@ class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -572,7 +578,9 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod

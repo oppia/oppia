@@ -84,8 +84,8 @@ class SentEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain data specific to the user. User ID is stored
-        to send an email not specific to the user.
+        """Users already have access to this data since emails were sent
+        to them.
         """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
@@ -337,7 +337,9 @@ class BulkEmailModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain data specific to the user."""
+        """Users already have access to this data since the emails were sent
+        to them.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod

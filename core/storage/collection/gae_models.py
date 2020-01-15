@@ -33,7 +33,10 @@ class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -41,7 +44,10 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -200,7 +206,10 @@ class CollectionRightsSnapshotMetadataModel(
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -209,7 +218,10 @@ class CollectionRightsSnapshotContentModel(
     """Storage model for the content of a collection rights snapshot."""
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -493,7 +505,9 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod

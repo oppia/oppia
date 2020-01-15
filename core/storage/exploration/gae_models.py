@@ -34,7 +34,10 @@ class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -43,7 +46,10 @@ class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -231,7 +237,10 @@ class ExplorationRightsSnapshotMetadataModel(
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -241,7 +250,10 @@ class ExplorationRightsSnapshotContentModel(
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model relates to version history of entity. Not included in export
+        because the export contains the data associated with the most recent
+        version.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
@@ -537,7 +549,9 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_export_policy():
-        """Model contains user data."""
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
