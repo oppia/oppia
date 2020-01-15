@@ -34,12 +34,10 @@ class CheckFrontEndCoverageTests(test_utils.GenericTestBase):
         self.check_function_calls = {
             'open_file_is_called': False,
             'exists_is_called': False,
-            'check_call_is_called': False,
         }
         self.expected_check_function_calls = {
             'open_file_is_called': True,
             'exists_is_called': True,
-            'check_call_is_called': True,
         }
         self.printed_messages = []
         class MockFile(python_utils.OBJECT):
