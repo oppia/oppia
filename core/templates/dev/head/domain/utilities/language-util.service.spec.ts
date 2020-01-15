@@ -44,8 +44,8 @@ describe('Language util service', function() {
       id: 'en-auto',
       description: 'English (auto)',
       explorationLanguage: 'en',
-      speech_synthesis_code: 'en-GB',
-      speech_synthesis_code_mobile: 'en_US'
+      speechSynthesisCode: 'en-GB',
+      speechSynthesisCodeMobile: 'en_US'
     }];
     var mockSupportedAudioLanguages = [{
       id: 'en',
