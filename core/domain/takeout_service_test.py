@@ -241,7 +241,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
             'exploration.exp1.thread_1')
-        
+
         # Setup for TopicRightsModel.
         topic_models.TopicRightsModel(
             id=self.TOPIC_ID_1,

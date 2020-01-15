@@ -613,7 +613,7 @@ class TopicRightsModel(base_models.VersionedModel):
 
         Args:
             user_id: str. The user_id denotes which user's data to extract.
-        
+
         Returns:
             dict. The user-relevant properties of TopicRightsModel in a dict
             format. In this case, we are returning all the ids of the topics
@@ -625,4 +625,3 @@ class TopicRightsModel(base_models.VersionedModel):
         return {
             'managed_collection_ids': managed_collection_ids
         }
-

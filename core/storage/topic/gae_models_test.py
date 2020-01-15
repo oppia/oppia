@@ -438,7 +438,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             'managed_collection_ids': [self.TOPIC_4_ID, self.TOPIC_5_ID]
         }
         self.assertEqual(user_data, expected_data)
-    
+
     def test_export_data_trivial(self):
         """Tests trivial export data on user with no managed topics."""
         user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_1)
