@@ -32,10 +32,10 @@ import utils
 
 (
     base_models, collection_models, email_models,
-    exploration_models, feedback_models,
+    exploration_models, feedback_models, topic_models,
     suggestion_models, user_models) = models.Registry.import_models([
         models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-        models.NAMES.exploration, models.NAMES.feedback,
+        models.NAMES.exploration, models.NAMES.feedback, models.NAMES.topic,
         models.NAMES.suggestion, models.NAMES.user])
 
 
@@ -46,6 +46,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     USER_GAE_ID_1 = 'gae_1'
     THREAD_ID_1 = 'thread_id_1'
     THREAD_ID_2 = 'thread_id_2'
+    TOPIC_ID_1 = 'topic_id_1'
+    TOPIC_ID_2 = 'topic_id_2'
     USER_1_REPLY_TO_ID_1 = 'user_1_reply_to_id_thread_1'
     USER_1_REPLY_TO_ID_2 = 'user_1_reply_to_id_thread_2'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
@@ -238,6 +240,24 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW, self.USER_ID_1,
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
             'exploration.exp1.thread_1')
+        
+        # Setup for TopicRightsModel.
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_1_ID,
+            manager_ids=[self.USER_ID_1],
+            topic_is_published=True
+        ).commit(
+            'commiter_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_2_ID,
+            manager_ids=[self.USER_ID_1],
+            topic_is_published=True
+        ).commit(
+            'commiter_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
 
         # Setup for ExplorationRightsModel.
         exploration_models.ExplorationRightsModel(
@@ -371,6 +391,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_thread_ids': [],
             'last_checked': None
         }
+        topic_rights_data = {
+            'managed_collection_ids': []
+        }
         expected_export = {
             'user_stats_data': stats_data,
             'user_settings_data': settings_data,
@@ -390,6 +413,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_message_data': general_feedback_message_data,
             'collection_rights_data': collection_rights_data,
             'general_suggestion_data': general_suggestion_data,
+            'topic_rights_data': topic_rights_data,
             'exploration_rights_data': exploration_rights_data,
             'general_feedback_email_reply_to_id_data': reply_to_data
         }
@@ -590,6 +614,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS +
                                            [thread_id],
             'last_checked': None
+        }
+
+        expected_topics_data = {
+            'managed_collection_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
 
         expected_export = {
