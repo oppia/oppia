@@ -18,6 +18,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import atexit
+import contextlib
 import functools
 import os
 import re
@@ -548,11 +549,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
                         run_e2e_tests.build_js_files(False)
 
     def test_tweak_webdriver_manager_on_x64_machine(self):
-        expected_replace = 'this.osArch = "x64";'
+
+        def mock_is_windows():
+            return True
         def mock_inplace_replace(
                 unused_filepath, unused_regex_pattern, unused_replace):
             return
+        def mock_undo_tweak():
+            return
 
+        expected_replace = 'this.osArch = "x64";'
         inplace_replace_swap = self.swap_with_checks(
             common, 'inplace_replace_file', mock_inplace_replace,
             expected_args=[
@@ -570,13 +576,23 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         architecture_swap = self.swap_with_checks(
             common, 'is_x64_architecture', mock_is_x64)
+        is_windows_swap = self.swap_with_checks(
+            common, 'is_windows_os', mock_is_windows)
+        undo_swap = self.swap_with_checks(
+            run_e2e_tests, 'undo_webdriver_tweak', mock_undo_tweak)
 
-        with inplace_replace_swap, architecture_swap:
-            run_e2e_tests.tweak_webdriver_manager()
+        with inplace_replace_swap, architecture_swap, is_windows_swap:
+            with undo_swap:
+                with run_e2e_tests.tweak_webdriver_manager():
+                    pass
 
-    def test_tweak_webdriver_manager_on_x86_machine(self):
+    def test_tweak_webdriver_manager_on_x86_windows(self):
+        def mock_is_windows():
+            return True
         def mock_inplace_replace(
                 unused_filepath, unused_regex_pattern, unused_replace):
+            return
+        def mock_undo_tweak():
             return
 
         expected_replace = 'this.osArch = "x86";'
@@ -597,9 +613,15 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
 
         architecture_swap = self.swap_with_checks(
             common, 'is_x64_architecture', mock_is_x64)
+        is_windows_swap = self.swap_with_checks(
+            common, 'is_windows_os', mock_is_windows)
+        undo_swap = self.swap_with_checks(
+            run_e2e_tests, 'undo_webdriver_tweak', mock_undo_tweak)
 
-        with inplace_replace_swap, architecture_swap:
-            run_e2e_tests.tweak_webdriver_manager()
+        with inplace_replace_swap, architecture_swap, is_windows_swap:
+            with undo_swap:
+                with run_e2e_tests.tweak_webdriver_manager():
+                    pass
 
     def test_undo_webdriver_tweak(self):
         files_to_check = [
@@ -637,22 +659,16 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         with isfile_swap, rename_swap, remove_swap:
             run_e2e_tests.undo_webdriver_tweak()
 
-    def test_start_webdriver_manager_on_windows(self):
+    def test_start_webdriver_manager(self):
+        @contextlib.contextmanager
         def mock_tweak_webdriver():
-            return
-
-        def mock_undo_tweak():
-            return
+            yield
 
         def mock_run_webdriver_manager(unused_commands):
             return
 
-        def mock_is_windows():
-            return True
         tweak_swap = self.swap_with_checks(
             run_e2e_tests, 'tweak_webdriver_manager', mock_tweak_webdriver)
-        undo_swap = self.swap_with_checks(
-            run_e2e_tests, 'undo_webdriver_tweak', mock_undo_tweak)
 
         expected_commands = [
             (['update', '--versions.chrome',
@@ -664,45 +680,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         run_swap = self.swap_with_checks(
             run_e2e_tests, 'run_webdriver_manager', mock_run_webdriver_manager,
             expected_args=expected_commands)
-
-        is_windows_swap = self.swap_with_checks(
-            common, 'is_windows_os', mock_is_windows)
-        with tweak_swap, undo_swap, run_swap, is_windows_swap:
-            run_e2e_tests.start_webdriver_manager()
-
-    def test_start_webdriver_manager_on_machine_other_than_windows(self):
-        def mock_tweak_webdriver():
-            return
-
-        def mock_undo_tweak():
-            return
-
-        def mock_run_webdriver_manager(unused_commands):
-            return
-
-        def mock_is_windows():
-            return False
-        tweak_swap = self.swap_with_checks(
-            run_e2e_tests, 'tweak_webdriver_manager', mock_tweak_webdriver,
-            called=False)
-        undo_swap = self.swap_with_checks(
-            run_e2e_tests, 'undo_webdriver_tweak', mock_undo_tweak,
-            called=False)
-
-        expected_commands = [
-            (['update', '--versions.chrome',
-              run_e2e_tests.CHROME_DRIVER_VERSION],),
-            (['start', '--versions.chrome',
-              run_e2e_tests.CHROME_DRIVER_VERSION, '--detach', '--quiet'],)
-        ]
-
-        run_swap = self.swap_with_checks(
-            run_e2e_tests, 'run_webdriver_manager', mock_run_webdriver_manager,
-            expected_args=expected_commands)
-
-        is_windows_swap = self.swap_with_checks(
-            common, 'is_windows_os', mock_is_windows)
-        with tweak_swap, undo_swap, run_swap, is_windows_swap:
+        with tweak_swap, run_swap:
             run_e2e_tests.start_webdriver_manager()
 
     def test_get_parameter_for_one_sharding_instance(self):

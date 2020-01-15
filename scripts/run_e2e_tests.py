@@ -19,6 +19,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import argparse
 import atexit
+import contextlib
 import os
 import re
 import subprocess
@@ -267,6 +268,7 @@ def build_js_files(dev_mode_setting):
     build.main(args=(['--prod_env'] if not dev_mode_setting else []))
 
 
+@contextlib.contextmanager
 def tweak_webdriver_manager():
     """webdriver-manager (version 13.0.0) uses `os.arch()` to determine the
     architecture of the operating system, however, this function can only be
@@ -283,13 +285,19 @@ def tweak_webdriver_manager():
     https://github.com/angular/webdriver-manager/blob/b7539a5a3897a8a76abae7245f0de8175718b142/lib/provider/chromedriver.ts#L167
     https://github.com/nodejs/node/issues/17036
     """
-    regex_pattern = PATTERN_FOR_REPLACE_WEBDRIVER_CODE
-    arch = 'x64' if common.is_x64_architecture() else 'x86'
-    replace = 'this.osArch = "%s";' % arch
-    common.inplace_replace_file(
-        CHROME_PROVIDER_FILE_PATH, regex_pattern, replace)
-    common.inplace_replace_file(
-        GECKO_PROVIDER_FILE_PATH, regex_pattern, replace)
+    try:
+        if common.is_windows_os():
+            regex_pattern = PATTERN_FOR_REPLACE_WEBDRIVER_CODE
+            arch = 'x64' if common.is_x64_architecture() else 'x86'
+            replace = 'this.osArch = "%s";' % arch
+            common.inplace_replace_file(
+                CHROME_PROVIDER_FILE_PATH, regex_pattern, replace)
+            common.inplace_replace_file(
+                GECKO_PROVIDER_FILE_PATH, regex_pattern, replace)
+        yield
+    finally:
+        if common.is_windows_os():
+            undo_webdriver_tweak()
 
 
 def undo_webdriver_tweak():
@@ -304,17 +312,12 @@ def undo_webdriver_tweak():
 
 def start_webdriver_manager():
     """Update and start webdriver manager."""
-    if common.is_windows_os():
-        tweak_webdriver_manager()
-
-    run_webdriver_manager(
-        ['update', '--versions.chrome', CHROME_DRIVER_VERSION])
-    run_webdriver_manager(
-        ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
-         '--detach', '--quiet'])
-
-    if common.is_windows_os():
-        undo_webdriver_tweak()
+    with tweak_webdriver_manager():
+        run_webdriver_manager(
+            ['update', '--versions.chrome', CHROME_DRIVER_VERSION])
+        run_webdriver_manager(
+            ['start', '--versions.chrome', CHROME_DRIVER_VERSION,
+             '--detach', '--quiet'])
 
 
 def get_parameter_for_sharding(sharding_instances):
