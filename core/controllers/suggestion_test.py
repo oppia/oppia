@@ -1008,7 +1008,7 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         self.rubric_dicts = [rubric.to_dict() for rubric in self.rubrics]
         self.save_new_skill(
-            self.SKILL_ID, self.owner_id, self.SKILL_DESCRIPTION,
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION,
             rubrics=self.rubrics)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
