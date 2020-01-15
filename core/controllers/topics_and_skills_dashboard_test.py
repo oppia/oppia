@@ -45,11 +45,14 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.linked_skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.linked_skill_id, self.admin_id, 'Description 3')
-        skill_services.publish_skill(self.linked_skill_id, self.admin_id)
+            self.linked_skill_id, self.admin_id, description='Description 3')
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
-            'Description', [], [], [self.linked_skill_id], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.linked_skill_id],
+            subtopics=[], next_subtopic_id=1)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTests(
@@ -59,10 +62,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         # Check that non-admins or non-topic managers cannot access the
         # topics and skills dashboard data.
         skill_id = skill_services.get_new_skill_id()
-        skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.admin_id, 'Description')
-        skill_services.publish_skill(skill_id, self.admin_id)
-        self.save_new_skill(skill_id_2, self.admin_id, 'Description 2')
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
             feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
@@ -89,11 +89,6 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
-        self.assertEqual(
-            len(json_response['unpublished_skill_summary_dicts']), 1)
-        self.assertEqual(
-            json_response['unpublished_skill_summary_dicts'][0]['id'],
-            skill_id_2)
         self.assertEqual(
             json_response['can_delete_topic'], True)
         self.assertEqual(
@@ -128,8 +123,6 @@ class TopicsAndSkillsDashboardPageDataHandlerTests(
         self.assertEqual(
             json_response['untriaged_skill_summary_dicts'][0]['id'],
             skill_id)
-        self.assertEqual(
-            len(json_response['unpublished_skill_summary_dicts']), 0)
         self.assertEqual(
             json_response['can_delete_topic'], False)
         self.assertEqual(
@@ -315,7 +308,8 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
 
         old_skill_id = self.linked_skill_id
         new_skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(new_skill_id, self.admin_id, 'Skill Description')
+        self.save_new_skill(
+            new_skill_id, self.admin_id, description='Skill Description')
         old_links = question_services.get_question_skill_links_of_skill(
             old_skill_id, 'Old Description')
         new_links = question_services.get_question_skill_links_of_skill(
@@ -362,7 +356,8 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
     def test_merge_skill_fails_when_old_skill_id_is_invalid(self):
         self.login(self.ADMIN_EMAIL)
         new_skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(new_skill_id, self.admin_id, 'Skill Description')
+        self.save_new_skill(
+            new_skill_id, self.admin_id, description='Skill Description')
         payload = {
             'old_skill_id': 'invalid_old_skill_id',
             'new_skill_id': new_skill_id

@@ -16,91 +16,22 @@
  * @fileoverview Unit tests for statistics services.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// state-improvement-suggestion.service.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/exploration/StatesObjectFactory.ts');
-require(
-  'pages/exploration-editor-page/statistics-tab/services/' +
-  'state-improvement-suggestion.service.ts'
-);
-require(
-  'pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { StateImprovementSuggestionService, StateStats } from
+  // eslint-disable-next-line max-len
+  'pages/exploration-editor-page/statistics-tab/services/state-improvement-suggestion.service';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 
-describe('StateImprovementSuggestionService', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
+describe('StateImprovementSuggestionService', () => {
   // TODO(bhenning): These tests were ported from the backend tests. More tests
   // should be added to make sure getStateImprovements() is thoroughly tested.
-
-  describe('getStateImprovements', function() {
-    var IMPROVE_TYPE_INCOMPLETE = 'incomplete';
-
-    var siss;
-    var ssof;
+  describe('getStateImprovements', () => {
+    let IMPROVE_TYPE_INCOMPLETE: string = 'incomplete';
+    let siss: StateImprovementSuggestionService;
+    let ssof: StatesObjectFactory;
 
     // A self-looping state.
     var statesDict1 = {
@@ -373,8 +304,15 @@ describe('StateImprovementSuggestionService', function() {
         },
       }
     };
-
-    var _createState = function(destStateName) {
+    interface InteractionType {
+      interaction: {
+        // eslint-disable-next-line camelcase
+        default_outcome?: {
+          dest: string
+        }
+      }
+    }
+    var _createState = (destStateName: string): InteractionType => {
       // Only a partial state definition is needed for these tests.
       if (destStateName) {
         return {
@@ -391,31 +329,34 @@ describe('StateImprovementSuggestionService', function() {
         };
       }
     };
-
-    var _createDefaultStateStats = function() {
+    var _createDefaultStateStats = (): StateStats => {
       return {
         total_entry_count: 0,
         no_submitted_answer_count: 0
       };
     };
-
-    var _enterStateWithoutAnswer = function(stateStats) {
+    var _enterStateWithoutAnswer = (
+        stateStats: StateStats): void => {
       stateStats.total_entry_count++;
     };
-    var _answerIncorrectly = function(stateStats) {
+    var _answerIncorrectly = (stateStats: StateStats): void => {
       stateStats.total_entry_count++;
       stateStats.no_submitted_answer_count++;
     };
-    var _answerDefaultOutcome = function(stateStats) {
+
+    var _answerDefaultOutcome = (stateStats: StateStats): void => {
       stateStats.total_entry_count++;
     };
 
-    beforeEach(angular.mock.inject(function($injector) {
-      siss = $injector.get('StateImprovementSuggestionService');
-      ssof = $injector.get('StatesObjectFactory');
-    }));
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [CamelCaseToHyphensPipe]
+      });
+      siss = TestBed.get(StateImprovementSuggestionService);
+      ssof = TestBed.get(StatesObjectFactory);
+    });
 
-    it('should not suggest improvements for non-default answers', function() {
+    it('should not suggest improvements for non-default answers', () => {
       // Create a non-looping state for testing, similar to
       // save_new_valid_exploration.
       var states = ssof.createFromBackendDict(statesDict2);
@@ -434,7 +375,7 @@ describe('StateImprovementSuggestionService', function() {
     });
 
     it('should suggest incomplete improvements depending on unsubmitted ' +
-       'answer counts', function() {
+       'answer counts', () => {
       // Create a looping state, similar to create_default_exploration.
       var states = ssof.createFromBackendDict(statesDict1);
 

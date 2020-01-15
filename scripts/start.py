@@ -29,7 +29,7 @@ import time
 
 # Install third party libraries before importing other files.
 from . import install_third_party_libs
-install_third_party_libs.main(args=[])
+install_third_party_libs.main()
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
@@ -110,7 +110,7 @@ def main(args=None):
             python_utils.PRINT(
                 re.sub(
                     r'"DEV_MODE": .*', constants_env_variable, line), end='')
-        build.main(args=['--prod_env', '--enable_watcher'])
+        build.main(args=['--prod_env'])
         app_yaml_filepath = 'app.yaml'
     else:
         constants_env_variable = '"DEV_MODE": true'
@@ -121,7 +121,7 @@ def main(args=None):
             python_utils.PRINT(
                 re.sub(
                     r'"DEV_MODE": .*', constants_env_variable, line), end='')
-        build.main(args=['--enable_watcher'])
+        build.main(args=[])
         app_yaml_filepath = 'app_dev.yaml'
 
     # Set up a local dev instance.

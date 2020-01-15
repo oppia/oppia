@@ -8,6 +8,12 @@ cron:
 - description: weekly copy of a user's dashboard statistics
   url: /cron/users/dashboard_stats
   schedule: every monday 09:00
+- description: run user deletion job
+  url: /cron/users/user_deletion
+  schedule: every 12 hours
+- description: run user deletion verification job
+  url: /cron/users/verify_user_deletion
+  schedule: every 12 hours
 - description: weekly exploration recommendations computation
   url: /cron/explorations/recommendations
   schedule: every tuesday 9:00

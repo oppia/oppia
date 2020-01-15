@@ -24,6 +24,8 @@ require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 describe('Editable question backend API service', function() {
   var EditableQuestionBackendApiService = null;
   var sampleDataResults = null;
@@ -34,7 +36,7 @@ describe('Editable question backend API service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
-    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    'oppia', TranslatorProviderForTests));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

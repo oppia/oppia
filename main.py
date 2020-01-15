@@ -259,11 +259,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
     get_redirect_route(
-        r'%s/<story_id>/<node_id>' % feconf.STORY_NODE_COMPLETION_URL_PREFIX,
-        story_viewer.StoryNodeCompletionHandler),
-    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
+    get_redirect_route(
+        r'%s/<story_id>/<node_id>' % feconf.STORY_PROGRESS_URL_PREFIX,
+        story_viewer.StoryProgressHandler),
     get_redirect_route(
         r'%s/<topic_name>/<subtopic_id>' %
         feconf.SUBTOPIC_DATA_HANDLER,
@@ -395,6 +395,11 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(r'%s' % feconf.SIGNUP_URL, profile.SignupPage),
     get_redirect_route(r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler),
     get_redirect_route(feconf.DELETE_ACCOUNT_URL, profile.DeleteAccountPage),
+    get_redirect_route(
+        feconf.DELETE_ACCOUNT_HANDLER_URL, profile.DeleteAccountHandler),
+    get_redirect_route(
+        feconf.PENDING_ACCOUNT_DELETION_URL,
+        profile.PendingAccountDeletionPage),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL, profile.UsernameCheckHandler),
     get_redirect_route(
