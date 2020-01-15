@@ -378,7 +378,7 @@ def get_e2e_test_parameters(
     dev_mode_parameters = get_parameter_for_dev_mode(dev_mode_setting)
     suite_parameter = get_parameter_for_suite(suite_name)
 
-    commands = []
+    commands = [PROTRACTOR_CONFIG_FILE_PATH]
     commands.extend(sharding_parameters)
     commands.extend(suite_parameter)
     commands.append(dev_mode_parameters)

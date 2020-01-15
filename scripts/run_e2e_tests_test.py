@@ -735,6 +735,7 @@ class RunE2ETestsTests(test_utils.GenericTestBase):
         result = run_e2e_tests.get_e2e_test_parameters(3, 'Full', False)
         self.assertEqual(
             result, [
+                run_e2e_tests.PROTRACTOR_CONFIG_FILE_PATH,
                 '--capabilities.shardTestFiles=True',
                 '--capabilities.maxInstances=3',
                 '--suite', 'Full', '--params.devMode=False'
