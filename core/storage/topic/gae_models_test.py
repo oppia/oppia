@@ -317,6 +317,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             'commiter_id',
             'New topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
     def test_get_deletion_policy(self):
         self.assertEqual(
             topic_models.TopicRightsModel.get_deletion_policy(),
