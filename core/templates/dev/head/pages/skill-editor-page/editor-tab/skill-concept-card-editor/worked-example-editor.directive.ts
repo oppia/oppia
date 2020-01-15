@@ -36,16 +36,7 @@ angular.module('oppia').directive('workedExampleEditor', [
       controller: [
         '$scope', 'SkillUpdateService', 'SkillEditorStateService',
         function($scope, SkillUpdateService, SkillEditorStateService) {
-          $scope.editorIsOpen = false;
-          $scope.container = {
-            workedExampleHtml: $scope.workedExample.getHtml()
-          };
-
-          $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
+          var ctrl = this;
           $scope.openEditor = function() {
             if ($scope.isEditable()) {
               $scope.workedExampleMemento =
@@ -75,6 +66,18 @@ angular.module('oppia').directive('workedExampleEditor', [
               $scope.workedExampleMemento);
             $scope.workedExampleMemento = null;
             $scope.editorIsOpen = false;
+          };
+
+          ctrl.$onInit = function() {
+            $scope.editorIsOpen = false;
+            $scope.container = {
+              workedExampleHtml: $scope.workedExample.getHtml()
+            };
+
+            $scope.WORKED_EXAMPLE_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
           };
         }]
     };

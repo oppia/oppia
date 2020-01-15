@@ -23,11 +23,11 @@ require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').factory('RteHelperService', [
-  '$document', '$log', '$uibModal',
+  '$document', '$log', '$timeout', '$uibModal',
   'FocusManagerService', 'HtmlEscaperService',
   'UrlInterpolationService', 'INLINE_RTE_COMPONENTS', 'RTE_COMPONENT_SPECS',
   function(
-      $document, $log, $uibModal,
+      $document, $log, $timeout, $uibModal,
       FocusManagerService, HtmlEscaperService,
       UrlInterpolationService, INLINE_RTE_COMPONENTS, RTE_COMPONENT_SPECS) {
     var _RICH_TEXT_COMPONENTS = [];
@@ -91,8 +91,8 @@ angular.module('oppia').factory('RteHelperService', [
           backdrop: 'static',
           resolve: {},
           controller: [
-            '$scope', '$uibModalInstance', '$timeout',
-            function($scope, $uibModalInstance, $timeout) {
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
               $scope.customizationArgSpecs = customizationArgSpecs;
 
               // Without this code, the focus will remain in the background RTE

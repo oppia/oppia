@@ -85,27 +85,7 @@ angular.module('oppia').directive('stateTranslation', [
             COMPONENT_NAME_FEEDBACK, COMPONENT_NAME_HINT,
             COMPONENT_NAME_SOLUTION, INTERACTION_SPECS,
             RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
-          // Define tab constants.
-          $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
-          $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
-          $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
-          $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
-
-          $scope.ExplorationCorrectnessFeedbackService =
-            ExplorationCorrectnessFeedbackService;
-
-          // Activates Content tab by default.
-          $scope.activatedTabId = $scope.TAB_ID_CONTENT;
-
-          $scope.activeHintIndex = null;
-          $scope.activeAnswerGroupIndex = null;
-          $scope.stateContent = null;
-          $scope.stateInteractionId = null;
-          $scope.stateAnswerGroups = [];
-          $scope.stateDefaultOutcome = null;
-          $scope.stateHints = [];
-          $scope.stateSolution = null;
-
+          var ctrl = this;
           $scope.isVoiceoverModeActive = (
             TranslationTabActiveModeService.isVoiceoverModeActive);
           var isTranslatedTextRequired = function() {
@@ -342,10 +322,6 @@ angular.module('oppia').directive('stateTranslation', [
             return htmlAsPlainText;
           };
 
-          $scope.$on('refreshStateTranslation', function() {
-            $scope.initStateTranslation();
-          });
-
           $scope.initStateTranslation = function() {
             $scope.stateName = StateEditorService.getActiveStateName();
             $scope.stateContent = ExplorationStatesService
@@ -376,7 +352,32 @@ angular.module('oppia').directive('stateTranslation', [
             }
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
-          $scope.initStateTranslation();
+          ctrl.$onInit = function() {
+            // Define tab constants.
+            $scope.TAB_ID_CONTENT = COMPONENT_NAME_CONTENT;
+            $scope.TAB_ID_FEEDBACK = COMPONENT_NAME_FEEDBACK;
+            $scope.TAB_ID_HINTS = COMPONENT_NAME_HINT;
+            $scope.TAB_ID_SOLUTION = COMPONENT_NAME_SOLUTION;
+
+            $scope.ExplorationCorrectnessFeedbackService =
+              ExplorationCorrectnessFeedbackService;
+
+            // Activates Content tab by default.
+            $scope.activatedTabId = $scope.TAB_ID_CONTENT;
+
+            $scope.activeHintIndex = null;
+            $scope.activeAnswerGroupIndex = null;
+            $scope.stateContent = null;
+            $scope.stateInteractionId = null;
+            $scope.stateAnswerGroups = [];
+            $scope.stateDefaultOutcome = null;
+            $scope.stateHints = [];
+            $scope.stateSolution = null;
+            $scope.$on('refreshStateTranslation', function() {
+              $scope.initStateTranslation();
+            });
+            $scope.initStateTranslation();
+          };
         }
       ]
     };

@@ -33,11 +33,13 @@ angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
       controller: ['StoryViewerBackendApiService', 'UrlService',
         function(StoryViewerBackendApiService, UrlService) {
           var ctrl = this;
-          StoryViewerBackendApiService.fetchStoryData(
-            UrlService.getStoryIdFromViewerUrl()).then(
-            function(storyDataDict) {
-              ctrl.storyTitle = storyDataDict.story_title;
-            });
+          ctrl.$onInit = function() {
+            StoryViewerBackendApiService.fetchStoryData(
+              UrlService.getStoryIdFromViewerUrl()).then(
+              function(storyDataDict) {
+                ctrl.storyTitle = storyDataDict.story_title;
+              });
+          };
         }
       ]
     };

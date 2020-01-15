@@ -36,15 +36,8 @@ angular.module('oppia').directive('multipleIncorrectIssue', [
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'PlaythroughIssuesService',
         function($scope, $uibModal, AlertsService, PlaythroughIssuesService) {
-          $scope.currentIssueIdentifier = $scope.index() + 1;
-
+          var ctrl = this;
           var issue = $scope.issue();
-          $scope.issueStatement =
-            PlaythroughIssuesService.renderIssueStatement(issue);
-          $scope.suggestions =
-            PlaythroughIssuesService.renderIssueSuggestions(issue);
-          $scope.playthroughIds = issue.playthroughIds;
-
           var getPlaythroughIndex = function(playthroughId) {
             return $scope.playthroughIds.indexOf(playthroughId);
           };
@@ -70,6 +63,14 @@ angular.module('oppia').directive('multipleIncorrectIssue', [
           $scope.showPlaythrough = function(playthroughId) {
             var index = $scope.playthroughIds.indexOf(playthroughId);
             PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
+          };
+          ctrl.$onInit = function() {
+            $scope.currentIssueIdentifier = $scope.index() + 1;
+            $scope.issueStatement =
+              PlaythroughIssuesService.renderIssueStatement(issue);
+            $scope.suggestions =
+              PlaythroughIssuesService.renderIssueSuggestions(issue);
+            $scope.playthroughIds = issue.playthroughIds;
           };
         }
       ]

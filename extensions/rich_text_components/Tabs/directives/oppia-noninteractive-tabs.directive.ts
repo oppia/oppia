@@ -37,8 +37,10 @@ angular.module('oppia').directive('oppiaNoninteractiveTabs', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.tabContents = HtmlEscaperService.escapedJsonToObj(
-          $attrs.tabContentsWithValue);
+        ctrl.$onInit = function() {
+          ctrl.tabContents = HtmlEscaperService.escapedJsonToObj(
+            $attrs.tabContentsWithValue);
+        };
       }]
     };
   }

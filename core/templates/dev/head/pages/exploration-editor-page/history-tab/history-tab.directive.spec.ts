@@ -102,6 +102,11 @@ describe('HistoryTab controller', function() {
     beforeEach(angular.mock.inject(function(_$componentController_) {
       $componentController = _$componentController_;
       historyTabCtrl = $componentController('historyTab', null, {});
+      // Refer: https://www.codelord.net/2017/01/09/
+      // unit-testing-angular-components-with-%24componentcontroller/
+      // Angular and $componentController does not take care of
+      // $onInit lifecycle hook, so we need to call it explicitly.
+      historyTabCtrl.$onInit();
     }));
 
     it('should get version numbers of revisions to be displayed',

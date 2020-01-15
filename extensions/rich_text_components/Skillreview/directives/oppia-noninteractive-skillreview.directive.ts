@@ -38,8 +38,6 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
           var ctrl = this;
           var skillSummary = HtmlEscaperService.escapedJsonToObj(
             $attrs.skillSummaryWithValue);
-          ctrl.skillDescription = skillSummary.description;
-
           ctrl.openConceptCard = function() {
             var skillId = skillSummary.id;
             var skillDescription = ctrl.skillDescription;
@@ -68,7 +66,11 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
               ]
             });
           };
-        }]
+          ctrl.$onInit = function() {
+            ctrl.skillDescription = skillSummary.description;
+          };
+        }
+      ]
     };
   }
 ]);

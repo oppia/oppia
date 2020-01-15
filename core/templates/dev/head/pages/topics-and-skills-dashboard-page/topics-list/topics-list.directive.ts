@@ -42,12 +42,7 @@ angular.module('oppia').directive('topicsList', [
         function(
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
             AlertsService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
-          // As additional stories are not supported initially, it's not
-          // being shown, for now.
-          $scope.TOPIC_HEADINGS = [
-            'name', 'subtopic_count', 'skill_count',
-            'canonical_story_count', 'topic_status'
-          ];
+          var ctrl = this;
           $scope.getTopicEditorUrl = function(topicId) {
             return '/topic_editor/' + topicId;
           };
@@ -90,7 +85,20 @@ angular.module('oppia').directive('topicsList', [
                     error || 'There was an error when deleting the topic.');
                 }
               );
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
+          };
+
+          ctrl.$onInit = function() {
+            // As additional stories are not supported initially, it's not
+            // being shown, for now.
+            $scope.TOPIC_HEADINGS = [
+              'name', 'subtopic_count', 'skill_count',
+              'canonical_story_count', 'topic_status'
+            ];
           };
         }
       ]

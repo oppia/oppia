@@ -56,13 +56,9 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
             ImprovementsService, StateEditorService,
             StateInteractionIdService, StateTopAnswersStatsService,
             INTERACTION_SPECS, SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
+          var ctrl = this;
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
-
-          $scope.unresolvedAnswersOverviewIsShown = false;
-
-          $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-            SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
 
           var isStateRequiredToBeResolved = function(stateName) {
             return ImprovementsService
@@ -153,9 +149,9 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                       params: {
                         state_name: stateName
                       }
-                    }).success(function(response) {
+                    }).then(function(response) {
                       $scope.showUnresolvedAnswers(response.unresolved_answers);
-                    }).error(function(response) {
+                    }, function(response) {
                       $log.error(
                         'Error occurred while fetching unresolved answers ' +
                         'for exploration ' + _explorationId + 'state ' +
@@ -254,12 +250,21 @@ angular.module('oppia').directive('unresolvedAnswersOverview', [
                   $scope.loadingDotsAreShown = true;
                   fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
                 }]
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
           $scope.getUnresolvedStateStats = function() {
             return StateTopAnswersStatsService.getUnresolvedStateStats(
               StateEditorService.getActiveStateName());
+          };
+          ctrl.$onInit = function() {
+            $scope.unresolvedAnswersOverviewIsShown = false;
+            $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
+              SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           };
         }
       ]

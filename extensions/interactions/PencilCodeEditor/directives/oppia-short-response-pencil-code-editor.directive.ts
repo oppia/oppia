@@ -38,8 +38,10 @@ angular.module('oppia').directive('oppiaShortResponsePencilCodeEditor', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.answerCode = HtmlEscaperService.escapedJsonToObj(
-          $attrs.answer).code;
+        ctrl.$onInit = function() {
+          ctrl.answerCode = HtmlEscaperService.escapedJsonToObj(
+            $attrs.answer).code;
+        };
       }]
     };
   }

@@ -34,16 +34,18 @@ angular.module('oppia').directive('intEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.SCHEMA = {
-          type: 'int',
-          validators: [{
-            id: 'is_integer'
-          }]
-        };
+        ctrl.$onInit = function() {
+          ctrl.SCHEMA = {
+            type: 'int',
+            validators: [{
+              id: 'is_integer'
+            }]
+          };
 
-        if (!ctrl.value) {
-          ctrl.value = 0;
-        }
+          if (!ctrl.value) {
+            ctrl.value = 0;
+          }
+        };
       }]
     };
   }]);

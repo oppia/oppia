@@ -49,64 +49,17 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
             FractionObjectFactory, FRACTION_PARSING_ERRORS,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-
+          // Label for errors caused whilst parsing a fraction.
+          var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
+          var errorMessage = '';
           var requireSimplestForm = (
             $attrs.requireSimplestFormWithValue === 'true');
           var allowImproperFraction = (
             $attrs.allowImproperFractionWithValue === 'true');
-          ctrl.allowNonzeroIntegerPart = (
-            $attrs.allowNonzeroIntegerPartWithValue === 'true');
-          ctrl.customPlaceholder = HtmlEscaperService.escapedJsonToObj(
-            $attrs.customPlaceholderWithValue);
-
-          var errorMessage = '';
-          // Label for errors caused whilst parsing a fraction.
-          var FORM_ERROR_TYPE = 'FRACTION_FORMAT_ERROR';
-          ctrl.FRACTION_INPUT_FORM_SCHEMA = {
-            type: 'unicode',
-            ui_config: {}
-          };
 
           ctrl.getWarningText = function() {
             return errorMessage;
           };
-
-          /**
-           * Disables the input box if the data entered is not a valid prefix
-           * for a fraction.
-           * Examples of valid prefixes:
-           * -- 1
-           * -- 1 2
-           * -- 1 2/
-           * -- 2/
-           * -- 1 2/3
-           */
-          $scope.$watch('$ctrl.answer', function(newValue) {
-            var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
-            // Accepts incomplete fraction inputs
-            // (see examples above except last).
-            var PARTIAL_FRACTION_REGEX =
-              /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
-            // Accepts complete fraction inputs.
-            var FRACTION_REGEX =
-              /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
-            if (INVALID_CHARS_REGEX.test(newValue)) {
-              errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS;
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            } else if (!(FRACTION_REGEX.test(newValue) ||
-                PARTIAL_FRACTION_REGEX.test(newValue))) {
-              errorMessage = FRACTION_PARSING_ERRORS.INVALID_FORMAT;
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            } else {
-              errorMessage = '';
-              ctrl.FractionInputForm.answer.$setValidity(
-                FORM_ERROR_TYPE, true);
-            }
-          });
 
           ctrl.submitAnswer = function(answer) {
             try {
@@ -156,9 +109,56 @@ angular.module('oppia').directive('oppiaInteractiveFractionInput', [
           var submitAnswerFn = function() {
             ctrl.submitAnswer(ctrl.answer);
           };
+          ctrl.$onInit = function() {
+            /**
+             * Disables the input box if the data entered is not a valid prefix
+             * for a fraction.
+             * Examples of valid prefixes:
+             * -- 1
+             * -- 1 2
+             * -- 1 2/
+             * -- 2/
+             * -- 1 2/3
+             */
+            $scope.$watch('$ctrl.answer', function(newValue) {
+              var INVALID_CHARS_REGEX = /[^\d\s\/-]/g;
+              // Accepts incomplete fraction inputs
+              // (see examples above except last).
+              var PARTIAL_FRACTION_REGEX =
+                /^\s*(-?\s*((\d*\s*\d+\s*\/?\s*)|\d+)\s*)?$/;
+              // Accepts complete fraction inputs.
+              var FRACTION_REGEX =
+                /^\s*-?\s*((\d*\s*\d+\s*\/\s*\d+)|\d+)\s*$/;
+              if (INVALID_CHARS_REGEX.test(newValue)) {
+                errorMessage = FRACTION_PARSING_ERRORS.INVALID_CHARS;
+                ctrl.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              } else if (!(FRACTION_REGEX.test(newValue) ||
+                  PARTIAL_FRACTION_REGEX.test(newValue))) {
+                errorMessage = FRACTION_PARSING_ERRORS.INVALID_FORMAT;
+                ctrl.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              } else {
+                errorMessage = '';
+                ctrl.FractionInputForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, true);
+              }
+            });
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+            ctrl.allowNonzeroIntegerPart = (
+              $attrs.allowNonzeroIntegerPartWithValue === 'true');
+            ctrl.customPlaceholder = HtmlEscaperService.escapedJsonToObj(
+              $attrs.customPlaceholderWithValue);
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, ctrl.isAnswerValid);
+            ctrl.FRACTION_INPUT_FORM_SCHEMA = {
+              type: 'unicode',
+              ui_config: {}
+            };
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, ctrl.isAnswerValid);
+          };
         }
       ]
     };

@@ -35,12 +35,6 @@ angular.module('oppia').directive('splashPage', [function() {
       function($rootScope, $timeout, $window, SiteAnalyticsService,
           UrlInterpolationService, UserService) {
         var ctrl = this;
-        ctrl.userIsLoggedIn = null;
-        $rootScope.loadingMessage = 'Loading';
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          $rootScope.loadingMessage = '';
-        });
         ctrl.getStaticImageUrl = function(imagePath) {
           return UrlInterpolationService.getStaticImageUrl(imagePath);
         };
@@ -72,6 +66,14 @@ angular.module('oppia').directive('splashPage', [function() {
             $window.location = '/creator_dashboard?mode=create';
           }, 150);
           return false;
+        };
+        ctrl.$onInit = function() {
+          ctrl.userIsLoggedIn = null;
+          $rootScope.loadingMessage = 'Loading';
+          UserService.getUserInfoAsync().then(function(userInfo) {
+            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            $rootScope.loadingMessage = '';
+          });
         };
       }
     ]

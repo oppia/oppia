@@ -42,6 +42,7 @@ angular.module('oppia').directive('storyEditor', [
             $scope, StoryEditorStateService, StoryUpdateService,
             UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR, $uibModal,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED, AlertsService) {
+          var ctrl = this;
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
@@ -189,13 +190,6 @@ angular.module('oppia').directive('storyEditor', [
             });
           };
 
-          $scope.NOTES_SCHEMA = {
-            type: 'html',
-            ui_config: {
-              startupFocusEnabled: false
-            }
-          };
-
           $scope.updateNotes = function(newNotes) {
             if (newNotes === $scope.story.getNotes()) {
               return;
@@ -223,19 +217,27 @@ angular.module('oppia').directive('storyEditor', [
             }
           };
 
-          $scope.$on(EVENT_VIEW_STORY_NODE_EDITOR, function(evt, nodeId) {
-            $scope.setNodeToEdit(nodeId);
-          });
+          ctrl.$onInit = function() {
+            $scope.NOTES_SCHEMA = {
+              type: 'html',
+              ui_config: {
+                startupFocusEnabled: false
+              }
+            };
+            $scope.$on(EVENT_VIEW_STORY_NODE_EDITOR, function(evt, nodeId) {
+              $scope.setNodeToEdit(nodeId);
+            });
 
-          $scope.$on('storyGraphUpdated', function(evt, storyContents) {
+            $scope.$on('storyGraphUpdated', function(evt, storyContents) {
+              _initEditor();
+            });
+
+            $scope.$on(EVENT_STORY_INITIALIZED, _init);
+            $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
+
+            _init();
             _initEditor();
-          });
-
-          $scope.$on(EVENT_STORY_INITIALIZED, _init);
-          $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
-
-          _init();
-          _initEditor();
+          };
         }
       ]
     };

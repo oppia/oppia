@@ -38,24 +38,25 @@ angular.module('oppia').directive('profileLinkImage', [
           var DEFAULT_PROFILE_IMAGE_PATH = (
             UrlInterpolationService.getStaticImageUrl(
               '/avatar/user_blue_72px.png'));
-
           ctrl.isUsernameLinkable = function(username) {
             return SYSTEM_USER_IDS.indexOf(username) === -1;
           };
+          ctrl.$onInit = function() {
+            ctrl.profileImageUrl = (
+              '/preferenceshandler/profile_picture_by_username/' +
+              ctrl.username());
+            ctrl.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
 
-          ctrl.profileImageUrl = (
-            '/preferenceshandler/profile_picture_by_username/' +
-            ctrl.username());
-          ctrl.profilePicture = DEFAULT_PROFILE_IMAGE_PATH;
-
-          // Returns a promise for the user profile picture, or the default
-          // image if user is not logged in or has not uploaded a profile
-          // picture, or the player is in preview mode.
-          $http.get(ctrl.profileImageUrl).then(function(response) {
-            ctrl.profilePicture = (
-              response.data.profile_picture_data_url_for_username ||
-              DEFAULT_PROFILE_IMAGE_PATH);
-          });
-        }]
+            // Returns a promise for the user profile picture, or the default
+            // image if user is not logged in or has not uploaded a profile
+            // picture, or the player is in preview mode.
+            $http.get(ctrl.profileImageUrl).then(function(response) {
+              ctrl.profilePicture = (
+                response.data.profile_picture_data_url_for_username ||
+                DEFAULT_PROFILE_IMAGE_PATH);
+            });
+          };
+        }
+      ]
     };
   }]);

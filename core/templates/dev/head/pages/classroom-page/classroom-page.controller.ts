@@ -49,25 +49,26 @@ angular.module('oppia').directive('classroomPage', [
             PageTitleService, TopicSummaryObjectFactory, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
+          ctrl.$onInit = function() {
+            ctrl.classroomName = UrlService.getClassroomNameFromUrl();
+            ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+              '/splash/books.svg');
 
-          ctrl.classroomName = UrlService.getClassroomNameFromUrl();
-          ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
-            '/splash/books.svg');
+            PageTitleService.setPageTitle(ctrl.classroomName + ' - Oppia');
 
-          PageTitleService.setPageTitle(ctrl.classroomName + ' - Oppia');
-
-          $rootScope.loadingMessage = 'Loading';
-          ClassroomBackendApiService.fetchClassroomData(
-            ctrl.classroomName).then(function(topicSummaryObjects) {
-            ctrl.topicSummaries = topicSummaryObjects;
-            $rootScope.loadingMessage = '';
-            $rootScope.$broadcast('initializeTranslation');
-          },
-          function(errorResponse) {
-            if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-              AlertsService.addWarning('Failed to get dashboard data');
-            }
-          });
+            $rootScope.loadingMessage = 'Loading';
+            ClassroomBackendApiService.fetchClassroomData(
+              ctrl.classroomName).then(function(topicSummaryObjects) {
+              ctrl.topicSummaries = topicSummaryObjects;
+              $rootScope.loadingMessage = '';
+              $rootScope.$broadcast('initializeTranslation');
+            },
+            function(errorResponse) {
+              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                AlertsService.addWarning('Failed to get dashboard data');
+              }
+            });
+          };
         }
       ]
     };

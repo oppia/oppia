@@ -93,6 +93,7 @@ angular.module('oppia').directive('stateGraphVisualization', [
             ExplorationWarningsService, StateGraphLayoutService,
             TranslationStatusService, MAX_NODES_PER_ROW,
             MAX_NODE_LABEL_LENGTH) {
+          var ctrl = this;
           var graphBounds = {
             bottom: 0,
             left: 0,
@@ -203,22 +204,6 @@ angular.module('oppia').directive('stateGraphVisualization', [
               }, 20);
             }
           };
-
-          $scope.$on('redrawGraph', function() {
-            redrawGraph();
-          });
-
-          $scope.$on('centerGraph', function() {
-            centerGraph();
-          });
-
-          $scope.$watch('graphData()', redrawGraph, true);
-          $scope.$watch('currentStateId()', redrawGraph);
-          $scope.$watch('getNodeColors()', redrawGraph, true);
-          // If statistics for a different version of the exploration are
-          // loaded, this may change the opacities of the nodes.
-          $scope.$watch('opacityMap', redrawGraph);
-          $(window).resize(redrawGraph);
 
           var getElementDimensions = function() {
             return {
@@ -411,6 +396,23 @@ angular.module('oppia').directive('stateGraphVisualization', [
             if ($scope.centerAtCurrentState) {
               centerGraph();
             }
+          };
+          ctrl.$onInit = function() {
+            $scope.$on('redrawGraph', function() {
+              redrawGraph();
+            });
+
+            $scope.$on('centerGraph', function() {
+              centerGraph();
+            });
+
+            $scope.$watch('graphData()', redrawGraph, true);
+            $scope.$watch('currentStateId()', redrawGraph);
+            $scope.$watch('getNodeColors()', redrawGraph, true);
+            // If statistics for a different version of the exploration are
+            // loaded, this may change the opacities of the nodes.
+            $scope.$watch('opacityMap', redrawGraph);
+            $(window).resize(redrawGraph);
           };
         }
       ]

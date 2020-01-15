@@ -59,8 +59,7 @@ angular.module('oppia').directive('progressNav', [
             WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
             ExplorationPlayerStateService) {
-          $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
-          $scope.isIframed = UrlService.isIframed();
+          var ctrl = this;
           var transcriptLength = 0;
           var interactionIsInline = true;
           var interactionHasNavSubmitButton = false;
@@ -90,14 +89,6 @@ angular.module('oppia').directive('progressNav', [
 
             $scope.helpCardHasContinueButton = false;
           };
-
-          $scope.$watch(function() {
-            return PlayerPositionService.getDisplayedCardIndex();
-          }, updateDisplayedCardInfo);
-
-          $scope.$on('helpCardAvailable', function(evt, helpCard) {
-            $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
-          });
 
           var doesInteractionHaveNavSubmitButton = function() {
             try {
@@ -151,6 +142,18 @@ angular.module('oppia').directive('progressNav', [
               interactionIsInline &&
               $scope.displayedCard.isCompleted() &&
               $scope.displayedCard.getLastOppiaResponse());
+          };
+
+          ctrl.$onInit = function() {
+            $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
+            $scope.isIframed = UrlService.isIframed();
+            $scope.$watch(function() {
+              return PlayerPositionService.getDisplayedCardIndex();
+            }, updateDisplayedCardInfo);
+
+            $scope.$on('helpCardAvailable', function(evt, helpCard) {
+              $scope.helpCardHasContinueButton = helpCard.hasContinueButton;
+            });
           };
         }
       ]

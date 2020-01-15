@@ -25,14 +25,17 @@ angular.module('oppia').directive('mathjaxBind', [function() {
     restrict: 'E',
     controller: [
       '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.$watch($attrs.mathjaxData, function(value) {
-          var $script = angular.element(
-            '<script type="math/tex">'
-          ).html(value === undefined ? '' : value);
-          $element.html('');
-          $element.append($script);
-          MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
-        });
+        var ctrl = this;
+        ctrl.$onInit = function() {
+          $scope.$watch($attrs.mathjaxData, function(value) {
+            var $script = angular.element(
+              '<script type="math/tex">'
+            ).html(value === undefined ? '' : value);
+            $element.html('');
+            $element.append($script);
+            MathJax.Hub.Queue(['Reprocess', MathJax.Hub, $element[0]]);
+          });
+        };
       }
     ]
   };

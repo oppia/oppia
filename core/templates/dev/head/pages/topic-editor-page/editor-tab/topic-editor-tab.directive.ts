@@ -39,19 +39,20 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', '$timeout', 'AlertsService',
+        '$scope', '$uibModal', 'AlertsService',
         'ContextService', 'CsrfTokenService', 'ImageUploadHelperService',
         'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
         'UrlInterpolationService', 'StoryCreationService',
         'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, $uibModal, $timeout, AlertsService,
+            $scope, $uibModal, AlertsService,
             ContextService, CsrfTokenService, ImageUploadHelperService,
             TopicEditorStateService, TopicUpdateService, UndoRedoService,
             UrlInterpolationService, StoryCreationService,
             EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
+          var ctrl = this;
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
@@ -83,7 +84,9 @@ angular.module('oppia').directive('topicEditorTab', [
               TopicEditorStateService.getCanonicalStorySummaries();
           };
 
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
 
           $scope.createCanonicalStory = function() {
             if (UndoRedoService.getChangeCount() > 0) {
@@ -100,6 +103,10 @@ angular.module('oppia').directive('topicEditorTab', [
                     };
                   }
                 ]
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               StoryCreationService.createNewCanonicalStory(
@@ -143,12 +150,14 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
-          $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
+            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+            $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
 
-          _initEditor();
-          _initStorySummaries();
+            _initEditor();
+            _initStorySummaries();
+          };
         }
       ]
     };

@@ -54,25 +54,27 @@ angular.module('oppia').directive('subtopicViewerPage', [
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
           };
-          ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-          ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
+          ctrl.$onInit = function() {
+            ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+            ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
 
-          $rootScope.loadingMessage = 'Loading';
-          SubtopicViewerBackendApiService.fetchSubtopicData(
-            ctrl.topicName, ctrl.subtopicId).then(
-            function(subtopicDataObject) {
-              ctrl.pageContents = (
-                subtopicDataObject.getPageContents().getSubtitledHtml());
-              ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
-              PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
-              $rootScope.loadingMessage = '';
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get subtopic data');
+            $rootScope.loadingMessage = 'Loading';
+            SubtopicViewerBackendApiService.fetchSubtopicData(
+              ctrl.topicName, ctrl.subtopicId).then(
+              function(subtopicDataObject) {
+                ctrl.pageContents = (
+                  subtopicDataObject.getPageContents().getSubtitledHtml());
+                ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+                PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
+                $rootScope.loadingMessage = '';
+              },
+              function(errorResponse) {
+                if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                  AlertsService.addWarning('Failed to get subtopic data');
+                }
               }
-            }
-          );
+            );
+          };
         }
       ]
     };

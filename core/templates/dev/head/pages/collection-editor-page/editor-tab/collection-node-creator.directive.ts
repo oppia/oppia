@@ -55,13 +55,6 @@ angular.module('oppia').directive('collectionNodeCreator', [
             SearchExplorationsBackendApiService, SiteAnalyticsService,
             INVALID_NAME_CHARS) {
           var ctrl = this;
-          ctrl.collection = CollectionEditorStateService.getCollection();
-          ctrl.newExplorationId = '';
-          ctrl.newExplorationTitle = '';
-          ctrl.searchQueryHasError = false;
-
-          var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
-
           /**
            * Fetches a list of exploration metadata dicts from backend, given
            * a search query. It then extracts the title and id of the
@@ -185,6 +178,12 @@ angular.module('oppia').directive('collectionNodeCreator', [
             addExplorationToCollection(convertTypeaheadToExplorationId(
               ctrl.newExplorationId));
             ctrl.newExplorationId = '';
+          };
+          ctrl.$onInit = function() {
+            ctrl.collection = CollectionEditorStateService.getCollection();
+            ctrl.newExplorationId = '';
+            ctrl.newExplorationTitle = '';
+            ctrl.searchQueryHasError = false;
           };
         }
       ]

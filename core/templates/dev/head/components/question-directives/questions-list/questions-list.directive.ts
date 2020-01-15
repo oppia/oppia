@@ -86,15 +86,6 @@ angular.module('oppia').directive('questionsList', [
             MODE_SELECT_SKILL, SKILL_DIFFICULTIES, StateEditorService,
             QuestionUndoRedoService, UndoRedoService, QuestionsListService) {
           var ctrl = this;
-          ctrl.skillIds = [];
-          ctrl.selectedSkillIds = [];
-          ctrl.associatedSkillSummaries = [];
-          ctrl.selectedSkillId = ctrl.getSelectedSkillId();
-          ctrl.getQuestionSummariesForOneSkill =
-            QuestionsListService.getCachedQuestionSummaries;
-          ctrl.getCurrentPageNumber = QuestionsListService.getCurrentPageNumber;
-          ctrl.editorIsOpen = false;
-
           var _reInitializeSelectedSkillIds = function() {
             ctrl.selectedSkillId = ctrl.getSelectedSkillId();
             if (ctrl.selectedSkillId !== null) {
@@ -703,11 +694,26 @@ angular.module('oppia').directive('questionsList', [
             });
           };
 
-          $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
-            _initTab(false);
-          });
+          ctrl.getQuestionSummariesForOneSkill = function() {
+            return QuestionsListService.getCachedQuestionSummaries();
+          };
+          ctrl.getCurrentPageNumber = function() {
+            return QuestionsListService.getCurrentPageNumber();
+          };
 
-          _initTab(true);
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, function(ev) {
+              _initTab(false);
+            });
+            ctrl.skillIds = [];
+            ctrl.selectedSkillIds = [];
+            ctrl.associatedSkillSummaries = [];
+            ctrl.selectedSkillId = ctrl.getSelectedSkillId();
+            ctrl.editorIsOpen = false;
+            // The _initTab function is written separately since it is also
+            // called in $scope.$on when some external events are triggered.
+            _initTab(true);
+          };
         }
       ]
     };

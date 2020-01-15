@@ -76,22 +76,6 @@ angular.module('oppia').directive('explorationEditorTab', [
             ExplorationWarningsService, GraphDataService, RouterService,
             StateEditorService, UrlInterpolationService) {
           var ctrl = this;
-          ctrl.areParametersEnabled =
-            ExplorationFeaturesService.areParametersEnabled;
-
-          ctrl.interactionIsShown = false;
-
-          $scope.$on('refreshStateEditor', function() {
-            ctrl.initStateEditor();
-          });
-
-          $scope.$watch(ExplorationStatesService.getStates, function() {
-            if (ExplorationStatesService.getStates()) {
-              StateEditorService.setStateNames(
-                ExplorationStatesService.getStateNames());
-            }
-          }, true);
-
           ctrl.getStateContentPlaceholder = function() {
             if (
               StateEditorService.getActiveStateName() ===
@@ -260,12 +244,31 @@ angular.module('oppia').directive('explorationEditorTab', [
                   ExplorationStatesService.saveWrittenTranslations(
                     stateName, writtenTranslations);
                 }
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             }
           };
 
           ctrl.navigateToState = function(stateName) {
             RouterService.navigateToMainTab(stateName);
+          };
+          ctrl.areParametersEnabled = function() {
+            return ExplorationFeaturesService.areParametersEnabled();
+          };
+          ctrl.$onInit = function() {
+            $scope.$on('refreshStateEditor', function() {
+              ctrl.initStateEditor();
+            });
+
+            $scope.$watch(ExplorationStatesService.getStates, function() {
+              if (ExplorationStatesService.getStates()) {
+                StateEditorService.setStateNames(
+                  ExplorationStatesService.getStateNames());
+              }
+            }, true);
+            ctrl.interactionIsShown = false;
           };
         }
       ]

@@ -48,9 +48,7 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
             $scope, $filter, $uibModal, $rootScope,
             MisconceptionObjectFactory, EVENT_SKILL_REINITIALIZED,
             MISCONCEPTION_NAME_CHAR_LIMIT) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.misconceptions = $scope.skill.getMisconceptions();
-
+          var ctrl = this;
           $scope.isEditable = function() {
             return true;
           };
@@ -62,10 +60,6 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
               $scope.activeMisconceptionIndex = idx;
             }
           };
-
-          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-            $scope.misconceptions = $scope.skill.getMisconceptions();
-          });
 
           $scope.getMisconceptionSummary = function(misconception) {
             return misconception.getName();
@@ -95,6 +89,10 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
               SkillUpdateService.deleteMisconception($scope.skill, result.id);
               $scope.misconceptions = $scope.skill.getMisconceptions();
               $scope.activeMisconceptionIndex = null;
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -151,6 +149,17 @@ angular.module('oppia').directive('skillMisconceptionsEditor', [
             }).result.then(function(result) {
               SkillUpdateService.addMisconception(
                 $scope.skill, result.misconception);
+              $scope.misconceptions = $scope.skill.getMisconceptions();
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
+          };
+          ctrl.$onInit = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.misconceptions = $scope.skill.getMisconceptions();
+            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
               $scope.misconceptions = $scope.skill.getMisconceptions();
             });
           };

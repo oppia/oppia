@@ -57,8 +57,6 @@ angular.module('oppia').directive('storyEditorPage', [
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
           var ctrl = this;
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-          StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
-
           ctrl.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
               var modalInstance = $uibModal.open({
@@ -86,13 +84,16 @@ angular.module('oppia').directive('storyEditorPage', [
                 ), '_self');
             }
           };
-
           var setPageTitle = function() {
             PageTitleService.setPageTitle(
               StoryEditorStateService.getStory().getTitle() + ' - Oppia');
           };
-          $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
-          $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
+
+          ctrl.$onInit = function() {
+            StoryEditorStateService.loadStory(UrlService.getStoryIdFromUrl());
+            $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
+            $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
+          };
         }
       ]
     };

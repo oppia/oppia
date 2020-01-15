@@ -38,10 +38,12 @@ angular.module('oppia').directive('oppiaNoninteractiveCollapsible', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.heading = HtmlEscaperService.escapedJsonToObj(
-          $attrs.headingWithValue);
-        ctrl.content = HtmlEscaperService.escapedJsonToObj(
-          $attrs.contentWithValue);
+        ctrl.$onInit = function() {
+          ctrl.heading = HtmlEscaperService.escapedJsonToObj(
+            $attrs.headingWithValue);
+          ctrl.content = HtmlEscaperService.escapedJsonToObj(
+            $attrs.contentWithValue);
+        };
       }]
     };
   }

@@ -38,17 +38,21 @@ angular.module('oppia').directive(
           '$attrs', 'HtmlEscaperService',
           function($attrs, HtmlEscaperService) {
             var ctrl = this;
-            ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-            ctrl.options =
-              HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-            ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
-
-            ctrl.answerVisible = ctrl.data.map(function(_, i) {
-              // First element is shown while all others are hidden by default.
-              return i === 0;
-            });
             ctrl.toggleAnswerVisibility = function(i) {
               ctrl.answerVisible[i] = !ctrl.answerVisible[i];
+            };
+            ctrl.$onInit = function() {
+              ctrl.data = HtmlEscaperService.escapedJsonToObj(
+                $attrs.escapedData);
+              ctrl.options =
+                HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
+              ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+
+              ctrl.answerVisible = ctrl.data.map(function(_, i) {
+                // First element is shown while all others are hidden by
+                // default.
+                return i === 0;
+              });
             };
           }
         ]

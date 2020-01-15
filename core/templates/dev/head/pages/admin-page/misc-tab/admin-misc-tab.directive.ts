@@ -44,9 +44,6 @@ angular.module('oppia').directive('adminMiscTab', [
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
-        ctrl.topicIdForRegeneratingOpportunities = null;
-        ctrl.regenerationMessage = null;
-
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
@@ -172,6 +169,10 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.stateName = '';
           ctrl.numAnswers = 0;
           ctrl.showDataExtractionQueryStatus = false;
+        };
+        ctrl.$onInit = function() {
+          ctrl.topicIdForRegeneratingOpportunities = null;
+          ctrl.regenerationMessage = null;
         };
       }]
     };

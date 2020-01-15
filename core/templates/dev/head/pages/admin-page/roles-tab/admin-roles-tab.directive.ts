@@ -41,50 +41,6 @@ angular.module('oppia').directive('adminRolesTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-
-        ctrl.resultRolesVisible = false;
-        ctrl.result = {};
-        ctrl.setStatusMessage('');
-        ctrl.viewFormValues = {};
-        ctrl.updateFormValues = {};
-        ctrl.viewFormValues.method = 'role';
-
-        ctrl.UPDATABLE_ROLES = {};
-        ctrl.VIEWABLE_ROLES = {};
-        ctrl.topicSummaries = {};
-        ctrl.graphData = {};
-        ctrl.graphDataLoaded = false;
-        AdminDataService.getDataAsync().then(function(response) {
-          ctrl.UPDATABLE_ROLES = response.updatable_roles;
-          ctrl.VIEWABLE_ROLES = response.viewable_roles;
-          ctrl.topicSummaries = response.topic_summaries;
-          ctrl.graphData = response.role_graph_data;
-
-          ctrl.graphDataLoaded = false;
-          // Calculating initStateId and finalStateIds for graphData
-          // Since role graph is acyclic, node with no incoming edge
-          // is initState and nodes with no outgoing edge are finalStates.
-          var hasIncomingEdge = [];
-          var hasOutgoingEdge = [];
-          for (var i = 0; i < ctrl.graphData.links.length; i++) {
-            hasIncomingEdge.push(ctrl.graphData.links[i].target);
-            hasOutgoingEdge.push(ctrl.graphData.links[i].source);
-          }
-          var finalStateIds = [];
-          for (var role in ctrl.graphData.nodes) {
-            if (ctrl.graphData.nodes.hasOwnProperty(role)) {
-              if (hasIncomingEdge.indexOf(role) === -1) {
-                ctrl.graphData.initStateId = role;
-              }
-              if (hasOutgoingEdge.indexOf(role) === -1) {
-                finalStateIds.push(role);
-              }
-            }
-          }
-          ctrl.graphData.finalStateIds = finalStateIds;
-          ctrl.graphDataLoaded = true;
-        });
-
         ctrl.submitRoleViewForm = function(values) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
@@ -140,6 +96,50 @@ angular.module('oppia').directive('adminRolesTab', [
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
+        };
+        ctrl.$onInit = function() {
+          ctrl.resultRolesVisible = false;
+          ctrl.result = {};
+          ctrl.setStatusMessage('');
+          ctrl.viewFormValues = {};
+          ctrl.updateFormValues = {};
+          ctrl.viewFormValues.method = 'role';
+
+          ctrl.UPDATABLE_ROLES = {};
+          ctrl.VIEWABLE_ROLES = {};
+          ctrl.topicSummaries = {};
+          ctrl.graphData = {};
+          ctrl.graphDataLoaded = false;
+          AdminDataService.getDataAsync().then(function(response) {
+            ctrl.UPDATABLE_ROLES = response.updatable_roles;
+            ctrl.VIEWABLE_ROLES = response.viewable_roles;
+            ctrl.topicSummaries = response.topic_summaries;
+            ctrl.graphData = response.role_graph_data;
+
+            ctrl.graphDataLoaded = false;
+            // Calculating initStateId and finalStateIds for graphData
+            // Since role graph is acyclic, node with no incoming edge
+            // is initState and nodes with no outgoing edge are finalStates.
+            var hasIncomingEdge = [];
+            var hasOutgoingEdge = [];
+            for (var i = 0; i < ctrl.graphData.links.length; i++) {
+              hasIncomingEdge.push(ctrl.graphData.links[i].target);
+              hasOutgoingEdge.push(ctrl.graphData.links[i].source);
+            }
+            var finalStateIds = [];
+            for (var role in ctrl.graphData.nodes) {
+              if (ctrl.graphData.nodes.hasOwnProperty(role)) {
+                if (hasIncomingEdge.indexOf(role) === -1) {
+                  ctrl.graphData.initStateId = role;
+                }
+                if (hasOutgoingEdge.indexOf(role) === -1) {
+                  finalStateIds.push(role);
+                }
+              }
+            }
+            ctrl.graphData.finalStateIds = finalStateIds;
+            ctrl.graphDataLoaded = true;
+          });
         };
       }]
     };

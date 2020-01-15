@@ -58,13 +58,7 @@ angular.module('oppia').directive('trainingPanel', [
             StateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory, GenerateContentIdService,
             COMPONENT_NAME_FEEDBACK) {
-          $scope.addingNewResponse = false;
-
-          var _stateName = StateEditorService.getActiveStateName();
-          var _state = ExplorationStatesService.getState(_stateName);
-          $scope.allOutcomes = TrainingDataService.getAllPotentialOutcomes(
-            _state);
-
+          var ctrl = this;
           var _updateAnswerTemplate = function() {
             $scope.answerTemplate = (
               ExplorationHtmlFormatterService.getAnswerHtml(
@@ -80,11 +74,6 @@ angular.module('oppia').directive('trainingPanel', [
             });
             return existingContentIds;
           };
-
-          $scope.$watch('answer', _updateAnswerTemplate);
-          _updateAnswerTemplate();
-          $scope.selectedAnswerGroupIndex = (
-            $scope.classification.answerGroupIndex);
 
           $scope.getCurrentStateName = function() {
             return StateEditorService.getActiveStateName();
@@ -118,6 +107,18 @@ angular.module('oppia').directive('trainingPanel', [
               $scope.selectAnswerGroupIndex($scope.allOutcomes.length - 1);
               $scope.addingNewResponse = false;
             }
+          };
+          ctrl.$onInit = function() {
+            $scope.addingNewResponse = false;
+
+            var _stateName = StateEditorService.getActiveStateName();
+            var _state = ExplorationStatesService.getState(_stateName);
+            $scope.allOutcomes = TrainingDataService.getAllPotentialOutcomes(
+              _state);
+            $scope.$watch('answer', _updateAnswerTemplate);
+            _updateAnswerTemplate();
+            $scope.selectedAnswerGroupIndex = (
+              $scope.classification.answerGroupIndex);
           };
         }
       ]

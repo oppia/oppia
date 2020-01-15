@@ -48,15 +48,7 @@ angular.module('oppia').directive('reviewMaterialEditor', [
         function(
             SubtitledHtmlObjectFactory, COMPONENT_NAME_EXPLANATION) {
           var ctrl = this;
-
-          ctrl.HTML_SCHEMA = {
-            type: 'html'
-          };
-
           var explanationMemento = null;
-          ctrl.editableExplanation =
-            ctrl.getBindableDict().displayedConceptCardExplanation;
-          ctrl.conceptCardExplanationEditorIsShown = false;
 
           ctrl.openConceptCardExplanationEditor = function() {
             ctrl.editableExplanation =
@@ -76,7 +68,16 @@ angular.module('oppia').directive('reviewMaterialEditor', [
               ctrl.editableExplanation, COMPONENT_NAME_EXPLANATION);
             ctrl.onSaveExplanation(explanationObject);
           };
-        }]
+          ctrl.$onInit = function() {
+            ctrl.HTML_SCHEMA = {
+              type: 'html'
+            };
+            ctrl.editableExplanation =
+              ctrl.getBindableDict().displayedConceptCardExplanation;
+            ctrl.conceptCardExplanationEditorIsShown = false;
+          };
+        }
+      ]
     };
   }
 ]);

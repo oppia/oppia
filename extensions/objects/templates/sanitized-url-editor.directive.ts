@@ -31,14 +31,16 @@ angular.module('oppia').directive('sanitizedUrlEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.SCHEMA = {
-          type: 'unicode',
-          validators: [{
-            id: 'is_nonempty'
-          }],
-          ui_config: {
-            placeholder: 'https://www.example.com'
-          }
+        ctrl.$onInit = function() {
+          ctrl.SCHEMA = {
+            type: 'unicode',
+            validators: [{
+              id: 'is_nonempty'
+            }],
+            ui_config: {
+              placeholder: 'https://www.example.com'
+            }
+          };
         };
       }]
     };

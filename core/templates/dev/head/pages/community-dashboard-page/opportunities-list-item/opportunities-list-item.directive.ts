@@ -41,23 +41,25 @@ angular.module('oppia').directive('opportunitiesListItem', [
       controller: [
         '$scope', function($scope) {
           var ctrl = this;
-          ctrl.opportunityDataIsLoading = false;
-          ctrl.opportunity = $scope.getOpportunity();
-          if ($scope.isLabelRequired()) {
-            ctrl.labelText = ctrl.opportunity.labelText;
-            ctrl.labelStyle = {
-              'background-color': ctrl.opportunity.labelColor
-            };
-          }
-          if (ctrl.opportunity) {
-            if (ctrl.opportunity.progressPercentage) {
-              ctrl.progressPercentage = (
-                ctrl.opportunity.progressPercentage + '%');
-              ctrl.progresBarStyle = {width: ctrl.progressPercentage};
+          ctrl.$onInit = function() {
+            ctrl.opportunityDataIsLoading = false;
+            ctrl.opportunity = $scope.getOpportunity();
+            if ($scope.isLabelRequired()) {
+              ctrl.labelText = ctrl.opportunity.labelText;
+              ctrl.labelStyle = {
+                'background-color': ctrl.opportunity.labelColor
+              };
             }
-          } else {
-            ctrl.opportunityDataIsLoading = true;
-          }
+            if (ctrl.opportunity) {
+              if (ctrl.opportunity.progressPercentage) {
+                ctrl.progressPercentage = (
+                  ctrl.opportunity.progressPercentage + '%');
+                ctrl.progresBarStyle = {width: ctrl.progressPercentage};
+              }
+            } else {
+              ctrl.opportunityDataIsLoading = true;
+            }
+          };
         }
       ]
     };

@@ -42,18 +42,20 @@ angular.module('oppia').directive('testInteractionPanel', [
         function($scope, ExplorationStatesService,
             INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
             CurrentInteractionService) {
-          var _stateName = $scope.getStateName();
-          var _state = ExplorationStatesService.getState(_stateName);
-          $scope.interactionIsInline = (
-            INTERACTION_SPECS[_state.interaction.id].display_mode ===
-            INTERACTION_DISPLAY_MODE_INLINE);
-
+          var ctrl = this;
           $scope.onSubmitAnswerFromButton = function() {
             CurrentInteractionService.submitAnswer();
           };
 
           $scope.isSubmitButtonDisabled = (
             CurrentInteractionService.isSubmitButtonDisabled);
+          ctrl.$onInit = function() {
+            var _stateName = $scope.getStateName();
+            var _state = ExplorationStatesService.getState(_stateName);
+            $scope.interactionIsInline = (
+              INTERACTION_SPECS[_state.interaction.id].display_mode ===
+              INTERACTION_DISPLAY_MODE_INLINE);
+          };
         }
       ]
     };

@@ -55,15 +55,19 @@ angular.module('oppia').directive('topicEditorPage', [
             TopicEditorStateService, UrlService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           var ctrl = this;
-          ctrl.getActiveTabName = TopicEditorRoutingService.getActiveTabName;
-          TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+          ctrl.getActiveTabName = function() {
+            return TopicEditorRoutingService.getActiveTabName();
+          };
 
           var setPageTitle = function() {
             PageTitleService.setPageTitle(
               TopicEditorStateService.getTopic().getName() + ' - Oppia');
           };
-          $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
+          ctrl.$onInit = function() {
+            TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+            $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
+            $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
+          };
         }
       ]
     };

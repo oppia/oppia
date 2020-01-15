@@ -349,16 +349,6 @@ angular.module('oppia').directive('filepathEditor', [
               ctrl.entityType, ctrl.entityId, encodedFilepath));
         };
 
-        /** Scope variables and functions (visibles to the view) */
-
-        // Reset the component each time the value changes
-        // (e.g. if this is part of an editable list).
-        $scope.$watch('$ctrl.value', function(newValue) {
-          if (newValue) {
-            ctrl.setSavedImageFilename(newValue, false);
-          }
-        });
-
         ctrl.resetFilePathEditor = function() {
           ctrl.data = {
             mode: MODE_EMPTY,
@@ -790,59 +780,70 @@ angular.module('oppia').directive('filepathEditor', [
             });
           });
         };
+        ctrl.$onInit = function() {
+          /** Scope variables and functions (visibles to the view) */
 
-        // This variable holds information about the image upload flow.
-        // It's always guaranteed to have the 'mode' and 'metadata' properties.
-        //
-        // See below a description of each mode.
-        //
-        // MODE_EMPTY:
-        //   The user has not uploaded an image yet.
-        //   In this mode, data.metadata will be an empty object:
-        //     {}
-        //
-        // MODE_UPLOADED:
-        //   The user has uploaded an image but it is not yet saved.
-        //   All the crop and resizing happens at this stage.
-        //   In this mode, data.metadata will contain the following info:
-        //     {
-        //       uploadedFile: <a File object>,
-        //       uploadedImageData: <binary data corresponding to the image>,
-        //       originalWidth: <original width of the uploaded image>,
-        //       originalHeight: <original height of the uploaded image>
-        //     }
-        //
-        // MODE_SAVED:
-        //   The user has saved the final image for use in Oppia.
-        //   At this stage, the user can click on the trash to start over.
-        //   In this mode, data.metadata will contain the following info:
-        //     {
-        //       savedImageFilename: <File name of the resource for the image>
-        //       savedImageUrl: <Trusted resource Url for the image>
-        //     }
-        ctrl.data = { mode: MODE_EMPTY, metadata: {} };
+          // Reset the component each time the value changes
+          // (e.g. if this is part of an editable list).
+          $scope.$watch('$ctrl.value', function(newValue) {
+            if (newValue) {
+              ctrl.setSavedImageFilename(newValue, false);
+            }
+          });
+          // This variable holds information about the image upload flow.
+          // It's always guaranteed to have the 'mode' and 'metadata'
+          // properties.
+          //
+          // See below a description of each mode.
+          //
+          // MODE_EMPTY:
+          //   The user has not uploaded an image yet.
+          //   In this mode, data.metadata will be an empty object:
+          //     {}
+          //
+          // MODE_UPLOADED:
+          //   The user has uploaded an image but it is not yet saved.
+          //   All the crop and resizing happens at this stage.
+          //   In this mode, data.metadata will contain the following info:
+          //     {
+          //       uploadedFile: <a File object>,
+          //       uploadedImageData: <binary data corresponding to the image>,
+          //       originalWidth: <original width of the uploaded image>,
+          //       originalHeight: <original height of the uploaded image>
+          //     }
+          //
+          // MODE_SAVED:
+          //   The user has saved the final image for use in Oppia.
+          //   At this stage, the user can click on the trash to start over.
+          //   In this mode, data.metadata will contain the following info:
+          //     {
+          //       savedImageFilename: <File name of the resource for the image>
+          //       savedImageUrl: <Trusted resource Url for the image>
+          //     }
+          ctrl.data = { mode: MODE_EMPTY, metadata: {} };
 
-        // Resizing properties.
-        ctrl.imageResizeRatio = 1;
+          // Resizing properties.
+          ctrl.imageResizeRatio = 1;
 
-        // Cropping properties.
-        ctrl.cropArea = { x1: 0, y1: 0, x2: 0, y2: 0 };
-        ctrl.mousePositionWithinCropArea = null;
-        ctrl.mouseLastKnownCoordinates = { x: 0, y: 0 };
-        ctrl.lastMouseDownEventCoordinates = { x: 0, y: 0 };
-        ctrl.userIsDraggingCropArea = false;
-        ctrl.userIsResizingCropArea = false;
-        ctrl.cropAreaResizeDirection = null;
-
-        ctrl.entityId = ContextService.getEntityId();
-        ctrl.entityType = ContextService.getEntityType();
-        ctrl.resetFilePathEditor();
-
-        window.addEventListener('mouseup', function(e) {
-          e.preventDefault();
+          // Cropping properties.
+          ctrl.cropArea = { x1: 0, y1: 0, x2: 0, y2: 0 };
+          ctrl.mousePositionWithinCropArea = null;
+          ctrl.mouseLastKnownCoordinates = { x: 0, y: 0 };
+          ctrl.lastMouseDownEventCoordinates = { x: 0, y: 0 };
           ctrl.userIsDraggingCropArea = false;
           ctrl.userIsResizingCropArea = false;
-        }, false);
+          ctrl.cropAreaResizeDirection = null;
+
+          ctrl.entityId = ContextService.getEntityId();
+          ctrl.entityType = ContextService.getEntityType();
+          ctrl.resetFilePathEditor();
+
+          window.addEventListener('mouseup', function(e) {
+            e.preventDefault();
+            ctrl.userIsDraggingCropArea = false;
+            ctrl.userIsResizingCropArea = false;
+          }, false);
+        };
       }]
     };
   }

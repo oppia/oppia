@@ -18,8 +18,8 @@ module.exports = function(config) {
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.4.1/jquery.min.js',
       'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
-      'third_party/static/angularjs-1.5.8/angular.js',
-      'third_party/static/angularjs-1.5.8/angular-mocks.js',
+      'third_party/static/angularjs-1.7.9/angular.js',
+      'third_party/static/angularjs-1.7.9/angular-mocks.js',
       'third_party/static/headroom-js-0.9.4/headroom.min.js',
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',

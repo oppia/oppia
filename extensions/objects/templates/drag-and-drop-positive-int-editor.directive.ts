@@ -31,20 +31,22 @@ angular.module('oppia').directive('dragAndDropPositiveIntEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        if (!parseInt(ctrl.value)) {
-          ctrl.value = 1;
-        }
-        if (!ctrl.selectedRank) {
-          ctrl.selectedRank = '';
-        }
-        ctrl.allowedRanks = [];
-        ctrl.initArgs = ctrl.getInitArgs();
-        ctrl.choices = ctrl.initArgs.choices;
-        for (var i = 0; i < ctrl.choices.length; i++) {
-          ctrl.allowedRanks.push(i + 1);
-        }
         ctrl.selection = function(selectedRank) {
           ctrl.value = parseInt(selectedRank);
+        };
+        ctrl.$onInit = function() {
+          if (!parseInt(ctrl.value)) {
+            ctrl.value = 1;
+          }
+          if (!ctrl.selectedRank) {
+            ctrl.selectedRank = '';
+          }
+          ctrl.allowedRanks = [];
+          ctrl.initArgs = ctrl.getInitArgs();
+          ctrl.choices = ctrl.initArgs.choices;
+          for (var i = 0; i < ctrl.choices.length; i++) {
+            ctrl.allowedRanks.push(i + 1);
+          }
         };
       }]
     };

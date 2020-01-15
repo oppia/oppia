@@ -52,13 +52,10 @@ angular.module('oppia').directive('baseContent', [
           }
 
           var ctrl = this;
-          ctrl.iframed = UrlService.isIframed();
-          ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
           ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
           ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
           ctrl.isBackgroundMaskActive = () => (
             BackgroundMaskService.isMaskActive());
-          ctrl.DEV_MODE = $rootScope.DEV_MODE;
           ctrl.skipToMainContent = function() {
             var mainContentElement = document.getElementById(
               'oppia-main-content');
@@ -69,6 +66,11 @@ angular.module('oppia').directive('baseContent', [
             mainContentElement.tabIndex = -1;
             mainContentElement.scrollIntoView();
             mainContentElement.focus();
+          };
+          ctrl.$onInit = function() {
+            ctrl.iframed = UrlService.isIframed();
+            ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
+            ctrl.DEV_MODE = $rootScope.DEV_MODE;
           };
         }
       ]

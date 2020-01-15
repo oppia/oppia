@@ -50,17 +50,18 @@ angular.module('oppia').directive('notificationsDashboardPage', [
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               millisSinceEpoch);
           };
-
-          $rootScope.loadingMessage = 'Loading';
-          $http.get('/notificationsdashboardhandler/data').then(function(
-              response) {
-            var data = response.data;
-            ctrl.recentNotifications = data.recent_notifications;
-            ctrl.jobQueuedMsec = data.job_queued_msec;
-            ctrl.lastSeenMsec = data.last_seen_msec || 0.0;
-            ctrl.currentUsername = data.username;
-            $rootScope.loadingMessage = '';
-          });
+          ctrl.$onInit = function() {
+            $rootScope.loadingMessage = 'Loading';
+            $http.get('/notificationsdashboardhandler/data').then(function(
+                response) {
+              var data = response.data;
+              ctrl.recentNotifications = data.recent_notifications;
+              ctrl.jobQueuedMsec = data.job_queued_msec;
+              ctrl.lastSeenMsec = data.last_seen_msec || 0.0;
+              ctrl.currentUsername = data.username;
+              $rootScope.loadingMessage = '';
+            });
+          };
         }
       ]
     };

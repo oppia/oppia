@@ -53,31 +53,11 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
             $scope, $element, $attrs, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
-          ctrl.errorMessage = '';
-          ctrl.graph = {
-            vertices: [],
-            edges: [],
-            isDirected: false,
-            isWeighted: false,
-            isLabeled: false
-          };
           ctrl.submitGraph = function() {
             // Here, angular.copy is needed to strip $$hashkey from the graph.
             CurrentInteractionService.onSubmit(
               angular.copy(ctrl.graph), GraphInputRulesService);
           };
-          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-
-            ctrl.canAddVertex = false;
-            ctrl.canDeleteVertex = false;
-            ctrl.canEditVertexLabel = false;
-            ctrl.canMoveVertex = false;
-            ctrl.canAddEdge = false;
-            ctrl.canDeleteEdge = false;
-            ctrl.canEditEdgeWeight = false;
-          });
 
           ctrl.resetGraph = function() {
             var newGraph = HtmlEscaperService.escapedJsonToObj(
@@ -122,11 +102,55 @@ angular.module('oppia').directive('oppiaInteractiveGraphInput', [
           var validityCheckFn = function() {
             return checkValidGraph(ctrl.graph);
           };
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
 
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitGraph, validityCheckFn);
+              ctrl.canAddVertex = false;
+              ctrl.canDeleteVertex = false;
+              ctrl.canEditVertexLabel = false;
+              ctrl.canMoveVertex = false;
+              ctrl.canAddEdge = false;
+              ctrl.canDeleteEdge = false;
+              ctrl.canEditEdgeWeight = false;
+            });
+            ctrl.errorMessage = '';
+            ctrl.graph = {
+              vertices: [],
+              edges: [],
+              isDirected: false,
+              isWeighted: false,
+              isLabeled: false
+            };
 
-          init();
+            ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitGraph, validityCheckFn);
+
+            if (ctrl.interactionIsActive) {
+              ctrl.resetGraph();
+            } else {
+              ctrl.graph = ctrl.getLastAnswer();
+            }
+            var stringToBool = function(str) {
+              return (str === 'true');
+            };
+            ctrl.canAddVertex = ctrl.interactionIsActive ?
+              stringToBool($attrs.canAddVertexWithValue) : false;
+            ctrl.canDeleteVertex = ctrl.interactionIsActive ?
+              stringToBool($attrs.canDeleteVertexWithValue) : false;
+            ctrl.canEditVertexLabel = ctrl.interactionIsActive ?
+              stringToBool($attrs.canEditVertexLabelWithValue) : false;
+            ctrl.canMoveVertex = ctrl.interactionIsActive ?
+              stringToBool($attrs.canMoveVertexWithValue) : false;
+            ctrl.canAddEdge = ctrl.interactionIsActive ?
+              stringToBool($attrs.canAddEdgeWithValue) : false;
+            ctrl.canDeleteEdge = ctrl.interactionIsActive ?
+              stringToBool($attrs.canDeleteEdgeWithValue) : false;
+            ctrl.canEditEdgeWeight = ctrl.interactionIsActive ?
+              stringToBool($attrs.canEditEdgeWeightWithValue) : false;
+          };
         }
       ]
     };

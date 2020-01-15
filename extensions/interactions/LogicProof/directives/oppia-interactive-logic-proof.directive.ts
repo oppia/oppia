@@ -49,81 +49,14 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
         'logic-proof-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$uibModal', 'LogicProofRulesService',
+        '$scope', '$attrs', '$timeout', '$uibModal', 'LogicProofRulesService',
         'WindowDimensionsService', 'UrlService',
         'CurrentInteractionService',
         function(
-            $scope, $attrs, $uibModal, LogicProofRulesService,
+            $scope, $attrs, $timeout, $uibModal, LogicProofRulesService,
             WindowDimensionsService, UrlService,
             CurrentInteractionService) {
           var ctrl = this;
-          ctrl.localQuestionData = HtmlEscaperService.escapedJsonToObj(
-            $attrs.questionWithValue);
-
-          // This is the information about how to mark a question (e.g. the
-          // permitted line templates) that is stored in defaultData.js within
-          // the dependencies.
-          ctrl.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
-
-          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-          });
-
-          ctrl.questionData.assumptions =
-            ctrl.localQuestionData.assumptions;
-          ctrl.questionData.results = ctrl.localQuestionData.results;
-
-          // Deduce the new operators, as in logicProofTeacher.buildQuestion(),
-          // since these are not currently stored separately for each question.
-          ctrl.expressions = [];
-          ctrl.topTypes = [];
-          for (var i = 0; i < ctrl.questionData.assumptions.length; i++) {
-            ctrl.expressions.push(ctrl.questionData.assumptions[i]);
-            ctrl.topTypes.push('boolean');
-          }
-          ctrl.expressions.push(ctrl.questionData.results[0]);
-          ctrl.topTypes.push('boolean');
-          ctrl.typing = logicProofShared.assignTypesToExpressionArray(
-            ctrl.expressions, ctrl.topTypes,
-            logicProofData.BASE_STUDENT_LANGUAGE,
-            ['variable', 'constant', 'prefix_function']
-          );
-
-          ctrl.questionData.language.operators = ctrl.typing[0].operators;
-
-          if (ctrl.questionData.assumptions.length <= 1) {
-            ctrl.assumptionsString = logicProofShared.displayExpressionArray(
-              ctrl.questionData.assumptions,
-              ctrl.questionData.language.operators);
-          } else {
-            ctrl.assumptionsString = logicProofShared.displayExpressionArray(
-              ctrl.questionData.assumptions.slice(
-                0, ctrl.questionData.assumptions.length - 1
-              ), ctrl.questionData.language.operators
-            ) + ' and ' + logicProofShared.displayExpression(
-              ctrl.questionData.assumptions[
-                ctrl.questionData.assumptions.length - 1],
-              ctrl.questionData.language.operators);
-          }
-          ctrl.targetString = logicProofShared.displayExpression(
-            ctrl.questionData.results[0],
-            ctrl.questionData.language.operators);
-          ctrl.questionString = (
-            ctrl.assumptionsString === '' ?
-              'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_NO_ASSUMPTION' :
-              'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_ASSUMPTIONS');
-          ctrl.questionStringData = {
-            target: ctrl.targetString,
-            assumptions: ctrl.assumptionsString
-          };
-
-          ctrl.questionInstance = logicProofStudent.buildInstance(
-            ctrl.questionData);
-          // Denotes whether messages are in response to a submission, in which
-          // case they persist for longer.
-          ctrl.messageIsSticky = false;
-
           // NOTE: for information on integrating angular and code-mirror see
           // http://github.com/angular-ui/ui-codemirror
           ctrl.codeEditor = function(editor) {
@@ -139,19 +72,21 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
 
             // NOTE: this is necessary to avoid the textarea being greyed-out.
             // See: http://stackoverflow.com/questions/8349571 for discussion.
-            setTimeout(function() {
+            $timeout(function() {
               editor.refresh();
             }, 500);
 
             // NOTE: we must use beforeChange rather than change here to avoid
             // an infinite loop (which code-mirror will not catch).
             editor.on('beforeChange', function(instance, change) {
-              var convertedText = logicProofConversion.convertToLogicCharacters(
+              var convertedText =
+              logicProofConversion.convertToLogicCharacters(
                 change.text.join('\n'));
               if (convertedText !== change.text.join('\n')) {
                 // We update using the converted text, then cancel its being
                 // overwritten by the original text.
-                editor.doc.replaceRange(convertedText, change.from, change.to);
+                editor.doc.replaceRange(
+                  convertedText, change.from, change.to);
                 change.cancel();
               }
             });
@@ -286,10 +221,6 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
             CurrentInteractionService.onSubmit(
               submission, LogicProofRulesService);
           };
-
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitProof, null);
-
           ctrl.showHelp = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
@@ -304,9 +235,87 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
                   };
                 }
               ]
-            }).result.then(function() {});
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
           };
-        }]
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
+            });
+            ctrl.localQuestionData = HtmlEscaperService.escapedJsonToObj(
+              $attrs.questionWithValue);
+
+            // This is the information about how to mark a question (e.g. the
+            // permitted line templates) that is stored in defaultData.js within
+            // the dependencies.
+            ctrl.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
+
+            ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+            ctrl.questionData.assumptions =
+              ctrl.localQuestionData.assumptions;
+            ctrl.questionData.results = ctrl.localQuestionData.results;
+
+            // Deduce the new operators, as in
+            // logicProofTeacher.buildQuestion(),
+            // since these are not currently stored separately for each
+            // question.
+            ctrl.expressions = [];
+            ctrl.topTypes = [];
+            for (var i = 0; i < ctrl.questionData.assumptions.length; i++) {
+              ctrl.expressions.push(ctrl.questionData.assumptions[i]);
+              ctrl.topTypes.push('boolean');
+            }
+            ctrl.expressions.push(ctrl.questionData.results[0]);
+            ctrl.topTypes.push('boolean');
+            ctrl.typing = logicProofShared.assignTypesToExpressionArray(
+              ctrl.expressions, ctrl.topTypes,
+              logicProofData.BASE_STUDENT_LANGUAGE,
+              ['variable', 'constant', 'prefix_function']
+            );
+
+            ctrl.questionData.language.operators = ctrl.typing[0].operators;
+
+            if (ctrl.questionData.assumptions.length <= 1) {
+              ctrl.assumptionsString = logicProofShared.displayExpressionArray(
+                ctrl.questionData.assumptions,
+                ctrl.questionData.language.operators);
+            } else {
+              ctrl.assumptionsString = logicProofShared.displayExpressionArray(
+                ctrl.questionData.assumptions.slice(
+                  0, ctrl.questionData.assumptions.length - 1
+                ), ctrl.questionData.language.operators
+              ) + ' and ' + logicProofShared.displayExpression(
+                ctrl.questionData.assumptions[
+                  ctrl.questionData.assumptions.length - 1],
+                ctrl.questionData.language.operators);
+            }
+            ctrl.targetString = logicProofShared.displayExpression(
+              ctrl.questionData.results[0],
+              ctrl.questionData.language.operators);
+            ctrl.questionString = (
+              ctrl.assumptionsString === '' ?
+                'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_NO_ASSUMPTION' :
+                'I18N_INTERACTIONS_LOGIC_PROOF_QUESTION_STR_ASSUMPTIONS');
+            ctrl.questionStringData = {
+              target: ctrl.targetString,
+              assumptions: ctrl.assumptionsString
+            };
+
+            ctrl.questionInstance = logicProofStudent.buildInstance(
+              ctrl.questionData);
+            // Denotes whether messages are in response to a submission, in
+            // which
+            // case they persist for longer.
+            ctrl.messageIsSticky = false;
+
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitProof, null);
+          };
+        }
+      ]
     };
   }
 ]);

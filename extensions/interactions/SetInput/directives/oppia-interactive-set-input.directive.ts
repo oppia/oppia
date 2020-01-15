@@ -43,21 +43,6 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
             $attrs, $translate, SetInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.schema = {
-            type: 'list',
-            items: {
-              type: 'unicode'
-            },
-            ui_config: {
-              // TODO(mili): Translate this in the HTML.
-              add_element_text: $translate.instant(
-                'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
-            }
-          };
-
-          // Adds an input field by default
-          ctrl.answer = [''];
-
           var hasDuplicates = function(answer) {
             for (var i = 0; i < answer.length; i++) {
               for (var j = 0; j < i; j++) {
@@ -94,9 +79,25 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
           var submitAnswerFn = function() {
             ctrl.submitAnswer(ctrl.answer);
           };
+          ctrl.$onInit = function() {
+            ctrl.schema = {
+              type: 'list',
+              items: {
+                type: 'unicode'
+              },
+              ui_config: {
+                // TODO(mili): Translate this in the HTML.
+                add_element_text: $translate.instant(
+                  'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
+              }
+            };
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, ctrl.isAnswerValid);
+            // Adds an input field by default
+            ctrl.answer = [''];
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, ctrl.isAnswerValid);
+          };
         }
       ]
     };

@@ -77,143 +77,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
             FeedbackMessageSummaryObjectFactory,
             SuggestionModalForLearnerDashboardService, UserService) {
           var ctrl = this;
-          ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
-            EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
-          ctrl.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
-            SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS);
-          ctrl.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
-            FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
-          ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS = (
-            LEARNER_DASHBOARD_SECTION_I18N_IDS);
-          ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
-            LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
-          ctrl.getStaticImageUrl = function(imagePath) {
-            return UrlInterpolationService.getStaticImageUrl(imagePath);
-          };
-          ctrl.PAGE_SIZE = 8;
-          ctrl.Math = window.Math;
-          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            ctrl.profilePictureDataUrl = dataUrl;
-          });
-
-          $rootScope.loadingMessage = 'Loading';
-          ctrl.username = '';
-          var userInfoPromise = UserService.getUserInfoAsync();
-          userInfoPromise.then(function(userInfo) {
-            ctrl.username = userInfo.getUsername();
-          });
-
-          var dashboardDataPromise = (
-            LearnerDashboardBackendApiService.fetchLearnerDashboardData());
-          dashboardDataPromise.then(
-            function(responseData) {
-              ctrl.isCurrentExpSortDescending = true;
-              ctrl.isCurrentSubscriptionSortDescending = true;
-              ctrl.isCurrentFeedbackSortDescending = true;
-              ctrl.currentExpSortType = (
-                EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key);
-              ctrl.currentSubscribersSortType = (
-                SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.USERNAME.key);
-              ctrl.currentFeedbackThreadsSortType = (
-                FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
-              ctrl.startIncompleteExpIndex = 0;
-              ctrl.startCompletedExpIndex = 0;
-              ctrl.startIncompleteCollectionIndex = 0;
-              ctrl.startCompletedCollectionIndex = 0;
-              ctrl.completedExplorationsList = (
-                responseData.completed_explorations_list
-              );
-              ctrl.completedCollectionsList = (
-                responseData.completed_collections_list
-              );
-              ctrl.incompleteExplorationsList = (
-                responseData.incomplete_explorations_list
-              );
-              ctrl.incompleteCollectionsList = (
-                responseData.incomplete_collections_list
-              );
-              ctrl.subscriptionsList = (
-                responseData.subscription_list
-              );
-              ctrl.numberNonexistentIncompleteExplorations = (
-                responseData.number_of_nonexistent_activities
-                  .incomplete_explorations
-              );
-              ctrl.numberNonexistentIncompleteCollections = (
-                responseData.number_of_nonexistent_activities
-                  .incomplete_collections
-              );
-              ctrl.numberNonexistentCompletedExplorations = (
-                responseData.number_of_nonexistent_activities
-                  .completed_explorations
-              );
-              ctrl.numberNonexistentCompletedCollections = (
-                responseData.number_of_nonexistent_activities
-                  .completed_collections
-              );
-              ctrl.numberNonexistentExplorationsFromPlaylist = (
-                responseData.number_of_nonexistent_activities
-                  .exploration_playlist
-              );
-              ctrl.numberNonexistentCollectionsFromPlaylist = (
-                responseData.number_of_nonexistent_activities
-                  .collection_playlist
-              );
-              ctrl.completedToIncompleteCollections = (
-                responseData.completed_to_incomplete_collections
-              );
-              var threadSummaryDicts = responseData.thread_summaries;
-              ctrl.threadSummaries = [];
-              for (var index = 0; index < threadSummaryDicts.length; index++) {
-                ctrl.threadSummaries.push(
-                  FeedbackThreadSummaryObjectFactory.createFromBackendDict(
-                    threadSummaryDicts[index]));
-              }
-              ctrl.numberOfUnreadThreads =
-                responseData.number_of_unread_threads;
-              ctrl.explorationPlaylist = responseData.exploration_playlist;
-              ctrl.collectionPlaylist = responseData.collection_playlist;
-              ctrl.activeSection =
-                LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE;
-              ctrl.activeSubsection = (
-                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
-              ctrl.feedbackThreadActive = false;
-
-              ctrl.noExplorationActivity = (
-                (ctrl.completedExplorationsList.length === 0) &&
-                  (ctrl.incompleteExplorationsList.length === 0));
-              ctrl.noCollectionActivity = (
-                (ctrl.completedCollectionsList.length === 0) &&
-                  (ctrl.incompleteCollectionsList.length === 0));
-              ctrl.noActivity = (
-                (ctrl.noExplorationActivity) && (ctrl.noCollectionActivity) &&
-                (ctrl.explorationPlaylist.length === 0) &&
-                (ctrl.collectionPlaylist.length === 0));
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning(
-                  'Failed to get learner dashboard data');
-              }
-            }
-          );
-
-          $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
-            $rootScope.loadingMessage = '';
-          });
-
-          ctrl.loadingFeedbacks = false;
           var threadIndex = null;
-
-          ctrl.newMessage = {
-            text: ''
-          };
-
-          ctrl.getLabelClass = ThreadStatusDisplayService.getLabelClass;
-          ctrl.getHumanReadableStatus = (
-            ThreadStatusDisplayService.getHumanReadableStatus);
-          ctrl.getLocaleAbbreviatedDatetimeString = (
-            DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
           ctrl.setActiveSection = function(newActiveSectionName) {
             ctrl.activeSection = newActiveSectionName;
@@ -412,11 +276,6 @@ angular.module('oppia').directive('learnerDashboardPage', [
             };
           };
 
-          ctrl.collectionPlaylistSortableOptions = getPlaylistSortableOptions(
-            ACTIVITY_TYPE_COLLECTION);
-          ctrl.explorationPlaylistSortableOptions = getPlaylistSortableOptions(
-            ACTIVITY_TYPE_EXPLORATION);
-
           ctrl.onClickThread = function(
               threadStatus, explorationId, threadId, explorationTitle) {
             ctrl.loadingFeedbacks = true;
@@ -469,7 +328,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               text: newMessage
             };
             ctrl.messageSendingInProgress = true;
-            $http.post(url, payload).success(function() {
+            $http.post(url, payload).then(function() {
               ctrl.threadSummary = ctrl.threadSummaries[threadIndex];
               ctrl.threadSummary.appendNewMessage(
                 newMessage, ctrl.username);
@@ -600,6 +459,155 @@ angular.module('oppia').directive('learnerDashboardPage', [
                 }
               }
             });
+          };
+
+          ctrl.getLabelClass = function(status) {
+            return ThreadStatusDisplayService.getLabelClass(status);
+          };
+          ctrl.getHumanReadableStatus = function(status) {
+            return ThreadStatusDisplayService.getHumanReadableStatus(status);
+          };
+          ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              millisSinceEpoch);
+          };
+          ctrl.$onInit = function() {
+            ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
+              EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
+            ctrl.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
+              SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS);
+            ctrl.FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS = (
+              FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS);
+            ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS = (
+              LEARNER_DASHBOARD_SECTION_I18N_IDS);
+            ctrl.LEARNER_DASHBOARD_SUBSECTION_I18N_IDS = (
+              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS);
+            ctrl.getStaticImageUrl = function(imagePath) {
+              return UrlInterpolationService.getStaticImageUrl(imagePath);
+            };
+            ctrl.PAGE_SIZE = 8;
+            ctrl.Math = window.Math;
+            UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+              ctrl.profilePictureDataUrl = dataUrl;
+            });
+
+            $rootScope.loadingMessage = 'Loading';
+            ctrl.username = '';
+            var userInfoPromise = UserService.getUserInfoAsync();
+            userInfoPromise.then(function(userInfo) {
+              ctrl.username = userInfo.getUsername();
+            });
+
+            var dashboardDataPromise = (
+              LearnerDashboardBackendApiService.fetchLearnerDashboardData());
+            dashboardDataPromise.then(
+              function(responseData) {
+                ctrl.isCurrentExpSortDescending = true;
+                ctrl.isCurrentSubscriptionSortDescending = true;
+                ctrl.isCurrentFeedbackSortDescending = true;
+                ctrl.currentExpSortType = (
+                  EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key);
+                ctrl.currentSubscribersSortType = (
+                  SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.USERNAME.key);
+                ctrl.currentFeedbackThreadsSortType = (
+                  FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS.LAST_UPDATED.key);
+                ctrl.startIncompleteExpIndex = 0;
+                ctrl.startCompletedExpIndex = 0;
+                ctrl.startIncompleteCollectionIndex = 0;
+                ctrl.startCompletedCollectionIndex = 0;
+                ctrl.completedExplorationsList = (
+                  responseData.completed_explorations_list
+                );
+                ctrl.completedCollectionsList = (
+                  responseData.completed_collections_list
+                );
+                ctrl.incompleteExplorationsList = (
+                  responseData.incomplete_explorations_list
+                );
+                ctrl.incompleteCollectionsList = (
+                  responseData.incomplete_collections_list
+                );
+                ctrl.subscriptionsList = (
+                  responseData.subscription_list
+                );
+                ctrl.numberNonexistentIncompleteExplorations = (
+                  responseData.number_of_nonexistent_activities
+                    .incomplete_explorations
+                );
+                ctrl.numberNonexistentIncompleteCollections = (
+                  responseData.number_of_nonexistent_activities
+                    .incomplete_collections
+                );
+                ctrl.numberNonexistentCompletedExplorations = (
+                  responseData.number_of_nonexistent_activities
+                    .completed_explorations
+                );
+                ctrl.numberNonexistentCompletedCollections = (
+                  responseData.number_of_nonexistent_activities
+                    .completed_collections
+                );
+                ctrl.numberNonexistentExplorationsFromPlaylist = (
+                  responseData.number_of_nonexistent_activities
+                    .exploration_playlist
+                );
+                ctrl.numberNonexistentCollectionsFromPlaylist = (
+                  responseData.number_of_nonexistent_activities
+                    .collection_playlist
+                );
+                ctrl.completedToIncompleteCollections = (
+                  responseData.completed_to_incomplete_collections
+                );
+                var threadSummaryDicts = responseData.thread_summaries;
+                ctrl.threadSummaries = [];
+                for (
+                  var index = 0; index < threadSummaryDicts.length; index++) {
+                  ctrl.threadSummaries.push(
+                    FeedbackThreadSummaryObjectFactory.createFromBackendDict(
+                      threadSummaryDicts[index]));
+                }
+                ctrl.numberOfUnreadThreads =
+                  responseData.number_of_unread_threads;
+                ctrl.explorationPlaylist = responseData.exploration_playlist;
+                ctrl.collectionPlaylist = responseData.collection_playlist;
+                ctrl.activeSection =
+                  LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE;
+                ctrl.activeSubsection = (
+                  LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS);
+                ctrl.feedbackThreadActive = false;
+
+                ctrl.noExplorationActivity = (
+                  (ctrl.completedExplorationsList.length === 0) &&
+                    (ctrl.incompleteExplorationsList.length === 0));
+                ctrl.noCollectionActivity = (
+                  (ctrl.completedCollectionsList.length === 0) &&
+                    (ctrl.incompleteCollectionsList.length === 0));
+                ctrl.noActivity = (
+                  (ctrl.noExplorationActivity) && (ctrl.noCollectionActivity) &&
+                  (ctrl.explorationPlaylist.length === 0) &&
+                  (ctrl.collectionPlaylist.length === 0));
+              },
+              function(errorResponse) {
+                if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                  AlertsService.addWarning(
+                    'Failed to get learner dashboard data');
+                }
+              }
+            );
+
+            $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
+              $rootScope.loadingMessage = '';
+            });
+
+            ctrl.loadingFeedbacks = false;
+
+            ctrl.newMessage = {
+              text: ''
+            };
+
+            ctrl.collectionPlaylistSortableOptions = getPlaylistSortableOptions(
+              ACTIVITY_TYPE_COLLECTION);
+            ctrl.explorationPlaylistSortableOptions = (
+              getPlaylistSortableOptions(ACTIVITY_TYPE_EXPLORATION));
           };
         }
       ]};

@@ -34,38 +34,40 @@ angular.module('oppia').directive('listOfTabsEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'dict',
-            properties: [{
-              name: 'title',
-              description: 'Tab title',
-              schema: {
-                type: 'unicode',
-                validators: [{
-                  id: 'is_nonempty'
-                }]
-              }
-            }, {
-              name: 'content',
-              description: 'Tab content',
-              schema: {
-                type: 'html',
-                ui_config: {
-                  hide_complex_extensions: true
+        ctrl.$onInit = function() {
+          ctrl.SCHEMA = {
+            type: 'list',
+            items: {
+              type: 'dict',
+              properties: [{
+                name: 'title',
+                description: 'Tab title',
+                schema: {
+                  type: 'unicode',
+                  validators: [{
+                    id: 'is_nonempty'
+                  }]
                 }
-              }
-            }]
-          },
-          ui_config: {
-            add_element_text: 'Add new tab'
+              }, {
+                name: 'content',
+                description: 'Tab content',
+                schema: {
+                  type: 'html',
+                  ui_config: {
+                    hide_complex_extensions: true
+                  }
+                }
+              }]
+            },
+            ui_config: {
+              add_element_text: 'Add new tab'
+            }
+          };
+
+          if (!ctrl.value) {
+            ctrl.value = [];
           }
         };
-
-        if (!ctrl.value) {
-          ctrl.value = [];
-        }
       }]
     };
   }]);

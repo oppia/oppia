@@ -56,9 +56,6 @@ angular.module('oppia').directive('reviewTestPage', [
             REVIEW_TESTS_URL, STORY_VIEWER_PAGE
         ) {
           var ctrl = this;
-          ctrl.storyId = UrlService.getStoryIdFromUrl();
-          ctrl.questionPlayerConfig = null;
-
           var _fetchSkillDetails = function() {
             var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
               REVIEW_TEST_DATA_URL, {
@@ -113,7 +110,11 @@ angular.module('oppia').directive('reviewTestPage', [
                 ctrl.questionPlayerConfig = questionPlayerConfig;
               });
           };
-          _fetchSkillDetails();
+          ctrl.$onInit = function() {
+            ctrl.storyId = UrlService.getStoryIdFromUrl();
+            ctrl.questionPlayerConfig = null;
+            _fetchSkillDetails();
+          };
         }
       ]
     };

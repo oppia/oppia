@@ -136636,7 +136636,7 @@ angular.module('ui.include',[])
           var fragment = scope.$eval(fragExp);
 
           if (src) {
-            $http.get(src, {cache: $templateCache}).success(function(response) {
+            $http.get(src, {cache: $templateCache}).then(function(response) {
               if (thisChangeId !== changeCounter) { return; }
 
               if (childScope) { childScope.$destroy(); }
@@ -136658,7 +136658,7 @@ angular.module('ui.include',[])
 
               childScope.$emit('$includeContentLoaded');
               scope.$eval(onloadExp);
-            }).error(function() {
+            }, function() {
               if (thisChangeId === changeCounter) { clearContent(); }
             });
           } else { clearContent(); }

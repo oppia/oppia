@@ -72,21 +72,6 @@ angular.module('oppia').directive('questionEditor', [
             INTERACTION_SPECS, StateEditorService, ResponsesService,
             SolutionValidityService, QuestionUpdateService) {
           var ctrl = this;
-          if (ctrl.canEditQuestion()) {
-            EditabilityService.markEditable();
-          } else {
-            EditabilityService.markNotEditable();
-          }
-          StateEditorService.setActiveStateName('question');
-          StateEditorService.setMisconceptionsBySkill(
-            ctrl.getMisconceptionsBySkill());
-          ctrl.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/avatar/oppia_avatar_100px.svg');
-
-          ctrl.interactionIsShown = false;
-
-          ctrl.stateEditorInitialized = false;
-
           ctrl.getStateContentPlaceholder = function() {
             return (
               'You can speak to the learner here, then ask them a question.');
@@ -207,23 +192,43 @@ angular.module('oppia').directive('questionEditor', [
                   writtenTranslations.markAllTranslationsAsNeedingUpdate(
                     contentId);
                 });
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             }
           };
 
-          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
-            _init();
-          });
+          ctrl.$onInit = function() {
+            $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+              _init();
+            });
 
-          $scope.$on('interactionEditorInitialized', function(evt) {
-            _init();
-          });
+            $scope.$on('interactionEditorInitialized', function(evt) {
+              _init();
+            });
 
-          $scope.$on('onInteractionIdChanged', function(evt) {
-            _init();
-          });
+            $scope.$on('onInteractionIdChanged', function(evt) {
+              _init();
+            });
+            if (ctrl.canEditQuestion()) {
+              EditabilityService.markEditable();
+            } else {
+              EditabilityService.markNotEditable();
+            }
+            StateEditorService.setActiveStateName('question');
+            StateEditorService.setMisconceptionsBySkill(
+              ctrl.getMisconceptionsBySkill());
+            ctrl.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/avatar/oppia_avatar_100px.svg');
 
-          _init();
+            ctrl.interactionIsShown = false;
+
+            ctrl.stateEditorInitialized = false;
+            // The _init function is written separately since it is also called
+            // in $scope.$on when some external events are triggered.
+            _init();
+          };
         }
       ]
     };

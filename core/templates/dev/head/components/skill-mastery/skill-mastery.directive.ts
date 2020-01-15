@@ -38,13 +38,6 @@ angular.module('oppia').directive('skillMasteryViewer', [
             $scope, SkillMasteryBackendApiService,
             MASTERY_CUTOFF) {
           var ctrl = this;
-          ctrl.skillMasteryDegree = 0.0;
-
-          SkillMasteryBackendApiService.fetchSkillMasteryDegrees(
-            [ctrl.skillId]).then(function(degreesOfMastery) {
-            ctrl.skillMasteryDegree = degreesOfMastery[ctrl.skillId];
-          });
-
           ctrl.getSkillMasteryPercentage = function() {
             return Math.round(ctrl.skillMasteryDegree * 100);
           };
@@ -71,6 +64,14 @@ angular.module('oppia').directive('skillMasteryViewer', [
                   'To improve it, try reviewing the concept card below and ' +
                   'then practicing more questions for the skill.';
             }
+          };
+          ctrl.$onInit = function() {
+            ctrl.skillMasteryDegree = 0.0;
+
+            SkillMasteryBackendApiService.fetchSkillMasteryDegrees(
+              [ctrl.skillId]).then(function(degreesOfMastery) {
+              ctrl.skillMasteryDegree = degreesOfMastery[ctrl.skillId];
+            });
           };
         }
       ]

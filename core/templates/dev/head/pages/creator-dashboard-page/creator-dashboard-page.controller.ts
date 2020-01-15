@@ -96,140 +96,6 @@ angular.module('oppia').directive('creatorDashboardPage', [
 
           var userDashboardDisplayPreference =
             ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS.CARD;
-
-          ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
-          ctrl.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
-          ctrl.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
-          ctrl.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
-            HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS);
-          ctrl.SUBSCRIPTION_SORT_BY_KEYS = SUBSCRIPTION_SORT_BY_KEYS;
-          ctrl.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = (
-            HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
-          ctrl.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
-            DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
-
-          ctrl.canCreateCollections = null;
-          $rootScope.loadingMessage = 'Loading';
-          var userInfoPromise = UserService.getUserInfoAsync();
-          userInfoPromise.then(function(userInfo) {
-            ctrl.canCreateCollections = userInfo.canCreateCollections();
-          });
-
-          var dashboardDataPromise = (
-            CreatorDashboardBackendApiService.fetchDashboardData());
-          dashboardDataPromise.then(
-            function(response) {
-              // The following condition is required for Karma testing. The
-              // Angular HttpClient returns an Observable which when converted
-              // to a promise does not have the 'data' key but the AngularJS
-              // mocks of services using HttpClient use $http which return
-              // promise and the content is contained in the 'data' key.
-              // Therefore the following condition checks for presence of
-              // 'response.data' which would be the case in AngularJS testing
-              // but assigns 'response' if the former is not present which is
-              // the case with HttpClient.
-              var responseData = response.data ? response.data : response;
-              ctrl.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
-              ctrl.currentSubscribersSortType =
-                SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
-              ctrl.isCurrentSortDescending = true;
-              ctrl.isCurrentSubscriptionSortDescending = true;
-              ctrl.explorationsList = responseData.explorations_list;
-              ctrl.collectionsList = responseData.collections_list;
-              ctrl.subscribersList = responseData.subscribers_list;
-              ctrl.dashboardStats = responseData.dashboard_stats;
-              ctrl.lastWeekStats = responseData.last_week_stats;
-              ctrl.myExplorationsView = responseData.display_preference;
-              var numberOfCreatedSuggestions = (
-                responseData.threads_for_created_suggestions_list.length);
-              var numberOfSuggestionsToReview = (
-                responseData.threads_for_suggestions_to_review_list.length);
-              ctrl.mySuggestionsList = [];
-              for (var i = 0; i < numberOfCreatedSuggestions; i++) {
-                if (responseData.created_suggestions_list.length !==
-                    numberOfCreatedSuggestions) {
-                  $log.error('Number of suggestions does not match number of ' +
-                            'suggestion threads');
-                }
-                for (var j = 0; j < numberOfCreatedSuggestions; j++) {
-                  var suggestion = SuggestionObjectFactory
-                    .createFromBackendDict(
-                      responseData.created_suggestions_list[j]);
-                  var threadDict = (
-                    responseData.threads_for_created_suggestions_list[i]);
-                  if (threadDict.thread_id === suggestion.getThreadId()) {
-                    var suggestionThread = (
-                      SuggestionThreadObjectFactory.createFromBackendDicts(
-                        threadDict, responseData.created_suggestions_list[j]));
-                    ctrl.mySuggestionsList.push(suggestionThread);
-                  }
-                }
-              }
-              ctrl.suggestionsToReviewList = [];
-              for (var i = 0; i < numberOfSuggestionsToReview; i++) {
-                if (responseData.suggestions_to_review_list.length !==
-                    numberOfSuggestionsToReview) {
-                  $log.error('Number of suggestions does not match number of ' +
-                            'suggestion threads');
-                }
-                for (var j = 0; j < numberOfSuggestionsToReview; j++) {
-                  var suggestion = SuggestionObjectFactory
-                    .createFromBackendDict(
-                      responseData.suggestions_to_review_list[j]);
-                  var threadDict = (
-                    responseData.threads_for_suggestions_to_review_list[i]);
-                  if (threadDict.thread_id === suggestion.getThreadId()) {
-                    var suggestionThread = (
-                      SuggestionThreadObjectFactory.createFromBackendDicts(
-                        threadDict,
-                        responseData.suggestions_to_review_list[j]));
-                    ctrl.suggestionsToReviewList.push(suggestionThread);
-                  }
-                }
-              }
-
-              if (ctrl.dashboardStats && ctrl.lastWeekStats) {
-                ctrl.relativeChangeInTotalPlays = (
-                  ctrl.dashboardStats.total_plays - (
-                    ctrl.lastWeekStats.total_plays)
-                );
-              }
-
-              if (ctrl.explorationsList.length === 0 &&
-                ctrl.collectionsList.length > 0) {
-                ctrl.activeTab = 'myCollections';
-              } else if (ctrl.explorationsList.length === 0 && (
-                ctrl.mySuggestionsList.length > 0 ||
-                ctrl.suggestionsToReviewList.length > 0)) {
-                ctrl.activeTab = 'suggestions';
-              } else {
-                ctrl.activeTab = 'myExplorations';
-              }
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get dashboard data');
-              }
-            }
-          );
-
-          $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
-            $rootScope.loadingMessage = '';
-          });
-
-          ctrl.getAverageRating = RatingComputationService
-            .computeAverageRating;
-          ctrl.createNewExploration = (
-            ExplorationCreationService.createNewExploration);
-          ctrl.getLocaleAbbreviatedDatetimeString = (
-            DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-          ctrl.getHumanReadableStatus = (
-            ThreadStatusDisplayService.getHumanReadableStatus);
-
-          ctrl.emptyDashboardImgUrl = UrlInterpolationService
-            .getStaticImageUrl('/general/empty_dashboard.svg');
-          ctrl.canReviewActiveThread = null;
-
           ctrl.setActiveTab = function(newActiveTabName) {
             ctrl.activeTab = newActiveTabName;
           };
@@ -282,12 +148,6 @@ angular.module('oppia').directive('creatorDashboardPage', [
               ctrl.publishText = EXP_PUBLISH_TEXTS.defaultText;
             }
           };
-
-          ctrl.updatesGivenScreenWidth();
-          angular.element($window).bind('resize', function() {
-            ctrl.updatesGivenScreenWidth();
-          });
-
           ctrl.setExplorationsSortingOptions = function(sortType) {
             if (sortType === ctrl.currentSortType) {
               ctrl.isCurrentSortDescending = !ctrl.isCurrentSortDescending;
@@ -388,6 +248,145 @@ angular.module('oppia').directive('creatorDashboardPage', [
 
           ctrl.getCompleteThumbnailIconUrl = function(iconUrl) {
             return UrlInterpolationService.getStaticImageUrl(iconUrl);
+          };
+          ctrl.$onInit = function() {
+            ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
+            ctrl.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
+            ctrl.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
+            ctrl.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
+              HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS);
+            ctrl.SUBSCRIPTION_SORT_BY_KEYS = SUBSCRIPTION_SORT_BY_KEYS;
+            ctrl.HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS = (
+              HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
+            ctrl.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
+              DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR);
+
+            ctrl.canCreateCollections = null;
+            $rootScope.loadingMessage = 'Loading';
+            var userInfoPromise = UserService.getUserInfoAsync();
+            userInfoPromise.then(function(userInfo) {
+              ctrl.canCreateCollections = userInfo.canCreateCollections();
+            });
+
+            var dashboardDataPromise = (
+              CreatorDashboardBackendApiService.fetchDashboardData());
+            dashboardDataPromise.then(
+              function(response) {
+                // The following condition is required for Karma testing. The
+                // Angular HttpClient returns an Observable which when converted
+                // to a promise does not have the 'data' key but the AngularJS
+                // mocks of services using HttpClient use $http which return
+                // promise and the content is contained in the 'data' key.
+                // Therefore the following condition checks for presence of
+                // 'response.data' which would be the case in AngularJS testing
+                // but assigns 'response' if the former is not present which is
+                // the case with HttpClient.
+                var responseData = response.data ? response.data : response;
+                ctrl.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
+                ctrl.currentSubscribersSortType =
+                  SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
+                ctrl.isCurrentSortDescending = true;
+                ctrl.isCurrentSubscriptionSortDescending = true;
+                ctrl.explorationsList = responseData.explorations_list;
+                ctrl.collectionsList = responseData.collections_list;
+                ctrl.subscribersList = responseData.subscribers_list;
+                ctrl.dashboardStats = responseData.dashboard_stats;
+                ctrl.lastWeekStats = responseData.last_week_stats;
+                ctrl.myExplorationsView = responseData.display_preference;
+                var numberOfCreatedSuggestions = (
+                  responseData.threads_for_created_suggestions_list.length);
+                var numberOfSuggestionsToReview = (
+                  responseData.threads_for_suggestions_to_review_list.length);
+                ctrl.mySuggestionsList = [];
+                for (var i = 0; i < numberOfCreatedSuggestions; i++) {
+                  if (responseData.created_suggestions_list.length !==
+                      numberOfCreatedSuggestions) {
+                    $log.error('Number of suggestions does not match number' +
+                              'of suggestion threads');
+                  }
+                  for (var j = 0; j < numberOfCreatedSuggestions; j++) {
+                    var suggestion = SuggestionObjectFactory
+                      .createFromBackendDict(
+                        responseData.created_suggestions_list[j]);
+                    var threadDict = (
+                      responseData.threads_for_created_suggestions_list[i]);
+                    if (threadDict.thread_id === suggestion.getThreadId()) {
+                      var suggestionThread = (
+                        SuggestionThreadObjectFactory.createFromBackendDicts(
+                          threadDict,
+                          responseData.created_suggestions_list[j]));
+                      ctrl.mySuggestionsList.push(suggestionThread);
+                    }
+                  }
+                }
+                ctrl.suggestionsToReviewList = [];
+                for (var i = 0; i < numberOfSuggestionsToReview; i++) {
+                  if (responseData.suggestions_to_review_list.length !==
+                      numberOfSuggestionsToReview) {
+                    $log.error('Number of suggestions does not match number' +
+                              'of suggestion threads');
+                  }
+                  for (var j = 0; j < numberOfSuggestionsToReview; j++) {
+                    var suggestion = SuggestionObjectFactory
+                      .createFromBackendDict(
+                        responseData.suggestions_to_review_list[j]);
+                    var threadDict = (
+                      responseData.threads_for_suggestions_to_review_list[i]);
+                    if (threadDict.thread_id === suggestion.getThreadId()) {
+                      var suggestionThread = (
+                        SuggestionThreadObjectFactory.createFromBackendDicts(
+                          threadDict,
+                          responseData.suggestions_to_review_list[j]));
+                      ctrl.suggestionsToReviewList.push(suggestionThread);
+                    }
+                  }
+                }
+
+                if (ctrl.dashboardStats && ctrl.lastWeekStats) {
+                  ctrl.relativeChangeInTotalPlays = (
+                    ctrl.dashboardStats.total_plays - (
+                      ctrl.lastWeekStats.total_plays)
+                  );
+                }
+
+                if (ctrl.explorationsList.length === 0 &&
+                  ctrl.collectionsList.length > 0) {
+                  ctrl.activeTab = 'myCollections';
+                } else if (ctrl.explorationsList.length === 0 && (
+                  ctrl.mySuggestionsList.length > 0 ||
+                  ctrl.suggestionsToReviewList.length > 0)) {
+                  ctrl.activeTab = 'suggestions';
+                } else {
+                  ctrl.activeTab = 'myExplorations';
+                }
+              },
+              function(errorResponse) {
+                if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                  AlertsService.addWarning('Failed to get dashboard data');
+                }
+              }
+            );
+
+            $q.all([userInfoPromise, dashboardDataPromise]).then(function() {
+              $rootScope.loadingMessage = '';
+            });
+
+            ctrl.getAverageRating = RatingComputationService
+              .computeAverageRating;
+            ctrl.createNewExploration = (
+              ExplorationCreationService.createNewExploration);
+            ctrl.getLocaleAbbreviatedDatetimeString = (
+              DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
+            ctrl.getHumanReadableStatus = (
+              ThreadStatusDisplayService.getHumanReadableStatus);
+
+            ctrl.emptyDashboardImgUrl = UrlInterpolationService
+              .getStaticImageUrl('/general/empty_dashboard.svg');
+            ctrl.canReviewActiveThread = null;
+            ctrl.updatesGivenScreenWidth();
+            angular.element($window).bind('resize', function() {
+              ctrl.updatesGivenScreenWidth();
+            });
           };
         }
       ]

@@ -118,33 +118,6 @@ angular.module('oppia').directive('settingsTab', [
             CATEGORIES_TO_COLORS, DEFAULT_CATEGORY_ICON, DEFAULT_COLOR,
             EXPLORATION_TITLE_INPUT_FOCUS_LABEL, TAG_REGEX) {
           var ctrl = this;
-          ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
-            EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
-          ctrl.EditabilityService = EditabilityService;
-          ctrl.CATEGORY_LIST_FOR_SELECT2 = [];
-          for (var i = 0; i < ALL_CATEGORIES.length; i++) {
-            ctrl.CATEGORY_LIST_FOR_SELECT2.push({
-              id: ALL_CATEGORIES[i],
-              text: ALL_CATEGORIES[i]
-            });
-          }
-
-          ctrl.isRolesFormOpen = false;
-
-          ctrl.TAG_REGEX = TAG_REGEX;
-          ctrl.canDelete = false;
-          ctrl.canModifyRoles = false;
-          ctrl.canReleaseOwnership = false;
-          ctrl.canUnpublish = false;
-          ctrl.explorationId = ExplorationDataService.explorationId;
-
-          UserExplorationPermissionsService.getPermissionsAsync()
-            .then(function(permissions) {
-              ctrl.canDelete = permissions.can_delete;
-              ctrl.canModifyRoles = permissions.can_modify_roles;
-              ctrl.canReleaseOwnership = permissions.can_release_ownership;
-              ctrl.canUnpublish = permissions.can_unpublish;
-            });
 
           var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
           var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -153,24 +126,6 @@ angular.module('oppia').directive('settingsTab', [
             return (
               window.location.protocol + '//' + window.location.host +
               EXPLORE_PAGE_PREFIX + ctrl.explorationId);
-          };
-
-          ctrl.initSettingsTab = function() {
-            ctrl.explorationTitleService = ExplorationTitleService;
-            ctrl.explorationCategoryService = ExplorationCategoryService;
-            ctrl.explorationObjectiveService = ExplorationObjectiveService;
-            ctrl.explorationLanguageCodeService = (
-              ExplorationLanguageCodeService);
-            ctrl.explorationTagsService = ExplorationTagsService;
-            ctrl.ExplorationRightsService = ExplorationRightsService;
-            ctrl.explorationInitStateNameService = (
-              ExplorationInitStateNameService);
-            ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
-            ctrl.explorationParamChangesService = (
-              ExplorationParamChangesService);
-            ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
-
-            ctrl.refreshSettingsTab();
           };
 
           ctrl.refreshSettingsTab = function() {
@@ -203,30 +158,6 @@ angular.module('oppia').directive('settingsTab', [
               }
               ctrl.hasPageLoaded = true;
             });
-          };
-
-          $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
-
-          ctrl.initSettingsTab();
-
-          ctrl.ROLES = [{
-            name: 'Manager (can edit permissions)',
-            value: 'owner'
-          }, {
-            name: 'Collaborator (can make changes)',
-            value: 'editor'
-          }, {
-            name: 'Voice Artist (can do voiceover)',
-            value: 'voice artist'
-          }, {
-            name: 'Playtester (can give feedback)',
-            value: 'viewer'
-          }];
-
-          ctrl.formStyle = {
-            display: 'table-cell',
-            width: '16.66666667%',
-            'vertical-align': 'top'
           };
 
           ctrl.saveExplorationTitle = function() {
@@ -269,21 +200,28 @@ angular.module('oppia').directive('settingsTab', [
           };
 
           // Methods for enabling advanced features.
-          ctrl.areParametersEnabled =
-            ExplorationFeaturesService.areParametersEnabled;
-          ctrl.enableParameters = ExplorationFeaturesService.enableParameters;
+          ctrl.areParametersEnabled = function() {
+            return ExplorationFeaturesService.areParametersEnabled();
+          };
+          ctrl.enableParameters = function() {
+            ExplorationFeaturesService.enableParameters();
+          };
 
-          ctrl.isAutomaticTextToSpeechEnabled = (
-            ExplorationAutomaticTextToSpeechService
-              .isAutomaticTextToSpeechEnabled);
-          ctrl.toggleAutomaticTextToSpeech = (
-            ExplorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech
-          );
+          ctrl.isAutomaticTextToSpeechEnabled = function() {
+            return ExplorationAutomaticTextToSpeechService
+              .isAutomaticTextToSpeechEnabled();
+          };
+          ctrl.toggleAutomaticTextToSpeech = function() {
+            return ExplorationAutomaticTextToSpeechService
+              .toggleAutomaticTextToSpeech();
+          };
 
-          ctrl.isCorrectnessFeedbackEnabled = (
-            ExplorationCorrectnessFeedbackService.isEnabled);
-          ctrl.toggleCorrectnessFeedback = (
-            ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
+          ctrl.isCorrectnessFeedbackEnabled = function() {
+            return ExplorationCorrectnessFeedbackService.isEnabled();
+          };
+          ctrl.toggleCorrectnessFeedback = function() {
+            ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback();
+          };
 
           // Methods for rights management.
           ctrl.openEditRolesForm = function() {
@@ -374,6 +312,10 @@ angular.module('oppia').directive('settingsTab', [
                   };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // Promise is returned by getCurrentUrl which is handled here.
+              // No further action is needed.
             });
           };
 
@@ -424,6 +366,10 @@ angular.module('oppia').directive('settingsTab', [
                 ctrl.explorationId).then(function() {
                 $window.location = CREATOR_DASHBOARD_PAGE_URL;
               });
+            }, function() {
+              // Note to developers:
+              // Promise is returned by uimodal which is handled here.
+              // No further action is needed.
             });
           };
 
@@ -494,6 +440,73 @@ angular.module('oppia').directive('settingsTab', [
 
           ctrl.isTitlePresent = function() {
             return ExplorationTitleService.savedMemento.length > 0;
+          };
+
+          ctrl.$onInit = function() {
+            $scope.$on('refreshSettingsTab', ctrl.refreshSettingsTab);
+            ctrl.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
+              EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+            ctrl.EditabilityService = EditabilityService;
+            ctrl.CATEGORY_LIST_FOR_SELECT2 = [];
+            for (var i = 0; i < ALL_CATEGORIES.length; i++) {
+              ctrl.CATEGORY_LIST_FOR_SELECT2.push({
+                id: ALL_CATEGORIES[i],
+                text: ALL_CATEGORIES[i]
+              });
+            }
+
+            ctrl.isRolesFormOpen = false;
+
+            ctrl.TAG_REGEX = TAG_REGEX;
+            ctrl.canDelete = false;
+            ctrl.canModifyRoles = false;
+            ctrl.canReleaseOwnership = false;
+            ctrl.canUnpublish = false;
+            ctrl.explorationId = ExplorationDataService.explorationId;
+
+            UserExplorationPermissionsService.getPermissionsAsync()
+              .then(function(permissions) {
+                ctrl.canDelete = permissions.can_delete;
+                ctrl.canModifyRoles = permissions.can_modify_roles;
+                ctrl.canReleaseOwnership = permissions.can_release_ownership;
+                ctrl.canUnpublish = permissions.can_unpublish;
+              });
+
+            ctrl.explorationTitleService = ExplorationTitleService;
+            ctrl.explorationCategoryService = ExplorationCategoryService;
+            ctrl.explorationObjectiveService = ExplorationObjectiveService;
+            ctrl.explorationLanguageCodeService = (
+              ExplorationLanguageCodeService);
+            ctrl.explorationTagsService = ExplorationTagsService;
+            ctrl.ExplorationRightsService = ExplorationRightsService;
+            ctrl.explorationInitStateNameService = (
+              ExplorationInitStateNameService);
+            ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
+            ctrl.explorationParamChangesService = (
+              ExplorationParamChangesService);
+            ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
+
+            ctrl.refreshSettingsTab();
+
+            ctrl.ROLES = [{
+              name: 'Manager (can edit permissions)',
+              value: 'owner'
+            }, {
+              name: 'Collaborator (can make changes)',
+              value: 'editor'
+            }, {
+              name: 'Voice Artist (can do voiceover)',
+              value: 'voice artist'
+            }, {
+              name: 'Playtester (can give feedback)',
+              value: 'viewer'
+            }];
+
+            ctrl.formStyle = JSON.stringify({
+              display: 'table-cell',
+              width: '16.66666667%',
+              'vertical-align': 'top'
+            });
           };
         }
       ]};

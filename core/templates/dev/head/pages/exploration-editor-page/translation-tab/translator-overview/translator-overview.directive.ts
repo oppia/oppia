@@ -40,16 +40,17 @@ angular.module('oppia').directive('translatorOverview', [
         '/pages/exploration-editor-page/translation-tab/translator-overview/' +
         'translator-overview.directive.html'),
       controller: [
-        '$rootScope', '$scope', '$timeout', '$window',
+        '$rootScope', '$scope', '$window',
         'ExplorationLanguageCodeService', 'LanguageUtilService',
         'TranslationLanguageService', 'TranslationStatusService',
         'TranslationTabActiveModeService', 'DEFAULT_AUDIO_LANGUAGE',
         'SUPPORTED_AUDIO_LANGUAGES', function(
-            $rootScope, $scope, $timeout, $window,
+            $rootScope, $scope, $window,
             ExplorationLanguageCodeService, LanguageUtilService,
             TranslationLanguageService, TranslationStatusService,
             TranslationTabActiveModeService, DEFAULT_AUDIO_LANGUAGE,
             SUPPORTED_AUDIO_LANGUAGES) {
+          var ctrl = this;
           var LAST_SELECTED_TRANSLATION_LANGUAGE = (
             'last_selected_translation_lang');
           var prevLanguageCode = $window.localStorage.getItem(
@@ -57,19 +58,6 @@ angular.module('oppia').directive('translatorOverview', [
           var allAudioLanguageCodes = LanguageUtilService
             .getAllVoiceoverLanguageCodes();
 
-          $scope.VOICEOVER_MODE = 'Voiceover';
-          $scope.TRANSLATION_MODE = 'Translate';
-
-          $scope.languageCode =
-            allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
-              prevLanguageCode : DEFAULT_AUDIO_LANGUAGE;
-          TranslationLanguageService.setActiveLanguageCode(
-            $scope.languageCode);
-          // We need to refresh the status service once the active language is
-          // set.
-          TranslationStatusService.refresh();
-          $scope.inTranslationMode = false;
-          $scope.inVoiceoverMode = false;
           $scope.canShowTabModeSwitcher = function() {
             return ($scope.languageCode !== (
               ExplorationLanguageCodeService.displayed));
@@ -152,7 +140,22 @@ angular.module('oppia').directive('translatorOverview', [
             }
           };
 
-          refreshDirectiveScope();
+          ctrl.$onInit = function() {
+            $scope.VOICEOVER_MODE = 'Voiceover';
+            $scope.TRANSLATION_MODE = 'Translate';
+
+            $scope.languageCode =
+              allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
+                prevLanguageCode : DEFAULT_AUDIO_LANGUAGE;
+            TranslationLanguageService.setActiveLanguageCode(
+              $scope.languageCode);
+            // We need to refresh the status service once the active language is
+            // set.
+            TranslationStatusService.refresh();
+            $scope.inTranslationMode = false;
+            $scope.inVoiceoverMode = false;
+            refreshDirectiveScope();
+          };
         }
       ]
     };
