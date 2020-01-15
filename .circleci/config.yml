@@ -97,26 +97,13 @@ jobs:
       - run:
           name: Run frontend tests
           command: |
-            python -m scripts.run_frontend_tests --run_minified_tests --skip_install
+            python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
       - run:
           name: Generate frontend coverage report
           command: |
             sudo pip install codecov
             codecov --file ../karma_coverage_reports/lcov.info -F frontend
           when: on_success
-
-  frontend_test_coverage:
-    <<: *job_defaults
-    steps:
-      - checkout
-      - attach_workspace: 
-          at: /home/circleci/ 
-      - run: 
-          <<: *install_dependencies 
-      - run:
-          name: Check frontend test coverage
-          command: |
-            python -m scripts.run_frontend_tests --run_minified_tests --skip_install --check_coverage
 
   backend_tests:
     <<: *job_defaults
