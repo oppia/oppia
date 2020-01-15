@@ -618,7 +618,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.save_new_skill(
-            self.SKILL_ID, self.admin_id, self.SKILL_DESCRIPTION)
+            self.SKILL_ID, self.admin_id, description=self.SKILL_DESCRIPTION)
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
                 'default_state').to_dict(),
@@ -700,7 +700,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 question_services.get_displayable_question_skill_link_details(
                     1, [self.SKILL_ID], ''))
         self.assertEqual(len(questions), 1)
-        self.assertEqual(questions[0].creator_id, self.author_id)
         self.assertEqual(
             merged_question_skill_links[0].skill_descriptions,
             [self.SKILL_DESCRIPTION])
@@ -730,7 +729,8 @@ class SkillSuggestionTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Description')
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Description')
 
         self.question_dict = {
             'question_state_data': self._create_valid_question_data(
@@ -1008,8 +1008,12 @@ class UserSubmittedSuggestionsHandlerTest(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         self.rubric_dicts = [rubric.to_dict() for rubric in self.rubrics]
         self.save_new_skill(
+<<<<<<< HEAD
             self.SKILL_ID, self.owner_id, self.SKILL_DESCRIPTION,
             rubrics=self.rubrics)
+=======
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
+>>>>>>> upstream/develop
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1185,7 +1189,7 @@ class ReviewableSuggestionsHandlerTest(test_utils.GenericTestBase):
             })], 'Changes.')
 
         self.save_new_skill(
-            self.SKILL_ID, self.owner_id, self.SKILL_DESCRIPTION)
+            self.SKILL_ID, self.owner_id, description=self.SKILL_DESCRIPTION)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)

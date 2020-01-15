@@ -52,6 +52,12 @@ export class LearnerAnswerDetails {
   getLearnerAnswerInfoData(): LearnerAnswerInfo[] {
     return this.learnerAnswerInfoData;
   }
+
+  getLastUpdatedTime(): number {
+    var createdOnValues =
+      this.learnerAnswerInfoData.map(info => info.getCreatedOn());
+    return Math.max(...createdOnValues);
+  }
 }
 
 @Injectable({

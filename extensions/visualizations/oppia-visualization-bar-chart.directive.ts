@@ -32,34 +32,36 @@ angular.module('oppia').directive('oppiaVisualizationBarChart', [function() {
       '$attrs', '$element', 'HtmlEscaperService',
       function($attrs, $element, HtmlEscaperService) {
         var ctrl = this;
-        ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-        ctrl.options =
-          HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
+        ctrl.$onInit = function() {
+          ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+          ctrl.options =
+            HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
 
-        var dataArray = [['Answers', '']];
-        for (var i = 0; i < ctrl.data.length; i++) {
-          dataArray.push([
-            String(ctrl.data[i].answer), ctrl.data[i].frequency]);
-        }
-
-        var data = google.visualization.arrayToDataTable(dataArray);
-
-        var options = {
-          chartArea: {
-            width: '60%'
-          },
-          hAxis: {
-            title: 'Number of times answer was submitted',
-            minValue: 0
-          },
-          legend: null,
-          vAxis: {
-            title: 'Answer choice'
+          var dataArray = [['Answers', '']];
+          for (var i = 0; i < ctrl.data.length; i++) {
+            dataArray.push([
+              String(ctrl.data[i].answer), ctrl.data[i].frequency]);
           }
-        };
 
-        var chart = new google.visualization.BarChart($element[0]);
-        chart.draw(data, options);
+          var data = google.visualization.arrayToDataTable(dataArray);
+
+          var options = {
+            chartArea: {
+              width: '60%'
+            },
+            hAxis: {
+              title: 'Number of times answer was submitted',
+              minValue: 0
+            },
+            legend: null,
+            vAxis: {
+              title: 'Answer choice'
+            }
+          };
+
+          var chart = new google.visualization.BarChart($element[0]);
+          chart.draw(data, options);
+        };
       }
     ]
   };

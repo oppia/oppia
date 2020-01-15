@@ -54,36 +54,16 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
     browser.getCurrentUrl().then(function(url) {
       topicId = url.split('/')[4];
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 
   beforeEach(function() {
     users.login('creator@topicEditor.com');
     topicEditorPage.get(topicId);
-  });
-
-  it('should edit topic name, abbreviated topic name, ' +
-    'thumbnail and description correctly', function() {
-    topicEditorPage.changeTopicName('Topic 1 edited');
-    expect(topicEditorPage.getTopicThumbnailSource())
-      .not
-      .toEqual(
-        topicEditorPage.submitTopicThumbnail('../data/img.png')
-          .then(function() {
-            return topicEditorPage.getTopicThumbnailSource();
-          })
-      );
-    topicEditorPage.changeAbbreviatedTopicName('short name');
-    topicEditorPage.changeTopicDescription('Topic Description');
-    topicEditorPage.saveTopic('Changed topic name and description.');
-
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectTopicNameToBe('Topic 1 edited', 0);
-
-    topicEditorPage.get(topicId);
-    topicEditorPage.expectTopicNameToBe('Topic 1 edited');
-    topicEditorPage.expectAbbreviatedTopicNameToBe('short name');
-    topicEditorPage.expectTopicDescriptionToBe('Topic Description');
   });
 
   it('should add and delete subtopics correctly', function() {
@@ -150,6 +130,10 @@ describe('Topic editor functionality', function() {
       skillEditorPage.get(skillId);
       skillEditorPage.moveToQuestionsTab();
       skillEditorPage.expectNumberOfQuestionsToBe(1);
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 

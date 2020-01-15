@@ -227,13 +227,13 @@ class GenerateReleaseInfoTests(test_utils.GenericTestBase):
             attributes={
                 'title': 'PR2', 'number': 2, 'labels': [
                     {'name': 'CHANGELOG: Test-changes-1 -- @owner1'}]},
-                    completed='')
+            completed='')
         pull3 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
                 'title': 'PR3', 'number': 3, 'labels': [
                     {'name': 'CHANGELOG: Test-changes-2 -- @owner2'}]},
-                    completed='')
+            completed='')
         pull4 = github.PullRequest.PullRequest(
             requester='', headers='',
             attributes={
