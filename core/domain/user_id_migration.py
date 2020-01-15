@@ -195,8 +195,8 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         """
         new_ids = []
         for gae_id in gae_ids:
-            if gae_id == feconf.SYSTEM_COMMITTER_ID:
-                new_ids.append(feconf.SYSTEM_COMMITTER_ID)
+            if gae_id in feconf.SYSTEM_USERS:
+                new_ids.append(gae_id)
             else:
                 user_settings_model = (
                     user_models.UserSettingsModel.get_by_gae_id(gae_id))
@@ -383,7 +383,7 @@ class BaseModelsUserIdsHaveUserSettingsVerificationJob(
     @staticmethod
     def _does_user_settings_model_exist(user_id):
         """Check if UserSettingsModel exists for the user_id or that the user_id
-        is SYSTEM_COMMITTER_ID.
+        belongs to one of SYSTEM_USERS.
 
         Args:
             user_id: str. User ID that should have its UserSettingsModel.
@@ -392,14 +392,14 @@ class BaseModelsUserIdsHaveUserSettingsVerificationJob(
             True if UserSettingsModel with id equal to user_id exists, False
             otherwise.
         """
-        if user_id == feconf.SYSTEM_COMMITTER_ID:
+        if user_id in feconf.SYSTEM_USERS:
             return True
         return user_models.UserSettingsModel.get_by_id(user_id) is not None
 
     @staticmethod
     def _check_id_and_user_id_exist(model_id, user_id):
         """Check if UserSettingsModel exists for user_id and model id contains
-        user_id or that the user_id is SYSTEM_COMMITTER_ID.
+        user_id or that the user_id belongs to one of SYSTEM_USERS.
 
         Args:
             model_id: str. ID of the model that should contain the user_id.
@@ -407,11 +407,11 @@ class BaseModelsUserIdsHaveUserSettingsVerificationJob(
 
         Returns:
             True if UserSettingsModel with id as user_id in model exists or
-            user_id is SYSTEM_COMMITTER_ID, False otherwise.
+            user_id belongs to one of SYSTEM_USERS. False otherwise.
         """
         if user_id not in model_id:
             return False
-        if user_id == feconf.SYSTEM_COMMITTER_ID:
+        if user_id in feconf.SYSTEM_USERS:
             return True
         return user_models.UserSettingsModel.get_by_id(user_id) is not None
 

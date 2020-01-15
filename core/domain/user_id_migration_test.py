@@ -625,7 +625,7 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
              [self.WRONG_GAE_ID]],
             output)
 
-    def test_migrate_exp_rights_snapshot_model_wrong_field(self):
+    def test_migrate_exp_rights_snapshot_model_admin(self):
         original_rights_model = exp_models.ExplorationRightsModel(
             id=self.SNAPSHOT_ID,
             owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
@@ -665,6 +665,54 @@ class SnapshotsUserIdMigrationJobTests(test_utils.GenericTestBase):
             migrated_rights_model.owner_ids)
         self.assertEqual(
             [self.USER_1_USER_ID, feconf.SYSTEM_COMMITTER_ID],
+            migrated_rights_model.editor_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.voice_artist_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_3_USER_ID],
+            migrated_rights_model.viewer_ids)
+
+    def test_migrate_exp_rights_snapshot_model_migration_bot(self):
+        original_rights_model = exp_models.ExplorationRightsModel(
+            id=self.SNAPSHOT_ID,
+            owner_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            editor_ids=[self.USER_1_GAE_ID, feconf.MIGRATION_BOT_USER_ID],
+            voice_artist_ids=[self.USER_1_GAE_ID, self.USER_2_GAE_ID],
+            viewer_ids=[self.USER_1_GAE_ID, self.USER_3_GAE_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        original_rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel(
+                id=self.SNAPSHOT_ID,
+                content=original_rights_model.to_dict()))
+        original_rights_snapshot_model.content['all_viewer_ids'] = ['id1']
+        original_rights_snapshot_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output[0],
+            [u'SUCCESS - ExplorationRightsSnapshotContentModel', 1])
+
+        migrated_rights_snapshot_model = (
+            exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
+                self.SNAPSHOT_ID))
+        self.assertEqual(
+            original_rights_snapshot_model.last_updated,
+            migrated_rights_snapshot_model.last_updated)
+
+        self.assertNotIn(
+            'all_viewer_ids', migrated_rights_snapshot_model.content)
+
+        migrated_rights_model = exp_models.ExplorationRightsModel(
+            **migrated_rights_snapshot_model.content)
+        self.assertEqual(
+            [self.USER_1_USER_ID, self.USER_2_USER_ID],
+            migrated_rights_model.owner_ids)
+        self.assertEqual(
+            [self.USER_1_USER_ID, feconf.MIGRATION_BOT_USER_ID],
             migrated_rights_model.editor_ids)
         self.assertEqual(
             [self.USER_1_USER_ID, self.USER_2_USER_ID],
@@ -907,7 +955,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJobTests(
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']).put()
         user_models.CompletedActivitiesModel(
-            id=feconf.SYSTEM_COMMITTER_ID,
+            id=feconf.MIGRATION_BOT_USER_ID,
             exploration_ids=['1', '2'],
             collection_ids=['1', '2']).put()
         user_models.ExpUserLastPlaythroughModel(
@@ -1033,6 +1081,18 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
             exploration_id='exp_1_id').put()
         exp_models.ExplorationCommitLogEntryModel(
             id='exp_2_id_1',
+            user_id=self.USER_1_USER_ID,
+            username=self.USER_1_USERNAME,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}],
+            post_commit_status='private',
+            post_commit_community_owned=False,
+            post_commit_is_private=True,
+            version=2,
+            exploration_id='exp_2_id').put()
+        exp_models.ExplorationCommitLogEntryModel(
+            id='exp_3_id_1',
             user_id=feconf.SYSTEM_COMMITTER_ID,
             username=feconf.SYSTEM_COMMITTER_ID,
             commit_type='create',
@@ -1042,7 +1102,7 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
             post_commit_community_owned=False,
             post_commit_is_private=True,
             version=2,
-            exploration_id='exp_2_id').put()
+            exploration_id='exp_3_id').put()
         exp_models.ExplorationSnapshotMetadataModel(
             id='exp_1_id',
             committer_id=self.USER_1_GAE_ID,
@@ -1051,19 +1111,32 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
             commit_cmds=[{'cmd': 'some_command'}]).put()
         exp_models.ExplorationSnapshotMetadataModel(
             id='exp_2_id',
+            committer_id=self.USER_1_USER_ID,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]).put()
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='exp_3_id',
             committer_id=feconf.SYSTEM_COMMITTER_ID,
             commit_type='create',
             commit_message='commit message 2',
             commit_cmds=[{'cmd': 'some_command'}]).put()
+        exp_models.ExplorationSnapshotMetadataModel(
+            id='exp_4_id',
+            committer_id=feconf.SUGGESTION_BOT_USER_ID,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]).put()
+
 
         output = self._run_one_off_job()
         self.assertIn(
             ['FAILURE - ExplorationCommitLogEntryModel', ['exp_1_id_1']],
             output)
         self.assertIn(
-            ['SUCCESS - ExplorationCommitLogEntryModel', 1], output)
+            ['SUCCESS - ExplorationCommitLogEntryModel', 2], output)
         self.assertIn(
             ['FAILURE - ExplorationSnapshotMetadataModel', ['exp_1_id']],
             output)
         self.assertIn(
-            ['SUCCESS - ExplorationSnapshotMetadataModel', 1], output)
+            ['SUCCESS - ExplorationSnapshotMetadataModel', 3], output)

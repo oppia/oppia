@@ -331,7 +331,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
                     self.viewer_ids)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
@@ -697,7 +697,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         user_ids = (self.owner_ids + self.editor_ids + self.viewer_ids +
                     self.contributor_ids)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
