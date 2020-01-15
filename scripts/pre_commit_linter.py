@@ -536,10 +536,7 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/.github/']
 
 # Check if project is running in CircleCI.
-try:
-    CIRCLECI_ENV = os.environ['CIRCLECI']
-except KeyError:
-    CIRCLECI_ENV = False
+IS_CI = os.getenv('CIRCLECI')
 
 # NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
 NODE_DIR = os.path.abspath(
@@ -693,7 +690,7 @@ def _lint_all_files(
         Stylelint outputs.
     """
 
-    if CIRCLECI_ENV:
+    if IS_CI:
         python_utils.PRINT('Starting Python linter...')
     else:
         python_utils.PRINT(
@@ -729,7 +726,7 @@ def _lint_all_files(
 
     linting_processes = []
 
-    if not CIRCLECI_ENV:
+    if not IS_CI:
         js_and_ts_result = multiprocessing.Queue()
 
         linting_processes.append(multiprocessing.Process(
@@ -779,7 +776,7 @@ def _lint_all_files(
         process.daemon = False
         process.start()
 
-    if CIRCLECI_ENV:
+    if IS_CI:
         result_queues = [py_result, py_result_for_python3_compatibility]
     else:
         result_queues = [
@@ -787,7 +784,7 @@ def _lint_all_files(
             py_result_for_python3_compatibility
         ]
 
-    if not CIRCLECI_ENV:
+    if not IS_CI:
         stdout_queus = [
             css_in_html_stdout, css_stdout
         ]
@@ -2008,7 +2005,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
 
     def _check_patterns(self):
         """Run checks relate to bad patterns."""
-        if CIRCLECI_ENV:
+        if IS_CI:
             methods = [self._check_mandatory_patterns]
         else:
             methods = [self._check_bad_patterns, self._check_mandatory_patterns]
@@ -2023,7 +2020,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         """
         self._check_patterns()
         mandatory_patterns_messages = self.process_manager['mandatory']
-        if not CIRCLECI_ENV:
+        if not IS_CI:
             pattern_messages = self.process_manager['bad_pattern']
             return (
                 mandatory_patterns_messages + pattern_messages)
