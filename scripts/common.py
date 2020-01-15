@@ -30,7 +30,7 @@ import release_constants
 NODE_VERSION = '10.18.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = 'v1.21.1'
+YARN_VERSION = '1.21.1'
 
 COVERAGE_VERSION = '4.5.4'
 
@@ -45,8 +45,7 @@ GOOGLE_CLOUD_SDK_HOME = os.path.join(
 NODE_PATH = os.path.join(OPPIA_TOOLS_DIR, 'node-%s' % NODE_VERSION)
 NODE_MODULES_PATH = os.path.join(CURR_DIR, 'node_modules')
 FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
-# The following assumes that the YARN_VERSION starts with a 'v'.
-YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION[1:])
+YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
 
