@@ -32,28 +32,29 @@ angular.module('oppia').directive('numberWithUnitsEditor', [
         var ctrl = this;
         var errorMessage = '';
         var numberWithUnitsString = '';
-        if (ctrl.value !== null) {
-          var defaultNumberWithUnits =
-            NumberWithUnitsObjectFactory.fromDict(ctrl.value);
-          numberWithUnitsString = defaultNumberWithUnits.toString();
-        }
-        ctrl.localValue = {
-          label: numberWithUnitsString
-        };
-
-        $scope.$watch('$ctrl.localValue.label', function(newValue) {
-          try {
-            var numberWithUnits =
-              NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-            ctrl.value = numberWithUnits;
-            errorMessage = '';
-          } catch (parsingError) {
-            errorMessage = parsingError.message;
-          }
-        });
 
         ctrl.getWarningText = function() {
           return errorMessage;
+        };
+        ctrl.$onInit = function() {
+          $scope.$watch('$ctrl.localValue.label', function(newValue) {
+            try {
+              var numberWithUnits =
+                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+              ctrl.value = numberWithUnits;
+              errorMessage = '';
+            } catch (parsingError) {
+              errorMessage = parsingError.message;
+            }
+          });
+          if (ctrl.value !== null) {
+            var defaultNumberWithUnits =
+              NumberWithUnitsObjectFactory.fromDict(ctrl.value);
+            numberWithUnitsString = defaultNumberWithUnits.toString();
+          }
+          ctrl.localValue = {
+            label: numberWithUnitsString
+          };
         };
       }]
     };

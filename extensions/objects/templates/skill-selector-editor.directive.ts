@@ -39,12 +39,6 @@ angular.module('oppia').directive('skillSelectorEditor', [
             $http, $scope, ContextService, ENTITY_TYPE,
             FETCH_SKILLS_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.skills = [];
-          if (ctrl.value) {
-            ContextService.setCustomEntityContext(
-              ENTITY_TYPE.SKILL, ctrl.value.id);
-          }
-
           ctrl.selectSkill = function(skillId, skillDescription) {
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             ctrl.value = {
@@ -52,12 +46,19 @@ angular.module('oppia').directive('skillSelectorEditor', [
               description: skillDescription
             };
           };
-          $http.get(FETCH_SKILLS_URL_TEMPLATE).then(function(response) {
-            ctrl.skills = angular.copy(response.data.skills);
-          });
-          $scope.$on('$destroy', function() {
-            ContextService.removeCustomEntityContext();
-          });
+          ctrl.$onInit = function() {
+            $scope.$on('$destroy', function() {
+              ContextService.removeCustomEntityContext();
+            });
+            ctrl.skills = [];
+            if (ctrl.value) {
+              ContextService.setCustomEntityContext(
+                ENTITY_TYPE.SKILL, ctrl.value.id);
+            }
+            $http.get(FETCH_SKILLS_URL_TEMPLATE).then(function(response) {
+              ctrl.skills = angular.copy(response.data.skills);
+            });
+          };
         }
       ]
     };
