@@ -22,7 +22,7 @@ import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
 import { CsrfTokenService } from
   'services/csrf-token.service';
-import { EmailDashboardDataService } from
+import { EmailDashboardDataService, Query } from
   'pages/email-dashboard-pages/email-dashboard-data.service';
 
 describe('Email Dashboard Services', () => {
@@ -138,7 +138,7 @@ describe('Email Dashboard Services', () => {
         expect(emailDashboardDataService.getQueries().length).toEqual(2);
         expect(emailDashboardDataService.getQueries()).toEqual(recentQueries);
 
-        emailDashboardDataService.fetchQuery('q123').then(function(query) {
+        emailDashboardDataService.fetchQuery('q123').then((query: Query) => {
           expect(query.id).toEqual('q123');
           expect(query.status).toEqual('completed');
         });
@@ -210,17 +210,19 @@ describe('Email Dashboard Services', () => {
         expect(emailDashboardDataService.getQueries()).toEqual(totalQueries);
 
         // Check that queries on page 1 are correct.
-        emailDashboardDataService.getNextQueries().then(function(queries) {
-          expect(queries.length).toEqual(10);
-          expect(queries).toEqual(totalQueries.slice(10, 20));
-        });
+        emailDashboardDataService.getNextQueries().then(
+          (queries: Array<Query>) => {
+            expect(queries.length).toEqual(10);
+            expect(queries).toEqual(totalQueries.slice(10, 20));
+          });
         expect(emailDashboardDataService.getCurrentPageIndex()).toEqual(1);
 
         // Check that queries on page 2 are correct.
-        emailDashboardDataService.getNextQueries().then(function(queries) {
-          expect(queries.length).toEqual(5);
-          expect(queries).toEqual(totalQueries.slice(20, 25));
-        });
+        emailDashboardDataService.getNextQueries().then(
+          (queries: Array<Query>) => {
+            expect(queries.length).toEqual(5);
+            expect(queries).toEqual(totalQueries.slice(20, 25));
+          });
         expect(emailDashboardDataService.getCurrentPageIndex()).toEqual(2);
 
         // Go back to page 1 and check again.
@@ -253,10 +255,11 @@ describe('Email Dashboard Services', () => {
         expect(emailDashboardDataService.getQueries()[0]).toEqual(queryData);
 
         // Check queries on page 2.
-        emailDashboardDataService.getNextQueries().then(function(queries) {
-          expect(queries.length).toEqual(6);
-          expect(queries).toEqual(totalQueries.slice(20, 26));
-        });
+        emailDashboardDataService.getNextQueries().then(
+          (queries: Array<Query>) => {
+            expect(queries.length).toEqual(6);
+            expect(queries).toEqual(totalQueries.slice(20, 26));
+          });
         expect(emailDashboardDataService.getCurrentPageIndex()).toEqual(2);
 
         // Check queries on page 1.
