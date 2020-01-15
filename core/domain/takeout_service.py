@@ -24,7 +24,7 @@ from core.platform import models
 
 (
     base_models, collection_models, email_models,
-    exploration_models, feedback_models, topic_models
+    exploration_models, feedback_models, topic_models,
     suggestion_models, user_models) = models.Registry.import_models(
         [models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
          models.NAMES.exploration, models.NAMES.feedback, models.NAMES.topic,

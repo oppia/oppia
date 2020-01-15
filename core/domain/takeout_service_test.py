@@ -25,6 +25,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import takeout_service
+from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -243,7 +244,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         
         # Setup for TopicRightsModel.
         topic_models.TopicRightsModel(
-            id=self.TOPIC_1_ID,
+            id=self.TOPIC_ID_1,
             manager_ids=[self.USER_ID_1],
             topic_is_published=True
         ).commit(
@@ -251,7 +252,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'New topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}])
         topic_models.TopicRightsModel(
-            id=self.TOPIC_2_ID,
+            id=self.TOPIC_ID_2,
             manager_ids=[self.USER_ID_1],
             topic_is_published=True
         ).commit(
@@ -405,6 +406,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': incomplete_activities_data,
             'exp_user_last_playthrough_data': last_playthrough_data,
             'learner_playlist_data': learner_playlist_data,
+            'topic_rights_data': topic_rights_data,
             'collection_progress_data': collection_progress_data,
             'story_progress_data': story_progress_data,
             'general_feedback_thread_data': general_feedback_thread_data,
@@ -413,7 +415,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'general_feedback_message_data': general_feedback_message_data,
             'collection_rights_data': collection_rights_data,
             'general_suggestion_data': general_suggestion_data,
-            'topic_rights_data': topic_rights_data,
             'exploration_rights_data': exploration_rights_data,
             'general_feedback_email_reply_to_id_data': reply_to_data
         }
@@ -616,7 +617,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'last_checked': None
         }
 
-        expected_topics_data = {
+        expected_topic_data = {
             'managed_collection_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
 
@@ -631,6 +632,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': expected_incomplete_activities_data,
             'exp_user_last_playthrough_data': expected_last_playthrough_data,
             'learner_playlist_data': expected_learner_playlist_data,
+            'topic_rights_data': expected_topic_data,
             'collection_progress_data': expected_collection_progress_data,
             'story_progress_data': expected_story_progress_data,
             'general_feedback_thread_data':
