@@ -54,6 +54,10 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
     browser.getCurrentUrl().then(function(url) {
       topicId = url.split('/')[4];
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 
@@ -126,6 +130,10 @@ describe('Topic editor functionality', function() {
       skillEditorPage.get(skillId);
       skillEditorPage.moveToQuestionsTab();
       skillEditorPage.expectNumberOfQuestionsToBe(1);
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 

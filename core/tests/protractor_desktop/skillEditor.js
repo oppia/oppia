@@ -51,6 +51,10 @@ describe('Skill Editor functionality', function() {
       'Skill 1', 'Concept card explanation');
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 

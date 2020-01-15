@@ -82,7 +82,21 @@ def download_and_install_package(url_to_retrieve, filename):
     tar = tarfile.open(name=filename)
     tar.extractall(path=common.OPPIA_TOOLS_DIR)
     tar.close()
+    rename_yarn_folder(filename, common.OPPIA_TOOLS_DIR)
     os.remove(filename)
+
+
+def rename_yarn_folder(filename, path):
+    """Removes the `v` from the yarn folder name.
+
+    Args:
+        filename: string. The name of the tar file.
+        path: string. The path of the yarn file.
+    """
+    if 'yarn' in filename:
+        old_name = filename.split('.tar.gz')[0]
+        new_name = ''.join(old_name.split('v'))
+        os.rename(path + '/' + old_name, path + '/' + new_name)
 
 
 def download_and_install_node():
@@ -175,11 +189,9 @@ def main(args=None):
             'visit https://yarnpkg.com/en/docs/usage.'])
 
         # NB: Update .yarnrc if the yarn version below is changed.
-        # TODO(#8125): Remove the `v` in the folder name, e.g., yarn-v1.17.3 ->
-        # yarn-1.17.3.
-        yarn_file_name = 'yarn-%s.tar.gz' % common.YARN_VERSION
+        yarn_file_name = 'yarn-v%s.tar.gz' % common.YARN_VERSION
         download_and_install_package(
-            'https://github.com/yarnpkg/yarn/releases/download/%s/%s'
+            'https://github.com/yarnpkg/yarn/releases/download/v%s/%s'
             % (common.YARN_VERSION, yarn_file_name), yarn_file_name)
 
     # Adjust path to support the default Chrome locations for Unix, Windows and

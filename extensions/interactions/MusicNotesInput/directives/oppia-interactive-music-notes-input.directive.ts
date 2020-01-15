@@ -34,14 +34,14 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
-  'AlertsService', 'CurrentInteractionService', 'HtmlEscaperService',
-  'MusicNotesInputRulesService', 'MusicPhrasePlayerService',
-  'UrlInterpolationService',
+  '$timeout', 'AlertsService', 'CurrentInteractionService',
+  'HtmlEscaperService', 'MusicNotesInputRulesService',
+  'MusicPhrasePlayerService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE', 'NOTE_NAMES_TO_MIDI_VALUES',
   function(
-      AlertsService, CurrentInteractionService, HtmlEscaperService,
-      MusicNotesInputRulesService, MusicPhrasePlayerService,
-      UrlInterpolationService,
+      $timeout, AlertsService, CurrentInteractionService,
+      HtmlEscaperService, MusicNotesInputRulesService,
+      MusicPhrasePlayerService, UrlInterpolationService,
       EVENT_NEW_CARD_AVAILABLE, NOTE_NAMES_TO_MIDI_VALUES) {
     return {
       restrict: 'E',
@@ -143,7 +143,7 @@ angular.module('oppia').directive('oppiaInteractiveMusicNotesInput', [
         // must be recalculated in order for the grid to work properly.
         scope.reinitStaff = function() {
           $('.oppia-music-input-valid-note-area').css('visibility', 'hidden');
-          setTimeout(function() {
+          $timeout(function() {
             $('.oppia-music-input-valid-note-area').css(
               'visibility', 'visible');
             scope.init();
