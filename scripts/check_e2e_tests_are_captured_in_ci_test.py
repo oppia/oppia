@@ -136,23 +136,81 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
 
     def test_main_with_invalid_test_suites(self):
         def mock_get_e2e_suite_names_from_protractor_file():
-            return ['fourWord', 'invalid', 'notPresent']
-
+            return ['oneword', 'fourWord', 'invalid', 'notPresent']
+        def mock_get_e2e_suite_names_from_travis_ci():
+            return ['oneword', 'twoWords']
         mock_protractor_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_protractor_file',
             mock_get_e2e_suite_names_from_protractor_file)
 
+        mock_travis_jobs = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'get_e2e_suite_names_from_jobs_travis_yml_file',
+            mock_get_e2e_suite_names_from_travis_ci)
+
+        mock_travis_scripts = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'get_e2e_suite_names_from_script_travis_yml_file',
+            mock_get_e2e_suite_names_from_travis_ci)
+
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_TRAVIS',
-            ['fourWord'])
+            'TEST_SUITES_NOT_RUN_ON_TRAVIS', ['fourWord'])
 
-        with mock_protractor_test_suites, mock_tests_to_remove:
+        common_test_swap = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'TRAVIS_PROTRACTOR_COMMON_TEST',
+            'oneword')
+
+        with common_test_swap, mock_tests_to_remove:
+            with mock_protractor_test_suites, mock_travis_jobs:
+                with mock_travis_scripts:
+                    with self.assertRaisesRegexp(Exception,
+                    'Protractor test suites and Travis Ci test '
+                    'suites are not in sync.'):
+                        check_e2e_tests_are_captured_in_ci.main()
+
+    def test_main_with_missing_test_fail(self):
+        def mock_get_e2e_suite_names():
+            return ['oneword', 'twoWords']
+
+        mock_travis_scripts = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'get_e2e_suite_names_from_script_travis_yml_file',
+            mock_get_e2e_suite_names)
+
+        mock_travis_jobs = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'get_e2e_suite_names_from_jobs_travis_yml_file',
+            mock_get_e2e_suite_names)
+
+        mock_protractor_test_suites = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'get_e2e_suite_names_from_protractor_file',
+            mock_get_e2e_suite_names)
+
+        mock_tests_not_on_travis = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
+
+        with mock_travis_scripts:
             with self.assertRaisesRegexp(Exception,
-                'Protractor test suites and Travis Ci test '
-                'suites are not in sync.'):
-                    check_e2e_tests_are_captured_in_ci.main()
+            'explorationImprovementsTab is missing from the e2e test '
+            'suites extracted from script section from travis.ci'):
+                check_e2e_tests_are_captured_in_ci.main()
+
+        with mock_travis_jobs:
+            with self.assertRaisesRegexp(Exception,
+            'explorationImprovementsTab is missing from the e2e test '
+            'suites extracted from jobs section from travis.ci'):
+                check_e2e_tests_are_captured_in_ci.main()
+
+        with mock_protractor_test_suites, mock_tests_not_on_travis:
+            with self.assertRaisesRegexp(Exception,
+            'explorationImprovementsTab is missing from the e2e test '
+            'suites extracted from protractor.conf.js'):
+                check_e2e_tests_are_captured_in_ci.main()
+
 
     def test_main_with_invalid_travis_jobs_test_suite_length(self):
         travis_path_swap = self.swap(
@@ -220,11 +278,15 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
         travis_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
             self._mock_read_travis_yml_file)
+        common_test_swap = self.swap(
+            check_e2e_tests_are_captured_in_ci, 'TRAVIS_PROTRACTOR_COMMON_TEST',
+            'oneword')
 
         mock_tests_to_remove = self._mock_tests_to_remove()
 
         with protractor_path_swap, travis_path_swap, mock_tests_to_remove:
-            check_e2e_tests_are_captured_in_ci.main()
+            with common_test_swap:
+                check_e2e_tests_are_captured_in_ci.main()
 
 
 TRAVIS_CI_DICT = {'env': {

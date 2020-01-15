@@ -27,12 +27,13 @@ import utils
 # These 4 test suites are not present in travis ci.
 # One is extra ie. (full: [*.js]), and three other tests that
 # are being run by circleCi.
-TEST_SUITES_NOT_RUN_ON_TRAVIS = ['full', 'classroomPage', 'fileUploadFeatures',
-    'topicAndStoryEditor']
+TEST_SUITES_NOT_RUN_ON_TRAVIS = [
+    'full', 'classroomPage', 'fileUploadFeatures','topicAndStoryEditor']
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
 PROTRACTOR_CONF_FILE_PATH = os.path.join(
     os.getcwd(), 'core', 'tests', 'protractor.conf.js')
+TRAVIS_PROTRACTOR_COMMON_TEST = 'explorationImprovementsTab'
 
 
 def get_e2e_suite_names_from_jobs_travis_yml_file():
@@ -47,7 +48,7 @@ def get_e2e_suite_names_from_jobs_travis_yml_file():
     suites_from_jobs = []
     # The following line extracts the test suite name from the jobs section
     # that is in the form RUN_E2E_TESTS_ACCESSIBILITY=true.
-    test_regex = re.compile(r'RUN_E2E_TESTS_([a-zA-Z_-]*)=')
+    test_regex = re.compile(r'RUN_E2E_TESTS_([A-Z_]*)=')
     jobs = test_regex.findall(jobs_str)
     for job in jobs:
         suites_from_jobs.append(
@@ -129,19 +130,31 @@ def main():
     for excluded_test in TEST_SUITES_NOT_RUN_ON_TRAVIS:
         protractor_test_suites.remove(excluded_test)
 
-    if not (len(yaml_jobs) > 0 and len(yaml_scripts) > 0
-            and len(protractor_test_suites) > 0):
-        if len(yaml_jobs) <= 0:
+    if not yaml_jobs or not yaml_scripts or not protractor_test_suites:
+        if not yaml_jobs:
             raise Exception('The e2e test suites that have been extracted from '
                             'jobs section from travis.ci are empty.')
-        if len(yaml_scripts) <= 0:
+        if not yaml_scripts:
             raise Exception('The e2e test suites that have been extracted from '
                             'script section from travis.ci are empty.')
-        if len(protractor_test_suites) <= 0:
+        if not protractor_test_suites:
             raise Exception('The e2e test suites that have been extracted from '
                             'protractor.conf.js are empty.')
 
-    if not protractor_test_suites == yaml_jobs and (yaml_jobs == yaml_scripts):
+    if (TRAVIS_PROTRACTOR_COMMON_TEST not in yaml_jobs or
+            TRAVIS_PROTRACTOR_COMMON_TEST not in yaml_scripts or
+            TRAVIS_PROTRACTOR_COMMON_TEST not in protractor_test_suites):
+        if TRAVIS_PROTRACTOR_COMMON_TEST not in yaml_jobs:
+            raise Exception('explorationImprovementsTab is missing from the e2e test '
+                            'suites extracted from jobs section from travis.ci')
+        if TRAVIS_PROTRACTOR_COMMON_TEST not in yaml_scripts:
+            raise Exception('explorationImprovementsTab is missing from the e2e test '
+                            'suites extracted from script section from travis.ci')
+        if TRAVIS_PROTRACTOR_COMMON_TEST not in protractor_test_suites:
+            raise Exception('explorationImprovementsTab is missing from the e2e test '
+                            'suites extracted from protractor.conf.js')
+
+    if not (protractor_test_suites == yaml_jobs and yaml_jobs == yaml_scripts):
         raise Exception(
             'Protractor test suites and Travis Ci test suites are not in sync.')
 
