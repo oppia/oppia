@@ -1922,12 +1922,12 @@ tags: []
             # Raise issues threw by the called function or assert error.
             raise
         finally:
-            self.longMessage = False
             setattr(obj, attr, original)
             if not error_occurred:
                 self.assertEqual(wrapper.called, called, msg=msg)
-                self.assertFalse(expected_args)
-                self.assertFalse(expected_kwargs)
+                self.assertFalse(expected_args, msg=msg)
+                self.assertFalse(expected_kwargs, msg=msg)
+            self.longMessage = False
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):
