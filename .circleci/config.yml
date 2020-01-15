@@ -12,9 +12,6 @@ workflows:
       - frontend_tests:
           requires:
             - setup
-      - frontend_test_coverage:
-          requires:
-            - frontend_tests
       - backend_tests:
           requires:
             - setup
