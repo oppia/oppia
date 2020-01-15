@@ -68,39 +68,13 @@ angular.module('oppia').directive('statisticsTab', [
             StatesObjectFactory, UrlInterpolationService,
             IMPROVE_TYPE_INCOMPLETE) {
           var ctrl = this;
-          ctrl.COMPLETION_RATE_CHART_OPTIONS = {
-            chartAreaWidth: 300,
-            colors: ['green', 'firebrick'],
-            height: 100,
-            legendPosition: 'right',
-            width: 500
-          };
-          ctrl.COMPLETION_RATE_PIE_CHART_OPTIONS = {
-            title: '',
-            left: 230,
-            pieHole: 0.6,
-            pieSliceTextStyleColor: 'black',
-            pieSliceBorderColor: 'black',
-            chartAreaWidth: 500,
-            colors: ['#008808', '#d8d8d8'],
-            height: 300,
-            legendPosition: 'right',
-            width: 600
-          };
           var _EXPLORATION_STATS_VERSION_ALL = 'all';
-          ctrl.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
+          var stateStatsModalIsOpen = false;
 
           ctrl.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               millisSinceEpoch);
           };
-
-          ctrl.hasTabLoaded = false;
-          $scope.$on('refreshStatisticsTab', function() {
-            ctrl.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
-          });
-
-          ctrl.explorationHasBeenVisited = false;
           ctrl.refreshExplorationStatistics = function(version) {
             ctrl.explorationStatisticsUrl = (
               '/createhandler/statistics/' +
@@ -153,8 +127,6 @@ angular.module('oppia').directive('statisticsTab', [
               ];
             });
           };
-
-          var stateStatsModalIsOpen = false;
           ctrl.onClickStateInStatsGraph = function(stateName) {
             if (!stateStatsModalIsOpen) {
               stateStatsModalIsOpen = true;
@@ -286,8 +258,40 @@ angular.module('oppia').directive('statisticsTab', [
                     };
                   }
                 ]
+              }).result.then(function() {}, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             });
+          };
+          ctrl.$onInit = function() {
+            $scope.$on('refreshStatisticsTab', function() {
+              ctrl.refreshExplorationStatistics(_EXPLORATION_STATS_VERSION_ALL);
+            });
+            ctrl.COMPLETION_RATE_CHART_OPTIONS = {
+              chartAreaWidth: 300,
+              colors: ['green', 'firebrick'],
+              height: 100,
+              legendPosition: 'right',
+              width: 500
+            };
+            ctrl.COMPLETION_RATE_PIE_CHART_OPTIONS = {
+              title: '',
+              left: 230,
+              pieHole: 0.6,
+              pieSliceTextStyleColor: 'black',
+              pieSliceBorderColor: 'black',
+              chartAreaWidth: 500,
+              colors: ['#008808', '#d8d8d8'],
+              height: 300,
+              legendPosition: 'right',
+              width: 600
+            };
+            ctrl.currentVersion = _EXPLORATION_STATS_VERSION_ALL;
+
+            ctrl.hasTabLoaded = false;
+
+            ctrl.explorationHasBeenVisited = false;
           };
         }
       ]

@@ -40,11 +40,14 @@ angular.module('oppia').directive('oppiaShortResponseMultipleChoiceInput', [
         '$attrs', '$filter',
         function($attrs, $filter) {
           var ctrl = this;
-          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
-          var response = $filter('convertToPlainText')(_choices[_answer]);
-          ctrl.response = $filter('truncateAtFirstLine')(response);
-        }]
+          ctrl.$onInit = function() {
+            var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+            var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
+            var response = $filter('convertToPlainText')(_choices[_answer]);
+            ctrl.response = $filter('truncateAtFirstLine')(response);
+          };
+        }
+      ]
     };
   }
 ]);
