@@ -35,21 +35,14 @@ angular.module('oppia').directive('teachPage', [
         '/pages/teach-page/teach-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$timeout', '$window', 'SiteAnalyticsService',
+        '$window', '$timeout', 'SiteAnalyticsService',
         'UrlInterpolationService',
         function(
-            $timeout, $window, SiteAnalyticsService,
+            $window, $timeout, SiteAnalyticsService,
             UrlInterpolationService) {
           var ctrl = this;
-          // Define constants
-          ctrl.TAB_ID_TEACH = 'teach';
-          ctrl.TAB_ID_PLAYBOOK = 'playbook';
-          ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
-
           var activeTabClass = 'oppia-about-tabs-active';
-          var hash = window.location.hash.slice(1);
           var visibleContent = 'oppia-about-visible-content';
-
           var activateTab = function(tabName) {
             $("a[id='" + tabName + "']").parent().addClass(
               activeTabClass
@@ -58,22 +51,6 @@ angular.module('oppia').directive('teachPage', [
               visibleContent
             );
           };
-
-          if (hash === ctrl.TAB_ID_TEACH) {
-            activateTab(ctrl.TAB_ID_TEACH);
-          } else if (hash === ctrl.TAB_ID_PLAYBOOK) {
-            activateTab(ctrl.TAB_ID_PLAYBOOK);
-          }
-
-          window.onhashchange = function() {
-            var hashChange = window.location.hash.slice(1);
-            if (hashChange === ctrl.TAB_ID_TEACH) {
-              activateTab(ctrl.TAB_ID_TEACH);
-            } else if (hashChange === ctrl.TAB_ID_PLAYBOOK) {
-              activateTab(ctrl.TAB_ID_PLAYBOOK);
-            }
-          };
-
           ctrl.onTabClick = function(tabName) {
             // Update hash
             window.location.hash = '#' + tabName;
@@ -90,6 +67,29 @@ angular.module('oppia').directive('teachPage', [
               $window.location = ctrl.TEACH_FORM_URL;
             }, 150);
             return false;
+          };
+          ctrl.$onInit = function() {
+            // Define constants
+            ctrl.TAB_ID_TEACH = 'teach';
+            ctrl.TAB_ID_PLAYBOOK = 'playbook';
+            ctrl.TEACH_FORM_URL = 'https://goo.gl/forms/0p3Axuw5tLjTfiri1';
+
+            var hash = window.location.hash.slice(1);
+
+            if (hash === ctrl.TAB_ID_TEACH) {
+              activateTab(ctrl.TAB_ID_TEACH);
+            } else if (hash === ctrl.TAB_ID_PLAYBOOK) {
+              activateTab(ctrl.TAB_ID_PLAYBOOK);
+            }
+
+            window.onhashchange = function() {
+              var hashChange = window.location.hash.slice(1);
+              if (hashChange === ctrl.TAB_ID_TEACH) {
+                activateTab(ctrl.TAB_ID_TEACH);
+              } else if (hashChange === ctrl.TAB_ID_PLAYBOOK) {
+                activateTab(ctrl.TAB_ID_PLAYBOOK);
+              }
+            };
           };
         }
       ]

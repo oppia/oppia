@@ -49,22 +49,9 @@ angular.module('oppia').directive('searchBar', [
             HtmlEscaperService, LanguageUtilService, NavigationService,
             SearchService, UrlService, SEARCH_DROPDOWN_CATEGORIES) {
           var ctrl = this;
-          ctrl.isSearchInProgress = SearchService.isSearchInProgress;
-          ctrl.SEARCH_DROPDOWN_CATEGORIES = (
-            SEARCH_DROPDOWN_CATEGORIES.map(
-              function(categoryName) {
-                return {
-                  id: categoryName,
-                  text: ConstructTranslationIdsService.getLibraryId(
-                    'categories', categoryName)
-                };
-              }
-            )
-          );
-          ctrl.ACTION_OPEN = NavigationService.ACTION_OPEN;
-          ctrl.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
-          ctrl.KEYBOARD_EVENT_TO_KEY_CODES =
-          NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
+          ctrl.isSearchInProgress = function() {
+            return SearchService.isSearchInProgress();
+          };
           /**
            * Opens the submenu.
            * @param {object} evt
@@ -90,32 +77,6 @@ angular.module('oppia').directive('searchBar', [
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
             ctrl.activeMenuName = NavigationService.activeMenuName;
           };
-          ctrl.SUPPORTED_CONTENT_LANGUAGES = (
-            LanguageUtilService.getLanguageIdsAndTexts());
-
-          ctrl.searchQuery = '';
-          ctrl.selectionDetails = {
-            categories: {
-              description: '',
-              itemsName: 'categories',
-              masterList: ctrl.SEARCH_DROPDOWN_CATEGORIES,
-              numSelections: 0,
-              selections: {},
-              summary: ''
-            },
-            languageCodes: {
-              description: '',
-              itemsName: 'languages',
-              masterList: ctrl.SUPPORTED_CONTENT_LANGUAGES,
-              numSelections: 0,
-              selections: {},
-              summary: ''
-            }
-          };
-
-          // Non-translatable parts of the html strings, like numbers or user
-          // names.
-          ctrl.translationData = {};
 
           // Update the description, numSelections and summary fields of the
           // relevant entry of ctrl.selectionDetails.
@@ -174,14 +135,6 @@ angular.module('oppia').directive('searchBar', [
             onSearchQueryChangeExec();
           };
 
-          $scope.$watch('$ctrl.searchQuery', function(
-              newQuery, oldQuery) {
-            // Run only if the query has changed.
-            if (newQuery !== oldQuery) {
-              onSearchQueryChangeExec();
-            }
-          });
-
           var onSearchQueryChangeExec = function() {
             SearchService.executeSearchQuery(
               ctrl.searchQuery, ctrl.selectionDetails.categories.selections,
@@ -197,11 +150,6 @@ angular.module('oppia').directive('searchBar', [
               $window.location.href = '/search/find?q=' + searchUrlQueryString;
             }
           };
-
-          // Initialize the selection descriptions and summaries.
-          for (var itemsType in ctrl.selectionDetails) {
-            updateSelectionDetails(itemsType);
-          }
 
           var updateSearchFieldsBasedOnUrlQuery = function() {
             var oldQueryString = SearchService.getCurrentUrlQueryString();
@@ -223,43 +171,6 @@ angular.module('oppia').directive('searchBar', [
             }
           };
 
-          $scope.$on('$locationChangeSuccess', function() {
-            if (UrlService.getUrlParams().hasOwnProperty('q')) {
-              updateSearchFieldsBasedOnUrlQuery();
-            }
-          });
-
-          $scope.$on(
-            'preferredLanguageCodesLoaded',
-            function(evt, preferredLanguageCodesList) {
-              preferredLanguageCodesList.forEach(function(languageCode) {
-                var selections =
-                 ctrl.selectionDetails.languageCodes.selections;
-                if (!selections.hasOwnProperty(languageCode)) {
-                  selections[languageCode] = true;
-                } else {
-                  selections[languageCode] = !selections[languageCode];
-                }
-              });
-
-              updateSelectionDetails('languageCodes');
-
-              if (UrlService.getUrlParams().hasOwnProperty('q')) {
-                updateSearchFieldsBasedOnUrlQuery();
-              }
-
-              if ($window.location.pathname === '/search/find') {
-                onSearchQueryChangeExec();
-              }
-
-              refreshSearchBarLabels();
-
-              // Notify the function that handles overflow in case the search
-              // elements load after it has already been run.
-              $rootScope.$broadcast('searchBarLoaded', true);
-            }
-          );
-
           var refreshSearchBarLabels = function() {
             // If you translate these strings in the html, then you must use a
             // filter because only the first 14 characters are displayed. That
@@ -278,8 +189,97 @@ angular.module('oppia').directive('searchBar', [
               ctrl.translationData, 'messageformat');
           };
 
-          $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
-          $rootScope.$on('initializeTranslation', refreshSearchBarLabels);
+          ctrl.$onInit = function() {
+            ctrl.SEARCH_DROPDOWN_CATEGORIES = (
+              SEARCH_DROPDOWN_CATEGORIES.map(
+                function(categoryName) {
+                  return {
+                    id: categoryName,
+                    text: ConstructTranslationIdsService.getLibraryId(
+                      'categories', categoryName)
+                  };
+                }
+              )
+            );
+            ctrl.ACTION_OPEN = NavigationService.ACTION_OPEN;
+            ctrl.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
+            ctrl.KEYBOARD_EVENT_TO_KEY_CODES =
+            NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
+            ctrl.SUPPORTED_CONTENT_LANGUAGES = (
+              LanguageUtilService.getLanguageIdsAndTexts());
+            ctrl.searchQuery = '';
+            ctrl.selectionDetails = {
+              categories: {
+                description: '',
+                itemsName: 'categories',
+                masterList: ctrl.SEARCH_DROPDOWN_CATEGORIES,
+                numSelections: 0,
+                selections: {},
+                summary: ''
+              },
+              languageCodes: {
+                description: '',
+                itemsName: 'languages',
+                masterList: ctrl.SUPPORTED_CONTENT_LANGUAGES,
+                numSelections: 0,
+                selections: {},
+                summary: ''
+              }
+            };
+
+            // Non-translatable parts of the html strings, like numbers or user
+            // names.
+            ctrl.translationData = {};
+            $scope.$watch('$ctrl.searchQuery', function(
+                newQuery, oldQuery) {
+              // Run only if the query has changed.
+              if (newQuery !== oldQuery) {
+                onSearchQueryChangeExec();
+              }
+            });
+            // Initialize the selection descriptions and summaries.
+            for (var itemsType in ctrl.selectionDetails) {
+              updateSelectionDetails(itemsType);
+            }
+            $scope.$on('$locationChangeSuccess', function() {
+              if (UrlService.getUrlParams().hasOwnProperty('q')) {
+                updateSearchFieldsBasedOnUrlQuery();
+              }
+            });
+
+            $scope.$on(
+              'preferredLanguageCodesLoaded',
+              function(evt, preferredLanguageCodesList) {
+                preferredLanguageCodesList.forEach(function(languageCode) {
+                  var selections =
+                   ctrl.selectionDetails.languageCodes.selections;
+                  if (!selections.hasOwnProperty(languageCode)) {
+                    selections[languageCode] = true;
+                  } else {
+                    selections[languageCode] = !selections[languageCode];
+                  }
+                });
+
+                updateSelectionDetails('languageCodes');
+
+                if (UrlService.getUrlParams().hasOwnProperty('q')) {
+                  updateSearchFieldsBasedOnUrlQuery();
+                }
+
+                if ($window.location.pathname === '/search/find') {
+                  onSearchQueryChangeExec();
+                }
+
+                refreshSearchBarLabels();
+
+                // Notify the function that handles overflow in case the search
+                // elements load after it has already been run.
+                $rootScope.$broadcast('searchBarLoaded', true);
+              }
+            );
+            $rootScope.$on('$translateChangeSuccess', refreshSearchBarLabels);
+            $rootScope.$on('initializeTranslation', refreshSearchBarLabels);
+          };
         }
       ]
     };

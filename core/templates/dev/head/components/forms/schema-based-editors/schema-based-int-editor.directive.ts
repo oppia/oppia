@@ -41,13 +41,14 @@ angular.module('oppia').directive('schemaBasedIntEditor', [
       controller: [
         '$scope', function($scope) {
           var ctrl = this;
-          if (ctrl.localValue === undefined) {
-            ctrl.localValue = 0;
-          }
-
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               $scope.$emit('submittedSchemaBasedIntForm');
+            }
+          };
+          ctrl.$onInit = function() {
+            if (ctrl.localValue === undefined) {
+              ctrl.localValue = 0;
             }
           };
         }

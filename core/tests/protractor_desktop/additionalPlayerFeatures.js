@@ -227,7 +227,15 @@ describe('Full exploration editor', function() {
               currentExplorationId = url.split('/')[4];
               expect(currentExplorationId).toBe(parentId1);
               users.logout();
+            }, function() {
+              // Note to developers:
+              // Promise is returned by getCurrentUrl which is handled here.
+              // No further action is needed.
             });
+          }, function() {
+            // Note to developers:
+            // Promise is returned by getCurrentUrl which is handled here.
+            // No further action is needed.
           });
         });
       });
@@ -364,6 +372,10 @@ describe('Full exploration editor', function() {
       expect(
         pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
       users.logout();
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
     });
   });
 
