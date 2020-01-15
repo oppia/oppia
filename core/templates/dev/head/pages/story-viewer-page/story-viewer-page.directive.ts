@@ -52,31 +52,6 @@ angular.module('oppia').directive('storyViewerPage', [
             PageTitleService, StoryPlaythroughObjectFactory,
             StoryViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
           var ctrl = this;
-
-          ctrl.storyIsLoaded = false;
-          $rootScope.loadingMessage = 'Loading';
-          var storyId = UrlService.getStoryIdFromViewerUrl();
-          StoryViewerBackendApiService.fetchStoryData(storyId).then(
-            function(storyDataDict) {
-              ctrl.storyIsLoaded = true;
-              ctrl.storyPlaythroughObject =
-                StoryPlaythroughObjectFactory.createFromBackendDict(
-                  storyDataDict);
-              PageTitleService.setPageTitle(
-                storyDataDict.story_title + ' - Oppia');
-              ctrl.storyTitle = storyDataDict.story_title;
-              ctrl.storyDescription = storyDataDict.story_description;
-              $rootScope.loadingMessage = '';
-              ctrl.generatePathParameters();
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get dashboard data');
-              }
-            }
-          );
-
-          ctrl.explorationCardIsShown = false;
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
@@ -87,22 +62,6 @@ angular.module('oppia').directive('storyViewerPage', [
             }
             return ctrl.storyPlaythroughObject.getStoryNodeCount() > 0;
           };
-          // The pathIconParameters is an array containing the co-ordinates,
-          // background color and icon url for the icons generated on the path.
-          ctrl.pathIconParameters = [];
-          ctrl.activeHighlightedIconIndex = -1;
-          ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX = 220;
-          ctrl.ODD_SVG_HEIGHT_OFFSET_PX = 150;
-          ctrl.EVEN_SVG_HEIGHT_OFFSET_PX = 280;
-          ctrl.ICON_Y_INITIAL_PX = 35;
-          ctrl.ICON_Y_INCREMENT_PX = 110;
-          ctrl.ICON_X_MIDDLE_PX = 225;
-          ctrl.ICON_X_LEFT_PX = 55;
-          ctrl.ICON_X_RIGHT_PX = 410;
-          ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
-          ctrl.nextExplorationId = null;
-
-          $anchorScroll.yOffset = -80;
 
           ctrl.isSummaryTileVisible = function(storyNode) {
             if (!storyNode) {
@@ -277,12 +236,55 @@ angular.module('oppia').directive('storyViewerPage', [
             $evt.stopPropagation();
           };
 
-          // Touching anywhere outside the mobile preview should hide it.
-          document.addEventListener('touchstart', function() {
-            if (ctrl.explorationCardIsShown === true) {
-              ctrl.explorationCardIsShown = false;
-            }
-          });
+          ctrl.$onInit = function() {
+            ctrl.storyIsLoaded = false;
+            $rootScope.loadingMessage = 'Loading';
+            var storyId = UrlService.getStoryIdFromViewerUrl();
+            StoryViewerBackendApiService.fetchStoryData(storyId).then(
+              function(storyDataDict) {
+                ctrl.storyIsLoaded = true;
+                ctrl.storyPlaythroughObject =
+                  StoryPlaythroughObjectFactory.createFromBackendDict(
+                    storyDataDict);
+                PageTitleService.setPageTitle(
+                  storyDataDict.story_title + ' - Oppia');
+                ctrl.storyTitle = storyDataDict.story_title;
+                ctrl.storyDescription = storyDataDict.story_description;
+                $rootScope.loadingMessage = '';
+                ctrl.generatePathParameters();
+              },
+              function(errorResponse) {
+                if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                  AlertsService.addWarning('Failed to get dashboard data');
+                }
+              }
+            );
+
+            ctrl.explorationCardIsShown = false;
+            // The pathIconParameters is an array containing the co-ordinates,
+            // background color and icon url for the icons generated on the
+            // path.
+            ctrl.pathIconParameters = [];
+            ctrl.activeHighlightedIconIndex = -1;
+            ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX = 220;
+            ctrl.ODD_SVG_HEIGHT_OFFSET_PX = 150;
+            ctrl.EVEN_SVG_HEIGHT_OFFSET_PX = 280;
+            ctrl.ICON_Y_INITIAL_PX = 35;
+            ctrl.ICON_Y_INCREMENT_PX = 110;
+            ctrl.ICON_X_MIDDLE_PX = 225;
+            ctrl.ICON_X_LEFT_PX = 55;
+            ctrl.ICON_X_RIGHT_PX = 410;
+            ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
+            ctrl.nextExplorationId = null;
+
+            $anchorScroll.yOffset = -80;
+            // Touching anywhere outside the mobile preview should hide it.
+            document.addEventListener('touchstart', function() {
+              if (ctrl.explorationCardIsShown === true) {
+                ctrl.explorationCardIsShown = false;
+              }
+            });
+          };
         }
       ]
     };
