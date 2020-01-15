@@ -28,10 +28,9 @@ angular.module('oppia').directive('scoreRing', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/score-ring/score-ring.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$scope', '$timeout', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
-        function($scope, $timeout, $window, COLORS_FOR_PASS_FAIL_MODE) {
+      controller: ['$scope', '$window', 'COLORS_FOR_PASS_FAIL_MODE',
+        function($scope, $window, COLORS_FOR_PASS_FAIL_MODE) {
           var ctrl = this;
-
           const circle = <SVGCircleElement>(
             document.querySelector('.score-ring-circle'));
           const radius = circle.r.baseVal.value;
@@ -41,16 +40,6 @@ angular.module('oppia').directive('scoreRing', [
             const offset = circumference - percent / 100 * circumference;
             circle.style.strokeDashoffset = offset.toString();
           };
-
-          circle.style.strokeDasharray = `${circumference} ${circumference}`;
-          circle.style.strokeDashoffset = circumference.toString();
-          $scope.$watch(function() {
-            return ctrl.getScore();
-          }, function(newScore) {
-            if (newScore && newScore > 0) {
-              setScore(newScore);
-            }
-          });
 
           ctrl.getScoreRingColor = function() {
             if (ctrl.testIsPassed()) {
@@ -68,6 +57,17 @@ angular.module('oppia').directive('scoreRing', [
               // return color orange when failed.
               return COLORS_FOR_PASS_FAIL_MODE.FAILED_COLOR_OUTER;
             }
+          };
+          ctrl.$onInit = function() {
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference.toString();
+            $scope.$watch(function() {
+              return ctrl.getScore();
+            }, function(newScore) {
+              if (newScore && newScore > 0) {
+                setScore(newScore);
+              }
+            });
           };
         }
       ]

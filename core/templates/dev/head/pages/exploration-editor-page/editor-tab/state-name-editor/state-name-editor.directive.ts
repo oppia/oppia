@@ -24,6 +24,9 @@ require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-name.service.ts');
 require('services/editability.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
@@ -46,59 +49,47 @@ angular.module('oppia').directive('stateNameEditor', [
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$rootScope', 'EditabilityService',
-        'StateEditorService', 'FocusManagerService', 'ExplorationStatesService',
-        'RouterService',
+        'StateEditorService', 'StateNameService', 'FocusManagerService',
+        'ExplorationStatesService', 'RouterService',
         function(
             $scope, $filter, $rootScope, EditabilityService,
-            StateEditorService, FocusManagerService, ExplorationStatesService,
-            RouterService) {
+            StateEditorService, StateNameService, FocusManagerService,
+            ExplorationStatesService, RouterService) {
           var ctrl = this;
-          ctrl.EditabilityService = EditabilityService;
-          var _stateNameMemento = null;
-          ctrl.stateNameEditorIsShown = false;
-          $scope.$on('stateEditorInitialized', function() {
-            ctrl.initStateNameEditor();
-          });
 
           ctrl.initStateNameEditor = function() {
-            _stateNameMemento = null;
-            ctrl.stateNameEditorIsShown = false;
-            ctrl.stateName = StateEditorService.getActiveStateName();
+            StateNameService.init();
           };
 
           ctrl.openStateNameEditor = function() {
-            ctrl.stateNameEditorIsShown = true;
-            ctrl.tmpStateName = ctrl.stateName;
-            _stateNameMemento = ctrl.stateName;
+            var stateName = StateEditorService.getActiveStateName();
+            StateNameService.setStateNameEditorVisibility(true);
+            StateNameService.setStateNameSavedMemento(stateName);
+            ctrl.tmpStateName = stateName;
             FocusManagerService.setFocus('stateNameEditorOpened');
           };
 
           ctrl.saveStateName = function(newStateName) {
             var normalizedNewName =
               ctrl._getNormalizedStateName(newStateName);
+            var savedMemento = StateNameService.getStateNameSavedMemento();
             if (!_isNewStateNameValid(normalizedNewName)) {
               return false;
             }
 
-            if (_stateNameMemento === normalizedNewName) {
-              ctrl.stateNameEditorIsShown = false;
+            if (savedMemento === normalizedNewName) {
+              StateNameService.setStateNameEditorVisibility(false);
               return false;
             } else {
               ExplorationStatesService.renameState(
                 StateEditorService.getActiveStateName(), normalizedNewName);
-              ctrl.stateNameEditorIsShown = false;
+              StateNameService.setStateNameEditorVisibility(false);
               // Save the contents of other open fields.
               $rootScope.$broadcast('externalSave');
               ctrl.initStateNameEditor();
               return true;
             }
           };
-
-          $scope.$on('externalSave', function() {
-            if (ctrl.stateNameEditorIsShown) {
-              ctrl.saveStateName(ctrl.tmpStateName);
-            }
-          });
 
           ctrl._getNormalizedStateName = function(newStateName) {
             return $filter('normalizeWhitespace')(newStateName);
@@ -119,6 +110,18 @@ angular.module('oppia').directive('stateNameEditor', [
             if (valid) {
               RouterService.navigateToMainTab(normalizedStateName);
             }
+          };
+          ctrl.$onInit = function() {
+            $scope.$on('externalSave', function() {
+              if (StateNameService.isStateNameEditorShown()) {
+                ctrl.saveStateName(ctrl.tmpStateName);
+              }
+            });
+            StateNameService.init();
+            ctrl.EditabilityService = EditabilityService;
+            ctrl.StateEditorService = StateEditorService;
+            ctrl.StateNameService = StateNameService;
+            ctrl.stateNameEditorIsShown = false;
           };
         }
       ]

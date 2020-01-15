@@ -64,18 +64,7 @@ angular.module('oppia').directive('stateHintsEditor', [
             StateHintsService, COMPONENT_NAME_HINT, StateEditorService,
             EditabilityService, StateInteractionIdService,
             UrlInterpolationService, HintObjectFactory, StateSolutionService) {
-          $scope.EditabilityService = EditabilityService;
-          $scope.StateHintsService = StateHintsService;
-          $scope.activeHintIndex = null;
-          $scope.canEdit = EditabilityService.isEditable();
-
-          $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/drag_dots.png');
-
-          $scope.$on('stateEditorInitialized', function(evt, stateData) {
-            $scope.activeHintIndex = null;
-          });
-
+          var ctrl = this;
           var _getExistingHintsContentIds = function() {
             var existingContentIds = [];
             StateHintsService.displayed.forEach(function(hint) {
@@ -102,7 +91,7 @@ angular.module('oppia').directive('stateHintsEditor', [
           };
 
           $scope.changeActiveHintIndex = function(newIndex) {
-            var currentActiveIndex = $scope.activeHintIndex;
+            var currentActiveIndex = StateHintsService.getActiveHintIndex();
             if (currentActiveIndex !== null && (
               !StateHintsService.displayed[currentActiveIndex]
                 .hintContent.getHtml())) {
@@ -118,10 +107,10 @@ angular.module('oppia').directive('stateHintsEditor', [
               }
             }
             // If the current hint is being clicked on again, close it.
-            if (newIndex === $scope.activeHintIndex) {
-              $scope.activeHintIndex = null;
+            if (newIndex === StateHintsService.getActiveHintIndex()) {
+              StateHintsService.setActiveHintIndex(null);
             } else {
-              $scope.activeHintIndex = newIndex;
+              StateHintsService.setActiveHintIndex(newIndex);
             }
           };
 
@@ -179,29 +168,11 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.displayed.push(result.hint);
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
-          };
-
-          // When the page is scrolled so that the top of the page is above the
-          // browser viewport, there are some bugs in the positioning of the
-          // helper. This is a bug in jQueryUI that has not been fixed yet. For
-          // more details, see http://stackoverflow.com/q/5791886
-          $scope.HINT_LIST_SORTABLE_OPTIONS = {
-            axis: 'y',
-            cursor: 'move',
-            handle: '.oppia-hint-sort-handle',
-            items: '.oppia-sortable-hint',
-            revert: 100,
-            tolerance: 'pointer',
-            start: function(e, ui) {
-              $rootScope.$broadcast('externalSave');
-              $scope.activeHintIndex = null;
-              ui.placeholder.height(ui.item.height());
-            },
-            stop: function() {
-              StateHintsService.saveDisplayedValue();
-              $scope.onSaveHints(StateHintsService.displayed);
-            }
           };
 
           var openDeleteLastHintModal = function() {
@@ -237,6 +208,10 @@ angular.module('oppia').directive('stateHintsEditor', [
               StateHintsService.displayed = [];
               StateHintsService.saveDisplayedValue();
               $scope.onSaveHints(StateHintsService.displayed);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -276,9 +251,13 @@ angular.module('oppia').directive('stateHintsEditor', [
                 $scope.onSaveHints(StateHintsService.displayed);
               }
 
-              if (index === $scope.activeHintIndex) {
-                $scope.activeHintIndex = null;
+              if (index === StateHintsService.getActiveHintIndex()) {
+                StateHintsService.setActiveHintIndex(null);
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -286,8 +265,37 @@ angular.module('oppia').directive('stateHintsEditor', [
             StateHintsService.saveDisplayedValue();
             $scope.onSaveHints(StateHintsService.displayed);
           };
+          ctrl.$onInit = function() {
+            $scope.EditabilityService = EditabilityService;
+            $scope.StateHintsService = StateHintsService;
+            StateHintsService.setActiveHintIndex(null);
+            $scope.canEdit = EditabilityService.isEditable();
 
-          StateEditorService.updateStateHintsEditorInitialised();
+            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/drag_dots.png');
+            // When the page is scrolled so that the top of the page is above
+            // the browser viewport, there are some bugs in the positioning of
+            // the helper. This is a bug in jQueryUI that has not been fixed
+            // yet. For more details, see http://stackoverflow.com/q/5791886
+            $scope.HINT_LIST_SORTABLE_OPTIONS = {
+              axis: 'y',
+              cursor: 'move',
+              handle: '.oppia-hint-sort-handle',
+              items: '.oppia-sortable-hint',
+              revert: 100,
+              tolerance: 'pointer',
+              start: function(e, ui) {
+                $rootScope.$broadcast('externalSave');
+                StateHintsService.setActiveHintIndex(null);
+                ui.placeholder.height(ui.item.height());
+              },
+              stop: function() {
+                StateHintsService.saveDisplayedValue();
+                $scope.onSaveHints(StateHintsService.displayed);
+              }
+            };
+            StateEditorService.updateStateHintsEditorInitialised();
+          };
         }
       ]
     };

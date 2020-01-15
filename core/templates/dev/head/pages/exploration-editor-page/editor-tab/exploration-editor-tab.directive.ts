@@ -76,32 +76,6 @@ angular.module('oppia').directive('explorationEditorTab', [
             ExplorationWarningsService, GraphDataService, RouterService,
             StateEditorService, UrlInterpolationService) {
           var ctrl = this;
-          ctrl.areParametersEnabled =
-            ExplorationFeaturesService.areParametersEnabled;
-
-          ctrl.interactionIsShown = false;
-
-          $scope.$on('refreshStateEditor', function() {
-            ctrl.initStateEditor();
-          });
-
-          $scope.$watch(ExplorationStatesService.getStates, function() {
-            if (ExplorationStatesService.getStates()) {
-              StateEditorService.setStateNames(
-                ExplorationStatesService.getStateNames());
-            }
-          }, true);
-
-          $scope.$watch(function() {
-            return StateEditorService.isStateEditorInitialised();
-          }, function() {
-            if (StateEditorService.isStateEditorInitialised() &&
-            ExplorationStatesService.isInitialized()) {
-              var stateData = ExplorationStatesService.getState(ctrl.stateName);
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
-            }
-          });
-
           ctrl.getStateContentPlaceholder = function() {
             if (
               StateEditorService.getActiveStateName() ===
@@ -133,7 +107,26 @@ angular.module('oppia').directive('explorationEditorTab', [
             StateEditorService.setInQuestionMode(false);
             var stateData = ExplorationStatesService.getState(ctrl.stateName);
             if (ctrl.stateName && stateData) {
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
+              // StateEditorService.checkEventListenerRegistrationStatus()
+              // returns true if the event listeners of the state editor child
+              // components have been registered.
+              // In this case 'stateEditorInitialized' is broadcasted so that:
+              // 1. state-editor directive can initialise the child
+              //    components of the state editor.
+              // 2. state-interaction-editor directive can initialise the
+              //    child components of the interaction editor.
+              $scope.$watch(function() {
+                return (
+                  StateEditorService.checkEventListenerRegistrationStatus());
+              }, function() {
+                if (
+                  StateEditorService.checkEventListenerRegistrationStatus() &&
+                ExplorationStatesService.isInitialized()) {
+                  var stateData = (
+                    ExplorationStatesService.getState(ctrl.stateName));
+                  $rootScope.$broadcast('stateEditorInitialized', stateData);
+                }
+              });
 
               var content = ExplorationStatesService.getStateContentMemento(
                 ctrl.stateName);
@@ -144,14 +137,6 @@ angular.module('oppia').directive('explorationEditorTab', [
               $rootScope.loadingMessage = '';
             }
           };
-
-          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
-            if (ExplorationStatesService.isInitialized()) {
-              var stateData = (
-                ExplorationStatesService.getState(ctrl.stateName));
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
-            }
-          });
 
           ctrl.recomputeGraph = function() {
             GraphDataService.recompute();
@@ -259,12 +244,31 @@ angular.module('oppia').directive('explorationEditorTab', [
                   ExplorationStatesService.saveWrittenTranslations(
                     stateName, writtenTranslations);
                 }
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             }
           };
 
           ctrl.navigateToState = function(stateName) {
             RouterService.navigateToMainTab(stateName);
+          };
+          ctrl.areParametersEnabled = function() {
+            return ExplorationFeaturesService.areParametersEnabled();
+          };
+          ctrl.$onInit = function() {
+            $scope.$on('refreshStateEditor', function() {
+              ctrl.initStateEditor();
+            });
+
+            $scope.$watch(ExplorationStatesService.getStates, function() {
+              if (ExplorationStatesService.getStates()) {
+                StateEditorService.setStateNames(
+                  ExplorationStatesService.getStateNames());
+              }
+            }, true);
+            ctrl.interactionIsShown = false;
           };
         }
       ]

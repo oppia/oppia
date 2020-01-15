@@ -73,10 +73,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
             EVENT_TYPE_TOPIC_CREATION_ENABLED,
             FATAL_ERROR_CODES, SKILL_DIFFICULTIES) {
           var ctrl = this;
-          ctrl.TAB_NAME_TOPICS = 'topics';
-          ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
-          ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
-
           var _initDashboard = function() {
             TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
               function(response) {
@@ -90,8 +86,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   response.data.untriaged_skill_summary_dicts;
                 ctrl.mergeableSkillSummaries =
                   response.data.mergeable_skill_summary_dicts;
-                ctrl.unpublishedSkillSummaries =
-                  response.data.unpublished_skill_summary_dicts;
                 ctrl.activeTab = ctrl.TAB_NAME_TOPICS;
                 ctrl.userCanCreateTopic = response.data.can_create_topic;
                 ctrl.userCanCreateSkill = response.data.can_create_skill;
@@ -104,10 +98,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 if (ctrl.topicSummaries.length === 0 &&
                     ctrl.untriagedSkillSummaries.length !== 0) {
                   ctrl.activeTab = ctrl.TAB_NAME_UNTRIAGED_SKILLS;
-                } else if (
-                  ctrl.topicSummaries.length === 0 &&
-                  ctrl.unpublishedSkillSummaries.length !== 0) {
-                  ctrl.activeTab = ctrl.TAB_NAME_UNPUBLISHED_SKILLS;
                 }
               },
               function(errorResponse) {
@@ -124,14 +114,12 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
           ctrl.isTopicTabHelpTextVisible = function() {
             return (
               (ctrl.topicSummaries.length === 0) &&
-              (ctrl.untriagedSkillSummaries.length > 0 ||
-              ctrl.unpublishedSkillSummaries.length > 0));
+              (ctrl.untriagedSkillSummaries.length > 0));
           };
           ctrl.isSkillsTabHelpTextVisible = function() {
             return (
               (ctrl.untriagedSkillSummaries.length === 0) &&
-              (ctrl.topicSummaries.length > 0) &&
-              (ctrl.unpublishedSkillSummaries.length === 0));
+              (ctrl.topicSummaries.length > 0));
           };
           ctrl.setActiveTab = function(tabName) {
             ctrl.activeTab = tabName;
@@ -198,10 +186,17 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 result.description, result.rubrics, result.explanation, []);
             });
           };
-
-          _initDashboard();
-          $scope.$on(
-            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, _initDashboard);
+          ctrl.$onInit = function() {
+            ctrl.TAB_NAME_TOPICS = 'topics';
+            ctrl.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
+            ctrl.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
+            $scope.$on(
+              EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, _initDashboard);
+            // The _initDashboard function is written separately since it is
+            // also called in $scope.$on when some external events are
+            // triggered.
+            _initDashboard();
+          };
         }
       ]
     };

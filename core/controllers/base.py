@@ -59,9 +59,9 @@ def _clear_login_cookies(response_headers):
             context of the response.
     """
     # App Engine sets the ACSID cookie for http:// and the SACSID cookie
-    # for https:// . We just unset both below.
-    cookie = http.cookies.SimpleCookie()
-    for cookie_name in [b'ACSID', b'SACSID']:
+    # for https:// . We just unset both below. We also unset dev_appserver_login
+    # cookie used in local server.
+    for cookie_name in [b'ACSID', b'SACSID', b'dev_appserver_login']:
         cookie = http.cookies.SimpleCookie()
         cookie[cookie_name] = ''
         cookie[cookie_name]['expires'] = (
@@ -80,13 +80,10 @@ class LogoutPage(webapp2.RequestHandler):
         """
 
         _clear_login_cookies(self.response.headers)
-        url_to_redirect_to = '/'
-
-        if constants.DEV_MODE:
-            self.redirect(
-                current_user_services.create_logout_url(url_to_redirect_to))
-        else:
-            self.redirect(url_to_redirect_to)
+        url_to_redirect_to = (
+            python_utils.convert_to_bytes(
+                self.request.get('redirect_url', '/')))
+        self.redirect(url_to_redirect_to)
 
 
 class UserFacingExceptions(python_utils.OBJECT):
@@ -160,11 +157,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.values['user_email'] = user_settings.email
             self.user_id = user_settings.user_id
 
-            self.user_is_scheduled_for_deletion = user_settings.to_be_deleted
-
-            if (self.REDIRECT_UNFINISHED_SIGNUPS and not
-                    user_services.has_fully_registered(user_settings.user_id)):
-                _clear_login_cookies(self.response.headers)
+            if user_settings.deleted:
+                self.user_is_scheduled_for_deletion = user_settings.deleted
+            elif (self.REDIRECT_UNFINISHED_SIGNUPS and not
+                  user_services.has_fully_registered(user_settings.user_id)):
                 self.partially_logged_in = True
             else:
                 self.username = user_settings.username
@@ -213,12 +209,13 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        # In DEV_MODE, clearing cookies does not log out the user, so we
-        # force-clear them by redirecting to the logout URL.
-        if ((constants.DEV_MODE and self.partially_logged_in) or
-                self.user_is_scheduled_for_deletion):
+        if self.user_is_scheduled_for_deletion:
             self.redirect(
-                current_user_services.create_logout_url(self.request.uri))
+                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
+            return
+
+        if self.partially_logged_in:
+            self.redirect('/logout?redirect_url=%s' % self.request.uri)
             return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:

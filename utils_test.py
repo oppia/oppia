@@ -190,7 +190,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, '.')
         p = utils.vfs_normpath('//foo//bar//baz//')
         self.assertEqual(p, '//foo/bar/baz')
-    
+
     def test_capitalize_string(self):
         test_data = [
             [None, None],
