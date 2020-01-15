@@ -39,8 +39,10 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
         self.skill_id1 = 'skill_id_1'
         self.skill_id2 = 'skill_id_2'
 
-        self.save_new_skill(self.skill_id1, self.admin_id, 'Skill 1')
-        self.save_new_skill(self.skill_id2, self.admin_id, 'Skill 2')
+        self.save_new_skill(
+            self.skill_id1, self.admin_id, description='Skill 1')
+        self.save_new_skill(
+            self.skill_id2, self.admin_id, description='Skill 2')
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name', 'abbrev')

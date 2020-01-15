@@ -218,8 +218,10 @@ class ExplorationModel(base_models.VersionedModel):
             exp_rights_models = ExplorationRightsModel.get_multi(
                 entity_ids, include_deleted=True)
             versioned_models = cls.get_multi(entity_ids, include_deleted=True)
-            for model, rights_model in python_utils.ZIP(
-                    versioned_models, exp_rights_models):
+
+            versioned_and_exp_rights_models = python_utils.ZIP(
+                versioned_models, exp_rights_models)
+            for model, rights_model in versioned_and_exp_rights_models:
                 exploration_commit_log = ExplorationCommitLogEntryModel.create(
                     model.id, model.version, committer_id, committer_username,
                     cls._COMMIT_TYPE_DELETE,

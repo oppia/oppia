@@ -596,7 +596,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
 
         cls._validate_post_commit_status(item)
 
-        if item.id[0:8] == 'question' or item.id[0:5] == 'skill':
+        if item.id.startswith('question') or item.id.startswith('skill'):
             cls._validate_post_commit_status_is_public(item)
         else:
             cls._validate_post_commit_is_private(item)
