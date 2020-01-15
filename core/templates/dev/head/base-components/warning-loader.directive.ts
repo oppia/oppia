@@ -29,7 +29,9 @@ angular.module('oppia').directive('warningLoader', [
       controller: ['AlertsService',
         function(AlertsService) {
           var ctrl = this;
-          ctrl.AlertsService = AlertsService;
+          ctrl.$onInit = function() {
+            ctrl.AlertsService = AlertsService;
+          };
         }
       ]
     };
