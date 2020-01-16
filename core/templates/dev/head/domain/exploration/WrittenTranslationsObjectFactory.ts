@@ -57,12 +57,12 @@ export class WrittenTranslations {
     return Object.keys(this.translationsMapping[contentId]);
   }
 
-  hasWrittenTranslation(contentId: string, langaugeCode: string): boolean {
+  hasWrittenTranslation(contentId: string, languageCode: string): boolean {
     if (!this.translationsMapping.hasOwnProperty(contentId)) {
       return false;
     }
     return this.getTranslationsLanguageCodes(
-      contentId).indexOf(langaugeCode) !== -1;
+      contentId).indexOf(languageCode) !== -1;
   }
 
   hasUnflaggedWrittenTranslations(contentId: string): boolean {
@@ -120,13 +120,13 @@ export class WrittenTranslations {
   toBackendDict(): any {
     var translationsMappingDict = {};
     for (var contentId in this.translationsMapping) {
-      var langaugeToWrittenTranslation = this.translationsMapping[contentId];
-      var langaugeToWrittenTranslationDict = {};
-      Object.keys(langaugeToWrittenTranslation).forEach((lang) => {
-        langaugeToWrittenTranslationDict[lang] = (
-          langaugeToWrittenTranslation[lang].toBackendDict());
+      var languageToWrittenTranslation = this.translationsMapping[contentId];
+      var languageToWrittenTranslationDict = {};
+      Object.keys(languageToWrittenTranslation).forEach((lang) => {
+        languageToWrittenTranslationDict[lang] = (
+          languageToWrittenTranslation[lang].toBackendDict());
       });
-      translationsMappingDict[contentId] = langaugeToWrittenTranslationDict;
+      translationsMappingDict[contentId] = languageToWrittenTranslationDict;
     }
 
     return {translations_mapping: translationsMappingDict};
