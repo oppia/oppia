@@ -22,7 +22,6 @@ from core.domain import question_domain
 from core.domain import state_domain
 from core.tests import test_utils
 import feconf
-import python_utils
 import utils
 
 
