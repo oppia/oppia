@@ -1255,7 +1255,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
                     'no-space-at-beginning', line=line_num + 1)
 
             # Check if comment contains version info or data type.
-            if line.startswith(b'#') and not next_line.startswith(b'#'):
+            if line.startswith(b'#'):
                 data_type_is_present = any(word in line for word in DATA_TYPES)
                 if data_type_is_present or re.search(br'^# v[0-9]+ .*$', line):
                     continue
