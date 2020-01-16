@@ -65,7 +65,7 @@ export class EmailDashboardDataService {
     return this.latestCursor;
   }
 
-  submitQuery(data: any) {
+  submitQuery(data: any): Promise<Array<Query>> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
@@ -78,7 +78,7 @@ export class EmailDashboardDataService {
     });
   }
 
-  getNextQueries(): Promise<Object> {
+  getNextQueries(): Promise<Array<Query>> {
     var startQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 2) * this.QUERIES_PER_PAGE;
 
@@ -115,7 +115,7 @@ export class EmailDashboardDataService {
     return (this.currentPageIndex > 0);
   }
 
-  fetchQuery(queryId: string): Promise<Object> {
+  fetchQuery(queryId: string): Promise<Query> {
     return this.http.get(this.QUERY_STATUS_CHECK_URL, {
       params: {
         query_id: queryId
