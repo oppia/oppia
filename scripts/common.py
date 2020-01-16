@@ -35,7 +35,7 @@ CURRENT_PYTHON_BIN = sys.executable
 NODE_VERSION = '10.18.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = 'v1.21.1'
+YARN_VERSION = '1.21.1'
 
 COVERAGE_VERSION = '4.5.4'
 
