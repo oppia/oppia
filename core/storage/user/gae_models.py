@@ -322,11 +322,11 @@ class CompletedActivitiesModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict or None. A dict with two keys, 'completed_exploration_ids'
+            dict. A dict with two keys, 'completed_exploration_ids'
             and 'completed_collection_ids'. The corresponding values are
             lists of the IDs of the explorations and collections,
             respectively, which the given user has completed. If the
-            user_id is invalid, returns None.
+            user_id is invalid, returns an empty dict.
         """
         user_model = CompletedActivitiesModel.get(user_id, strict=False)
         if not user_model:
