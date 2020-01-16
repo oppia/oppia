@@ -61,29 +61,6 @@ angular.module('oppia').directive('feedbackTab', [
             ThreadDataService, ThreadStatusDisplayService,
             UrlInterpolationService, UserService) {
           var ctrl = this;
-          ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
-          ctrl.threadData = ThreadDataService.data;
-          ctrl.getLabelClass = ThreadStatusDisplayService.getLabelClass;
-          ctrl.getHumanReadableStatus = (
-            ThreadStatusDisplayService.getHumanReadableStatus);
-          ctrl.getLocaleAbbreviatedDatetimeString = (
-            DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
-
-          ctrl.activeThread = null;
-          ctrl.userIsLoggedIn = null;
-          ctrl.threadIsUpdated = false;
-          ctrl.isExplorationEditable = EditabilityService.isEditable;
-          $rootScope.loadingMessage = 'Loading';
-          var userInfoPromise = UserService.getUserInfoAsync();
-          userInfoPromise.then(function(userInfo) {
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          });
-
-          // Initial load of the thread list on page load.
-          ctrl.tmpMessage = {
-            status: null,
-            text: ''
-          };
           var _resetTmpMessageFields = function() {
             ctrl.tmpMessage.status = ctrl.activeThread ?
               ctrl.activeThread.status : null;
@@ -93,12 +70,6 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.activeThread = null;
             _resetTmpMessageFields();
           };
-          ctrl.clearActiveThread();
-          ThreadDataService.fetchFeedbackStats();
-          var threadPromise = ThreadDataService.fetchThreads();
-          $q.all([userInfoPromise, threadPromise]).then(function() {
-            $rootScope.loadingMessage = '';
-          });
           // Fetches the threads again if any thread is updated.
           ctrl.fetchUpdatedThreads = function() {
             ThreadDataService.fetchThreads();
@@ -151,6 +122,10 @@ angular.module('oppia').directive('feedbackTab', [
                   ctrl.clearActiveThread();
                   AlertsService.addSuccessMessage('Feedback thread created.');
                 });
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -225,6 +200,46 @@ angular.module('oppia').directive('feedbackTab', [
             }
             ctrl.tmpMessage.status = ctrl.activeThread.status;
           };
+          ctrl.getLabelClass = function(status) {
+            return ThreadStatusDisplayService.getLabelClass(status);
+          };
+          ctrl.getHumanReadableStatus = function(status) {
+            return ThreadStatusDisplayService.getHumanReadableStatus(status);
+          };
+          ctrl.getLocaleAbbreviatedDatetimeString = function(
+              millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              millisSinceEpoch);
+          };
+          ctrl.isExplorationEditable = function() {
+            return EditabilityService.isEditable();
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
+            ctrl.threadData = ThreadDataService.data;
+            ctrl.activeThread = null;
+            ctrl.userIsLoggedIn = null;
+            ctrl.threadIsUpdated = false;
+            $rootScope.loadingMessage = 'Loading';
+            var userInfoPromise = UserService.getUserInfoAsync();
+            userInfoPromise.then(function(userInfo) {
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            });
+
+            // Initial load of the thread list on page load.
+            ctrl.tmpMessage = {
+              status: null,
+              text: ''
+            };
+            ctrl.clearActiveThread();
+            ThreadDataService.fetchFeedbackStats();
+            var threadPromise = ThreadDataService.fetchThreads();
+            $q.all([userInfoPromise, threadPromise]).then(function() {
+              $rootScope.loadingMessage = '';
+            });
+          };
         }
-      ]};
+      ]
+    };
   }]);

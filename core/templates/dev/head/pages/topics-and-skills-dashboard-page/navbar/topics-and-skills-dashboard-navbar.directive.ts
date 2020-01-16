@@ -49,6 +49,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
             EVENT_TYPE_SKILL_CREATION_ENABLED, EditableTopicBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED,
             SKILL_DIFFICULTIES) {
+          var ctrl = this;
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
           };
@@ -111,16 +112,18 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                 result.description, result.rubrics, result.explanation, []);
             });
           };
-          $rootScope.$on(
-            EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {
-              $scope.userCanCreateTopic = canCreateTopic;
-            }
-          );
-          $rootScope.$on(
-            EVENT_TYPE_SKILL_CREATION_ENABLED, function(evt, canCreateSkill) {
-              $scope.userCanCreateSkill = canCreateSkill;
-            }
-          );
+          ctrl.$onInit = function() {
+            $rootScope.$on(
+              EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {
+                $scope.userCanCreateTopic = canCreateTopic;
+              }
+            );
+            $rootScope.$on(
+              EVENT_TYPE_SKILL_CREATION_ENABLED, function(evt, canCreateSkill) {
+                $scope.userCanCreateSkill = canCreateSkill;
+              }
+            );
+          };
         }
       ]
     };

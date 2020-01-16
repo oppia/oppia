@@ -253,15 +253,18 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id, 'user', 'Description')
+            self.skill_id, 'user', description='Description')
 
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, 'user', 'Topic', 'abbrev', None, 'A new topic',
-            [], [], [], [], 0)
+            topic_id, 'user', name='Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, 'user', 'Title', 'Description', 'Notes', topic_id
         )
@@ -349,7 +352,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, 'user', 'Description')
+        self.save_new_skill(self.skill_id, 'user', description='Description')
 
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
@@ -381,7 +384,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_multiple_skill_id_returns_questions(self):
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_2, 'user', 'Description')
+        self.save_new_skill(skill_id_2, 'user', description='Description')
 
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(
