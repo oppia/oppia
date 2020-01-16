@@ -45,6 +45,10 @@ class Continue(base.BaseInteraction):
         'description': 'Button label',
         'schema': {
             'type': 'unicode',
+            'validators': [{
+                'max_value': 50,
+                'id': 'has_length_at_most'
+            }]
         },
         'default_value': 'Continue',
     }]

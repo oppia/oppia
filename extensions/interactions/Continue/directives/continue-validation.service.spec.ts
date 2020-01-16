@@ -82,6 +82,14 @@ describe('ContinueValidationService', () => {
         message: 'The button text should not be empty.'
       }]);
 
+      customizationArguments.buttonText.value = 'a'.repeat(51);
+      warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.CRITICAL,
+        message: 'The button text should not be too long.'
+      }]);
+
       expect(() => {
         validatorService.getAllWarnings(
           currentState, {}, [], goodDefaultOutcome);
