@@ -49,11 +49,11 @@ angular.module('oppia').directive('graphViz', [
         'graph-viz.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$element', '$attrs', '$document', '$timeout',
+        '$scope', '$element', '$attrs', '$document',
         'FocusManagerService', 'GraphDetailService', 'GRAPH_INPUT_LEFT_MARGIN',
         'EVENT_NEW_CARD_AVAILABLE', 'DeviceInfoService',
         function(
-            $scope, $element, $attrs, $document, $timeout,
+            $scope, $element, $attrs, $document,
             FocusManagerService, GraphDetailService, GRAPH_INPUT_LEFT_MARGIN,
             EVENT_NEW_CARD_AVAILABLE, DeviceInfoService) {
           var ctrl = this;
@@ -63,49 +63,53 @@ angular.module('oppia').directive('graphViz', [
             ADD_VERTEX: 2,
             DELETE: 3
           };
-          // The current state of the UI and stuff like that
-          ctrl.state = {
-            currentMode: _MODES.MOVE,
-            // Vertex, edge, mode button, label currently being hovered over
-            hoveredVertex: null,
-            hoveredEdge: null,
-            hoveredModeButton: null,
-            // If in ADD_EDGE mode, source vertex of the new edge, if it exists
-            addEdgeVertex: null,
-            // Currently dragged vertex
-            currentlyDraggedVertex: null,
-            // Selected vertex for editing label
-            selectedVertex: null,
-            // Selected edge for editing weight
-            selectedEdge: null,
-            // Mouse position in SVG coordinates
-            mouseX: 0,
-            mouseY: 0,
-            // Original position of dragged vertex
-            vertexDragStartX: 0,
-            vertexDragStartY: 0,
-            // Original position of mouse when dragging started
-            mouseDragStartX: 0,
-            mouseDragStartY: 0
-          };
-
-          ctrl.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
-          ctrl.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
-          ctrl.selectedEdgeWeightValue = 0;
-          ctrl.shouldShowWrongWeightWarning = false;
-
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.state.currentMode = null;
-          });
-
-          ctrl.isMobile = false;
-          if (DeviceInfoService.isMobileDevice()) {
-            ctrl.isMobile = true;
-          }
-
           var vizContainer = $($element).find('.oppia-graph-viz-svg');
-          ctrl.vizWidth = vizContainer.width();
-
+          // Styling functions
+          var DELETE_COLOR = 'red';
+          var HOVER_COLOR = 'aqua';
+          var SELECT_COLOR = 'orange';
+          var DEFAULT_COLOR = 'black';
+          ctrl.getEdgeColor = function(index) {
+            if (!ctrl.isInteractionActive()) {
+              return DEFAULT_COLOR;
+            }
+            if (ctrl.state.currentMode === _MODES.DELETE &&
+                index === ctrl.state.hoveredEdge &&
+                ctrl.canDeleteEdge) {
+              return DELETE_COLOR;
+            } else if (index === ctrl.state.hoveredEdge) {
+              return HOVER_COLOR;
+            } else if (ctrl.state.selectedEdge === index) {
+              return SELECT_COLOR;
+            } else {
+              return DEFAULT_COLOR;
+            }
+          };
+          ctrl.getVertexColor = function(index) {
+            if (!ctrl.isInteractionActive()) {
+              return DEFAULT_COLOR;
+            }
+            if (ctrl.state.currentMode === _MODES.DELETE &&
+                index === ctrl.state.hoveredVertex &&
+                ctrl.canDeleteVertex) {
+              return DELETE_COLOR;
+            } else if (index === ctrl.state.currentlyDraggedVertex) {
+              return HOVER_COLOR;
+            } else if (index === ctrl.state.hoveredVertex) {
+              return HOVER_COLOR;
+            } else if (ctrl.state.selectedVertex === index) {
+              return SELECT_COLOR;
+            } else {
+              return DEFAULT_COLOR;
+            }
+          };
+          ctrl.getDirectedEdgeArrowPoints = function(index) {
+            return GraphDetailService.getDirectedEdgeArrowPoints(
+              ctrl.graph, index);
+          };
+          ctrl.getEdgeCentre = function(index) {
+            return GraphDetailService.getEdgeCentre(ctrl.graph, index);
+          };
           ctrl.mousemoveGraphSVG = function(event) {
             if (!ctrl.isInteractionActive()) {
               return;
@@ -216,19 +220,6 @@ angular.module('oppia').directive('graphViz', [
               0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
                 ' ' + (viewBoxHeight));
           };
-
-          ctrl.graphOptions = [{
-            text: 'Labeled',
-            option: 'isLabeled'
-          },
-          {
-            text: 'Directed',
-            option: 'isDirected'
-          },
-          {
-            text: 'Weighted',
-            option: 'isWeighted'
-          }];
           ctrl.toggleGraphOption = function(option) {
             // Handle the case when we have two edges s -> d and d -> s
             if (option === 'isDirected' && ctrl.graph[option]) {
@@ -236,8 +227,6 @@ angular.module('oppia').directive('graphViz', [
             }
             ctrl.graph[option] = !ctrl.graph[option];
           };
-
-          ctrl.helpText = null;
           var setMode = function(mode) {
             ctrl.state.currentMode = mode;
             if (ctrl.isMobile) {
@@ -398,8 +387,6 @@ angular.module('oppia').directive('graphViz', [
               }
             }
           };
-          $document.on('mouseup', ctrl.onMouseupDocument);
-
           // Actions
           var beginAddEdge = function(startIndex) {
             ctrl.state.addEdgeVertex = startIndex;
@@ -541,60 +528,71 @@ angular.module('oppia').directive('graphViz', [
             }
             ctrl.state.selectedEdge = null;
           };
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.state.currentMode = null;
+            });
+            // The current state of the UI and stuff like that.
+            ctrl.state = {
+              currentMode: _MODES.MOVE,
+              // Vertex, edge, mode button, label currently being hovered over.
+              hoveredVertex: null,
+              hoveredEdge: null,
+              hoveredModeButton: null,
+              // If in ADD_EDGE mode, source vertex of the new edge, if it
+              // exists.
+              addEdgeVertex: null,
+              // Currently dragged vertex.
+              currentlyDraggedVertex: null,
+              // Selected vertex for editing label.
+              selectedVertex: null,
+              // Selected edge for editing weight.
+              selectedEdge: null,
+              // Mouse position in SVG coordinates.
+              mouseX: 0,
+              mouseY: 0,
+              // Original position of dragged vertex.
+              vertexDragStartX: 0,
+              vertexDragStartY: 0,
+              // Original position of mouse when dragging started.
+              mouseDragStartX: 0,
+              mouseDragStartY: 0
+            };
 
-          // Styling functions
-          var DELETE_COLOR = 'red';
-          var HOVER_COLOR = 'aqua';
-          var SELECT_COLOR = 'orange';
-          var DEFAULT_COLOR = 'black';
-          ctrl.getEdgeColor = function(index) {
-            if (!ctrl.isInteractionActive()) {
-              return DEFAULT_COLOR;
-            }
-            if (ctrl.state.currentMode === _MODES.DELETE &&
-                index === ctrl.state.hoveredEdge &&
-                ctrl.canDeleteEdge) {
-              return DELETE_COLOR;
-            } else if (index === ctrl.state.hoveredEdge) {
-              return HOVER_COLOR;
-            } else if (ctrl.state.selectedEdge === index) {
-              return SELECT_COLOR;
-            } else {
-              return DEFAULT_COLOR;
-            }
-          };
-          ctrl.getVertexColor = function(index) {
-            if (!ctrl.isInteractionActive()) {
-              return DEFAULT_COLOR;
-            }
-            if (ctrl.state.currentMode === _MODES.DELETE &&
-                index === ctrl.state.hoveredVertex &&
-                ctrl.canDeleteVertex) {
-              return DELETE_COLOR;
-            } else if (index === ctrl.state.currentlyDraggedVertex) {
-              return HOVER_COLOR;
-            } else if (index === ctrl.state.hoveredVertex) {
-              return HOVER_COLOR;
-            } else if (ctrl.state.selectedVertex === index) {
-              return SELECT_COLOR;
-            } else {
-              return DEFAULT_COLOR;
-            }
-          };
-          ctrl.getDirectedEdgeArrowPoints = function(index) {
-            return GraphDetailService.getDirectedEdgeArrowPoints(
-              ctrl.graph, index);
-          };
-          ctrl.getEdgeCentre = function(index) {
-            return GraphDetailService.getEdgeCentre(ctrl.graph, index);
-          };
+            ctrl.VERTEX_RADIUS = GraphDetailService.VERTEX_RADIUS;
+            ctrl.EDGE_WIDTH = GraphDetailService.EDGE_WIDTH;
+            ctrl.selectedEdgeWeightValue = 0;
+            ctrl.shouldShowWrongWeightWarning = false;
 
-          // Initial value of SVG view box.
-          ctrl.svgViewBox = initViewboxSize();
+            ctrl.isMobile = false;
+            if (DeviceInfoService.isMobileDevice()) {
+              ctrl.isMobile = true;
+            }
 
-          if (ctrl.isInteractionActive()) {
-            ctrl.init();
-          }
+            ctrl.vizWidth = vizContainer.width();
+
+            ctrl.graphOptions = [{
+              text: 'Labeled',
+              option: 'isLabeled'
+            },
+            {
+              text: 'Directed',
+              option: 'isDirected'
+            },
+            {
+              text: 'Weighted',
+              option: 'isWeighted'
+            }];
+            ctrl.helpText = null;
+            $document.on('mouseup', ctrl.onMouseupDocument);
+
+            // Initial value of SVG view box.
+            ctrl.svgViewBox = initViewboxSize();
+
+            if (ctrl.isInteractionActive()) {
+              ctrl.init();
+            }
+          };
         }
       ]
     };

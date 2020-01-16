@@ -38,17 +38,10 @@ angular.module('oppia').directive('skillDescriptionEditor', [
       controller: [
         '$scope', 'EVENT_SKILL_REINITIALIZED',
         function($scope, EVENT_SKILL_REINITIALIZED) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.tmpSkillDescription = $scope.skill.getDescription();
-          $scope.skillRights = SkillEditorStateService.getSkillRights();
-
+          var ctrl = this;
           $scope.canEditSkillDescription = function() {
             return $scope.skillRights.canEditSkillDescription();
           };
-
-          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-            $scope.tmpSkillDescription = $scope.skill.getDescription();
-          });
 
           $scope.saveSkillDescription = function(newSkillDescription) {
             if (newSkillDescription === $scope.skill.getDescription()) {
@@ -61,6 +54,15 @@ angular.module('oppia').directive('skillDescriptionEditor', [
                 $scope.skill,
                 newSkillDescription);
             }
+          };
+
+          ctrl.$onInit = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.tmpSkillDescription = $scope.skill.getDescription();
+            $scope.skillRights = SkillEditorStateService.getSkillRights();
+            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+              $scope.tmpSkillDescription = $scope.skill.getDescription();
+            });
           };
         }
       ]
