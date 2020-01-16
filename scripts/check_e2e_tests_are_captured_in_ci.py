@@ -28,7 +28,8 @@ import utils
 # One is extra ie. (full: [*.js]), and three other tests that
 # are being run by circleCi.
 TEST_SUITES_NOT_RUN_ON_TRAVIS = [
-    'full', 'classroomPage', 'fileUploadFeatures','topicAndStoryEditor']
+    'full', 'classroomPageFileUploadFeatures', 'fileUploadFeatures',
+    'topicAndStoryEditorFileUploadFeatures']
 
 TRAVIS_CI_FILE_PATH = os.path.join(os.getcwd(), '.travis.yml')
 PROTRACTOR_CONF_FILE_PATH = os.path.join(
@@ -145,14 +146,17 @@ def main():
             TRAVIS_PROTRACTOR_COMMON_TEST not in yaml_scripts or
             TRAVIS_PROTRACTOR_COMMON_TEST not in protractor_test_suites):
         if TRAVIS_PROTRACTOR_COMMON_TEST not in yaml_jobs:
-            raise Exception('explorationImprovementsTab is missing from the e2e test '
-                            'suites extracted from jobs section from travis.ci')
+            raise Exception('explorationImprovementsTab is missing from '
+                            'the e2e test suites extracted from jobs section'
+                            ' from travis.ci')
         if TRAVIS_PROTRACTOR_COMMON_TEST not in yaml_scripts:
-            raise Exception('explorationImprovementsTab is missing from the e2e test '
-                            'suites extracted from script section from travis.ci')
+            raise Exception('explorationImprovementsTab is missing from '
+                            'the e2e test suites extracted from script section'
+                            ' from travis.ci')
         if TRAVIS_PROTRACTOR_COMMON_TEST not in protractor_test_suites:
-            raise Exception('explorationImprovementsTab is missing from the e2e test '
-                            'suites extracted from protractor.conf.js')
+            raise Exception('explorationImprovementsTab is missing from '
+                            'the e2e test suites extracted from '
+                            'protractor.conf.js')
 
     if not (protractor_test_suites == yaml_jobs and yaml_jobs == yaml_scripts):
         raise Exception(
@@ -164,5 +168,5 @@ def main():
 # The 'no coverage' pragma is used as this line is un-testable. This is because
 # it will only be called when check_e2e_tests_are_captured_in_ci.py
 # is used as a script.
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     main()

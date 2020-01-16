@@ -351,7 +351,8 @@ def does_diff_include_travis_yaml_or_protractor_conf_file(files_to_lint):
     """
 
     for filename in files_to_lint:
-        if filename.endswith('protractor.conf.js') or filename.endswith('.travis.yml'):
+        if (filename.endswith('protractor.conf.js') or
+                filename.endswith('.travis.yml')):
             return True
     return False
 
@@ -398,11 +399,14 @@ def main(args=None):
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
-            if does_diff_include_travis_yaml_or_protractor_conf_file(files_to_lint):
-                travis_ci_check_status = start_python_script(TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
+            if does_diff_include_travis_yaml_or_protractor_conf_file(
+                    files_to_lint):
+                travis_ci_check_status = start_python_script(
+                    TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
             if travis_ci_check_status != 0:
                 python_utils.PRINT(
-                    'Push aborted due to failing checks travis e2e test configuration.')
+                    'Push aborted due to failing checks travis'
+                    ' e2e test configuration.')
                 sys.exit(1)
     return
 

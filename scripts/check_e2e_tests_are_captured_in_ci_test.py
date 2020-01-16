@@ -30,48 +30,13 @@ DUMMY_CONF_FILES = os.path.join(
     os.getcwd(), 'core', 'tests', 'data', 'dummy_ci_tests')
 
 
-class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
+class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
     """Test the methods which performs travis.yml and
     protractor.conf.js sync checks.
     """
-
-    def _mock_tests_to_remove(self):
-        return self.swap(check_e2e_tests_are_captured_in_ci,
-            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
-
-    def _mock_read_protractor_conf_file(self):
-        protractor_config_file = python_utils.open_file(
-            os.path.join(
-                DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
-        return protractor_config_file
-
-    def _mock_read_travis_yml_file(self):
-        travis_ci_file = python_utils.open_file(
-            os.path.join(
-                DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
-        travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
-        return travis_ci_dict
-
-    def _mock_read_protractor_conf_file_fail(self):
-        protractor_config_file = python_utils.open_file(
-            os.path.join(
-                DUMMY_CONF_FILES, 'protractor_has_extra_test.conf.js'),
-                'r').read()
-        return protractor_config_file
-
-    def _mock_read_travis_yml_file_fail(self):
-        travis_ci_file = python_utils.open_file(
-            os.path.join(
-                DUMMY_CONF_FILES, '.travis_has_extra_test.yml'), 'r').read()
-        travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
-        return travis_ci_dict
-
-    def _return_empty_list(self):
-        return []
-
     def test_read_travis_ci_file(self):
         travis_ci_file = os.path.join(
-                DUMMY_CONF_FILES, '.dummy_travis.yml')
+            DUMMY_CONF_FILES, '.dummy_travis.yml')
 
         travis_ci_file_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'TRAVIS_CI_FILE_PATH',
@@ -84,7 +49,7 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
 
     def test_read_protractor_file(self):
         protractor_config_file = os.path.join(
-                DUMMY_CONF_FILES, 'dummy_protractor.conf.js')
+            DUMMY_CONF_FILES, 'dummy_protractor.conf.js')
 
         protractor_config_file_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'PROTRACTOR_CONF_FILE_PATH',
@@ -92,13 +57,20 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
         with protractor_config_file_swap:
             actual_protractor_config_file = (
                 check_e2e_tests_are_captured_in_ci.read_protractor_conf_file())
-        self.assertEqual(DUMMY_PROTRACTOR_CONF_FILE,
-                         actual_protractor_config_file)
+        self.assertEqual(
+            DUMMY_PROTRACTOR_CONF_FILE, actual_protractor_config_file)
 
     def test_get_e2e_suite_names_from_jobs_travis_yml_file(self):
+        def mock_read_travis_yml_file():
+            travis_ci_file = python_utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
+            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
+            return travis_ci_dict
+
         dummy_path = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yml_file', self._mock_read_travis_yml_file)
+            'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
         with dummy_path:
             actual_travis_jobs = (
                 check_e2e_tests_are_captured_in_ci
@@ -106,8 +78,16 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
         self.assertEqual(DUMMY_TEST_SUITES, actual_travis_jobs)
 
     def test_get_e2e_suite_names_from_script_travis_yml_file(self):
-        dummy_path = self.swap(check_e2e_tests_are_captured_in_ci,
-           'read_and_parse_travis_yml_file',self._mock_read_travis_yml_file)
+        def mock_read_travis_yml_file():
+            travis_ci_file = python_utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
+            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
+            return travis_ci_dict
+
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
         with dummy_path:
             actual_travis_script = (
                 check_e2e_tests_are_captured_in_ci
@@ -115,9 +95,17 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
         self.assertEqual(DUMMY_TEST_SUITES, actual_travis_script)
 
     def test_get_e2e_suite_names_from_script_travis_yml_file_fail(self):
-        dummy_path = self.swap(check_e2e_tests_are_captured_in_ci,
-                   'read_and_parse_travis_yml_file',
-                    self._mock_read_travis_yml_file_fail)
+        def mock_read_travis_yml_file_fail():
+            travis_ci_file = python_utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, '.travis_has_extra_test.yml'), 'r').read()
+            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
+            return travis_ci_dict
+
+        dummy_path = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'read_and_parse_travis_yml_file',
+            mock_read_travis_yml_file_fail)
         with dummy_path:
             actual_travis_script = (
                 check_e2e_tests_are_captured_in_ci
@@ -125,9 +113,15 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
         self.assertNotEqual(DUMMY_TEST_SUITES, actual_travis_script)
 
     def test_get_e2e_suite_names_from_protractor_file(self):
+        def mock_read_protractor_conf_file():
+            protractor_config_file = python_utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
+            return protractor_config_file
+
         dummy_path = self.swap(
             check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
-            self._mock_read_protractor_conf_file)
+            mock_read_protractor_conf_file)
         with dummy_path:
             actual_protractor_suites = (
                 check_e2e_tests_are_captured_in_ci
@@ -137,6 +131,7 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
     def test_main_with_invalid_test_suites(self):
         def mock_get_e2e_suite_names_from_protractor_file():
             return ['oneword', 'fourWord', 'invalid', 'notPresent']
+
         def mock_get_e2e_suite_names_from_travis_ci():
             return ['oneword', 'twoWords']
         mock_protractor_test_suites = self.swap(
@@ -165,9 +160,9 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
         with common_test_swap, mock_tests_to_remove:
             with mock_protractor_test_suites, mock_travis_jobs:
                 with mock_travis_scripts:
-                    with self.assertRaisesRegexp(Exception,
-                    'Protractor test suites and Travis Ci test '
-                    'suites are not in sync.'):
+                    with self.assertRaisesRegexp(
+                        Exception, 'Protractor test suites and Travis Ci test '
+                                   'suites are not in sync.'):
                         check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_missing_test_fail(self):
@@ -194,95 +189,144 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
             'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
 
         with mock_travis_scripts:
-            with self.assertRaisesRegexp(Exception,
-            'explorationImprovementsTab is missing from the e2e test '
-            'suites extracted from script section from travis.ci'):
+            with self.assertRaisesRegexp(
+                Exception, 'explorationImprovementsTab is missing from the '
+                           'e2e test suites extracted from script section'
+                           ' from travis.ci'):
                 check_e2e_tests_are_captured_in_ci.main()
 
         with mock_travis_jobs:
-            with self.assertRaisesRegexp(Exception,
-            'explorationImprovementsTab is missing from the e2e test '
-            'suites extracted from jobs section from travis.ci'):
+            with self.assertRaisesRegexp(
+                Exception, 'explorationImprovementsTab is missing from the'
+                           ' e2e test suites extracted from jobs section'
+                           ' from travis.ci'):
                 check_e2e_tests_are_captured_in_ci.main()
 
         with mock_protractor_test_suites, mock_tests_not_on_travis:
-            with self.assertRaisesRegexp(Exception,
-            'explorationImprovementsTab is missing from the e2e test '
-            'suites extracted from protractor.conf.js'):
+            with self.assertRaisesRegexp(
+                Exception, 'explorationImprovementsTab is missing from the e2e'
+                           ' test suites extracted from protractor.conf.js'):
                 check_e2e_tests_are_captured_in_ci.main()
 
-
     def test_main_with_invalid_travis_jobs_test_suite_length(self):
+        def mock_read_travis_yml_file():
+            travis_ci_file = python_utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
+            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
+            return travis_ci_dict
+        def mock_return_empty_list():
+            return []
+
         travis_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'read_and_parse_travis_yml_file',
-            self._mock_read_travis_yml_file)
+            mock_read_travis_yml_file)
 
-        mock_tests_to_remove = self._mock_tests_to_remove()
+        mock_tests_to_remove = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
 
         mock_e2e_travis_jobs = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_jobs_travis_yml_file',
-            self._return_empty_list)
+            mock_return_empty_list)
 
         with travis_path_swap, mock_tests_to_remove:
             with mock_e2e_travis_jobs:
-                with self.assertRaisesRegexp(Exception,
-                    'The e2e test suites that have been extracted from '
-                    'jobs section from travis.ci are empty.'):
-                        check_e2e_tests_are_captured_in_ci.main()
+                with self.assertRaisesRegexp(
+                    Exception, 'The e2e test suites that have been '
+                               'extracted from jobs section from travis.ci'
+                               ' are empty.'):
+                    check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_invalid_travis_script_test_suite_length(self):
+        def mock_read_travis_yml_file():
+            travis_ci_file = python_utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
+            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
+            return travis_ci_dict
+        def mock_return_empty_list():
+            return []
+
         travis_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'read_and_parse_travis_yml_file',
-            self._mock_read_travis_yml_file)
+            mock_read_travis_yml_file)
 
-        mock_tests_to_remove = self._mock_tests_to_remove()
+        mock_tests_to_remove = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
 
         mock_e2e_travis_script = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_script_travis_yml_file',
-            self._return_empty_list)
+            mock_return_empty_list)
 
         with travis_path_swap, mock_tests_to_remove:
             with mock_e2e_travis_script:
-                with self.assertRaisesRegexp(Exception,
-                    'The e2e test suites that have been extracted from '
-                    'script section from travis.ci are empty.'):
-                        check_e2e_tests_are_captured_in_ci.main()
+                with self.assertRaisesRegexp(
+                    Exception, 'The e2e test suites that have been extracted '
+                               'from script section from travis.ci are empty.'):
+                    check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_invalid_protractor_test_suite_length(self):
+        def mock_read_protractor_conf_file():
+            protractor_config_file = python_utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
+            return protractor_config_file
+        def mock_return_empty_list():
+            return []
+
         protractor_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
-            self._mock_read_protractor_conf_file)
+            mock_read_protractor_conf_file)
 
-        mock_tests_to_remove = self._mock_tests_to_remove()
+        mock_tests_to_remove = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
 
         mock_e2e_test_suites = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'get_e2e_suite_names_from_protractor_file',
-            self._return_empty_list)
+            mock_return_empty_list)
 
         with protractor_path_swap, mock_tests_to_remove:
             with mock_e2e_test_suites:
-                with self.assertRaisesRegexp(Exception,
-                    'The e2e test suites that have been extracted from '
-                    'protractor.conf.js are empty.'):
-                        check_e2e_tests_are_captured_in_ci.main()
+                with self.assertRaisesRegexp(
+                    Exception, 'The e2e test suites that have been extracted'
+                               ' from protractor.conf.js are empty.'):
+                    check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_without_errors(self):
+        def mock_read_protractor_conf_file():
+            protractor_config_file = python_utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
+            return protractor_config_file
+
+        def mock_read_travis_yml_file():
+            travis_ci_file = python_utils.open_file(
+                os.path.join(
+                    DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
+            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
+            return travis_ci_dict
+
         protractor_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'read_protractor_conf_file',
-            self._mock_read_protractor_conf_file)
+            mock_read_protractor_conf_file)
         travis_path_swap = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'read_and_parse_travis_yml_file',
-            self._mock_read_travis_yml_file)
+            check_e2e_tests_are_captured_in_ci,
+            'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
         common_test_swap = self.swap(
             check_e2e_tests_are_captured_in_ci, 'TRAVIS_PROTRACTOR_COMMON_TEST',
             'oneword')
 
-        mock_tests_to_remove = self._mock_tests_to_remove()
+        mock_tests_to_remove = self.swap(
+            check_e2e_tests_are_captured_in_ci,
+            'TEST_SUITES_NOT_RUN_ON_TRAVIS', [])
 
         with protractor_path_swap, travis_path_swap, mock_tests_to_remove:
             with common_test_swap:
@@ -290,15 +334,16 @@ class CheckE2eTestsCapturedInCI(test_utils.GenericTestBase):
 
 
 TRAVIS_CI_DICT = {'env': {
-'jobs': [
-    'RUN_E2E_TESTS_ONEWORD=true', 'RUN_E2E_TESTS_TWO_WORDS=true']},
-'script': [
-    'if [ "RUN_E2E_TESTS_ONEWORD" == \'true\' ]; '
-    'then travis_retry bash scripts/run_e2e_tests.sh'
-    ' --suite="oneword" --prod_env; fi',
-    'if [ "RUN_E2E_TESTS_TWO_WORDS" == \'true\' ]; '
-    'then travis_retry bash scripts/run_e2e_tests.sh'
-    ' --suite="twoWords" --prod_env; fi']}
+    'jobs': [
+        'RUN_E2E_TESTS_ONEWORD=true', 'RUN_E2E_TESTS_TWO_WORDS=true']
+    },
+                  'script': [
+                      'if [ "RUN_E2E_TESTS_ONEWORD" == \'true\' ]; '
+                      'then travis_retry bash scripts/run_e2e_tests.sh'
+                      ' --suite="oneword" --prod_env; fi',
+                      'if [ "RUN_E2E_TESTS_TWO_WORDS" == \'true\' ]; '
+                      'then travis_retry bash scripts/run_e2e_tests.sh'
+                      ' --suite="twoWords" --prod_env; fi']}
 
 DUMMY_PROTRACTOR_CONF_FILE = """var path = require('path')
 var suites = {

@@ -67,7 +67,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
         def mock_does_diff_include_js_or_ts_files(unused_files_to_lint):
             return self.does_diff_include_js_or_ts_files
         self.does_diff_include_travis_yaml_or_protractor_conf_file = False
-        def mock_does_diff_include_travis_yaml_or_protractor_conf_file(unused_files_to_lint):
+        def mock_does_diff_include_travis_yaml_or_protractor_conf_file(
+                unused_files_to_lint):
             return self.does_diff_include_travis_yaml_or_protractor_conf_file
 
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
@@ -88,7 +89,8 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook, 'does_diff_include_js_or_ts_files',
             mock_does_diff_include_js_or_ts_files)
         self.travis_yaml_or_protractor_conf_swap = self.swap(
-            pre_push_hook, 'does_diff_include_travis_yaml_or_protractor_conf_file',
+            pre_push_hook,
+            'does_diff_include_travis_yaml_or_protractor_conf_file',
             mock_does_diff_include_travis_yaml_or_protractor_conf_file)
 
     def test_start_subprocess_for_result(self):
