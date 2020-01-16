@@ -154,7 +154,7 @@ def cleanup():
 
 
 def is_oppia_server_already_running():
-    """Check if the ports are taken by any other processes. If the any one of
+    """Check if the ports are taken by any other processes. If any one of
     them is taken, it may indicate there is already one Oppia instance running.
 
     Return:
@@ -322,7 +322,7 @@ def start_webdriver_manager():
 
 def get_parameter_for_sharding(sharding_instances):
     """Return the parameter for sharding, based on the given number of
-        sharding instances.
+    sharding instances.
 
     Args:
         sharding_instances: int. How many sharding instances to be running.

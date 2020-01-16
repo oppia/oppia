@@ -469,12 +469,12 @@ def convert_to_posixpath(file_path):
 
 
 def inplace_replace_file(filename, regex_pattern, replacement_string):
-    """Replace the file content inp-lace with regex pattern. The pattern is used
+    """Replace the file content in-place with regex pattern. The pattern is used
     to replace the file's content line by line.
 
     Note:
-        This function was not designed to achieve a comprehensive task. Instead,
-        it should only be used with some trivial tasks.
+        This function should only be used with files that are processed line by
+            line.
 
     Args:
         filename: str. The name of the file to be changed.
@@ -484,16 +484,17 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
     backup_filename = '%s.bak' % filename
     shutil.move(filename, backup_filename)
     new_contents = []
-    regex = re.compile(regex_pattern)
-    with python_utils.open_file(backup_filename, 'r') as f:
-        for line in f:
-            new_contents.append(regex.sub(replacement_string, line))
+    try:
+        regex = re.compile(regex_pattern)
+        with python_utils.open_file(backup_filename, 'r') as f:
+            for line in f:
+                new_contents.append(regex.sub(replacement_string, line))
 
-    with python_utils.open_file(filename, 'w') as f:
-        for line in new_contents:
-            f.write(line)
-
-    os.remove(backup_filename)
+        with python_utils.open_file(filename, 'w') as f:
+            for line in new_contents:
+                f.write(line)
+    finally:
+        os.remove(backup_filename)
 
 
 class CD(python_utils.OBJECT):

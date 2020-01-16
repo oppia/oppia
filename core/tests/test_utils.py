@@ -1919,7 +1919,7 @@ tags: []
             yield
         except Exception:
             error_occurred = True
-            # Raise issues threw by the called function or assert error.
+            # Raise issues thrown by the called function or assert error.
             raise
         finally:
             setattr(obj, attr, original)
