@@ -61,7 +61,6 @@ def get_models_which_should_be_exported():
         user_models.UserSubscriptionsModel
     ]
 
-
 def export_data_for_user(user_id):
     """Exports selected models according to model defined export_data functions.
 
