@@ -144,7 +144,7 @@ _PARSER.add_argument(
     dest='minify_third_party_libs_only')
 
 
-def generate_app_yaml(is_prod_mode):
+def generate_app_yaml(is_prod_mode=False):
     """Generate app.yaml from app_dev.yaml.
 
     Args:
@@ -1259,7 +1259,7 @@ def main(args=None):
         if not options.minify_third_party_libs_only:
             hashes = generate_hashes()
             build_using_webpack()
-            generate_app_yaml(options.prod_mode)
+            generate_app_yaml(is_prod_mode=options.prod_mode)
             generate_build_directory(hashes)
 
     save_hashes_to_file(dict())
