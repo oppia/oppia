@@ -619,9 +619,9 @@ class TopicRightsModel(base_models.VersionedModel):
             format. In this case, we are returning all the ids of the topics
             this user manages.
         """
-        managed_collections = cls.get_all().filter(cls.manager_ids == user_id)
-        managed_collection_ids = [col.key.id() for col in managed_collections]
+        managed_topics = cls.get_all().filter(cls.manager_ids == user_id)
+        managed_topic_ids = [col.key.id() for col in managed_topics]
 
         return {
-            'managed_collection_ids': managed_collection_ids
+            'managed_topic_ids': managed_topic_ids
         }

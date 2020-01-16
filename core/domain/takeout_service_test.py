@@ -393,7 +393,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'last_checked': None
         }
         topic_rights_data = {
-            'managed_collection_ids': []
+            'managed_topic_ids': []
         }
         expected_export = {
             'user_stats_data': stats_data,
@@ -618,7 +618,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         }
 
         expected_topic_data = {
-            'managed_collection_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
+            'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
         }
 
         expected_export = {

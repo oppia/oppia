@@ -32,10 +32,10 @@ from core.platform import models
 
 
 def get_models_which_should_be_exported():
-    """Returns list of classes of models to export.
+    """Returns list of models to export.
 
     Returns:
-        list of cls. List of classes of models whose data should be
+        list(ndb.Model). List of models whose data should be
         exported.
     """
     return [

@@ -436,7 +436,7 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
         """Tests nontrivial export data on user with some managed topics."""
         user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_2)
         expected_data = {
-            'managed_collection_ids': [self.TOPIC_4_ID, self.TOPIC_5_ID]
+            'managed_topic_ids': [self.TOPIC_4_ID, self.TOPIC_5_ID]
         }
         self.assertEqual(user_data, expected_data)
 
@@ -444,6 +444,6 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
         """Tests trivial export data on user with no managed topics."""
         user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_1)
         expected_data = {
-            'managed_collection_ids': []
+            'managed_topic_ids': []
         }
         self.assertEqual(user_data, expected_data)
