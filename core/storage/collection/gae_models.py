@@ -31,6 +31,7 @@ from google.appengine.ext import ndb
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model relates to version history of entity. Not included in export
@@ -42,6 +43,7 @@ class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model relates to version history of entity. Not included in export
@@ -216,6 +218,7 @@ class CollectionRightsSnapshotMetadataModel(
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
+
     @staticmethod
     def get_export_policy():
         """Model relates to version history of entity. Not included in export
