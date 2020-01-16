@@ -420,7 +420,6 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
-
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralFeedbackEmailReplyToIdModel exists for user.
