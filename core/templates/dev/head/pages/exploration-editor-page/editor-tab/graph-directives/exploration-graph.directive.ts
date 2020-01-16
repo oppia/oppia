@@ -45,9 +45,6 @@ angular.module('oppia').directive('explorationGraph', [
             ExplorationStatesService, GraphDataService, RouterService,
             StateEditorService, UrlInterpolationService) {
           var ctrl = this;
-          ctrl.getGraphData = GraphDataService.getGraphData;
-          ctrl.isEditable = EditabilityService.isEditable;
-
           // We hide the graph at the outset in order not to confuse new
           // exploration creators.
           ctrl.isGraphShown = function() {
@@ -119,8 +116,20 @@ angular.module('oppia').directive('explorationGraph', [
               } else {
                 console.error('Invalid closeDict action: ' + closeDict.action);
               }
+            }, function() {
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
             });
           };
-        }]
+
+          ctrl.getGraphData = function() {
+            return GraphDataService.getGraphData();
+          };
+
+          ctrl.isEditable = function() {
+            return EditabilityService.isEditable();
+          };
+        }
+      ]
     };
   }]);
