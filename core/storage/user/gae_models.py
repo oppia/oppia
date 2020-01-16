@@ -1673,7 +1673,9 @@ class UserQueryModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model contains user data."""
+        """Model is not exported since this is a computed model
+        and the information already exists in other exported models.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
