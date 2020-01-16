@@ -21,6 +21,7 @@ import contextlib
 import getpass
 import http.server
 import os
+import re
 import shutil
 import socketserver
 import stat
@@ -674,6 +675,26 @@ class CommonTests(test_utils.GenericTestBase):
         # Revert the file.
         os.remove(origin_file)
         shutil.move(backup_file, origin_file)
+
+    def test_inplace_replace_file_with_exception_raised(self):
+        origin_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json')
+        backup_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        with python_utils.open_file(origin_file, 'r') as f:
+            origin_content = f.readlines()
+
+        def mock_compile(unused_arg):
+            raise ValueError
+
+        compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
+        with self.assertRaises(ValueError), compile_swap:
+            common.inplace_replace_file(
+                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
+        self.assertFalse(os.path.isfile(backup_file))
+        with python_utils.open_file(origin_file, 'r') as f:
+            new_content = f.readlines()
+        self.assertEqual(origin_content, new_content)
 
     def test_convert_to_posixpath_on_windows(self):
         def mock_is_windows():

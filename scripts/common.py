@@ -482,7 +482,7 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         replacement_string: str. The content to be replaced.
     """
     backup_filename = '%s.bak' % filename
-    shutil.move(filename, backup_filename)
+    shutil.copyfile(filename, backup_filename)
     new_contents = []
     try:
         regex = re.compile(regex_pattern)
@@ -493,8 +493,12 @@ def inplace_replace_file(filename, regex_pattern, replacement_string):
         with python_utils.open_file(filename, 'w') as f:
             for line in new_contents:
                 f.write(line)
-    finally:
         os.remove(backup_filename)
+    except Exception:
+        # Restore the content if there was en error.
+        os.remove(filename)
+        shutil.move(backup_filename, filename)
+        raise
 
 
 class CD(python_utils.OBJECT):
