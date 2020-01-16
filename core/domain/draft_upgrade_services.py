@@ -90,8 +90,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     @classmethod
     def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
         """Converts draft change list from state version 30 to 31. State
-        Version 31 adds the duration float for the Voiceover section of state,
-        for which there should be no changes to drafts.
+        Version 31 adds the duration float for the Voiceover section of state.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
@@ -103,17 +102,19 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
+                    exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                # Get the language code to access the language code correctly.
+                new_change = change.new_value['voiceovers_mapping']
+                language_code = new_change['content'].keys()
+                # Initialize the value to migrate draft state to v31.
+                new_change['content'][language_code[0]]['duration'] = 0
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
                     'state_name': change.state_name,
                     'new_value': {
-                        'rule_specs': change.new_value['rule_specs'],
-                        'outcome': change.new_value['outcome'],
-                        'training_data': change.new_value['training_data'],
-                        'tagged_skill_misconception_id': None
+                        'voiceovers_mapping': new_change
                     }
                 })
         return draft_change_list
