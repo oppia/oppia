@@ -46,13 +46,6 @@ angular.module('oppia').directive('adminMiscTab', [
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
 
-<<<<<<< HEAD
-        ctrl.topicIdForRegeneratingOpportunities = null;
-        ctrl.dummyMailId = null;
-        ctrl.regenerationMessage = null;
-
-=======
->>>>>>> 50056e1864505e728dc11bfd183f630f37032a92
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
