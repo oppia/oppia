@@ -29,7 +29,7 @@ import { SubtitledHtml } from
 
 describe('Solution object factory', () => {
   describe('SolutionObjectFactory', () => {
-    var sof, solution;
+    let sof, solution;
     beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
@@ -46,31 +46,34 @@ describe('Solution object factory', () => {
     });
 
     it('should get the backend dict from a solution', () => {
-      expect(solution.toBackendDict()).toEqual({
+      const expectedSolution = {
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',
         explanation: {
           content_id: 'solution',
           html: 'This is the explanation to the answer'
         }
-      });
+      };
+
+      expect(solution.toBackendDict()).toEqual(expectedSolution);
     });
 
     it('should create a new solution from scratch', () => {
-      var solutionFromScratch = sof.createNew(
+      const solutionFromScratch = sof.createNew(
         true,
         'This is the correct answer!',
         'This is the explanation to the answer',
         'solution');
-
-      expect(solutionFromScratch.toBackendDict()).toEqual({
+      const expectedSolution = {
         answer_is_exclusive: true,
         correct_answer: 'This is the correct answer!',
         explanation: {
           content_id: 'solution',
           html: 'This is the explanation to the answer'
         }
-      });
+      };
+
+      expect(solutionFromScratch.toBackendDict()).toEqual(expectedSolution);
     });
 
     it('should create summary correctly', () => {
@@ -133,18 +136,29 @@ describe('Solution object factory', () => {
           }
         }
       };
-      expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual({
+      const expectedShortAnswerHtml = {
         prefix: 'One',
         answer: '<oppia-short-response-0 ' +
           'answer="&amp;quot;This is a correct answer!&amp;quot;" ' +
           'choices="&amp;quot;This is a choice&amp;quot;">' +
           '</oppia-short-response-0>'
-      });
+      };
+
+      expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(
+        expectedShortAnswerHtml);
     });
 
-    it('should change the boolean value of answer exclusivity', () => {
-      solution.setAnswerExclusivity(true);
-      expect(solution.toBackendDict().answer_is_exclusive).toBe(true);
+    it('should handle when answer exclusivity is true', () => {
+      const solution = sof.createFromBackendDict({
+        answer_is_exclusive: true,
+        correct_answer: 'This is a correct answer!',
+        explanation: {
+          content_id: 'solution',
+          html: 'This is the explanation to the answer'
+        }
+      });
+
+      expect(solution.answerIsExclusive).toBe(true);
       expect(solution.getSummary('TestInput')).toEqual(
         'The only solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');

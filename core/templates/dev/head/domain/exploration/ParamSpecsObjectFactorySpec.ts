@@ -69,12 +69,13 @@ describe('ParamSpecs', () => {
 
   it('should convert a param specs to backend dict correctly', () => {
     const paramSpec = paramSpecObjectFactory.createDefault();
-    const paramSpecBackendDict = {
+    const expectedParamSpecBackendDict = {
       [paramName]: paramSpec.toBackendDict()
     };
     emptyParamSpecs.addParamIfNew(paramName, paramSpec);
 
-    expect(emptyParamSpecs.toBackendDict()).toEqual(paramSpecBackendDict);
+    expect(emptyParamSpecs.toBackendDict()).toEqual(
+      expectedParamSpecBackendDict);
   });
 
   it('should create a non empty param specs', () => {
