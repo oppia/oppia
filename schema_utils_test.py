@@ -163,6 +163,11 @@ VALIDATOR_SPECS = {
         'is_nonempty': {},
         'is_regex': {},
         'is_valid_email': {},
+        'has_length_at_most': {
+            'max_value': {
+                'type': SCHEMA_TYPE_INT
+            }
+        }
     },
 }
 
