@@ -47,6 +47,9 @@ RELEASE_DRIVE_URL = (
 RELEASE_NOTES_URL = (
     'https://docs.google.com/document/d/'
     '1pmcDNfM2KtmkZeYipuInC48RE5JfkSJWQYdIQAkD0hQ/edit#')
+RELEASE_ROTA_URL = (
+    'https://github.com/oppia/oppia/wiki/Release-Schedule#'
+    'release-coordinators-and-qa-coordinators-for-upcoming-releases')
 
 REPEATABLE_JOBS_SPREADSHEETS_URL = (
     'https://docs.google.com/spreadsheets/d/'

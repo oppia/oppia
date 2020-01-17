@@ -35,6 +35,7 @@ SECTIONS_TO_ADD = [
     '[Add your name]']
 RELEASE_MAIL_MESSAGE_TEMPLATE = (
     'Hi all,\n\n'
+    '   We are happy to announce the release of v%s of Oppia.\n'
     '   The main changes in this release are %s.\n'
     '   %s.\n'
     '   %s\n'
@@ -42,7 +43,7 @@ RELEASE_MAIL_MESSAGE_TEMPLATE = (
     'testing, bug-fixing and QA, as well as %s for leading the QA team for '
     'this release.\n\n'
     'Thanks,\n'
-    '%s\n') % tuple(SECTIONS_TO_ADD)
+    '%s\n')
 
 PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 RELEASE_MAIL_MESSAGE_FILEPATH = os.path.join(
@@ -51,8 +52,11 @@ RELEASE_MAIL_MESSAGE_FILEPATH = os.path.join(
 
 def create_new_file_with_release_message_template():
     """Adds the template message to release mail filepath."""
+    release_version = common.get_current_release_version_number(
+        common.get_current_branch_name())
     with python_utils.open_file(RELEASE_MAIL_MESSAGE_FILEPATH, 'w') as f:
-        f.write(RELEASE_MAIL_MESSAGE_TEMPLATE)
+        f.write(RELEASE_MAIL_MESSAGE_TEMPLATE % (
+            tuple([release_version] + SECTIONS_TO_ADD)))
 
     common.ask_user_to_confirm(
         'Please make updates to following file %s for generating the '
@@ -137,6 +141,28 @@ def prompt_user_to_send_announcement_email():
         'Ensure the email sent to oppia@ is in the Announcements category')
 
 
+def create_group_for_next_release():
+    """Asks the release co-ordinator to create a new chat group for
+    the next release.
+    """
+    common.open_new_tab_in_browser_if_possible(
+        release_constants.RELEASE_ROTA_URL)
+    common.ask_user_to_confirm(
+        'Please do the following two things:\n\n'
+        '1. Create a new chat group for the next release, '
+        'and add the release coordinator, QA lead, Ankita '
+        'and Nithesh to that group. You can find the release schedule '
+        'and coordinators here: %s\n\n'
+        '2. Please send the following message to the newly created group:\n\n'
+        'Hi all, This is the group chat for the next release. '
+        '[Release co-ordinator\'s name] and [QA Lead\'s name] will be '
+        'the release co-ordinator & QA Lead for next release. '
+        'Please follow the release process doc: '
+        '[Add link to release process doc] to ensure the release '
+        'follows the schedule. Thanks!\n' % (
+            release_constants.RELEASE_ROTA_URL))
+
+
 def main():
     """Performs task to generate message for release announcement."""
     if not common.is_current_branch_a_release_branch():
@@ -157,6 +183,7 @@ def main():
     finally:
         if os.path.exists(RELEASE_MAIL_MESSAGE_FILEPATH):
             os.remove(RELEASE_MAIL_MESSAGE_FILEPATH)
+    create_group_for_next_release()
 
 
 # The 'no coverage' pragma is used as this line is un-testable. This is because
