@@ -18,10 +18,10 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
 import { ParamChange } from
   'domain/exploration/ParamChangeObjectFactory';
+import { ParamChangesObjectFactory } from
+  'domain/exploration/ParamChangesObjectFactory';
 
 describe('ParamChanges Object Factory', () => {
   let pcsof: ParamChangesObjectFactory;
@@ -38,6 +38,7 @@ describe('ParamChanges Object Factory', () => {
 
     pcsof = TestBed.get(ParamChangesObjectFactory);
   });
+
   it('should create a ParamChange array from a list of dictionaries',
     () => {
       var paramName = 'param_1';
