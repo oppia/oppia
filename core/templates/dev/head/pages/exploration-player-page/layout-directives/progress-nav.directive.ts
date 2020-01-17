@@ -114,11 +114,11 @@ angular.module('oppia').directive('progressNav', [
             // 3. MultipleChoiceInput interaction in mobile mode.
             if (BrowserCheckerService.isMobileDevice()) {
               return (SHOW_SUBMIT_INTERACTIONS.indexOf(
-                $scope.interactionId) >= 0)
+                $scope.interactionId) >= 0);
             } else {
               return ($scope.interactionId === 'ItemSelectionInput' &&
                       $scope.interactionCustomizationArgs
-                        .maxAllowableSelectionCount.value > 1)
+                        .maxAllowableSelectionCount.value > 1);
             }
           };
 
