@@ -29,7 +29,10 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class StoryViewerBackendApiService {
-  // Type is any because keys do not follow camel casing
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'storyDataDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
   storyDataDict: any = null;
 
   constructor(
