@@ -39,11 +39,17 @@ angular.module('oppia').directive('threadTable', [
       controller: [
         '$scope', 'ThreadStatusDisplayService', 'DateTimeFormatService',
         function($scope, ThreadStatusDisplayService, DateTimeFormatService) {
-          $scope.getLabelClass = ThreadStatusDisplayService.getLabelClass;
-          $scope.getHumanReadableStatus = (
-            ThreadStatusDisplayService.getHumanReadableStatus);
-          $scope.getLocaleAbbreviatedDatetimeString = (
-            DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
+          $scope.getLabelClass = function(status) {
+            return ThreadStatusDisplayService.getLabelClass(status);
+          };
+          $scope.getHumanReadableStatus = function(status) {
+            return ThreadStatusDisplayService.getHumanReadableStatus(status);
+          };
+          $scope.getLocaleAbbreviatedDatetimeString = function(
+              millisSinceEpoch) {
+            return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+              millisSinceEpoch);
+          };
         }
       ]
     };

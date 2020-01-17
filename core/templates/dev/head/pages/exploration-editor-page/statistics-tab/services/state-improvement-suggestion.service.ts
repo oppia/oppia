@@ -16,58 +16,78 @@
  * @fileoverview Service for suggestion improvements to a specific state.
  */
 
-require(
-  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StateImprovementSuggestionService', [
-  'IMPROVE_TYPE_INCOMPLETE',
-  function(IMPROVE_TYPE_INCOMPLETE) {
-    return {
-      // Returns an array of suggested improvements to states. Each suggestion
-      // is an object with the keys: rank, improveType, and stateName.
-      getStateImprovements: function(explorationStates, allStateStats) {
-        var rankComparator = function(lhs, rhs) {
-          return rhs.rank - lhs.rank;
-        };
+import { States }
+  from 'domain/exploration/StatesObjectFactory';
+import { ExplorationEditorPageConstants }
+  from 'pages/exploration-editor-page/exploration-editor-page.constants';
 
-        var rankedStates = [];
-        explorationStates.getStateNames().forEach(function(stateName) {
-          if (!allStateStats.hasOwnProperty(stateName)) {
-            return;
-          }
+interface RankedStates {
+  rank: number;
+  stateName: string;
+  type: string;
+}
 
-          var stateStats = allStateStats[stateName];
-          var totalEntryCount = stateStats.total_entry_count;
-          var noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
+export interface StateStats {
+  // eslint-disable-next-line camelcase
+  total_entry_count: number;
+  // eslint-disable-next-line camelcase
+  no_submitted_answer_count: number;
+}
 
-          if (totalEntryCount === 0) {
-            return;
-          }
-
-          var threshold = 0.2 * totalEntryCount;
-          var eligibleFlags = [];
-          var state = explorationStates.getState(stateName);
-          var stateInteraction = state.interaction;
-          if (noAnswerSubmittedCount > threshold) {
-            eligibleFlags.push({
-              rank: noAnswerSubmittedCount,
-              improveType: IMPROVE_TYPE_INCOMPLETE,
-            });
-          }
-          if (eligibleFlags.length > 0) {
-            eligibleFlags.sort(rankComparator);
-            rankedStates.push({
-              rank: eligibleFlags[0].rank,
-              stateName: stateName,
-              type: eligibleFlags[0].improveType,
-            });
-          }
-        });
-
-        // The returned suggestions are sorted decreasingly by their ranks.
-        rankedStates.sort(rankComparator);
-        return rankedStates;
-      }
+@Injectable({
+  providedIn: 'root'
+})
+export class StateImprovementSuggestionService {
+  getStateImprovements(
+      explorationStates: States,
+      allStateStats: {[state: string]: StateStats}): RankedStates[] {
+    const rankComparator = (lhs, rhs) => {
+      return rhs.rank - lhs.rank;
     };
+
+    const rankedStates = [];
+    explorationStates.getStateNames().forEach(stateName => {
+      if (!allStateStats.hasOwnProperty(stateName)) {
+        return;
+      }
+
+      const stateStats = allStateStats[stateName];
+      const totalEntryCount = stateStats.total_entry_count;
+      const noAnswerSubmittedCount = stateStats.no_submitted_answer_count;
+
+      if (totalEntryCount === 0) {
+        return;
+      }
+
+      const threshold = 0.2 * totalEntryCount;
+      const eligibleFlags = [];
+      const state = explorationStates.getState(stateName);
+      const stateInteraction = state.interaction;
+      if (noAnswerSubmittedCount > threshold) {
+        eligibleFlags.push({
+          rank: noAnswerSubmittedCount,
+          improveType: ExplorationEditorPageConstants.IMPROVE_TYPE_INCOMPLETE,
+        });
+      }
+      if (eligibleFlags.length > 0) {
+        eligibleFlags.sort(rankComparator);
+        rankedStates.push({
+          rank: eligibleFlags[0].rank,
+          stateName: stateName,
+          type: eligibleFlags[0].improveType,
+        });
+      }
+    });
+
+    // The returned suggestions are sorted decreasingly by their ranks.
+    rankedStates.sort(rankComparator);
+    return rankedStates;
   }
-]);
+}
+
+angular.module('oppia').factory(
+  'StateImprovementSuggestionService',
+  downgradeInjectable(StateImprovementSuggestionService));

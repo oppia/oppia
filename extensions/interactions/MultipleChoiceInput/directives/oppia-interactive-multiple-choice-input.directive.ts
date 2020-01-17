@@ -47,19 +47,20 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
         '$attrs', 'CurrentInteractionService',
         function($attrs, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.choices = HtmlEscaperService.escapedJsonToObj(
-            $attrs.choicesWithValue);
-          ctrl.answer = null;
 
           ctrl.selectAnswer = function(event, answer) {
             if (answer === null) {
               return;
             }
             // Deselect previously selected option.
-            $('button.multiple-choice-option.selected')
-              .removeClass('selected');
+            var selectedElement = (
+              document.querySelector(
+                'button.multiple-choice-option.selected'));
+            if(selectedElement) {
+              selectedElement.classList.remove('selected');
+            }
             // Selected current option.
-            $(event.currentTarget).addClass('selected');
+            event.currentTarget.classList.add('selected');
             ctrl.answer = parseInt(answer, 10);
             if (!BrowserCheckerService.isMobileDevice()) {
               ctrl.submitAnswer();
@@ -78,8 +79,13 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
               ctrl.answer, MultipleChoiceInputRulesService);
           };
 
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitAnswer, validityCheckFn);
+          ctrl.$onInit = function() {
+            ctrl.choices = HtmlEscaperService.escapedJsonToObj(
+              $attrs.choicesWithValue);
+            ctrl.answer = null;
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitAnswer, validityCheckFn);
+          };
         }
       ]
     };

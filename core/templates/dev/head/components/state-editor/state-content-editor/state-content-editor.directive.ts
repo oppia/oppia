@@ -53,19 +53,7 @@ angular.module('oppia').directive('stateContentEditor', [
         function(
             $scope, EditabilityService, EditorFirstTimeEventsService,
             StateContentService, StateEditorService) {
-          $scope.HTML_SCHEMA = {
-            type: 'html'
-          };
-          $scope.contentId = null;
-          $scope.StateContentService = StateContentService;
-          if (StateContentService.displayed) {
-            $scope.contentId = StateContentService.displayed.getContentId();
-          }
-
-          $scope.contentEditorIsOpen = false;
-          $scope.isEditable = EditabilityService.isEditable;
-          $scope.cardHeightLimitWarningIsShown = true;
-
+          var ctrl = this;
           $scope.isCardHeightLimitReached = function() {
             var shadowPreviewCard = $(
               '.oppia-shadow-preview-card .oppia-learner-view-card-top-section'
@@ -83,12 +71,6 @@ angular.module('oppia').directive('stateContentEditor', [
             $scope.onSaveStateContent(StateContentService.displayed);
             $scope.contentEditorIsOpen = false;
           };
-
-          $scope.$on('externalSave', function() {
-            if ($scope.contentEditorIsOpen) {
-              saveContent();
-            }
-          });
 
           $scope.openStateContentEditor = function() {
             if ($scope.isEditable()) {
@@ -114,8 +96,26 @@ angular.module('oppia').directive('stateContentEditor', [
             StateContentService.restoreFromMemento();
             $scope.contentEditorIsOpen = false;
           };
+          ctrl.$onInit = function() {
+            $scope.HTML_SCHEMA = {
+              type: 'html'
+            };
+            $scope.contentId = null;
+            $scope.StateContentService = StateContentService;
+            if (StateContentService.displayed) {
+              $scope.contentId = StateContentService.displayed.getContentId();
+            }
 
-          StateEditorService.updateStateContentEditorInitialised();
+            $scope.contentEditorIsOpen = false;
+            $scope.isEditable = EditabilityService.isEditable;
+            $scope.cardHeightLimitWarningIsShown = true;
+            $scope.$on('externalSave', function() {
+              if ($scope.contentEditorIsOpen) {
+                saveContent();
+              }
+            });
+            StateEditorService.updateStateContentEditorInitialised();
+          };
         }
       ]
     };

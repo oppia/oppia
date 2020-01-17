@@ -83,12 +83,12 @@ angular.module('oppia').directive('emailDashboardResultPage', [
 
               $http.post(resultHandlerUrl, {
                 data: data
-              }).success(function() {
+              }).then(function() {
                 ctrl.emailSubmitted = true;
                 $timeout(function() {
                   $window.location.href = EMAIL_DASHBOARD_PAGE;
                 }, 4000);
-              }).error(function() {
+              }, function() {
                 ctrl.errorHasOccurred = true;
                 ctrl.submitIsInProgress = false;
               });
@@ -111,12 +111,12 @@ angular.module('oppia').directive('emailDashboardResultPage', [
                 query_id: getQueryId()
               });
 
-            $http.post(cancelUrlHandler).success(function() {
+            $http.post(cancelUrlHandler).then(function() {
               ctrl.emailCancelled = true;
               $timeout(function() {
                 $window.location.href = EMAIL_DASHBOARD_PAGE;
               }, 4000);
-            }).error(function() {
+            }, function() {
               ctrl.errorHasOccurred = true;
               ctrl.submitIsInProgress = false;
             });
@@ -133,7 +133,7 @@ angular.module('oppia').directive('emailDashboardResultPage', [
               $http.post(testEmailHandlerUrl, {
                 email_subject: ctrl.emailSubject,
                 email_body: ctrl.emailBody
-              }).success(function() {
+              }).then(function() {
                 ctrl.testEmailSentSuccesfully = true;
               });
               ctrl.invalid.subject = false;
@@ -141,25 +141,28 @@ angular.module('oppia').directive('emailDashboardResultPage', [
               ctrl.invalid.maxRecipients = false;
             }
           };
-
-          ctrl.emailOption = 'all';
-          ctrl.emailSubject = '';
-          ctrl.emailBody = '';
-          ctrl.invalid = {
-            subject: false,
-            body: false,
-            maxRecipients: false
+          ctrl.$onInit = function() {
+            ctrl.emailOption = 'all';
+            ctrl.emailSubject = '';
+            ctrl.emailBody = '';
+            ctrl.invalid = {
+              subject: false,
+              body: false,
+              maxRecipients: false
+            };
+            ctrl.maxRecipients = null;
+            ctrl.POSSIBLE_EMAIL_INTENTS = [
+              'bulk_email_marketing', 'bulk_email_improve_exploration',
+              'bulk_email_create_exploration',
+              'bulk_email_creator_reengagement',
+              'bulk_email_learner_reengagement'];
+            ctrl.emailIntent = ctrl.POSSIBLE_EMAIL_INTENTS[0];
+            ctrl.emailSubmitted = false;
+            ctrl.submitIsInProgress = false;
+            ctrl.errorHasOccurred = false;
+            ctrl.testEmailSentSuccesfully = false;
           };
-          ctrl.maxRecipients = null;
-          ctrl.POSSIBLE_EMAIL_INTENTS = [
-            'bulk_email_marketing', 'bulk_email_improve_exploration',
-            'bulk_email_create_exploration', 'bulk_email_creator_reengagement',
-            'bulk_email_learner_reengagement'];
-          ctrl.emailIntent = ctrl.POSSIBLE_EMAIL_INTENTS[0];
-          ctrl.emailSubmitted = false;
-          ctrl.submitIsInProgress = false;
-          ctrl.errorHasOccurred = false;
-          ctrl.testEmailSentSuccesfully = false;
         }
-      ]};
+      ]
+    };
   }]);

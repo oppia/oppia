@@ -17,6 +17,7 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core.domain import collection_services
+from core.domain import email_manager
 from core.domain import exp_fetchers
 from core.domain import exp_services
 from core.domain import user_services
@@ -90,6 +91,8 @@ def verify_user_deleted(pending_deletion_model):
     """
     if _verify_user_models_deleted(pending_deletion_model.id):
         pending_deletion_model.delete()
+        email_manager.send_account_deleted_email(
+            pending_deletion_model.id, pending_deletion_model.email)
         return True
     else:
         pending_deletion_model.deletion_complete = False

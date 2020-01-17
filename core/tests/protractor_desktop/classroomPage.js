@@ -53,31 +53,6 @@ describe('Classroom page functionality', function() {
     users.login('creator@classroomPage.com');
   });
 
-  it('should add a new published topic to the Math classroom', function() {
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
-    topicEditorPage.submitTopicThumbnail('../data/img.png');
-    topicEditorPage.saveTopic('Added thumbnail.');
-    browser.getCurrentUrl().then(function(url) {
-      var topicId = url.split('/')[4].slice(0, -1);
-      adminPage.editConfigProperty(
-        'The set of topic IDs for each classroom page.',
-        'List',
-        function(elem) {
-          elem.editItem(0, 'Dictionary').editEntry(1, 'List').addItem(
-            'Unicode').setValue(topicId);
-        });
-      classroomPage.get('Math');
-      classroomPage.expectNumberOfTopicsToBe(0);
-      topicsAndSkillsDashboardPage.get();
-      topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
-      topicEditorPage.publishTopic();
-      classroomPage.get('Math');
-      classroomPage.expectNumberOfTopicsToBe(1);
-    });
-    users.logout();
-  });
-
   it('should search for explorations from classroom page', function() {
     workflow.createAndPublishExploration(
       'Exploration Title',
