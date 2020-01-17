@@ -18,8 +18,8 @@ module.exports = function(config) {
       // are not bundled, they will be treated separately.
       'third_party/static/jquery-3.4.1/jquery.min.js',
       'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
-      'third_party/static/angularjs-1.5.8/angular.js',
-      'third_party/static/angularjs-1.5.8/angular-mocks.js',
+      'third_party/static/angularjs-1.7.9/angular.js',
+      'third_party/static/angularjs-1.7.9/angular-mocks.js',
       'third_party/static/headroom-js-0.9.4/headroom.min.js',
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
@@ -150,17 +150,9 @@ module.exports = function(config) {
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
+      devtool: 'inline-source-map',
       module: {
         rules: [
-          {
-            // Exclude all the spec files from the report.
-            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
-            enforce: 'post',
-            use: {
-              loader: 'istanbul-instrumenter-loader',
-              options: { esModules: true }
-            }
-          },
           {
             test: /\.ts$/,
             use: [
@@ -178,6 +170,15 @@ module.exports = function(config) {
           {
             test: /\.html$/,
             loader: 'underscore-template-loader'
+          },
+          {
+            // Exclude all the spec files from the report.
+            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
+            enforce: 'post',
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              options: { esModules: true }
+            }
           },
           {
             test: /\.css$/,

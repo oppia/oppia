@@ -41,18 +41,9 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
         function(
             $scope, $filter, $uibModal, $rootScope,
             EVENT_SKILL_REINITIALIZED, AlertsService) {
-          $scope.skill = SkillEditorStateService.getSkill();
+          var ctrl = this;
           var groupedSkillSummaries =
             SkillEditorStateService.getGroupedSkillSummaries();
-          $scope.skillIdToSummaryMap = {};
-
-          for (var name in groupedSkillSummaries) {
-            var skillSummaries = groupedSkillSummaries[name];
-            for (var idx in skillSummaries) {
-              $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
-                skillSummaries[idx].description;
-            }
-          }
 
           $scope.removeSkillId = function(skillId) {
             SkillUpdateService.deletePrerequisiteSkill($scope.skill, skillId);
@@ -105,6 +96,19 @@ angular.module('oppia').directive('skillPrerequisiteSkillsEditor', [
               }
               SkillUpdateService.addPrerequisiteSkill($scope.skill, skillId);
             });
+          };
+
+          ctrl.$onInit = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.skillIdToSummaryMap = {};
+
+            for (var name in groupedSkillSummaries) {
+              var skillSummaries = groupedSkillSummaries[name];
+              for (var idx in skillSummaries) {
+                $scope.skillIdToSummaryMap[skillSummaries[idx].id] =
+                  skillSummaries[idx].description;
+              }
+            }
           };
         }]
     };

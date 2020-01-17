@@ -40,9 +40,10 @@ angular.module('oppia').directive('oppiaResponseDragAndDropSortInput', [
           }
           return true;
         };
-
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
+        ctrl.$onInit = function() {
+          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
+        };
       }]
     };
   }

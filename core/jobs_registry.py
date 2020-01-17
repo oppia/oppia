@@ -216,6 +216,11 @@ class ContinuousComputationEventDispatcher(python_utils.OBJECT):
     def dispatch_event(cls, event_type, *args, **kwargs):
         """Dispatches an incoming event to the ContinuousComputation
         classes which listen to events of that type.
+
+        Args:
+            event_type: str. The type of the event.
+            args: *. Positional arguments to pass to on_incoming_event().
+            kwargs: *. Keyword arguments to pass to on_incoming_event().
         """
         for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
             if event_type in klass.get_event_types_listened_to():

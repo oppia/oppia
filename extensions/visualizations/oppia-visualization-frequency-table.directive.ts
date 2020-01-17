@@ -35,10 +35,12 @@ angular.module('oppia').directive('oppiaVisualizationFrequencyTable', [
         '$attrs', 'HtmlEscaperService',
         function($attrs, HtmlEscaperService) {
           var ctrl = this;
-          ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-          ctrl.options =
-            HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-          ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+          ctrl.$onInit = function() {
+            ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+            ctrl.options =
+              HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
+            ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+          };
         }
       ]
     };
