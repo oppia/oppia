@@ -546,6 +546,7 @@ def get_collection_summaries_subscribed_to(user_id):
         ) if summary is not None
     ]
 
+
 # TODO(bhenning): Update this function to support also matching the query to
 # explorations contained within this collection. Introduce tests to verify this
 # behavior.

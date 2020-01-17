@@ -39,16 +39,18 @@ angular.module('oppia').directive('skillRubricsEditor', [
         function(
             $scope, $filter, $uibModal, $rootScope,
             RubricObjectFactory, EVENT_SKILL_REINITIALIZED) {
-          $scope.skill = SkillEditorStateService.getSkill();
-
+          var ctrl = this;
           $scope.onSaveRubric = function(difficulty, explanation) {
             SkillUpdateService.updateRubricForDifficulty(
               $scope.skill, difficulty, explanation);
           };
 
-          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
-            $scope.rubrics = $scope.skill.getRubrics();
-          });
+          ctrl.$onInit = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+              $scope.rubrics = $scope.skill.getRubrics();
+            });
+          };
         }]
     };
   }

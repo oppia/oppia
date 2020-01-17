@@ -77,32 +77,6 @@ angular.module('oppia').directive('previewTab', [
             PlayerCorrectnessFeedbackEnabledService, StateEditorService,
             UrlInterpolationService) {
           var ctrl = this;
-          ctrl.isExplorationPopulated = false;
-          ExplorationDataService.getData().then(function() {
-            var initStateNameForPreview = StateEditorService
-              .getActiveStateName();
-            var manualParamChanges = [];
-
-            // Show a warning message if preview doesn't start from the first
-            // state.
-            if (initStateNameForPreview !==
-                ExplorationInitStateNameService.savedMemento) {
-              ctrl.previewWarning =
-                'Preview started from \"' + initStateNameForPreview + '\"';
-            } else {
-              ctrl.previewWarning = '';
-            }
-
-            // Prompt user to enter any unset parameters, then populate
-            // exploration.
-            manualParamChanges = ctrl.getManualParamChanges(
-              initStateNameForPreview)
-              .then(function(manualParamChanges) {
-                ctrl.loadPreviewState(
-                  initStateNameForPreview, manualParamChanges);
-              });
-          });
-
           ctrl.getManualParamChanges = function(initStateNameForPreview) {
             var deferred = $q.defer();
 
@@ -190,17 +164,43 @@ angular.module('oppia').directive('previewTab', [
             }, 200);
           };
 
-          // This allows the active state to be kept up-to-date whilst
-          // navigating in preview mode, ensuring that the state does not change
-          // when toggling between editor and preview.
-          $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
-            StateEditorService.setActiveStateName(stateName);
-          });
+          ctrl.$onInit = function() {
+            // This allows the active state to be kept up-to-date whilst
+            // navigating in preview mode, ensuring that the state does not
+            // change when toggling between editor and preview.
+            $scope.$on('updateActiveStateIfInEditor', function(evt, stateName) {
+              StateEditorService.setActiveStateName(stateName);
+            });
+            $scope.$on('playerStateChange', function() {
+              ctrl.allParams = LearnerParamsService.getAllParams();
+            });
+            ctrl.isExplorationPopulated = false;
+            ExplorationDataService.getData().then(function() {
+              var initStateNameForPreview = StateEditorService
+                .getActiveStateName();
+              var manualParamChanges = [];
 
-          ctrl.allParams = {};
-          $scope.$on('playerStateChange', function() {
-            ctrl.allParams = LearnerParamsService.getAllParams();
-          });
+              // Show a warning message if preview doesn't start from the first
+              // state.
+              if (initStateNameForPreview !==
+                  ExplorationInitStateNameService.savedMemento) {
+                ctrl.previewWarning =
+                  'Preview started from \"' + initStateNameForPreview + '\"';
+              } else {
+                ctrl.previewWarning = '';
+              }
+
+              // Prompt user to enter any unset parameters, then populate
+              // exploration.
+              manualParamChanges = ctrl.getManualParamChanges(
+                initStateNameForPreview)
+                .then(function(manualParamChanges) {
+                  ctrl.loadPreviewState(
+                    initStateNameForPreview, manualParamChanges);
+                });
+            });
+            ctrl.allParams = {};
+          };
         }
       ]
     };

@@ -35,15 +35,6 @@ angular.module('oppia').directive('emailDashboardPage', [
         '$rootScope', 'EmailDashboardDataService', 'UserService',
         function($rootScope, EmailDashboardDataService, UserService) {
           var ctrl = this;
-          ctrl.username = '';
-          $rootScope.loadingMessage = 'Loading';
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.username = userInfo.getUsername();
-            $rootScope.loadingMessage = '';
-          });
-
-          ctrl.currentPageOfQueries = [];
-
           ctrl.resetForm = function() {
             ctrl.has_not_logged_in_for_n_days = null;
             ctrl.inactive_in_last_n_days = null;
@@ -104,9 +95,19 @@ angular.module('oppia').directive('emailDashboardPage', [
             return (submitter === ctrl.username) && (status === 'completed');
           };
 
-          EmailDashboardDataService.getNextQueries().then(function(queries) {
-            ctrl.currentPageOfQueries = queries;
-          });
+          ctrl.$onInit = function() {
+            ctrl.username = '';
+            $rootScope.loadingMessage = 'Loading';
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.username = userInfo.getUsername();
+              $rootScope.loadingMessage = '';
+            });
+
+            ctrl.currentPageOfQueries = [];
+            EmailDashboardDataService.getNextQueries().then(function(queries) {
+              ctrl.currentPageOfQueries = queries;
+            });
+          };
         }
       ]};
   }]);
