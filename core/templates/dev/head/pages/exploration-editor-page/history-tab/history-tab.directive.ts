@@ -53,54 +53,15 @@ angular.module('oppia').directive('historyTab', [
             DateTimeFormatService, EditabilityService, ExplorationDataService,
             UrlInterpolationService, VersionTreeService) {
           var ctrl = this;
-          ctrl.EditabilityService = EditabilityService;
-          ctrl.explorationId = ExplorationDataService.explorationId;
-          ctrl.explorationAllSnapshotsUrl =
-              '/createhandler/snapshots/' + ctrl.explorationId;
-          ctrl.revertExplorationUrl =
-            '/createhandler/revert/' + ctrl.explorationId;
-          ctrl.explorationDownloadUrl =
-            '/createhandler/download/' + ctrl.explorationId;
-
-          /* Variable definitions:
-          *
-          * explorationSnapshots is a list of all snapshots for the exploration
-          * in ascending order.
-          *
-          * explorationVersionMetadata is an object whose keys are version
-          * numbers and whose values are objects containing data of that
-          * revision (that is to be displayed) with the keys 'committerId',
-          * 'createdOn', 'commitMessage', and 'versionNumber'. It contains a
-          * maximum of 30 versions.
-          *
-          * versionCheckboxArray is an array of the version numbers of the
-          * revisions to be displayed on the page, in the order they are
-          * displayed in.
-          *
-          * nodesData is an object whose keys are nodeIds (assigned in version
-          * comparison), and whose values are an object containing
-          * 'newestStateName', 'originalStateName' and 'stateProperty'.
-          */
-          ctrl.explorationVersionMetadata = null;
-          ctrl.versionCheckboxArray = [];
+          // explorationSnapshots is a list of all snapshots for the
+          // exploration in ascending order.
           var explorationSnapshots = null;
           var versionTreeParents = null;
+          // nodesData is an object whose keys are nodeIds (assigned in version
+          // comparison), and whose values are an object containing
+          // 'newestStateName', 'originalStateName' and 'stateProperty'.
           var nodesData = null;
           var currentPage = 0;
-          ctrl.displayedCurrentPageNumber = currentPage + 1;
-          ctrl.versionNumbersToDisplay = [];
-          ctrl.VERSIONS_PER_PAGE = 30;
-
-          $scope.$on('refreshVersionHistory', function(evt, data) {
-            // Uncheck all checkboxes when page is refreshed
-            angular.forEach(ctrl.versionCheckboxArray, function(
-                versionCheckbox) {
-              versionCheckbox.selected = false;
-            });
-            if (data.forceRefresh || ctrl.explorationVersionMetadata === null) {
-              ctrl.refreshVersionHistory();
-            }
-          });
 
           // Compares the two selected versions and displays the comparison
           // results.
@@ -320,6 +281,48 @@ angular.module('oppia').directive('historyTab', [
                 ctrl.versionCheckboxArray[i].vnum);
             }
           };
+          ctrl.$onInit = function() {
+            $scope.$on('refreshVersionHistory', function(evt, data) {
+              // Uncheck all checkboxes when page is refreshed
+              angular.forEach(ctrl.versionCheckboxArray, function(
+                  versionCheckbox) {
+                versionCheckbox.selected = false;
+              });
+              if (
+                data.forceRefresh || ctrl.explorationVersionMetadata === null) {
+                ctrl.refreshVersionHistory();
+              }
+            });
+            ctrl.EditabilityService = EditabilityService;
+            ctrl.explorationId = ExplorationDataService.explorationId;
+            ctrl.explorationAllSnapshotsUrl =
+                '/createhandler/snapshots/' + ctrl.explorationId;
+            ctrl.revertExplorationUrl =
+              '/createhandler/revert/' + ctrl.explorationId;
+            ctrl.explorationDownloadUrl =
+              '/createhandler/download/' + ctrl.explorationId;
+
+            /* Variable definitions:
+            *
+            * explorationVersionMetadata is an object whose keys are version
+            * numbers and whose values are objects containing data of that
+            * revision (that is to be displayed) with the keys 'committerId',
+            * 'createdOn', 'commitMessage', and 'versionNumber'. It contains a
+            * maximum of 30 versions.
+            *
+            * versionCheckboxArray is an array of the version numbers of the
+            * revisions to be displayed on the page, in the order they are
+            * displayed in.
+            *
+            */
+            ctrl.explorationVersionMetadata = null;
+            ctrl.versionCheckboxArray = [];
+
+            ctrl.displayedCurrentPageNumber = currentPage + 1;
+            ctrl.versionNumbersToDisplay = [];
+            ctrl.VERSIONS_PER_PAGE = 30;
+          };
         }
-      ]};
+      ]
+    };
   }]);
