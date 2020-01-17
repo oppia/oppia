@@ -23,6 +23,8 @@ import { AudioTranslationLanguageService } from
 
 describe('Audio translation language service', () => {
   let atls: AudioTranslationLanguageService;
+  let allAudioLanguageCodesInExploration;
+
   beforeEach(() => {
     atls = TestBed.get(AudioTranslationLanguageService);
 
@@ -37,17 +39,18 @@ describe('Audio translation language service', () => {
 
   it('should properly initialize the current audio language when ' +
      'a preferred language is set', () => {
-    let allAudioLanguageCodesInExploration = ['hi-en', 'en'];
+    allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     let preferredLanguageCode = 'hi-en';
     let explorationLanguageCode = 'hi';
     const automaticTextToSpeechEnabled = false;
 
-    atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
+    atls.init(
+      allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, automaticTextToSpeechEnabled);
     expect(atls.isAutomaticTextToSpeechEnabled()).toBe(
       automaticTextToSpeechEnabled);
     expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
-    expect(atls.getallAudioLanguageCodesInExploration()).toBe(
+    expect(atls.getAllAudioLanguageCodesInExploration()).toBe(
       allAudioLanguageCodesInExploration);
     atls.clearCurrentAudioLanguageCode();
 
@@ -67,40 +70,40 @@ describe('Audio translation language service', () => {
     atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, false);
     expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
-    expect(atls.getallAudioLanguageCodesInExploration()).toBe(
+    expect(atls.getAllAudioLanguageCodesInExploration()).toBe(
       allAudioLanguageCodesInExploration);
   });
 
   it('should initialize the current audio language when ' +
      'no preferred language is set and the exploration contains an audio ' +
      'language that is related to the exploration language', () => {
-    const allAudioLanguageCodesInExploration = ['hi-en', 'en'];
+    allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     const preferredLanguageCode = null;
     const explorationLanguageCode = 'hi';
     atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, false);
     expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
-    expect(atls.getallAudioLanguageCodesInExploration()).toBe(
+    expect(atls.getAllAudioLanguageCodesInExploration()).toBe(
       allAudioLanguageCodesInExploration);
   });
 
   it('should initialize the current audio language when ' +
     'no preferred language is set and the exploration contains an audio ' +
     'language that is no related to the exploration language', () => {
-    const allAudioLanguageCodesInExploration = ['hi', 'en'];
+    allAudioLanguageCodesInExploration = ['hi', 'en'];
     const preferredLanguageCode = null;
     const explorationLanguageCode = 'hi-en';
     atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, false);
     expect(atls.getCurrentAudioLanguageCode()).toEqual('hi');
-    expect(atls.getallAudioLanguageCodesInExploration()).toBe(
+    expect(atls.getAllAudioLanguageCodesInExploration()).toBe(
       allAudioLanguageCodesInExploration);
   });
 
   it('should initialize the current audio language to the most ' +
      'relevant language when multiple audio languages are related ' +
      'to the exploration language', () => {
-    const allAudioLanguageCodesInExploration = ['hi-en', 'en'];
+    allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     const preferredLanguageCode = null;
     const explorationLanguageCode = 'en';
     const languageOptions = [{
@@ -113,14 +116,14 @@ describe('Audio translation language service', () => {
     atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, false);
     expect(atls.getCurrentAudioLanguageCode()).toEqual('en');
-    expect(atls.getallAudioLanguageCodesInExploration()).toBe(
+    expect(atls.getAllAudioLanguageCodesInExploration()).toBe(
       allAudioLanguageCodesInExploration);
     expect(atls.getLanguageOptionsForDropdown()).toEqual(languageOptions);
   });
 
   it('should not have any audio language option when no audio is available ' +
      'and automatic Text-to-speech is disabled in an exploration', () => {
-    const allAudioLanguageCodesInExploration = [];
+    allAudioLanguageCodesInExploration = [];
     const explorationLanguageCode = 'en';
     const automaticTextToSpeechEnabled = false;
 
@@ -142,7 +145,7 @@ describe('Audio translation language service', () => {
 
   it('should initialize the current audio language when audio is available ' +
     'and automatic Text-to-speech is enabled in an exploration', () => {
-    const allAudioLanguageCodesInExploration = [];
+    allAudioLanguageCodesInExploration = [];
     const explorationLanguageCode = 'en';
     const preferredLanguageCode = null;
     const automaticTextToSpeechEnabled = true;
@@ -162,7 +165,7 @@ describe('Audio translation language service', () => {
   it('should initialize the current audio language when exploration has ' +
     'audio language codes and audio is available and automatic ' +
     'Text-to-speech is enabled in it', () => {
-    const allAudioLanguageCodesInExploration = ['hi-en', 'en'];
+    allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     const explorationLanguageCode = 'en';
     const preferredLanguageCode = null;
     const languageOptions = [{
@@ -184,7 +187,7 @@ describe('Audio translation language service', () => {
   it('should get speech synthesis language code when userAgent is mobile',
     () => {
       spyOnProperty(navigator, 'userAgent').and.returnValue('iPhone');
-      const allAudioLanguageCodesInExploration = [];
+      allAudioLanguageCodesInExploration = [];
       const explorationLanguageCode = 'en';
       const preferredLanguageCode = null;
       const automaticTextToSpeechEnabled = true;
@@ -201,23 +204,23 @@ describe('Audio translation language service', () => {
     });
 
   it('should change current audio language after initialization', () => {
-    const allAudioLanguageCodesInExploration = ['hi-en', 'en'];
+    allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     const preferredLanguageCode = 'hi-en';
     const explorationLanguageCode = 'hi';
     const automaticTextToSpeechEnabled = false;
     atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
       explorationLanguageCode, automaticTextToSpeechEnabled);
     expect(atls.getCurrentAudioLanguageCode()).toEqual('hi-en');
-    expect(atls.getallAudioLanguageCodesInExploration()).toBe(
+    expect(atls.getAllAudioLanguageCodesInExploration()).toBe(
       allAudioLanguageCodesInExploration);
     atls.setCurrentAudioLanguageCode('en');
     expect(atls.getCurrentAudioLanguageCode()).toEqual('en');
-    expect(atls.getallAudioLanguageCodesInExploration()).toBe(
+    expect(atls.getAllAudioLanguageCodesInExploration()).toBe(
       allAudioLanguageCodesInExploration);
   });
 
   it('should get the current language description correctly', () => {
-    const allAudioLanguageCodesInExploration = ['hi-en', 'en'];
+    allAudioLanguageCodesInExploration = ['hi-en', 'en'];
     const preferredLanguageCode = 'hi-en';
     const explorationLanguageCode = 'hi';
     atls.init(allAudioLanguageCodesInExploration, preferredLanguageCode,
