@@ -94,13 +94,14 @@ describe('State Object Factory', () => {
     };
   });
 
-  it('should create a new state object from backend', () => {
+  it('should create a new state object from backend dict', () => {
     const stateObjectBackend = sof.createFromBackendDict(
       'State name', stateObject);
     expect(stateObjectBackend.toBackendDict()).toEqual(stateObject);
   });
 
-  it('should handle when param_changes length is greater than 0', () => {
+  it('should correctly create a state object when param_changes length ' +
+    'is greater than 0', () => {
     const paramChanges = [{
       customization_args: {
         parse_with_jinja: false,
@@ -134,9 +135,7 @@ describe('State Object Factory', () => {
       'Default state', stateObject);
 
     stateObjectDefault.setName(stateName);
-    stateObject.interaction.default_outcome.dest = stateName;
-
-    expect(stateObjectDefault.toBackendDict()).toEqual(stateObject);
+    expect(stateObjectDefault.name).toBe(stateName);
   });
 
   it('should copy a state object', () => {
@@ -145,6 +144,7 @@ describe('State Object Factory', () => {
 
     stateObjectDefault.copy(otherState);
 
-    expect(otherState).toEqual(stateObjectDefault);
+    expect(stateObjectDefault).toEqual(otherState);
+    expect(stateObjectDefault.name).toEqual('Other state');
   });
 });

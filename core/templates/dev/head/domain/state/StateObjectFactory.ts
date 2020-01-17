@@ -58,11 +58,6 @@ export class State {
   }
   setName(newName: string): void {
     this.name = newName;
-    this.updateInteractionDestName(newName);
-  }
-
-  updateInteractionDestName(newName: string) {
-    this.interaction.defaultOutcome.dest = newName;
   }
 
   // TODO(#7165): Replace any with exact type.

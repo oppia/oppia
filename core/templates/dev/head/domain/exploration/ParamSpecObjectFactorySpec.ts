@@ -33,7 +33,7 @@ describe('Param Spec Object Factory', () => {
     paramType = ptof.getDefaultType();
   });
 
-  it('should create a param spec object from backend', () => {
+  it('should create a param spec object from backend dict', () => {
     const paramSpecObject = psof.createFromBackendDict({
       obj_type: 'UnicodeString'
     });

@@ -46,7 +46,7 @@ describe('Written Translations Object Factory', () => {
       }));
   });
 
-  it('should create a written translations object from backend', () => {
+  it('should create a written translations object from backend dict', () => {
     expect(writtenTranslationsBackendDict.toBackendDict())
       .toEqual({
         translations_mapping: {
@@ -68,7 +68,11 @@ describe('Written Translations Object Factory', () => {
 
   it('should add and delete contents from a written translations object',
     () => {
+      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+        'content_1']);
       writtenTranslationsBackendDict.addContentId('content_2');
+      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+        'content_1', 'content_2']);
       expect(() => {
         writtenTranslationsBackendDict.addContentId('content_2');
       }).toThrow(Error('Trying to add duplicate content id.'));
@@ -81,6 +85,8 @@ describe('Written Translations Object Factory', () => {
       expect(() => {
         writtenTranslationsBackendDict.deleteContentId('content_2');
       }).toThrow(Error('Unable to find the given content id.'));
+      expect(writtenTranslationsBackendDict.getAllContentId()).toEqual([
+        'content_1']);
     });
 
   it('should add translation in a written translations object', () => {
@@ -128,7 +134,7 @@ describe('Written Translations Object Factory', () => {
         .toBe(false);
     });
 
-  it('should toggle update needing in a language code', () => {
+  it('should toggle needs_update for a language code', () => {
     writtenTranslationsBackendDict.toggleNeedsUpdateAttribute(
       'content_1', 'hi-en');
     expect(writtenTranslationsBackendDict.getWrittenTranslation(
