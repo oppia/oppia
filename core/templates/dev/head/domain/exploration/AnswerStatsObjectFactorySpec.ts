@@ -26,7 +26,7 @@ describe('Answer Stats Object Factory', () => {
     asof = new AnswerStatsObjectFactory();
   });
 
-  it('should create an answer stats object from backend', () => {
+  it('should create an answer stats object from backend dict', () => {
     const answerStatsObjectBackend = {
       answer: 'hola',
       frequency: 1
@@ -42,7 +42,7 @@ describe('Answer Stats Object Factory', () => {
     expect(answerStatsObject.getIsAddressed()).toBeFalse();
   });
 
-  it('should create an answer stats object from backend when answer is ' +
+  it('should create an answer stats object from backend dict when answer is ' +
     'not a string', () => {
     const answerStatsObjectBackend = {
       answer: 2,

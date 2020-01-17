@@ -26,7 +26,7 @@ describe('Param Change Object Factory', () => {
     pcof = new ParamChangeObjectFactory();
   });
 
-  it('should create a param change object from backend', () => {
+  it('should create a param change object from backend dict', () => {
     const sampleData = {
       customization_args: {
         parse_with_jinja: false,
