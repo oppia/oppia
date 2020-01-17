@@ -56,7 +56,7 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
             var selectedElement = (
               document.querySelector(
                 'button.multiple-choice-option.selected'));
-            if(selectedElement) {
+            if (selectedElement) {
               selectedElement.classList.remove('selected');
             }
             // Selected current option.
