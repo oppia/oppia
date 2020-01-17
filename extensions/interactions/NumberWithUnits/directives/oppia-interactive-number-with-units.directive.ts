@@ -46,38 +46,12 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
             NumberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
             CurrentInteractionService) {
           var ctrl = this;
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-
           var errorMessage = '';
           // Label for errors caused whilst parsing number with units.
           var FORM_ERROR_TYPE = 'NUMBER_WITH_UNITS_FORMAT_ERROR';
-          ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {
-            type: 'unicode',
-            ui_config: {}
-          };
-
           ctrl.getWarningText = function() {
             return errorMessage;
           };
-
-          try {
-            NumberWithUnitsObjectFactory.createCurrencyUnits();
-          } catch (parsingError) {}
-
-          $scope.$watch('$ctrl.answer', function(newValue) {
-            try {
-              var numberWithUnits =
-                NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-              errorMessage = '';
-              ctrl.NumberWithUnitsForm.answer.$setValidity(
-                FORM_ERROR_TYPE, true);
-            } catch (parsingError) {
-              errorMessage = parsingError.message;
-              ctrl.NumberWithUnitsForm.answer.$setValidity(
-                FORM_ERROR_TYPE, false);
-            }
-          });
 
           ctrl.submitAnswer = function(answer) {
             try {
@@ -103,10 +77,6 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
           var submitAnswerFn = function() {
             ctrl.submitAnswer(ctrl.answer);
           };
-
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, ctrl.isAnswerValid);
-
           ctrl.showHelp = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getExtensionResourceUrl(
@@ -121,9 +91,41 @@ angular.module('oppia').directive('oppiaInteractiveNumberWithUnits', [
                   };
                 }
               ]
-            }).result.then(function() {});
+            }).result.then(function() {}, function() {
+
+            });
           };
-        }]
+          ctrl.$onInit = function() {
+            $scope.$watch('$ctrl.answer', function(newValue) {
+              try {
+                var numberWithUnits =
+                  NumberWithUnitsObjectFactory.fromRawInputString(newValue);
+                errorMessage = '';
+                ctrl.NumberWithUnitsForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, true);
+              } catch (parsingError) {
+                errorMessage = parsingError.message;
+                ctrl.NumberWithUnitsForm.answer.$setValidity(
+                  FORM_ERROR_TYPE, false);
+              }
+            });
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+
+            ctrl.NUMBER_WITH_UNITS_FORM_SCHEMA = {
+              type: 'unicode',
+              ui_config: {}
+            };
+
+            try {
+              NumberWithUnitsObjectFactory.createCurrencyUnits();
+            } catch (parsingError) {}
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, ctrl.isAnswerValid);
+          };
+        }
+      ]
     };
   }
 ]);

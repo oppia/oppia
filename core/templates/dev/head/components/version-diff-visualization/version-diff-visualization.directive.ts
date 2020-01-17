@@ -26,7 +26,8 @@ require(
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('versionDiffVisualization', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  '$timeout', 'UrlInterpolationService',
+  function($timeout, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -87,114 +88,8 @@ angular.module('oppia').directive('versionDiffVisualization', [
         // 'true' or false depending on whether the state property is used in
         // the diff graph. (Will be used to generate legend)
         var _stateTypeUsed = {};
-        _stateTypeUsed[NODE_TYPE_ADDED] = false;
-        _stateTypeUsed[NODE_TYPE_DELETED] = false;
-        _stateTypeUsed[NODE_TYPE_CHANGED] = false;
-        _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
-        _stateTypeUsed[NODE_TYPE_RENAMED] = false;
-        _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
-
-        ctrl.LEGEND_GRAPH_COLORS = {};
-        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_ADDED] = COLOR_ADDED;
-        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_DELETED] = COLOR_DELETED;
-        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED] = COLOR_CHANGED;
-        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_UNCHANGED] = COLOR_UNCHANGED;
-        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_RENAMED] = COLOR_RENAMED_UNCHANGED;
-        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED_RENAMED] = COLOR_CHANGED;
-
-        ctrl.LEGEND_GRAPH_SECONDARY_LABELS = {};
-        ctrl.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_CHANGED_RENAMED] = (
-          '(was: Old name)');
-        ctrl.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_RENAMED] = (
-          '(was: Old name)');
-        ctrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
-          hidden: 'stroke: none; marker-end: none;'
-        };
-        ctrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
-          added: (
-            'stroke: #1F7D1F; stroke-opacity: 0.8; ' +
-            'marker-end: url(#arrowhead-green)'),
-          deleted: (
-            'stroke: #B22222; stroke-opacity: 0.8; ' +
-            'marker-end: url(#arrowhead-red)')
-        };
         var diffGraphNodes = {};
-        ctrl.diffGraphSecondaryLabels = {};
-        ctrl.diffGraphNodeColors = {};
-
-        var nodesData = ctrl.getDiffData().nodes;
-        for (var nodeId in nodesData) {
-          var nodeStateProperty = nodesData[nodeId].stateProperty;
-          if (nodeStateProperty === STATE_PROPERTY_ADDED) {
-            diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-            ctrl.diffGraphNodeColors[nodeId] = COLOR_ADDED;
-            _stateTypeUsed[NODE_TYPE_ADDED] = true;
-          } else if (nodeStateProperty === STATE_PROPERTY_DELETED) {
-            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-            ctrl.diffGraphNodeColors[nodeId] = COLOR_DELETED;
-            _stateTypeUsed[NODE_TYPE_DELETED] = true;
-          } else if (nodeStateProperty === STATE_PROPERTY_CHANGED) {
-            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-            ctrl.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
-            if (nodesData[nodeId].originalStateName !==
-                nodesData[nodeId].newestStateName) {
-              ctrl.diffGraphSecondaryLabels[nodeId] = '(was: ' +
-                nodesData[nodeId].originalStateName + ')';
-              diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-              _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = true;
-            } else {
-              _stateTypeUsed[NODE_TYPE_CHANGED] = true;
-            }
-          } else if (nodeStateProperty === STATE_PROPERTY_UNCHANGED) {
-            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-            ctrl.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
-            if (nodesData[nodeId].originalStateName !==
-                nodesData[nodeId].newestStateName) {
-              ctrl.diffGraphSecondaryLabels[nodeId] = '(was: ' +
-                nodesData[nodeId].originalStateName + ')';
-              diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-              ctrl.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
-              _stateTypeUsed[NODE_TYPE_RENAMED] = true;
-            } else {
-              _stateTypeUsed[NODE_TYPE_UNCHANGED] = true;
-            }
-          } else {
-            throw new Error('Invalid state property.');
-          }
-        }
-
-        ctrl.v1InitStateId = ctrl.getDiffData().v1InitStateId;
-
-        ctrl.diffGraphData = {
-          nodes: diffGraphNodes,
-          links: ctrl.getDiffData().links,
-          initStateId: ctrl.getDiffData().v2InitStateId,
-          finalStateIds: ctrl.getDiffData().finalStateIds
-        };
-
-        // Generate the legend graph
-        ctrl.legendGraph = {
-          nodes: {},
-          links: []
-        };
-        var _lastUsedStateType = null;
-        for (var stateProperty in _stateTypeUsed) {
-          if (_stateTypeUsed[stateProperty]) {
-            ctrl.legendGraph.nodes[stateProperty] = stateProperty;
-            if (_lastUsedStateType) {
-              ctrl.legendGraph.links.push({
-                source: _lastUsedStateType,
-                target: stateProperty,
-                linkProperty: 'hidden'
-              });
-            }
-            _lastUsedStateType = stateProperty;
-            if (!ctrl.legendGraph.hasOwnProperty('initStateId')) {
-              ctrl.legendGraph.initStateId = stateProperty;
-            }
-          }
-        }
-        ctrl.legendGraph.finalStateIds = [_lastUsedStateType];
+        var nodesData;
         // Opens the modal showing the history diff for a given state.
         // stateId is the unique ID assigned to a state during the
         // calculation of the state graph.
@@ -216,7 +111,7 @@ angular.module('oppia').directive('versionDiffVisualization', [
         //     between the 2 versions, or the name of the state in the older
         //     version if the state name is changed.
         // - stateProperty is whether the state is added, changed, unchanged or
-        //     deleted.
+        //   deleted.
         ctrl.showStateDiffModal = function(
             newStateName, oldStateName, stateProperty) {
           $uibModal.open({
@@ -259,12 +154,12 @@ angular.module('oppia').directive('versionDiffVisualization', [
               }
             },
             controller: [
-              '$scope', '$http', '$uibModalInstance', '$timeout',
+              '$scope', '$http', '$uibModalInstance',
               'newStateName', 'oldStateName', 'newState', 'oldState',
               'headers', 'ContextService',
               'UrlInterpolationService',
               function(
-                  $scope, $http, $uibModalInstance, $timeout,
+                  $scope, $http, $uibModalInstance,
                   newStateName, oldStateName, newState, oldState,
                   headers, ContextService,
                   UrlInterpolationService) {
@@ -329,7 +224,118 @@ angular.module('oppia').directive('versionDiffVisualization', [
                 };
               }
             ]
+          }).result.then(function() {}, function() {
+            // This callback is triggered when the Cancel button is
+            // clicked. No further action is needed.
           });
+        };
+        ctrl.$onInit = function() {
+          nodesData = ctrl.getDiffData().nodes;
+          _stateTypeUsed[NODE_TYPE_ADDED] = false;
+          _stateTypeUsed[NODE_TYPE_DELETED] = false;
+          _stateTypeUsed[NODE_TYPE_CHANGED] = false;
+          _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
+          _stateTypeUsed[NODE_TYPE_RENAMED] = false;
+          _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
+          ctrl.LEGEND_GRAPH_COLORS = {};
+          ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_ADDED] = COLOR_ADDED;
+          ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_DELETED] = COLOR_DELETED;
+          ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED] = COLOR_CHANGED;
+          ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_UNCHANGED] = COLOR_UNCHANGED;
+          ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_RENAMED] = COLOR_RENAMED_UNCHANGED;
+          ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED_RENAMED] = COLOR_CHANGED;
+
+          ctrl.LEGEND_GRAPH_SECONDARY_LABELS = {};
+          ctrl.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_CHANGED_RENAMED] = (
+            '(was: Old name)');
+          ctrl.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_RENAMED] = (
+            '(was: Old name)');
+          ctrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
+            hidden: 'stroke: none; marker-end: none;'
+          };
+          ctrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
+            added: (
+              'stroke: #1F7D1F; stroke-opacity: 0.8; ' +
+              'marker-end: url(#arrowhead-green)'),
+            deleted: (
+              'stroke: #B22222; stroke-opacity: 0.8; ' +
+              'marker-end: url(#arrowhead-red)')
+          };
+          ctrl.diffGraphSecondaryLabels = {};
+          ctrl.diffGraphNodeColors = {};
+
+          for (var nodeId in nodesData) {
+            var nodeStateProperty = nodesData[nodeId].stateProperty;
+            if (nodeStateProperty === STATE_PROPERTY_ADDED) {
+              diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
+              ctrl.diffGraphNodeColors[nodeId] = COLOR_ADDED;
+              _stateTypeUsed[NODE_TYPE_ADDED] = true;
+            } else if (nodeStateProperty === STATE_PROPERTY_DELETED) {
+              diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
+              ctrl.diffGraphNodeColors[nodeId] = COLOR_DELETED;
+              _stateTypeUsed[NODE_TYPE_DELETED] = true;
+            } else if (nodeStateProperty === STATE_PROPERTY_CHANGED) {
+              diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
+              ctrl.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
+              if (nodesData[nodeId].originalStateName !==
+                  nodesData[nodeId].newestStateName) {
+                ctrl.diffGraphSecondaryLabels[nodeId] = '(was: ' +
+                  nodesData[nodeId].originalStateName + ')';
+                diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
+                _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = true;
+              } else {
+                _stateTypeUsed[NODE_TYPE_CHANGED] = true;
+              }
+            } else if (nodeStateProperty === STATE_PROPERTY_UNCHANGED) {
+              diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
+              ctrl.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
+              if (nodesData[nodeId].originalStateName !==
+                  nodesData[nodeId].newestStateName) {
+                ctrl.diffGraphSecondaryLabels[nodeId] = '(was: ' +
+                  nodesData[nodeId].originalStateName + ')';
+                diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
+                ctrl.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
+                _stateTypeUsed[NODE_TYPE_RENAMED] = true;
+              } else {
+                _stateTypeUsed[NODE_TYPE_UNCHANGED] = true;
+              }
+            } else {
+              throw new Error('Invalid state property.');
+            }
+          }
+
+          ctrl.v1InitStateId = ctrl.getDiffData().v1InitStateId;
+
+          ctrl.diffGraphData = {
+            nodes: diffGraphNodes,
+            links: ctrl.getDiffData().links,
+            initStateId: ctrl.getDiffData().v2InitStateId,
+            finalStateIds: ctrl.getDiffData().finalStateIds
+          };
+
+          // Generate the legend graph
+          ctrl.legendGraph = {
+            nodes: {},
+            links: []
+          };
+          var _lastUsedStateType = null;
+          for (var stateProperty in _stateTypeUsed) {
+            if (_stateTypeUsed[stateProperty]) {
+              ctrl.legendGraph.nodes[stateProperty] = stateProperty;
+              if (_lastUsedStateType) {
+                ctrl.legendGraph.links.push({
+                  source: _lastUsedStateType,
+                  target: stateProperty,
+                  linkProperty: 'hidden'
+                });
+              }
+              _lastUsedStateType = stateProperty;
+              if (!ctrl.legendGraph.hasOwnProperty('initStateId')) {
+                ctrl.legendGraph.initStateId = stateProperty;
+              }
+            }
+          }
+          ctrl.legendGraph.finalStateIds = [_lastUsedStateType];
         };
       }]
     };

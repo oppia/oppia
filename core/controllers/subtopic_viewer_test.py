@@ -62,12 +62,19 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
         subtopic = topic_domain.Subtopic.create_default_subtopic(
             1, 'Subtopic Title')
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'abbrev', None,
-            'Description', [], [], [], [subtopic], 2)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         self.save_new_topic(
-            'topic_id_2', self.admin_id, 'Private_Name', 'abbrev', None,
-            'Description', [], [], [], [subtopic], 2)
+            'topic_id_2', self.admin_id, name='Private_Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[],
+            subtopics=[subtopic], next_subtopic_id=2)
         self.recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {

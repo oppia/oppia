@@ -67,8 +67,8 @@ class NotificationsDashboardHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         job_queued_msec, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications(  # pylint: disable=line-too-long
-                self.user_id))
+            user_jobs_continuous.DashboardRecentUpdatesAggregator
+            .get_recent_user_changes(self.user_id))
 
         last_seen_msec = (
             subscription_services.get_last_seen_notifications_msec(
@@ -320,8 +320,8 @@ class NotificationsHandler(base.BaseHandler):
             subscription_services.get_last_seen_notifications_msec(
                 self.user_id))
         _, recent_notifications = (
-            user_jobs_continuous.DashboardRecentUpdatesAggregator.get_recent_notifications( # pylint: disable=line-too-long
-                self.user_id))
+            user_jobs_continuous.DashboardRecentUpdatesAggregator
+            .get_recent_user_changes(self.user_id))
         for notification in recent_notifications:
             if (notification['last_updated_ms'] > last_seen_msec and
                     notification['author_id'] != self.user_id):
