@@ -16,59 +16,76 @@
  * @fileoverview Service to get story data.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/story_viewer/story-viewer-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StoryViewerBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'STORY_DATA_URL_TEMPLATE',
-  'STORY_PROGRESS_URL_TEMPLATE', function(
-      $http, $q, UrlInterpolationService, STORY_DATA_URL_TEMPLATE,
-      STORY_PROGRESS_URL_TEMPLATE) {
-    var storyDataDict = null;
-    var _fetchStoryData = function(storyId, successCallback, errorCallback) {
-      var storyDataUrl = UrlInterpolationService.interpolateUrl(
-        STORY_DATA_URL_TEMPLATE, {
-          story_id: storyId
-        });
+import { StoryViewerDomainConstants } from
+  'domain/story_viewer/story-viewer-domain.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-      $http.get(storyDataUrl).then(function(response) {
-        storyDataDict = angular.copy(response.data);
-        if (successCallback) {
-          successCallback(storyDataDict);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class StoryViewerBackendApiService {
+  // Delete File
+  // Type is any because keys do not follow camel case
+  storyDataDict: any = null;
+
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient
+  ) {}
+
+  // Return type is any because this function doesn't actually return anything
+  _fetchStoryData(storyId: string, successCallback, errorCallback): any {
+    var storyDataUrl = this.urlInterpolationService.interpolateUrl(
+      StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
+        story_id: storyId
       });
-    };
 
-    var _recordChapterCompletion = function(
-        storyId, nodeId, successCallback, errorCallback) {
-      var chapterCompletionUrl = UrlInterpolationService.interpolateUrl(
-        STORY_PROGRESS_URL_TEMPLATE, {
-          story_id: storyId,
-          node_id: nodeId
-        });
-      $http.post(chapterCompletionUrl).then(function(response) {
-        successCallback({
-          summaries: response.data.summaries,
-          nextNodeId: response.data.next_node_id,
-          readyForReviewTest: response.data.ready_for_review_test});
-      });
-    };
-
-    return {
-      fetchStoryData: function(storyId) {
-        return $q(function(resolve, reject) {
-          _fetchStoryData(storyId, resolve, reject);
-        });
-      },
-      recordChapterCompletion: function(storyId, nodeId) {
-        return $q(function(resolve, reject) {
-          _recordChapterCompletion(storyId, nodeId, resolve, reject);
-        });
+    this.http.get(storyDataUrl).toPromise().then((data) => {
+      this.storyDataDict = angular.copy(data);
+      if (successCallback) {
+        successCallback(this.storyDataDict);
       }
-    };
+    }, (error) => {
+      if (errorCallback) {
+        errorCallback(error);
+      }
+    });
   }
-]);
+
+  // Return type is any because this function doesn't actually return anything
+  _recordChapterCompletion(storyId: string, nodeId: string,
+      successCallback, errorCallback): any {
+    var chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
+      StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
+        story_id: storyId,
+        node_id: nodeId
+      });
+    this.http.post(chapterCompletionUrl, {}).toPromise().then((data: any) => {
+      successCallback({
+        summaries: data.summaries,
+        nextNodeId: data.next_node_id,
+        readyForReviewTest: data.ready_for_review_test});
+    });
+  }
+
+  fetchStoryData(storyId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchStoryData(storyId, resolve, reject);
+    });
+  }
+
+  recordChapterCompletion(storyId: string, nodeId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._recordChapterCompletion(storyId, nodeId, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'StoryViewerBackendApiService',
+  downgradeInjectable(StoryViewerBackendApiService));

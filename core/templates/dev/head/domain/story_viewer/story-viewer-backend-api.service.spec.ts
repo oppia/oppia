@@ -16,62 +16,54 @@
  * @fileoverview Unit tests for StoryViewerBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-require('domain/story_viewer/story-viewer-backend-api.service.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-describe('Story viewer backend API service', function() {
-  var StoryViewerBackendApiService = null;
-  var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
-  var UndoRedoService = null;
+import { StoryViewerBackendApiService } from
+  'domain/story_viewer/story-viewer-backend-api.service';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+describe('Story viewer backend API service', () => {
+  let storyViewerBackendApiService: StoryViewerBackendApiService = null;
+  let httpTestingController: HttpTestingController;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    StoryViewerBackendApiService = $injector.get(
-      'StoryViewerBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
+  var sampleDataResults = {
+    story_title: 'Story title',
+    story_description: 'Story description',
+    completed_nodes: [],
+    pending_nodes: []
+  };
 
-    // Sample story object returnable from the backend
-    sampleDataResults = {
-      story_title: 'Story title',
-      story_description: 'Story description',
-      completed_nodes: [],
-      pending_nodes: []
-    };
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [StoryViewerBackendApiService]
+    });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing story from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/story_data_handler/0').respond(
-        sampleDataResults);
-      StoryViewerBackendApiService.fetchStoryData('0').then(
+      storyViewerBackendApiService.fetchStoryData('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+
+      var req = httpTestingController.expectOne('/story_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 });
