@@ -44,7 +44,9 @@
   border-color: #115FD4;
 }
 
-/* Hover pseudo-class should be used in desktops only. */
+/* Hover pseudo-class should only be used in desktops because it
+ * breaks functionality on mobile.
+ */
 @media screen and (min-width: 800px) {
   .multiple-choice-option:hover {
     color: #115FD4;
