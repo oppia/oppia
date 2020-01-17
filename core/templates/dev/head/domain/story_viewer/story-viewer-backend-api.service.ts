@@ -29,8 +29,7 @@ import { UrlInterpolationService } from
   providedIn: 'root'
 })
 export class StoryViewerBackendApiService {
-  // Delete File
-  // Type is any because keys do not follow camel case
+  // Type is any because keys do not follow camel casing
   storyDataDict: any = null;
 
   constructor(
