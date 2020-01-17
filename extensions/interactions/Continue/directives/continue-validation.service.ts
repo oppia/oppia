@@ -60,7 +60,7 @@ export class ContinueValidationService {
     if (customizationArgs.buttonText.value.length > buttonTextMaxLength) {
       warningsList.push({
         type: AppConstants.WARNING_TYPES.CRITICAL,
-        message: 'The button text should not be too long.'
+        message: 'The button text shouldn\'t be longer than 50 characters.'
       });
     }
 

@@ -87,7 +87,7 @@ describe('ContinueValidationService', () => {
         currentState, customizationArguments, [], goodDefaultOutcome);
       expect(warnings).toEqual([{
         type: WARNING_TYPES.CRITICAL,
-        message: 'The button text should not be too long.'
+        message: 'The button text shouldn\'t be longer than 50 characters.'
       }]);
 
       expect(() => {
