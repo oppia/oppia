@@ -52,11 +52,13 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.skill_id_1 = 'skill_id_1'
         self.skill_id_2 = 'skill_id_2'
         self.save_new_topic(
-            self.TOPIC_ID, self.albert_id, 'Name', 'abbrev', None,
-            'Description', [self.story_id_1, self.story_id_2],
-            [self.story_id_3], [self.skill_id_1, self.skill_id_2],
-            [], 1
-        )
+            self.TOPIC_ID, self.albert_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description',
+            canonical_story_ids=[self.story_id_1, self.story_id_2],
+            additional_story_ids=[self.story_id_3],
+            uncategorized_skill_ids=[self.skill_id_1, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_story(self):

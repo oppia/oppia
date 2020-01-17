@@ -110,7 +110,7 @@ def main(args=None):
             python_utils.PRINT(
                 re.sub(
                     r'"DEV_MODE": .*', constants_env_variable, line), end='')
-        build.main(args=['--prod_env', '--enable_watcher'])
+        build.main(args=['--prod_env'])
         app_yaml_filepath = 'app.yaml'
     else:
         constants_env_variable = '"DEV_MODE": true'
@@ -121,7 +121,7 @@ def main(args=None):
             python_utils.PRINT(
                 re.sub(
                     r'"DEV_MODE": .*', constants_env_variable, line), end='')
-        build.main(args=['--enable_watcher'])
+        build.main(args=[])
         app_yaml_filepath = 'app_dev.yaml'
 
     # Set up a local dev instance.

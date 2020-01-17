@@ -20,8 +20,6 @@ import datetime
 import types
 
 from constants import constants
-from core.domain import question_domain
-from core.domain import question_services
 from core.domain import skill_services
 from core.domain import state_domain
 from core.platform import models
@@ -269,9 +267,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_question_skill_links_by_skill_ids(self):
         skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_1, 'user', 'Description 1')
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_2, 'user', 'Description 2')
+        self.save_new_skill(skill_id_2, 'user', description='Description 2')
 
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -312,13 +310,13 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_get_question_skill_links_by_skill_ids_many_skills(self):
         # Test the case when len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION.
         skill_id_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_1, 'user', 'Description 1')
+        self.save_new_skill(skill_id_1, 'user', description='Description 1')
         skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_2, 'user', 'Description 2')
+        self.save_new_skill(skill_id_2, 'user', description='Description 2')
         skill_id_3 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_3, 'user', 'Description 3')
+        self.save_new_skill(skill_id_3, 'user', description='Description 3')
         skill_id_4 = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id_4, 'user', 'Description 4')
+        self.save_new_skill(skill_id_4, 'user', description='Description 4')
 
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(

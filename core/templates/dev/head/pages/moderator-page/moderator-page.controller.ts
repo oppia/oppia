@@ -37,7 +37,6 @@ angular.module('oppia').directive('moderatorPage', [
         '$http', '$rootScope', 'AlertsService', 'DateTimeFormatService',
         function($http, $rootScope, AlertsService, DateTimeFormatService) {
           var ctrl = this;
-          $rootScope.loadingMessage = 'Loading';
           ctrl.getDatetimeAsString = function(millisSinceEpoch) {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               millisSinceEpoch);
@@ -53,63 +52,6 @@ angular.module('oppia').directive('moderatorPage', [
                 'exploration' ? '/create' : '/create_collection')) +
               '/' + reference.id);
           };
-
-          ctrl.allCommits = [];
-          ctrl.allFeedbackMessages = [];
-          // Map of exploration ids to objects containing a single key: title.
-          ctrl.explorationData = {};
-
-          ctrl.displayedFeaturedActivityReferences = [];
-          ctrl.lastSavedFeaturedActivityReferences = [];
-          ctrl.FEATURED_ACTIVITY_REFERENCES_SCHEMA = {
-            type: 'list',
-            items: {
-              type: 'dict',
-              properties: [{
-                name: 'type',
-                schema: {
-                  type: 'unicode',
-                  choices: ['exploration', 'collection']
-                }
-              }, {
-                name: 'id',
-                schema: {
-                  type: 'unicode'
-                }
-              }]
-            }
-          };
-
-          var RECENT_COMMITS_URL = (
-            '/recentcommitshandler/recent_commits' +
-            '?query_type=all_non_private_commits');
-          // TODO(sll): Update this to also support collections.
-          $http.get(RECENT_COMMITS_URL).then(function(response) {
-            // Update the explorationData object with information about newly-
-            // discovered explorations.
-            var data = response.data;
-            var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
-            for (var expId in explorationIdsToExplorationData) {
-              if (!ctrl.explorationData.hasOwnProperty(expId)) {
-                ctrl.explorationData[expId] = (
-                  explorationIdsToExplorationData[expId]);
-              }
-            }
-            ctrl.allCommits = data.results;
-            $rootScope.loadingMessage = '';
-          });
-
-          $http.get('/recent_feedback_messages').then(function(response) {
-            ctrl.allFeedbackMessages = response.data.results;
-          });
-
-          $http.get('/moderatorhandler/featured').then(function(response) {
-            ctrl.displayedFeaturedActivityReferences = (
-              response.data.featured_activity_references);
-            ctrl.lastSavedFeaturedActivityReferences = angular.copy(
-              ctrl.displayedFeaturedActivityReferences);
-          });
-
           ctrl.isSaveFeaturedActivitiesButtonDisabled = function() {
             return angular.equals(
               ctrl.displayedFeaturedActivityReferences,
@@ -127,6 +69,64 @@ angular.module('oppia').directive('moderatorPage', [
               ctrl.lastSavedFeaturedActivityReferences = (
                 activityReferencesToSave);
               AlertsService.addSuccessMessage('Featured activities saved.');
+            });
+          };
+          ctrl.$onInit = function() {
+            $rootScope.loadingMessage = 'Loading';
+            ctrl.allCommits = [];
+            ctrl.allFeedbackMessages = [];
+            // Map of exploration ids to objects containing a single key: title.
+            ctrl.explorationData = {};
+
+            ctrl.displayedFeaturedActivityReferences = [];
+            ctrl.lastSavedFeaturedActivityReferences = [];
+            ctrl.FEATURED_ACTIVITY_REFERENCES_SCHEMA = {
+              type: 'list',
+              items: {
+                type: 'dict',
+                properties: [{
+                  name: 'type',
+                  schema: {
+                    type: 'unicode',
+                    choices: ['exploration', 'collection']
+                  }
+                }, {
+                  name: 'id',
+                  schema: {
+                    type: 'unicode'
+                  }
+                }]
+              }
+            };
+
+            var RECENT_COMMITS_URL = (
+              '/recentcommitshandler/recent_commits' +
+              '?query_type=all_non_private_commits');
+            // TODO(sll): Update this to also support collections.
+            $http.get(RECENT_COMMITS_URL).then(function(response) {
+              // Update the explorationData object with information about newly-
+              // discovered explorations.
+              var data = response.data;
+              var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
+              for (var expId in explorationIdsToExplorationData) {
+                if (!ctrl.explorationData.hasOwnProperty(expId)) {
+                  ctrl.explorationData[expId] = (
+                    explorationIdsToExplorationData[expId]);
+                }
+              }
+              ctrl.allCommits = data.results;
+              $rootScope.loadingMessage = '';
+            });
+
+            $http.get('/recent_feedback_messages').then(function(response) {
+              ctrl.allFeedbackMessages = response.data.results;
+            });
+
+            $http.get('/moderatorhandler/featured').then(function(response) {
+              ctrl.displayedFeaturedActivityReferences = (
+                response.data.featured_activity_references);
+              ctrl.lastSavedFeaturedActivityReferences = angular.copy(
+                ctrl.displayedFeaturedActivityReferences);
             });
           };
         }

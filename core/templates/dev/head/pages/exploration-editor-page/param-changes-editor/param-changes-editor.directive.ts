@@ -56,20 +56,7 @@ angular.module('oppia').directive('paramChangesEditor', [
             ExplorationParamSpecsService, AlertsService,
             ParamChangeObjectFactory, ExplorationStatesService,
             INVALID_PARAMETER_NAMES) {
-          $scope.EditabilityService = EditabilityService;
-          $scope.isParamChangesEditorOpen = false;
-          $scope.warningText = '';
-          $scope.PREAMBLE_TEXT = {
-            Copier: 'to',
-            RandomSelector: 'to one of'
-          };
-
-          $scope.$on('externalSave', function() {
-            if ($scope.isParamChangesEditorOpen) {
-              $scope.saveParamChanges();
-            }
-          });
-
+          var ctrl = this;
           var generateParamNameChoices = function() {
             return ExplorationParamSpecsService.displayed.getParamNames().sort()
               .map(function(paramName) {
@@ -79,13 +66,6 @@ angular.module('oppia').directive('paramChangesEditor', [
                 };
               });
           };
-
-          // This is a local variable that is used by the select2 dropdowns for
-          // choosing parameter names. It may not accurately reflect the content
-          // of ExplorationParamSpecsService, since it's possible that temporary
-          // parameter names may be added and then deleted within the course
-          // of a single "parameter changes" edit.
-          $scope.paramNameChoices = [];
 
           $scope.addParamChange = function() {
             var newParamName = (
@@ -117,24 +97,6 @@ angular.module('oppia').directive('paramChangesEditor', [
 
           $scope.onChangeGeneratorType = function(paramChange) {
             paramChange.resetCustomizationArgs();
-          };
-
-          $scope.HUMAN_READABLE_ARGS_RENDERERS = {
-            Copier: function(customizationArgs) {
-              return 'to ' + customizationArgs.value;
-            },
-            RandomSelector: function(customizationArgs) {
-              var result = 'to one of [';
-              for (
-                var i = 0; i < customizationArgs.list_of_values.length; i++) {
-                if (i !== 0) {
-                  result += ', ';
-                }
-                result += String(customizationArgs.list_of_values[i]);
-              }
-              result += '] at random';
-              return result;
-            }
           };
 
           $scope.areDisplayedParamChangesValid = function() {
@@ -230,40 +192,77 @@ angular.module('oppia').directive('paramChangesEditor', [
             $scope.paramChangesService.displayed.splice(index, 1);
           };
 
-          $scope.PARAM_CHANGE_LIST_SORTABLE_OPTIONS = {
-            axis: 'y',
-            containment: '.oppia-param-change-draggable-area',
-            cursor: 'move',
-            handle: '.oppia-param-change-sort-handle',
-            items: '.oppia-param-editor-row',
-            tolerance: 'pointer',
-            start: function(e, ui) {
-              $scope.$apply();
-              ui.placeholder.height(ui.item.height());
-            },
-            stop: function() {
-              // This ensures that any new parameter names that have been added
-              // before the swap are added to the list of possible names in the
-              // select2 dropdowns. Otherwise, after the swap, the dropdowns may
-              // turn blank.
-              $scope.paramChangesService.displayed.forEach(
-                function(paramChange) {
-                  ExplorationParamSpecsService.displayed.addParamIfNew(
-                    paramChange.name);
-                }
-              );
-              $scope.paramNameChoices = generateParamNameChoices();
-              $scope.$apply();
-            }
-          };
-
           $scope.cancelEdit = function() {
             $scope.paramChangesService.restoreFromMemento();
             $scope.isParamChangesEditorOpen = false;
           };
 
-          $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/drag_dots.png');
+          ctrl.$onInit = function() {
+            $scope.EditabilityService = EditabilityService;
+            $scope.isParamChangesEditorOpen = false;
+            $scope.warningText = '';
+            $scope.PREAMBLE_TEXT = {
+              Copier: 'to',
+              RandomSelector: 'to one of'
+            };
+
+            $scope.$on('externalSave', function() {
+              if ($scope.isParamChangesEditorOpen) {
+                $scope.saveParamChanges();
+              }
+            });
+            // This is a local variable that is used by the select2 dropdowns
+            // for choosing parameter names. It may not accurately reflect the
+            // content of ExplorationParamSpecsService, since it's possible that
+            // temporary parameter names may be added and then deleted within
+            // the course of a single "parameter changes" edit.
+            $scope.paramNameChoices = [];
+            $scope.HUMAN_READABLE_ARGS_RENDERERS = {
+              Copier: function(customizationArgs) {
+                return 'to ' + customizationArgs.value;
+              },
+              RandomSelector: function(customizationArgs) {
+                var result = 'to one of [';
+                for (
+                  var i = 0; i < customizationArgs.list_of_values.length; i++) {
+                  if (i !== 0) {
+                    result += ', ';
+                  }
+                  result += String(customizationArgs.list_of_values[i]);
+                }
+                result += '] at random';
+                return result;
+              }
+            };
+            $scope.PARAM_CHANGE_LIST_SORTABLE_OPTIONS = {
+              axis: 'y',
+              containment: '.oppia-param-change-draggable-area',
+              cursor: 'move',
+              handle: '.oppia-param-change-sort-handle',
+              items: '.oppia-param-editor-row',
+              tolerance: 'pointer',
+              start: function(e, ui) {
+                $scope.$apply();
+                ui.placeholder.height(ui.item.height());
+              },
+              stop: function() {
+                // This ensures that any new parameter names that have been
+                // added before the swap are added to the list of possible names
+                // in the select2 dropdowns. Otherwise, after the swap, the
+                // dropdowns may turn blank.
+                $scope.paramChangesService.displayed.forEach(
+                  function(paramChange) {
+                    ExplorationParamSpecsService.displayed.addParamIfNew(
+                      paramChange.name);
+                  }
+                );
+                $scope.paramNameChoices = generateParamNameChoices();
+                $scope.$apply();
+              }
+            };
+            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/drag_dots.png');
+          };
         }
       ]
     };

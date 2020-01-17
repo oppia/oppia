@@ -32,10 +32,10 @@ class SkillMasteryDataHandlerTest(test_utils.GenericTestBase):
 
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id_1, self.user_id, 'Skill Description 1')
+            self.skill_id_1, self.user_id, description='Skill Description 1')
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id_2, self.user_id, 'Skill Description 2')
+            self.skill_id_2, self.user_id, description='Skill Description 2')
 
         self.degree_of_mastery_1 = 0.3
         self.degree_of_mastery_2 = 0.5
