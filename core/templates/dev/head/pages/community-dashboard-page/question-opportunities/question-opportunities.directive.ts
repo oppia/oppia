@@ -67,11 +67,6 @@ angular.module('oppia').directive('questionOpportunities', [
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionUndoRedoService, SkillObjectFactory) {
           var ctrl = this;
-          ctrl.opportunities = [];
-          ctrl.opportunitiesAreLoading = true;
-          ctrl.moreOpportunitiesAvailable = true;
-          ctrl.progressBarRequired = true;
-
           var getOpportunity = function(skillId) {
             for (var index in ctrl.opportunities) {
               if (ctrl.opportunities[index].id === skillId) {
@@ -208,9 +203,14 @@ angular.module('oppia').directive('questionOpportunities', [
               ]
             });
           };
-
-          ContributionOpportunitiesService.getSkillOpportunities(
-            updateWithNewOpportunities);
+          ctrl.$onInit = function() {
+            ctrl.opportunities = [];
+            ctrl.opportunitiesAreLoading = true;
+            ctrl.moreOpportunitiesAvailable = true;
+            ctrl.progressBarRequired = true;
+            ContributionOpportunitiesService.getSkillOpportunities(
+              updateWithNewOpportunities);
+          };
         }
       ]
     };

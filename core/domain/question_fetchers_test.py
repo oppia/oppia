@@ -47,9 +47,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.save_new_skill(
-            'skill_1', self.admin_id, 'Skill Description 1')
+            'skill_1', self.admin_id, description='Skill Description 1')
         self.save_new_skill(
-            'skill_2', self.admin_id, 'Skill Description 2')
+            'skill_2', self.admin_id, description='Skill Description 2')
 
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(

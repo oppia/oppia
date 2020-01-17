@@ -26,6 +26,8 @@ import { UserInfoObjectFactory } from 'domain/user/UserInfoObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require('pages/preferences-page/preferences-page.controller.ts');
 
 describe('Preferences Controller', function() {
@@ -52,7 +54,7 @@ describe('Preferences Controller', function() {
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
     }));
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
 
     beforeEach(angular.mock.inject(function(
         _$componentController_, $http, _$httpBackend_, $rootScope) {
@@ -71,6 +73,11 @@ describe('Preferences Controller', function() {
         $rootScope: $rootScope,
         AlertsService: mockAlertsService
       });
+      // Refer: https://www.codelord.net/2017/01/09/
+      // unit-testing-angular-components-with-%24componentcontroller/
+      // Angular and $componentController does not take care of
+      // $onInit lifecycle hook, so we need to call it explicitly.
+      ctrl.$onInit();
     }));
 
     it('should show that editor role notifications checkbox is true by default',

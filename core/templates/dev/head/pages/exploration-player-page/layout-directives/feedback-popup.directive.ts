@@ -55,27 +55,7 @@ angular.module('oppia').directive('feedbackPopup', [
             AlertsService, BackgroundMaskService, FocusManagerService,
             PlayerPositionService, UserService, WindowDimensionsService,
             FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
-          $scope.feedbackText = '';
-          $scope.isSubmitterAnonymized = false;
-          $scope.isLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.isLoggedIn = userInfo.isLoggedIn();
-          });
-          $scope.feedbackSubmitted = false;
-          // We generate a random id since there may be multiple popover
-          // elements on the same page.
-          $scope.feedbackPopoverId = (
-            'feedbackPopover' + Math.random().toString(36).slice(2));
-          $scope.feedbackTitle = (
-            'Feedback when the user was at card "' +
-            PlayerPositionService.getCurrentStateName() + '"');
-
-          if (WindowDimensionsService.isWindowNarrow()) {
-            BackgroundMaskService.activateMask();
-          }
-
-          FocusManagerService.setFocus($scope.feedbackPopoverId);
-
+          var ctrl = this;
           var feedbackUrl = (
             '/explorehandler/give_feedback/' +
             ExplorationEngineService.getExplorationId());
@@ -156,9 +136,31 @@ angular.module('oppia').directive('feedbackPopup', [
             BackgroundMaskService.deactivateMask();
           };
 
-          $scope.$on('$destroy', function() {
-            BackgroundMaskService.deactivateMask();
-          });
+          ctrl.$onInit = function() {
+            $scope.feedbackText = '';
+            $scope.isSubmitterAnonymized = false;
+            $scope.isLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              $scope.isLoggedIn = userInfo.isLoggedIn();
+            });
+            $scope.feedbackSubmitted = false;
+            // We generate a random id since there may be multiple popover
+            // elements on the same page.
+            $scope.feedbackPopoverId = (
+              'feedbackPopover' + Math.random().toString(36).slice(2));
+            $scope.feedbackTitle = (
+              'Feedback when the user was at card "' +
+              PlayerPositionService.getCurrentStateName() + '"');
+
+            if (WindowDimensionsService.isWindowNarrow()) {
+              BackgroundMaskService.activateMask();
+            }
+
+            FocusManagerService.setFocus($scope.feedbackPopoverId);
+            $scope.$on('$destroy', function() {
+              BackgroundMaskService.deactivateMask();
+            });
+          };
         }
       ]
     };

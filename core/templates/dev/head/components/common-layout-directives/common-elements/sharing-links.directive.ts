@@ -46,42 +46,47 @@ angular.module('oppia').directive('sharingLinks', [
             ExplorationEmbedButtonService, SiteAnalyticsService,
             DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR) {
           var ctrl = this;
-          ctrl.registerShareEvent = null;
+          ctrl.$onInit = function() {
+            ctrl.registerShareEvent = null;
 
-          if (ctrl.shareType === 'exploration') {
-            ctrl.explorationId = ctrl.getExplorationId();
+            if (ctrl.shareType === 'exploration') {
+              ctrl.explorationId = ctrl.getExplorationId();
 
-            ctrl.activityType = 'explore';
-            ctrl.activityId = ctrl.explorationId;
+              ctrl.activityType = 'explore';
+              ctrl.activityId = ctrl.explorationId;
 
-            ctrl.registerShareEvent = (
-              SiteAnalyticsService.registerShareExplorationEvent);
+              ctrl.registerShareEvent = function(network) {
+                SiteAnalyticsService.registerShareExplorationEvent(network);
+              };
 
-            ctrl.showEmbedExplorationModal = (
-              ExplorationEmbedButtonService.showModal);
-          } else if (ctrl.shareType === 'collection') {
-            ctrl.collectionId = ctrl.getCollectionId();
+              ctrl.showEmbedExplorationModal = function(expId) {
+                ExplorationEmbedButtonService.showModal(expId);
+              };
+            } else if (ctrl.shareType === 'collection') {
+              ctrl.collectionId = ctrl.getCollectionId();
 
-            ctrl.activityType = 'collection';
-            ctrl.activityId = ctrl.collectionId;
+              ctrl.activityType = 'collection';
+              ctrl.activityId = ctrl.collectionId;
 
-            ctrl.registerShareEvent = (
-              SiteAnalyticsService.registerShareCollectionEvent);
-          } else {
-            throw Error(
-              'SharingLinks directive can only be used either in the' +
-              'collection player or the exploration player');
-          }
+              ctrl.registerShareEvent = function(network) {
+                SiteAnalyticsService.registerShareCollectionEvent(network);
+              };
+            } else {
+              throw Error(
+                'SharingLinks directive can only be used either in the' +
+                'collection player or the exploration player');
+            }
 
-          ctrl.serverName = (
-            $window.location.protocol + '//' + $window.location.host);
+            ctrl.serverName = (
+              $window.location.protocol + '//' + $window.location.host);
 
-          ctrl.escapedTwitterText = (
-            HtmlEscaperService.unescapedStrToEscapedStr(
-              DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
+            ctrl.escapedTwitterText = (
+              HtmlEscaperService.unescapedStrToEscapedStr(
+                DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
 
-          ctrl.classroomUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/classroom.png');
+            ctrl.classroomUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/classroom.png');
+          };
         }
       ]
     };
