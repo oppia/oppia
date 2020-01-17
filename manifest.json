@@ -246,11 +246,11 @@
       "popperJs": {
         "version": "1.15.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/FezVrasta/popper.js/archive/v1.15.0.zip",
-        "rootDirPrefix": "popper.js-",
+        "url": "https://github.com/popperjs/popper-core/archive/v1.15.0.zip",
+        "rootDirPrefix": "popper-core-",
         "targetDirPrefix": "popperJs-",
         "bundle": {
-          "js": ["dist/umd/popper.js"]
+          "js": ["dist/umd/popper-core"]
         }
       },
       "bootstrap": {
