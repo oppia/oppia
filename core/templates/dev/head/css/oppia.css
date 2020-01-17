@@ -2179,11 +2179,6 @@ pre.oppia-pre-wrapped-text {
   padding-top: 3px;
 }
 
-.oppia-small-tag-pb {
-  display: block;
-  padding-bottom: 10px;
-}
-
 .oppia-delete-interaction-button,
 .oppia-close-popover-button {
   background: none;
@@ -3833,7 +3828,7 @@ md-card.preview-conversation-skin-supplemental-card {
   https://www.nczonline.net/blog/2013/04/01/making-accessible-icon-buttons/
   Use for all links and buttons that only use an icon */
 .oppia-icon-accessibility-label {
-  display: block;
+  display: inline-block;
   font-size: 0;
   height: 1px;
   overflow: hidden;

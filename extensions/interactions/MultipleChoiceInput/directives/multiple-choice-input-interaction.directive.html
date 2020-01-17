@@ -1,9 +1,4 @@
 <form ng-submit="$ctrl.submitAnswer($ctrl.answer)">
-  <small class="oppia-small-tag-pb">
-    <span>
-      <span translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH" translate-values="{minChoiceNumber: 1}" translate-interpolation="messageformat"></span>
-    </span>
-  </small>
   <div class="multiple-choice-option-container" ng-repeat="choice in $ctrl.choices track by $index">
     <button class="multiple-choice-option" ng-click="$ctrl.submitAnswer($index)">
       <div class="multiple-choice-radio-button-container">
