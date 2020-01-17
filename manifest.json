@@ -250,7 +250,7 @@
         "rootDirPrefix": "popper-core-",
         "targetDirPrefix": "popperJs-",
         "bundle": {
-          "js": ["dist/umd/popper-core"]
+          "js": ["dist/umd/popper.js"]
         }
       },
       "bootstrap": {
