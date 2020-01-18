@@ -263,7 +263,6 @@ FULLY_COVERED_FILENAMES = [
     'story-domain.constants.ts',
     'story-editor-page.constants.ajs.ts',
     'story-editor-page.constants.ts',
-    'story-viewer-domain.constants.ajs.ts',
     'story-viewer-domain.constants.ts',
     'StoryObjectFactory.ts',
     'StoryPlaythroughObjectFactory.ts',
