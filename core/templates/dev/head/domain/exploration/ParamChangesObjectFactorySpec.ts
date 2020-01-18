@@ -25,11 +25,11 @@ import { ParamChangesObjectFactory } from
 
 describe('ParamChanges Object Factory', () => {
   let pcsof: ParamChangesObjectFactory;
-  let cArgs = {
+  const cArgs = {
     parse_with_jinja: true,
     value: ''
   };
-  let gId = 'Copier';
+  const gId = 'Copier';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -41,8 +41,9 @@ describe('ParamChanges Object Factory', () => {
 
   it('should create a ParamChange array from a list of dictionaries',
     () => {
-      var paramName = 'param_1';
-      var backendList = [{
+      let paramName = 'param_1';
+      let paramName2 = 'param_2';
+      let backendList = [{
         customization_args: cArgs,
         generator_id: gId,
         name: paramName
@@ -50,15 +51,18 @@ describe('ParamChanges Object Factory', () => {
       {
         customization_args: cArgs,
         generator_id: gId,
-        name: 'param_2'
+        name: paramName2
       }];
 
-      var testOutcome: ParamChange[] = pcsof.createFromBackendList(backendList);
+      let testOutcome: ParamChange[] = pcsof.createFromBackendList(backendList);
 
       expect(testOutcome.length).toBe(2);
       expect(testOutcome[0].customizationArgs).toEqual(cArgs);
       expect(testOutcome[0].generatorId).toBe(gId);
       expect(testOutcome[0].name).toBe(paramName);
+      expect(testOutcome[1].customizationArgs).toEqual(cArgs);
+      expect(testOutcome[1].generatorId).toBe(gId);
+      expect(testOutcome[1].name).toBe(paramName2);
     }
   );
 });
