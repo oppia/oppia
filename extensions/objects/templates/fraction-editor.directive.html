@@ -1,4 +1,4 @@
-<input type="text" ng-model="$ctrl.localValue.label" class="form-control">
+<input type="text" ng-model="$ctrl.localValue.label" class="form-control" ui-validate="'$ctrl.isValid($value)'">
 
 <div class="oppia-form-error">
   <[$ctrl.getWarningText()]>
