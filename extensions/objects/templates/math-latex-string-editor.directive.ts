@@ -39,38 +39,14 @@ angular.module('oppia').directive('mathLatexStringEditor', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        ctrl.placeholderText = '\\frac{x}{y}';
-        ctrl.alwaysEditable = ctrl.getAlwaysEditable();
-
-        // Reset the component each time the value changes (e.g. if this is part
-        // of an editable list).
-        $scope.$watch('$ctrl.value', function() {
-          ctrl.localValue = {
-            label: ctrl.value || ''
-          };
-        }, true);
-
-        if (ctrl.alwaysEditable) {
-          $scope.$watch('$ctrl.localValue.label', function(newValue) {
-            ctrl.value = newValue;
-          });
-        } else {
-          ctrl.openEditor = function() {
-            ctrl.active = true;
-          };
-
-          ctrl.closeEditor = function() {
-            ctrl.active = false;
-          };
-
-          ctrl.replaceValue = function(newValue) {
+        ctrl.$onInit = function() {
+          // Reset the component each time the value changes (e.g. if this is
+          // part of an editable list).
+          $scope.$watch('$ctrl.value', function() {
             ctrl.localValue = {
-              label: newValue
+              label: ctrl.value || ''
             };
-            ctrl.value = newValue;
-            ctrl.closeEditor();
-          };
-
+          }, true);
           $scope.$on('externalSave', function() {
             if (ctrl.active) {
               ctrl.replaceValue(ctrl.localValue.label);
@@ -79,9 +55,33 @@ angular.module('oppia').directive('mathLatexStringEditor', [
               $scope.$apply();
             }
           });
+          ctrl.placeholderText = '\\frac{x}{y}';
+          ctrl.alwaysEditable = ctrl.getAlwaysEditable();
 
-          ctrl.closeEditor();
-        }
+          if (ctrl.alwaysEditable) {
+            $scope.$watch('$ctrl.localValue.label', function(newValue) {
+              ctrl.value = newValue;
+            });
+          } else {
+            ctrl.openEditor = function() {
+              ctrl.active = true;
+            };
+
+            ctrl.closeEditor = function() {
+              ctrl.active = false;
+            };
+
+            ctrl.replaceValue = function(newValue) {
+              ctrl.localValue = {
+                label: newValue
+              };
+              ctrl.value = newValue;
+              ctrl.closeEditor();
+            };
+
+            ctrl.closeEditor();
+          }
+        };
       }]
     };
   }

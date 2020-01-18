@@ -56,10 +56,6 @@ angular.module('oppia').directive('stateNameEditor', [
             StateEditorService, StateNameService, FocusManagerService,
             ExplorationStatesService, RouterService) {
           var ctrl = this;
-          StateNameService.init();
-          ctrl.EditabilityService = EditabilityService;
-          ctrl.StateEditorService = StateEditorService;
-          ctrl.StateNameService = StateNameService;
 
           ctrl.initStateNameEditor = function() {
             StateNameService.init();
@@ -95,12 +91,6 @@ angular.module('oppia').directive('stateNameEditor', [
             }
           };
 
-          $scope.$on('externalSave', function() {
-            if (StateNameService.isStateNameEditorShown()) {
-              ctrl.saveStateName(ctrl.tmpStateName);
-            }
-          });
-
           ctrl._getNormalizedStateName = function(newStateName) {
             return $filter('normalizeWhitespace')(newStateName);
           };
@@ -120,6 +110,18 @@ angular.module('oppia').directive('stateNameEditor', [
             if (valid) {
               RouterService.navigateToMainTab(normalizedStateName);
             }
+          };
+          ctrl.$onInit = function() {
+            $scope.$on('externalSave', function() {
+              if (StateNameService.isStateNameEditorShown()) {
+                ctrl.saveStateName(ctrl.tmpStateName);
+              }
+            });
+            StateNameService.init();
+            ctrl.EditabilityService = EditabilityService;
+            ctrl.StateEditorService = StateEditorService;
+            ctrl.StateNameService = StateNameService;
+            ctrl.stateNameEditorIsShown = false;
           };
         }
       ]

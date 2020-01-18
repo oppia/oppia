@@ -101,15 +101,28 @@ describe('Current Interaction Service', function() {
     var dummyValidityCheckFn = function() {
       return false;
     };
+    var dummySubmitAnswerFn = function() {
+      return false;
+    };
     CurrentInteractionService.registerCurrentInteraction(
-      null, dummyValidityCheckFn);
+      dummySubmitAnswerFn, dummyValidityCheckFn);
     expect(CurrentInteractionService.isSubmitButtonDisabled()).toBe(
       !dummyValidityCheckFn());
   });
 
   it('should handle case where validityCheckFn is null', function() {
-    CurrentInteractionService.registerCurrentInteraction(null, null);
+    var dummySubmitAnswerFn = function() {
+      return false;
+    };
+    CurrentInteractionService.registerCurrentInteraction(
+      dummySubmitAnswerFn, null);
     expect(CurrentInteractionService.isSubmitButtonDisabled()).toBe(false);
+  });
+
+  it('should handle case where submitAnswerFn is null', function() {
+    CurrentInteractionService.registerCurrentInteraction(
+      null, null);
+    expect(CurrentInteractionService.isSubmitButtonDisabled()).toBe(true);
   });
 
   it('should properly register and clear presubmit hooks', function() {

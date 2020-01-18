@@ -63,10 +63,6 @@ angular.module('oppia').directive('ruleEditor', [
             ValidatorsService, INTERACTION_SPECS,
             ResponsesService, StateInteractionIdService) {
           var ctrl = this;
-
-          ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
-          ctrl.editRuleForm = {};
-
           // This returns the rule description string.
           var computeRuleDescriptionFragments = function() {
             if (!ctrl.rule.type) {
@@ -202,11 +198,6 @@ angular.module('oppia').directive('ruleEditor', [
             return ruleDescription;
           };
 
-          $scope.$on('updateAnswerGroupInteractionId', function(
-              evt, newInteractionId) {
-            ctrl.currentInteractionId = newInteractionId;
-          });
-
           ctrl.onSelectNewRuleType = function(newRuleType) {
             var oldRuleInputs = angular.copy(ctrl.rule.inputs) || {};
             var oldRuleInputTypes = angular.copy(ctrl.rule.inputTypes) || {};
@@ -266,15 +257,19 @@ angular.module('oppia').directive('ruleEditor', [
             ctrl.onSaveRule();
           };
 
-          ctrl.init = function() {
+          ctrl.$onInit = function() {
+            $scope.$on('updateAnswerGroupInteractionId', function(
+                evt, newInteractionId) {
+              ctrl.currentInteractionId = newInteractionId;
+            });
+            ctrl.currentInteractionId = StateInteractionIdService.savedMemento;
+            ctrl.editRuleForm = {};
             // Select a default rule type, if one isn't already selected.
             if (ctrl.rule.type === null) {
               ctrl.onSelectNewRuleType(ctrl.rule.type);
             }
             computeRuleDescriptionFragments();
           };
-
-          ctrl.init();
         }
       ]
     };
