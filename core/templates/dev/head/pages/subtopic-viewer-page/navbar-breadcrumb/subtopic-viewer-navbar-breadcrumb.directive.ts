@@ -32,18 +32,21 @@ angular.module('oppia').directive('subtopicViewerNavbarBreadcrumb', [
         'TOPIC_VIEWER_URL_TEMPLATE', function(
             $scope, SubtopicViewerBackendApiService, UrlService,
             TOPIC_VIEWER_URL_TEMPLATE) {
-          $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
+          var ctrl = this;
           $scope.getTopicUrl = function() {
             return UrlInterpolationService.interpolateUrl(
               TOPIC_VIEWER_URL_TEMPLATE, {
                 topic_name: $scope.topicName
               });
           };
-          SubtopicViewerBackendApiService.fetchSubtopicData(
-            $scope.topicName, UrlService.getSubtopicIdFromUrl()).then(
-            function(subtopicDataObject) {
-              $scope.subtopicTitle = subtopicDataObject.getSubtopicTitle();
-            });
+          ctrl.$onInit = function() {
+            $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
+            SubtopicViewerBackendApiService.fetchSubtopicData(
+              $scope.topicName, UrlService.getSubtopicIdFromUrl()).then(
+              function(subtopicDataObject) {
+                $scope.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+              });
+          };
         }
       ]
     };

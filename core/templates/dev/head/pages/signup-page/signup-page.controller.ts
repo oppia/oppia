@@ -36,36 +36,17 @@ angular.module('oppia').directive('signupPage', [
         '/pages/signup-page/signup-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$rootScope', '$uibModal', 'AlertsService',
+        '$http', '$rootScope', '$timeout', '$uibModal', 'AlertsService',
         'FocusManagerService', 'SiteAnalyticsService',
         'UrlInterpolationService', 'UrlService', 'DASHBOARD_TYPE_CREATOR',
         'DASHBOARD_TYPE_LEARNER', 'SITE_NAME',
         function(
-            $http, $rootScope, $uibModal, AlertsService,
+            $http, $rootScope, $timeout, $uibModal, AlertsService,
             FocusManagerService, SiteAnalyticsService,
             UrlInterpolationService, UrlService, DASHBOARD_TYPE_CREATOR,
             DASHBOARD_TYPE_LEARNER, SITE_NAME) {
           var ctrl = this;
           var _SIGNUP_DATA_URL = '/signuphandler/data';
-          $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
-          ctrl.warningI18nCode = '';
-          ctrl.siteName = SITE_NAME;
-          ctrl.submissionInProcess = false;
-
-          $http.get(_SIGNUP_DATA_URL).then(function(response) {
-            var data = response.data;
-            $rootScope.loadingMessage = '';
-            ctrl.username = data.username;
-            ctrl.hasEverRegistered = data.has_ever_registered;
-            ctrl.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
-            ctrl.showEmailPreferencesForm = data.can_send_emails;
-            ctrl.hasUsername = Boolean(ctrl.username);
-            FocusManagerService.setFocus('usernameInputField');
-          });
-
-          ctrl.blurredAtLeastOnce = false;
-          ctrl.canReceiveEmailUpdates = null;
-
           ctrl.isFormValid = function() {
             return (
               ctrl.hasAgreedToLatestTerms &&
@@ -212,9 +193,9 @@ angular.module('oppia').directive('signupPage', [
               resolve: {},
               controller: [
                 '$scope', '$uibModalInstance', 'SiteAnalyticsService',
-                'UserService', '$timeout', '$window',
+                'UserService', '$window',
                 function($scope, $uibModalInstance, SiteAnalyticsService,
-                    UserService, $timeout, $window) {
+                    UserService, $window) {
                   $scope.continueRegistration = function() {
                     UserService.getLoginUrlAsync().then(
                       function(loginUrl) {
@@ -232,6 +213,26 @@ angular.module('oppia').directive('signupPage', [
                 }
               ]
             });
+          };
+          ctrl.$onInit = function() {
+            $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
+            ctrl.warningI18nCode = '';
+            ctrl.siteName = SITE_NAME;
+            ctrl.submissionInProcess = false;
+
+            $http.get(_SIGNUP_DATA_URL).then(function(response) {
+              var data = response.data;
+              $rootScope.loadingMessage = '';
+              ctrl.username = data.username;
+              ctrl.hasEverRegistered = data.has_ever_registered;
+              ctrl.hasAgreedToLatestTerms = data.has_agreed_to_latest_terms;
+              ctrl.showEmailPreferencesForm = data.can_send_emails;
+              ctrl.hasUsername = Boolean(ctrl.username);
+              FocusManagerService.setFocus('usernameInputField');
+            });
+
+            ctrl.blurredAtLeastOnce = false;
+            ctrl.canReceiveEmailUpdates = null;
           };
         }
       ]
