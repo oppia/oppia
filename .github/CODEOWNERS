@@ -104,6 +104,8 @@
 /scripts/__init__.py @kevinlee12
 /scripts/build.py @kevinlee12
 /scripts/build_test.py @kevinlee12
+/scripts/check_frontend_coverage.py @marianazangrossi @kevinlee12
+/scripts/check_frontend_coverage_test.py @marianazangrossi @kevinlee12
 /scripts/clean.py @kevinlee12
 /scripts/clean_test.py @kevinlee12
 /scripts/common.py @kevinlee12
