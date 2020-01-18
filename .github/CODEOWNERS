@@ -12,7 +12,7 @@
 #   can be optimized further.
 
 # Angular Migration team
-/core/templates/dev/head/services/contextual/logger.service.ts @bansalnitish
+/core/templates/dev/head/services/contextual/logger.service*.ts @bansalnitish
 /core/templates/dev/head/services/UpgradedServices.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
@@ -405,7 +405,7 @@
 /core/templates/dev/head/pages/interaction-specs.constants.ts @bansalnitish
 /core/templates/dev/head/I18nFooter.ts @nithusha21
 /core/templates/dev/head/i18n-footer.directive.html @nithusha21
-/core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @bansalnitish
+/core/templates/dev/head/services/contextual/document-attribute-customization.service*.ts @bansalnitish
 /core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @bansalnitish
 /core/templates/dev/head/services/translation-file-hash-loader.service.ts @nithusha21
 /release_constants.py @ankita240796 @nithusha21 @seanlip
