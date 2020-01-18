@@ -17,17 +17,16 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('pages/admin-page/services/admin-config-tab-backend-api.service');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
-require('pages/admin-page/admin-page.constants.ajs.ts');
-
 angular.module('oppia').directive('adminConfigTab', [
-  '$http', '$window', 'AdminDataService', 'AdminTaskManagerService',
-  'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  '$window', 'AdminConfigTabBackendApiService', 'AdminDataService',
+  'AdminTaskManagerService', 'UrlInterpolationService',
   function(
-      $http, $window, AdminDataService, AdminTaskManagerService,
-      UrlInterpolationService, ADMIN_HANDLER_URL) {
+      $window, AdminConfigTabBackendApiService, AdminDataService,
+      AdminTaskManagerService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -58,7 +57,7 @@ angular.module('oppia').directive('adminConfigTab', [
             return;
           }
 
-          $http.post(ADMIN_HANDLER_URL, {
+          AdminConfigTabBackendApiService.revertConfigProperty({
             action: 'revert_config_property',
             config_property_id: configPropertyId
           }).then(function() {
@@ -87,7 +86,7 @@ angular.module('oppia').directive('adminConfigTab', [
               ctrl.configProperties[property].value);
           }
 
-          $http.post(ADMIN_HANDLER_URL, {
+          AdminConfigTabBackendApiService.saveConfigProperties({
             action: 'save_config_properties',
             new_config_property_values: newConfigPropertyValues
           }).then(function() {
