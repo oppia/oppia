@@ -131,6 +131,6 @@ describe('Pretest question backend API service', function() {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-    }
+    })
   );
 });
