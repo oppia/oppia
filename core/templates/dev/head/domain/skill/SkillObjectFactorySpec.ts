@@ -178,10 +178,12 @@ describe('Skill object factory', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
       skill.getConceptCard().setExplanation(
         SubtitledHtmlObjectFactory.createDefault('', 'review_material'));
+      skill.getMisconceptions()[0].setName('Invalid / name');
       expect(skill.getValidationIssues()).toEqual([
         'There should be review material in the concept card.',
         'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
-        'in rubrics.'
+        'in rubrics.',
+        'Misconception Invalid / name has invalid character.'
       ]);
     });
 
