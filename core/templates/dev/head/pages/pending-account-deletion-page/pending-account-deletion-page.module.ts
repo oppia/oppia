@@ -66,7 +66,7 @@ const downgradedModule = downgradeModule(bootstrapFn);
 declare var angular: any;
 
 angular.module('oppia', [
-  'ngCookies', 'pascalprecht.translate', 'toastr', 'ui.bootstrap',
+  require('angular-cookies'), 'pascalprecht.translate', 'toastr', 'ui.bootstrap',
   downgradedModule
 ])
   // This directive is the downgraded version of the Angular component to

@@ -49,6 +49,7 @@
     "@typescript-eslint/parser": "^2.3.0",
     "ajv": "^6.10.0",
     "angular": "1.7.9",
+    "angular-cookies": "1.7.9",
     "angular-route": "1.7.9",
     "babel-eslint": "^10.0.1",
     "bootstrap": "3.4.1",

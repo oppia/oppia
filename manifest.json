@@ -180,16 +180,6 @@
           "js": ["angular-translate-loader-static-files.min.js"]
         }
       },
-      "angularCookiesRev": {
-        "version": "1.7.9",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.7.9.zip",
-        "rootDirPrefix": "bower-angular-cookies-",
-        "targetDirPrefix": "bower-angular-cookies-",
-        "bundle": {
-          "js": ["angular-cookies.min.js"]
-        }
-      },
       "angularDragAndDrop": {
         "version": "2.1.0",
         "downloadFormat": "zip",

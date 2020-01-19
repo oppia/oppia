@@ -887,6 +887,16 @@ amdefine@>=0.0.4:
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
   integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
 
+angular-cookies@1.7.9:
+  version "1.7.9"
+  resolved "https://registry.yarnpkg.com/angular-cookies/-/angular-cookies-1.7.9.tgz#0f0cd2a9d1c81e5b8d6c6711d41f0909f9d0b8e0"
+  integrity sha512-3eRq/aPrtCZKDWQnc3nW3sFoMbLiHkCkyDF2O9u7VXnqvVsUPaipk5R1ZqahgcSQHQrN/F5IU4T4nrz52qAZmA==
+
+angular-drag-and-drop-lists@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/angular-drag-and-drop-lists/-/angular-drag-and-drop-lists-2.1.0.tgz#da10cc85c804251fbaaa84d837f7380fb0cd780f"
+  integrity sha1-2hDMhcgEJR+6qoTYN/c4D7DNeA8=
+
 angular-route@1.7.9:
   version "1.7.9"
   resolved "https://registry.yarnpkg.com/angular-route/-/angular-route-1.7.9.tgz#f9910a2af0ba3ad7a969c5dd369b8360d0d5e4ef"
