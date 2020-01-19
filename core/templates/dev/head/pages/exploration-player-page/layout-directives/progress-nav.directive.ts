@@ -63,7 +63,7 @@ angular.module('oppia').directive('progressNav', [
           var transcriptLength = 0;
           var interactionIsInline = true;
           var interactionHasNavSubmitButton = false;
-          var SHOW_SUBMIT_INTERACTIONS = [
+          var SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
             'ItemSelectionInput', 'MultipleChoiceInput'];
           var updateDisplayedCardInfo = function() {
             transcriptLength = PlayerTranscriptService.getNumCards();
@@ -106,14 +106,14 @@ angular.module('oppia').directive('progressNav', [
           };
 
           var doesInteractionHaveSpecialCaseForMobile = function() {
-            // Special cases to show submit button:
-            // 1. ItemSelectionInput interaction with maximum selectable
-            //    choices > 1 in desktop/mobile mode.
-            // 2. ItemSelectionInput interaction with maximum selectable
-            //    choices == 1 in mobile mode.
-            // 3. MultipleChoiceInput interaction in mobile mode.
+            // The submit button should be shown:
+            // 1. In mobile mode, if the current interaction is either
+            //    ItemSelectionInput with maximum selectable choices == 1 or
+            //    MultipleChoiceInput.
+            // 2. In desktop/mobile, mode if ItemSelectionInput interaction
+            //    with maximum selectable choices > 1.
             if (BrowserCheckerService.isMobileDevice()) {
-              return (SHOW_SUBMIT_INTERACTIONS.indexOf(
+              return (SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE.indexOf(
                 $scope.interactionId) >= 0);
             } else {
               return ($scope.interactionId === 'ItemSelectionInput' &&
