@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to retrieve information of review tests from the
- * backend.
+ * @fileoverview Service to revert/change admin-config-tab properties
  */
 
 require('pages/admin-page/admin-page.constants.ajs.ts');
