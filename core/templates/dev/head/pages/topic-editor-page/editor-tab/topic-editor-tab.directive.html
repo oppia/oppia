@@ -1,8 +1,8 @@
 <div role="form" class="form-horizontal topic-editor">
   <md-card class="oppia-page-card oppia-long-text">
-    <!-- Move this form into a separate directive -->
+    <label class="form-heading">Topic Thumbnail</label>
     <thumbnail-uploader disabled="!topicRights.canEditTopic()"
-                        editable-thumbnail-data-url="editableThumbnailDataUrl"
+                        filename="topic.getThumbnailFilename()"
                         update-filename="updateTopicThumbnailFilename">
     </thumbnail-uploader>
 

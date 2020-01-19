@@ -162,6 +162,9 @@ export class ContextService {
         if (hashValues.length === 3 && hashValues[1] === '/questions') {
           return AppConstants.ENTITY_TYPE.QUESTION;
         }
+        if (hashValues.length === 2 && hashValues[1] === '/subtopics') {
+          return AppConstants.ENTITY_TYPE.SUBTOPIC;
+        }
         return AppConstants.ENTITY_TYPE.TOPIC;
       }
       if (pathnameArray[i] === 'subtopic') {

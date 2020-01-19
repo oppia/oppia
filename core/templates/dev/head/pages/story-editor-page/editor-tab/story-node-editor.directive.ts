@@ -16,6 +16,8 @@
  * @fileoverview Controller for the story node editor.
  */
 require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
+require(
   'components/skill-selector/skill-selector.directive.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');

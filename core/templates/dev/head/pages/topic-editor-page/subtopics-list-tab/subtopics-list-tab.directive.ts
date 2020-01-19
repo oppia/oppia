@@ -15,6 +15,8 @@
 /**
  * @fileoverview Controller for the subtopics list editor.
  */
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
@@ -56,6 +58,7 @@ angular.module('oppia').directive('subtopicsListTab', [
 
           $scope.editSubtopic = function(subtopic) {
             var editableTitle = subtopic.getTitle();
+            var editableThumbnailFilename = subtopic.getThumbnailFilename();
             TopicEditorStateService.loadSubtopicPage(
               $scope.topic.getId(), subtopic.getId());
             var subtopicTitles = $scope.subtopicTitles;
@@ -70,6 +73,7 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.subtopicId = subtopic.getId();
                   $scope.subtopicTitles = subtopicTitles;
                   $scope.editableTitle = editableTitle;
+                  $scope.editableThumbnailFilename = editableThumbnailFilename;
                   $scope.subtopicPage =
                     TopicEditorStateService.getSubtopicPage();
                   var pageContents = $scope.subtopicPage.getPageContents();
@@ -88,6 +92,15 @@ angular.module('oppia').directive('subtopicsListTab', [
                     ui_config: {
                       rows: 100
                     }
+                  };
+
+                  $scope.updateSubtopicThumbnailFilename = function(
+                      newThumbnailFilename) {
+                    var oldThumbnailFilename = subtopic.getThumbnailFilename();
+                    if (newThumbnailFilename === oldThumbnailFilename) {
+                      return;
+                    }
+                    $scope.editableThumbnailFilename = newThumbnailFilename;
                   };
 
                   $scope.updateSubtopicTitle = function(title) {
@@ -114,7 +127,8 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.save = function() {
                     $uibModalInstance.close({
                       newTitle: $scope.editableTitle,
-                      newHtmlData: $scope.htmlData
+                      newHtmlData: $scope.htmlData,
+                      newThumbnailFilename: $scope.editableThumbnailFilename
                     });
                   };
 
@@ -129,6 +143,7 @@ angular.module('oppia').directive('subtopicsListTab', [
               $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
               var newTitle = newValues.newTitle;
               var newHtmlData = newValues.newHtmlData;
+              var newThumbnailFilename = newValues.newThumbnailFilename;
 
               if (newTitle !== subtopic.getTitle()) {
                 TopicUpdateService.setSubtopicTitle(
@@ -142,6 +157,10 @@ angular.module('oppia').directive('subtopicsListTab', [
                 TopicUpdateService.setSubtopicPageContentsHtml(
                   $scope.subtopicPage, subtopic.getId(), subtitledHtml);
                 TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
+              }
+              if (newThumbnailFilename != subtopic.getThumbnailFilename()) {
+                TopicUpdateService.setSubtopicThumbnailFilename(
+                  $scope.topic, subtopic.getId(), newThumbnailFilename);
               }
             }, function() {
               // Note to developers:

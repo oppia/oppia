@@ -83,6 +83,9 @@ angular.module('oppia').constant(
   TopicDomainConstants.TOPIC_PROPERTY_LANGUAGE_CODE);
 
 angular.module('oppia').constant(
+  'SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME',
+  TopicDomainConstants.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME);
+angular.module('oppia').constant(
   'SUBTOPIC_PROPERTY_TITLE', TopicDomainConstants.SUBTOPIC_PROPERTY_TITLE);
 
 angular.module('oppia').constant(

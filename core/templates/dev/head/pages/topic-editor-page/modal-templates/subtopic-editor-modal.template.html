@@ -5,6 +5,15 @@
     </h3>
   </div>
   <div class="modal-body">
+    <div class="subtopic-thumbnail">
+      <p>
+        <strong style="font-size: 1.2em;">Subtopic Thumbnail</strong>
+      </p>
+      <thumbnail-uploader disabled=""
+                          filename=""
+                          update-filename="updateSubtopicThumbnailFilename">
+      </thumbnail-uploader>
+    </div>
     <div class="subtopic-title">
       <p>
         <strong style="font-size: 1.2em;">Subtopic Title</strong>
@@ -44,6 +53,10 @@
 
   .subtopic-editor .modal-body .subtopic-title {
     margin-bottom: 3%;
+  }
+
+  .subtopic-editor .modal-body .subtopic-thumbnail {
+    height: 150px;
   }
 
   .subtopic-editor .modal-footer {

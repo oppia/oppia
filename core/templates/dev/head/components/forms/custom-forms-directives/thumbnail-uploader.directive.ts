@@ -34,7 +34,7 @@ angular.module('oppia').directive('thumbnailUploader', [
       restrict: 'E',
       scope: {
         disabled: '=',
-        editableThumbnailDataUrl: '=',
+        filename: '=',
         updateFilename: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -46,13 +46,26 @@ angular.module('oppia').directive('thumbnailUploader', [
         function($scope, $uibModal,
             AlertsService, ContextService, CsrfTokenService,
             ImageUploadHelperService) {
+          var placeholderImageUrl = '/icons/story-image-icon.png';
+          if (!$scope.filename) {
+            $scope.editableThumbnailDataUrl = (
+              UrlInterpolationService.getStaticImageUrl(
+                placeholderImageUrl));
+          } else {
+            $scope.editableThumbnailDataUrl = (
+              ImageUploadHelperService
+                .getTrustedResourceUrlForThumbnailFilename(
+                  $scope.filename,
+                  ContextService.getEntityType(),
+                  ContextService.getEntityId()));
+          }
           $scope.showEditThumbnailModal = function() {
             if ($scope.disabled) {
               return;
             }
             var tempImageName = '';
 
-            var saveTopicThumbnailImageData = function(imageURI) {
+            var saveThumbnailImageData = function(imageURI) {
               let resampledFile = null;
               resampledFile = (
                 ImageUploadHelperService.convertImageDataToImageFile(
@@ -109,8 +122,8 @@ angular.module('oppia').directive('thumbnailUploader', [
             };
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                'edit-topic-thumbnail-modal.template.html'),
+                '/components/forms/custom-forms-directives/' +
+                'edit-thumbnail-modal.template.html'),
               size: 'lg',
               backdrop: true,
               controller: [
@@ -178,7 +191,7 @@ angular.module('oppia').directive('thumbnailUploader', [
             }).result.then(function(newThumbnailDataUrl) {
               $scope.editableThumbnailDataUrl = newThumbnailDataUrl;
               $scope.updateFilename(tempImageName);
-              saveTopicThumbnailImageData(newThumbnailDataUrl);
+              saveThumbnailImageData(newThumbnailDataUrl);
             });
           };
         }]

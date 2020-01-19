@@ -60,19 +60,6 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableName = $scope.topic.getName();
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
-            var placeholderImageUrl = '/icons/story-image-icon.png';
-            if (!$scope.topic.getThumbnailFilename()) {
-              $scope.editableThumbnailDataUrl = (
-                UrlInterpolationService.getStaticImageUrl(
-                  placeholderImageUrl));
-            } else {
-              $scope.editableThumbnailDataUrl = (
-                ImageUploadHelperService
-                  .getTrustedResourceUrlForThumbnailFilename(
-                    $scope.topic.getThumbnailFilename(),
-                    ContextService.getEntityType(),
-                    ContextService.getEntityId()));
-            }
 
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
@@ -139,7 +126,7 @@ angular.module('oppia').directive('topicEditorTab', [
             if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
               return;
             }
-            TopicUpdateService.setThumbnailFilename(
+            TopicUpdateService.setTopicThumbnailFilename(
               $scope.topic, newThumbnailFilename);
           };
 

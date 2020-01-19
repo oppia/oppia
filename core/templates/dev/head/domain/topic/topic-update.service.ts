@@ -35,7 +35,8 @@ angular.module('oppia').factory('TopicUpdateService', [
   'CMD_REMOVE_UNCATEGORIZED_SKILL_ID', 'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY',
   'CMD_UPDATE_SUBTOPIC_PROPERTY', 'CMD_UPDATE_TOPIC_PROPERTY',
   'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO',
-  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML', 'SUBTOPIC_PROPERTY_TITLE',
+  'SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML',
+  'SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME', 'SUBTOPIC_PROPERTY_TITLE',
   'TOPIC_PROPERTY_ABBREVIATED_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
   'TOPIC_PROPERTY_LANGUAGE_CODE', 'TOPIC_PROPERTY_NAME',
   'TOPIC_PROPERTY_THUMBNAIL_FILENAME', function(
@@ -46,7 +47,8 @@ angular.module('oppia').factory('TopicUpdateService', [
       CMD_REMOVE_UNCATEGORIZED_SKILL_ID, CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
       CMD_UPDATE_SUBTOPIC_PROPERTY, CMD_UPDATE_TOPIC_PROPERTY,
       SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
-      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML, SUBTOPIC_PROPERTY_TITLE,
+      SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
+      SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, SUBTOPIC_PROPERTY_TITLE,
       TOPIC_PROPERTY_ABBREVIATED_NAME, TOPIC_PROPERTY_DESCRIPTION,
       TOPIC_PROPERTY_LANGUAGE_CODE, TOPIC_PROPERTY_NAME,
       TOPIC_PROPERTY_THUMBNAIL_FILENAME) {
@@ -149,7 +151,7 @@ angular.module('oppia').factory('TopicUpdateService', [
        * Changes the thumbnail filename of a topic and records the change in the
        * undo/redo service.
        */
-      setThumbnailFilename: function(topic, thumbnailFilename) {
+      setTopicThumbnailFilename: function(topic, thumbnailFilename) {
         var oldThumbnailFilename = angular.copy(topic.getThumbnailFilename());
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_THUMBNAIL_FILENAME,
@@ -398,6 +400,28 @@ angular.module('oppia').factory('TopicUpdateService', [
             skillSummary.getId(), skillSummary.getDescription());
           topic.removeUncategorizedSkill(skillSummary.getId());
         });
+      },
+
+      setSubtopicThumbnailFilename: function(
+          topic, subtopicId, thumbnailFilename) {
+        var subtopic = topic.getSubtopicById(subtopicId);
+        if (!subtopic) {
+          throw Error('Subtopic doesn\'t exist');
+        }
+        var oldThumbnailFilename = angular.copy(
+          subtopic.getThumbnailFilename());
+        _applySubtopicPropertyChange(
+          topic, SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, subtopicId,
+          thumbnailFilename, oldThumbnailFilename,
+          function(changeDict, subtopic) {
+            // Apply
+            var thumbnailFilename = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            subtopic.setThumbnailFilename(thumbnailFilename);
+          }, function(changeDict, subtopic) {
+            // Undo.
+            subtopic.setThumbnailFilename(oldThumbnailFilename);
+          });
       },
 
       /**

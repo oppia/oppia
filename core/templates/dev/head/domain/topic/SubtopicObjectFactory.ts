@@ -28,12 +28,14 @@ export class Subtopic {
   _title: any;
   _skillSummaries: any;
   _skillSummaryObjectFactory: SkillSummaryObjectFactory;
+  _thumbnailFilename: string;
   constructor(
       subtopicId, title, skillIds, skillIdToDescriptionMap,
-      skillSummaryObjectFactory) {
+      skillSummaryObjectFactory, thumbnailFilename) {
     this._id = subtopicId;
     this._title = title;
     this._skillSummaryObjectFactory = skillSummaryObjectFactory;
+    this._thumbnailFilename = thumbnailFilename;
     this._skillSummaries = skillIds.map(
       (skillId) => {
         return this._skillSummaryObjectFactory.create(
@@ -111,6 +113,14 @@ export class Subtopic {
       throw Error('The given skill doesn\'t exist in the subtopic');
     }
   }
+
+  setThumbnailFilename(thumbnailFilename: string): void {
+    this._thumbnailFilename = thumbnailFilename;
+  }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
 }
 
 @Injectable({
@@ -123,14 +133,15 @@ export class SubtopicObjectFactory {
     return new Subtopic(
       subtopicBackendDict.id, subtopicBackendDict.title,
       subtopicBackendDict.skill_ids, skillIdToDescriptionMap,
-      this.skillSummaryObjectFactory);
+      this.skillSummaryObjectFactory, subtopicBackendDict.thumbnail_filename);
   }
 
   createFromTitle(subtopicId, title) {
     return this.create({
       id: subtopicId,
       title: title,
-      skill_ids: []
+      skill_ids: [],
+      thumbnail_filename: null
     }, {});
   }
 }
