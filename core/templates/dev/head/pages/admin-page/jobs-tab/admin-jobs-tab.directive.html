@@ -34,7 +34,7 @@
 <md-card class="oppia-page-card oppia-long-text" style="max-width: 900px">
   <h3>One-off jobs</h3>
   <h4>Current time: <[$ctrl.HUMAN_READABLE_CURRENT_TIME]></h4>
-  <table>
+  <table class="table table-striped">
     <tr ng-repeat="job_spec in $ctrl.ONE_OFF_JOB_SPECS" class="protractor-test-one-off-jobs-rows">
       <td class="protractor-test-one-off-jobs-name"><[job_spec.job_type]></td>
       <td>
