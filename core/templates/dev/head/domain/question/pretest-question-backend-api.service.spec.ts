@@ -28,7 +28,7 @@ import { TranslatorProviderForTests } from 'tests/test.extras';
 describe('Pretest question backend API service', function() {
   var PretestQuestionBackendApiService = null;
   var responseDictionaries = null;
-  var sampleDataResultsObjects = null;
+  var pretestQuestionObjects = null;
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
@@ -135,12 +135,10 @@ describe('Pretest question backend API service', function() {
       }],
       next_start_cursor: null
     };
-    sampleDataResultsObjects = {
-      pretest_question_objects: [
-        QuestionObjectFactory.createFromBackendDict(
-          responseDictionaries.pretest_question_dicts[0])
-      ]
-    };
+    pretestQuestionObjects = [
+      QuestionObjectFactory.createFromBackendDict(
+        responseDictionaries.pretest_question_dicts[0])
+    ];
   }));
 
   afterEach(function() {
@@ -161,7 +159,7 @@ describe('Pretest question backend API service', function() {
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleDataResultsObjects.pretest_question_objects);
+        pretestQuestionObjects);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
