@@ -20,7 +20,7 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 
-describe('Admin Tab', function() {
+describe('Admin Page', function() {
   var adminPage = null;
 
   beforeAll(function() {
@@ -49,6 +49,27 @@ describe('Admin Tab', function() {
     adminPage.updateRole('collectionEditor1', 'collection editor');
     adminPage.getUsersAsssignedToRole('collection editor');
     adminPage.expectUsernamesToMatch(['collectionEditor1']);
+    users.logout();
+  });
+
+  it('should run,verify and stop one-off jobs', function() {
+    users.createAndLoginAdminUser('adminA@adminTab.com', 'alphaMan');
+    adminPage.getJobsTab();
+
+    adminPage.startOneOffJob('FeedbackThreadCacheOneOffJob');
+    adminPage.expectJobTobeRunning('FeedbackThreadCacheOneOffJob');
+    adminPage.expectNumberOfRunningOneOffJobs(1);
+
+    adminPage.startOneOffJob('ExplorationValidityJobManager');
+    adminPage.expectJobTobeRunning('ExplorationValidityJobManager');
+    adminPage.expectNumberOfRunningOneOffJobs(2);
+
+    adminPage.stopOneOffJob('FeedbackThreadCacheOneOffJob');
+    adminPage.expectJobTobeRunning('ExplorationValidityJobManager');
+    adminPage.expectNumberOfRunningOneOffJobs(1);
+
+    adminPage.stopOneOffJob('ExplorationValidityJobManager');
+    adminPage.expectNumberOfRunningOneOffJobs(0);
   });
 
   afterEach(function() {
