@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Common utilities for test classes."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -1868,6 +1869,7 @@ class AppEngineTestBase(TestBase):
 
     def _delete_all_models(self):
         """Deletes all models from the NDB datastore."""
+
         from google.appengine.ext import ndb
         ndb.delete_multi(ndb.Query().iter(keys_only=True))
 

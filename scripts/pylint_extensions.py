@@ -1411,42 +1411,31 @@ class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
-        in_multi_line_comment = False
         multi_line_indicator = b'"""'
         file_content = read_from_node(node)
         file_length = len(file_content)
+        triple_quote_counter = 0
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()
             # Single line comment, ignore it.
             if line.startswith(b'#'):
                 continue
-            # Single multi-line comment, ignore it.
-            if line.count(multi_line_indicator) == 2:
-                continue
-
-            # Flip multi-line boolean depending on whether or not we see
-            # the multi-line indicator. Possible for multiline comment to
-            # be somewhere other than the start of a line (e.g. func arg),
-            # so we can't look at start of or end of a line, which is why
-            # the case where two indicators in a single line is handled
-            # separately (i.e. one line comment with multi-line strings).
-            if multi_line_indicator in line:
-                in_multi_line_comment = not in_multi_line_comment
-
-            # Ignore anything inside a multiline comment.
-            if in_multi_line_comment:
-                continue
+            triple_quote_counter += line.count(multi_line_indicator)
             previous_line = file_content[line_num - 1].strip()
-            if line.startswith(b'import') or line.startswith(b'from'):
-                if previous_line.endswith(b'"""'):
+            if (line.startswith(b'import') or line.startswith(b'from')):
+                if (previous_line.endswith(b'"""') and
+                        (triple_quote_counter == 2)):
                     self.add_message(
                         'no-empty-line-provided-below-fileoverview',
                         line=line_num + 1)
-                if (file_content[line_num - 1] == b'\n' and
-                        file_content[line_num - 2] == b'\n'):
+                    break
+                if ((file_content[line_num - 1] == b'\n' and
+                     file_content[line_num - 2] == b'\n') and
+                        (triple_quote_counter == 2)):
                     self.add_message(
                         'only-a-single-empty-line-should-be-provided',
                         line=line_num + 1)
+                    break
 
 
 def register(linter):
