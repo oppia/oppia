@@ -191,7 +191,7 @@ var AdminPage = function() {
     });
   };
 
-  this.expectJobTobeRunning = function(jobName) {
+  this.expectJobToBeRunning = function(jobName) {
     browser.refresh();
     waitFor.pageToFullyLoad();
     waitFor.visibilityOf(element(

@@ -57,15 +57,15 @@ describe('Admin Page', function() {
     adminPage.getJobsTab();
 
     adminPage.startOneOffJob('FeedbackThreadCacheOneOffJob');
-    adminPage.expectJobTobeRunning('FeedbackThreadCacheOneOffJob');
+    adminPage.expectJobToBeRunning('FeedbackThreadCacheOneOffJob');
     adminPage.expectNumberOfRunningOneOffJobs(1);
 
     adminPage.startOneOffJob('ExplorationValidityJobManager');
-    adminPage.expectJobTobeRunning('ExplorationValidityJobManager');
+    adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
     adminPage.expectNumberOfRunningOneOffJobs(2);
 
     adminPage.stopOneOffJob('FeedbackThreadCacheOneOffJob');
-    adminPage.expectJobTobeRunning('ExplorationValidityJobManager');
+    adminPage.expectJobToBeRunning('ExplorationValidityJobManager');
     adminPage.expectNumberOfRunningOneOffJobs(1);
 
     adminPage.stopOneOffJob('ExplorationValidityJobManager');
