@@ -221,7 +221,6 @@ FULLY_COVERED_FILENAMES = [
     'replace-inputs-with-ellipses.pipe.ts',
     'require-is-float.directive.ts',
     'review-test-backend-api.service.ts',
-    'review-test-domain.constants.ajs.ts',
     'review-test-domain.constants.ts',
     'review-test-engine.service.ts',
     'review-test-page.constants.ajs.ts',
