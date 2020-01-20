@@ -108,8 +108,7 @@ angular.module('oppia').directive('progressNav', [
           var doesInteractionHaveSpecialCaseForMobile = function() {
             // The submit button should be shown:
             // 1. In mobile mode, if the current interaction is either
-            //    ItemSelectionInput with maximum selectable choices == 1 or
-            //    MultipleChoiceInput.
+            //    ItemSelectionInput or MultipleChoiceInput.
             // 2. In desktop/mobile, mode if ItemSelectionInput interaction
             //    with maximum selectable choices > 1.
             if (BrowserCheckerService.isMobileDevice()) {
