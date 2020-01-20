@@ -257,9 +257,9 @@ FULLY_COVERED_FILENAMES = [
     'state-solution.service.ts',
     'state-top-answers-stats-backend-api.service.ts',
     'state-written-translations.service.ts',
+    'StateObjectFactory.ts',
     'statistics-domain.constants.ajs.ts',
     'statistics-domain.constants.ts',
-    'StateObjectFactory.ts',
     'StopwatchObjectFactory.ts',
     'story-domain.constants.ajs.ts',
     'story-domain.constants.ts',
@@ -326,7 +326,7 @@ FULLY_COVERED_FILENAMES = [
     'wrap-text-with-ellipsis.filter.ts',
     'wrap-text-with-ellipsis.pipe.ts',
     'WrittenTranslationObjectFactory.ts',
-    'WrittenTranslationsObjectFactory.ts'
+    'WrittenTranslationsObjectFactory.ts',
 ]
 
 
