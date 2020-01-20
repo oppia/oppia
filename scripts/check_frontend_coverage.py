@@ -80,7 +80,7 @@ FULLY_COVERED_FILENAMES = [
     'community-dashboard-page.constants.ajs.ts',
     'community-dashboard-page.constants.ts',
     'compare-versions.service.ts',
-    'concept-card-backend-api-service.ts',
+    'concept-card-backend-api.service.ts',
     'constants.ts',
     'continue-rules.service.ts',
     'continue-validation.service.ts',
@@ -246,8 +246,8 @@ FULLY_COVERED_FILENAMES = [
     'skills-mastery-list.constants.ajs.ts',
     'skills-mastery-list.constants.ts',
     'SkillSummaryObjectFactory.ts',
-    'SolutionObjectFactory.ts'
     'solution-validity.service.ts',
+    'SolutionObjectFactory.ts',
     'state-content.service.ts',
     'state-editor.constants.ajs.ts',
     'state-editor.constants.ts',
