@@ -16,6 +16,7 @@
  * @fileoverview Module for the learner dashboard page.
  */
 
+import 'bootstrap';
 import 'core-js/es7/reflect';
 import 'zone.js';
 

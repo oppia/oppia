@@ -16,6 +16,7 @@
  * @fileoverview Module for the maintenance page.
  */
 
+import 'bootstrap';
 import 'core-js/es7/reflect';
 import 'zone.js';
 

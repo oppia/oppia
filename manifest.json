@@ -233,16 +233,6 @@
           "js": ["dist/angular-toastr.tpls.min.js"]
         }
       },
-      "popperJs": {
-        "version": "1.15.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/popperjs/popper-core/archive/v1.15.0.zip",
-        "rootDirPrefix": "popper-core-",
-        "targetDirPrefix": "popperJs-",
-        "bundle": {
-          "js": ["dist/umd/popper.js"]
-        }
-      },
       "bootstrap": {
         "version": "4.3.1",
         "downloadFormat": "zip",
@@ -250,8 +240,7 @@
         "rootDir": "bootstrap-4.3.1-dist",
         "targetDirPrefix": "bootstrap-",
         "bundle": {
-          "css": ["css/bootstrap.css"],
-          "js": ["js/bootstrap.js"]
+          "css": ["css/bootstrap.css"]
         }
       },
       "bowerAngularTranslateLoaderPartial": {

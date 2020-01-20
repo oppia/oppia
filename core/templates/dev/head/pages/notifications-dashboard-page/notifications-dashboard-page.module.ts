@@ -16,6 +16,7 @@
  * @fileoverview Module for the notifications dashboard page.
  */
 
+import 'bootstrap';
 import 'core-js/es7/reflect';
 import 'zone.js';
 
