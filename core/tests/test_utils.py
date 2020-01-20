@@ -1869,7 +1869,6 @@ class AppEngineTestBase(TestBase):
 
     def _delete_all_models(self):
         """Deletes all models from the NDB datastore."""
-
         from google.appengine.ext import ndb
         ndb.delete_multi(ndb.Query().iter(keys_only=True))
 
