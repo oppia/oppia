@@ -27,7 +27,7 @@ describe('Story viewer backend API service', () => {
   let storyViewerBackendApiService: StoryViewerBackendApiService = null;
   let httpTestingController: HttpTestingController;
 
-  var sampleDataResults = {
+  let sampleDataResults = {
     story_title: 'Story title',
     story_description: 'Story description',
     completed_nodes: [],
@@ -49,13 +49,13 @@ describe('Story viewer backend API service', () => {
 
   it('should successfully fetch an existing story from the backend',
     fakeAsync(() => {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
       storyViewerBackendApiService.fetchStoryData('0').then(
         successHandler, failHandler);
 
-      var req = httpTestingController.expectOne('/story_data_handler/0');
+      let req = httpTestingController.expectOne('/story_data_handler/0');
       expect(req.request.method).toEqual('GET');
       req.flush(sampleDataResults);
 

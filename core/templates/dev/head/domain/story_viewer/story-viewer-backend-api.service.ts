@@ -43,7 +43,7 @@ export class StoryViewerBackendApiService {
   _fetchStoryData(storyId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    var storyDataUrl = this.urlInterpolationService.interpolateUrl(
+    let storyDataUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_DATA_URL_TEMPLATE, {
         story_id: storyId
       });
@@ -63,7 +63,7 @@ export class StoryViewerBackendApiService {
   _recordChapterCompletion(storyId: string, nodeId: string,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
-    var chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
+    let chapterCompletionUrl = this.urlInterpolationService.interpolateUrl(
       StoryViewerDomainConstants.STORY_PROGRESS_URL_TEMPLATE, {
         story_id: storyId,
         node_id: nodeId
