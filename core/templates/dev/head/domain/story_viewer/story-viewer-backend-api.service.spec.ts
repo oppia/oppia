@@ -36,8 +36,7 @@ describe('Story viewer backend API service', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [StoryViewerBackendApiService]
+      imports: [HttpClientTestingModule]
     });
 
     storyViewerBackendApiService = TestBed.get(StoryViewerBackendApiService);
