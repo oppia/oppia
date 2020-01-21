@@ -16,8 +16,7 @@
  * @fileoverview Validator service for the drag and drop sorting interaction.
  */
 
-// TODO(#7403): Convert this to partial imports.
-import math from 'mathjs';
+import { min, max } from 'mathjs';
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
@@ -109,8 +108,8 @@ export class DragAndDropSortInputValidationService {
       var noOfMismatches = 0;
       var inputs = earlierRule.inputs.x;
       var answer = laterRule.inputs.x;
-      for (var i = 0; i < math.min(inputs.length, answer.length); i++) {
-        for (var j = 0; j < math.max(answer[i].length, inputs[i].length);
+      for (var i = 0; i < min(inputs.length, answer.length); i++) {
+        for (var j = 0; j < max(answer[i].length, inputs[i].length);
           j++) {
           if (inputs[i].length > answer[i].length) {
             if (answer[i].indexOf(inputs[i][j]) === -1) {
