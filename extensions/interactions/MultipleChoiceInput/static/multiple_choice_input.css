@@ -31,12 +31,7 @@
   width: 16px;
 }
 
-.multiple-choice-option:hover {
-  color: #115FD4;
-}
-
-.multiple-choice-option:hover .multiple-choice-inner-radio-button,
-.multiple-choice-option:focus .multiple-choice-inner-radio-button {
+.multiple-choice-option.selected .multiple-choice-inner-radio-button {
   background-color: #115FD4;
   border-radius: 50%;
   display: block;
@@ -45,7 +40,28 @@
   width: 8px;
 }
 
-.multiple-choice-option:hover .multiple-choice-outer-radio-button,
 .multiple-choice-option:focus .multiple-choice-outer-radio-button {
   border-color: #115FD4;
+}
+
+/* Hover pseudo-class should only be used in desktops because it
+ * breaks functionality on mobile.
+ */
+@media screen and (min-width: 800px) {
+  .multiple-choice-option:hover {
+    color: #115FD4;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-inner-radio-button {
+    background-color: #115FD4;
+    border-radius: 50%;
+    display: block;
+    height: 8px;
+    margin: 2px;
+    width: 8px;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-outer-radio-button {
+    border-color: #115FD4;
+  }
 }
