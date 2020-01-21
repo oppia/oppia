@@ -1,4 +1,11 @@
 /* The following is needed so that the radio button does not show. */
+.item-selection-info-text {
+  font-weight: bold;
+  font-size: 1em;
+  padding-bottom: 10px;
+  display: block;
+}
+
 .item-selection-input-radio-button {
   display: none;
 }
