@@ -59,7 +59,6 @@ FULLY_COVERED_FILENAMES = [
     'ChangeObjectFactory.ts',
     'ClassifierObjectFactory.ts',
     'classifiers-extension.constants.ts',
-    'classroom-domain.constants.ajs.ts',
     'classroom-domain.constants.ts',
     'code-normalizer.service.ts',
     'code-repl-rules.service.ts',
