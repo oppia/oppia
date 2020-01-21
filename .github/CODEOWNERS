@@ -192,7 +192,7 @@
 /core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @bansalnitish
 /core/templates/dev/head/components/ck-editor-helpers/customize-rte-component-modal.template.html @bansalnitish
 /core/templates/dev/head/services/schema-default-value.service.ts @bansalnitish
-/core/templates/dev/head/services/schema-undefined-last-element.service.ts @bansalnitish
+/core/templates/dev/head/services/schema-undefined-last-element.service*.ts @bansalnitish
 
 
 # Google-app-engine configurations
@@ -240,7 +240,7 @@
 /core/templates/dev/head/services/id-generation.service*.ts @ankita240796
 /core/templates/dev/head/services/alerts.service*.ts @ankita240796
 /core/templates/dev/head/services/page-title.service*.ts @ankita240796
-/core/templates/dev/head/services/extension-tag-assembler.service.ts @ankita240796
+/core/templates/dev/head/services/extension-tag-assembler.service*.ts @ankita240796
 /core/templates/dev/head/services/nested-directives*.ts @ankita240796
 /core/templates/dev/head/services/stateful/background-mask.service*.ts @ankita240796
 /core/templates/dev/head/services/stateful/focus-manager.service*.ts @ankita240796
@@ -463,7 +463,7 @@
 /core/domain/suggestion*.py @nithusha21
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
-/core/templates/dev/head/services/suggestion-modal.service.ts @nithusha21
+/core/templates/dev/head/services/suggestion-modal.service*.ts @nithusha21
 
 
 # Feedback project.
