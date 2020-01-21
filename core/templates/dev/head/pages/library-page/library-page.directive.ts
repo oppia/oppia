@@ -349,7 +349,7 @@ angular.module('oppia').directive('libraryPage', [
               initCarousels();
               // This is needed, otherwise ctrl.tileDisplayCount takes a long
               // time (several seconds) to update.
-              $scope.$apply();
+              $scope.$applyAsync();
             });
 
             var libraryWindowCutoffPx = 530;
@@ -359,7 +359,7 @@ angular.module('oppia').directive('libraryPage', [
             WindowDimensionsService.registerOnResizeHook(function() {
               ctrl.libraryWindowIsNarrow = (
                 WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-              $scope.$apply();
+              $scope.$applyAsync();
             });
           };
         }
