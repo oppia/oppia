@@ -234,11 +234,20 @@ angular.module('oppia').factory('$exceptionHandler', [
     var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
     return function(exception, cause) {
-      var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
-      // Suppress tpload errors which occur with p1 of -1 in the error URL
-      // because -1 is the status code for aborted requests.
-      if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
-        return;
+      // Exceptions are expected to be of Error type. If an error is thrown
+      // with a primitive data type, it must be converted to an Error object
+      // so that the error gets logged correctly.
+      // This check can be removed once all the manually thrown exceptions
+      // are converted to Error objects (see #8456).
+      if (exception instanceof Error) {
+        var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
+        // Suppress tpload errors which occur with p1 of -1 in the error URL
+        // because -1 is the status code for aborted requests.
+        if (tploadStatusCode !== null && tploadStatusCode[1] === '-1') {
+          return;
+        }
+      } else {
+        exception = new Error(exception);
       }
       sourceMappedStackTrace.mapStackTrace(
         exception.stack, function(mappedStack) {
