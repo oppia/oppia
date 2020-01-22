@@ -35,19 +35,21 @@ angular.module('oppia').directive('randomSelector', [
       controllerAs: '$ctrl',
       controller: function() {
         var ctrl = this;
-        ctrl.SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'unicode'
-          },
-          ui_config: {
-            add_element_text: 'Add New Choice'
+        ctrl.$onInit = function() {
+          ctrl.SCHEMA = {
+            type: 'list',
+            items: {
+              type: 'unicode'
+            },
+            ui_config: {
+              add_element_text: 'Add New Choice'
+            }
+          };
+          ctrl.generatorId = ctrl.getGeneratorId();
+          if (!ctrl.customizationArgs.list_of_values) {
+            ctrl.customizationArgs.list_of_values = [];
           }
         };
-        ctrl.generatorId = ctrl.getGeneratorId();
-        if (!ctrl.customizationArgs.list_of_values) {
-          ctrl.customizationArgs.list_of_values = [];
-        }
       }
     };
   }]);

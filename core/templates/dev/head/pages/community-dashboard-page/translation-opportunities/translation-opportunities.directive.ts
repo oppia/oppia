@@ -53,15 +53,6 @@ angular.module('oppia').directive(
             TranslateTextService, TranslationLanguageService, UserService) {
           var ctrl = this;
           var userIsLoggedIn = false;
-          ctrl.opportunities = [];
-          ctrl.opportunitiesAreLoading = true;
-          ctrl.moreOpportunitiesAvailable = true;
-          ctrl.progressBarRequired = true;
-
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            userIsLoggedIn = userInfo.isLoggedIn();
-          });
-
           var getOpportunitySummary = function(expId) {
             for (var index in ctrl.opportunities) {
               if (ctrl.opportunities[index].id === expId) {
@@ -94,15 +85,6 @@ angular.module('oppia').directive(
             ctrl.moreOpportunitiesAvailable = more;
             ctrl.opportunitiesAreLoading = false;
           };
-
-          $scope.$on('activeLanguageChanged', function() {
-            ctrl.opportunities = [];
-            ctrl.opportunitiesAreLoading = true;
-            ctrl.moreOpportunitiesAvailable = true;
-            ContributionOpportunitiesService.getTranslationOpportunities(
-              TranslationLanguageService.getActiveLanguageCode(),
-              updateWithNewOpportunities);
-          });
 
           ctrl.onLoadMoreOpportunities = function() {
             if (
@@ -203,10 +185,27 @@ angular.module('oppia').directive(
               ]
             });
           };
+          ctrl.$onInit = function() {
+            $scope.$on('activeLanguageChanged', function() {
+              ctrl.opportunities = [];
+              ctrl.opportunitiesAreLoading = true;
+              ctrl.moreOpportunitiesAvailable = true;
+              ContributionOpportunitiesService.getTranslationOpportunities(
+                TranslationLanguageService.getActiveLanguageCode(),
+                updateWithNewOpportunities);
+            });
+            ctrl.opportunities = [];
+            ctrl.opportunitiesAreLoading = true;
+            ctrl.moreOpportunitiesAvailable = true;
+            ctrl.progressBarRequired = true;
 
-          ContributionOpportunitiesService.getTranslationOpportunities(
-            TranslationLanguageService.getActiveLanguageCode(),
-            updateWithNewOpportunities);
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              userIsLoggedIn = userInfo.isLoggedIn();
+            });
+            ContributionOpportunitiesService.getTranslationOpportunities(
+              TranslationLanguageService.getActiveLanguageCode(),
+              updateWithNewOpportunities);
+          };
         }
       ]
     };

@@ -287,7 +287,7 @@ skip_files:
 - third_party/static/bower-angular-translate-interpolation-messageformat-2.18.1/
 - third_party/static/bower-angular-translate-loader-partial-2.18.1/
 - third_party/static/bower-angular-translate-loader-static-files-2.18.1/
-- third_party/static/bower-angular-cookies-1.5.8/
+- third_party/static/bower-angular-cookies-1.7.9/
 - third_party/static/bower-angular-translate-storage-cookie-2.18.1,/
 - third_party/static/bower-material-1.1.19/
 # CKEditor-4.12.1 plugins in the download from the CKEditor website include

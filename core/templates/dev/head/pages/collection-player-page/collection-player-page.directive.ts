@@ -70,45 +70,9 @@ angular.module('oppia').directive('collectionPlayerPage', [
             UrlInterpolationService, UrlService, UserService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
-          $rootScope.loadingMessage = 'Loading';
-          ctrl.collection = null;
-          ctrl.collectionPlaythrough = null;
-          ctrl.collectionId = UrlService.getCollectionIdFromUrl();
-          ctrl.explorationCardIsShown = false;
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
-          // The pathIconParameters is an array containing the co-ordinates,
-          // background color and icon url for the icons generated on the path.
-          ctrl.pathIconParameters = [];
-          ctrl.activeHighlightedIconIndex = -1;
-          ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX = 220;
-          ctrl.ODD_SVG_HEIGHT_OFFSET_PX = 150;
-          ctrl.EVEN_SVG_HEIGHT_OFFSET_PX = 280;
-          ctrl.ICON_Y_INITIAL_PX = 35;
-          ctrl.ICON_Y_INCREMENT_PX = 110;
-          ctrl.ICON_X_MIDDLE_PX = 225;
-          ctrl.ICON_X_LEFT_PX = 55;
-          ctrl.ICON_X_RIGHT_PX = 395;
-          ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
-          ctrl.nextExplorationId = null;
-          ctrl.whitelistedCollectionIdsForGuestProgress = (
-            WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
-          $anchorScroll.yOffset = -80;
-
-          $http.get('/collection_handler/data/' + ctrl.collectionId).then(
-            function(response) {
-              response = response.data;
-              angular.element('meta[itemprop="name"]').attr(
-                'content', response.meta_name);
-              angular.element('meta[itemprop="description"]').attr(
-                'content', response.meta_description);
-              angular.element('meta[property="og:title"]').attr(
-                'content', response.meta_name);
-              angular.element('meta[property="og:description"]').attr(
-                'content', response.meta_description);
-            }
-          );
           ctrl.setIconHighlight = function(index) {
             ctrl.activeHighlightedIconIndex = index;
           };
@@ -263,84 +227,6 @@ angular.module('oppia').directive('collectionPlayerPage', [
             }
           };
 
-          $http.get('/collectionsummarieshandler/data', {
-            params: {
-              stringified_collection_ids: JSON.stringify([ctrl.collectionId])
-            }
-          }).then(
-            function(response) {
-              ctrl.collectionSummary = response.data.summaries[0];
-            },
-            function() {
-              AlertsService.addWarning(
-                'There was an error while fetching the collection summary.');
-            }
-          );
-
-          // Load the collection the learner wants to view.
-          ReadOnlyCollectionBackendApiService.loadCollection(
-            ctrl.collectionId).then(
-            function(collectionBackendObject) {
-              ctrl.collection = CollectionObjectFactory.create(
-                collectionBackendObject);
-              $rootScope.$broadcast('collectionLoaded');
-
-              PageTitleService.setPageTitle(
-                ctrl.collection.getTitle() + ' - Oppia');
-
-              // Load the user's current progress in the collection. If the
-              // user is a guest, then either the defaults from the server will
-              // be used or the user's local progress, if any has been made and
-              // the collection is whitelisted.
-              var collectionAllowsGuestProgress = (
-                ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
-                  ctrl.collectionId) !== -1);
-              UserService.getUserInfoAsync().then(function(userInfo) {
-                $rootScope.loadingMessage = '';
-                ctrl.isLoggedIn = userInfo.isLoggedIn();
-                if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
-                    GuestCollectionProgressService.hasCompletedSomeExploration(
-                      ctrl.collectionId)) {
-                  var completedExplorationIds = (
-                    GuestCollectionProgressService.getCompletedExplorationIds(
-                      ctrl.collection));
-                  var nextExplorationId = (
-                    GuestCollectionProgressService.getNextExplorationId(
-                      ctrl.collection, completedExplorationIds));
-                  ctrl.collectionPlaythrough = (
-                    CollectionPlaythroughObjectFactory.create(
-                      nextExplorationId, completedExplorationIds));
-                } else {
-                  ctrl.collectionPlaythrough = (
-                    CollectionPlaythroughObjectFactory.createFromBackendObject(
-                      collectionBackendObject.playthrough_dict));
-                }
-                ctrl.nextExplorationId =
-                  ctrl.collectionPlaythrough.getNextExplorationId();
-
-                ctrl.isCompletedExploration = function(explorationId) {
-                  var completedExplorationIds = (
-                    ctrl.collectionPlaythrough.getCompletedExplorationIds());
-                  return completedExplorationIds.indexOf(explorationId) > -1;
-                };
-              });
-            },
-            function() {
-              // TODO(bhenning): Handle not being able to load the collection.
-              // NOTE TO DEVELOPERS: Check the backend console for an indication
-              // as to why this error occurred; sometimes the errors are noisy,
-              // so they are not shown to the user.
-              AlertsService.addWarning(
-                'There was an error loading the collection.');
-            }
-          );
-
-          $scope.$watch('$ctrl.collection', function(newValue) {
-            if (newValue !== null) {
-              ctrl.generatePathParameters();
-            }
-          }, true);
-
           ctrl.scrollToLocation = function(id) {
             $location.hash(id);
             $anchorScroll();
@@ -353,14 +239,131 @@ angular.module('oppia').directive('collectionPlayerPage', [
           ctrl.onClickStopPropagation = function($evt) {
             $evt.stopPropagation();
           };
+          ctrl.$onInit = function() {
+            $scope.$watch('$ctrl.collection', function(newValue) {
+              if (newValue !== null) {
+                ctrl.generatePathParameters();
+              }
+            }, true);
+            $rootScope.loadingMessage = 'Loading';
+            ctrl.collection = null;
+            ctrl.collectionPlaythrough = null;
+            ctrl.collectionId = UrlService.getCollectionIdFromUrl();
+            ctrl.explorationCardIsShown = false;
+            // The pathIconParameters is an array containing the co-ordinates,
+            // background color and icon url for the icons generated on the
+            // path.
+            ctrl.pathIconParameters = [];
+            ctrl.activeHighlightedIconIndex = -1;
+            ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX = 220;
+            ctrl.ODD_SVG_HEIGHT_OFFSET_PX = 150;
+            ctrl.EVEN_SVG_HEIGHT_OFFSET_PX = 280;
+            ctrl.ICON_Y_INITIAL_PX = 35;
+            ctrl.ICON_Y_INCREMENT_PX = 110;
+            ctrl.ICON_X_MIDDLE_PX = 225;
+            ctrl.ICON_X_LEFT_PX = 55;
+            ctrl.ICON_X_RIGHT_PX = 395;
+            ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
+            ctrl.nextExplorationId = null;
+            ctrl.whitelistedCollectionIdsForGuestProgress = (
+              WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
+            $anchorScroll.yOffset = -80;
 
-          // Touching anywhere outside the mobile preview should hide it.
-          document.addEventListener('touchstart', function() {
-            if (ctrl.explorationCardIsShown === true) {
-              ctrl.explorationCardIsShown = false;
-            }
-          });
-        }]
+            // Touching anywhere outside the mobile preview should hide it.
+            document.addEventListener('touchstart', function() {
+              if (ctrl.explorationCardIsShown === true) {
+                ctrl.explorationCardIsShown = false;
+              }
+            });
+            $http.get('/collection_handler/data/' + ctrl.collectionId).then(
+              function(response) {
+                response = response.data;
+                angular.element('meta[itemprop="name"]').attr(
+                  'content', response.meta_name);
+                angular.element('meta[itemprop="description"]').attr(
+                  'content', response.meta_description);
+                angular.element('meta[property="og:title"]').attr(
+                  'content', response.meta_name);
+                angular.element('meta[property="og:description"]').attr(
+                  'content', response.meta_description);
+              }
+            );
+
+            $http.get('/collectionsummarieshandler/data', {
+              params: {
+                stringified_collection_ids: JSON.stringify([ctrl.collectionId])
+              }
+            }).then(
+              function(response) {
+                ctrl.collectionSummary = response.data.summaries[0];
+              },
+              function() {
+                AlertsService.addWarning(
+                  'There was an error while fetching the collection summary.');
+              }
+            );
+
+            // Load the collection the learner wants to view.
+            ReadOnlyCollectionBackendApiService.loadCollection(
+              ctrl.collectionId).then(
+              function(collectionBackendObject) {
+                ctrl.collection = CollectionObjectFactory.create(
+                  collectionBackendObject);
+                $rootScope.$broadcast('collectionLoaded');
+
+                PageTitleService.setPageTitle(
+                  ctrl.collection.getTitle() + ' - Oppia');
+
+                // Load the user's current progress in the collection. If the
+                // user is a guest, then either the defaults from the server
+                // will be used or the user's local progress, if any has been
+                // made and the collection is whitelisted.
+                var collectionAllowsGuestProgress = (
+                  ctrl.whitelistedCollectionIdsForGuestProgress.indexOf(
+                    ctrl.collectionId) !== -1);
+                UserService.getUserInfoAsync().then(function(userInfo) {
+                  $rootScope.loadingMessage = '';
+                  ctrl.isLoggedIn = userInfo.isLoggedIn();
+                  if (!ctrl.isLoggedIn && collectionAllowsGuestProgress &&
+                      GuestCollectionProgressService
+                        .hasCompletedSomeExploration(ctrl.collectionId)) {
+                    var completedExplorationIds = (
+                      GuestCollectionProgressService.getCompletedExplorationIds(
+                        ctrl.collection));
+                    var nextExplorationId = (
+                      GuestCollectionProgressService.getNextExplorationId(
+                        ctrl.collection, completedExplorationIds));
+                    ctrl.collectionPlaythrough = (
+                      CollectionPlaythroughObjectFactory.create(
+                        nextExplorationId, completedExplorationIds));
+                  } else {
+                    ctrl.collectionPlaythrough = (
+                      CollectionPlaythroughObjectFactory
+                        .createFromBackendObject(
+                          collectionBackendObject.playthrough_dict));
+                  }
+                  ctrl.nextExplorationId =
+                    ctrl.collectionPlaythrough.getNextExplorationId();
+
+                  ctrl.isCompletedExploration = function(explorationId) {
+                    var completedExplorationIds = (
+                      ctrl.collectionPlaythrough.getCompletedExplorationIds());
+                    return completedExplorationIds.indexOf(explorationId) > -1;
+                  };
+                });
+              },
+              function() {
+                // TODO(bhenning): Handle not being able to load the collection.
+                // NOTE TO DEVELOPERS: Check the backend console for an
+                // indication as to why this error occurred; sometimes the
+                // errors are noisy, so they are not shown to the user.
+                AlertsService.addWarning(
+                  'There was an error loading the collection.');
+              }
+            );
+          };
+        }
+      ]
     };
   }
 ]);

@@ -41,11 +41,8 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
             UrlInterpolationService, UndoRedoService, StoryEditorStateService,
             EVENT_STORY_INITIALIZED
         ) {
-          $scope.story = StoryEditorStateService.getStory();
+          var ctrl = this;
           var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
-          $scope.$on(EVENT_STORY_INITIALIZED, function() {
-            $scope.topicName = StoryEditorStateService.getTopicName();
-          });
           $scope.returnToTopicEditorPage = function() {
             if (UndoRedoService.getChangeCount() > 0) {
               var modalInstance = $uibModal.open({
@@ -61,6 +58,10 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
                     };
                   }
                 ]
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               $window.open(
@@ -70,6 +71,12 @@ angular.module('oppia').directive('storyEditorNavbarBreadcrumb', [
                   }
                 ), '_self');
             }
+          };
+          ctrl.$onInit = function() {
+            $scope.story = StoryEditorStateService.getStory();
+            $scope.$on(EVENT_STORY_INITIALIZED, function() {
+              $scope.topicName = StoryEditorStateService.getTopicName();
+            });
           };
         }
       ]
