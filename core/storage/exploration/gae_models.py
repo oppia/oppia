@@ -245,6 +245,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
+    # The user_ids of users who are (or were in history) members of owner_ids,
+    # editor_ids, voice_artist_ids or viewer_ids.
+    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
+
     # Whether this exploration is owned by the community.
     community_owned = ndb.BooleanProperty(indexed=True, default=False)
     # The exploration id which this exploration was cloned from. If None, this

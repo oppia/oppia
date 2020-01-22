@@ -100,7 +100,7 @@ class ActivityRights(python_utils.OBJECT):
 
     def __init__(
             self, exploration_id, owner_ids, editor_ids, voice_artist_ids,
-            viewer_ids, community_owned=False, cloned_from=None,
+            viewer_ids, all_user_ids, community_owned=False, cloned_from=None,
             status=ACTIVITY_STATUS_PRIVATE, viewable_if_private=False,
             first_published_msec=None):
         self.id = exploration_id
@@ -108,6 +108,7 @@ class ActivityRights(python_utils.OBJECT):
         self.editor_ids = editor_ids
         self.voice_artist_ids = voice_artist_ids
         self.viewer_ids = viewer_ids
+        self.all_user_ids = all_user_ids
         self.community_owned = community_owned
         self.cloned_from = cloned_from
         self.status = status
@@ -137,15 +138,12 @@ class ActivityRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Public explorations should have no viewers specified.')
 
-        owner_editor = set(self.owner_ids).intersection(set(self.editor_ids))
-        owner_voice_artist = set(self.owner_ids).intersection(
-            set(self.voice_artist_ids))
-        owner_viewer = set(self.owner_ids).intersection(set(self.viewer_ids))
-        editor_voice_artist = set(self.editor_ids).intersection(
-            set(self.voice_artist_ids))
-        editor_viewer = set(self.editor_ids).intersection(set(self.viewer_ids))
-        voice_artist_viewer = set(self.voice_artist_ids).intersection(
-            set(self.viewer_ids))
+        owner_editor = set(self.owner_ids) & set(self.editor_ids)
+        owner_voice_artist = set(self.owner_ids) & set(self.voice_artist_ids)
+        owner_viewer = set(self.owner_ids) & set(self.viewer_ids)
+        editor_voice_artist = set(self.editor_ids) & set(self.voice_artist_ids)
+        editor_viewer = set(self.editor_ids) & set(self.viewer_ids)
+        voice_artist_viewer = set(self.voice_artist_ids) & set(self.viewer_ids)
         if owner_editor:
             raise utils.ValidationError(
                 'A user cannot be both an owner and an editor: %s' %
@@ -170,6 +168,25 @@ class ActivityRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'A user cannot be both a voice artist and a viewer: %s' %
                 voice_artist_viewer)
+
+        owner_not_in_all = set(self.owner_ids) - set(self.all_user_ids)
+        editor_not_in_all = set(self.editor_ids) - set(self.all_user_ids)
+        voice_artist_not_in_all = (
+            set(self.voice_artist_ids) - set(self.all_user_ids))
+        viewer_not_in_all = set(self.viewer_ids) - set(self.all_user_ids)
+        if owner_not_in_all:
+            raise utils.ValidationError(
+                'Owner is not listed in all user ids: %s' % owner_not_in_all)
+        if editor_not_in_all:
+            raise utils.ValidationError(
+                'Editor is not listed in all user ids: %s' % editor_not_in_all)
+        if voice_artist_not_in_all:
+            raise utils.ValidationError(
+                'Voice artist is not listed in all user ids: %s' %
+                voice_artist_not_in_all)
+        if viewer_not_in_all:
+            raise utils.ValidationError(
+                'Viewer is not listed in all user ids: %s' % viewer_not_in_all)
 
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
@@ -370,6 +387,7 @@ def _save_activity_rights(
     model.editor_ids = activity_rights.editor_ids
     model.viewer_ids = activity_rights.viewer_ids
     model.voice_artist_ids = activity_rights.voice_artist_ids
+    model.all_user_ids = activity_rights.all_user_ids
     model.community_owned = activity_rights.community_owned
     model.status = activity_rights.status
     model.viewable_if_private = activity_rights.viewable_if_private
@@ -1036,6 +1054,9 @@ def _assign_role(
 
     else:
         raise Exception('Invalid role: %s' % new_role)
+
+    if assignee_id not in activity_rights.all_user_ids:
+        activity_rights.all_user_ids.append(assignee_id)
 
     commit_message = 'Changed role of %s from %s to %s' % (
         assignee_username, old_role, new_role)

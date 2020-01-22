@@ -1120,6 +1120,7 @@ def assign_role(committer, assignee, new_role, topic_id):
         if topic_rights.is_manager(assignee.user_id):
             raise Exception('This user already is a manager for this topic')
         topic_rights.manager_ids.append(assignee.user_id)
+        topic_rights.all_user_ids.append(assignee.user_id)
     elif new_role == topic_domain.ROLE_NONE:
         if topic_rights.is_manager(assignee.user_id):
             topic_rights.manager_ids.remove(assignee.user_id)
