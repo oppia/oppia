@@ -491,7 +491,7 @@ class ModelsUserIdsHaveUserSettingsVerificationJob(
         # We need to reduce the number of shards for this job, since it goes
         # over big number of model classes.
         super(ModelsUserIdsHaveUserSettingsVerificationJob, cls).enqueue(
-            job_id, shards_count=2)
+            job_id, shard_count=2)
 
     @classmethod
     def entity_classes_to_map_over(cls):
