@@ -1416,19 +1416,14 @@ class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
         file_length = len(file_content)
         triple_quote_counter = 0
         empty_line_counter = 0
-        imports_detected = False
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()
             # Single line comment, ignore it.
             if line.startswith(b'#'):
                 continue
-            if line.startswith(b'import') or line.startswith(b'from'):
-                imports_detected = True
             triple_quote_counter += line.count(multi_line_indicator)
-            is_file_overview = ((not imports_detected) and
-                                triple_quote_counter == 2)
 
-            if line.endswith(b'"""') and is_file_overview:
+            if line.endswith(b'"""') and triple_quote_counter == 2:
                 temp_line_num = line_num
                 while file_content[temp_line_num + 1] == b'\n':
                     empty_line_counter += 1
