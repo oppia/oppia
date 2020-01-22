@@ -55,7 +55,7 @@ _COMPONENT_CONFIG_SCHEMA = [
 class RteComponentUnitTests(test_utils.GenericTestBase):
     """Tests that all the default RTE components are valid."""
 
-    def is_camel_cased(self, name):
+    def _is_camel_cased(self, name):
         """Check whether a name is in CamelCase."""
         return name and (name[0] in string.ascii_uppercase)
 
@@ -63,7 +63,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         """Check whether a string is alphanumeric."""
         return bool(re.compile('^[a-zA-Z0-9_]+$').match(input_string))
 
-    def validate_customization_arg_specs(self, customization_arg_specs):
+    def _validate_customization_arg_specs(self, customization_arg_specs):
         """Validates the given customization arg specs."""
         for ca_spec in customization_arg_specs:
             self.assertEqual(set(ca_spec.keys()), set([
@@ -100,7 +100,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                         ca_spec['default_value'],
                         obj_class.normalize(ca_spec['default_value']))
 
-    def listdir_omit_ignored(self, directory):
+    def _listdir_omit_ignored(self, directory):
         """List all files and directories within 'directory', omitting the ones
         whose name ends in one of the IGNORED_FILE_SUFFIXES.
         """
@@ -140,7 +140,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             # Check that the component id is valid.
             hyphenated_component_id = utils.camelcase_to_hyphenated(
                 component_id)
-            self.assertTrue(self.is_camel_cased(component_id))
+            self.assertTrue(self._is_camel_cased(component_id))
 
             # Check that the component directory exists.
             component_dir = os.path.join(
@@ -152,7 +152,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             # preview .png file.
             # In /directives directory should be HTML file, a JS file,
             # there could be multiple JS and HTML files.
-            dir_contents = self.listdir_omit_ignored(component_dir)
+            dir_contents = self._listdir_omit_ignored(component_dir)
             self.assertLessEqual(len(dir_contents), 4)
 
             directives_dir = os.path.join(component_dir, 'directives')
@@ -187,7 +187,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 if item_type == python_utils.BASESTRING:
                     self.assertTrue(component_specs[item])
 
-            self.validate_customization_arg_specs(
+            self._validate_customization_arg_specs(
                 component_specs['customization_arg_specs'])  # pylint: disable=protected-access
 
     def test_require_file_contains_all_imports(self):
