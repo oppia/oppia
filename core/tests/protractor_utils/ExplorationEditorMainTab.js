@@ -175,7 +175,7 @@ var ExplorationEditorMainTab = function() {
       if (buttons.length === 1) {
         buttons[0].click();
       } else if (buttons.length !== 0) {
-        throw 'Expected to find at most one \'exit tutorial\' button';
+        throw new Error('Expected to find at most one \'exit tutorial\' button');
       }
     });
   };
