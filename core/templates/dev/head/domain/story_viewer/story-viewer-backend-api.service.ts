@@ -20,6 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import cloneDeep from 'lodash/cloneDeep';
+
 import { StoryViewerDomainConstants } from
   'domain/story_viewer/story-viewer-domain.constants';
 import { UrlInterpolationService } from
@@ -49,7 +51,7 @@ export class StoryViewerBackendApiService {
       });
 
     this.http.get(storyDataUrl).toPromise().then((data) => {
-      this.storyDataDict = angular.copy(data);
+      this.storyDataDict = cloneDeep(data);
       if (successCallback) {
         successCallback(this.storyDataDict);
       }
