@@ -21,8 +21,8 @@
 require('services/promo-bar.service.ts');
 
 angular.module('oppia').directive('promoBar', [
-  '$cookies', 'PromoBarService',
-  function($cookies, PromoBarService) {
+  '$window', 'PromoBarService',
+  function($window, PromoBarService) {
     return {
       restrict: 'E',
       scope: {},
@@ -33,24 +33,25 @@ angular.module('oppia').directive('promoBar', [
         function() {
           var ctrl = this;
           var isPromoDismissed = function() {
-            if (!isCookieStorageAvailable()) {
+            if (!isSessionStorageAvailable()) {
               return false;
             }
-            return !!angular.fromJson($cookies.get('promoIsDismissed'));
+            return !!angular.fromJson($window.sessionStorage.promoIsDismissed);
           };
           var setPromoDismissed = function(promoIsDismissed) {
-            if (!isCookieStorageAvailable()) {
+            if (!isSessionStorageAvailable()) {
               return false;
             }
-            $cookies.put('promoIsDismissed', angular.toJson(promoIsDismissed));
+            $window.sessionStorage.promoIsDismissed = angular.toJson(
+              promoIsDismissed);
           };
 
-          var isCookieStorageAvailable = function() {
-            // This is to ensure cookieStorage is accessible.
+          var isSessionStorageAvailable = function() {
+            // This is to ensure sessionStorage is accessible.
             var testKey = 'Oppia';
             try {
-              $cookies.put(testKey, testKey);
-              $cookies.remove(testKey);
+              $window.sessionStorage.setItem(testKey, testKey);
+              $window.sessionStorage.removeItem(testKey);
               return true;
             } catch (e) {
               return false;
@@ -66,6 +67,9 @@ angular.module('oppia').directive('promoBar', [
               ctrl.promoBarMessage = promoBarObject.promoBarMessage;
             });
 
+            // TODO(#8300): Utilize cookies for tracking when a promo is
+            // dismissed. Cookies allow for a longer-lived memory of whether the
+            // promo is dismissed.
             ctrl.promoIsVisible = !isPromoDismissed();
           };
         }
