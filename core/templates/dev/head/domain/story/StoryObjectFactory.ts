@@ -32,10 +32,11 @@ export class Story {
   _languageCode: string;
   _version: number;
   _correspondingTopicId: string;
+  _thumbnailFilename: string;
   constructor(
       id: string, title: string, description: string, notes: string,
       storyContents: StoryContents, languageCode: string, version: number,
-      correspondingTopicId: string) {
+      correspondingTopicId: string, thumbnailFilename: string) {
     this._id = id;
     this._title = title;
     this._description = description;
@@ -44,6 +45,7 @@ export class Story {
     this._languageCode = languageCode;
     this._version = version;
     this._correspondingTopicId = correspondingTopicId;
+    this._thumbnailFilename = thumbnailFilename;
   }
 
   getId(): string {
@@ -94,6 +96,14 @@ export class Story {
     return this._correspondingTopicId;
   }
 
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  setThumbnailFilename(thumbnailFilename: string): void {
+    this._thumbnailFilename = thumbnailFilename;
+  }
+
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because the return type is a list with varying element types.
   validate(): any {
@@ -117,6 +127,7 @@ export class Story {
     this._version = otherStory.getVersion();
     this._storyContents = otherStory.getStoryContents();
     this._correspondingTopicId = otherStory.getCorrespondingTopicId();
+    this._thumbnailFilename = otherStory.getThumbnailFilename();
   }
 }
 
@@ -132,7 +143,8 @@ export class StoryObjectFactory {
       this.storyContentsObjectFactory.createFromBackendDict(
         storyBackendDict.story_contents),
       storyBackendDict.language_code,
-      storyBackendDict.version, storyBackendDict.corresponding_topic_id
+      storyBackendDict.version, storyBackendDict.corresponding_topic_id,
+      storyBackendDict.thumbnail_filename
     );
   }
 
@@ -141,7 +153,7 @@ export class StoryObjectFactory {
   createInterstitialStory() {
     return new Story(
       null, 'Story title loading', 'Story description loading',
-      'Story notes loading', null, 'en', 1, null);
+      'Story notes loading', null, 'en', 1, null, null);
   }
 }
 

@@ -35,6 +35,7 @@ angular.module('oppia').directive('storyNodeEditor', [
         getId: '&nodeId',
         getOutline: '&outline',
         getExplorationId: '&explorationId',
+        getThumbnailFilename: '&thumbnailFilename',
         isOutlineFinalized: '&outlineFinalized',
         getDestinationNodeIds: '&destinationNodeIds',
         getPrerequisiteSkillIds: '&prerequisiteSkillIds',
@@ -93,6 +94,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
             $scope.currentTitle = $scope.nodeIdToTitleMap[$scope.getId()];
             $scope.editableTitle = $scope.currentTitle;
+            $scope.editableThumbnailFilename = $scope.getThumbnailFilename();
             $scope.oldOutline = $scope.getOutline();
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
@@ -121,6 +123,15 @@ angular.module('oppia').directive('storyNodeEditor', [
             StoryUpdateService.setStoryNodeTitle(
               $scope.story, $scope.getId(), newTitle);
             $scope.currentTitle = newTitle;
+          };
+
+          $scope.updateThumbnailFilename = function(newThumbnailFilename) {
+            if (newThumbnailFilename === $scope.editableThumbnailFilename) {
+              return;
+            }
+            StoryUpdateService.setStoryNodeThumbnailFilename(
+              $scope.story, $scope.getId(), newThumbnailFilename);
+            $scope.editableThumbnailFilename = newThumbnailFilename;
           };
 
           $scope.viewNodeEditor = function(nodeId) {

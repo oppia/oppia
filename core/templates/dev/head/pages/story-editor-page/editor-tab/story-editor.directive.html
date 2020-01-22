@@ -1,9 +1,8 @@
 <div role="form" class="form-horizontal">
   <md-card class="oppia-page-card oppia-long-text">
     <label class="form-heading">Story Thumbnail</label>
-    <thumbnail-uploader disabled=""
-                        editable-thumbnail-data-url=""
-                        update-filename="">
+    <thumbnail-uploader filename="editableThumbnailFilename"
+                        update-filename="updateStoryThumbnailFilename">
     </thumbnail-uploader>
     <div class="story-title">
       <label for="storyTitle" class="form-heading">Story Title</label>
@@ -124,6 +123,7 @@
         <div ng-repeat="node in nodes">
           <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
                              node-id="node.getId()"
+                             thumbnail-filename="node.getThumbnailFilename()"
                              outline="node.getOutline()"
                              exploration-id="node.getExplorationId()"
                              outline-finalized="node.getOutlineStatus()"

@@ -72,6 +72,8 @@ angular.module('oppia').directive('storyEditor', [
             $scope.notesEditorIsShown = false;
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
+            $scope.editableThumbnailFilename = (
+              $scope.story.getThumbnailFilename());
             $scope.editableNotes = $scope.story.getNotes();
             $scope.editableDescription = $scope.story.getDescription();
             $scope.editableDescriptionIsEmpty = (
@@ -210,6 +212,15 @@ angular.module('oppia').directive('storyEditor', [
               return;
             }
             StoryUpdateService.setStoryTitle($scope.story, newTitle);
+          };
+
+          $scope.updateStoryThumbnailFilename = function(
+              newThumbnailFilename) {
+            if (newThumbnailFilename === $scope.story.getThumbnailFilename()) {
+              return;
+            }
+            StoryUpdateService.setThumbnailFilename(
+              $scope.story, newThumbnailFilename);
           };
 
           $scope.updateStoryDescription = function(newDescription) {

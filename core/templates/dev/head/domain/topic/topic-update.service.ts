@@ -413,7 +413,7 @@ angular.module('oppia').factory('TopicUpdateService', [
         _applySubtopicPropertyChange(
           topic, SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME, subtopicId,
           thumbnailFilename, oldThumbnailFilename,
-          function(changeDict, subtopic) {
+          function(changeDict, topic) {
             // Apply
             var thumbnailFilename = (
               _getNewPropertyValueFromChangeDict(changeDict));

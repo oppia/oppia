@@ -343,6 +343,11 @@ def apply_change_list(topic_id, change_list):
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
                     topic.update_subtopic_title(
                         change.subtopic_id, change.new_value)
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME):
+                    topic.update_subtopic_thumbnail_filename(
+                        change.subtopic_id, change.new_value)
+
             elif (
                     change.cmd ==
                     topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION):

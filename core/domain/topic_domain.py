@@ -49,6 +49,7 @@ TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
+SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
@@ -104,7 +105,9 @@ class TopicChange(change_domain.BaseChange):
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
-    SUBTOPIC_PROPERTIES = (SUBTOPIC_PROPERTY_TITLE,)
+    SUBTOPIC_PROPERTIES = (
+        SUBTOPIC_PROPERTY_TITLE,
+        SUBTOPIC_PROPERTY_THUMBNAIL_FILENAME)
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -287,7 +290,7 @@ class StoryReference(python_utils.OBJECT):
 class Subtopic(python_utils.OBJECT):
     """Domain object for a Subtopic."""
 
-    def __init__(self, subtopic_id, title, skill_ids):
+    def __init__(self, subtopic_id, title, skill_ids, thumbnail_filename):
         """Constructs a Subtopic domain object.
 
         Args:
@@ -295,10 +298,13 @@ class Subtopic(python_utils.OBJECT):
             title: str. The title of the subtopic.
             skill_ids: list(str). The list of skill ids that are part of this
                 subtopic.
+            thumbnail_filename: str|None. The thumbnail filename for the
+                subtopic.
         """
         self.id = subtopic_id
         self.title = title
         self.skill_ids = skill_ids
+        self.thumbnail_filename = thumbnail_filename
 
     def to_dict(self):
         """Returns a dict representing this Subtopic domain object.
@@ -309,7 +315,8 @@ class Subtopic(python_utils.OBJECT):
         return {
             'id': self.id,
             'title': self.title,
-            'skill_ids': self.skill_ids
+            'skill_ids': self.skill_ids,
+            'thumbnail_filename': self.thumbnail_filename
         }
 
     @classmethod
@@ -324,7 +331,7 @@ class Subtopic(python_utils.OBJECT):
         """
         subtopic = cls(
             subtopic_dict['id'], subtopic_dict['title'],
-            subtopic_dict['skill_ids'])
+            subtopic_dict['skill_ids'], subtopic_dict['thumbnail_filename'])
         return subtopic
 
     @classmethod
@@ -339,7 +346,7 @@ class Subtopic(python_utils.OBJECT):
             Subtopic. A subtopic object with given id, title and empty skill ids
                 list.
         """
-        return cls(subtopic_id, title, [])
+        return cls(subtopic_id, title, [], None)
 
     def validate(self):
         """Validates various properties of the Subtopic object.
@@ -1028,6 +1035,25 @@ class Topic(python_utils.OBJECT):
             raise Exception(
                 'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].title = new_title
+
+    def update_subtopic_thumbnail_filename(
+            self, subtopic_id, new_thumbnail_filename):
+        """Updates the thumbnail filename property of the new subtopic.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to edit.
+            new_thumbnail_filename: str. The new thumbnail filename for the
+                subtopic.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        self.subtopics[subtopic_index].thumbnail_filename = (
+            new_thumbnail_filename)
 
     def move_skill_id_to_subtopic(
             self, old_subtopic_id, new_subtopic_id, skill_id):

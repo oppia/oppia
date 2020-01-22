@@ -29,6 +29,7 @@ import utils
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 STORY_PROPERTY_TITLE = 'title'
+STORY_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 STORY_PROPERTY_DESCRIPTION = 'description'
 STORY_PROPERTY_NOTES = 'notes'
 STORY_PROPERTY_LANGUAGE_CODE = 'language_code'
@@ -38,6 +39,7 @@ STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
 STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 STORY_NODE_PROPERTY_OUTLINE = 'outline'
 STORY_NODE_PROPERTY_TITLE = 'title'
+STORY_NODE_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
 
@@ -89,8 +91,9 @@ class StoryChange(change_domain.BaseChange):
     # The allowed list of story properties which can be used in
     # update_story_property command.
     STORY_PROPERTIES = (
-        STORY_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
-        STORY_PROPERTY_NOTES, STORY_PROPERTY_LANGUAGE_CODE)
+        STORY_PROPERTY_TITLE, STORY_PROPERTY_THUMBNAIL_FILENAME,
+        STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_NOTES,
+        STORY_PROPERTY_LANGUAGE_CODE)
 
     # The allowed list of story node properties which can be used in
     # update_story_node_property command.
@@ -98,7 +101,8 @@ class StoryChange(change_domain.BaseChange):
         STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
         STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
         STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, STORY_NODE_PROPERTY_OUTLINE,
-        STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE)
+        STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE,
+        STORY_NODE_PROPERTY_THUMBNAIL_FILENAME)
 
     # The allowed list of story contente properties which can be used in
     # update_story_contents_property command.
@@ -149,7 +153,7 @@ class StoryNode(python_utils.OBJECT):
     """
 
     def __init__(
-            self, node_id, title, destination_node_ids,
+            self, node_id, title, thumbnail_filename, destination_node_ids,
             acquired_skill_ids, prerequisite_skill_ids,
             outline, outline_is_finalized, exploration_id):
         """Initializes a StoryNode domain object.
@@ -157,6 +161,8 @@ class StoryNode(python_utils.OBJECT):
         Args:
             node_id: str. The unique id for each node.
             title: str. The title of the story node.
+            thumbnail_filename: str|None. The thumbnail filename of the story
+                node.
             destination_node_ids: list(str). The list of destination node ids
                 that this node points to in the story graph.
             acquired_skill_ids: list(str). The list of skill ids acquired by
@@ -176,6 +182,7 @@ class StoryNode(python_utils.OBJECT):
         """
         self.id = node_id
         self.title = title
+        self.thumbnail_filename = thumbnail_filename
         self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
@@ -235,6 +242,7 @@ class StoryNode(python_utils.OBJECT):
         return {
             'id': self.id,
             'title': self.title,
+            'thumbnail_filename': self.thumbnail_filename,
             'destination_node_ids': self.destination_node_ids,
             'acquired_skill_ids': self.acquired_skill_ids,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
@@ -255,6 +263,7 @@ class StoryNode(python_utils.OBJECT):
         """
         node = cls(
             node_dict['id'], node_dict['title'],
+            node_dict['thumbnail_filename'],
             node_dict['destination_node_ids'],
             node_dict['acquired_skill_ids'],
             node_dict['prerequisite_skill_ids'], node_dict['outline'],
@@ -274,7 +283,7 @@ class StoryNode(python_utils.OBJECT):
             StoryNode. The StoryNode domain object with default
             value.
         """
-        return cls(node_id, title, [], [], [], '', False, None)
+        return cls(node_id, title, None, [], [], [], '', False, None)
 
     def validate(self):
         """Validates various properties of the story node.
@@ -579,7 +588,7 @@ class Story(python_utils.OBJECT):
     """Domain object for an Oppia Story."""
 
     def __init__(
-            self, story_id, title, description, notes,
+            self, story_id, title, thumbnail_filename, description, notes,
             story_contents, story_contents_schema_version, language_code,
             corresponding_topic_id, version, created_on=None,
             last_updated=None):
@@ -605,9 +614,11 @@ class Story(python_utils.OBJECT):
                 created.
             last_updated: datetime.datetime. Date and time when the
                 story was last updated.
+            thumbnail_filename: str|None. The thumbnail filename of the story.
         """
         self.id = story_id
         self.title = title
+        self.thumbnail_filename = thumbnail_filename
         self.description = description
         self.notes = html_cleaner.clean(notes)
         self.story_contents = story_contents
@@ -757,7 +768,8 @@ class Story(python_utils.OBJECT):
             'story_contents_schema_version': self.story_contents_schema_version,
             'corresponding_topic_id': self.corresponding_topic_id,
             'version': self.version,
-            'story_contents': self.story_contents.to_dict()
+            'story_contents': self.story_contents.to_dict(),
+            'thumbnail_filename': self.thumbnail_filename
         }
 
     @classmethod
@@ -779,7 +791,7 @@ class Story(python_utils.OBJECT):
         initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents([], None, initial_node_id)
         return cls(
-            story_id, title,
+            story_id, title, None,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
@@ -815,6 +827,15 @@ class Story(python_utils.OBJECT):
             title: str. The new title of the story.
         """
         self.title = title
+
+    def update_thumbnail_filename(self, thumbnail_filename):
+        """Updates the thumbnail filename of the story.
+
+        Args:
+            thumbnail_filename: str|None. The new thumbnail filename of the
+                story.
+        """
+        self.thumbnail_filename = thumbnail_filename
 
     def update_description(self, description):
         """Updates the description of the story.
@@ -935,6 +956,24 @@ class Story(python_utils.OBJECT):
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].title = new_title
+
+    def update_node_thumbnail_filename(self, node_id, new_thumbnail_filename):
+        """Updates the thumbnail filename field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_thumbnail_filename: str|None. The new thumbnail filename of the
+                given node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].thumbnail_filename = (
+            new_thumbnail_filename)
 
     def mark_node_outline_as_finalized(self, node_id):
         """Updates the outline_is_finalized field of the node with the given

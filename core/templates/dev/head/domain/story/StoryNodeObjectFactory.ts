@@ -32,10 +32,12 @@ export class StoryNode {
   _outline: string;
   _outlineIsFinalized: boolean;
   _explorationId: string;
+  _thumbnailFilename: string;
   constructor(
       id: string, title: string, destinationNodeIds: string[],
       prerequisiteSkillIds: string[], acquiredSkillIds: string[],
-      outline: string, outlineIsFinalized: boolean, explorationId: string) {
+      outline: string, outlineIsFinalized: boolean, explorationId: string,
+      thumbnailFilename: string) {
     this._id = id;
     this._title = title;
     this._destinationNodeIds = destinationNodeIds;
@@ -44,6 +46,7 @@ export class StoryNode {
     this._outline = outline;
     this._outlineIsFinalized = outlineIsFinalized;
     this._explorationId = explorationId;
+    this._thumbnailFilename = thumbnailFilename;
   }
 
   _checkValidNodeId(nodeId: string): boolean {
@@ -96,6 +99,14 @@ export class StoryNode {
 
   markOutlineAsNotFinalized(): void {
     this._outlineIsFinalized = false;
+  }
+
+  getThumbnailFilename(): string {
+    return this._thumbnailFilename;
+  }
+
+  setThumbnailFilename(thumbnailFilename: string): void {
+    this._thumbnailFilename = thumbnailFilename;
   }
 
   validate(): string[] {
@@ -240,12 +251,13 @@ export class StoryNodeObjectFactory {
       storyNodeBackendObject.acquired_skill_ids,
       storyNodeBackendObject.outline,
       storyNodeBackendObject.outline_is_finalized,
-      storyNodeBackendObject.exploration_id
+      storyNodeBackendObject.exploration_id,
+      storyNodeBackendObject.thumbnail_filename
     );
   }
 
   createFromIdAndTitle(nodeId: string, title: string): StoryNode {
-    return new StoryNode(nodeId, title, [], [], [], '', false, null);
+    return new StoryNode(nodeId, title, [], [], [], '', false, null, null);
   }
 }
 
