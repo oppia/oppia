@@ -1,6 +1,6 @@
 <div class="item-selection-input-form-container">
-  <form ng-submit="$ctrl.submitAnswer()">
-    <small ng-if="$ctrl.displayCheckboxes">
+  <form>
+    <small class="item-selection-info-text" ng-if="$ctrl.displayCheckboxes">
       <span ng-if="$ctrl.notEnoughSelections">
         <span translate="I18N_INTERACTIONS_ITEM_SELECTION_NOT_ENOUGH" translate-values="{minChoiceNumber: $ctrl.minAllowableSelectionCount}" translate-interpolation="messageformat"></span>
       </span>
@@ -28,7 +28,7 @@
       </div>
 
       <div ng-if="!$ctrl.displayCheckboxes">
-        <button class="multiple-choice-option" ng-click="$ctrl.submitMultipleChoiceAnswer($index)">
+        <button class="multiple-choice-option" ng-click="$ctrl.submitMultipleChoiceAnswer($event, $index)">
           <div class="multiple-choice-radio-button-container">
             <span class="multiple-choice-outer-radio-button">
               <span class="multiple-choice-inner-radio-button"></span>
