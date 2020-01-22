@@ -2007,7 +2007,7 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
         message = testutils.Message(
             msg_id='no-empty-line-provided-below-fileoverview',
-            line=3)
+            line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2033,7 +2033,7 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
         message = testutils.Message(
             msg_id='no-empty-line-provided-below-fileoverview',
-            line=3)
+            line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2061,7 +2061,7 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
             node_extra_space_above_import)
 
         message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided', line=5)
+            msg_id='only-a-single-empty-line-should-be-provided', line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2088,7 +2088,7 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
             node_extra_space_above_import_from)
 
         message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided', line=5)
+            msg_id='only-a-single-empty-line-should-be-provided', line=2)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2116,7 +2116,7 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
             node_extra_space_above_import_from)
 
         message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided', line=6)
+            msg_id='only-a-single-empty-line-should-be-provided', line=3)
 
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
@@ -2141,6 +2141,32 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
         self.checker_test_object.checker.process_module(
             node_with_no_error_message)
+
+        with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_no_file_overview_above_import(self):
+        node_no_file_overview_above_import = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    # this a test comment
+                    import random
+
+                    def foo():
+                        \"\"\" something \"\"\"
+                        return
+                """)
+        node_no_file_overview_above_import.file = filename
+        node_no_file_overview_above_import.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_no_file_overview_above_import)
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()

@@ -1415,25 +1415,32 @@ class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
         file_content = read_from_node(node)
         file_length = len(file_content)
         triple_quote_counter = 0
+        empty_line_counter = 0
+        imports_detected = False
         for line_num in python_utils.RANGE(file_length):
             line = file_content[line_num].strip()
             # Single line comment, ignore it.
             if line.startswith(b'#'):
                 continue
+            if line.startswith(b'import') or line.startswith(b'from'):
+                imports_detected = True
             triple_quote_counter += line.count(multi_line_indicator)
-            previous_line = file_content[line_num - 1].strip()
-            if (line.startswith(b'import') or line.startswith(b'from')):
-                if (previous_line.endswith(b'"""') and
-                        (triple_quote_counter == 2)):
-                    self.add_message(
-                        'no-empty-line-provided-below-fileoverview',
-                        line=line_num + 1)
-                    break
-                if ((file_content[line_num - 1] == b'\n' and
-                     file_content[line_num - 2] == b'\n') and
-                        (triple_quote_counter == 2)):
+            is_file_overview = ((not imports_detected) and
+                                triple_quote_counter == 2)
+
+            if line.endswith(b'"""') and is_file_overview:
+                temp_line_num = line_num
+                while file_content[temp_line_num + 1] == b'\n':
+                    empty_line_counter += 1
+                    temp_line_num += 1
+                if empty_line_counter > 1:
                     self.add_message(
                         'only-a-single-empty-line-should-be-provided',
+                        line=line_num + 1)
+                    break
+                if empty_line_counter == 0:
+                    self.add_message(
+                        'no-empty-line-provided-below-fileoverview',
                         line=line_num + 1)
                     break
 
