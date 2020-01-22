@@ -2144,29 +2144,3 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
         with self.checker_test_object.assertNoMessages():
             temp_file.close()
-
-    def test_no_file_overview_above_import(self):
-        node_no_file_overview_above_import = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    # this a test comment
-                    import random
-
-                    def foo():
-                        \"\"\" something \"\"\"
-                        return
-                """)
-        node_no_file_overview_above_import.file = filename
-        node_no_file_overview_above_import.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_no_file_overview_above_import)
-
-        with self.checker_test_object.assertNoMessages():
-            temp_file.close()

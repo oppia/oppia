@@ -1410,7 +1410,7 @@ class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
-
+        # the check works on the assumption that the module has a file overview
         multi_line_indicator = b'"""'
         file_content = read_from_node(node)
         file_length = len(file_content)
