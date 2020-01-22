@@ -29,11 +29,14 @@ angular.module('oppia').directive('topicViewerNavbarBreadcrumb', [
         'topic-viewer-navbar-breadcrumb.directive.html'),
       controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
         function($scope, TopicViewerBackendApiService, UrlService) {
-          TopicViewerBackendApiService.fetchTopicData(
-            UrlService.getTopicNameFromLearnerUrl()).then(
-            function(topicDataDict) {
-              $scope.topicName = topicDataDict.topic_name;
-            });
+          var ctrl = this;
+          ctrl.$onInit = function() {
+            TopicViewerBackendApiService.fetchTopicData(
+              UrlService.getTopicNameFromLearnerUrl()).then(
+              function(topicDataDict) {
+                $scope.topicName = topicDataDict.topic_name;
+              });
+          };
         }
       ]
     };

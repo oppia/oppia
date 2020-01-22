@@ -199,6 +199,9 @@ class StoryNode(python_utils.OBJECT):
     def get_incremented_node_id(cls, node_id):
         """Increments the next node id of the story.
 
+        Args:
+            node_id: str. The id of the node.
+
         Returns:
             str. The new next node id.
         """
