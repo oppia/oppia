@@ -26,7 +26,7 @@ import { ExtensionTagAssemblerService } from
 import { HtmlEscaperService } from 'services/html-escaper.service';
 
 interface InteractionArgs {
-  choices : {
+  choices: {
     value: string;
   };
 }
