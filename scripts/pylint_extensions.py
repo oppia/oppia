@@ -1384,11 +1384,11 @@ class DocstringChecker(checkers.BaseChecker):
                 is_docstring = False
 
 
-class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
-    """Checks if there is an empty line between file overview and imports.
-       Note: The check assumes that all files have a file overview, this
-       assumption is justified because Pylint has an inbuilt check for missing
-       file overview.
+class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
+    """Checks if there is a single empty line below the fileoverview docstring.
+    Note: The check assumes that all files have a file overview. This
+    assumption is justified because Pylint has an inbuilt check for missing
+    file overview.( Name of this check is missing-docstring.)
     """
 
     __implements__ = interfaces.IRawChecker
@@ -1396,20 +1396,20 @@ class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
     priority = -1
     msgs = {
         'C0024': (
-            'No empty line used between file overview and import.',
+            'No empty line used below the fileoverview docstring.',
             'no-empty-line-provided-below-fileoverview',
-            'please provide a line between file overview and imports.'
+            'please provide a line below the fileoverview.'
         ),
         'C0025': (
-            'Single empty line should be provided above imports.',
+            'Single empty line should be provided below the fileoverview.',
             'only-a-single-empty-line-should-be-provided',
-            'please provide a single new line above imports.'
+            'please provide a empty line below the fileoverview.'
         )
     }
 
     def process_module(self, node):
-        """Process a module to ensure that there is an empty line between
-        file overview and imports.
+        """Process a module to ensure that there is a blank line below
+        file overview docstring.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
@@ -1432,7 +1432,7 @@ class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
                 break
 
         empty_line_check_index = closing_line_index_of_fileoverview
-        if empty_line_check_index < file_length:
+        if empty_line_check_index < file_length - 1:
             while file_content[empty_line_check_index + 1] == b'\n':
                 empty_line_counter += 1
                 empty_line_check_index += 1
@@ -1467,4 +1467,4 @@ def register(linter):
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(DocstringChecker(linter))
-    linter.register_checker(SpaceBelowFileOverviewChecker(linter))
+    linter.register_checker(BlankLineBelowFileOverviewChecker(linter))

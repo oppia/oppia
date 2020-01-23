@@ -1976,17 +1976,17 @@ class DocstringCheckerTests(unittest.TestCase):
             temp_file.close()
 
 
-class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
+class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
 
     def setUp(self):
-        super(SpaceBelowFileOverviewCheckerTests, self).setUp()
+        super(BlankLineBelowFileOverviewCheckerTests, self).setUp()
         self.checker_test_object = testutils.CheckerTestCase()
         self.checker_test_object.CHECKER_CLASS = (
-            pylint_extensions.SpaceBelowFileOverviewChecker)
+            pylint_extensions.BlankLineBelowFileOverviewChecker)
         self.checker_test_object.setup_method()
 
-    def test_no_space_above_import(self):
-        node_no_space_above_import = astroid.scoped_nodes.Module(
+    def test_no_empty_line_below_fileoverview(self):
+        node_no_empty_line_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -1999,11 +1999,11 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
                     import something
                     import random
                 """)
-        node_no_space_above_import.file = filename
-        node_no_space_above_import.path = filename
+        node_no_empty_line_below_fileoverview.file = filename
+        node_no_empty_line_below_fileoverview.path = filename
 
         self.checker_test_object.checker.process_module(
-            node_no_space_above_import)
+            node_no_empty_line_below_fileoverview)
 
         message = testutils.Message(
             msg_id='no-empty-line-provided-below-fileoverview',
@@ -2012,34 +2012,8 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_no_space_above_import_from(self):
-        node_no_space_above_import_from = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    \"\"\" this file does something \"\"\"
-                    from something import random
-                """)
-        node_no_space_above_import_from.file = filename
-        node_no_space_above_import_from.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_no_space_above_import_from)
-
-        message = testutils.Message(
-            msg_id='no-empty-line-provided-below-fileoverview',
-            line=2)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_extra_space_above_import(self):
-        node_extra_space_above_import = astroid.scoped_nodes.Module(
+    def test_extra_empty_lines_below_fileoverview(self):
+        node_extra_empty_lines_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -2052,40 +2026,13 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
 
                     import something
-                    import random
-                """)
-        node_extra_space_above_import.file = filename
-        node_extra_space_above_import.path = filename
-
-        self.checker_test_object.checker.process_module(
-            node_extra_space_above_import)
-
-        message = testutils.Message(
-            msg_id='only-a-single-empty-line-should-be-provided', line=2)
-
-        with self.checker_test_object.assertAddsMessages(message):
-            temp_file.close()
-
-    def test_extra_space_above_import_from(self):
-        node_extra_space_above_import_from = astroid.scoped_nodes.Module(
-            name='test',
-            doc='Custom test')
-        temp_file = tempfile.NamedTemporaryFile()
-        filename = temp_file.name
-
-        with python_utils.open_file(filename, 'w') as tmp:
-            tmp.write(
-                u"""
-                    \"\"\" this file does something \"\"\"
-
-
                     from something import random
                 """)
-        node_extra_space_above_import_from.file = filename
-        node_extra_space_above_import_from.path = filename
+        node_extra_empty_lines_below_fileoverview.file = filename
+        node_extra_empty_lines_below_fileoverview.path = filename
 
         self.checker_test_object.checker.process_module(
-            node_extra_space_above_import_from)
+            node_extra_empty_lines_below_fileoverview)
 
         message = testutils.Message(
             msg_id='only-a-single-empty-line-should-be-provided', line=2)
@@ -2093,8 +2040,8 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_extra_space_above_import_from_with_unicode_characters(self):
-        node_extra_space_above_import_from = astroid.scoped_nodes.Module(
+    def test_extra_empty_lines_below_fileoverview_with_unicode_characters(self):
+        node_extra_empty_lines_below_fileoverview = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -2109,11 +2056,11 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
 
                     from something import random
                 """)
-        node_extra_space_above_import_from.file = filename
-        node_extra_space_above_import_from.path = filename
+        node_extra_empty_lines_below_fileoverview.file = filename
+        node_extra_empty_lines_below_fileoverview.path = filename
 
         self.checker_test_object.checker.process_module(
-            node_extra_space_above_import_from)
+            node_extra_empty_lines_below_fileoverview)
 
         message = testutils.Message(
             msg_id='only-a-single-empty-line-should-be-provided', line=3)
@@ -2121,7 +2068,35 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
         with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
 
-    def test_single_new_line_above_import(self):
+    def test_no_empty_line_below_fileoverview_with_unicode_characters(self):
+        node_no_empty_line_below_fileoverview = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    #this comment has a unicode character \u2713
+                    \"\"\" this file does \u2715 something \"\"\"
+                    import something
+                    import random
+                """)
+        node_no_empty_line_below_fileoverview.file = filename
+        node_no_empty_line_below_fileoverview.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_no_empty_line_below_fileoverview)
+
+        message = testutils.Message(
+            msg_id='no-empty-line-provided-below-fileoverview',
+            line=3)
+
+        with self.checker_test_object.assertAddsMessages(message):
+            temp_file.close()
+
+    def test_single_new_line_below_file_overview(self):
         node_with_no_error_message = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
@@ -2143,4 +2118,28 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
             node_with_no_error_message)
 
         with self.checker_test_object.assertNoMessages():
+            temp_file.close()
+
+    def test_file_overview_at_end_of_file(self):
+        node_with_no_error_message = astroid.scoped_nodes.Module(
+            name='test',
+            doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+
+        with python_utils.open_file(filename, 'w') as tmp:
+            tmp.write(
+                u"""
+                    \"\"\" this file does something \"\"\"   """)
+        node_with_no_error_message.file = filename
+        node_with_no_error_message.path = filename
+
+        self.checker_test_object.checker.process_module(
+            node_with_no_error_message)
+
+        message = testutils.Message(
+            msg_id='no-empty-line-provided-below-fileoverview',
+            line=2)
+
+        with self.checker_test_object.assertAddsMessages(message):
             temp_file.close()
