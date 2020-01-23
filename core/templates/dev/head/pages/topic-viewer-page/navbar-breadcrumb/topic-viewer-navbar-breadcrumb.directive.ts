@@ -33,8 +33,8 @@ angular.module('oppia').directive('topicViewerNavbarBreadcrumb', [
           ctrl.$onInit = function() {
             TopicViewerBackendApiService.fetchTopicData(
               UrlService.getTopicNameFromLearnerUrl()).then(
-              function(topicDataDict) {
-                $scope.topicName = topicDataDict.topic_name;
+              function(topicDataObject) {
+                $scope.topicName = topicDataObject.getTopicName();
               });
           };
         }

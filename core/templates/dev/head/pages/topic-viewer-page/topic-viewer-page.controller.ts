@@ -65,14 +65,14 @@ angular.module('oppia').directive('topicViewerPage', [
 
             $rootScope.loadingMessage = 'Loading';
             TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
-              function(topicDataDict) {
-                ctrl.topicId = topicDataDict.topic_id;
-                ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
-                ctrl.degreesOfMastery = topicDataDict.degrees_of_mastery;
-                ctrl.skillDescriptions = topicDataDict.skill_descriptions;
-                ctrl.subtopics = topicDataDict.subtopics;
+              function(topicDataObject) {
+                ctrl.topicId = topicDataObject.getTopicId();
+                ctrl.canonicalStoriesList =
+                  topicDataObject.getCanonicalStories();
+                ctrl.degreesOfMastery = topicDataObject.getDegreesOfMastery();
+                ctrl.skillDescriptions = topicDataObject.getSkillDescription();
+                ctrl.subtopics = topicDataObject.getSubtopics();
                 $rootScope.loadingMessage = '';
-                ctrl.topicId = topicDataDict.id;
               },
               function(errorResponse) {
                 if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
