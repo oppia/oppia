@@ -23,6 +23,8 @@ import feconf
 import python_utils
 import utils
 
+from google.appengine.api import datastore_types
+
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -231,7 +233,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
     # TODO(#8368): String properties have a size limit of 1500 bytes according
     # to the GAE API. We should investigate the effort required to use
     # ndb.TextProperty instead.
-    text = ndb.StringProperty(indexed=False)
+    text = ndb.TextProperty(indexed=False)
     # Whether the incoming message is received by email (as opposed to via
     # the web).
     received_via_email = (
@@ -281,6 +283,7 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
         feedback_models = cls.get_all().filter(cls.author_id == user_id).fetch()
 
         for feedback_model in feedback_models:
+            feedback_model['text'] = datastore_types.Text(i['text'])
             user_data[feedback_model.id] = {
                 'thread_id': feedback_model.thread_id,
                 'message_id': feedback_model.message_id,
