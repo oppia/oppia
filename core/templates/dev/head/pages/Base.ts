@@ -123,7 +123,6 @@ angular.module('oppia').controller('Base', [
       // TODO(sll): use 'touchstart' for mobile.
       $document.on('click', function() {
         SidebarStatusService.onDocumentClick();
-        $scope.$applyAsync();
       });
     };
   }
