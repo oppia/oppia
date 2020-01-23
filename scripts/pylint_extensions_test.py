@@ -2121,7 +2121,7 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
             temp_file.close()
 
     def test_file_overview_at_end_of_file(self):
-        node_with_no_error_message = astroid.scoped_nodes.Module(
+        node_file_overview_at_end_of_file = astroid.scoped_nodes.Module(
             name='test',
             doc='Custom test')
         temp_file = tempfile.NamedTemporaryFile()
@@ -2131,11 +2131,11 @@ class BlankLineBelowFileOverviewCheckerTests(unittest.TestCase):
             tmp.write(
                 u"""
                     \"\"\" this file does something \"\"\"   """)
-        node_with_no_error_message.file = filename
-        node_with_no_error_message.path = filename
+        node_file_overview_at_end_of_file.file = filename
+        node_file_overview_at_end_of_file.path = filename
 
         self.checker_test_object.checker.process_module(
-            node_with_no_error_message)
+            node_file_overview_at_end_of_file)
 
         message = testutils.Message(
             msg_id='no-empty-line-provided-below-fileoverview',
