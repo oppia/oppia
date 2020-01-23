@@ -96,7 +96,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
             NotImplementedError,
             'Subclasses of BaseJobManager should implement _real_enqueue().'):
             jobs.BaseJobManager._real_enqueue(  # pylint: disable=protected-access
-                'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None)
+                'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None, None)
 
     def test_failing_jobs(self):
         observed_log_messages = []

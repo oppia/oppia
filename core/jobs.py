@@ -638,7 +638,7 @@ class BaseDeferredJobManager(BaseJobManager):
 
     @classmethod
     def _real_enqueue(
-            cls, job_id, queue_name, additional_job_params, shard_count):
+            cls, job_id, queue_name, additional_job_params, unused_shard_count):
         """Puts the job in the task queue.
 
         Args:
@@ -648,10 +648,10 @@ class BaseDeferredJobManager(BaseJobManager):
                 values.
             additional_job_params: dict(str : *) or None. Additional params to
                 pass into the job's _run() method.
-            shard_count: int. Number of shards used for the job.
+            unused_shard_count: int. Number of shards used for the job.
         """
         taskqueue_services.defer(
-            cls._run_job, shard_count, queue_name,
+            cls._run_job, queue_name,
             job_id, additional_job_params)
 
 
