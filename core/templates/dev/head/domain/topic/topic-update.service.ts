@@ -228,7 +228,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       deleteSubtopic: function(topic, subtopicId) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
-          throw Error('Subtopic doesn\'t exist');
+          throw new Error('Subtopic doesn\'t exist');
         }
         var newlyCreated = false;
         var changeList = UndoRedoService.getCommittableChangeList();
@@ -333,7 +333,7 @@ angular.module('oppia').factory('TopicUpdateService', [
           topic.deleteSubtopic(subtopicId, newlyCreated);
         }, function(changeDict, topic) {
           // Undo.
-          throw Error('A deleted subtopic cannot be restored');
+          throw new Error('A deleted subtopic cannot be restored');
         });
       },
 
@@ -344,7 +344,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       moveSkillToSubtopic: function(
           topic, oldSubtopicId, newSubtopicId, skillSummary) {
         if (newSubtopicId === null) {
-          throw Error('New subtopic cannot be null');
+          throw new Error('New subtopic cannot be null');
         }
         if (oldSubtopicId !== null) {
           var oldSubtopic = topic.getSubtopicById(oldSubtopicId);
@@ -407,7 +407,7 @@ angular.module('oppia').factory('TopicUpdateService', [
       setSubtopicTitle: function(topic, subtopicId, title) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
-          throw Error('Subtopic doesn\'t exist');
+          throw new Error('Subtopic doesn\'t exist');
         }
         var oldTitle = angular.copy(subtopic.getTitle());
         _applySubtopicPropertyChange(

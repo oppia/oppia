@@ -148,7 +148,7 @@ export class StoryContents {
     for (var i = 0; i < nodeIds.length; i++) {
       var nodeId = nodeIds[i];
       if (nodeIds.indexOf(nodeId) < nodeIds.lastIndexOf(nodeId)) {
-        throw Error(
+        throw new Error(
           'The node with id ' + nodeId + ' is duplicated in the story');
       }
     }
@@ -162,7 +162,7 @@ export class StoryContents {
         initialNodeIsPresent = true;
       }
       if (nodeIdNumber > nextNodeIdNumber) {
-        throw Error(
+        throw new Error(
           'Node id out of bounds for node with id ' + nodes[i].getId());
       }
       for (var j = 0; j < nodes[i].getDestinationNodeIds().length; j++) {
@@ -175,7 +175,7 @@ export class StoryContents {
     }
     if (nodes.length > 0) {
       if (!initialNodeIsPresent) {
-        throw Error(
+        throw new Error(
           'Initial node - ' + this._initialNodeId +
           ' - is not present in the story');
       }
@@ -252,7 +252,7 @@ export class StoryContents {
   // typed as void and the return statement should be removed.
   setInitialNodeId(nodeId: string): any {
     if (this.getNodeIndex(nodeId) === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     return this._initialNodeId = nodeId;
   }
@@ -269,13 +269,13 @@ export class StoryContents {
 
   deleteNode(nodeId: string): void {
     if (this.getNodeIndex(nodeId) === -1) {
-      throw Error('The node does not exist');
+      throw new Error('The node does not exist');
     }
     if (nodeId === this._initialNodeId) {
       if (this._nodes.length === 1) {
         this._initialNodeId = null;
       } else {
-        throw Error('Cannot delete initial story node');
+        throw new Error('Cannot delete initial story node');
       }
     }
     for (var i = 0; i < this._nodes.length; i++) {
@@ -289,7 +289,7 @@ export class StoryContents {
   setNodeOutline(nodeId: string, outline: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].setOutline(outline);
   }
@@ -297,7 +297,7 @@ export class StoryContents {
   setNodeTitle(nodeId: string, title: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].setTitle(title);
   }
@@ -305,12 +305,12 @@ export class StoryContents {
   setNodeExplorationId(nodeId: string, explorationId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     } else if (explorationId !== null || explorationId !== '') {
       for (var i = 0; i < this._nodes.length; i++) {
         if ((this._nodes[i].getExplorationId() === explorationId) && (
           i !== index)) {
-          throw Error('The given exploration already exists in the story.');
+          throw new Error('The given exploration already exists in the story.');
         }
       }
       this._nodes[index].setExplorationId(explorationId);
@@ -320,7 +320,7 @@ export class StoryContents {
   markNodeOutlineAsFinalized(nodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].markOutlineAsFinalized();
   }
@@ -328,7 +328,7 @@ export class StoryContents {
   markNodeOutlineAsNotFinalized(nodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].markOutlineAsNotFinalized();
   }
@@ -336,7 +336,7 @@ export class StoryContents {
   addPrerequisiteSkillIdToNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].addPrerequisiteSkillId(skillId);
   }
@@ -344,7 +344,7 @@ export class StoryContents {
   removePrerequisiteSkillIdFromNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].removePrerequisiteSkillId(skillId);
   }
@@ -352,7 +352,7 @@ export class StoryContents {
   addAcquiredSkillIdToNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].addAcquiredSkillId(skillId);
   }
@@ -360,7 +360,7 @@ export class StoryContents {
   removeAcquiredSkillIdFromNode(nodeId: string, skillId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].removeAcquiredSkillId(skillId);
   }
@@ -368,10 +368,10 @@ export class StoryContents {
   addDestinationNodeIdToNode(nodeId: string, destinationNodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     if (this.getNodeIndex(destinationNodeId) === -1) {
-      throw Error('The destination node with given id doesn\'t exist');
+      throw new Error('The destination node with given id doesn\'t exist');
     }
     this._nodes[index].addDestinationNodeId(destinationNodeId);
   }
@@ -380,7 +380,7 @@ export class StoryContents {
       nodeId: string, destinationNodeId: string): void {
     var index = this.getNodeIndex(nodeId);
     if (index === -1) {
-      throw Error('The node with given id doesn\'t exist');
+      throw new Error('The node with given id doesn\'t exist');
     }
     this._nodes[index].removeDestinationNodeId(destinationNodeId);
   }

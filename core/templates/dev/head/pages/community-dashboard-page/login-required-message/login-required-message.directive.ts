@@ -45,7 +45,7 @@ angular.module('oppia').directive('loginRequiredMessage', [
                     $window.location = loginUrl;
                   }, 150);
                 } else {
-                  throw Error('Login url not found.');
+                  throw new Error('Login url not found.');
                 }
               }
             );

@@ -66,7 +66,7 @@ export class PlayerTranscriptService {
 
   addPreviousCard(): void {
     if (this.transcript.length === 1) {
-      throw Error(
+      throw new Error(
         'Exploration player is on the first card and hence no previous ' +
           'card exists.');
     }
@@ -82,7 +82,7 @@ export class PlayerTranscriptService {
     let card = this.getLastCard();
     let pairs = card.getInputResponsePairs();
     if (pairs.length > 0 && card.getLastOppiaResponse() === null) {
-      throw Error(
+      throw new Error(
         'Trying to add an input before the response for the previous ' +
           'input has been received.'
       );

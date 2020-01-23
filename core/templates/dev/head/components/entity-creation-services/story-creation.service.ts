@@ -59,7 +59,7 @@ angular.module('oppia').factory('StoryCreationService', [
 
         modalInstance.result.then(function(storyTitle) {
           if (storyTitle === '') {
-            throw Error('Story title cannot be empty');
+            throw new Error('Story title cannot be empty');
           }
           storyCreationInProgress = true;
           AlertsService.clearWarnings();

@@ -225,7 +225,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
           return this._misconceptions[idx];
         }
       }
-      throw Error('Could not find misconception with ID: ' + id);
+      throw new Error('Could not find misconception with ID: ' + id);
     };
 
     Skill.prototype.deleteMisconception = function(id) {
@@ -252,7 +252,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
     Skill.prototype.updateRubricForDifficulty = function(
         difficulty, explanation) {
       if (SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
-        throw Error('Invalid difficulty value passed');
+        throw new Error('Invalid difficulty value passed');
       }
       for (var idx in this._rubrics) {
         if (this._rubrics[idx].getDifficulty() === difficulty) {

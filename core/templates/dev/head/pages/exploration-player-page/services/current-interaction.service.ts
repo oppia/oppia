@@ -101,7 +101,7 @@ angular.module('oppia').factory('CurrentInteractionService', [
             '\nContext: ' + ContextService.getPageContext() +
             '\nSequence of steps: ' + sequenceOfInteractions +
             '\nErrored at index: ' + index);
-          throw Error('The current interaction did not ' +
+          throw new Error('The current interaction did not ' +
                       'register a _submitAnswerFn.' + additionalInfo);
         } else {
           _submitAnswerFn();

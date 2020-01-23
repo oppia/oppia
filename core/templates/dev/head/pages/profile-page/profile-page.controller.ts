@@ -120,7 +120,7 @@ angular.module('oppia').directive('profilePage', [
                       if (loginUrl) {
                         window.location.href = loginUrl;
                       } else {
-                        throw Error('Login url not found.');
+                        throw new Error('Login url not found.');
                       }
                     }
                   );

@@ -192,7 +192,7 @@ exports.config = {
           } else {
             errorMessage = pattern + ' does not exist.';
           }
-          throw Error(errorMessage)
+          throw new Error(errorMessage)
         }
       }
     });

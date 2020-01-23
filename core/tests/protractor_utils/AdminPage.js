@@ -137,7 +137,7 @@ var AdminPage = function() {
         success = success || results[i];
       }
       if (!success) {
-        throw Error('Could not find config property: ' + propertyName);
+        throw new Error('Could not find config property: ' + propertyName);
       }
     });
   };

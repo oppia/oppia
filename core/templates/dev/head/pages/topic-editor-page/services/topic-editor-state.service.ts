@@ -328,7 +328,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
           if (newIndex === -1) {
             return;
           } else {
-            throw Error('Invalid subtopic page.');
+            throw new Error('Invalid subtopic page.');
           }
         }
         _cachedSubtopicPages.splice(index, 1);

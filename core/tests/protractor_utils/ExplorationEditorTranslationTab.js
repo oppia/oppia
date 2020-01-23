@@ -48,7 +48,7 @@ var ExplorationEditorTranslationTab = function() {
       if (buttons.length === 1) {
         buttons[0].click();
       } else if (buttons.length !== 0) {
-        throw 'Expected to find at most one \'exit tutorial\' button';
+        throw new Error('Expected to find at most one \'exit tutorial\' button');
       }
     });
   };
@@ -63,7 +63,7 @@ var ExplorationEditorTranslationTab = function() {
       if (buttons.length === 1) {
         buttons[0].click();
       } else {
-        throw Error('There is more than 1 Finish button!');
+        throw new Error('There is more than 1 Finish button!');
       }
     });
   };
@@ -93,7 +93,7 @@ var ExplorationEditorTranslationTab = function() {
             tutorialTabHeadingElement,
             'Tutorial stage takes too long to disappear');
         } else {
-          throw Error('There is more than one Next button!');
+          throw new Error('There is more than one Next button!');
         }
       });
     });
@@ -465,7 +465,7 @@ var ExplorationEditorTranslationTab = function() {
         }
       }
       if (!matched) {
-        throw Error(
+        throw new Error(
           'State ' + targetName + ' not found by editorTranslationTab.' +
           'moveToState.');
       }
@@ -485,7 +485,7 @@ var ExplorationEditorTranslationTab = function() {
         }
       }
       if (!matched) {
-        throw Error(
+        throw new Error(
           'State ' + targetName +
           ' not found by editorTranslationTab.expectCorrectStatusColor.');
       }

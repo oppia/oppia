@@ -73,7 +73,7 @@ angular.module('oppia').directive('topNavigationBar', [
                     $window.location = loginUrl;
                   }, 150);
                 } else {
-                  throw Error('Login url not found.');
+                  throw new Error('Login url not found.');
                 }
               }
             );

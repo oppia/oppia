@@ -44,7 +44,7 @@ export class LearnerParamsService {
   // upgraded.
   getValue(paramName: string): any {
     if (!this._paramDict.hasOwnProperty(paramName)) {
-      throw 'Invalid parameter name: ' + paramName;
+      throw new Error('Invalid parameter name: ' + paramName);
     } else {
       return cloneDeep(this._paramDict[paramName]);
     }
@@ -54,7 +54,7 @@ export class LearnerParamsService {
     // TODO(sll): Currently, all parameters are strings. In the future, we
     // will need to maintain information about parameter types.
     if (!this._paramDict.hasOwnProperty(paramName)) {
-      throw 'Cannot set unknown parameter: ' + paramName;
+      throw new Error('Cannot set unknown parameter: ' + paramName);
     } else {
       this._paramDict[paramName] = String(newParamValue);
     }

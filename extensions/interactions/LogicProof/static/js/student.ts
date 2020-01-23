@@ -1127,7 +1127,7 @@ var logicProofStudent = (function() {
         var answer = evaluationRule.evaluateExpression(
           argumentsList, types, evaluationRuleParameters);
       } else {
-        throw Error('Unknown evaluation rule format (' +
+        throw new Error('Unknown evaluation rule format (' +
           evaluationRule.format + ') sent to evaluate().');
       }
     }

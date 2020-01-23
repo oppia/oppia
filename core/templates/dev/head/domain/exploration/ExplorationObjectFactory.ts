@@ -68,7 +68,7 @@ export class Exploration {
   // TODO(#7165): Replace any with exact type
   getAuthorRecommendedExpIds(stateName: string): any {
     if (!this.isStateTerminal(stateName)) {
-      throw Error(
+      throw new Error(
         'Tried to get recommendations for a non-terminal state: ' +
           stateName);
     }

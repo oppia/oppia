@@ -77,7 +77,7 @@ angular.module('oppia').factory('SearchService', [
           itemCodes.indexOf(EXPECTED_PREFIX) !== 0 ||
           itemCodes.lastIndexOf(EXPECTED_SUFFIX) !==
             itemCodes.length - EXPECTED_SUFFIX.length) {
-        throw Error('Invalid search query url fragment for ' +
+        throw new Error('Invalid search query url fragment for ' +
                     itemsType + ': ' + urlComponent);
       }
 

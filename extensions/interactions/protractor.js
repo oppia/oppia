@@ -59,7 +59,7 @@ var getInteraction = function(interactionName) {
   if (INTERACTIONS.hasOwnProperty(interactionName)) {
     return INTERACTIONS[interactionName];
   } else {
-    throw Error('Unknown interaction: ' + interactionName);
+    throw new Error('Unknown interaction: ' + interactionName);
   }
 };
 

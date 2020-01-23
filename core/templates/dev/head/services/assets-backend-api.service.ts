@@ -34,7 +34,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       UrlInterpolationService, DEV_MODE, ENTITY_TYPE,
       GCS_RESOURCE_BUCKET_NAME) {
     if (!DEV_MODE && !GCS_RESOURCE_BUCKET_NAME) {
-      throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
+      throw new Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
 
     // List of filenames that have been requested for but have

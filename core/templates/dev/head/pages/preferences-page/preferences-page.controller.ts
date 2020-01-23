@@ -101,7 +101,7 @@ angular.module('oppia').directive('preferencesPage', [
                   console.error(
                     'Error: received bad value for a subject interest.' +
                     ' Expected a string, got ', subjectInterests[i]);
-                  throw Error(
+                  throw new Error(
                     'Error: received bad value for a subject interest.');
                 }
               }
@@ -109,7 +109,7 @@ angular.module('oppia').directive('preferencesPage', [
               console.error(
                 'Error: received bad value for subject interests. Expected' +
                 ' list of strings, got ', subjectInterests);
-              throw Error('Error: received bad value for subject interests.');
+              throw new Error('Error: received bad value for subject interests.');
             }
           };
 

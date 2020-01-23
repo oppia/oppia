@@ -75,7 +75,7 @@ var logicProofShared = (function() {
             message += displayExpression(parameter, language.operators);
             break;
           default:
-            throw Error(
+            throw new Error(
               'Unknown format ' + parameterFormat +
               ' sent to renderGeneralMessage().');
         }

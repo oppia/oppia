@@ -72,7 +72,7 @@ angular.module('oppia').factory('StoryUpdateService', [
     var _getStoryNode = function(storyContents, nodeId) {
       var storyNodeIndex = storyContents.getNodeIndex(nodeId);
       if (storyNodeIndex === -1) {
-        throw Error('The given node doesn\'t exist');
+        throw new Error('The given node doesn\'t exist');
       }
       return storyContents.getNodes()[storyNodeIndex];
     };
@@ -236,7 +236,7 @@ angular.module('oppia').factory('StoryUpdateService', [
           story.getStoryContents().deleteNode(nodeId);
         }, function(changeDict, story) {
           // Undo.
-          throw Error('A deleted story node cannot be restored.');
+          throw new Error('A deleted story node cannot be restored.');
         });
       },
 
@@ -247,7 +247,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       finalizeStoryNodeOutline: function(story, nodeId) {
         var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
         if (storyNode.getOutlineStatus()) {
-          throw Error('Node outline is already finalized.');
+          throw new Error('Node outline is already finalized.');
         }
         _applyChange(story, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
           node_id: nodeId,
@@ -269,7 +269,7 @@ angular.module('oppia').factory('StoryUpdateService', [
       unfinalizeStoryNodeOutline: function(story, nodeId) {
         var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
         if (!storyNode.getOutlineStatus()) {
-          throw Error('Node outline is already not finalized.');
+          throw new Error('Node outline is already not finalized.');
         }
         _applyChange(story, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
           node_id: nodeId,
@@ -384,7 +384,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         var newDestinationNodeIds = angular.copy(oldDestinationNodeIds);
         var index = newDestinationNodeIds.indexOf(destinationNodeId);
         if (index === -1) {
-          throw Error('The given destination node is not part of the node');
+          throw new Error('The given destination node is not part of the node');
         }
         newDestinationNodeIds.splice(index, 1);
 
@@ -437,7 +437,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         var newPrerequisiteSkillIds = angular.copy(oldPrerequisiteSkillIds);
         var index = newPrerequisiteSkillIds.indexOf(skillId);
         if (index === -1) {
-          throw Error('The given prerequisite skill is not part of the node');
+          throw new Error('The given prerequisite skill is not part of the node');
         }
         newPrerequisiteSkillIds.splice(index, 1);
 
@@ -491,7 +491,7 @@ angular.module('oppia').factory('StoryUpdateService', [
         var newAcquiredSkillIds = angular.copy(oldAcquiredSkillIds);
         var index = newAcquiredSkillIds.indexOf(skillId);
         if (index === -1) {
-          throw Error('The given acquired skill id is not part of the node');
+          throw new Error('The given acquired skill id is not part of the node');
         }
         newAcquiredSkillIds.splice(index, 1);
 
