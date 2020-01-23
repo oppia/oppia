@@ -21,12 +21,18 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 angular.module('oppia').factory('AdminConfigTabBackendApiService', [
   '$http', 'ADMIN_HANDLER_URL',
   function($http, ADMIN_HANDLER_URL) {
-    var _revertConfigProperty = function(data) {
-      return $http.post(ADMIN_HANDLER_URL, data);
+    var _revertConfigProperty = function(configPropertyId) {
+      return $http.post(ADMIN_HANDLER_URL, {
+        action: 'revert_config_property',
+        config_property_id: configPropertyId
+      });
     };
 
-    var _saveConfigProperties = function(data) {
-      return $http.post(ADMIN_HANDLER_URL, data);
+    var _saveConfigProperties = function(newConfigPropertyValues) {
+      return $http.post(ADMIN_HANDLER_URL, {
+        action: 'save_config_properties',
+        new_config_property_values: newConfigPropertyValues
+      });
     };
 
     return {

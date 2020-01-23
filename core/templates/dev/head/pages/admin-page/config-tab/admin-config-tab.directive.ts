@@ -57,10 +57,9 @@ angular.module('oppia').directive('adminConfigTab', [
             return;
           }
 
-          AdminConfigTabBackendApiService.revertConfigProperty({
-            action: 'revert_config_property',
-            config_property_id: configPropertyId
-          }).then(function() {
+          AdminConfigTabBackendApiService.revertConfigProperty(
+            configPropertyId
+          ).then(function() {
             ctrl.setStatusMessage('Config property reverted successfully.');
             ctrl.reloadConfigProperties();
           }, function(errorResponse) {
@@ -86,10 +85,9 @@ angular.module('oppia').directive('adminConfigTab', [
               ctrl.configProperties[property].value);
           }
 
-          AdminConfigTabBackendApiService.saveConfigProperties({
-            action: 'save_config_properties',
-            new_config_property_values: newConfigPropertyValues
-          }).then(function() {
+          AdminConfigTabBackendApiService.saveConfigProperties(
+            newConfigPropertyValues
+          ).then(function() {
             ctrl.setStatusMessage('Data saved successfully.');
             AdminTaskManagerService.finishTask();
           }, function(errorResponse) {
