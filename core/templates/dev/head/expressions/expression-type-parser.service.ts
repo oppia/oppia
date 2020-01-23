@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Expression Type Parser Service.
  */
 
-require('expressions/expression-parser.service.js');
+require('expressions/expression-parser.service.ts');
 require('expressions/expression-syntax-tree.service.ts');
 
 angular.module('oppia').factory('ExpressionTypeParserService', [

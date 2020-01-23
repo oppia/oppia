@@ -76,6 +76,7 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
+import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { ExtractImageFilenamesFromStateService } from
@@ -269,6 +270,7 @@ export class UpgradedServices {
       new ExplorationDraftObjectFactory();
     upgradedServices['ExplorationFeaturesService'] =
       new ExplorationFeaturesService();
+    upgradedServices['ExpressionParserService'] = new ExpressionParserService();
     upgradedServices['FeedbackThreadObjectFactory'] =
       new FeedbackThreadObjectFactory();
     upgradedServices['FractionObjectFactory'] = new FractionObjectFactory();

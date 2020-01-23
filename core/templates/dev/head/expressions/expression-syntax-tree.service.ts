@@ -16,7 +16,7 @@
  * @fileoverview Expression syntax tree service.
  */
 
-require('expressions/expression-parser.service.js');
+require('expressions/expression-parser.service.ts');
 
 angular.module('oppia').factory('ExpressionSyntaxTreeService', [
   'ExpressionParserService', 'PARAMETER_TYPES',

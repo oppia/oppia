@@ -62,7 +62,7 @@
  * @fileoverview Service for expression evaluation.
  */
 
-require('expressions/expression-parser.service.js');
+require('expressions/expression-parser.service.ts');
 require('expressions/expression-syntax-tree.service.ts');
 
 // Service for expression evaluation.
