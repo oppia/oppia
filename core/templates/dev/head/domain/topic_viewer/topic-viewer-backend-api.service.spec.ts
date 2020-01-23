@@ -20,6 +20,9 @@
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+import { TopicDataObjectFactory } from
+  'domain/topic_viewer/TopicDataObjectFactory';
+
 
 require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 
@@ -30,6 +33,8 @@ describe('Topic viewer backend API service', function() {
   var $scope = null;
   var $httpBackend = null;
   var UndoRedoService = null;
+  var sampleDataResultsObjects = null;
+  let topicDataObjectFactory = new TopicDataObjectFactory();
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -74,6 +79,9 @@ describe('Topic viewer backend API service', function() {
         skill_id_2: 'Skill Description 2'
       }
     };
+
+    sampleDataResultsObjects = topicDataObjectFactory.createFromBackendDict(
+      sampleDataResults);
   }));
 
   afterEach(function() {
@@ -92,7 +100,7 @@ describe('Topic viewer backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      expect(successHandler).toHaveBeenCalledWith(sampleDataResultsObjects);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

@@ -20,10 +20,13 @@ require('domain/utilities/url-interpolation.service.ts');
 
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 
+import { TopicDataObjectFactory } from
+  'domain/topic_viewer/TopicDataObjectFactory';
+
 angular.module('oppia').factory('TopicViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'TOPIC_DATA_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService, TOPIC_DATA_URL_TEMPLATE) {
-    var topicDataDict = null;
+    var topicDataObject = null;
     var _fetchTopicData = function(topicName, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
         TOPIC_DATA_URL_TEMPLATE, {
@@ -31,9 +34,10 @@ angular.module('oppia').factory('TopicViewerBackendApiService', [
         });
 
       $http.get(topicDataUrl).then(function(response) {
-        topicDataDict = angular.copy(response.data);
+        topicDataObject = new TopicDataObjectFactory().createFromBackendDict(
+          angular.copy(response.data));
         if (successCallback) {
-          successCallback(topicDataDict);
+          successCallback(topicDataObject);
         }
       }, function(errorResponse) {
         if (errorCallback) {
