@@ -1385,7 +1385,11 @@ class DocstringChecker(checkers.BaseChecker):
 
 
 class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
-    """Checks if there is an empty line between file overview and imports."""
+    """Checks if there is an empty line between file overview and imports.
+       Note: The check assumes that all files have a file overview, this
+       assumption is justified because Pylint has an inbuilt check for missing
+       file overview.
+    """
 
     __implements__ = interfaces.IRawChecker
     name = 'space_between_imports_and_file-overview'
@@ -1424,20 +1428,23 @@ class SpaceBelowFileOverviewChecker(checkers.BaseChecker):
             triple_quote_counter += line.count(multi_line_indicator)
 
             if line.endswith(b'"""') and triple_quote_counter == 2:
-                temp_line_num = line_num
-                while file_content[temp_line_num + 1] == b'\n':
-                    empty_line_counter += 1
-                    temp_line_num += 1
-                if empty_line_counter > 1:
-                    self.add_message(
-                        'only-a-single-empty-line-should-be-provided',
-                        line=line_num + 1)
-                    break
-                if empty_line_counter == 0:
-                    self.add_message(
-                        'no-empty-line-provided-below-fileoverview',
-                        line=line_num + 1)
-                    break
+                closing_line_index_of_fileoverview = line_num
+                break
+
+        empty_line_check_index = closing_line_index_of_fileoverview
+        if empty_line_check_index < file_length:
+            while file_content[empty_line_check_index + 1] == b'\n':
+                empty_line_counter += 1
+                empty_line_check_index += 1
+
+        if empty_line_counter > 1:
+            self.add_message(
+                'only-a-single-empty-line-should-be-provided',
+                line=closing_line_index_of_fileoverview + 1)
+        elif empty_line_counter == 0:
+            self.add_message(
+                'no-empty-line-provided-below-fileoverview',
+                line=closing_line_index_of_fileoverview + 1)
 
 
 def register(linter):

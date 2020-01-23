@@ -1985,7 +1985,6 @@ class SpaceBelowFileOverviewCheckerTests(unittest.TestCase):
             pylint_extensions.SpaceBelowFileOverviewChecker)
         self.checker_test_object.setup_method()
 
-    # The checks assume that all files have a file overview.
     def test_no_space_above_import(self):
         node_no_space_above_import = astroid.scoped_nodes.Module(
             name='test',
