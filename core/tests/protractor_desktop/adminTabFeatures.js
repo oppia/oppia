@@ -56,6 +56,7 @@ describe('Admin Page', function() {
     users.createAndLoginAdminUser('adminA@adminTab.com', 'alphaMan');
     adminPage.getJobsTab();
 
+    // The following jobs are selected arbitrarily.
     adminPage.startOneOffJob('FeedbackThreadCacheOneOffJob');
     adminPage.expectJobToBeRunning('FeedbackThreadCacheOneOffJob');
     adminPage.expectNumberOfRunningOneOffJobs(1);
