@@ -464,6 +464,13 @@ def main():
 
     personal_access_token = common.get_personal_access_token()
 
+    g = github.Github(personal_access_token)
+    repo = g.get_organization('oppia').get_repo('oppia')
+    repo_fork = g.get_repo('%s/oppia' % github_username)
+
+    common.check_blocking_bug_issue_count(repo)
+    common.check_prs_for_current_release_are_released(repo)
+
     python_utils.PRINT('Generating release summary...')
     generate_release_info.main(personal_access_token)
 
@@ -471,9 +478,6 @@ def main():
         raise Exception(
             'Release summary file %s is missing. Please re-run '
             'this script.' % release_constants.RELEASE_SUMMARY_FILEPATH)
-
-    g = github.Github(personal_access_token)
-    repo_fork = g.get_repo('%s/oppia' % github_username)
 
     current_release_version_number = common.get_current_release_version_number(
         branch_name)
