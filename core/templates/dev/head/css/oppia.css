@@ -4369,21 +4369,36 @@ div.oppia-issues-learner-action {
 }
 
 .oppia-issues-playthrough-modal-btn {
-  background: transparent;
-  border-radius: 0;
+  padding: 15px 25px;
+  font-size: 24px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #009A8B;
   border: none;
+  border-radius: 15px;
+  box-shadow: 7px 0px #009595;
+  height: 220px;
+}
+
+.oppia-issues-playthrough-modal-btn:hover {background-color: #00b3a0}
+
+.oppia-issues-playthrough-modal-btn:active {
+  background-color: #00b3a0;
+  box-shadow: 0 10px #008080;
+  transform: translateY(4px);
 }
 
 /* Values below were experimentally generated using 'http://csshexagon.com' */
+
 .oppia-hexagon {
   transform: scale(0.5);
   position: relative;
   width: 200px;
   height: 115.47px;
-  background-color: #009A8B;
+  background-color: transparent;
   margin: 15px 0;
-  border-left: solid 2px #009A8B;
-  border-right: solid 2px #009A8B;
   font-size: 20px;
   font-weight: bold;
   color: white;
@@ -4405,14 +4420,10 @@ div.oppia-issues-learner-action {
 
 .oppia-hexagon:before {
   top: -70.7107px;
-  border-top: solid 2.8284px #009A8B;
-  border-right: solid 2.8284px #009A8B;
 }
 
 .oppia-hexagon:after {
   bottom: -70.7107px;
-  border-bottom: solid 2.8284px #009A8B;
-  border-left: solid 2.8284px #009A8B;
 }
 
 .oppia-issues-content {
