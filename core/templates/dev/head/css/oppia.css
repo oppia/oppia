@@ -4379,7 +4379,7 @@ div.oppia-issues-learner-action {
   height: 220px;
   outline: none;
   padding: 20px 15px;
-  text-align: center;  
+  text-align: center;
 }
 
 .oppia-issues-playthrough-modal-btn:hover {
@@ -4403,7 +4403,7 @@ div.oppia-issues-learner-action {
   margin: 15px 0;
   position: relative;
   transform: scale(0.5);
-  width: 200px; 
+  width: 200px;
 }
 
 .oppia-hexagon:before,
