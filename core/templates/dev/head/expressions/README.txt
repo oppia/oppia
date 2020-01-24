@@ -12,21 +12,24 @@ Example boolean expressions:
 
 See comments in parser.pegjs for the description of input expression grammar.
 Also see parser.pegjs for the parser output (i.e. parse tree) data format.
-See ExpressionEvaluatorService.js for the operator contracts.
+See expression-evaluator.service.ts for the operator contracts.
 
 Files:
 parser.pegjs
-  This is the parser definition which is used to generate the expression-parser.service.js file
+  This is the parser definition which is used to generate the parser.js file
   that will be used at runtime to parse user-entered expressions.
-expression-parser.service.js
+parser.js
   This is the JavaScript parser file produced by PEGJS and the input file
   parser.pegjs.
-ExpressionEvaluatorService.js
+expression-parser.service.ts
+  This is a wrapper around parser.js to allow the parser to be used as an
+  Angular 8 service.
+expression-evaluator.service.ts
   Implementation of the expression evaluator. Includes the evaluation engine
   as well as the system operators.
-ExpressionParserServiceSpec.js
+expression-parser.service.spec.ts
   Tests for the parser.
-ExpressionEvaluatorServiceSpec.js
+expression-evaluator.service.spec.ts
   Tests for the evaluator.
 
 How to update the parser:
@@ -36,12 +39,12 @@ How to update the parser:
 
       python -m scripts.create_expression_parser
 
-   which updates expression-parser.service.js. Then run the frontend unit tests using
+   which updates parser.js. Then run the frontend unit tests using
 
       python -m scripts.run_frontend_tests
 
-   to ensure that the new grammar passes the tests in ExpressionParserServiceSpec.js and
-   ExpressionEvaluatorServiceSpec.js.
+   to ensure that the new grammar passes the tests in
+   expression-parser.service.spec.ts and expression-evaluator.service.spec.ts.
 4. Repeat 1-3 until the desired grammar is written and tested.
-5. Check the changes. You need to check in parser.pegjs as well as expression-parser.service.js
-  (and probably ExpressionParserServiceSpec.js and ExpressionEvaluatorServiceSpec.js).
+5. Check the changes. You need to check in parser.pegjs as well as parser.js
+  (and probably expression-parser.service.spec.ts and expression-evaluator.service.spec.ts).
