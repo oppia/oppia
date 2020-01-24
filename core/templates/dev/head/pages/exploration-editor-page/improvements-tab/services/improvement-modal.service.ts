@@ -122,6 +122,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   let action = playthrough.actions[i];
                   let currentStateName =
                       action.actionCustomizationArgs.state_name.value;
+
                   if (currentStateName !== previousStateName) {
                     // When the latest state name and the state name of the
                     // current learner action differ, they are part of
