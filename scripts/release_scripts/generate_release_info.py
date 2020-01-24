@@ -296,9 +296,6 @@ def main(personal_access_token):
     g = github.Github(personal_access_token)
     repo = g.get_organization('oppia').get_repo('oppia')
 
-    common.check_blocking_bug_issue_count(repo)
-    common.check_prs_for_current_release_are_released(repo)
-
     current_release = get_current_version_tag(repo)
     current_release_tag = current_release.name
     base_commit = current_release.commit.sha
@@ -403,3 +400,10 @@ def main(personal_access_token):
 
     python_utils.PRINT('Done. Summary file generated in %s' % (
         release_constants.RELEASE_SUMMARY_FILEPATH))
+
+
+# The 'no coverage' pragma is used as this line is un-testable. This is because
+# it will only be called when generate_release_info.py is used as
+# a script.
+if __name__ == '__main__': # pragma: no cover
+    main(common.get_personal_access_token())
