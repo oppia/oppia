@@ -4382,7 +4382,9 @@ div.oppia-issues-learner-action {
   height: 220px;
 }
 
-.oppia-issues-playthrough-modal-btn:hover {background-color: #00b3a0}
+.oppia-issues-playthrough-modal-btn:hover {
+  background-color: #00b3a0
+}
 
 .oppia-issues-playthrough-modal-btn:active {
   background-color: #00b3a0;
