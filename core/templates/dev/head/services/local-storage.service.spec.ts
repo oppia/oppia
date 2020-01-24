@@ -53,7 +53,7 @@ describe('LocalStorageService', () => {
         draftDictTwo);
     });
 
-    it('should storage be available', () => {
+    it('should verify that storage is available', () => {
       expect(localStorageService.isStorageAvailable()).toBe(true);
     });
 

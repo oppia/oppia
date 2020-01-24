@@ -61,7 +61,7 @@ export class LocalStorageService {
 
   /**
    * Check that localStorage is available to the client.
-   * @returns {boolean} true if the client has access to localStorage.
+   * @returns {boolean} true iff the client has access to localStorage.
    */
   isStorageAvailable(): boolean {
     return Boolean(this.storage);
