@@ -86,7 +86,7 @@ describe('Enable correctness feedback and set correctness', function() {
     explorationEditorPage.navigateToMainTab();
   });
 
-  it('should allow selecting correct feedback from the response editor ' +
+  fit('should allow selecting correct feedback from the response editor ' +
      'after the interaction is created', function() {
     explorationEditorMainTab.setStateName('First');
     explorationEditorMainTab.setContent(forms.toRichText(
