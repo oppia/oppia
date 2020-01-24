@@ -13,16 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for review test domain.
+ * @fileoverview File to import necessary scripts for get_started page.
  */
 
-/* eslint-disable max-len */
-// TODO(#7092): Delete this file once migration is complete and these AngularJS
-// equivalents of the Angular constants are no longer needed.
-import { ReviewTestDomainConstants } from
-  'domain/review_test/review-test-domain.constants';
-/* eslint-enable max-len */
+// The module needs to be loaded before everything else since it defines the
+// main module the elements are attached to.
+require('pages/pending-account-deletion-page/' +
+        'pending-account-deletion-page.module.ts');
+require('App.ts');
 
-angular.module('oppia').constant(
-  'REVIEW_TEST_DATA_URL',
-  ReviewTestDomainConstants.REVIEW_TEST_DATA_URL);
+require('base-components/base-content.directive.ts');
+require('components/common-layout-directives/common-elements/' +
+        'background-banner.directive.ts');

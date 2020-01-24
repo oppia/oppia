@@ -47,11 +47,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
             StoryEditorStateService, UrlService,
             EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-          $scope.story = StoryEditorStateService.getStory();
-          $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
-          $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
-          $scope.validationIssues = [];
-
+          var ctrl = this;
           $scope.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
           };
@@ -120,6 +116,10 @@ angular.module('oppia').directive('storyEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               StoryEditorStateService.saveStory(commitMessage);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -139,10 +139,16 @@ angular.module('oppia').directive('storyEditorNavbar', [
               });
           };
 
-          $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);
-          $scope.$on(EVENT_STORY_REINITIALIZED, _validateStory);
-          $scope.$on(
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateStory);
+          ctrl.$onInit = function() {
+            $scope.story = StoryEditorStateService.getStory();
+            $scope.isStoryPublished = StoryEditorStateService.isStoryPublished;
+            $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
+            $scope.validationIssues = [];
+            $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);
+            $scope.$on(EVENT_STORY_REINITIALIZED, _validateStory);
+            $scope.$on(
+              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateStory);
+          };
         }
       ]
     };

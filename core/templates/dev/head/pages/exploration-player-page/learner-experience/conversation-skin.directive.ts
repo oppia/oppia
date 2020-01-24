@@ -48,6 +48,7 @@ require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
+require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/' +
@@ -371,7 +372,8 @@ angular.module('oppia').directive('conversationSkin', [
         'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', 'FEEDBACK_POPOVER_PATH',
         'INTERACTION_DISPLAY_MODE_INLINE',
         'INTERACTION_SPECS', 'NUM_EXPLORATIONS_PER_REVIEW_TEST',
-        'PAGE_CONTEXT', 'SUPPORTED_SITE_LANGUAGES', 'TWO_CARD_THRESHOLD_PX',
+        'PAGE_CONTEXT', 'STORY_VIEWER_URL_TEMPLATE',
+        'SUPPORTED_SITE_LANGUAGES', 'TWO_CARD_THRESHOLD_PX',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
             $http, $location, $q, $rootScope, $scope, $timeout,
@@ -407,62 +409,45 @@ angular.module('oppia').directive('conversationSkin', [
             EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, FEEDBACK_POPOVER_PATH,
             INTERACTION_DISPLAY_MODE_INLINE,
             INTERACTION_SPECS, NUM_EXPLORATIONS_PER_REVIEW_TEST,
-            PAGE_CONTEXT, SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
+            PAGE_CONTEXT, STORY_VIEWER_URL_TEMPLATE,
+            SUPPORTED_SITE_LANGUAGES, TWO_CARD_THRESHOLD_PX,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
-          $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
+          var ctrl = this;
           // The minimum width, in pixels, needed to be able to show two cards
           // side-by-side.
           var TIME_PADDING_MSEC = 250;
           var TIME_SCROLL_MSEC = 600;
           var MIN_CARD_LOADING_DELAY_MSEC = 950;
 
-          $scope.isLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.isLoggedIn = userInfo.isLoggedIn();
-          });
-
-          $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl();
-          if ($scope.collectionId) {
-            ReadOnlyCollectionBackendApiService
-              .loadCollection($scope.collectionId)
-              .then(function(collection) {
-                $scope.collectionTitle = collection.title;
-              });
-          } else {
-            $scope.collectionTitle = null;
-          }
-
           $scope.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
               FEEDBACK_POPOVER_PATH);
           };
 
-          var alwaysAskLearnerForAnswerDetails = (
-            ExplorationEngineService.getAlwaysAskLearnerForAnswerDetails);
+          var alwaysAskLearnerForAnswerDetails = function() {
+            return ExplorationEngineService.getAlwaysAskLearnerForAnswerDetails(
+            );
+          };
 
-          $scope.canAskLearnerForAnswerInfo = (
-            LearnerAnswerInfoService.canAskLearnerForAnswerInfo);
+          $scope.canAskLearnerForAnswerInfo = function() {
+            return LearnerAnswerInfoService.canAskLearnerForAnswerInfo();
+          };
 
-          var initLearnerAnswerInfoService = (
-            LearnerAnswerInfoService.initLearnerAnswerInfoService);
+          var initLearnerAnswerInfoService = function(
+              entityId, state, answer, interactionRulesService,
+              alwaysAskLearnerForAnswerInfo) {
+            LearnerAnswerInfoService.initLearnerAnswerInfoService(
+              entityId, state, answer, interactionRulesService,
+              alwaysAskLearnerForAnswerInfo);
+          };
 
           var hasInteractedAtLeastOnce = false;
-          $scope.answerIsBeingProcessed = false;
           var _nextFocusLabel = null;
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
           // This variable is used only when viewport is narrow.
           // Indicates whether the tutor card is displayed.
           var tutorCardIsDisplayedIfNarrow = true;
-          $scope.explorationId = ExplorationEngineService.getExplorationId();
           var questionPlayerConfig = $scope.getQuestionPlayerConfig();
-          $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
-          $scope.isIframed = UrlService.isIframed();
-          $rootScope.loadingMessage = 'Loading';
-          $scope.hasFullyLoaded = false;
-          $scope.recommendedExplorationSummaries = null;
-          $scope.answerIsCorrect = false;
-          $scope.nextCard = null;
-          $scope.pendingCardWasSeenBefore = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
           };
@@ -504,29 +489,16 @@ angular.module('oppia').directive('conversationSkin', [
             return randomSuffix;
           };
 
-          $scope.OPPIA_AVATAR_IMAGE_URL = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/avatar/oppia_avatar_100px.svg'));
           $scope.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
 
-          $scope.displayedCard = null;
           var explorationActuallyStarted = false;
-
-          $scope.upcomingInlineInteractionHtml = null;
-
-          $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
-            DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
 
           $scope.getContentFocusLabel = function(index) {
             return CONTENT_FOCUS_LABEL_PREFIX + index;
           };
 
-          // If the exploration is iframed, send data to its parent about its
-          // height so that the parent can be resized as necessary.
-          $scope.lastRequestedHeight = 0;
-          $scope.lastRequestedScroll = false;
           $scope.adjustPageHeight = function(scroll, callback) {
             $timeout(function() {
               var newHeight = document.body.scrollHeight;
@@ -646,18 +618,6 @@ angular.module('oppia').directive('conversationSkin', [
             }, TIME_NUM_CARDS_CHANGE_MSEC);
           };
 
-          if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
-            $rootScope.$on('hintConsumed', function(evt) {
-              QuestionPlayerStateService.hintUsed(
-                QuestionPlayerEngineService.getCurrentQuestion());
-            });
-
-            $rootScope.$on('solutionViewed', function(evt, timestamp) {
-              QuestionPlayerStateService.solutionViewed(
-                QuestionPlayerEngineService.getCurrentQuestion());
-            });
-          }
-
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
               PlayerPositionService.getDisplayedCardIndex());
@@ -716,12 +676,40 @@ angular.module('oppia').directive('conversationSkin', [
                 includeAutogeneratedRecommendations = true;
               }
 
-              ExplorationRecommendationsService.getRecommendedSummaryDicts(
-                recommendedExplorationIds,
-                includeAutogeneratedRecommendations,
-                function(summaries) {
-                  $scope.recommendedExplorationSummaries = summaries;
+              if (ExplorationPlayerStateService.isInStoryChapterMode() &&
+                ENABLE_NEW_STRUCTURE_VIEWER_UPDATES) {
+                recommendedExplorationIds = [];
+                includeAutogeneratedRecommendations = false;
+                var storyId = UrlService.getUrlParams().story_id;
+                var nodeId = UrlService.getUrlParams().node_id;
+                $scope.inStoryMode = true;
+                $scope.storyViewerUrl = UrlInterpolationService.interpolateUrl(
+                  STORY_VIEWER_URL_TEMPLATE, {
+                    story_id: storyId
+                  });
+                StoryViewerBackendApiService.recordChapterCompletion(
+                  storyId, nodeId).then(function(returnObject) {
+                  $scope.recommendedExplorationSummaries =
+                    returnObject.summaries;
+                  $scope.nextNodeId = returnObject.nextNodeId;
+                  if (returnObject.readyForReviewTest) {
+                    var REVIEW_TEST_URL_TEMPLATE = (
+                      '/review_test/<story_id>');
+                    $window.location =
+                      UrlInterpolationService.interpolateUrl(
+                        REVIEW_TEST_URL_TEMPLATE, {
+                          story_id: storyId
+                        });
+                  }
                 });
+              } else {
+                ExplorationRecommendationsService.getRecommendedSummaryDicts(
+                  recommendedExplorationIds,
+                  includeAutogeneratedRecommendations,
+                  function(summaries) {
+                    $scope.recommendedExplorationSummaries = summaries;
+                  });
+              }
             }
           };
 
@@ -772,80 +760,6 @@ angular.module('oppia').directive('conversationSkin', [
                 _initializeDirectiveComponents);
             }
           };
-
-          $rootScope.$on('playerStateChange', function(evt, newStateName) {
-            if (!newStateName) {
-              return;
-            }
-            // To restart the preloader for the new state if required.
-            if (!_editorPreviewMode) {
-              ImagePreloaderService.onStateChange(newStateName);
-            }
-            // Ensure the transition to a terminal state properly logs the end
-            // of the exploration.
-            if (
-              !_editorPreviewMode && $scope.nextCard.isTerminal()) {
-              StatsReportingService.recordExplorationCompleted(
-                newStateName, LearnerParamsService.getAllParams());
-
-              // If the user is a guest, has completed this exploration within
-              // the context of a collection, and the collection is whitelisted,
-              // record their temporary progress.
-              var collectionAllowsGuestProgress = (
-                WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
-                  $scope.collectionId) !== -1);
-              if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
-                GuestCollectionProgressService.
-                  recordExplorationCompletedInCollection(
-                    $scope.collectionId, $scope.explorationId);
-              }
-
-              if (ExplorationPlayerStateService.isInStoryChapterMode() &&
-                $scope.nextCard.isTerminal() &&
-                ENABLE_NEW_STRUCTURE_VIEWER_UPDATES) {
-                var storyId = UrlService.getUrlParams().story_id;
-                var nodeId = UrlService.getUrlParams().node_id;
-                StoryViewerBackendApiService.recordStoryNodeCompletion(
-                  storyId, nodeId);
-
-                StoryViewerBackendApiService.fetchStoryData(storyId).then(
-                  function(storyDataDict) {
-                    var storyNodes = storyDataDict.story_nodes.map(
-                      function(storyNodeDict) {
-                        return ReadOnlyStoryNodeObjectFactory
-                          .createFromBackendDict(storyNodeDict);
-                      });
-                    var completedStoryNodes = [];
-                    storyNodes.forEach(function(storyNode) {
-                      if (storyNode.isCompleted) {
-                        completedStoryNodes.push(storyNode);
-                      }
-                    });
-                    if (completedStoryNodes.length %
-                      NUM_EXPLORATIONS_PER_REVIEW_TEST === 0 ||
-                      completedStoryNodes.length === storyNodes.length) {
-                      var REVIEW_TEST_URL_TEMPLATE = (
-                        '/review_test/<story_id>');
-                      $window.location =
-                        UrlInterpolationService.interpolateUrl(
-                          REVIEW_TEST_URL_TEMPLATE, {
-                            story_id: storyId
-                          });
-                    }
-                  }
-                );
-              }
-
-              // For single state explorations, when the exploration reaches the
-              // terminal state and explorationActuallyStarted is false, record
-              // exploration actual start event.
-              if (!explorationActuallyStarted) {
-                StatsReportingService.recordExplorationActuallyStarted(
-                  newStateName);
-                explorationActuallyStarted = true;
-              }
-            }
-          });
 
           $scope.submitAnswer = function(answer, interactionRulesService) {
             // Safety check to prevent double submissions from occurring.
@@ -1092,8 +1006,7 @@ angular.module('oppia').directive('conversationSkin', [
               }
             );
           };
-          CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
-          $scope.startCardChangeAnimation = false;
+
           $scope.showPendingCard = function() {
             $scope.startCardChangeAnimation = true;
             ExplorationPlayerStateService.recordNewCardAdded();
@@ -1209,40 +1122,12 @@ angular.module('oppia').directive('conversationSkin', [
           $scope.submitUserRating = function(ratingValue) {
             LearnerViewRatingService.submitUserRating(ratingValue);
           };
-          $scope.$on('ratingUpdated', function() {
-            $scope.userRating = LearnerViewRatingService.getUserRating();
-          });
-
-          $window.addEventListener('beforeunload', function(e) {
-            if ($scope.redirectToRefresherExplorationConfirmed) {
-              return;
-            }
-            if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
-                !$scope.displayedCard.isTerminal()) {
-              StatsReportingService.recordMaybeLeaveEvent(
-                PlayerTranscriptService.getLastStateName(),
-                LearnerParamsService.getAllParams());
-              var confirmationMessage = (
-                'If you navigate away from this page, your progress on the ' +
-                'exploration will be lost.');
-              (e || $window.event).returnValue = confirmationMessage;
-              return confirmationMessage;
-            }
-          });
 
           // Returns whether the screen is wide enough to fit two
           // cards (e.g., the tutor and supplemental cards) side-by-side.
           $scope.canWindowShowTwoCards = function() {
             return WindowDimensionsService.getWidth() > TWO_CARD_THRESHOLD_PX;
           };
-
-          $window.onresize = function() {
-            $scope.adjustPageHeight(false, null);
-          };
-
-          $window.addEventListener('scroll', function() {
-            fixSupplementOnScroll();
-          });
 
           var fixSupplementOnScroll = function() {
             var supplementCard = $('div.conversation-skin-supplemental-card');
@@ -1255,32 +1140,6 @@ angular.module('oppia').directive('conversationSkin', [
                 'conversation-skin-supplemental-card-fixed');
             }
           };
-
-          $scope.initializePage();
-          if (!questionPlayerConfig) {
-            LearnerViewRatingService.init(function(userRating) {
-              $scope.userRating = userRating;
-            });
-          }
-
-          $scope.collectionSummary = null;
-
-          if ($scope.collectionId) {
-            $http.get('/collectionsummarieshandler/data', {
-              params: {
-                stringified_collection_ids: JSON.stringify(
-                  [$scope.collectionId])
-              }
-            }).then(
-              function(response) {
-                $scope.collectionSummary = response.data.summaries[0];
-              },
-              function() {
-                AlertsService.addWarning(
-                  'There was an error while fetching the collection summary.');
-              }
-            );
-          }
 
           $scope.onNavigateFromIframe = function() {
             SiteAnalyticsService.registerVisitOppiaFromIframeEvent(
@@ -1303,6 +1162,151 @@ angular.module('oppia').directive('conversationSkin', [
 
           $scope.submitAnswerFromProgressNav = function() {
             CurrentInteractionService.submitAnswer();
+          };
+
+          ctrl.$onInit = function() {
+            $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
+            $scope.isLoggedIn = null;
+            $scope.inStoryMode = false;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              $scope.isLoggedIn = userInfo.isLoggedIn();
+            });
+
+            $scope.collectionId = UrlService.getCollectionIdFromExplorationUrl(
+            );
+            if ($scope.collectionId) {
+              ReadOnlyCollectionBackendApiService
+                .loadCollection($scope.collectionId)
+                .then(function(collection) {
+                  $scope.collectionTitle = collection.title;
+                });
+            } else {
+              $scope.collectionTitle = null;
+            }
+            $scope.answerIsBeingProcessed = false;
+            $scope.explorationId = ExplorationEngineService.getExplorationId();
+            $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
+            $scope.isIframed = UrlService.isIframed();
+            $rootScope.loadingMessage = 'Loading';
+            $scope.hasFullyLoaded = false;
+            $scope.recommendedExplorationSummaries = null;
+            $scope.answerIsCorrect = false;
+            $scope.nextCard = null;
+            $scope.pendingCardWasSeenBefore = false;
+            $scope.OPPIA_AVATAR_IMAGE_URL = (
+              UrlInterpolationService.getStaticImageUrl(
+                '/avatar/oppia_avatar_100px.svg'));
+            $scope.displayedCard = null;
+            $scope.upcomingInlineInteractionHtml = null;
+            $scope.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER =
+              DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR;
+            // If the exploration is iframed, send data to its parent about
+            // its height so that the parent can be resized as necessary.
+            $scope.lastRequestedHeight = 0;
+            $scope.lastRequestedScroll = false;
+            if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
+              $rootScope.$on('hintConsumed', function(evt) {
+                QuestionPlayerStateService.hintUsed(
+                  QuestionPlayerEngineService.getCurrentQuestion());
+              });
+
+              $rootScope.$on('solutionViewed', function(evt, timestamp) {
+                QuestionPlayerStateService.solutionViewed(
+                  QuestionPlayerEngineService.getCurrentQuestion());
+              });
+            }
+            $rootScope.$on('playerStateChange', function(evt, newStateName) {
+              if (!newStateName) {
+                return;
+              }
+              // To restart the preloader for the new state if required.
+              if (!_editorPreviewMode) {
+                ImagePreloaderService.onStateChange(newStateName);
+              }
+              // Ensure the transition to a terminal state properly logs the end
+              // of the exploration.
+              if (
+                !_editorPreviewMode && $scope.nextCard.isTerminal()) {
+                StatsReportingService.recordExplorationCompleted(
+                  newStateName, LearnerParamsService.getAllParams());
+
+                // If the user is a guest, has completed this exploration within
+                // the context of a collection, and the collection is
+                // whitelisted, record their temporary progress.
+                var collectionAllowsGuestProgress = (
+                  WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS.indexOf(
+                    $scope.collectionId) !== -1);
+                if (collectionAllowsGuestProgress && !$scope.isLoggedIn) {
+                  GuestCollectionProgressService.
+                    recordExplorationCompletedInCollection(
+                      $scope.collectionId, $scope.explorationId);
+                }
+
+                // For single state explorations, when the exploration reaches
+                // the terminal state and explorationActuallyStarted is false,
+                // record exploration actual start event.
+                if (!explorationActuallyStarted) {
+                  StatsReportingService.recordExplorationActuallyStarted(
+                    newStateName);
+                  explorationActuallyStarted = true;
+                }
+              }
+            });
+            $scope.$on('ratingUpdated', function() {
+              $scope.userRating = LearnerViewRatingService.getUserRating();
+            });
+
+            $window.addEventListener('beforeunload', function(e) {
+              if ($scope.redirectToRefresherExplorationConfirmed) {
+                return;
+              }
+              if (hasInteractedAtLeastOnce && !$scope.isInPreviewMode &&
+                  !$scope.displayedCard.isTerminal()) {
+                StatsReportingService.recordMaybeLeaveEvent(
+                  PlayerTranscriptService.getLastStateName(),
+                  LearnerParamsService.getAllParams());
+                var confirmationMessage = (
+                  'If you navigate away from this page, your progress on the ' +
+                  'exploration will be lost.');
+                (e || $window.event).returnValue = confirmationMessage;
+                return confirmationMessage;
+              }
+            });
+            $window.onresize = function() {
+              $scope.adjustPageHeight(false, null);
+            };
+
+            $window.addEventListener('scroll', function() {
+              fixSupplementOnScroll();
+            });
+            CurrentInteractionService.setOnSubmitFn($scope.submitAnswer);
+            $scope.startCardChangeAnimation = false;
+            $scope.initializePage();
+            if (!questionPlayerConfig) {
+              LearnerViewRatingService.init(function(userRating) {
+                $scope.userRating = userRating;
+              });
+            }
+
+            $scope.collectionSummary = null;
+
+            if ($scope.collectionId) {
+              $http.get('/collectionsummarieshandler/data', {
+                params: {
+                  stringified_collection_ids: JSON.stringify(
+                    [$scope.collectionId])
+                }
+              }).then(
+                function(response) {
+                  $scope.collectionSummary = response.data.summaries[0];
+                },
+                function() {
+                  AlertsService.addWarning(
+                    'There was an error while fetching the collection ' +
+                    'summary.');
+                }
+              );
+            }
           };
         }
       ]
