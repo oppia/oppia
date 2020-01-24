@@ -1387,7 +1387,7 @@ class DocstringChecker(checkers.BaseChecker):
 class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
     """Checks if there is a single empty line below the fileoverview docstring.
     Note: The check assumes that all files have a file overview. This
-    assumption is justified because because Pylint has an inbuilt check
+    assumption is justified because Pylint has an inbuilt check
     (missing-docstring) for missing file overviews.
     """
 
