@@ -437,6 +437,19 @@ def convert_to_posixpath(file_path):
     return file_path.replace('\\', '/')
 
 
+def create_readme(dir_path, readme_content):
+    """Creates a readme in a given dir path with the specified
+    readme content.
+
+    Args:
+        dir_path: str. The path of the dir where the README is to
+            be created.
+        readme_content: str. The content to be written in the README.
+    """
+    with python_utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+        f.write(readme_content)
+
+
 class CD(python_utils.OBJECT):
     """Context manager for changing the current working directory."""
 
