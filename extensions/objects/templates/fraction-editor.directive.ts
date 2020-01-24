@@ -38,7 +38,7 @@ angular.module('oppia').directive('fractionEditor', [
           return errorMessage;
         };
 
-        ctrl.isValid = function(value) {
+        ctrl.isValidFraction = function(value) {
           if (value.length === 0) {
             errorMessage = 'Please enter a non-empty fraction value.';
             return false;
