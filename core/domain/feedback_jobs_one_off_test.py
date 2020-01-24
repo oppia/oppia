@@ -373,7 +373,7 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
 
 class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
-    """Tests for ExpSummary aggregations."""
+    """Tests for GeneralFeedbackThreadUserOneOffJob."""
 
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
         feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob]
