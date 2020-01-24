@@ -66,6 +66,7 @@ def main(args=None):
     delete_file('.coverage')
     delete_directory_tree('local_compiled_js/')
     delete_directory_tree('local_compiled_js_for_test/')
+    delete_directory_tree('readme_test_dir/')
     delete_file('tsc_output_log.txt')
     delete_file('dev_output.txt')
     delete_file('.viminfo')
