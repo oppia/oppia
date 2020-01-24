@@ -73,8 +73,9 @@ export class Exploration {
           stateName);
     }
 
-    return this.getInteractionCustomizationArgs(
-      stateName).recommendedExplorationIds.value;
+    const customizationArgs = this.getInteractionCustomizationArgs(stateName);
+    return customizationArgs && customizationArgs.recommendedExplorationIds ?
+      customizationArgs.recommendedExplorationIds.value : null;
   }
 
   // TODO(#7165): Replace any with exact type
@@ -161,6 +162,10 @@ export class Exploration {
   // TODO(#7165): Replace any with exact type
   getVoiceovers(stateName: string): any {
     let state = this.getState(stateName);
+    if (!state) {
+      this.logger.error('Invalid state name: ' + stateName);
+      return null;
+    }
     let recordedVoiceovers = state.recordedVoiceovers;
     let contentId = state.content.getContentId();
     return recordedVoiceovers.getBindableVoiceovers(
@@ -170,9 +175,14 @@ export class Exploration {
   getVoiceover(
       stateName: string, languageCode: string): any {
     let state = this.getState(stateName);
+    if (!state) {
+      this.logger.error('Invalid state name: ' + stateName);
+      return null;
+    }
     let recordedVoiceovers = state.recordedVoiceovers;
     let contentId = state.content.getContentId();
-    return recordedVoiceovers.getVoiceover(contentId, languageCode);
+    const voiceovers = recordedVoiceovers.getVoiceover(contentId, languageCode);
+    return voiceovers || null;
   }
   // TODO(#7165): Replace any with exact type
   getAllVoiceovers(languageCode: string): any {
