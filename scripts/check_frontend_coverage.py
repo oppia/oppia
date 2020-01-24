@@ -289,6 +289,7 @@ FULLY_COVERED_FILENAMES = [
     'thread-status-display.service.ts',
     'topic-domain.constants.ajs.ts',
     'topic-domain.constants.ts',
+    'TopicDataObjectFactory.ts',
     'topic-editor-page.constants.ajs.ts',
     'topic-editor-page.constants.ts',
     'topic-landing-page.constants.ajs.ts',
