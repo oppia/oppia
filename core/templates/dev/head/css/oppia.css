@@ -4372,13 +4372,13 @@ div.oppia-issues-learner-action {
   background-color: #009A8B;
   border: none;
   border-radius: 15px;
-  box-shadow: 7px 0px #009595;
+  box-shadow: 10px 0px #008080;
   color: #fff;
   cursor: pointer;
   font-size: 24px;
   height: 220px;
   outline: none;
-  padding: 15px 25px;
+  padding: 20px 15px;
   text-align: center;  
 }
 
