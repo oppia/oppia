@@ -20,6 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import cloneDeep from 'lodash/cloneDeep';
+
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { QuestionDomainConstants } from
@@ -53,7 +55,7 @@ export class PretestQuestionBackendApiService {
 
     this.http.get(pretestDataUrl).toPromise().then((data: any) => {
       var pretestQuestionDicts = (
-        angular.copy(data.pretest_question_dicts));
+        cloneDeep(data.pretest_question_dicts));
       this._cursor = data.next_start_cursor;
       if (successCallback) {
         successCallback(pretestQuestionDicts);
