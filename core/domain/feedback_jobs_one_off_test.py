@@ -370,3 +370,122 @@ class FeedbackThreadCacheOneOffJobTest(test_utils.GenericTestBase):
 
         model = feedback_models.GeneralFeedbackThreadModel.get_by_id(thread_id)
         self.assertIsNone(model.last_nonempty_message_author_id)
+
+
+class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
+    """Tests for ExpSummary aggregations."""
+
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob]
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob
+            .create_new())
+        feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob
+            .get_output(job_id))
+
+        eval_output = [ast.literal_eval(stringified_item)
+                       for stringified_item in stringified_output]
+        output = [(eval_item[0], int(eval_item[1]))
+                  for eval_item in eval_output]
+        return output
+
+    def _check_model_validity(
+            self, user_id, thread_id, original_user_feedback_model):
+        """Checks if the model was migrated correctly."""
+        migrated_user_feedback_model = (
+            feedback_models.GeneralFeedbackThreadUserModel
+            .get(user_id, thread_id))
+        self.assertEqual(migrated_user_feedback_model.user_id, user_id)
+        self.assertEqual(migrated_user_feedback_model.thread_id, thread_id)
+        # Check that the other values didn't change.
+        self.assertEqual(
+            migrated_user_feedback_model.created_on,
+            original_user_feedback_model.created_on
+        )
+        self.assertEqual(
+            migrated_user_feedback_model.last_updated,
+            original_user_feedback_model.last_updated
+        )
+        self.assertEqual(
+            migrated_user_feedback_model.message_ids_read_by_user,
+            original_user_feedback_model.message_ids_read_by_user,
+        )
+
+    def test_successful_migration_deleted(self):
+        user_id = None
+        thread_id = 'exploration.exp_id.thread_id'
+        instance_id = '%s.%s' % (user_id, thread_id)
+        user_feedback_model = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id, user_id=user_id, thread_id=thread_id)
+        user_feedback_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [(u'SUCCESS - DELETED', 1)])
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
+                instance_id))
+
+    def test_successful_migration_not_deleted(self):
+        user_id = 'user_id'
+        thread_id = 'exploration.exp_id.thread_id'
+        instance_id = '%s.%s' % (user_id, thread_id)
+        user_feedback_model = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id, user_id=user_id, thread_id=thread_id)
+        user_feedback_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [(u'SUCCESS - NOT DELETED', 1)])
+        self._check_model_validity(user_id, thread_id, user_feedback_model)
+
+    def test_successful_migration_deleted_multiple(self):
+        user_id1 = None
+        thread_id1 = 'exploration.exp_id.thread_id1'
+        instance_id1 = '%s.%s' % (user_id1, thread_id1)
+        user_feedback_model1 = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id1, user_id=user_id1, thread_id=thread_id1)
+        user_feedback_model1.put()
+
+        user_id2 = None
+        thread_id2 = 'exploration.exp_id.thread_id2'
+        instance_id2 = '%s.%s' % (user_id2, thread_id2)
+        user_feedback_model2 = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id2, user_id=user_id2, thread_id=thread_id2)
+        user_feedback_model2.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [(u'SUCCESS - DELETED', 2)])
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
+                instance_id1))
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
+                instance_id2))
+
+    def test_successful_migration_not_deleted_multiple(self):
+        user_id1 = 'user1'
+        thread_id1 = 'exploration.exp_id.thread_id1'
+        instance_id1 = '%s.%s' % (user_id1, thread_id1)
+        user_feedback_model1 = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id1, user_id=user_id1, thread_id=thread_id1)
+        user_feedback_model1.put()
+
+        user_id2 = 'user2'
+        thread_id2 = 'exploration.exp_id.thread_id2'
+        instance_id2 = '%s.%s' % (user_id2, thread_id2)
+        user_feedback_model2 = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id2, user_id=user_id2, thread_id=thread_id2)
+        user_feedback_model2.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(output, [(u'SUCCESS - NOT DELETED', 2)])
+        self._check_model_validity(user_id1, thread_id1, user_feedback_model1)
+        self._check_model_validity(user_id2, thread_id2, user_feedback_model2)
