@@ -37,8 +37,7 @@ angular.module('oppia').factory('QuestionSuggestionService', [
             topic_name: topicName,
           }
         };
-        $http.post(url, data);
-        onSuccess();
+        $http.post(url, data).then(onSuccess);
       }
     };
   }]);

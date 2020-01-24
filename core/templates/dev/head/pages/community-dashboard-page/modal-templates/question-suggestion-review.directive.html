@@ -20,8 +20,8 @@
   <section class="oppia-reviewer-actions">
     <div class="oppia-suggestion-review-message" ng-show="reviewable">
       <div class="oppia-difficulty-message">Please select an appropriate difficulty for the question.</div>
-      <md-radio-group ng-model="difficulty">
-        <md-radio-button ng-repeat="rubric in skillRubrics track by $index" value="rubric.difficulty">
+      <md-radio-group ng-model="difficulty" ng-init="difficulty='Easy'">
+        <md-radio-button ng-repeat="rubric in skillRubrics track by $index" ng-value="rubric.difficulty">
           <strong> <[skillDifficulties[$index]]> </strong>
           <angular-html-bind html-data="rubric.explanation">
           </angular-html-bind>
@@ -35,10 +35,6 @@
       Review message (required if rejecting):
       <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
     </div>
-    <div ng-show="reviewable" class="oppia-suggestion-review-message">
-      Brief Description of Changes (required if accepting):
-      <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" style="width: 100%">
-    </div>
   </section>
 </div>
 
@@ -47,8 +43,8 @@
   <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
     <button class="btn btn-danger" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="reject()">Reject</button>
   </span>
-  <span uib-tooltip="Enter commit message before accepting" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
-    <button class="btn btn-success" ng-if="reviewable" ng-disabled="commitMessage.length == 0" ng-click="accept()">Accept</button>
+  <span tooltip-placement="bottom">
+    <button class="btn btn-success" ng-if="reviewable" ng-click="accept()">Accept</button>
   </span>
 </div>
 

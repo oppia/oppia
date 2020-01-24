@@ -552,6 +552,12 @@ export = {
 
   "SKILL_DIFFICULTIES": ["Easy", "Medium", "Hard"],
 
+  "SKILL_DIFFICULTY_LABEL_TO_FLOAT": {
+    "Easy": 0.3,
+    "Medium": 0.6,
+    "Hard": 0.9
+  },
+
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   // For the full new structures viewer features, both

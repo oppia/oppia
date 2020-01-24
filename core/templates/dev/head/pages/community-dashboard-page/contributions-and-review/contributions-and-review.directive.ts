@@ -172,14 +172,13 @@ angular.module('oppia').directive('contributionsAndReview', [
               controller: [
                 '$scope', '$uibModalInstance', 'SuggestionModalService',
                 'question', 'reviewable', 'DEFAULT_SKILL_DIFFICULTY',
-                'SKILL_DIFFICULTIES',
+                'SKILL_DIFFICULTIES', 'SKILL_DIFFICULTY_LABEL_TO_FLOAT',
                 function($scope, $uibModalInstance, SuggestionModalService,
                     question, reviewable, DEFAULT_SKILL_DIFFICULTY,
-                    SKILL_DIFFICULTIES) {
+                    SKILL_DIFFICULTIES, SKILL_DIFFICULTY_LABEL_TO_FLOAT) {
                   $scope.authorName = authorName;
                   $scope.contentHtml = contentHtml;
                   $scope.reviewable = reviewable;
-                  $scope.commitMessage = '';
                   $scope.reviewMessage = '';
                   $scope.question = question;
                   $scope.questionHeader = questionHeader;
@@ -200,9 +199,9 @@ angular.module('oppia').directive('contributionsAndReview', [
                       $uibModalInstance,
                       {
                         action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-                        commitMessage: $scope.commitMessage,
                         reviewMessage: $scope.reviewMessage,
-                        skillDifficulty: $scope.difficulty
+                        skillDifficulty: SKILL_DIFFICULTY_LABEL_TO_FLOAT[
+                          $scope.difficulty]
                       });
                   };
 
@@ -223,8 +222,7 @@ angular.module('oppia').directive('contributionsAndReview', [
             }).result.then(function(result) {
               ContributionAndReviewService.resolveSuggestiontoSkill(
                 targetId, suggestionId, result.action, result.reviewMessage,
-                result.commitMessage, parseFloat(result.skillDifficulty),
-                resolveSuggestionSuccess);
+                result.skillDifficulty, resolveSuggestionSuccess);
             });
           };
 

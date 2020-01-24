@@ -169,8 +169,8 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_skill)
     def put(self, target_id, suggestion_id):
-        if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
-            raise self.PageNotFoundException
+        # if not constants.ENABLE_NEW_STRUCTURE_VIEWER_UPDATES:
+        #     raise self.PageNotFoundException
 
         if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_SKILL:
             raise self.InvalidInputException(
@@ -192,8 +192,9 @@ class SuggestionToSkillActionHandler(base.BaseHandler):
                 # suggestion.
                 suggestion.change.skill_id = target_id
             suggestion.skill_difficulty = self.payload.get('skill_difficulty')
+            # Question suggestions do not use commit messages.
             suggestion_services.accept_suggestion(
-                suggestion, self.user_id, self.payload.get('commit_message'),
+                suggestion, self.user_id, 'UNUSED_COMMIT_MESSAGE',
                 self.payload.get('review_message'))
         elif action == suggestion_models.ACTION_TYPE_REJECT:
             suggestion_services.reject_suggestion(
