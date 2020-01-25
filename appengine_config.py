@@ -15,6 +15,7 @@
 # pylint: skip-file
 
 """Configuration for App Engine."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -39,6 +40,7 @@ def webapp_add_wsgi_middleware(app):  # pragma: no cover
 
         https://stackoverflow.com/questions/4305243/disable-appstats-logging
     """
+
     from google.appengine.ext.appstats import recording
 
     def save(self):

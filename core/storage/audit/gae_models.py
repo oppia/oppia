@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for storing the audit logs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 

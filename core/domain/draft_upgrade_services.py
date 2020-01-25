@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Commands that can be used to upgrade draft to newer Exploration versions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 

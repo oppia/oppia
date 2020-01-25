@@ -15,6 +15,7 @@
 """This script should only be run by Travis to install and provide a constant
 version of Chrome.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 

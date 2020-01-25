@@ -15,6 +15,7 @@
 """Controllers for the topics and skills dashboard, from where topics and skills
 are created.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 

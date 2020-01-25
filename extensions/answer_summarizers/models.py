@@ -36,6 +36,7 @@ calculation may look like this:
         'calculation_id': 'AnswerFrequencies',
     }]
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 

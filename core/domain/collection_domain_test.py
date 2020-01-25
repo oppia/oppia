@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for collection domain objects and methods defined on them."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
