@@ -98,7 +98,8 @@ var ProfilePage = function() {
       });
 
     if (explorationsCardByName.length === 0) {
-      throw new Error('There is no exploration card with name ' + explorationName);
+      throw new Error(
+        'There is no exploration card with name ' + explorationName);
     }
     expect(explorationsCardByName.count()).toBeGreaterThanOrEqual(1);
   };

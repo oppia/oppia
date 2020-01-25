@@ -243,7 +243,6 @@ describe('Music phrase player service', function() {
       if ($window.MIDI) {
         throw new Error('Expected MIDI library not to show up in tests.');
       }
-
       $window.MIDI = {  
         Player: {
           stop: function() {}

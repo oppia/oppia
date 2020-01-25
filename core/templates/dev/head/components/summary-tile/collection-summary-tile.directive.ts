@@ -83,7 +83,6 @@ angular.module('oppia').directive('collectionSummaryTile', [
           };
 
           ctrl.setHoverState = function(hoverState) {
-            console.log(hoverState)
             ctrl.collectionIsCurrentlyHoveredOver = hoverState;
           };
           ctrl.$onInit = function() {

@@ -46,10 +46,12 @@ export class baseInteractionValidationService {
     }
     if (missingArgs.length > 0) {
       if (missingArgs.length === 1) {
-        throw new Error( 'Expected customization arguments to have property: ' +
+        throw new Error( 
+          'Expected customization arguments to have property: ' +
           missingArgs[0]);
       } else {
-        throw new Error( 'Expected customization arguments to have properties: ' +
+        throw new Error( 
+          'Expected customization arguments to have properties: ' +
           missingArgs.join(', '));
       }
     }

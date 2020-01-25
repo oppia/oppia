@@ -59,7 +59,8 @@ angular.module('oppia').directive('stewardsLandingPage', [
             } else if (ctrl.activeTabName === ctrl.TAB_NAME_VOLUNTEERS) {
               return 'Volunteer';
             } else {
-              throw new  Error('Invalid active tab name: ' + ctrl.activeTabName);
+              throw new Error(
+                'Invalid active tab name: ' + ctrl.activeTabName);
             }
           };
 

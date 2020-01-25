@@ -212,7 +212,8 @@ describe('Interaction validator', function() {
         expect(function() {
           bivs.requireCustomizationArguments({}, expectedArgs);
         }).toThrow(
-          new Error('Expected customization arguments to have properties: first, second'));
+          new Error(
+            'Expected customization arguments to have properties: first, second'));
       }
     );
   });
