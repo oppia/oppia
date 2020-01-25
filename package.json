@@ -26,6 +26,8 @@
     "@angular/router": "^8.0.0",
     "@angular/upgrade": "^8.0.0",
     "@mapbox/stylelint-processor-arbitrary-tags": "^0.2.0",
+    "@percy/agent": "^0.20.12",
+    "@percy/protractor": "^1.0.4",
     "@types/angular": "^1.6.54",
     "@types/angular-animate": "^1.5.10",
     "@types/angular-mocks": "^1.7.0",

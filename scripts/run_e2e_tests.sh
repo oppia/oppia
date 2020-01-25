@@ -240,14 +240,14 @@ done
 # TODO(bhenning): Figure out if this is a bug with protractor.
 if [ "$RUN_ON_BROWSERSTACK" == "False" ]; then
   if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-    node_modules/protractor/bin/protractor core/tests/protractor.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
+    node_modules/.bin/percy exec -- node_modules/protractor/bin/protractor core/tests/protractor.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
   else
-    node_modules/protractor/bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
+    node_modules/.bin/percy exec -- node_modules/protractor/bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
   fi
 else
   if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-    node_modules/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
+    node_modules/.bin/percy exec -- node_modules/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE" --params.devMode="$DEV_MODE"
   else
-    node_modules/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
+    node_modules/.bin/percy exec -- node_modules/protractor/bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE" --params.devMode="$DEV_MODE"
   fi
 fi
