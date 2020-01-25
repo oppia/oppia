@@ -35,11 +35,11 @@
   <h3>One-off jobs</h3>
   <h4>Current time: <[$ctrl.HUMAN_READABLE_CURRENT_TIME]></h4>
   <table class="table table-striped">
-    <tr ng-repeat="job_spec in $ctrl.ONE_OFF_JOB_SPECS">
-      <td><[job_spec.job_type]></td>
+    <tr ng-repeat="job_spec in $ctrl.ONE_OFF_JOB_SPECS" class="protractor-test-one-off-jobs-rows">
+      <td class="protractor-test-one-off-jobs-name"><[job_spec.job_type]></td>
       <td>
         <button ng-click="$ctrl.startNewJob(job_spec.job_type)"
-                class="float-right">
+                class="float-right protractor-test-one-off-jobs-start-btn">
           Start new job
         </button>
         <span ng-if="job_spec.is_queued_or_running"
@@ -76,25 +76,26 @@
 </md-card>
 
 <md-card ng-if="$ctrl.UNFINISHED_JOB_DATA.length > 0"
-         class="oppia-page-card oppia-long-text" style="max-width: 900px">
+         class="oppia-page-card oppia-long-text protractor-test-unfinished-jobs-card" style="max-width: 900px">
   <h3>Unfinished jobs</h3>
   <em>Note: This table may be stale; refresh to see the latest state.</em>
   <table class="table">
     <tr>
-      <th>Job ID</th>
+      <th class="protractor-test-unfinished-one-off-jobs-id-header">Job ID</th>
       <th>Status</th>
       <th>Time started</th>
       <th>Time finished</th>
       <th></th>
     </tr>
-    <tr ng-repeat="job in $ctrl.UNFINISHED_JOB_DATA track by $index">
-      <td><[job.id]></td>
+    <tr ng-repeat="job in $ctrl.UNFINISHED_JOB_DATA track by $index" class="protractor-test-unfinished-one-off-jobs-rows">
+      <td class="protractor-test-unfinished-one-off-jobs-id"><[job.id]></td>
       <td><[job.status_code]></td>
       <td><[job.human_readable_time_started]></td>
       <td><[job.human_readable_time_finished]></td>
       <td>
         <button ng-if="job.can_be_canceled"
-                ng-click="$ctrl.cancelJob(job.id, job.job_type)">
+                ng-click="$ctrl.cancelJob(job.id, job.job_type)"
+                class="protractor-test-one-off-jobs-stop-btn">
           Cancel
         </button>
       </td>

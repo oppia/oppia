@@ -20,6 +20,7 @@ Domain objects capture domain-specific logic and are agnostic of how the
 objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 

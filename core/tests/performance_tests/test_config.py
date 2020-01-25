@@ -30,6 +30,7 @@ Each page entry includes:
         uncached: see above.
         cached: see above.
 """
+
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 PAGE_KEY_SPLASH = 'splash'
