@@ -204,8 +204,8 @@ describe('Interaction validator', function() {
       expect(function() {
         bivs.requireCustomizationArguments({}, ['levelone']);
       }).toThrow(new Error(
-        'Expected customization arguments to have property: '
-         + 'levelone'));
+        'Expected customization arguments to have property:' +
+        'levelone'));
     });
 
     it('should throw warnings for multiple missing top-level fields',
