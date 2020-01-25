@@ -164,6 +164,7 @@ def flush_memcache(app_name):
     Returns:
         bool. True if memcache is flushed successfully, false otherwise.
     """
+
     import dev_appserver
     dev_appserver.fix_sys_path()
 
