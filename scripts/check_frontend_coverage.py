@@ -161,6 +161,7 @@ FULLY_COVERED_FILENAMES = [
     'is-nonempty.filter.ts',
     'item-selection-input-rules.service.ts',
     'ItemSelectionInput.ts',
+    'learner-action-render.service.ts',
     'learner-answer-details-data.service.ts',
     'learner-dashboard-backend-api.service.ts',
     'learner-dashboard-ids-backend-api.service.ts',

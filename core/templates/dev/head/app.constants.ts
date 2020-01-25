@@ -124,6 +124,14 @@ export class AppConstants {
   public static ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS =
     'MultipleIncorrectSubmissions';
   public static ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS = 'CyclicStateTransitions';
+
+  // A block refers to a set of learner actions displayed together so that
+  // they are part of the same context. If two consecutive learner actions are
+  // from different states, we consider them unrelated. This constant refers to
+  // the maximum number of such actions that can exist in one block. (Note that
+  // all related actions are shown together, regardless of how many there are.)
+  public static MAX_UNRELATED_ACTIONS_PER_BLOCK = 4;
+
   public static SITE_NAME = 'Oppia.org';
 
   public static DEFAULT_PROFILE_IMAGE_PATH = '/avatar/user_blue_72px.png';

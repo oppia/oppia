@@ -1,0 +1,19 @@
+<div ng-repeat="action in $ctrl.nonSubmitActions track by $index" class="oppia-issues-learner-action" style="text-align: left; margin-left: 0.2rem;">
+  <angular-html-bind html-data="$ctrl.renderLearnerAction(action, $ctrl.getLearnerActionIndex($index))">
+  </angular-html-bind>
+</div>
+<div class="oppia-issues-learner-action">
+  <[$ctrl.tableIndex]>. Submitted the following answers in card "<[$ctrl.stateName]>"
+</div>
+<table class="oppia-issues-learner-action-table">
+  <tr>
+    <th>Answer</th>
+    <th>Feedback</th>
+  </tr>
+  <tr ng-repeat="action in $ctrl.finalBlock" ng-if="$ctrl.isActionSubmit(action)">
+    <td><angular-html-bind html-data="$ctrl.getShortAnswerHtml(action)"></angular-html-bind></td>
+    <td><angular-html-bind html-data="$ctrl.getFeedback(action)"></angular-html-bind></td>
+  </tr>
+</table>
+<angular-html-bind html-data="$ctrl.renderLearnerAction($ctrl.finalBlock[$ctrl.index], $ctrl.tableIndex + 1)">
+</angular-html-bind>
