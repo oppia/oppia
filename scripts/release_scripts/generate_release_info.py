@@ -96,7 +96,8 @@ def get_extra_commits_in_new_release(base_commit, repo):
         the current commit, which haven't been cherrypicked already.
     """
     get_commits_cmd = GIT_CMD_TEMPLATE_GET_NEW_COMMITS % base_commit
-    out = common.run_cmd(get_commits_cmd.split(' ')).split('\n')
+    out = python_utils.UNICODE(
+        common.run_cmd(get_commits_cmd.split(' ')), 'utf-8').split('\n')
     commits = []
     for line in out:
         # Lines that start with a - are already cherrypicked. The commits of
