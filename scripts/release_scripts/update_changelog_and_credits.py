@@ -493,29 +493,35 @@ def main():
             release_constants.RELEASE_SUMMARY_FILEPATH))
 
     common.ask_user_to_confirm(
-        'Check emails and names for authors and contributors in the release '
-        'summary file and verify that the emails are '
+        'Check emails and names for new authors and new contributors in the '
+        'file: %s and verify that the emails are '
         'correct through welcome emails sent from welcome@oppia.org '
-        '(confirm with Sean in case of doubt).')
+        '(confirm with Sean in case of doubt).' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.open_new_tab_in_browser_if_possible(
         release_constants.CREDITS_FORM_URL)
     common.ask_user_to_confirm(
         'Check the credits form and add any additional contributors '
-        'to the contributor list in the release summary file.')
+        'to the contributor list in the file: %s.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
         'Categorize the PR titles in the Uncategorized section of the '
-        'changelog in the release summary file, and arrange the changelog '
-        'to have user-facing categories on top.')
+        'changelog in the file: %s, and arrange the changelog '
+        'to have user-facing categories on top.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
-        'Verify each item is in the correct section in the release summary '
-        'file and remove trivial changes like "Fix lint errors" '
-        'from the changelog.')
+        'Verify each item is in the correct section in the '
+        'file: %s and remove trivial changes like "Fix lint errors" '
+        'from the changelog.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
-        'Ensure that all items in changelog in the release summary file '
-        'start with a verb in simple present tense.')
+        'Ensure that all items in changelog in the file: %s '
+        'start with a verb in simple present tense.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
-        'Please save the release summary file with all the changes that '
-        'you have made.')
+        'Please save the file: %s with all the changes that '
+        'you have made.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
 
     release_summary_lines = []
     with python_utils.open_file(
