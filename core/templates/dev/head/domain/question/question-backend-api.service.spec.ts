@@ -16,6 +16,8 @@
  */
 
 require('domain/question/question-backend-api.service.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/question/QuestionSummaryObjectFactory.ts');
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -25,6 +27,10 @@ import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Question backend Api service', function() {
   var QuestionBackendApiService = null;
+  var QuestionObjectFactory = null;
+  var QuestionSummaryObjectFactory = null;
+  var questionObject = null;
+  var questionSummaryObject = null;
   var sampleDataResults = null;
   var sampleResponse = null;
   var $httpBackend = null;
@@ -45,6 +51,8 @@ describe('Question backend Api service', function() {
       'QuestionBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
+    QuestionObjectFactory = $injector.get('QuestionObjectFactory');
+    QuestionSummaryObjectFactory = $injector.get('QuestionSummaryObjectFactory');
 
     // Sample question object returnable from the backend
     sampleDataResults = {
@@ -104,6 +112,12 @@ describe('Question backend Api service', function() {
       }],
       next_start_cursor: null
     };
+    questionObject = QuestionObjectFactory.createFromBackendDict(
+      sampleDataResults.question_dicts
+    );
+    questionSummaryObject = QuestionSummaryObjectFactory.createFromBackendDict(
+      sampleResponse.question_summary_dicts
+    );
   }));
 
   afterEach(function() {
@@ -125,7 +139,7 @@ describe('Question backend Api service', function() {
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(
-      sampleDataResults.question_dicts);
+      questionObject);
     expect(failHandler).not.toHaveBeenCalled();
   });
 
@@ -144,7 +158,7 @@ describe('Question backend Api service', function() {
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(
-      sampleDataResults.question_dicts);
+      questionObject);
     expect(failHandler).not.toHaveBeenCalled();
   });
 
@@ -270,7 +284,7 @@ describe('Question backend Api service', function() {
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith({
-        questionSummaries: sampleResponse.question_summary_dicts,
+        questionSummaries: questionSummaryObject,
         nextCursor: null
       });
       expect(failHandler).not.toHaveBeenCalled();
@@ -308,7 +322,7 @@ describe('Question backend Api service', function() {
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith({
-        questionSummaries: sampleResponse.question_summary_dicts,
+        questionSummaries: questionSummaryObject,
         nextCursor: null
       });
       expect(failHandler).not.toHaveBeenCalled();
