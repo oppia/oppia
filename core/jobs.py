@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Common classes and methods for managing long running jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -139,7 +140,9 @@ class BaseJobManager(python_utils.OBJECT):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id, queue_name, additional_job_params=None):
+    def enqueue(
+            cls, job_id, queue_name,
+            additional_job_params=None, shard_count=None):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
@@ -149,6 +152,7 @@ class BaseJobManager(python_utils.OBJECT):
                 values.
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
+            shard_count: int. Number of shards used for the job.
         """
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -158,7 +162,8 @@ class BaseJobManager(python_utils.OBJECT):
 
         # Enqueue the job.
         cls._pre_enqueue_hook(job_id)
-        cls._real_enqueue(job_id, queue_name, additional_job_params)
+        cls._real_enqueue(
+            job_id, queue_name, additional_job_params, shard_count)
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
@@ -350,7 +355,8 @@ class BaseJobManager(python_utils.OBJECT):
             cls.cancel(model.id, user_id)
 
     @classmethod
-    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
+    def _real_enqueue(
+            cls, job_id, queue_name, additional_job_params, shard_count):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Args:
@@ -360,6 +366,7 @@ class BaseJobManager(python_utils.OBJECT):
                 values.
             additional_job_params: dict(str : *) or None. Additional parameters
                 on jobs.
+            shard_count: int. Number of shards used for the job.
         """
         raise NotImplementedError(
             'Subclasses of BaseJobManager should implement _real_enqueue().')
@@ -631,7 +638,8 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
+    def _real_enqueue(
+            cls, job_id, queue_name, additional_job_params, unused_shard_count):
         """Puts the job in the task queue.
 
         Args:
@@ -641,9 +649,11 @@ class BaseDeferredJobManager(BaseJobManager):
                 values.
             additional_job_params: dict(str : *) or None. Additional params to
                 pass into the job's _run() method.
+            unused_shard_count: int. Number of shards used for the job.
         """
         taskqueue_services.defer(
-            cls._run_job, queue_name, job_id, additional_job_params)
+            cls._run_job, queue_name,
+            job_id, additional_job_params)
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
@@ -812,7 +822,8 @@ class BaseMapReduceJobManager(BaseJobManager):
             'reduce as a @staticmethod.')
 
     @classmethod
-    def _real_enqueue(cls, job_id, queue_name, additional_job_params):
+    def _real_enqueue(
+            cls, job_id, queue_name, additional_job_params, shard_count):
         """Configures, creates, and queues the pipeline for the given job and
         params.
 
@@ -823,6 +834,7 @@ class BaseMapReduceJobManager(BaseJobManager):
                 values.
             additional_job_params: dict(str : *) or None. Additional params to
                 pass into the job's _run() method.
+            shard_count: int. Number of shards used for the job.
 
         Raises:
             Exception: Passed a value to a parameter in the mapper which has
@@ -856,7 +868,8 @@ class BaseMapReduceJobManager(BaseJobManager):
                     'content_type': 'text/plain',
                     'naming_format': 'mrdata/$name/$id/output-$num',
                 }
-            }
+            },
+            'shards': shard_count
         }
 
         if additional_job_params is not None:
@@ -913,17 +926,21 @@ class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
     """Overriden to force subclass jobs into the one-off jobs queue."""
 
     @classmethod
-    def enqueue(cls, job_id, additional_job_params=None):
+    def enqueue(cls, job_id, additional_job_params=None, shard_count=8):
         """Marks a job as queued and adds it to a queue for processing.
 
         Args:
             job_id: str. The ID of the job to enqueue.
             additional_job_params: dict(str : *) or None. Additional parameters
                 for the job.
+            shard_count: int. Number of shards used for the job.
+                Default count is 8.
         """
         super(BaseMapReduceOneOffJobManager, cls).enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-            additional_job_params=additional_job_params)
+            job_id,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            additional_job_params=additional_job_params,
+            shard_count=shard_count)
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):

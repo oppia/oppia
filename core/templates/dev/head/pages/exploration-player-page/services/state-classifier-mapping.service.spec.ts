@@ -30,7 +30,9 @@ describe('State classifier mapping service', () => {
       });
 
       mappingService = TestBed.get(StateClassifierMappingService);
+    });
 
+    it('should return correct classifier details.', () => {
       mappingService.init({
         stateName1: {
           algorithm_id: 'TestClassifier',
@@ -38,15 +40,25 @@ describe('State classifier mapping service', () => {
           data_schema_version: 1
         }
       });
-    });
 
-    it('should return correct classifier details.', () => {
       var stateName = 'stateName1';
+      var stateNameNonexistent = 'stateName2';
       var retrievedClassifier = mappingService.getClassifier(stateName);
+      var nonExistentClassifier = mappingService.getClassifier(
+        stateNameNonexistent);
 
       expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
       expect(retrievedClassifier.classifierData).toEqual({});
       expect(retrievedClassifier.dataSchemaVersion).toEqual(1);
+      expect(nonExistentClassifier).toBe(null);
+    });
+
+    it('should not return correct classifier details when init is not ' +
+      'called', () => {
+      var stateName = 'stateName1';
+      var retrievedClassifier = mappingService.getClassifier(stateName);
+
+      expect(retrievedClassifier).toBe(null);
     });
   });
 });

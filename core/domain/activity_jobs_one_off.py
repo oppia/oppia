@@ -15,12 +15,14 @@
 # limitations under the License.
 
 """One-off jobs for activities."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 from core import jobs
 from core.domain import search_services
 from core.platform import models
+import feconf
 
 (
     collection_models, config_models,
@@ -55,3 +57,39 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         pass
+
+
+class ReplaceAdminIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that replaces the usage of 'Admin' in ExplorationCommitLogEntryModel
+    and ExplorationRightsSnapshotMetadataModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsSnapshotMetadataModel,
+                exp_models.ExplorationCommitLogEntryModel]
+
+    @staticmethod
+    def map(model):
+        if isinstance(model, exp_models.ExplorationRightsSnapshotMetadataModel):
+            if model.committer_id == 'Admin':
+                model.committer_id = feconf.SYSTEM_COMMITTER_ID
+                model.put(update_last_updated_time=False)
+                yield ('SUCCESS-RENAMED-SNAPSHOT', model.id)
+            else:
+                yield ('SUCCESS-KEPT-SNAPSHOT', model.id)
+        else:
+            if model.user_id == 'Admin':
+                model.user_id = feconf.SYSTEM_COMMITTER_ID
+                model.put(update_last_updated_time=False)
+                yield ('SUCCESS-RENAMED-COMMIT', model.id)
+            else:
+                yield ('SUCCESS-KEPT-COMMIT', model.id)
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function for this job."""
+        if key.startswith('SUCCESS-KEPT'):
+            yield (key, len(values))
+        else:
+            yield (key, values)

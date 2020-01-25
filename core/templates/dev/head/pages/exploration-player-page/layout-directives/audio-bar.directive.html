@@ -29,7 +29,21 @@
     </div>
     <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fas fa-sort-up"></i></div>
   </div>
-  <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()"><span class="audio-expand-button-text" translate="I18N_PLAYER_AUDIO_EXPAND_TEXT"></span> <i class="audio-expand-icon fas fa-sort-down"></i></div>
+  <div class="audio-expand-button audio-toggle-button" ng-if="!audioBarIsExpanded" ng-click="expandAudioBar()">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 px-0 mt-1 ml-2">
+          <span class="audio-expand-button-text" translate="I18N_PLAYER_AUDIO_EXPAND_TEXT"></span>
+        </div>
+        <div class="col-lg-3 col-6 px-0 mt-lg-2">
+          <i class="audio-expand-icon fas fa-headphones-alt"></i>
+        </div>
+        <div class="col-lg-2 col-6 px-0 mt-lg-1">
+          <i class="audio-expand-icon fas fa-sort-down"></i>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
@@ -71,9 +85,22 @@
   }
 
   .audio-expand-button {
-    height: 20px;
-    width: 80px;
-    text-transform: uppercase;
+    height: 45px;
+    width: 150px;
+  }
+
+  @media screen and (max-width: 991px) {
+    .audio-expand-button {
+      height: 32px;
+      width: 90px;
+    }
+    .audio-expand-button-text {
+      display: none;
+    }
+  }
+
+  .audio-expand-icon {
+    font-size: 25px;
   }
 
   .audio-collapse-button {
@@ -190,19 +217,6 @@
 
   .audio-bar-nav-hidden {
     margin-top: -270px;
-  }
-
-  @media screen and (max-width: 959px) {
-    .audio-expand-button {
-      height: 32px;
-      width: 100px;
-      text-transform: capitalize;
-    }
-
-    .audio-expand-button-text, .audio-expand-icon {
-      font-size: 18px;
-      line-height: 1.7em;
-    }
   }
 
 </style>
