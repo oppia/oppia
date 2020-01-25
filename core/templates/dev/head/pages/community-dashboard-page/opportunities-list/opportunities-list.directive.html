@@ -2,7 +2,7 @@
   <div infinite-scroll="$ctrl.showMoreOpportunities()"
        infinite-scroll-distance="1"
        infinite-scroll-disabled="false">
-    <div ng-repeat="opportunity in getOpportunities()">
+    <div ng-repeat="opportunity in getOpportunities() | filter:$ctrl.filterFunction">
       <opportunities-list-item opportunity="opportunity"
                                on-click-action-button="onClickActionButton"
                                progress-bar-required="isProgressBarRequired()"

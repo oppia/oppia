@@ -50,7 +50,9 @@ angular.module('oppia').directive('questionOpportunities', [
   function(UrlInterpolationService, MAX_QUESTIONS_PER_SKILL) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        filterText: '@',
+      },
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/community-dashboard-page/question-opportunities/' +

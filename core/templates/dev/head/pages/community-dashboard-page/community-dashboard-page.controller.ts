@@ -61,11 +61,12 @@ angular.module('oppia').directive('communityDashboardPage', [
         'COMMUNITY_DASHBOARD_TABS_DETAILS',
         'DEFAULT_OPPORTUNITY_LANGUAGE_CODE',
         function(
-            $window, LanguageUtilService, LocalStorageService,
+          $window, LanguageUtilService, LocalStorageService,
             TranslationLanguageService, UserService,
             COMMUNITY_DASHBOARD_TABS_DETAILS,
             DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
           var ctrl = this;
+          ctrl.filterText = '';
           var prevSelectedLanguageCode = (
             LocalStorageService.getLastSelectedTranslationLanguageCode());
           var allAudioLanguageCodes = LanguageUtilService
