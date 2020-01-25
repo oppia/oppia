@@ -1324,7 +1324,7 @@ class RegenerateMissingV2StatsModelsOneOffJob(
             else:
                 change_list = (
                     [exp_domain.ExplorationChange(commit_cmd)
-                    for commit_cmd in commit_log.commit_cmds])
+                     for commit_cmd in commit_log.commit_cmds])
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
 

@@ -1547,7 +1547,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
             self.assertEqual(model, None)
 
     def test_job_correctly_calculates_stats_for_missing_commit_log_models(self):
-        def mock_put(self):
+        def mock_put(unused_self):
             pass
 
         with self.swap(
@@ -1606,7 +1606,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
         model = stats_models.ExplorationStatsModel.get(model_id)
         model.delete()
 
-        for i in range(1, 7):
+        for i in python_utils.RANGE(1, 7):
             commit_log_model = (
                 exp_models.ExplorationCommitLogEntryModel.get_commit(exp.id, i))
             self.assertIsNone(commit_log_model)
