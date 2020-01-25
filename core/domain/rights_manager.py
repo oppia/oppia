@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain objects and functions that manage rights for various user actions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -404,6 +405,7 @@ def _update_collection_summary(activity_rights):
         activity_rights: ActivityRights. The rights object for the given
             activity.
     """
+
     from core.domain import collection_services
     collection_services.update_collection_summary(
         activity_rights.id, None)
