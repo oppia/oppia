@@ -52,7 +52,8 @@ describe('Question backend Api service', function() {
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
-    QuestionSummaryObjectFactory = $injector.get('QuestionSummaryObjectFactory');
+    QuestionSummaryObjectFactory = 
+    $injector.get('QuestionSummaryObjectFactory');
 
     // Sample question object returnable from the backend
     sampleDataResults = {
