@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Common utility functions and classes used by multiple Python scripts."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -30,7 +31,7 @@ import release_constants
 NODE_VERSION = '10.18.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = 'v1.21.1'
+YARN_VERSION = '1.21.1'
 
 COVERAGE_VERSION = '4.5.4'
 
@@ -435,6 +436,19 @@ def convert_to_posixpath(file_path):
     if not is_windows_os():
         return file_path
     return file_path.replace('\\', '/')
+
+
+def create_readme(dir_path, readme_content):
+    """Creates a readme in a given dir path with the specified
+    readme content.
+
+    Args:
+        dir_path: str. The path of the dir where the README is to
+            be created.
+        readme_content: str. The content to be written in the README.
+    """
+    with python_utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+        f.write(readme_content)
 
 
 class CD(python_utils.OBJECT):

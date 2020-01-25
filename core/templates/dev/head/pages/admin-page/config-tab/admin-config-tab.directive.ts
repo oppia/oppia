@@ -39,8 +39,6 @@ angular.module('oppia').directive('adminConfigTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.configProperties = {};
-
         ctrl.isNonemptyObject = function(object) {
           var hasAtLeastOneElement = false;
           for (var property in object) {
@@ -101,8 +99,10 @@ angular.module('oppia').directive('adminConfigTab', [
             AdminTaskManagerService.finishTask();
           });
         };
-
-        ctrl.reloadConfigProperties();
+        ctrl.$onInit = function() {
+          ctrl.configProperties = {};
+          ctrl.reloadConfigProperties();
+        };
       }]
     };
   }

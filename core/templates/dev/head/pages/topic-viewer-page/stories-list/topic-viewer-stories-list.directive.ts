@@ -22,7 +22,8 @@ require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('storiesList', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  '$timeout', 'UrlInterpolationService',
+  function($timeout, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -31,13 +32,11 @@ angular.module('oppia').directive('storiesList', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-viewer-page/stories-list/' +
         'topic-viewer-stories-list.directive.html'),
-      controller: ['WindowDimensionsService', '$scope', '$timeout',
-        function(WindowDimensionsService, $scope, $timeout) {
+      controller: ['WindowDimensionsService', '$scope',
+        function(WindowDimensionsService, $scope) {
+          var ctrl = this;
           var STORY_TILE_WIDTH_PX = 360;
-          $scope.leftmostCardIndices = 0;
           var MAX_NUM_TILES_PER_ROW = 4;
-          $scope.tileDisplayCount = 0;
-          $scope.canonicalStories = $scope.getCanonicalStories();
 
           var initCarousels = function() {
             $scope.canonicalStories = $scope.getCanonicalStories();
@@ -109,30 +108,34 @@ angular.module('oppia').directive('storiesList', [
             });
           };
 
-          var topicViewerWindowCutoffPx = 895;
-          $scope.topicViewerWindowIsNarrow = (
-            WindowDimensionsService.getWidth() <= topicViewerWindowCutoffPx);
-
-          WindowDimensionsService.registerOnResizeHook(function() {
-            $scope.topicViewerWindowIsNarrow = (
-              WindowDimensionsService.getWidth() <= topicViewerWindowCutoffPx);
-            $scope.$apply();
-          });
-
           $scope.incrementLeftmostCardIndex = function() {
             $scope.leftmostCardIndices++;
           };
           $scope.decrementLeftmostCardIndex = function() {
             $scope.leftmostCardIndices--;
           };
-          $timeout(function() {
-            initCarousels();
-          }, 390);
 
-          $(window).resize(function() {
-            initCarousels();
-            $scope.$apply();
-          });
+          ctrl.$onInit = function() {
+            $scope.leftmostCardIndices = 0;
+            $scope.tileDisplayCount = 0;
+            $scope.canonicalStories = $scope.getCanonicalStories();
+            var topicViewerWindowCutoffPx = 895;
+            $scope.topicViewerWindowIsNarrow = (
+              WindowDimensionsService.getWidth() <= topicViewerWindowCutoffPx);
+            WindowDimensionsService.registerOnResizeHook(function() {
+              $scope.topicViewerWindowIsNarrow = (
+                WindowDimensionsService.getWidth() <= topicViewerWindowCutoffPx
+              );
+              $scope.$apply();
+            });
+            $timeout(function() {
+              initCarousels();
+            }, 390);
+            $(window).resize(function() {
+              initCarousels();
+              $scope.$apply();
+            });
+          };
         }
       ]
     };

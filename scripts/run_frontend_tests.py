@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """This script runs unit tests for frontend JavaScript code (using Karma)."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -24,6 +25,7 @@ import sys
 import python_utils
 
 from . import build
+from . import check_frontend_coverage
 from . import common
 from . import install_third_party_libs
 from . import setup
@@ -46,6 +48,11 @@ _PARSER.add_argument(
     help='optional; if specified, runs frontend karma tests on both minified '
     'and non-minified code',
     action='store_true')
+_PARSER.add_argument(
+    '--check_coverage',
+    help='option; if specified, checks frontend test coverage',
+    action='store_true'
+)
 
 
 def main(args=None):
@@ -86,7 +93,16 @@ def main(args=None):
     task.wait()
 
     python_utils.PRINT('Done!')
-    sys.exit(task.returncode)
+
+    if parsed_args.check_coverage:
+        if task.returncode:
+            sys.exit(
+                'The frontend tests failed. Please fix it before running the'
+                ' test coverage check.')
+        else:
+            check_frontend_coverage.main()
+    elif task.returncode:
+        sys.exit(task.returncode)
 
 
 if __name__ == '__main__':

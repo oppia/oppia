@@ -20,6 +20,7 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/browser-checker.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -29,11 +30,11 @@ require(
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
-  'HtmlEscaperService', 'MultipleChoiceInputRulesService',
-  'UrlInterpolationService',
+  'BrowserCheckerService', 'HtmlEscaperService',
+  'MultipleChoiceInputRulesService', 'UrlInterpolationService',
   function(
-      HtmlEscaperService, MultipleChoiceInputRulesService,
-      UrlInterpolationService) {
+      BrowserCheckerService, HtmlEscaperService,
+      MultipleChoiceInputRulesService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -46,19 +47,45 @@ angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
         '$attrs', 'CurrentInteractionService',
         function($attrs, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.choices = HtmlEscaperService.escapedJsonToObj(
-            $attrs.choicesWithValue);
-          ctrl.answer = null;
 
-          ctrl.submitAnswer = function(answer) {
+          ctrl.selectAnswer = function(event, answer) {
             if (answer === null) {
               return;
             }
-            answer = parseInt(answer, 10);
-            CurrentInteractionService.onSubmit(
-              answer, MultipleChoiceInputRulesService);
+            // Deselect previously selected option.
+            var selectedElement = (
+              document.querySelector(
+                'button.multiple-choice-option.selected'));
+            if (selectedElement) {
+              selectedElement.classList.remove('selected');
+            }
+            // Selected current option.
+            event.currentTarget.classList.add('selected');
+            ctrl.answer = parseInt(answer, 10);
+            if (!BrowserCheckerService.isMobileDevice()) {
+              ctrl.submitAnswer();
+            }
           };
-          CurrentInteractionService.registerCurrentInteraction(null, null);
+
+          var validityCheckFn = function() {
+            return ctrl.answer !== null;
+          };
+
+          ctrl.submitAnswer = function() {
+            if (ctrl.answer === null) {
+              return;
+            }
+            CurrentInteractionService.onSubmit(
+              ctrl.answer, MultipleChoiceInputRulesService);
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.choices = HtmlEscaperService.escapedJsonToObj(
+              $attrs.choicesWithValue);
+            ctrl.answer = null;
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitAnswer, validityCheckFn);
+          };
         }
       ]
     };
