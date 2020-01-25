@@ -44,6 +44,18 @@ describe('Param Spec Object Factory', () => {
     });
   });
 
+  it('should create a param spec objec from a non default type', () => {
+    const paramType = ptof.getTypeFromBackendName('UnicodeString');
+    const paramSpecObject = psof.createFromBackendDict({
+      obj_type: 'UnicodeString'
+    });
+
+    expect(paramSpecObject.getType()).toEqual(paramType);
+    expect(paramSpecObject.toBackendDict()).toEqual({
+      obj_type: 'UnicodeString'
+    });
+  });
+
   it('should not create a param spec objec from backend when obj_type ' +
     'is invalid', () => {
     expect(() => {
