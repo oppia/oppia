@@ -110,7 +110,7 @@ describe('MultipleChoiceInputValidationService', () => {
     expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-    }).toThrow('Expected customization arguments to have property: choices');
+    }).toThrow(new Error('Expected customization arguments to have property: choices'));
   });
 
   it('should expect non-empty and unique choices', () => {
