@@ -165,6 +165,8 @@ def generate_app_yaml(is_prod_mode=False):
             content = content.replace(
                 file_path,
                 prod_file_prefix + file_path)
+    if not is_prod_mode:
+        content = content.replace('version: default', '')
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
     with python_utils.open_file(APP_YAML_FILEPATH, 'w+') as prod_yaml_file:
