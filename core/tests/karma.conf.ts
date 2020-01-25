@@ -92,12 +92,14 @@ module.exports = function(config) {
     browsers: ['CI_Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
+    browserNoActivityTimeout: 120000,
+    browserDisconnectTimeout: 20000,
+    browserDisconnectTolerance: 3,
     browserConsoleLogOptions: {
       level: 'log',
       format: '%b %T: %m',
       terminal: true
     },
-    browserNoActivityTimeout: 120000,
     // Continue running in the background after running tests.
     singleRun: true,
     customLaunchers: {
@@ -108,7 +110,8 @@ module.exports = function(config) {
         // https://github.com/karma-runner/karma-chrome-launcher/issues/180
         flags: [
           '--no-sandbox',
-          '--disable-gpu'
+          '--disable-gpu',
+          '--js-flags=--max-old-space-size=4096'
         ]
       }
     },
@@ -150,17 +153,9 @@ module.exports = function(config) {
         ],
         extensions: ['.ts', '.js', '.json', '.html', '.svg', '.png']
       },
+      devtool: 'inline-source-map',
       module: {
         rules: [
-          {
-            // Exclude all the spec files from the report.
-            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
-            enforce: 'post',
-            use: {
-              loader: 'istanbul-instrumenter-loader',
-              options: { esModules: true }
-            }
-          },
           {
             test: /\.ts$/,
             use: [
@@ -178,6 +173,15 @@ module.exports = function(config) {
           {
             test: /\.html$/,
             loader: 'underscore-template-loader'
+          },
+          {
+            // Exclude all the spec files from the report.
+            test: /^(?!.*(s|S)pec\.ts$).*\.ts$/,
+            enforce: 'post',
+            use: {
+              loader: 'istanbul-instrumenter-loader',
+              options: { esModules: true }
+            }
           },
           {
             test: /\.css$/,

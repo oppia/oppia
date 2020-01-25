@@ -20,8 +20,8 @@ require(
   'pages/exploration-player-page/learner-experience/' +
   'continue-button.directive.ts');
 
+require('domain/utilities/browser-checker.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -49,20 +49,22 @@ angular.module('oppia').directive('progressNav', [
         '/pages/exploration-player-page/layout-directives/' +
         'progress-nav.directive.html'),
       controller: [
-        '$scope', '$rootScope', 'PlayerPositionService', 'UrlService',
-        'PlayerTranscriptService', 'ExplorationEngineService',
-        'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
+        '$rootScope', '$scope', 'BrowserCheckerService',
+        'ExplorationPlayerStateService', 'PlayerPositionService',
+        'PlayerTranscriptService', 'UrlService', 'WindowDimensionsService',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'INTERACTION_SPECS',
-        'ExplorationPlayerStateService',
-        function($scope, $rootScope, PlayerPositionService, UrlService,
-            PlayerTranscriptService, ExplorationEngineService,
-            WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
+        'TWO_CARD_THRESHOLD_PX',
+        function($rootScope, $scope, BrowserCheckerService,
+            ExplorationPlayerStateService, PlayerPositionService,
+            PlayerTranscriptService, UrlService, WindowDimensionsService,
             CONTINUE_BUTTON_FOCUS_LABEL, INTERACTION_SPECS,
-            ExplorationPlayerStateService) {
+            TWO_CARD_THRESHOLD_PX) {
           var ctrl = this;
           var transcriptLength = 0;
           var interactionIsInline = true;
           var interactionHasNavSubmitButton = false;
+          var SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE = [
+            'ItemSelectionInput', 'MultipleChoiceInput'];
           var updateDisplayedCardInfo = function() {
             transcriptLength = PlayerTranscriptService.getNumCards();
             $scope.displayedCardIndex =
@@ -103,6 +105,22 @@ angular.module('oppia').directive('progressNav', [
             }
           };
 
+          var doesInteractionHaveSpecialCaseForMobile = function() {
+            // The submit button should be shown:
+            // 1. In mobile mode, if the current interaction is either
+            //    ItemSelectionInput or MultipleChoiceInput.
+            // 2. In desktop mode, if the current interaction is
+            //    ItemSelectionInput with maximum selectable choices > 1.
+            if (BrowserCheckerService.isMobileDevice()) {
+              return (SHOW_SUBMIT_INTERACTIONS_ONLY_FOR_MOBILE.indexOf(
+                $scope.interactionId) >= 0);
+            } else {
+              return ($scope.interactionId === 'ItemSelectionInput' &&
+                      $scope.interactionCustomizationArgs
+                        .maxAllowableSelectionCount.value > 1);
+            }
+          };
+
           $scope.changeCard = function(index) {
             if (index >= 0 && index < transcriptLength) {
               PlayerPositionService.recordNavigationButtonClick();
@@ -122,9 +140,7 @@ angular.module('oppia').directive('progressNav', [
           };
 
           $scope.shouldGenericSubmitButtonBeShown = function() {
-            if ($scope.interactionId === 'ItemSelectionInput' &&
-                $scope.interactionCustomizationArgs
-                  .maxAllowableSelectionCount.value > 1) {
+            if (doesInteractionHaveSpecialCaseForMobile()) {
               return true;
             }
 
