@@ -2354,7 +2354,7 @@ class Exploration(python_utils.OBJECT):
             for content_id in voiceovers.keys():
                 for language_code in voiceovers[content_id].keys():
                     # Initialize duration with 0.0 for every voiceover
-                    # recording under Content, Feedback, Hints, Solutions.
+                    # recording under Content, Feedback, Hints, and Solutions.
                     # This is necessary to keep the state functional
                     # when migrating to v31.
                     voiceovers[content_id][language_code]['duration'] = 0.0

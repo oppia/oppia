@@ -108,7 +108,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                 new_change = change.new_value['voiceovers_mapping']
                 language_code = new_change['content'].keys()
                 # Initialize the value to migrate draft state to v31.
-                new_change['content'][language_code[0]]['duration'] = 0
+                new_change['content'][language_code[0]]['duration'] = 0.0
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
