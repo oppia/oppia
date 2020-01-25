@@ -34,7 +34,9 @@ import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
-
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts'
+import { ValidatorsService } from 'services/validators.service';
+import { ConceptCardObjectFactory } from './ConceptCardObjectFactory';
 require('App.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/SkillObjectFactory.ts');
@@ -54,6 +56,10 @@ describe('Skill object factory', function() {
     $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+    $provide.value(
+      'SkillObjectFactory',new SkillObjectFactory(new ConceptCardObjectFactory()
+      ,new MisconceptionObjectFactory(), new RubricObjectFactory(),new ValidatorsService())
+    )
     $provide.value(
       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
@@ -77,15 +83,14 @@ describe('Skill object factory', function() {
     var skillContentsDict = null;
     var skillDict = null;
     var skillDifficulties = null;
-
-    beforeEach(angular.mock.inject(function($injector) {
-      SkillObjectFactory = $injector.get('SkillObjectFactory');
-      MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
-      RubricObjectFactory = $injector.get('RubricObjectFactory');
-      ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
-      SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
-      skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
-
+    beforeEach(() => {
+      SkillObjectFactory = new SkillObjectFactory();
+      MisconceptionObjectFactory = new MisconceptionObjectFactory();
+      RubricObjectFactory=new RubricObjectFactory();
+      ConceptCardObjectFactory=new ConceptCardObjectFactory();
+      SubtitledHtmlObjectFactory=new SubtitledHtmlObjectFactory();
+      skillDifficulties=["Easy", "Medium", "Hard"];
+      
       misconceptionDict1 = {
         id: 2,
         name: 'test name',
@@ -144,7 +149,16 @@ describe('Skill object factory', function() {
         all_questions_merged: false,
         prerequisite_skill_ids: ['skill_1']
       };
-    }));
+
+    });
+    // beforeEach(angular.mock.inject(function($injector) {
+    //   SkillObjectFactory = $injector.get('SkillObjectFactory');
+    //   MisconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+    //   RubricObjectFactory = $injector.get('RubricObjectFactory');
+    //   ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
+    //   SubtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
+    //   skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
+    // }));
 
     it('should create a new skill from a backend dictionary', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
