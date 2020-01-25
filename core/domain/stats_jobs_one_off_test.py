@@ -32,6 +32,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (exp_models, stats_models,) = models.Registry.import_models(
     [models.NAMES.exploration, models.NAMES.statistics])
@@ -1492,3 +1493,134 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
             output,
             [u'[u\'Missing model without revert commit\', [u\''
              + self.EXP_ID + '\']]'])
+
+    def test_job_cleans_up_stats_models_for_deleted_exps(self):
+        exp_id_1 = 'EXP_ID_1'
+        exp = self.save_new_valid_exploration(exp_id_1, 'owner_id')
+        state_name = exp.init_state_name
+
+        change_list = []
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': state_name,
+                'new_state_name': 'b',
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+
+        exp_services.revert_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp_id_1, 3, 2)
+
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': state_name,
+                'new_state_name': 'b',
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+        exp = exp_fetchers.get_exploration_by_id(exp_id_1)
+        self.assertEqual(exp.version, 5)
+
+        exp_services.delete_exploration(feconf.SYSTEM_COMMITTER_ID, exp_id_1)
+
+        # The call to delete_exploration() causes some tasks to be started. So,
+        # we flush them before running the job.
+        self.process_and_flush_pending_tasks()
+
+        output = self.run_one_off_job()
+        self.assertEqual(
+            output, [u'[u\'Deleted all stats\', [u"{u\'exp_id\': \'EXP_ID_1\', '
+                     'u\'number_of_models\': 5}"]]', u'[u\'No change\', 1]'])
+
+        all_models = (
+            stats_models.ExplorationStatsModel.get_multi_stats_models(
+                [exp_domain.ExpVersionReference(exp.id, version)
+                 for version in python_utils.RANGE(1, exp.version + 1)]))
+        for model in all_models:
+            self.assertEqual(model, None)
+
+    def test_job_correctly_calculates_stats_for_missing_commit_log_models(self):
+        def mock_put(self):
+            pass
+
+        with self.swap(
+            exp_models.ExplorationCommitLogEntryModel, 'put', mock_put):
+
+            exp_id_1 = 'EXP_ID_1'
+            exp = self.save_new_valid_exploration(exp_id_1, 'owner_id')
+            state_name = exp.init_state_name
+
+            change_list = []
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+            change_list = [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': state_name,
+                    'new_state_name': 'b',
+                })
+            ]
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+
+            exp_services.revert_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exp_id_1, 3, 2)
+
+            change_list = [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': state_name,
+                    'new_state_name': 'c',
+                })
+            ]
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+            change_list = [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'd',
+                })
+            ]
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+            change_list = [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'd'
+                })
+            ]
+            exp_services.update_exploration(
+                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+        exp = exp_fetchers.get_exploration_by_id(exp_id_1)
+        self.assertEqual(exp.version, 7)
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.EXP_ID, 4)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        model.delete()
+
+        for i in range(1, 7):
+            commit_log_model = (
+                exp_models.ExplorationCommitLogEntryModel.get_commit(exp.id, i))
+            self.assertIsNone(commit_log_model)
+
+        output = self.run_one_off_job()
+        self.assertEqual(output, [u'[u\'No change\', 1]', u'[u\'Success\', 1]'])
+
+        all_models = (
+            stats_models.ExplorationStatsModel.get_multi_stats_models(
+                [exp_domain.ExpVersionReference(exp.id, version)
+                 for version in python_utils.RANGE(1, exp.version + 1)]))
+        for model in all_models:
+            self.assertNotEqual(model, None)
+        self.assertTrue('c' in all_models[4].state_stats_mapping)
+        self.assertFalse('b' in all_models[4].state_stats_mapping)
+
+        self.assertTrue('d' in all_models[5].state_stats_mapping)
+        self.assertFalse('d' in all_models[6].state_stats_mapping)
