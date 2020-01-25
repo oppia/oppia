@@ -25,9 +25,9 @@ angular.module('oppia').factory('QuestionBackendApiService', [
   'QuestionSummaryObjectFactory', 'UrlInterpolationService',
   'QUESTIONS_LIST_URL_TEMPLATE', 'QUESTION_PLAYER_URL_TEMPLATE',
   function(
-    $http, $q, QuestionObjectFactory,
-    QuestionSummaryObjectFactory, UrlInterpolationService,
-    QUESTIONS_LIST_URL_TEMPLATE, QUESTION_PLAYER_URL_TEMPLATE) {
+      $http, $q, QuestionObjectFactory,
+      QuestionSummaryObjectFactory, UrlInterpolationService,
+      QUESTIONS_LIST_URL_TEMPLATE, QUESTION_PLAYER_URL_TEMPLATE) {
     var _fetchQuestions = function(
         skillIds, questionCount, questionsSortedByDifficulty,
         successCallback, errorCallback) {
@@ -74,18 +74,18 @@ angular.module('oppia').factory('QuestionBackendApiService', [
       $http.get(questionsDataUrl).then(function(response) {
         var questionSummaries = angular.copy(
           response.data.question_summary_dicts);
-          var questionSummaryObject = questionSummaries.map(
-            function(questionSummaryDict) {
-              return QuestionSummaryObjectFactory.createFromBackendDict(
-                questionSummaryDict);
-            }
-          );
-          var nextCursor = response.data.next_start_cursor;
-          if (successCallback) {
-            successCallback({
-              questionSummaries: questionSummaryObject,
-              nextCursor: nextCursor
-            });
+        var questionSummaryObject = questionSummaries.map(
+          function(questionSummaryDict) {
+            return QuestionSummaryObjectFactory.createFromBackendDict(
+              questionSummaryDict);
+          }
+        );
+        var nextCursor = response.data.next_start_cursor;
+        if (successCallback) {
+          successCallback({
+            questionSummaries: questionSummaryObject,
+            nextCursor: nextCursor
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {
