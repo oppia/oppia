@@ -2,9 +2,6 @@ runtime: python27
 api_version: 1
 threadsafe: false
 instance_class: F2
-# The "version" line is added here so that MR jobs can run locally (see issue
-# #6534 on oppia/oppia).
-version: default
 
 builtins:
 - appstats: on
@@ -17,63 +14,12 @@ inbound_services:
 
 default_expiration: "10m"
 handlers:
-# DEVELOPMENT STATIC
-- url: /webpack_bundles
-  static_dir: webpack_bundles
-  secure: always
-  application_readable: true
-  expiration: "0"
-- url: /assets
-  static_dir: assets
-  secure: always
-  application_readable: true
-  expiration: "0"
-# Serve js scripts and css files under core/templates/dev/head.
-# This regex allows us to recursively serve js scripts.
-# "\1" inserts text captured by the capture group in the URL pattern.
+# PRODUCTION STATIC
 - url: /templates/dev/head/(.*\.(css))$
   static_files: core/templates/dev/head/\1
   upload: core/templates/dev/head/(.*\.(css))$
   secure: always
   expiration: "0"
-- url: /templates/dev/head/(.*\.(js))$
-  static_files: local_compiled_js/core/templates/dev/head/\1
-  upload: local_compiled_js/core/templates/dev/head/(.*\.(js))$
-  secure: always
-  expiration: "0"
-- url: /templates/dev/head/(.*\.(html))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(html))$
-  secure: always
-  expiration: "0"
-  application_readable: true
-- url: /third_party/static
-  static_dir: third_party/static
-  secure: always
-  expiration: "90d"
-- url: /third_party/generated
-  static_dir: third_party/generated
-  secure: always
-  expiration: "0"
-- url: /extensions/interactions/(.*)/static/(.*\.(css|png))
-  static_files: extensions/interactions/\1/static/\2
-  upload: extensions/interactions/(.*)/static/(.*\.(css|png))
-  secure: always
-  expiration: "0"
-- url: /extensions/interactions/(.*)/static/(.js)
-  static_files: extensions/interactions/\1/static/\2
-  upload: local_compiled_js/extensions/interactions/(.*)/static/(.js)
-  secure: always
-  expiration: "0"
-- url: /extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
-  static_files: extensions/\1/\2/directives/\3
-  upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
-  secure: always
-  expiration: "0"
-# Serve js scripts for gadgets, interactions, rich_text_components, custom ckeditor plugins
-# and objects under extensions in dev mode. This regex allows us to recursively serve js
-# scripts under the three specified directories. "\1" and "\2" insert capture
-# groups from the url pattern.
 - url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
   static_files: extensions/\1/\2
   upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
@@ -84,16 +30,33 @@ handlers:
   upload: extensions/ckeditor_plugins/(.*\.(js))$
   secure: always
   expiration: "0"
-- url: /extensions/visualizations/(.*\.html)
-  static_files: extensions/visualizations/\1
-  upload: extensions/visualizations/(.*\.html)
+- url: /third_party/static
+  static_dir: third_party/static
+  secure: always
+  expiration: "90d"
+- url: /third_party/generated
+  static_dir: third_party/generated
   secure: always
   expiration: "0"
-- url: /extensions/objects/templates/(.*\.html)
-  static_files: extensions/objects/templates/\1
-  upload: extensions/objects/templates/(.*\.html)
+- url: /favicon.ico
+  static_files: assets/favicon.ico
+  upload: assets/favicon.ico
   secure: always
-  expiration: "0"
+- url: /robots.txt
+  static_files: assets/robots.txt
+  upload: assets/robots.txt
+  secure: always
+- url: /sitemap.xml
+  static_files: assets/sitemap.xml
+  upload: assets/sitemap.xml
+  secure: always
+- url: /mapreduce/pipeline/images
+  static_dir: third_party/gae-mapreduce-1.9.22.0/mapreduce/lib/pipeline/ui/images
+  secure: always
+- url: /build
+  static_dir: build
+  secure: always
+  expiration: "90d"
 
 # DYNAMIC
 - url: /mapreduce(/.*)?
