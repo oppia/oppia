@@ -109,6 +109,14 @@ export class StoryNode {
     this._thumbnailFilename = thumbnailFilename;
   }
 
+  prepublishValidate(): Array<string> {
+    let issues = [];
+    if (!this._thumbnailFilename) {
+      issues.push('Chapter ' + this._title + ' should have a thumbnail.');
+    }
+    return issues;
+  }
+
   validate(): string[] {
     var issues = [];
 

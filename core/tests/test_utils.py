@@ -1606,7 +1606,7 @@ tags: []
             [{'cmd': question_domain.CMD_CREATE_NEW}])
 
     def save_new_skill(
-            self, skill_id, owner_id,
+            self, skill_id, owner_id, thumbnail_filename=None,
             description='description', misconceptions=None, rubrics=None,
             skill_contents=None, language_code=constants.DEFAULT_LANGUAGE_CODE,
             prerequisite_skill_ids=None):

@@ -83,6 +83,14 @@ export class Subtopic {
     return issues;
   }
 
+  prepublishValidate(): Array<string> {
+    let issues = [];
+    if (!this._thumbnailFilename) {
+      issues.push('Subtopic ' + this._title + ' should have a thumbnail.');
+    }
+    return issues;
+  }
+
   // Returns the summaries of the skills in the subtopic.
   getSkillSummaries() {
     return this._skillSummaries.slice();

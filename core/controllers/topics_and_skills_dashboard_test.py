@@ -229,6 +229,21 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
+    def test_skill_creation_in_invalid_thumbnail_filename(self):
+        self.login(self.ADMIN_EMAIL)
+        csrf_token = self.get_new_csrf_token()
+        payload = {
+            'description': 'Skill Description',
+            'linked_topic_ids': [self.topic_id],
+            'rubrics': [],
+            'thumbnail_filename': []
+        }
+        json_response = self.post_json(
+            self.url, payload, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(json_response['status_code'], 400)
+        self.logout()
+
     def test_skill_creation_in_invalid_explanation(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()

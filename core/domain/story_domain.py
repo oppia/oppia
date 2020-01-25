@@ -642,6 +642,12 @@ class Story(python_utils.OBJECT):
                 'Expected description to be a string, received %s'
                 % self.description)
 
+        if self.thumbnail_filename is not None and not (
+                isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % self.thumbnail_filename)
+
         if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected notes to be a string, received %s' % self.notes)

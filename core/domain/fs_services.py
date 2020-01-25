@@ -18,11 +18,13 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import imghdr
 import json
 
 from core.domain import fs_domain
 from core.platform import models
 import feconf
+import utils
 
 gae_image_services = models.Registry.import_gae_image_services()
 
@@ -39,6 +41,49 @@ def save_original_and_compressed_versions_of_image(
         original_image_content: str. The content of the original image.
         filename_prefix: str. The string to prefix to the filename.
     """
+    if not original_image_content:
+        raise utils.InvalidInputException('No image supplied')
+
+    allowed_formats = ', '.join(
+        list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
+
+    # Verify that the data is recognized as an image.
+    file_format = imghdr.what(None, h=original_image_content)
+    if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
+        raise utils.InvalidInputException('Image not recognized')
+
+    # Verify that the file type matches the supplied extension.
+    if not filename:
+        raise utils.InvalidInputException('No filename supplied')
+    if filename.rfind('.') == 0:
+        raise utils.InvalidInputException('Invalid filename')
+    if '/' in filename or '..' in filename:
+        raise utils.InvalidInputException(
+            'Filenames should not include slashes (/) or consecutive '
+            'dot characters.')
+    if '.' not in filename:
+        raise utils.InvalidInputException(
+            'Image filename with no extension: it should have '
+            'one of the following extensions: %s.' % allowed_formats)
+
+    dot_index = filename.rfind('.')
+    extension = filename[dot_index + 1:].lower()
+    if (extension not in
+            feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
+        raise utils.InvalidInputException(
+            'Expected a filename ending in .%s, received %s' %
+            (file_format, filename))
+
+    file_system_class = get_entity_file_system_class()
+    fs = fs_domain.AbstractFileSystem(file_system_class(
+        entity_type, entity_id))
+    filepath = '%s/%s' % (filename_prefix, filename)
+
+    if fs.isfile(filepath):
+        raise utils.InvalidInputException(
+            'A file with the name %s already exists. Please choose a '
+            'different name.' % filename)
+
     filepath = '%s/%s' % (filename_prefix, filename)
 
     filename_wo_filetype = filename[:filename.rfind('.')]

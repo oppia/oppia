@@ -47,6 +47,8 @@ class SkillModel(base_models.VersionedModel):
 
     # The description of the skill.
     description = ndb.StringProperty(required=True, indexed=True)
+    # The thumbnail filename of the topic.
+    thumbnail_filename = ndb.StringProperty(indexed=True)
     # The schema version for each of the misconception dicts.
     misconceptions_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)

@@ -195,7 +195,8 @@ def get_skill_from_model(skill_model):
         _migrate_rubrics_to_latest_schema(versioned_rubrics)
 
     return skill_domain.Skill(
-        skill_model.id, skill_model.description,
+        skill_model.id, skill_model.thumbnail_filename,
+        skill_model.description,
         [
             skill_domain.Misconception.from_dict(misconception)
             for misconception in versioned_misconceptions['misconceptions']
@@ -418,6 +419,7 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
     model = skill_models.SkillModel(
         id=skill.id,
         description=skill.description,
+        thumbnail_filename=skill.thumbnail_filename,
         language_code=skill.language_code,
         misconceptions=[
             misconception.to_dict()
@@ -487,6 +489,9 @@ def apply_change_list(skill_id, change_list, committer_id):
                     (opportunity_services
                      .update_skill_opportunity_skill_description(
                          skill.id, change.new_value))
+                elif (change.property_name ==
+                      skill_domain.SKILL_PROPERTY_THUMBNAIL_FILENAME):
+                    skill.update_thumbnail_filename(change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)
@@ -598,6 +603,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
             % (skill_model.version, skill.version))
 
     skill_model.description = skill.description
+    skill_model.thumbnail_filename = skill.thumbnail_filename
     skill_model.language_code = skill.language_code
     skill_model.superseding_skill_id = skill.superseding_skill_id
     skill_model.all_questions_merged = skill.all_questions_merged

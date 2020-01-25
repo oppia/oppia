@@ -115,6 +115,14 @@ export class Story {
     return issues;
   }
 
+  prepublishValidate(): Array<string> {
+    let issues = [];
+    if (!this._thumbnailFilename) {
+      issues.push('Story should have a thumbnail.');
+    }
+    return issues;
+  }
+
   // Reassigns all values within this story to match the existing
   // story. This is performed as a deep copy such that none of the
   // internal, bindable objects are changed within this story.

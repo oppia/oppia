@@ -33,6 +33,7 @@ export class SkillDomainConstants {
 
   public static SKILL_PROPERTY_DESCRIPTION = 'description';
   public static SKILL_PROPERTY_LANGUAGE_CODE = 'language_code';
+  public static SKILL_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
   public static SKILL_CONTENTS_PROPERTY_EXPLANATION = 'explanation';
   public static SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES = 'worked_examples';
   public static SKILL_MISCONCEPTIONS_PROPERTY_NAME = 'name';

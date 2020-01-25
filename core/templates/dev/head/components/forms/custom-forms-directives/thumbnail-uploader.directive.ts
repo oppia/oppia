@@ -35,7 +35,8 @@ angular.module('oppia').directive('thumbnailUploader', [
       scope: {
         disabled: '=',
         filename: '=',
-        updateFilename: '='
+        updateFilename: '=',
+        updateThumbnailDataUrl: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/custom-forms-directives/' +
@@ -74,7 +75,11 @@ angular.module('oppia').directive('thumbnailUploader', [
                 AlertsService.addWarning('Could not get resampled file.');
                 return;
               }
-              postImageToServer(resampledFile);
+              if ($scope.updateThumbnailDataUrl) {
+                $scope.updateThumbnailDataUrl(resampledFile);
+              } else {
+                postImageToServer(resampledFile);
+              }
             };
 
             var postImageToServer = function(resampledFile) {
@@ -192,6 +197,10 @@ angular.module('oppia').directive('thumbnailUploader', [
               $scope.editableThumbnailDataUrl = newThumbnailDataUrl;
               $scope.updateFilename(tempImageName);
               saveThumbnailImageData(newThumbnailDataUrl);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
         }]

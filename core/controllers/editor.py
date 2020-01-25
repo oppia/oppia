@@ -19,7 +19,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import imghdr
 import logging
 
 from constants import constants
@@ -626,49 +625,6 @@ class ImageUploadHandler(EditorHandler):
         filename_prefix = self.payload.get('filename_prefix')
         if filename_prefix is None:
             filename_prefix = self._FILENAME_PREFIX
-        if not raw:
-            raise self.InvalidInputException('No image supplied')
-
-        allowed_formats = ', '.join(
-            list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
-
-        # Verify that the data is recognized as an image.
-        file_format = imghdr.what(None, h=raw)
-        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
-            raise self.InvalidInputException('Image not recognized')
-
-        # Verify that the file type matches the supplied extension.
-        if not filename:
-            raise self.InvalidInputException('No filename supplied')
-        if filename.rfind('.') == 0:
-            raise self.InvalidInputException('Invalid filename')
-        if '/' in filename or '..' in filename:
-            raise self.InvalidInputException(
-                'Filenames should not include slashes (/) or consecutive '
-                'dot characters.')
-        if '.' not in filename:
-            raise self.InvalidInputException(
-                'Image filename with no extension: it should have '
-                'one of the following extensions: %s.' % allowed_formats)
-
-        dot_index = filename.rfind('.')
-        extension = filename[dot_index + 1:].lower()
-        if (extension not in
-                feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
-            raise self.InvalidInputException(
-                'Expected a filename ending in .%s, received %s' %
-                (file_format, filename))
-
-        file_system_class = fs_services.get_entity_file_system_class()
-        fs = fs_domain.AbstractFileSystem(file_system_class(
-            entity_type, entity_id))
-        filepath = '%s/%s' % (filename_prefix, filename)
-
-        if fs.isfile(filepath):
-            raise self.InvalidInputException(
-                'A file with the name %s already exists. Please choose a '
-                'different name.' % filename)
-
         fs_services.save_original_and_compressed_versions_of_image(
             filename, entity_type, entity_id, raw, filename_prefix)
 

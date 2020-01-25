@@ -27,6 +27,7 @@ import utils
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 SKILL_PROPERTY_DESCRIPTION = 'description'
+SKILL_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 SKILL_PROPERTY_LANGUAGE_CODE = 'language_code'
 SKILL_PROPERTY_SUPERSEDING_SKILL_ID = 'superseding_skill_id'
 SKILL_PROPERTY_ALL_QUESTIONS_MERGED = 'all_questions_merged'
@@ -86,8 +87,8 @@ class SkillChange(change_domain.BaseChange):
     # The allowed list of skill properties which can be used in
     # update_skill_property command.
     SKILL_PROPERTIES = (
-        SKILL_PROPERTY_DESCRIPTION, SKILL_PROPERTY_LANGUAGE_CODE,
-        SKILL_PROPERTY_SUPERSEDING_SKILL_ID,
+        SKILL_PROPERTY_DESCRIPTION, SKILL_PROPERTY_THUMBNAIL_FILENAME,
+        SKILL_PROPERTY_LANGUAGE_CODE, SKILL_PROPERTY_SUPERSEDING_SKILL_ID,
         SKILL_PROPERTY_ALL_QUESTIONS_MERGED,
         SKILL_PROPERTY_PREREQUISITE_SKILL_IDS)
 
@@ -426,8 +427,8 @@ class Skill(python_utils.OBJECT):
     """Domain object for an Oppia Skill."""
 
     def __init__(
-            self, skill_id, description, misconceptions, rubrics,
-            skill_contents, misconceptions_schema_version,
+            self, skill_id, thumbnail_filename, description, misconceptions,
+            rubrics, skill_contents, misconceptions_schema_version,
             rubric_schema_version, skill_contents_schema_version,
             language_code, version, next_misconception_id, superseding_skill_id,
             all_questions_merged, prerequisite_skill_ids,
@@ -436,6 +437,7 @@ class Skill(python_utils.OBJECT):
 
         Args:
             skill_id: str. The unique ID of the skill.
+            thumbnail_filename: str|None. The thumbnail filename of the skill.
             description: str. Describes the observable behaviour of the skill.
             misconceptions: list(Misconception). The list of misconceptions
                 associated with the skill.
@@ -468,6 +470,7 @@ class Skill(python_utils.OBJECT):
                 skill was last updated.
         """
         self.id = skill_id
+        self.thumbnail_filename = thumbnail_filename
         self.description = description
         self.misconceptions = misconceptions
         self.skill_contents = skill_contents
@@ -517,6 +520,12 @@ class Skill(python_utils.OBJECT):
             ValidationError: One or more attributes of skill are invalid.
         """
         self.require_valid_description(self.description)
+
+        if self.thumbnail_filename is not None and not (
+                isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % self.thumbnail_filename)
 
         Misconception.require_valid_misconception_id(self.next_misconception_id)
 
@@ -654,6 +663,7 @@ class Skill(python_utils.OBJECT):
         """
         return {
             'id': self.id,
+            'thumbnail_filename': self.thumbnail_filename,
             'description': self.description,
             'misconceptions': [
                 misconception.to_dict()
@@ -673,13 +683,16 @@ class Skill(python_utils.OBJECT):
         }
 
     @classmethod
-    def create_default_skill(cls, skill_id, description, rubrics):
+    def create_default_skill(
+            cls, skill_id, thumbnail_filename, description, rubrics):
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
         when the skill is created for the first time.
 
         Args:
             skill_id: str. The unique id of the skill.
+            thumbnail_filename: string|null. The thumbnail filename for the
+                skill.
             description: str. The initial description for the skill.
             rubrics: list(Rubric). The list of rubrics for the skill.
 
@@ -701,8 +714,8 @@ class Skill(python_utils.OBJECT):
                 }
             }))
         return cls(
-            skill_id, description, [], rubrics, skill_contents,
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            skill_id, thumbnail_filename, description, [], rubrics,
+            skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False, [])
@@ -807,6 +820,14 @@ class Skill(python_utils.OBJECT):
             description: str. The new description of the skill.
         """
         self.description = description
+
+    def update_thumbnail_filename(self, thumbnail_filename):
+        """Updates the thumbnail filename of the skill.
+
+        Args:
+            thumbnail_filename: str|None. The thumbnail filename of the skill.
+        """
+        self.thumbnail_filename = thumbnail_filename
 
     def update_language_code(self, language_code):
         """Updates the language code of the skill.

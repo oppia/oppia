@@ -35,6 +35,7 @@ angular.module('oppia').factory('SkillUpdateService', [
   'SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED',
   'SKILL_MISCONCEPTIONS_PROPERTY_NAME',
   'SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'SKILL_PROPERTY_DESCRIPTION',
+  'SKILL_PROPERTY_THUMBNAIL_FILENAME',
   function(
       ChangeObjectFactory,
       UndoRedoService, CMD_ADD_PREREQUISITE_SKILL,
@@ -48,7 +49,8 @@ angular.module('oppia').factory('SkillUpdateService', [
       SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
       SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED,
       SKILL_MISCONCEPTIONS_PROPERTY_NAME,
-      SKILL_MISCONCEPTIONS_PROPERTY_NOTES, SKILL_PROPERTY_DESCRIPTION) {
+      SKILL_MISCONCEPTIONS_PROPERTY_NOTES, SKILL_PROPERTY_DESCRIPTION,
+      SKILL_PROPERTY_THUMBNAIL_FILENAME) {
     var _applyChange = function(skill, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
@@ -111,6 +113,20 @@ angular.module('oppia').factory('SkillUpdateService', [
             skill.setDescription(description);
           }, function(changeDict, skill) {
             skill.setDescription(oldDescription);
+          });
+      },
+
+      setThumbnailFilename: function(skill, newThumbnailFilename) {
+        var oldThumbnailFilename = angular.copy(skill.getThumbnailFilename());
+        _applyPropertyChange(
+          skill, SKILL_PROPERTY_THUMBNAIL_FILENAME, newThumbnailFilename,
+          oldThumbnailFilename,
+          function(changeDict, skill) {
+            var thumbnailFilename = (
+              _getNewPropertyValueFromChangeDict(changeDict));
+            skill.setThumbnailFilename(thumbnailFilename);
+          }, function(changeDict, skill) {
+            skill.setThumbnailFilename(oldThumbnailFilename);
           });
       },
 

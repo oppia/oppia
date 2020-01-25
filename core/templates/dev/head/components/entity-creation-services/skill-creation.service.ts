@@ -18,20 +18,23 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require('services/csrf-token.service.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
-  'UrlInterpolationService',
+  'CsrfTokenService', 'UrlInterpolationService',
   function(
       $http, $rootScope, $timeout, $window, AlertsService,
-      UrlInterpolationService) {
+      CsrfTokenService, UrlInterpolationService) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
+    var CREATE_NEW_SKILL_URL = '/skill_editor_handler/create_new';
     var skillCreationInProgress = false;
 
     return {
       createNewSkill: function(
-          description, rubrics, explanation, linkedTopicIds) {
+          description, rubrics, explanation, linkedTopicIds,
+          thumbnailFilename, thumbnailDataUrl) {
         if (skillCreationInProgress) {
           return;
         }
@@ -41,20 +44,45 @@ angular.module('oppia').factory('SkillCreationService', [
         skillCreationInProgress = true;
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating skill';
-        $http.post('/skill_editor_handler/create_new', {
+        let form = new FormData();
+        form.append('image', thumbnailDataUrl);
+        form.append('payload', JSON.stringify({
           description: description,
           linked_topic_ids: linkedTopicIds,
           explanation_dict: explanation,
-          rubrics: rubrics
-        }).then(function(response) {
-          $timeout(function() {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_SKILL_URL_TEMPLATE, {
-                skill_id: response.data.skillId
-              });
-          }, 150);
-        }, function() {
-          $rootScope.loadingMessage = '';
+          rubrics: rubrics,
+          thumbnail_filename: thumbnailFilename,
+        }));
+        CsrfTokenService.getTokenAsync().then(function(token) {
+          form.append('csrf_token', token);
+          $.ajax({
+            url: CREATE_NEW_SKILL_URL,
+            data: form,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            dataFilter: function(data) {
+              // Remove the XSSI prefix.
+              var transformedData = data.substring(5);
+              return JSON.parse(transformedData);
+            },
+            dataType: 'text'
+          }).done(function(response) {
+            $timeout(function() {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_SKILL_URL_TEMPLATE, {
+                  skill_id: response.skillId
+                });
+            }, 150);
+            $rootScope.loadingMessage = '';
+          }).fail(function(data) {
+            // Remove the XSSI prefix.
+            var transformedData = data.responseText.substring(5);
+            var parsedResponse = JSON.parse(transformedData);
+            $rootScope.loadingMessage = '';
+            AlertsService.addWarning(
+              parsedResponse.error || 'Error communicating with server.');
+          });
         });
       }
     };
