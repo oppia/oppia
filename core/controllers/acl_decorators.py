@@ -2556,8 +2556,6 @@ def can_edit_entity(handler):
             return can_edit_skill(reduced_handler)(self, entity_id, **kwargs)
         elif entity_type == feconf.ENTITY_TYPE_STORY:
             return can_edit_story(reduced_handler)(self, entity_id, **kwargs)
-        elif entity_type == feconf.ENTITY_TYPE_SUBTOPIC:
-            return can_edit_topic(reduced_handler)(self, entity_id, **kwargs)
         else:
             raise self.PageNotFoundException
 
