@@ -20,7 +20,7 @@ var waitFor = require('../protractor_utils/waitFor.js');
 var ThanksPage = require('../protractor_utils/ThanksPage.js');
 var GetStartedPage = require('../protractor_utils/GetStartedPage.js');
 
-const { percySnapshot } = require('@percy/protractor')
+const { percySnapshot } = require('@percy/protractor');
 
 describe('Oppia static pages tour', function() {
   var thanksPage = null;
@@ -30,8 +30,8 @@ describe('Oppia static pages tour', function() {
     waitFor.pageToFullyLoad();
   });
 
-  fit('Loads the page', async function() {
-    await percySnapshot('Sample snapshot')
+  it('Loads the page', async function() {
+    await percySnapshot('Splash page snapshot');
   });
 
   it('visits the links in About dropdown', function() {
