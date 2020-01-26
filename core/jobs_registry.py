@@ -59,6 +59,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
+    feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
