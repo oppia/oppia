@@ -75,7 +75,7 @@ class AnswerGroup(python_utils.OBJECT):
     def __init__(
             self, outcome, rule_specs, training_data,
             tagged_skill_misconception_id):
-        """Initializes a AnswerGroup domain object.
+        """Initializes an AnswerGroup domain object.
 
         Args:
             outcome: Outcome. The outcome corresponding to the answer group.
@@ -571,7 +571,7 @@ class Outcome(python_utils.OBJECT):
     def __init__(
             self, dest, feedback, labelled_as_correct, param_changes,
             refresher_exploration_id, missing_prerequisite_skill_id):
-        """Initializes a Outcome domain object.
+        """Initializes an Outcome domain object.
 
         Args:
             dest: str. The name of the destination state.
@@ -797,7 +797,12 @@ class WrittenTranslations(python_utils.OBJECT):
     """
 
     def __init__(self, translations_mapping):
-        """Initializes a WrittenTranslations domain object."""
+        """Initializes a WrittenTranslations domain object.
+
+        Args:
+            translations_mapping: dict. A dict mapping content_id keys to dicts.
+                These dicts map language_code keys to WrittenTranslation objects.
+        """
         self.translations_mapping = translations_mapping
 
     def to_dict(self):
@@ -1017,7 +1022,12 @@ class RecordedVoiceovers(python_utils.OBJECT):
     """
 
     def __init__(self, voiceovers_mapping):
-        """Initializes a RecordedVoiceovers domain object."""
+        """Initializes a RecordedVoiceovers domain object.
+
+        Args:
+            voiceovers_mapping: dict. A dict mapping content_id keys to dicts.
+                These dicts map language_code keys to Voiceover objects.
+        """
         self.voiceovers_mapping = voiceovers_mapping
 
     def to_dict(self):
@@ -1339,7 +1349,16 @@ class SubtitledHtml(python_utils.OBJECT):
 
     @classmethod
     def create_default_subtitled_html(cls, content_id):
-        """Create a default SubtitledHtml domain object."""
+        """Create a default SubtitledHtml domain object.
+
+        Args:
+            content_id: str. the ID of the content
+
+        Returns:
+            SubtitledHtml. A default SubtitledHtml domain object. Note that
+            this calls init with html=''.
+
+        """
         return cls(content_id, '')
 
 
@@ -1465,7 +1484,7 @@ class State(python_utils.OBJECT):
         """Returns the content belongs to a given content id of the object.
 
         Args:
-            content_id: The id of the content.
+            content_id:str. The id of the content.
 
         Returns:
             str. The html content corresponding to the given content id.
@@ -1480,7 +1499,13 @@ class State(python_utils.OBJECT):
         return content_id_to_html[content_id]
 
     def get_training_data(self):
-        """Retrieves training data from the State domain object."""
+        """Retrieves training data from the State domain object.
+
+        Returns:
+            list(dict). A list of dicts, each of which has two key-value pairs. One pair maps
+            'answer_group_index' to the index of the answer group and the other maps 'answers'
+            to the answer group's training data
+        """
         state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
