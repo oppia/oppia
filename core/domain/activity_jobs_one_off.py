@@ -74,14 +74,14 @@ class ReplaceAdminIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if model.committer_id == 'Admin':
                 model.committer_id = feconf.SYSTEM_COMMITTER_ID
                 model.put(update_last_updated_time=False)
-                yield ('SUCCESS-DELETED-SNAPSHOT', model.id)
+                yield ('SUCCESS-RENAMED-SNAPSHOT', model.id)
             else:
                 yield ('SUCCESS-KEPT-SNAPSHOT', model.id)
         else:
             if model.user_id == 'Admin':
                 model.user_id = feconf.SYSTEM_COMMITTER_ID
                 model.put(update_last_updated_time=False)
-                yield ('SUCCESS-DELETED-COMMIT', model.id)
+                yield ('SUCCESS-RENAMED-COMMIT', model.id)
             else:
                 yield ('SUCCESS-KEPT-COMMIT', model.id)
 

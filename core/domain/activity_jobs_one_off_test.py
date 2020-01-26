@@ -134,7 +134,7 @@ class ReplaceAdminIdOneOffJobTests(test_utils.GenericTestBase):
             commit_cmds=[{'cmd': 'some_command'}]).put()
 
         output = self._run_one_off_job()
-        self.assertIn(['SUCCESS-DELETED-SNAPSHOT', ['exp_1_id']], output)
+        self.assertIn(['SUCCESS-RENAMED-SNAPSHOT', ['exp_1_id']], output)
 
         migrated_model = (
             exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
@@ -170,7 +170,7 @@ class ReplaceAdminIdOneOffJobTests(test_utils.GenericTestBase):
             post_commit_status='public').put()
 
         output = self._run_one_off_job()
-        self.assertIn(['SUCCESS-DELETED-COMMIT', ['exp_1_id-1']], output)
+        self.assertIn(['SUCCESS-RENAMED-COMMIT', ['exp_1_id-1']], output)
 
         migrated_model = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id('exp_1_id-1'))
@@ -237,10 +237,10 @@ class ReplaceAdminIdOneOffJobTests(test_utils.GenericTestBase):
 
         output = self._run_one_off_job()
         self.assertIn(
-            ['SUCCESS-DELETED-SNAPSHOT', ['exp_1_id-1']], output)
+            ['SUCCESS-RENAMED-SNAPSHOT', ['exp_1_id-1']], output)
         self.assertIn(['SUCCESS-KEPT-SNAPSHOT', 1], output)
         self.assertIn(
-            ['SUCCESS-DELETED-COMMIT', ['exp_1_id-1', 'exp_1_id-2']], output)
+            ['SUCCESS-RENAMED-COMMIT', ['exp_1_id-1', 'exp_1_id-2']], output)
         self.assertIn(['SUCCESS-KEPT-COMMIT', 1], output)
 
         migrated_model = (
