@@ -114,12 +114,18 @@ class GeneralFeedbackThreadUserOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(model_instance):
         """Implements the map function for this job."""
-        if model_instance.user_id == 'None' or model_instance.user_id is None:
+        if model_instance.user_id is None:
             model_instance.delete()
-            yield ('SUCCESS - DELETED', model_instance.id)
+            yield ('SUCCESS-DELETED-NONE', model_instance.id)
+        elif model_instance.user_id == 'None':
+            model_instance.delete()
+            yield ('SUCCESS-DELETED-STRING', model_instance.id)
         else:
-            yield ('SUCCESS - NOT DELETED', model_instance.id)
+            yield ('SUCCESS-NOT_DELETED', model_instance.id)
 
     @staticmethod
     def reduce(key, values):
-        yield (key, len(values))
+        if key == 'SUCCESS-NOT_DELETED':
+            yield (key, len(values))
+        else:
+            yield (key, values)

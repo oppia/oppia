@@ -394,9 +394,7 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
 
         eval_output = [ast.literal_eval(stringified_item)
                        for stringified_item in stringified_output]
-        output = [(eval_item[0], int(eval_item[1]))
-                  for eval_item in eval_output]
-        return output
+        return eval_output
 
     def _check_model_validity(
             self, user_id, thread_id, original_user_feedback_model):
@@ -420,7 +418,7 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
             original_user_feedback_model.message_ids_read_by_user,
         )
 
-    def test_successful_migration_deleted(self):
+    def test_successful_migration_deleted_none(self):
         user_id = None
         thread_id = 'exploration.exp_id.thread_id'
         instance_id = '%s.%s' % (user_id, thread_id)
@@ -429,7 +427,25 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
         user_feedback_model.put()
 
         output = self._run_one_off_job()
-        self.assertEqual(output, [('SUCCESS - DELETED', 1)])
+        self.assertEqual(
+            output,
+            [['SUCCESS-DELETED-NONE', ['None.exploration.exp_id.thread_id']]])
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
+                instance_id))
+
+    def test_successful_migration_deleted_string(self):
+        user_id = 'None'
+        thread_id = 'exploration.exp_id.thread_id'
+        instance_id = '%s.%s' % (user_id, thread_id)
+        user_feedback_model = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id, user_id=user_id, thread_id=thread_id)
+        user_feedback_model.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS-DELETED-STRING', ['None.exploration.exp_id.thread_id']]])
         self.assertIsNone(
             feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
                 instance_id))
@@ -443,10 +459,10 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
         user_feedback_model.put()
 
         output = self._run_one_off_job()
-        self.assertEqual(output, [('SUCCESS - NOT DELETED', 1)])
+        self.assertEqual(output, [['SUCCESS-NOT_DELETED', 1]])
         self._check_model_validity(user_id, thread_id, user_feedback_model)
 
-    def test_successful_migration_deleted_multiple(self):
+    def test_successful_migration_deleted_none_multiple(self):
         user_id1 = None
         thread_id1 = 'exploration.exp_id.thread_id1'
         instance_id1 = '%s.%s' % (user_id1, thread_id1)
@@ -462,7 +478,39 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
         user_feedback_model2.put()
 
         output = self._run_one_off_job()
-        self.assertEqual(output, [('SUCCESS - DELETED', 2)])
+        self.assertEqual(
+            output,
+            [['SUCCESS-DELETED-NONE',
+              ['None.exploration.exp_id.thread_id1',
+               'None.exploration.exp_id.thread_id2']]])
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
+                instance_id1))
+        self.assertIsNone(
+            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
+                instance_id2))
+
+    def test_successful_migration_deleted_string_multiple(self):
+        user_id1 = 'None'
+        thread_id1 = 'exploration.exp_id.thread_id1'
+        instance_id1 = '%s.%s' % (user_id1, thread_id1)
+        user_feedback_model1 = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id1, user_id=user_id1, thread_id=thread_id1)
+        user_feedback_model1.put()
+
+        user_id2 = 'None'
+        thread_id2 = 'exploration.exp_id.thread_id2'
+        instance_id2 = '%s.%s' % (user_id2, thread_id2)
+        user_feedback_model2 = feedback_models.GeneralFeedbackThreadUserModel(
+            id=instance_id2, user_id=user_id2, thread_id=thread_id2)
+        user_feedback_model2.put()
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS-DELETED-STRING',
+              ['None.exploration.exp_id.thread_id1',
+               'None.exploration.exp_id.thread_id2']]])
         self.assertIsNone(
             feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
                 instance_id1))
@@ -486,7 +534,7 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
         user_feedback_model2.put()
 
         output = self._run_one_off_job()
-        self.assertEqual(output, [('SUCCESS - NOT DELETED', 2)])
+        self.assertEqual(output, [['SUCCESS-NOT_DELETED', 2]])
         self._check_model_validity(user_id1, thread_id1, user_feedback_model1)
         self._check_model_validity(user_id2, thread_id2, user_feedback_model2)
 
@@ -499,7 +547,7 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
             id=instance_id1, user_id=user_id1, thread_id=thread_id1)
         user_feedback_model1.put()
 
-        user_id2 = None
+        user_id2 = 'None'
         thread_id2 = 'exploration.exp_id.thread_id2'
         instance_id2 = '%s.%s' % (user_id2, thread_id2)
         user_feedback_model2 = feedback_models.GeneralFeedbackThreadUserModel(
@@ -521,8 +569,13 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
         user_feedback_model4.put()
 
         output = self._run_one_off_job()
-        self.assertIn(('SUCCESS - NOT DELETED', 2), output)
-        self.assertIn(('SUCCESS - DELETED', 2), output)
+        self.assertIn(['SUCCESS-NOT_DELETED', 2], output)
+        self.assertIn(
+            ['SUCCESS-DELETED-NONE', ['None.exploration.exp_id.thread_id1']],
+            output)
+        self.assertIn(
+            ['SUCCESS-DELETED-STRING', ['None.exploration.exp_id.thread_id2']],
+            output)
         self.assertIsNone(
             feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
                 instance_id1))
