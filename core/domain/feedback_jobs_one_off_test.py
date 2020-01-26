@@ -462,62 +462,6 @@ class GeneralFeedbackThreadUserOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(output, [['SUCCESS-NOT_DELETED', 1]])
         self._check_model_validity(user_id, thread_id, user_feedback_model)
 
-    def test_successful_migration_deleted_none_multiple(self):
-        user_id1 = None
-        thread_id1 = 'exploration.exp_id.thread_id1'
-        instance_id1 = '%s.%s' % (user_id1, thread_id1)
-        user_feedback_model1 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id1, user_id=user_id1, thread_id=thread_id1)
-        user_feedback_model1.put()
-
-        user_id2 = None
-        thread_id2 = 'exploration.exp_id.thread_id2'
-        instance_id2 = '%s.%s' % (user_id2, thread_id2)
-        user_feedback_model2 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id2, user_id=user_id2, thread_id=thread_id2)
-        user_feedback_model2.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(
-            output,
-            [['SUCCESS-DELETED-NONE',
-              ['None.exploration.exp_id.thread_id1',
-               'None.exploration.exp_id.thread_id2']]])
-        self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
-                instance_id1))
-        self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
-                instance_id2))
-
-    def test_successful_migration_deleted_string_multiple(self):
-        user_id1 = 'None'
-        thread_id1 = 'exploration.exp_id.thread_id1'
-        instance_id1 = '%s.%s' % (user_id1, thread_id1)
-        user_feedback_model1 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id1, user_id=user_id1, thread_id=thread_id1)
-        user_feedback_model1.put()
-
-        user_id2 = 'None'
-        thread_id2 = 'exploration.exp_id.thread_id2'
-        instance_id2 = '%s.%s' % (user_id2, thread_id2)
-        user_feedback_model2 = feedback_models.GeneralFeedbackThreadUserModel(
-            id=instance_id2, user_id=user_id2, thread_id=thread_id2)
-        user_feedback_model2.put()
-
-        output = self._run_one_off_job()
-        self.assertEqual(
-            output,
-            [['SUCCESS-DELETED-STRING',
-              ['None.exploration.exp_id.thread_id1',
-               'None.exploration.exp_id.thread_id2']]])
-        self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
-                instance_id1))
-        self.assertIsNone(
-            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
-                instance_id2))
-
     def test_successful_migration_not_deleted_multiple(self):
         user_id1 = 'user1'
         thread_id1 = 'exploration.exp_id.thread_id1'
