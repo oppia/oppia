@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the suggestion gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -512,6 +513,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         model.author_id = feconf.SYSTEM_COMMITTER_ID
         self.assertTrue(model.verify_model_user_ids_exist())
+        model.author_id = feconf.MIGRATION_BOT_USER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.author_id = feconf.SUGGESTION_BOT_USER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
 
         model.author_id = 'user_non_id'
         self.assertFalse(model.verify_model_user_ids_exist())
@@ -741,6 +746,10 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.author_id = feconf.SYSTEM_COMMITTER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.author_id = feconf.MIGRATION_BOT_USER_ID
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.author_id = feconf.SUGGESTION_BOT_USER_ID
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.author_id = 'user_non_id'

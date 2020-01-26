@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for collection models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -205,23 +206,6 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
                 collection_models.CollectionRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
 
-            # We remove the USER_ID_4 from the exploration to verify that the
-            # USER_ID_4 is still found in CollectionRightsSnapshotContentModel.
-            collection_model = (
-                collection_models.CollectionRightsModel.get_by_id(
-                    self.COLLECTION_ID_4))
-            collection_model.owner_ids = [self.USER_ID_1]
-            collection_model.editor_ids = [self.USER_ID_1]
-            collection_model.voice_artist_ids = [self.USER_ID_1]
-            collection_model.viewer_ids = [self.USER_ID_1]
-            collection_model.commit(
-                self.USER_ID_COMMITTER, 'Changed collection rights',
-                [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
-
-            self.assertTrue(
-                collection_models.CollectionRightsModel
-                .has_reference_to_user_id(self.USER_ID_4))
-
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             collection_models.CollectionRightsModel
@@ -328,6 +312,10 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.owner_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.owner_ids = [feconf.SUGGESTION_BOT_USER_ID]
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [self.USER_ID_1, 'user_non_id']
@@ -816,6 +804,10 @@ class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.owner_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.owner_ids = [feconf.SUGGESTION_BOT_USER_ID]
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [self.USER_ID_1_NEW, 'user_non_id']
