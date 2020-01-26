@@ -51,7 +51,9 @@ class IndexAllActivitiesJobManager(jobs.BaseMapReduceOneOffJobManager):
 
 
 class AddAllUserIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """"""
+    """For every right model merge the data from all the user id fields
+    together and put them in new all_user_ids field.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -84,11 +86,14 @@ class AddAllUserIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """"""
+    """For every snapshot of right model merge the data from all the user id
+    fields together and put them in the all_user_ids field of the appropriate
+    right model."""
 
     @staticmethod
-    def _migrate_collection(rights_snapshot_model):
-        """
+    def _add_collection_user_ids(rights_snapshot_model):
+        """Merge the user ids form the snapshot and put them in the parent
+        collection rights model.
         """
         content_dict = (
             collection_models.CollectionRightsModel.transform_dict_to_valid(
@@ -107,8 +112,9 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         rights_model.put(update_last_updated_time=False)
 
     @staticmethod
-    def _migrate_exploration(rights_snapshot_model):
-        """
+    def _add_exploration_user_ids(rights_snapshot_model):
+        """Merge the user ids form the snapshot and put them in the parent
+        exploration rights model.
         """
         content_dict = (
             collection_models.ExplorationRightsModel.transform_dict_to_valid(
@@ -127,8 +133,9 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         rights_model.put(update_last_updated_time=False)
 
     @staticmethod
-    def _migrate_topic(rights_snapshot_model):
-        """
+    def _add_topic_user_ids(rights_snapshot_model):
+        """Merge the user ids form the snapshot and put them in the parent
+        topic rights model.
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **rights_snapshot_model.content)
@@ -151,17 +158,17 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if isinstance(
                 rights_snapshot_model,
                 collection_models.CollectionRightsSnapshotContentModel):
-            AddAllUserIdsSnapshotsOneOffJob._migrate_collection(
+            AddAllUserIdsSnapshotsOneOffJob._add_collection_user_ids(
                 rights_snapshot_model)
         elif isinstance(
                 rights_snapshot_model,
                 exp_models.ExplorationRightsSnapshotContentModel):
-            AddAllUserIdsSnapshotsOneOffJob._migrate_exploration(
+            AddAllUserIdsSnapshotsOneOffJob._add_exploration_user_ids(
                 rights_snapshot_model)
         elif isinstance(
                 rights_snapshot_model,
                 topic_models.TopicRightsSnapshotContentModel):
-            AddAllUserIdsSnapshotsOneOffJob._migrate_topic(
+            AddAllUserIdsSnapshotsOneOffJob._add_topic_user_ids(
                 rights_snapshot_model)
         class_name = rights_snapshot_model.__class__.__name__
         yield ('SUCCESS - %s' % class_name, rights_snapshot_model.id)
