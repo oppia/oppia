@@ -16,11 +16,11 @@
  * @fileoverview Factory for creating frontend
  * instances of Skill objects.
  */
-import { ConceptCardObjectFactory } from 
+import { ConceptCardObjectFactory , ConceptCard} from 
  './ConceptCardObjectFactory'
-import { MisconceptionObjectFactory } from
+import { MisconceptionObjectFactory , Misconception } from
  './MisconceptionObjectFactory'
-import { RubricObjectFactory } from
+import { RubricObjectFactory, Rubric } from
  './RubricObjectFactory'
 import { ValidatorsService } from
  'services/validators.service.ts'
@@ -29,22 +29,27 @@ import { downgradeInjectable }
   from '@angular/upgrade/static';
 import predConsts from
  './../../../../../../assets/constants'
+import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe'
 
 export class Skill {
-  _id: number = null;
-  _description:string= null;
-  _misconceptions = null;
-  _rubrics = null;
-  _conceptCard = null;
-  _languageCode = null;
-  _version = null;
-  _nextMisconceptionId = null
-  _supersedingSkillId = null;
-  _allQuestionsMerged = null;
-  _prerequisiteSkillIds:[] = null;
+  _id: number;
+  _description:string;
+  _misconceptions:Array<Misconception>;
+  _rubrics:Array<Rubric>;
+  _conceptCard:ConceptCard;
+  _languageCode:string;
+  _version:number;
+  _nextMisconceptionId:number;
+  _supersedingSkillId:string;
+  _allQuestionsMerged:boolean;
+  _prerequisiteSkillIds:string[];
   SKILL_DIFFICULTIES = predConsts.SKILL_DIFFICULTIES
-  constructor(id, description, misconceptions, rubrics, conceptCard, languageCode,
-    version, nextMisconceptionId, supersedingSkillId, allQuestionsMerged, prerequisiteSkillIds ) {
+
+
+  constructor(id:number, description:string, misconceptions:Array<Misconception>,
+     rubrics:Array<Rubric>, conceptCard:ConceptCard, languageCode:string,
+    version:number, nextMisconceptionId:number, supersedingSkillId:string, 
+    allQuestionsMerged:boolean, prerequisiteSkillIds:string[] ) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
     this._conceptCard = conceptCard;
@@ -54,64 +59,65 @@ export class Skill {
     this._version = version;
     this._description = description;
     this._nextMisconceptionId = nextMisconceptionId;
-    this._prerequisiteSkillIds = prerequisiteSkillIds;
     this._supersedingSkillId = supersedingSkillId;
+    this._prerequisiteSkillIds = prerequisiteSkillIds;
   }
-  setDescription(description) {
+  
+  getId():number {
+    return this._id;
+  };
+  
+  setDescription(description:string):void {
     this._description = description;
   };
 
-  getDescription() {
+  getDescription():string {
     return this._description;
   };
 
-  getPrerequisiteSkillIds() {
+  getPrerequisiteSkillIds():string[] {
     return this._prerequisiteSkillIds.slice();
   };
 
-  addPrerequisiteSkill(skillId) {
+  addPrerequisiteSkill(skillId):void {
     this._prerequisiteSkillIds.push(skillId);
   };
 
-  deletePrerequisiteSkill(skillId : number) {
-    for (var idx in this._prerequisiteSkillIds) {
-      if (this._prerequisiteSkillIds[idx] === skillId) {
-        this._prerequisiteSkillIds.splice(idx, 1);
-      }
-    }
-  };
+  // deletePrerequisiteSkill(skillId : number):void {
+  //   for (var idx in this._prerequisiteSkillIds) {
+  //     if (this._prerequisiteSkillIds[idx] === skillId) {
+  //       this._prerequisiteSkillIds.splice(idx, 1);
+  //     }
+  //   }
+  // };
 
-  getId() {
-    return this._id;
-  };
-
-  getConceptCard() {
+  getConceptCard():ConceptCard {
     return this._conceptCard;
   };
 
-  getMisconceptions() {
+  getMisconceptions() : Array<Misconception>{
     return this._misconceptions.slice();
   };
 
-  getRubrics() {
+  getRubrics():Array<Rubric> {
     return this._rubrics.slice();
   };
 
-  appendMisconception(newMisconception) {
+  appendMisconception(newMisconception):void {
     this._misconceptions.push(newMisconception);
     this._nextMisconceptionId = this.getIncrementedMisconceptionId(
       newMisconception.getId());
   };
 
-  getLanguageCode() {
+  getLanguageCode():string {
     return this._languageCode;
   };
 
-  getVersion() {
+  getVersion():number {
     return this._version;
   };
 
-  getNextMisconceptionId() {
+  getNextMisconceptionId():number {
     return this._nextMisconceptionId;
   };
 
@@ -119,15 +125,15 @@ export class Skill {
     return id + 1;
   };
 
-  getSupersedingSkillId() {
+  getSupersedingSkillId():string {
     return this._supersedingSkillId;
   };
 
-  getAllQuestionsMerged() {
+  getAllQuestionsMerged():boolean {
     return this._allQuestionsMerged;
   };
 
-  findMisconceptionById(id) {
+  findMisconceptionById(id:number) {
     for (var idx in this._misconceptions) {
       if (this._misconceptions[idx].getId() === id) {
         return this._misconceptions[idx];
@@ -137,19 +143,24 @@ export class Skill {
       'Could not find misconception with ID: ' + id);
   };
 
-  deleteMisconception(id) {
-    for (var idx in this._misconceptions) {
-      if (this._misconceptions[idx].getId() === id) {
-        this._misconceptions.splice(idx, 1);
+  deleteMisconception(id:number){
+    // for (var idx in this._misconceptions) {
+    //   if (this._misconceptions[idx].getId() === id) {
+    //      this._misconceptions.splice(idx, 1);
+    //   }
+    // }
+    this._misconceptions.forEach((misc,index)=>{
+      if(misc.getId() === id){
+        this._misconceptions.splice(index,1)
       }
-    }
+    })
   };
 
-  getMisconceptionAtIndex(idx) {
+  getMisconceptionAtIndex(idx:number) {
     return this._misconceptions[idx];
   };
 
-  getRubricExplanation(difficulty) {
+  getRubricExplanation(difficulty:string) {
     for (var idx in this._rubrics) {
       if (this._rubrics[idx].getDifficulty() === difficulty) {
         return this._rubrics[idx].getExplanation();
@@ -158,7 +169,7 @@ export class Skill {
     return null;
   };
 
-  updateRubricForDifficulty(difficulty, explanation) {
+  updateRubricForDifficulty(difficulty:string, explanation:string) {
     if (this.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
       throw Error('Invalid difficulty value passed');
     }
@@ -175,10 +186,10 @@ export class Skill {
     return {
       id: this._id,
       description: this._description,
-      misconceptions: this._misconceptions.map(function(misconception) {
+      misconceptions: this._misconceptions.map(misconception => {
         return misconception.toBackendDict();
       }),
-      rubrics: this._rubrics.map(function(rubric) {
+      rubrics: this._rubrics.map((rubric)=> {
         return rubric.toBackendDict();
       }),
       skill_contents: this._conceptCard.toBackendDict(),
@@ -190,7 +201,7 @@ export class Skill {
       prerequisite_skill_ids: this._prerequisiteSkillIds
     };
   };
-  getValidationIssues() {
+  getValidationIssues():string[] {
     var issues = [];
     if (this.getConceptCard().getExplanation().getHtml() === '') {
       issues.push(
@@ -215,19 +226,19 @@ export class SkillObjectFactory {
     private rubricObjectFactory: RubricObjectFactory,
     private validatorService :ValidatorsService){
   }
-  createInterstitialSkill() {
+  createInterstitialSkill():Skill {
     return new Skill(null, 'Skill description loading',
       [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(), 'en',
       1, 0, null, false, []);
   };
-  hasValidDescription(description) {
+  hasValidDescription(description:string) {
     /* eslint-enable dot-notation */
     var allowDescriptionToBeBlank = false;
     var showWarnings = true;
     return this.validatorService.isValidEntityName(
       description, showWarnings, allowDescriptionToBeBlank);
   };
-  createFromBackendDict(skillBackendDict) {
+  createFromBackendDict(skillBackendDict):Skill {
     return new Skill(
       skillBackendDict.id,
       skillBackendDict.description,
