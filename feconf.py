@@ -521,6 +521,16 @@ MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
 SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
 
+# The system usernames are reserved usernames. Before adding new value to this
+# dict, make sure that there aren't any similar usernames in the datastore.
+# Note: All bot user IDs and usernames should start with "Oppia" and end with
+# "Bot".
+SYSTEM_USERS = {
+    SYSTEM_COMMITTER_ID: SYSTEM_COMMITTER_ID,
+    MIGRATION_BOT_USER_ID: MIGRATION_BOT_USERNAME,
+    SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME
+}
+
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
     'Collapsible': {
