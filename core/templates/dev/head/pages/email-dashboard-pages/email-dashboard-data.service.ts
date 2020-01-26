@@ -17,8 +17,10 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
+import { CsrfTokenService } from 'services/csrf-token.service';
 
 export interface Query {
   id: string,
@@ -34,22 +36,28 @@ export class EmailDashboardDataService {
   // No. of query results to display on a single page.
   QUERIES_PER_PAGE: number = 10;
   // Store latest cursor value for fetching next query page.
-  latestCursor = null;
+  latestCursor: string = null;
   // Array containing all fetched queries.
   queries: Array<Query> = [];
   // Index of currently-shown page of query results.
   currentPageIndex: number = -1;
 
   constructor(
-    private http: HttpClient
-  ) {}
+    private http: HttpClient,
+    private csrfTokenService: CsrfTokenService
+  ) {
+    this.csrfTokenService.initializeToken();
+  }
 
   fetchQueriesPage(pageSize, cursor): Promise<Object> {
+    let params: any = {
+      num_queries_to_fetch: pageSize
+    };
+    if (cursor) {
+      params.cursor = cursor;
+    }
     return this.http.get(this.QUERY_DATA_URL, {
-      params: {
-        num_queries_to_fetch: pageSize,
-        cursor: cursor
-      }
+      params: params
     }).toPromise();
   }
 
@@ -61,7 +69,7 @@ export class EmailDashboardDataService {
     return this.currentPageIndex;
   }
 
-  getLatestCursor() {
+  getLatestCursor(): string {
     return this.latestCursor;
   }
 
@@ -69,12 +77,20 @@ export class EmailDashboardDataService {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
-    return this.http.post(this.QUERY_DATA_URL, {
-      data: data
-    }).toPromise().then((data: any) => {
-      var newQueries = [data.query];
-      this.queries = newQueries.concat(this.queries);
-      return this.queries.slice(startQueryIndex, endQueryIndex);
+    return this.csrfTokenService.getTokenAsync().then((token) => {
+      const body = new HttpParams()
+        .set('payload', JSON.stringify({data: data}))
+        .set('csrf_token', token)
+        .set('source', document.URL);
+      const headers = new HttpHeaders()
+        .set('Content-Type', 'application/x-www-form-urlencoded');
+
+      return this.http.post(this.QUERY_DATA_URL, body.toString(), {
+        headers: headers}).toPromise().then((data: any) => {
+        var newQueries = [data.query];
+        this.queries = newQueries.concat(this.queries);
+        return this.queries.slice(startQueryIndex, endQueryIndex);
+      });
     });
   }
 
