@@ -25,8 +25,8 @@ export interface IUnitsDict {
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-// TODO(#7403): Convert this to partial imports.
-import math from 'mathjs';
+
+import { createUnit, unit } from 'mathjs';
 
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
@@ -190,11 +190,11 @@ export class UnitsObjectFactory {
     for (var i = 0; i < keys.length; i++) {
       if (ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit === null) {
         // Base unit (like: rupees, dollar etc.).
-        math.createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
+        createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
           aliases: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases});
       } else {
         // Sub unit (like: paise, cents etc.).
-        math.createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
+        createUnit(ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].name, {
           definition: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].base_unit,
           aliases: ObjectsDomainConstants.CURRENCY_UNITS[keys[i]].aliases});
       }
@@ -253,7 +253,7 @@ export class UnitsObjectFactory {
     var compatibleUnits = this.toMathjsCompatibleString(units);
     if (compatibleUnits !== '') {
       try {
-        math.unit(compatibleUnits);
+        unit(compatibleUnits);
       } catch (err) {
         throw new Error(err);
       }
