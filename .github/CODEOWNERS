@@ -16,7 +16,6 @@
 /core/templates/dev/head/services/UpgradedServices.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
-/tsconfig-for-compile-check.json @ankita240796
 
 
 # Answer classification team.
@@ -105,6 +104,8 @@
 /scripts/__init__.py @kevinlee12
 /scripts/build.py @kevinlee12
 /scripts/build_test.py @kevinlee12
+/scripts/check_frontend_coverage.py @marianazangrossi @kevinlee12
+/scripts/check_frontend_coverage_test.py @marianazangrossi @kevinlee12
 /scripts/clean.py @kevinlee12
 /scripts/clean_test.py @kevinlee12
 /scripts/common.py @kevinlee12
@@ -332,6 +333,11 @@
 /core/templates/dev/head/components/question-directives/questions-list/ @aks681 @vinitamurthi
 /core/templates/dev/head/components/question-directives/modal-templates/ @aks681 @vinitamurthi
 /core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
+
+# Readme
+/core/README.md @ankita240796
+/extensions/README.md @ankita240796
+/scripts/README.md @ankita240796
 
 # Skill project.
 /core/controllers/concept_card_viewer*.py @aks681

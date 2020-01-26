@@ -86,8 +86,9 @@ angular.module('oppia').factory('AssetsBackendApiService', [
         responseType: 'blob',
         url: _getDownloadUrl(entityType, entityId, filename, assetType),
         timeout: canceler.promise
-      }).success(function(data) {
+      }).then(function(response) {
         var assetBlob = null;
+        var data = response.data;
         try {
           assetBlob = new Blob([data], {type: data.type});
         } catch (exception) {
@@ -127,7 +128,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
           successCallback(
             ImageFileObjectFactory.createNew(filename, assetBlob));
         }
-      }).error(function() {
+      }, function() {
         errorCallback(filename);
       })['finally'](function() {
         _removeFromFilesCurrentlyBeingRequested(filename, assetType);
