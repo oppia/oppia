@@ -287,7 +287,7 @@ var uploadThumbnail = function(thumbnailClickableElement, imgPath) {
   return thumbnailUploadInput.sendKeys(absPath);
 };
 
-var submitThumbnail = function(imgPath) {
+var submitThumbnail = function(thumbnailClickableElement, imgPath) {
   return this.uploadThumbnail(
     thumbnailClickableElement, imgPath).then(function() {
     waitFor.visibilityOf(
