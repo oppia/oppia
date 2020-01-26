@@ -49,7 +49,7 @@ class BasePracticeSessionsControllerTests(test_utils.GenericTestBase):
             self.topic_id, 'public_topic_name', 'abbrev')
         self.topic.uncategorized_skill_ids.append(self.skill_id1)
         self.topic.subtopics.append(topic_domain.Subtopic(
-            1, 'subtopic_name', [self.skill_id2]))
+            1, 'subtopic_name', [self.skill_id2], 'image.png'))
         self.topic.next_subtopic_id = 2
         topic_services.save_new_topic(self.admin_id, self.topic)
 

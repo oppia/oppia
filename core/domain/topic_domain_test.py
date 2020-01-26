@@ -40,7 +40,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'Name', 'abbrev')
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title', ['skill_id_1'])]
+            topic_domain.Subtopic(1, 'Title', ['skill_id_1'], 'image.png')]
         self.topic.next_subtopic_id = 2
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -86,12 +86,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_subtopics(self):
         self.topic.subtopics = [topic_domain.Subtopic(
-            1, 'Title', ['skill_id_1'])]
+            1, 'Title', ['skill_id_1'], 'image.png')]
         subtopics = self.topic.get_all_subtopics()
         self.assertEqual(
             subtopics, [{
                 'skill_ids': ['skill_id_1'],
                 'id': 1,
+                'thumbnail_filename': 'image.png',
                 'title': 'Title'}])
 
     def test_delete_canonical_story(self):
@@ -243,6 +244,11 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_subtopic_id_validation(self):
         self.topic.subtopics[0].id = 'invalid_id'
         self._assert_validation_error('Expected subtopic id to be an int')
+    
+    def test_subtopic_thumbnail_filename_validation(self):
+        self.topic.subtopics[0].thumbnail_filename = 1
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received 1')
 
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'
@@ -357,7 +363,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_add_uncategorized_skill_id(self):
         self.topic.subtopics.append(
-            topic_domain.Subtopic('id_2', 'Title2', ['skill_id_2']))
+            topic_domain.Subtopic('id_2', 'Title2', ['skill_id_2'],
+            'image.png'))
         with self.assertRaisesRegexp(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
@@ -486,8 +493,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_move_existing_skill_to_subtopic(self):
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title', ['skill_id_1']),
-            topic_domain.Subtopic(2, 'Another title', ['skill_id_1'])]
+            topic_domain.Subtopic(1, 'Title', ['skill_id_1'], 'image.png'),
+            topic_domain.Subtopic(2, 'Another title', ['skill_id_1'],
+            'image.png')]
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):

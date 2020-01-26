@@ -48,7 +48,7 @@ describe('Skill Editor functionality', function() {
       'creator@skillEditor.com', 'creatorSkillEditor');
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 1', 'Concept card explanation');
+      'Skill 1', 'Concept card explanation', '../data/img.png');
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
     }, function() {

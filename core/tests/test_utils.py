@@ -1632,7 +1632,7 @@ tags: []
             Skill. A newly-created skill.
         """
         skill = skill_domain.Skill.create_default_skill(
-            skill_id, description, [])
+            skill_id, thumbnail_filename, description, [])
         if misconceptions is not None:
             skill.misconceptions = misconceptions
             skill.next_misconception_id = len(misconceptions) + 1

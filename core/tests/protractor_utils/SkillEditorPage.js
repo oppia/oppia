@@ -89,10 +89,21 @@ var SkillEditorPage = function() {
     by.css('.protractor-test-save-rubric-explanation-button'));
   var rubricExplanations = element.all(
     by.css('.protractor-test-rubric-explanation'));
-
+  var skillThumbnailImageElement = element(
+    by.css('.subtopic-thumbnail .protractor-test-custom-photo'));
+  var skillThumbnailClickable = element(
+    by.css('.subtopic-thumbnail .protractor-test-photo-clickable'));
   this.get = function(skillId) {
     browser.get(EDITOR_URL_PREFIX + skillId);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.getSkillThumbnailSource = function() {
+    return workflow.getThumbnailSource(skillThumbnailImageElement);
+  };
+
+  this.submitSkillThumbnail = function(imgPath) {
+    return workflow.submitThumbnail(skillThumbnailClickable, imgPath);
   };
 
   this.editRubricExplanationWithIndex = function(index, explanation) {

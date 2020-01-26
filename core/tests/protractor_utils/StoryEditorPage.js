@@ -101,9 +101,33 @@ var StoryEditorPage = function() {
   var warningIndicator = element(by.css('.protractor-test-warning-indicator'));
   var warningTextElements = element.all(
     by.css('.protractor-test-warnings-text'));
+  var storyThumbnailImageElement = element(
+    by.css('.story-thumbnail .protractor-test-custom-photo'));
+  var storyThumbnailClickable = element(
+    by.css('.story-thumbnail .protractor-test-photo-clickable'));
+  var chapterThumbnailImageElement = element(
+    by.css('.story-node-thumbnail .protractor-test-custom-photo'));
+  var chapterThumbnailClickable = element(
+    by.css('.story-node-thumbnail .protractor-test-photo-clickable'));
   this.get = function(storyId) {
     browser.get(EDITOR_URL_PREFIX + storyId);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.getStoryThumbnailSource = function() {
+    return workflow.getThumbnailSource(storyThumbnailImageElement);
+  };
+
+  this.getChapterThumbnailSource = function() {
+    return workflow.getThumbnailSource(chapterThumbnailImageElement);
+  };
+
+  this.submitStoryThumbnail = function(imgPath) {
+    return workflow.submitThumbnail(storyThumbnailClickable, imgPath);
+  };
+
+  this.submitChapterThumbnail = function(imgPath) {
+    return workflow.submitThumbnail(chapterThumbnailClickable, imgPath);
   };
 
   this.publishStory = function() {

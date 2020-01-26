@@ -65,7 +65,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should move published skill to unused skills section', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation');
+      'Skill 2', 'Concept card explanation', '../data/img.png');
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
@@ -82,7 +82,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should merge an outside skill with one in a topic', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be merged', 'Concept card explanation');
+      'Skill to be merged', 'Concept card explanation', '../data/img.png');
     skillEditorPage.moveToQuestionsTab();
     skillEditorPage.clickCreateQuestionButton();
     skillEditorPage.confirmSkillDifficulty();
@@ -109,7 +109,7 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should remove a skill from list once deleted', function() {
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill to be deleted', 'Concept card explanation');
+      'Skill to be deleted', 'Concept card explanation', '../data/img.png');
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);

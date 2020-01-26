@@ -595,6 +595,31 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill.skill_contents.explanation.to_dict(), new_explanation)
 
+    def test_update_skill_thumbnail_filename(self):
+        skill = skill_services.get_skill_by_id(self.SKILL_ID)
+        old_thumbnail_filename = None
+        new_thumbnail_filename = 'image.jpg'
+
+        self.assertEqual(
+            skill.thumbnail_filename, old_thumbnail_filename)
+
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_THUMBNAIL_FILENAME),
+                'old_value': old_thumbnail_filename,
+                'new_value': new_thumbnail_filename
+            })
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist,
+            'Change thumbnail filename.')
+
+        skill = skill_services.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(
+            skill.thumbnail_filename, new_thumbnail_filename)
+
     def test_update_skill_worked_examples(self):
         skill = skill_services.get_skill_by_id(self.SKILL_ID)
         old_worked_examples = {'content_id': '2', 'html': '<p>Example 1</p>'}

@@ -117,6 +117,12 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'property_name': story_domain.STORY_PROPERTY_DESCRIPTION,
                 'old_value': 'Description',
                 'new_value': 'New Description'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME,
+                'old_value': None,
+                'new_value': 'image.png'
             })
         ]
         story_services.update_story(
@@ -125,6 +131,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_fetchers.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.title, 'New Title')
         self.assertEqual(story.description, 'New Description')
+        self.assertEqual(story.thumbnail_filename, 'image.png')
         self.assertEqual(story.version, 3)
 
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
@@ -768,6 +775,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         story.description = ('Description')
         self.node_1 = {
             'id': self.NODE_ID_1,
+            'thumbnail_filename': 'image.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': [],
@@ -778,6 +786,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         }
         self.node_2 = {
             'id': self.NODE_ID_2,
+            'thumbnail_filename': 'image.png',
             'title': 'Title 2',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -788,6 +797,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         }
         self.node_3 = {
             'id': self.NODE_ID_3,
+            'thumbnail_filename': 'image.png',
             'title': 'Title 3',
             'destination_node_ids': ['node_4'],
             'acquired_skill_ids': [],
@@ -798,6 +808,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         }
         self.node_4 = {
             'id': self.NODE_ID_4,
+            'thumbnail_filename': 'image.png',
             'title': 'Title 4',
             'destination_node_ids': [],
             'acquired_skill_ids': [],

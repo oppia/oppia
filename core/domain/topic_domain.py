@@ -356,6 +356,11 @@ class Subtopic(python_utils.OBJECT):
             ValidationError: One or more attributes of the subtopic are
                 invalid.
         """
+        if self.thumbnail_filename is not None and not (
+                isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % self.thumbnail_filename)
         if not isinstance(self.id, int):
             raise utils.ValidationError(
                 'Expected subtopic id to be an int, received %s' % self.id)

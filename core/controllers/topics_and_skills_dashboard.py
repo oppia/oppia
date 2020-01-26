@@ -142,7 +142,7 @@ class NewSkillHandler(base.BaseHandler):
         thumbnail_data_url = self.request.get('image')
         thumbnail_filename = self.payload.get('thumbnail_filename')
 
-        if not isinstance(thumbnail_filename, python_utils.BASE_STRING):
+        if not isinstance(thumbnail_filename, python_utils.BASESTRING):
             raise self.InvalidInputException(
                 'Thumbnail filename should be a string.')
         if not isinstance(rubrics, list):

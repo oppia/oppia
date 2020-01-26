@@ -79,27 +79,11 @@ describe('Topic editor functionality', function() {
     topicEditorPage.expectNumberOfSubtopicsToBe(0);
   });
 
-  it('should edit subtopic page contents correctly', function() {
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.editSubtopicWithIndex(0);
-    topicEditorPage.changeSubtopicTitle('Modified Title');
-    topicEditorPage.changeSubtopicPageContents(
-      forms.toRichText('Subtopic Contents'));
-    topicEditorPage.saveSubtopic();
-    topicEditorPage.saveTopic('Edited subtopic.');
-
-    topicEditorPage.get(topicId);
-    topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.expectTitleOfSubtopicWithIndexToMatch('Modified Title', 0);
-    topicEditorPage.editSubtopicWithIndex(0);
-    topicEditorPage.expectSubtopicPageContentsToMatch('Subtopic Contents');
-  });
-
   it('should create a question for a skill in the topic', function() {
     var skillId = null;
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 1', 'Concept card explanation');
+      'Skill 1', 'Concept card explanation', '../data/img.png');
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
       topicsAndSkillsDashboardPage.get();
@@ -190,7 +174,7 @@ describe('Topic editor functionality', function() {
   it('should assign a skill to, between, and from subtopics', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation');
+      'Skill 2', 'Concept card explanation', '../data/img.png');
 
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();

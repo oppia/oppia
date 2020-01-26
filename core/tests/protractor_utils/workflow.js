@@ -25,6 +25,19 @@ var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 
+//
+var customThumbnail = element(
+  by.css('.protractor-test-custom-photo'));
+var thumbnailClickable = element(
+  by.css('.protractor-test-photo-clickable'));
+//
+var thumbnailUploadInput = element(
+  by.css('.protractor-test-photo-upload-input'));
+var thumbnailCropper = element(
+  by.css('.cropper-container'));
+var thumbnailSubmitButton = element(
+  by.css('.protractor-test-photo-upload-submit'));
+
 // check if the save roles button is clickable
 var canAddRolesToUsers = function() {
   return element(by.css('.protractor-test-save-role')).isEnabled();
@@ -251,18 +264,46 @@ var getExplorationPlaytesters = function() {
 };
 
 var createSkillAndAssignTopic = function(
-    skillDescription, material, topicName) {
+    skillDescription, material, topicName, thumbnailPath) {
   var topicsAndSkillsDashboardPage =
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-    skillDescription, material);
+    skillDescription, material, thumbnailPath, '../data/img.png');
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
   topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
   topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
     0, topicName);
 };
+
+var getThumbnailSource = function(customThumbnailElement) {
+  return customThumbnailElement.getAttribute('src');
+};
+
+var uploadThumbnail = function(thumbnailClickableElement, imgPath) {
+  thumbnailClickableElement.click();
+  absPath = path.resolve(__dirname, imgPath);
+  return thumbnailUploadInput.sendKeys(absPath);
+};
+
+var submitThumbnail = function(imgPath) {
+  return this.uploadThumbnail(
+    thumbnailClickableElement, imgPath).then(function() {
+      waitFor.visibilityOf(
+        thumbnailCropper, 'Photo cropper is taking too long to appear');
+  }).then(function() {
+    thumbnailSubmitButton.click();
+  }).then(function() {
+    return waitFor.invisibilityOf(
+      thumbnailUploadInput,
+      'Photo uploader is taking too long to disappear');
+  });
+};
+
+exports.getThumbnailSource = getThumbnailSource;
+exports.submitThumbnail = submitThumbnail;
+exports.uploadThumbnail = uploadThumbnail;
 
 exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;

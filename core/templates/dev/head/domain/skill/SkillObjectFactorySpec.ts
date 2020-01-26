@@ -133,6 +133,7 @@ describe('Skill object factory', function() {
 
       skillDict = {
         id: '1',
+        thumbnail_filename: 'image.png',
         description: 'test description',
         misconceptions: [misconceptionDict1, misconceptionDict2],
         rubrics: [rubricDict],
@@ -149,6 +150,7 @@ describe('Skill object factory', function() {
     it('should create a new skill from a backend dictionary', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
       expect(skill.getId()).toEqual('1');
+      expect(skill.getThumbnailFilename()).toEqual('image.png');
       expect(skill.getDescription()).toEqual('test description');
       expect(skill.getMisconceptions()).toEqual(
         [MisconceptionObjectFactory.createFromBackendDict(

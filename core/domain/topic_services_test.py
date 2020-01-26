@@ -287,6 +287,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'subtopic_id': 1,
             'old_value': 'Title',
             'new_value': 'New Title'
+        }), topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                'property_name': 'thumbnail_filename',
+                'subtopic_id': 1,
+                'old_value': None,
+                'new_value': 'image.png'
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -295,6 +301,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'New Title')
+        self.assertEqual(topic.subtopics[0].thumbnail_filename, 'image.png')
 
     def test_cannot_create_topic_change_class_with_invalid_cmd(self):
         with self.assertRaisesRegexp(
@@ -1259,6 +1266,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
         })
         subtopic_dict = {
             'id': 1,
+            'thumbnail_filename': 'image.png',
             'title': 'subtopic_title',
             'skill_ids': []
         }

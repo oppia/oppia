@@ -29,6 +29,7 @@ describe('Story node object factory', () => {
 
     var sampleStoryNodeBackendDict = {
       id: 'node_1',
+      thumbnail_filename: 'image.png',
       title: 'Title 1',
       prerequisite_skill_ids: ['skill_1'],
       acquired_skill_ids: ['skill_2'],
@@ -45,6 +46,7 @@ describe('Story node object factory', () => {
     var storyNode = storyNodeObjectFactory.createFromIdAndTitle(
       'node_1', 'Title 1');
     expect(storyNode.getId()).toEqual('node_1');
+    expect(storyNode.getThumbnailFilename()).toEqual('image.png');
     expect(storyNode.getTitle()).toEqual('Title 1');
     expect(storyNode.getDestinationNodeIds()).toEqual([]);
     expect(storyNode.getPrerequisiteSkillIds()).toEqual([]);
@@ -56,6 +58,13 @@ describe('Story node object factory', () => {
 
   it('should correctly validate a valid story node', () => {
     expect(_sampleStoryNode.validate()).toEqual([]);
+  });
+
+  it('should correctly perform prepublish validation for a story node', () => {
+    expect(_sampleStoryNode.prepublishValidate()).toEqual([]);
+    _sampleStoryNode.setThumbnailFilename('');
+    expect(_sampleStoryNode.prepublishValidate()).toEqual([
+      'Chapter Title 1 should have a thumbnail.']);
   });
 
   it('should correctly validate story nodes', () => {

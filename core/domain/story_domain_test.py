@@ -279,6 +279,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
+            'thumbnail_filename': None,
             'description': feconf.DEFAULT_STORY_DESCRIPTION,
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_contents': {
@@ -355,6 +356,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.title = 1
         self._assert_validation_error(
             'Title should be a string')
+
+    def test_thumbnail_filename_validation(self):
+        self.story.thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received')
 
     def test_description_validation(self):
         self.story.description = 1
@@ -441,6 +447,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict({
                 'id': 'node_1',
+                'thumbnail_filename': None,
                 'title': 'Title 1',
                 'destination_node_ids': [self.NODE_ID_2],
                 'prerequisite_skill_ids': [],
@@ -479,6 +486,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].prerequisite_skill_ids = 1
         self._assert_validation_error(
             'Expected prerequisite skill ids to be a list, received 1')
+        self.story.story_contents.nodes[0].prerequisite_skill_ids = ['1']
+        self.story.story_contents.nodes[0].thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received')
 
     def test_acquired_prerequisite_skill_intersection_validation(self):
         self.story.story_contents.nodes[0].prerequisite_skill_ids = [
@@ -493,6 +504,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image1.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -503,6 +515,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image2.png',
             'title': 'Title 2',
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
@@ -513,6 +526,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image3.png',
             'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -542,6 +556,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -552,6 +567,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 2',
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
@@ -562,6 +578,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -588,6 +605,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -611,6 +629,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -634,6 +653,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 1: Prerequisite skills not acquired.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_2', 'node_3'],
             'acquired_skill_ids': ['skill_2'],
@@ -644,6 +664,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
@@ -654,6 +675,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
@@ -675,6 +697,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 2: Story with loops.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
@@ -685,6 +708,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 2',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': ['skill_3'],
@@ -695,6 +719,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 3',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_4'],
@@ -713,6 +738,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 3: Disconnected graph.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
@@ -723,6 +749,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
@@ -733,6 +760,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
@@ -752,6 +780,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 4: Graph with duplicate nodes.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
@@ -762,6 +791,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
@@ -772,6 +802,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
@@ -791,6 +822,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 5: A valid graph.
         node_1 = {
             'id': 'node_1',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
@@ -801,6 +833,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 2',
             'destination_node_ids': ['node_4', 'node_3'],
             'acquired_skill_ids': ['skill_3', 'skill_4'],
@@ -811,6 +844,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -821,6 +855,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_4 = {
             'id': 'node_4',
+            'thumbnail_filename': 'image.png',
             'title': 'Title 4',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -842,7 +877,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         story_contents object.
         """
         story_node = story_domain.StoryNode(
-            self.NODE_ID_1, 'Title', [self.NODE_ID_2],
+            self.NODE_ID_1, 'Title', None, [self.NODE_ID_2],
             [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', False, self.EXP_ID)
         story_contents = story_domain.StoryContents(

@@ -61,7 +61,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new skill that should not be affected by the
         # job.
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='A description', rubrics=self.rubrics)
+            self.SKILL_ID, thumbnail_filename='image.png',
+            description='A description', rubrics=self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
         self.assertEqual(
             skill.skill_contents_schema_version,
@@ -102,7 +103,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='A description', rubrics=self.rubrics)
+            self.SKILL_ID, thumbnail_filename='image.png',
+            description='A description', rubrics=self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
 
         # Delete the skill before migration occurs.
@@ -194,7 +196,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
             return 'invalid_skill'
 
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, description='A description', rubrics=self.rubrics)
+            self.SKILL_ID, thumbnail_filename='image.png',
+            description='A description', rubrics=self.rubrics)
         skill_services.save_new_skill(self.albert_id, skill)
 
         get_skill_by_id_swap = self.swap(

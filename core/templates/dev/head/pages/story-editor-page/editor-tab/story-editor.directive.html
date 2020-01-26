@@ -1,9 +1,11 @@
 <div role="form" class="form-horizontal">
   <md-card class="oppia-page-card oppia-long-text">
-    <label class="form-heading">Story Thumbnail</label>
-    <thumbnail-uploader filename="editableThumbnailFilename"
-                        update-filename="updateStoryThumbnailFilename">
-    </thumbnail-uploader>
+    <div class="story-thumbnail">
+      <label class="form-heading">Story Thumbnail</label>
+      <thumbnail-uploader filename="editableThumbnailFilename"
+                          update-filename="updateStoryThumbnailFilename">
+      </thumbnail-uploader>
+    </div>
     <div class="story-title">
       <label for="storyTitle" class="form-heading">Story Title</label>
       <input id="storyTitle" type="text" class="form-control protractor-test-story-title-field"

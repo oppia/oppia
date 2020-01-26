@@ -54,7 +54,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], '<p>Explanation 3</p>')]
         self.skill = skill_domain.Skill(
-            self.SKILL_ID, 'Description', misconceptions, rubrics,
+            self.SKILL_ID, 'image.png', 'Description', misconceptions, rubrics,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_RUBRIC_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
@@ -76,6 +76,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_valid_skill_id(self):
         self._assert_valid_skill_id('Skill id should be a string', 10)
         self._assert_valid_skill_id('Invalid skill id', 'abc')
+    
+    def test_valid_skill_thumbnail_filename(self):
+        self.skill.thumbnail_filename = []
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received')
 
     def test_valid_misconception_id(self):
         self.skill.next_misconception_id = 'invalid_id'
@@ -282,9 +287,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2],
                 '<p>[NOTE: Creator should fill this in]</p>')]
         skill = skill_domain.Skill.create_default_skill(
-            self.SKILL_ID, 'Description', rubrics)
+            self.SKILL_ID, 'image.png', 'Description', rubrics)
         expected_skill_dict = {
             'id': self.SKILL_ID,
+            'thumbnail_filename': 'image.png',
             'description': 'Description',
             'misconceptions': [],
             'rubrics': [rubric.to_dict() for rubric in rubrics],

@@ -298,6 +298,11 @@ class StoryNode(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected exploration ID to be a string, received %s' %
                     self.exploration_id)
+        if self.thumbnail_filename is not None and not (
+                isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % self.thumbnail_filename)
 
         if not isinstance(self.outline, python_utils.BASESTRING):
             raise utils.ValidationError(

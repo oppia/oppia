@@ -692,7 +692,7 @@ class Skill(python_utils.OBJECT):
 
         Args:
             skill_id: str. The unique id of the skill.
-            thumbnail_filename: string|null. The thumbnail filename for the
+            thumbnail_filename: string|None. The thumbnail filename for the
                 skill.
             description: str. The initial description for the skill.
             rubrics: list(Rubric). The list of rubrics for the skill.

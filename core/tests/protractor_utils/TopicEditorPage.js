@@ -20,6 +20,7 @@
 var dragAndDropScript = require('html-dnd').code;
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
 var path = require('path');
 
 var TopicEditorPage = function() {
@@ -90,17 +91,14 @@ var TopicEditorPage = function() {
   var questionItem = element(by.css('.protractor-test-question-list-item'));
   var selectSkillDropdown = element(
     by.css('.protractor-test-select-skill-dropdown'));
-  var customTopicThumbnail = element(
-    by.css('.protractor-test-custom-photo'));
+  var subtopicThumbnailImageElement = element(
+    by.css('.subtopic-thumbnail .protractor-test-custom-photo'));
+  var subtopicThumbnailClickable = element(
+    by.css('.subtopic-thumbnail .protractor-test-photo-clickable'));
+  var topicThumbnailImageElement = element(
+    by.css('.thumbnail-editor .protractor-test-custom-photo'));
   var topicThumbnailClickable = element(
-    by.css('.protractor-test-photo-clickable'));
-  var topicThumbnailUploadInput = element(
-    by.css('.protractor-test-photo-upload-input'));
-  var topicThumbnailCropper = element(
-    by.css('.cropper-container'));
-  var topicThumbnailSubmitButton = element(
-    by.css('.protractor-test-photo-upload-submit'));
-
+    by.css('.thumbnail-editor .protractor-test-photo-clickable'));
   var dragAndDrop = function(fromElement, toElement) {
     browser.executeScript(dragAndDropScript, fromElement, toElement);
   };
@@ -111,32 +109,25 @@ var TopicEditorPage = function() {
   };
 
   this.getTopicThumbnailSource = function() {
-    return customTopicThumbnail.getAttribute('src');
+    return workflow.getThumbnailSource(topicThumbnailImageElement);
   };
 
-  this.uploadThumbnail = function(imgPath) {
-    topicThumbnailClickable.click();
-    absPath = path.resolve(__dirname, imgPath);
-    return topicThumbnailUploadInput.sendKeys(absPath);
+  this.getSubtopicThumbnailSource = function() {
+    return workflow.getThumbnailSource(subtopicThumbnailImageElement);
+  };
+
+  this.submitTopicThumbnail = function(imgPath) {
+    return workflow.submitThumbnail(topicThumbnailClickable, imgPath);
+  };
+
+  this.submitSubtopicThumbnail = function(imgPath) {
+    return workflow.submitThumbnail(subtopicThumbnailClickable, imgPath);
   };
 
   this.publishTopic = function() {
     publishTopicButton.click();
     return waitFor.invisibilityOf(
       publishTopicButton, 'Topic is taking too long to publish.');
-  };
-
-  this.submitTopicThumbnail = function(imgPath) {
-    return this.uploadThumbnail(imgPath).then(function() {
-      waitFor.visibilityOf(
-        topicThumbnailCropper, 'Photo cropper is taking too long to appear');
-    }).then(function() {
-      topicThumbnailSubmitButton.click();
-    }).then(function() {
-      return waitFor.invisibilityOf(
-        topicThumbnailUploadInput,
-        'Photo uploader is taking too long to disappear');
-    });
   };
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = function(

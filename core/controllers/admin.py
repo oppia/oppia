@@ -335,7 +335,7 @@ class AdminHandler(base.BaseHandler):
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill = skill_domain.Skill.create_default_skill(
-            skill_id, skill_description, rubrics)
+            skill_id, None, skill_description, rubrics)
         skill.update_explanation(
             state_domain.SubtitledHtml('1', explanation).to_dict())
         return skill

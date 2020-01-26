@@ -171,12 +171,12 @@ var TopicsAndSkillsDashboardPage = function() {
   };
 
   this.createSkillWithDescriptionAndExplanation = function(
-      description, reviewMaterial) {
+      description, reviewMaterial, thumbnailPath) {
     waitFor.elementToBeClickable(
       createSkillButton,
       'Create Skill button takes too long to be clickable');
     createSkillButton.click();
-
+    skillEditorPage.submitSkillThumbnail(thumbnailPath);
     skillNameField.sendKeys(description);
     editConceptCardExplanationButton.click();
 
