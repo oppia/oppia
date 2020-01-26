@@ -45,7 +45,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             actual_travis_ci_dict = (
                 check_e2e_tests_are_captured_in_ci
                 .read_and_parse_travis_yml_file())
-            self.assertEqual(TRAVIS_CI_DICT, actual_travis_ci_dict)
+            self.assertEqual(EXPECTED_TRAVIS_CI_DICT, actual_travis_ci_dict)
 
     def test_read_protractor_file(self):
         protractor_config_file = os.path.join(
@@ -58,7 +58,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             actual_protractor_config_file = (
                 check_e2e_tests_are_captured_in_ci.read_protractor_conf_file())
         self.assertEqual(
-            DUMMY_PROTRACTOR_CONF_FILE, actual_protractor_config_file)
+            EXPECTED_PROTRACTOR_CONF_FILE, actual_protractor_config_file)
 
     def test_get_e2e_suite_names_from_jobs_travis_yml_file(self):
         def mock_read_travis_yml_file():
@@ -93,24 +93,6 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                 check_e2e_tests_are_captured_in_ci
                 .get_e2e_suite_names_from_script_travis_yml_file())
         self.assertEqual(DUMMY_TEST_SUITES, actual_travis_script)
-
-    def test_get_e2e_suite_names_from_script_travis_yml_file_fail(self):
-        def mock_read_travis_yml_file_fail():
-            travis_ci_file = python_utils.open_file(
-                os.path.join(
-                    DUMMY_CONF_FILES, '.travis_has_extra_test.yml'), 'r').read()
-            travis_ci_dict = utils.dict_from_yaml(travis_ci_file)
-            return travis_ci_dict
-
-        dummy_path = self.swap(
-            check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yml_file',
-            mock_read_travis_yml_file_fail)
-        with dummy_path:
-            actual_travis_script = (
-                check_e2e_tests_are_captured_in_ci
-                .get_e2e_suite_names_from_jobs_travis_yml_file())
-        self.assertNotEqual(DUMMY_TEST_SUITES, actual_travis_script)
 
     def test_get_e2e_suite_names_from_protractor_file(self):
         def mock_read_protractor_conf_file():
@@ -154,7 +136,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             'TEST_SUITES_NOT_RUN_ON_TRAVIS', ['fourWord'])
 
         common_test_swap = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'TRAVIS_PROTRACTOR_COMMON_TEST',
+            check_e2e_tests_are_captured_in_ci,
+            'SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST',
             'oneword')
 
         with common_test_swap, mock_tests_to_remove:
@@ -190,22 +173,23 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         with mock_travis_scripts:
             with self.assertRaisesRegexp(
-                Exception, 'explorationImprovementsTab is missing from the '
-                           'e2e test suites extracted from script section'
-                           ' from travis.ci'):
+                Exception, 'explorationImprovementsTab is expected to be in '
+                           'the e2e test suites extracted from the script '
+                           'section of .travis.yml file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
         with mock_travis_jobs:
             with self.assertRaisesRegexp(
-                Exception, 'explorationImprovementsTab is missing from the'
-                           ' e2e test suites extracted from jobs section'
-                           ' from travis.ci'):
+                Exception, 'explorationImprovementsTab is expected to be in '
+                           'the e2e test suites extracted from the jobs '
+                           'section of .travis.yml file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
         with mock_protractor_test_suites, mock_tests_not_on_travis:
             with self.assertRaisesRegexp(
-                Exception, 'explorationImprovementsTab is missing from the e2e'
-                           ' test suites extracted from protractor.conf.js'):
+                Exception, 'explorationImprovementsTab is expected to be in '
+                           'the e2e test suites extracted from the '
+                           'protractor.conf.js file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_invalid_travis_jobs_test_suite_length(self):
@@ -321,7 +305,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             check_e2e_tests_are_captured_in_ci,
             'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
         common_test_swap = self.swap(
-            check_e2e_tests_are_captured_in_ci, 'TRAVIS_PROTRACTOR_COMMON_TEST',
+            check_e2e_tests_are_captured_in_ci,
+            'SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST',
             'oneword')
 
         mock_tests_to_remove = self.swap(
@@ -333,19 +318,20 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                 check_e2e_tests_are_captured_in_ci.main()
 
 
-TRAVIS_CI_DICT = {'env': {
-    'jobs': [
-        'RUN_E2E_TESTS_ONEWORD=true', 'RUN_E2E_TESTS_TWO_WORDS=true']
-    },
-                  'script': [
-                      'if [ "RUN_E2E_TESTS_ONEWORD" == \'true\' ]; '
-                      'then travis_retry bash scripts/run_e2e_tests.sh'
-                      ' --suite="oneword" --prod_env; fi',
-                      'if [ "RUN_E2E_TESTS_TWO_WORDS" == \'true\' ]; '
-                      'then travis_retry bash scripts/run_e2e_tests.sh'
-                      ' --suite="twoWords" --prod_env; fi']}
+EXPECTED_TRAVIS_CI_DICT = {
+    'env': {
+        'jobs': [
+            'RUN_E2E_TESTS_ONEWORD=true', 'RUN_E2E_TESTS_TWO_WORDS=true']
+        },
+    'script': [
+        'if [ "RUN_E2E_TESTS_ONEWORD" == \'true\' ]; '
+        'then travis_retry bash scripts/run_e2e_tests.sh'
+        ' --suite="oneword" --prod_env; fi',
+        'if [ "RUN_E2E_TESTS_TWO_WORDS" == \'true\' ]; '
+        'then travis_retry bash scripts/run_e2e_tests.sh'
+        ' --suite="twoWords" --prod_env; fi']}
 
-DUMMY_PROTRACTOR_CONF_FILE = """var path = require('path')
+EXPECTED_PROTRACTOR_CONF_FILE = """var path = require('path')
 var suites = {
   oneword: [
     'protractor/oneword.js'
