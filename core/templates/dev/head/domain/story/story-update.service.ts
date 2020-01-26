@@ -34,8 +34,8 @@ angular.module('oppia').factory('StoryUpdateService', [
   'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS',
   'STORY_NODE_PROPERTY_THUMBNAIL_FILENAME', 'STORY_NODE_PROPERTY_TITLE',
   'STORY_PROPERTY_DESCRIPTION', 'STORY_PROPERTY_LANGUAGE_CODE',
-  'STORY_PROPERTY_NOTES', 'STORY_PROPERTY_TITLE',
-  'STORY_PROPERTY_THUMBNAIL_FILENAME', function(
+  'STORY_PROPERTY_NOTES', 'STORY_PROPERTY_THUMBNAIL_FILENAME',
+  'STORY_PROPERTY_TITLE', function(
       AlertsService, ChangeObjectFactory, UndoRedoService,
       CMD_ADD_STORY_NODE, CMD_DELETE_STORY_NODE,
       CMD_UPDATE_STORY_CONTENTS_PROPERTY, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
@@ -46,8 +46,8 @@ angular.module('oppia').factory('StoryUpdateService', [
       STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS,
       STORY_NODE_PROPERTY_THUMBNAIL_FILENAME, STORY_NODE_PROPERTY_TITLE,
       STORY_PROPERTY_DESCRIPTION, STORY_PROPERTY_LANGUAGE_CODE,
-      STORY_PROPERTY_NOTES, STORY_PROPERTY_TITLE,
-      STORY_PROPERTY_THUMBNAIL_FILENAME) {
+      STORY_PROPERTY_NOTES, STORY_PROPERTY_THUMBNAIL_FILENAME,
+      STORY_PROPERTY_TITLE) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // story.
@@ -144,7 +144,8 @@ angular.module('oppia').factory('StoryUpdateService', [
           story, STORY_PROPERTY_THUMBNAIL_FILENAME, oldThumbnailFilename,
           newThumbnailFilename, function(changeDict, story) {
             // Apply
-            var thumbnailFilename = _getNewPropertyValueFromChangeDict(changeDict);
+            var thumbnailFilename = (
+              _getNewPropertyValueFromChangeDict(changeDict));
             story.setThumbnailFilename(thumbnailFilename);
           }, function(changeDict, story) {
             // Undo.

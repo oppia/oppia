@@ -5543,7 +5543,7 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i, 
+            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(6)]

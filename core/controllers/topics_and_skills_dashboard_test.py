@@ -17,6 +17,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import os
+
 from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
@@ -25,8 +27,8 @@ from core.domain import topic_fetchers
 from core.domain import topic_services
 from core.tests import test_utils
 import feconf
-import os
 import python_utils
+
 
 class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
 
@@ -273,7 +275,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'image', 'unused_filename', self.original_image_content),))
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
-    
+
     def test_skill_creation_with_no_thumbnail_data_url_supplied(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()

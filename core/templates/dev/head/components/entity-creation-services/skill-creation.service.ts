@@ -21,10 +21,10 @@ require('services/alerts.service.ts');
 require('services/csrf-token.service.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
-  '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
+  '$rootScope', '$timeout', '$window', 'AlertsService',
   'CsrfTokenService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $window, AlertsService,
+      $rootScope, $timeout, $window, AlertsService,
       CsrfTokenService, UrlInterpolationService) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');

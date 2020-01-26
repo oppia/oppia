@@ -90,13 +90,11 @@ describe('Topic editor functionality', function() {
     topicEditorPage.changeSubtopicPageContents(
       forms.toRichText('Subtopic Contents'));
     expect(topicEditorPage.getSubtopicThumbnailSource())
-    .not
-    .toEqual(
-      topicEditorPage.submitSubtopicThumbnail('../data/img.png')
-        .then(function() {
-          return topicEditorPage.getSubtopicThumbnailSource();
-        })
-    );
+      .not.toEqual(
+        topicEditorPage.submitSubtopicThumbnail('../data/img.png')
+          .then(function() {
+            return topicEditorPage.getSubtopicThumbnailSource();
+          }));
     topicEditorPage.saveSubtopic();
     topicEditorPage.saveTopic('Edited subtopic.');
 

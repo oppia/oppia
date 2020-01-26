@@ -244,7 +244,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_subtopic_id_validation(self):
         self.topic.subtopics[0].id = 'invalid_id'
         self._assert_validation_error('Expected subtopic id to be an int')
-    
+
     def test_subtopic_thumbnail_filename_validation(self):
         self.topic.subtopics[0].thumbnail_filename = 1
         self._assert_validation_error(
@@ -363,8 +363,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_add_uncategorized_skill_id(self):
         self.topic.subtopics.append(
-            topic_domain.Subtopic('id_2', 'Title2', ['skill_id_2'],
-            'image.png'))
+            topic_domain.Subtopic(
+                'id_2', 'Title2', ['skill_id_2'], 'image.png'))
         with self.assertRaisesRegexp(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):

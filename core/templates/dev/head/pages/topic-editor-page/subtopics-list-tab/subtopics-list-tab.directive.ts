@@ -158,7 +158,7 @@ angular.module('oppia').directive('subtopicsListTab', [
                   $scope.subtopicPage, subtopic.getId(), subtitledHtml);
                 TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
               }
-              if (newThumbnailFilename != subtopic.getThumbnailFilename()) {
+              if (newThumbnailFilename !== subtopic.getThumbnailFilename()) {
                 TopicUpdateService.setSubtopicThumbnailFilename(
                   $scope.topic, subtopic.getId(), newThumbnailFilename);
               }

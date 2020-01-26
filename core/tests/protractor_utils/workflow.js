@@ -290,8 +290,8 @@ var uploadThumbnail = function(thumbnailClickableElement, imgPath) {
 var submitThumbnail = function(imgPath) {
   return this.uploadThumbnail(
     thumbnailClickableElement, imgPath).then(function() {
-      waitFor.visibilityOf(
-        thumbnailCropper, 'Photo cropper is taking too long to appear');
+    waitFor.visibilityOf(
+      thumbnailCropper, 'Photo cropper is taking too long to appear');
   }).then(function() {
     thumbnailSubmitButton.click();
   }).then(function() {

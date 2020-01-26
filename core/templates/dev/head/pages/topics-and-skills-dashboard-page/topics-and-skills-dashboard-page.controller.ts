@@ -172,7 +172,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   $scope.updateThumbnailDataUrl = function(
                       newThumbnailDataUrl) {
                     $scope.thumbnailDataUrl = newThumbnailDataUrl;
-                  }
+                  };
 
                   $scope.onSaveRubric = function(difficulty, explanation) {
                     for (var idx in $scope.rubrics) {

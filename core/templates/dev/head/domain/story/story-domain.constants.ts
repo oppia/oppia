@@ -36,7 +36,7 @@ export class StoryDomainConstants {
     CMD_UPDATE_STORY_CONTENTS_PROPERTY = 'update_story_contents_property';
 
   public static STORY_PROPERTY_TITLE = 'title';
-  public static STORY_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
+  public static STORY_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename';
   public static STORY_PROPERTY_DESCRIPTION = 'description';
   public static STORY_PROPERTY_NOTES = 'notes';
   public static STORY_PROPERTY_LANGUAGE_CODE = 'language_code';

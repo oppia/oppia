@@ -288,11 +288,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'old_value': 'Title',
             'new_value': 'New Title'
         }), topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
-                'property_name': 'thumbnail_filename',
-                'subtopic_id': 1,
-                'old_value': None,
-                'new_value': 'image.png'
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': 'thumbnail_filename',
+            'subtopic_id': 1,
+            'old_value': None,
+            'new_value': 'image.png'
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,

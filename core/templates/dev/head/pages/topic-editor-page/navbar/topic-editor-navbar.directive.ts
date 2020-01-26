@@ -40,11 +40,11 @@ angular.module('oppia').directive('topicEditorNavbar', [
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-          $scope, $rootScope, $uibModal, $window, AlertsService,
-          UndoRedoService, TopicEditorStateService, UrlService,
-          TopicRightsBackendApiService, TopicEditorRoutingService,
-          EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
-          EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            $scope, $rootScope, $uibModal, $window, AlertsService,
+            UndoRedoService, TopicEditorStateService, UrlService,
+            TopicRightsBackendApiService, TopicEditorRoutingService,
+            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
           $scope.isSaveInProgress = function() {
             return TopicEditorStateService.isSavingTopic();
@@ -65,7 +65,7 @@ angular.module('oppia').directive('topicEditorNavbar', [
           var _validateTopic = function() {
             $scope.validationIssues = $scope.topic.validate();
             var prepublishTopicValidationIssues = (
-              $scope.topic.prepublishValidate());            
+              $scope.topic.prepublishValidate());
             var subtopicPrepublishValidationIssues = (
               [].concat.apply([], $scope.topic.getSubtopics().map(
                 (subtopic) => subtopic.prepublishValidate())));
@@ -97,10 +97,10 @@ angular.module('oppia').directive('topicEditorNavbar', [
               modalInstance.result.then(function() {
                 TopicRightsBackendApiService.sendMail(
                   $scope.topicId, $scope.topicName).then(function() {
-                    var successToast = 'Mail Sent.';
-                    AlertsService.addSuccessMessage(
-                      successToast, 1000);
-                  });
+                  var successToast = 'Mail Sent.';
+                  AlertsService.addSuccessMessage(
+                    successToast, 1000);
+                });
               }, function() {
                 // Note to developers:
                 // This callback is triggered when the Cancel button is clicked.

@@ -1616,6 +1616,7 @@ tags: []
         Args:
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
+            thumbnail_filename: str|None. The thumbnail filename of the skill.
             description: str. The description of the skill.
             misconceptions: list(Misconception)|None. A list of Misconception
                 objects that contains the various misconceptions of the skill.

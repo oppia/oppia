@@ -33,6 +33,7 @@ from core.domain import topic_services
 import feconf
 import python_utils
 
+
 class TopicsAndSkillsDashboardPage(base.BaseHandler):
     """Page showing the topics and skills dashboard."""
 

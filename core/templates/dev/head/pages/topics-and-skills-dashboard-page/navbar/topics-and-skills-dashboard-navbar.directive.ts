@@ -98,7 +98,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardNavbar', [
                   $scope.updateThumbnailDataUrl = function(
                       newThumbnailDataUrl) {
                     $scope.thumbnailDataUrl = newThumbnailDataUrl;
-                  }
+                  };
 
                   $scope.onSaveRubric = function(difficulty, explanation) {
                     for (var idx in $scope.rubrics) {

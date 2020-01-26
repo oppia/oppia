@@ -151,7 +151,7 @@ def apply_change_list(story_id, change_list):
                         story_domain.STORY_PROPERTY_TITLE):
                     story.update_title(change.new_value)
                 elif (change.property_name ==
-                        story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
+                      story_domain.STORY_PROPERTY_THUMBNAIL_FILENAME):
                     story.update_thumbnail_filename(change.new_value)
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_DESCRIPTION):

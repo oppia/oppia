@@ -61,7 +61,7 @@ angular.module('oppia').directive('storyEditorNavbar', [
             var prepublishValidationIssuesCount = (
               $scope.prepublishValidationIssues.length);
             return validationIssuesCount + prepublishValidationIssuesCount;
-          }
+          };
 
           $scope.isStorySaveable = function() {
             return (

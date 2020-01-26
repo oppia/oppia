@@ -76,7 +76,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_valid_skill_id(self):
         self._assert_valid_skill_id('Skill id should be a string', 10)
         self._assert_valid_skill_id('Invalid skill id', 'abc')
-    
+
     def test_valid_skill_thumbnail_filename(self):
         self.skill.thumbnail_filename = []
         self._assert_validation_error(
