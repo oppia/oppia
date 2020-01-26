@@ -196,8 +196,8 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
         suggestionThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
       };
 
-      spyOn(ThreadDataService, 'fetchThreads').and.returnValue(
-        $q.resolve(threads));
+      spyOn(ThreadDataService, 'fetchThreads').and
+        .returnValue($q.resolve(threads));
       var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages').and
         .callFake(done);
 
