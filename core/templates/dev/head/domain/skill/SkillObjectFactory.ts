@@ -16,17 +16,23 @@
  * @fileoverview Factory for creating frontend
  * instances of Skill objects.
  */
-import { ConceptCardObjectFactory } from './ConceptCardObjectFactory'
-import { MisconceptionObjectFactory } from './MisconceptionObjectFactory'
-import { RubricObjectFactory, Rubric } from './RubricObjectFactory'
-import { ValidatorsService } from 'services/validators.service.ts'
+import { ConceptCardObjectFactory } from 
+ './ConceptCardObjectFactory'
+import { MisconceptionObjectFactory } from
+ './MisconceptionObjectFactory'
+import { RubricObjectFactory } from
+ './RubricObjectFactory'
+import { ValidatorsService } from
+ 'services/validators.service.ts'
 import { Injectable } from '@angular/core'
-import { downgradeInjectable } from '@angular/upgrade/static';
-import predConsts from './../../../../../../assets/constants'
+import { downgradeInjectable } 
+  from '@angular/upgrade/static';
+import predConsts from
+ './../../../../../../assets/constants'
 
 export class Skill {
   _id: number = null;
-  _description = null;
+  _description:string= null;
   _misconceptions = null;
   _rubrics = null;
   _conceptCard = null;
@@ -35,7 +41,7 @@ export class Skill {
   _nextMisconceptionId = null
   _supersedingSkillId = null;
   _allQuestionsMerged = null;
-  _prerequisiteSkillIds = null;
+  _prerequisiteSkillIds:[] = null;
   SKILL_DIFFICULTIES = predConsts.SKILL_DIFFICULTIES
   constructor(id, description, misconceptions, rubrics, conceptCard, languageCode,
     version, nextMisconceptionId, supersedingSkillId, allQuestionsMerged, prerequisiteSkillIds ) {
@@ -67,7 +73,7 @@ export class Skill {
     this._prerequisiteSkillIds.push(skillId);
   };
 
-  deletePrerequisiteSkill(skillId) {
+  deletePrerequisiteSkill(skillId : number) {
     for (var idx in this._prerequisiteSkillIds) {
       if (this._prerequisiteSkillIds[idx] === skillId) {
         this._prerequisiteSkillIds.splice(idx, 1);
@@ -87,7 +93,7 @@ export class Skill {
     return this._misconceptions.slice();
   };
 
-  getRubrics = function () {
+  getRubrics() {
     return this._rubrics.slice();
   };
 
@@ -105,11 +111,11 @@ export class Skill {
     return this._version;
   };
 
-  getNextMisconceptionId = function () {
+  getNextMisconceptionId() {
     return this._nextMisconceptionId;
   };
 
-  getIncrementedMisconceptionId(id) {
+  getIncrementedMisconceptionId(id:number) {
     return id + 1;
   };
 
@@ -127,7 +133,8 @@ export class Skill {
         return this._misconceptions[idx];
       }
     }
-    throw new Error('Could not find misconception with ID: ' + id);
+    throw new Error(
+      'Could not find misconception with ID: ' + id);
   };
 
   deleteMisconception(id) {
@@ -164,6 +171,39 @@ export class Skill {
     const rubricObjectFactory = new RubricObjectFactory();
     this._rubrics.push(rubricObjectFactory.create(difficulty, explanation));
   };
+  toBackendDict() {
+    return {
+      id: this._id,
+      description: this._description,
+      misconceptions: this._misconceptions.map(function(misconception) {
+        return misconception.toBackendDict();
+      }),
+      rubrics: this._rubrics.map(function(rubric) {
+        return rubric.toBackendDict();
+      }),
+      skill_contents: this._conceptCard.toBackendDict(),
+      language_code: this._languageCode,
+      version: this._version,
+      next_misconception_id: this._nextMisconceptionId,
+      superseding_skill_id: this._supersedingSkillId,
+      all_questions_merged: this._allQuestionsMerged,
+      prerequisite_skill_ids: this._prerequisiteSkillIds
+    };
+  };
+  getValidationIssues() {
+    var issues = [];
+    if (this.getConceptCard().getExplanation().getHtml() === '') {
+      issues.push(
+        'There should be review material in the concept card.');
+    }
+    if (this.getRubrics().length !== 3) {
+      issues.push(
+        'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
+        'in rubrics.');
+    }
+    return issues;
+  };
+
 }
 
 @Injectable({
@@ -175,7 +215,11 @@ export class SkillObjectFactory {
     private rubricObjectFactory: RubricObjectFactory,
     private validatorService :ValidatorsService){
   }
-  
+  createInterstitialSkill() {
+    return new Skill(null, 'Skill description loading',
+      [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(), 'en',
+      1, 0, null, false, []);
+  };
   hasValidDescription(description) {
     /* eslint-enable dot-notation */
     var allowDescriptionToBeBlank = false;
@@ -209,7 +253,8 @@ export class SkillObjectFactory {
     });
   };
 }
-angular.module('oppia').factory('ConceptCardObjectFactory', downgradeInjectable(ConceptCardObjectFactory));
+angular.module('oppia').factory('ConceptCardObjectFactory', 
+  downgradeInjectable(ConceptCardObjectFactory));
 // require('domain/skill/ConceptCardObjectFactory.ts');
 // require('domain/skill/MisconceptionObjectFactory.ts');
 // require('domain/skill/RubricObjectFactory.ts');
