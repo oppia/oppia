@@ -495,7 +495,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics = [
             topic_domain.Subtopic(1, 'Title', ['skill_id_1'], 'image.png'),
             topic_domain.Subtopic(2, 'Another title', ['skill_id_1'],
-            'image.png')]
+                                  'image.png')]
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):
