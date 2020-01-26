@@ -72,7 +72,7 @@ angular.module('oppia').factory('ThreadDataService', [
     // Number of open threads that need action
     var _openThreadsCount = 0;
 
-    var _fetchThreads = function(onSuccess = () => {}) {
+    var _fetchThreads = function() {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
       var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
         params: {target_type: 'exploration', target_id: _expId}
@@ -114,8 +114,8 @@ angular.module('oppia').factory('ThreadDataService', [
     };
 
     return {
-      fetchThreads: function(onSuccess) {
-        return _fetchThreads(onSuccess);
+      fetchThreads: function() {
+        return _fetchThreads();
       },
       fetchMessages: function(threadId) {
         return _fetchMessages(threadId);
