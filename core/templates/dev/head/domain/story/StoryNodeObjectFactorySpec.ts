@@ -46,7 +46,7 @@ describe('Story node object factory', () => {
     var storyNode = storyNodeObjectFactory.createFromIdAndTitle(
       'node_1', 'Title 1');
     expect(storyNode.getId()).toEqual('node_1');
-    expect(storyNode.getThumbnailFilename()).toEqual('image.png');
+    expect(storyNode.getThumbnailFilename()).toEqual(null);
     expect(storyNode.getTitle()).toEqual('Title 1');
     expect(storyNode.getDestinationNodeIds()).toEqual([]);
     expect(storyNode.getPrerequisiteSkillIds()).toEqual([]);
