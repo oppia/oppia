@@ -105,12 +105,12 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
        */
       fetchTasks: function() {
         var createNew = this.createNew;
-        return ThreadDataService.fetchThreads()
-          .then(threadData => $q.all([
-            $q.resolve(threadData),
-            ...threadData.suggestionThreads.map(
-              thread => ThreadDataService.fetchMessages(thread.threadId))]))
-          .then(results => results.shift().suggestionThreads.map(createNew));
+        return ThreadDataService.fetchThreads().then(threadData => {
+          return $q.all(
+            threadData.suggestionThreads.map(
+              thread => ThreadDataService.fetchMessages(thread.threadId))
+          ).then(() => threadData);
+        }).then(threadData => threadData.suggestionThreads.map(createNew));
       },
     };
   }
