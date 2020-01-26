@@ -29,15 +29,12 @@ require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveTextInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/TextInput/directives/' +
-        'text-input-interaction.directive.html'),
+      template: require('./text-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'FocusManagerService', 'TextInputRulesService',

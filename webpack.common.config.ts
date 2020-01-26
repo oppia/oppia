@@ -677,8 +677,15 @@ module.exports = {
       ]
     },
     {
-      test: /\.html$/,
+      test: {
+        include: /.html$/,
+        exclude: /directive\.html$/
+      },
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /directive\.html$/,
+      loader: 'html-loader'
     },
     {
       test: /\.css$/,

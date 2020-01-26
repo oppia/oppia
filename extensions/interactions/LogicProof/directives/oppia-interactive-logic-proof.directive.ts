@@ -18,7 +18,6 @@
 
 require('interactions/codemirrorRequires.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/LogicProof/directives/logic-proof-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -35,18 +34,15 @@ import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
   'interactions/LogicProof/static/js/generatedDefaultData.ts';
 
 angular.module('oppia').directive('oppiaInteractiveLogicProof', [
-  'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  function(
-      HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
+  'HtmlEscaperService', 'EVENT_NEW_CARD_AVAILABLE',
+  function(HtmlEscaperService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         getLastAnswer: '&lastAnswer',
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/LogicProof/directives/' +
-        'logic-proof-interaction.directive.html'),
+      template: require('./logic-proof-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$timeout', '$uibModal', 'LogicProofRulesService',
@@ -223,9 +219,7 @@ angular.module('oppia').directive('oppiaInteractiveLogicProof', [
           };
           ctrl.showHelp = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/LogicProof/directives/' +
-                'logic-proof-help-modal.directive.html'),
+              template: require('./logic-proof-help-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
@@ -31,20 +30,15 @@ require('services/html-escaper.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
-  '$timeout', 'HtmlEscaperService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
-  function(
-      $timeout, HtmlEscaperService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+  '$timeout', 'HtmlEscaperService', 'EVENT_NEW_CARD_AVAILABLE',
+  function($timeout, HtmlEscaperService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         getLastAnswer: '&lastAnswer'
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/PencilCodeEditor/directives/' +
-        'pencil-code-editor-interaction.directive.html'),
+      template: require('./pencil-code-editor-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$element', '$uibModal',
@@ -57,9 +51,8 @@ angular.module('oppia').directive('oppiaInteractivePencilCodeEditor', [
           var iframeDiv, pce;
           ctrl.reset = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/interactions/PencilCodeEditor/directives/' +
-                'pencil-code-reset-confirmation.directive.html'),
+              template: require(
+                './pencil-code-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [

@@ -21,7 +21,6 @@
  */
 
 require('domain/utilities/browser-checker.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/ItemSelectionInput/directives/' +
   'item-selection-input-rules.service.ts');
@@ -33,16 +32,14 @@ require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
   'BrowserCheckerService', 'HtmlEscaperService',
-  'ItemSelectionInputRulesService', 'UrlInterpolationService', function(
+  'ItemSelectionInputRulesService', function(
       BrowserCheckerService, HtmlEscaperService,
-      ItemSelectionInputRulesService, UrlInterpolationService) {
+      ItemSelectionInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/ItemSelectionInput/directives/' +
-        'item-selection-input-interaction.directive.html'),
+      template: require('./item-selection-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'WindowDimensionsService',

@@ -20,21 +20,18 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/SetInput/directives/set-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveSetInput', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/SetInput/directives/' +
-        'set-input-interaction.directive.html'),
+      template: require('./set-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$translate', 'SetInputRulesService',
