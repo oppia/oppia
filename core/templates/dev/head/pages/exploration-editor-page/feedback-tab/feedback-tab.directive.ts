@@ -72,9 +72,10 @@ angular.module('oppia').directive('feedbackTab', [
           };
           // Fetches the threads again if any thread is updated.
           ctrl.fetchUpdatedThreads = function() {
-            ThreadDataService.fetchThreads();
-            ctrl.threadData = ThreadDataService.data;
-            ctrl.threadIsUpdated = false;
+            return ThreadDataService.fetchThreads().then(threadData => {
+              ctrl.threadData = threadData;
+              ctrl.threadIsUpdated = false;
+            });
           };
           ctrl.onBackButtonClicked = function() {
             ctrl.clearActiveThread();
@@ -154,9 +155,8 @@ angular.module('oppia').directive('feedbackTab', [
               {
                 activeThread: ctrl.activeThread,
                 setActiveThread: function(threadId) {
-                  ThreadDataService.fetchThreads().then(function() {
-                    ctrl.setActiveThread(threadId);
-                  });
+                  ctrl.fetchUpdatedThreads()
+                    .then(() => ctrl.setActiveThread(threadId));
                 },
                 isSuggestionHandled: _isSuggestionHandled,
                 hasUnsavedChanges: _hasUnsavedChanges,
@@ -217,7 +217,6 @@ angular.module('oppia').directive('feedbackTab', [
 
           ctrl.$onInit = function() {
             ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
-            ctrl.threadData = ThreadDataService.data;
             ctrl.activeThread = null;
             ctrl.userIsLoggedIn = null;
             ctrl.threadIsUpdated = false;
@@ -234,7 +233,7 @@ angular.module('oppia').directive('feedbackTab', [
             };
             ctrl.clearActiveThread();
             ThreadDataService.fetchFeedbackStats();
-            var threadPromise = ThreadDataService.fetchThreads();
+            var threadPromise = ctrl.fetchUpdatedThreads();
             $q.all([userInfoPromise, threadPromise]).then(function() {
               $rootScope.loadingMessage = '';
             });

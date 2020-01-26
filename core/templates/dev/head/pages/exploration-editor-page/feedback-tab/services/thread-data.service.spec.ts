@@ -129,15 +129,15 @@ describe('retrieving threads service', function() {
       suggestions: mockGeneralSuggestionThreads
     });
 
-    ThreadDataService.fetchThreads(function() {
+    ThreadDataService.fetchThreads().then(threadData => {
       for (var i = 0; i < mockFeedbackThreads.length; i++) {
-        expect(ThreadDataService.getData().feedbackThreads).toContain(
-          mockFeedbackThreads[i]);
+        expect(threadData.feedbackThreads)
+          .toContain(mockFeedbackThreads[i]);
       }
 
       for (var i = 0; i < mockGeneralSuggestionThreads.length; i++) {
-        expect(ThreadDataService.getData().suggestionThreads).toContain(
-          mockGeneralSuggestionThreads[i]);
+        expect(threadData.suggestionThreads)
+          .toContain(mockGeneralSuggestionThreads[i]);
       }
     });
     httpBackend.flush();
