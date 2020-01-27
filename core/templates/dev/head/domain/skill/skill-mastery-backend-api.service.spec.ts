@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for SkillMasteryBackendApiService.
  */
 
-import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import { fakeAsync, flushMicrotasks, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from
   '@angular/common/http/testing';
 

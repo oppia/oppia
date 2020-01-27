@@ -62,13 +62,14 @@ export class SkillMasteryBackendApiService {
     });
   }
 
-  fetchSkillMasteryDegrees(skillIds): Promise<void> {
+  fetchSkillMasteryDegrees(skillIds: Array<string>): Promise<void> {
     return new Promise((resolve, reject) => {
       this._fetchSkillMasteryDegrees(skillIds, resolve, reject);
     });
   }
 
-  updateSkillMasteryDegrees(masteryPerSkillMapping): Promise<void> {
+  updateSkillMasteryDegrees(
+      masteryPerSkillMapping: {[key: string]: number}): Promise<void> {
     return new Promise((resolve, reject) => {
       this._updateSkillMasteryDegrees(masteryPerSkillMapping, resolve, reject);
     });
