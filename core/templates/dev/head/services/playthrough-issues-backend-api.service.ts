@@ -55,7 +55,7 @@ angular.module('oppia').factory('PlaythroughIssuesBackendApiService', [
     };
     return {
       fetchIssues: function(explorationId, explorationVersion) {
-        if (cachedIssues !== null && cachedIssues.length !== 0) {
+        if (cachedIssues !== null) {
           return $q.resolve(cachedIssues);
         } else {
           return $http.get(getFullIssuesUrl(explorationId), {
