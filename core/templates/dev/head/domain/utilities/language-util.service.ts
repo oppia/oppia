@@ -111,7 +111,8 @@ export class LanguageUtilService {
     return this.getAllAudioLanguageCodes();
   }
   getAudioLanguageDescription(audioLanguageCode: string): string {
-    return this.getSupportedAudioLanguages()[audioLanguageCode].description;
+    const language = this.getSupportedAudioLanguages()[audioLanguageCode];
+    return language ? language.description : null;
   }
   // Given a list of audio language codes, returns the complement list, i.e.
   // the list of audio language codes not in the input list.
