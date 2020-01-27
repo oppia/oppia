@@ -20,15 +20,15 @@
 // eslint-disable-next-line max-len
 require('components/common-layout-directives/navigation-bars/navigation-bars.constants.ajs.ts');
 
-angular.module('oppia').factory('NavigationBarsBackendApiService', [
+angular.module('oppia').factory('NotificationsBackendApiService', [
   '$http', 'NOTIFICATIONS_HANDLER_URL',
   function($http, NOTIFICATIONS_HANDLER_URL) {
-    var _fetchNotificationHandler = function() {
+    var _fetchUnseenNotificationCount = function() {
       return $http.get(NOTIFICATIONS_HANDLER_URL);
     };
 
     return {
-      fetchNotificationHandler: _fetchNotificationHandler,
+      fetchUnseenNotificationCount: _fetchUnseenNotificationCount,
     };
   }
 ]);
