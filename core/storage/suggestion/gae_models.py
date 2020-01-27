@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for Oppia suggestions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -371,7 +372,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         if self.final_reviewer_id is not None:
             user_ids.append(self.final_reviewer_id)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
@@ -521,7 +522,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         if self.final_reviewer_id is not None:
             user_ids.append(self.final_reviewer_id)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)

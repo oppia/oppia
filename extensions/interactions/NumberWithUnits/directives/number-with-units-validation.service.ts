@@ -19,8 +19,8 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-// TODO(#7403): Convert this to partial imports.
-import math from 'mathjs';
+
+import { unit } from 'mathjs';
 
 import { AppConstants } from 'app.constants';
 import { baseInteractionValidationService } from
@@ -85,8 +85,7 @@ export class NumberWithUnitsValidationService {
       var earlierInputString = earlierInput.toMathjsCompatibleString();
       var laterInputString = laterInput.toMathjsCompatibleString();
       try {
-        return math.unit(laterInputString).equals(math.unit(
-          earlierInputString));
+        return unit(laterInputString).equals(unit(earlierInputString));
       } catch (e) {
         var additionalInfo = (
           '\nlaterInput: ' + JSON.stringify(laterInput.toDict()) +

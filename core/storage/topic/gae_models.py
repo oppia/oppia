@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for topics and related constructs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -478,7 +479,7 @@ class TopicRightsModel(base_models.VersionedModel):
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in manager_ids."""
         user_ids = [user_id for user_id in self.manager_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
