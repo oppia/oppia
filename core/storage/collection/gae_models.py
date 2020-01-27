@@ -290,7 +290,8 @@ class CollectionRightsModel(base_models.VersionedModel):
                 cls.owner_ids == user_id,
                 cls.editor_ids == user_id,
                 cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id
+                cls.viewer_ids == user_id,
+                cls.all_user_ids == user_id
             )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
@@ -325,6 +326,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             model.viewer_ids = [
                 new_user_id if viewer_id == old_user_id else viewer_id
                 for viewer_id in model.viewer_ids]
+            # These will be set by the AddAllUserIdsOneOffJob.
+            model.all_user_ids = []
             migrated_models.append(model)
         cls.put_multi(
             migrated_models, update_last_updated_time=False)
@@ -341,6 +344,13 @@ class CollectionRightsModel(base_models.VersionedModel):
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
 
+    def compute_snapshot(self):
+        """Generates a snapshot (dict) from the model property values. Exclude
+        timestamp values and all_user_ids because we don't want to save it into
+        the history for now.
+        """
+        return self.to_dict(
+            exclude=['created_on', 'last_updated', 'all_user_ids'])
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given

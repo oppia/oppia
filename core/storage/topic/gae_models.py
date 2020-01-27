@@ -428,9 +428,12 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (cls.query(cls.manager_ids == user_id).get(
-            keys_only=True) is not None or
-                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return (
+            cls.query(ndb.OR(
+                cls.manager_ids == user_id,
+                cls.all_user_ids == user_id
+            )).get(keys_only=True) is not None
+            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -450,6 +453,8 @@ class TopicRightsModel(base_models.VersionedModel):
             model.manager_ids = [
                 new_user_id if manager_id == old_user_id else manager_id
                 for manager_id in model.manager_ids]
+            # These will be set by the AddAllUserIdsOneOffJob.
+            model.all_user_ids = []
             migrated_models.append(model)
         cls.put_multi(
             migrated_models, update_last_updated_time=False)
@@ -477,6 +482,14 @@ class TopicRightsModel(base_models.VersionedModel):
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
+
+    def compute_snapshot(self):
+        """Generates a snapshot (dict) from the model property values. Exclude
+        timestamp values and all_user_ids because we don't want to save it into
+        the history for now.
+        """
+        return self.to_dict(
+            exclude=['created_on', 'last_updated', 'all_user_ids'])
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

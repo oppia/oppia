@@ -101,7 +101,7 @@ class ActivityRights(python_utils.OBJECT):
 
     def __init__(
             self, exploration_id, owner_ids, editor_ids, voice_artist_ids,
-            viewer_ids, all_user_ids, community_owned=False, cloned_from=None,
+            viewer_ids, community_owned=False, cloned_from=None,
             status=ACTIVITY_STATUS_PRIVATE, viewable_if_private=False,
             first_published_msec=None):
         self.id = exploration_id
@@ -109,7 +109,6 @@ class ActivityRights(python_utils.OBJECT):
         self.editor_ids = editor_ids
         self.voice_artist_ids = voice_artist_ids
         self.viewer_ids = viewer_ids
-        self.all_user_ids = all_user_ids
         self.community_owned = community_owned
         self.cloned_from = cloned_from
         self.status = status
@@ -169,25 +168,6 @@ class ActivityRights(python_utils.OBJECT):
             raise utils.ValidationError(
                 'A user cannot be both a voice artist and a viewer: %s' %
                 voice_artist_viewer)
-
-        owner_not_in_all = set(self.owner_ids) - set(self.all_user_ids)
-        editor_not_in_all = set(self.editor_ids) - set(self.all_user_ids)
-        voice_artist_not_in_all = (
-            set(self.voice_artist_ids) - set(self.all_user_ids))
-        viewer_not_in_all = set(self.viewer_ids) - set(self.all_user_ids)
-        if owner_not_in_all:
-            raise utils.ValidationError(
-                'Owner is not listed in all user ids: %s' % owner_not_in_all)
-        if editor_not_in_all:
-            raise utils.ValidationError(
-                'Editor is not listed in all user ids: %s' % editor_not_in_all)
-        if voice_artist_not_in_all:
-            raise utils.ValidationError(
-                'Voice artist is not listed in all user ids: %s' %
-                voice_artist_not_in_all)
-        if viewer_not_in_all:
-            raise utils.ValidationError(
-                'Viewer is not listed in all user ids: %s' % viewer_not_in_all)
 
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
@@ -350,7 +330,6 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
         activity_rights_model.editor_ids,
         activity_rights_model.voice_artist_ids,
         activity_rights_model.viewer_ids,
-        activity_rights_model.all_user_ids,
         community_owned=activity_rights_model.community_owned,
         cloned_from=(
             activity_rights_model.cloned_from
@@ -390,7 +369,6 @@ def _save_activity_rights(
     model.editor_ids = activity_rights.editor_ids
     model.viewer_ids = activity_rights.viewer_ids
     model.voice_artist_ids = activity_rights.voice_artist_ids
-    model.all_user_ids = activity_rights.all_user_ids
     model.community_owned = activity_rights.community_owned
     model.status = activity_rights.status
     model.viewable_if_private = activity_rights.viewable_if_private
@@ -486,7 +464,7 @@ def create_new_exploration_rights(exploration_id, committer_id):
         committer_id: str. ID of the committer.
     """
     exploration_rights = ActivityRights(
-        exploration_id, [committer_id], [], [], [], [committer_id])
+        exploration_id, [committer_id], [], [], [])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
 
     exp_models.ExplorationRightsModel(
@@ -495,7 +473,6 @@ def create_new_exploration_rights(exploration_id, committer_id):
         editor_ids=exploration_rights.editor_ids,
         voice_artist_ids=exploration_rights.voice_artist_ids,
         viewer_ids=exploration_rights.viewer_ids,
-        all_user_ids=exploration_rights.all_user_ids,
         community_owned=exploration_rights.community_owned,
         status=exploration_rights.status,
         viewable_if_private=exploration_rights.viewable_if_private,
@@ -602,7 +579,7 @@ def create_new_collection_rights(collection_id, committer_id):
         committer_id: str. ID of the committer.
     """
     collection_rights = ActivityRights(
-        collection_id, [committer_id], [], [], [], [committer_id])
+        collection_id, [committer_id], [], [], [])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
 
     collection_models.CollectionRightsModel(
@@ -611,7 +588,6 @@ def create_new_collection_rights(collection_id, committer_id):
         editor_ids=collection_rights.editor_ids,
         voice_artist_ids=collection_rights.voice_artist_ids,
         viewer_ids=collection_rights.viewer_ids,
-        all_user_ids=collection_rights.all_user_ids,
         community_owned=collection_rights.community_owned,
         status=collection_rights.status,
         viewable_if_private=collection_rights.viewable_if_private,
@@ -1060,9 +1036,6 @@ def _assign_role(
 
     else:
         raise Exception('Invalid role: %s' % new_role)
-
-    if assignee_id not in activity_rights.all_user_ids:
-        activity_rights.all_user_ids.append(assignee_id)
 
     commit_message = 'Changed role of %s from %s to %s' % (
         assignee_username, old_role, new_role)
