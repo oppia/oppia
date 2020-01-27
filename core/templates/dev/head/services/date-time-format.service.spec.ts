@@ -62,4 +62,13 @@ describe('datetimeformatter', () => {
       df.getLocaleAbbreviatedDatetimeString(
         NOW_MILLIS - 365 * 24 * 60 * 60 * 1000)).toBe('11/21/13');
   });
+
+  it('should provide correct date format MM/DD/YYY string', () => {
+    expect(df.getLocaleDateString(NOW_MILLIS)).toBe('11/21/2014');
+    expect(df.getLocaleDateString(NaN)).toBe('Invalid Date');
+
+    // Some enviroments will consider null date as 1/1/1970 other as 12/31/1969
+    const possibleExpectedDates = ['1/1/1970', '12/31/1969'];
+    expect(possibleExpectedDates).toContain(df.getLocaleDateString(null));
+  });
 });

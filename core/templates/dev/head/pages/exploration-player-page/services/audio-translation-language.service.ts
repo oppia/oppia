@@ -144,7 +144,7 @@ export class AudioTranslationLanguageService {
       this._currentAudioLanguageCode);
   }
 
-  getallAudioLanguageCodesInExploration(): Array<string> {
+  getAllAudioLanguageCodesInExploration(): Array<string> {
     return this._allAudioLanguageCodesInExploration;
   }
   // TODO(#7165): Replace any with correct type.
