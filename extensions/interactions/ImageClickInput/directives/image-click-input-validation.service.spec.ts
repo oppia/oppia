@@ -26,7 +26,7 @@ import { Outcome, OutcomeObjectFactory } from
 
 import { AppConstants } from 'app.constants';
 
-fdescribe('ImageClickInputValidationService', () => {
+describe('ImageClickInputValidationService', () => {
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'WARNING_TYPES' is a constant and its type needs to be
   // preferably in the constants file itself.
@@ -105,8 +105,7 @@ fdescribe('ImageClickInputValidationService', () => {
         validatorService.getAllWarnings(
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
       }).toThrow(new Error(
-        "Expected customization arguments to have property: imageAndRegions"
-      ));
+         'Expected customization arguments to have property:imageAndRegions'));
     });
 
   it('should expect an image path customization argument', () => {

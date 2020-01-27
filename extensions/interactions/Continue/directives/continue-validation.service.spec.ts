@@ -87,7 +87,7 @@ describe('ContinueValidationService', () => {
           currentState, {}, [], goodDefaultOutcome);
       }).toThrow(
         new Error(
-          'Expected customization arguments to have property: buttonText'));
+        'Expected customization arguments to have property:buttonText'));
     });
 
   it('should expect no answer groups', () => {
