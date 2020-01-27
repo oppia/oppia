@@ -35,7 +35,7 @@ import { SubtitledHtmlObjectFactory } from
 // import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts'
-// import { ValidatorsService } from 'services/validators.service';
+import { ValidatorsService } from 'services/validators.service';
 import { ConceptCardObjectFactory } from './ConceptCardObjectFactory';
 import { TestBed } from '@angular/core/testing';
 // require('App.ts');
@@ -45,36 +45,44 @@ import { TestBed } from '@angular/core/testing';
 
 describe('Skill object factory',()=>{
   let skillObjectFactory:SkillObjectFactory;
-  let conceptCardObjectFactory:ConceptCardObjectFactory;
-  let rubricObjectFactory:RubricObjectFactory;
-  let misconceptionObjectFactory:MisconceptionObjectFactory;
+  let conceptCardObjectFactorySpy:jasmine.SpyObj<ConceptCardObjectFactory>;
+  let rubricObjectFactorySpy:jasmine.SpyObj<RubricObjectFactory>;
+  let misconceptionObjectFactorySpy:jasmine.SpyObj<MisconceptionObjectFactory>;
+  let validatorServiceSpy:jasmine.SpyObj<ValidatorsService>
   let misconceptionDict1;
   let misconceptionDict2;
   let rubricDict;
   let skillContentsDict;
-  let skillDict = {
-    id: '1',
-    description: 'test description',
-    misconceptions: [misconceptionDict1, misconceptionDict2],
-    rubrics: [rubricDict],
-    skill_contents: skillContentsDict,
-    language_code: 'en',
-    version: 3,
-    next_misconception_id: 6,
-    superseding_skill_id: '2',
-    all_questions_merged: false,
-    prerequisite_skill_ids: ['skill_1']
-  };
+  let skillDict;
   let skillDifficulties;
   let subtitledHtmlObjectFactory:SubtitledHtmlObjectFactory
 
   beforeEach(()=>{
+    const spyConceptCard = jasmine.createSpyObj('ConceptCardObjectFactory', 
+      ['createFromBackendDict','createInterstitialSkill','createInterstitialConceptCard']);
+    const spyMisconception=jasmine.createSpyObj('MisconceptionObjectFactory',
+      ['createFromBackendDict','generateMisconceptionsFromBackendDict']);
+    const spyRubric=jasmine.createSpyObj('RubricObjectFactory',
+      ['createFromBackendDict','generateRubricsFromBackendDict']);
+    const spyValidator=jasmine.createSpyObj('ValidatorService',['hasValidDescription'])
+    TestBed.configureTestingModule({
+      // Provide both the service-to-test and its (spy) dependency
+      providers: [
+        SkillObjectFactory,
+        // If there is no dependency, only master service would work
+        { provide: ConceptCardObjectFactory, useValue: spyConceptCard },
+        { provide: MisconceptionObjectFactory, useValue:spyMisconception},
+        { provide : RubricObjectFactory , useValue:spyRubric},
+        { provide :ValidatorsService,useValue:spyValidator}
+      ]
+    });
+    
     skillObjectFactory = TestBed.get(SkillObjectFactory);
-    conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
-    rubricObjectFactory = TestBed.get(RubricObjectFactory);
-    misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
+    conceptCardObjectFactorySpy = TestBed.get(ConceptCardObjectFactory);
+    rubricObjectFactorySpy = TestBed.get(RubricObjectFactory);
+    misconceptionObjectFactorySpy = TestBed.get(MisconceptionObjectFactory);
+    validatorServiceSpy=TestBed.get(ValidatorsService);
     skillDifficulties=["Easy", "Medium", "Hard"];
-
     misconceptionDict1 = {
       id: 2,
       name: 'test name',
@@ -119,20 +127,34 @@ describe('Skill object factory',()=>{
         }
       }
     };
+    skillDict = {
+      id: 1,
+      description: 'test description',
+      misconceptions: [misconceptionDict1, misconceptionDict2],
+      rubrics: [rubricDict],
+      skill_contents: skillContentsDict,
+      language_code: 'en',
+      version: 3,
+      next_misconception_id: 6,
+      superseding_skill_id: '2',
+      all_questions_merged: false,
+      prerequisite_skill_ids: ['skill_1']
+    };
   })
+  
   it('should create a new skill from a backend dictionary', function() {
     var skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(skill.getId()).toEqual('1');
+    expect(skill.getId()).toEqual(1);
     expect(skill.getDescription()).toEqual('test description');
     expect(skill.getMisconceptions()).toEqual(
-      [misconceptionObjectFactory.createFromBackendDict(
+      [misconceptionObjectFactorySpy.createFromBackendDict(
         misconceptionDict1),
-      misconceptionObjectFactory.createFromBackendDict(
+      misconceptionObjectFactorySpy.createFromBackendDict(
         misconceptionDict2)]);
     expect(skill.getRubrics()).toEqual([
-      rubricObjectFactory.createFromBackendDict(rubricDict)]);
+      rubricObjectFactorySpy.createFromBackendDict(rubricDict)]);
     expect(skill.getConceptCard()).toEqual(
-      conceptCardObjectFactory.createFromBackendDict(skillContentsDict));
+      conceptCardObjectFactorySpy.createFromBackendDict(skillContentsDict));
     expect(skill.getLanguageCode()).toEqual('en');
     expect(skill.getVersion()).toEqual(3);
     expect(skill.getSupersedingSkillId()).toEqual('2');
@@ -144,7 +166,7 @@ describe('Skill object factory',()=>{
     var skill = skillObjectFactory.createFromBackendDict(skillDict);
     skill.deleteMisconception(2);
     expect(skill.getMisconceptions()).toEqual(
-      [misconceptionObjectFactory.createFromBackendDict(
+      [misconceptionObjectFactorySpy.createFromBackendDict(
         misconceptionDict2)]);
   });
 
@@ -182,7 +204,7 @@ describe('Skill object factory',()=>{
     skill.deleteMisconception(4);
     expect(skill.getNextMisconceptionId()).toEqual(6);
 
-    var misconceptionToAdd1 = misconceptionObjectFactory
+    var misconceptionToAdd1 = misconceptionObjectFactorySpy
       .createFromBackendDict({
         id: skill.getNextMisconceptionId(),
         name: 'test name',
@@ -209,7 +231,7 @@ describe('Skill object factory',()=>{
     expect(skill.getMisconceptions()).toEqual([]);
     expect(skill.getRubrics()).toEqual([]);
     expect(skill.getConceptCard()).toEqual(
-      conceptCardObjectFactory.createInterstitialConceptCard());
+      conceptCardObjectFactorySpy.createInterstitialConceptCard());
     expect(skill.getLanguageCode()).toEqual('en');
     expect(skill.getVersion()).toEqual(1);
     expect(skill.getSupersedingSkillId()).toEqual(null);

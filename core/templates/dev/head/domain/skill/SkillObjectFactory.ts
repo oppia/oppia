@@ -29,7 +29,6 @@ import { downgradeInjectable }
   from '@angular/upgrade/static';
 import predConsts from
  './../../../../../../assets/constants'
-import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe'
 
 export class Skill {
   _id: number;
@@ -182,6 +181,7 @@ export class Skill {
     const rubricObjectFactory = new RubricObjectFactory();
     this._rubrics.push(rubricObjectFactory.create(difficulty, explanation));
   };
+
   toBackendDict() {
     return {
       id: this._id,
@@ -238,6 +238,7 @@ export class SkillObjectFactory {
     return this.validatorService.isValidEntityName(
       description, showWarnings, allowDescriptionToBeBlank);
   };
+
   createFromBackendDict(skillBackendDict):Skill {
     return new Skill(
       skillBackendDict.id,
