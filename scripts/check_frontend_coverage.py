@@ -115,6 +115,7 @@ FULLY_COVERED_FILENAMES = [
     'exploration-title.service.ts',
     'ExplorationDraftObjectFactory.ts',
     'ExplorationOpportunitySummaryObjectFactory.ts',
+    'expression-parser.service.ts',
     'extract-image-filenames-from-state.service.ts',
     'FeedbackImprovementTaskObjectFactory.ts',
     'FeedbackMessageSummaryObjectFactory.ts',

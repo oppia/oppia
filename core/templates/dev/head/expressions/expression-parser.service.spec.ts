@@ -18,7 +18,7 @@
 
  import { ExpressionParserService } from "expressions/expression-parser.service";
 
-describe('Expression parser service', function() {
+describe('Expression parser service', () => {
 
   let eps: ExpressionParserService;
   beforeEach(() => {
