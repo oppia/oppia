@@ -837,6 +837,7 @@ def get_topic_rights_from_model(topic_rights_model):
     return topic_domain.TopicRights(
         topic_rights_model.id,
         topic_rights_model.manager_ids,
+        topic_rights_model.all_user_ids,
         topic_rights_model.topic_is_published
     )
 
@@ -916,6 +917,7 @@ def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
     model = topic_models.TopicRightsModel.get(topic_rights.id, strict=False)
 
     model.manager_ids = topic_rights.manager_ids
+    model.all_user_ids = topic_rights.all_user_ids
     model.topic_is_published = topic_rights.topic_is_published
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -928,12 +930,13 @@ def create_new_topic_rights(topic_id, committer_id):
         topic_id: str. ID of the topic.
         committer_id: str. ID of the committer.
     """
-    topic_rights = topic_domain.TopicRights(topic_id, [], False)
+    topic_rights = topic_domain.TopicRights(topic_id, [], [], False)
     commit_cmds = [{'cmd': topic_domain.CMD_CREATE_NEW}]
 
     topic_models.TopicRightsModel(
         id=topic_rights.id,
         manager_ids=topic_rights.manager_ids,
+        all_user_ids=topic_rights.all_user_ids,
         topic_is_published=topic_rights.topic_is_published
     ).commit(committer_id, 'Created new topic rights', commit_cmds)
 

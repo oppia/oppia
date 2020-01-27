@@ -395,7 +395,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         user_ids = [self.user_id_a, self.user_id_b]
-        topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
+        topic_rights = (
+            topic_domain.TopicRights(self.topic_id, user_ids, user_ids, False))
         expected_dict = {
             'topic_id': self.topic_id,
             'manager_names': ['A', 'B'],
@@ -406,7 +407,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_is_manager(self):
         user_ids = [self.user_id_a, self.user_id_b]
-        topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
+        topic_rights = (
+            topic_domain.TopicRights(self.topic_id, user_ids, user_ids, False))
         self.assertTrue(topic_rights.is_manager(self.user_id_a))
         self.assertTrue(topic_rights.is_manager(self.user_id_b))
         self.assertFalse(topic_rights.is_manager('fakeuser'))
@@ -942,8 +944,7 @@ class TopicRightsTests(test_utils.GenericTestBase):
         }
 
         self.topic_summary = topic_domain.TopicRights(
-            'topic_id', [self.user_id_a], False
-        )
+            'topic_id', [self.user_id_a], [self.user_id_a], False)
 
     def test_topic_summary_gets_created(self):
         self.assertEqual(

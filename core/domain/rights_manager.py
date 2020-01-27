@@ -343,6 +343,7 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
     Returns:
         ActivityRights. The rights object created from the model.
     """
+
     return ActivityRights(
         activity_rights_model.id,
         activity_rights_model.owner_ids,

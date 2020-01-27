@@ -70,7 +70,6 @@ class AddAllUserIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         commit_message = 'Add new all_user_ids field'
         commit_cmds = [{'cmd': 'add_new_field', 'field_name': 'all_user_ids'}]
 
-
         unifed_rights_classes = (
             collection_models.CollectionRightsModel,
             exp_models.ExplorationRightsModel)
@@ -97,12 +96,12 @@ class AddAllUserIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """For every snapshot of right model merge the data from all the user id
     fields together and put them in the all_user_ids field of the appropriate
-    right model.
+    rights model.
     """
 
     @staticmethod
     def _add_collection_user_ids(rights_snapshot_model):
-        """Merge the user ids form the snapshot and put them in the parent
+        """Merge the user ids from the snapshot and put them in the parent
         collection rights model.
         """
         content_dict = (
@@ -124,7 +123,7 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _add_exploration_user_ids(rights_snapshot_model):
-        """Merge the user ids form the snapshot and put them in the parent
+        """Merge the user ids from the snapshot and put them in the parent
         exploration rights model.
         """
         content_dict = (
@@ -145,7 +144,7 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def _add_topic_user_ids(rights_snapshot_model):
-        """Merge the user ids form the snapshot and put them in the parent
+        """Merge the user ids from the snapshot and put them in the parent
         topic rights model.
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(

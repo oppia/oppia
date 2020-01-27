@@ -1257,18 +1257,21 @@ class TopicSummary(python_utils.OBJECT):
 class TopicRights(python_utils.OBJECT):
     """Domain object for topic rights."""
 
-    def __init__(self, topic_id, manager_ids, topic_is_published):
+    def __init__(self, topic_id, manager_ids, all_user_ids, topic_is_published):
         """Constructs a TopicRights domain object.
 
         Args:
             topic_id: str. The id of the topic.
             manager_ids: list(str). The id of the users who have been assigned
                 as managers for the topic.
+            all_user_ids: list(str). The id of the users who were assigned as
+                managers for the topic.
             topic_is_published: bool. Whether the topic is viewable by a
                 learner.
         """
         self.id = topic_id
         self.manager_ids = manager_ids
+        self.all_user_ids = all_user_ids
         self.topic_is_published = topic_is_published
 
     def to_dict(self):

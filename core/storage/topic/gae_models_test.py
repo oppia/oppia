@@ -318,23 +318,6 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             self.assertFalse(
                 topic_models.TopicRightsModel.has_reference_to_user_id('x_id'))
 
-            # We remove the manager_id form manager_ids to to verify that the
-            # manager_id is still found in TopicRightsSnapshotContentModel.
-            topic_rights = topic_models.TopicRightsModel.get_by_id(
-                self.TOPIC_1_ID)
-            topic_rights.manager_ids = ['different_manager_id']
-            topic_rights.commit(
-                'committer_id',
-                'Change topic rights',
-                [{'cmd': topic_domain.CMD_CREATE_NEW}])
-
-            self.assertTrue(
-                topic_models.TopicRightsModel
-                .has_reference_to_user_id('manager_id'))
-            self.assertTrue(
-                topic_models.TopicRightsModel
-                .has_reference_to_user_id('different_manager_id'))
-
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             topic_models.TopicRightsModel.get_user_id_migration_policy(),
