@@ -349,6 +349,7 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
         activity_rights_model.editor_ids,
         activity_rights_model.voice_artist_ids,
         activity_rights_model.viewer_ids,
+        activity_rights_model.all_user_ids,
         community_owned=activity_rights_model.community_owned,
         cloned_from=(
             activity_rights_model.cloned_from
@@ -484,7 +485,7 @@ def create_new_exploration_rights(exploration_id, committer_id):
         committer_id: str. ID of the committer.
     """
     exploration_rights = ActivityRights(
-        exploration_id, [committer_id], [], [], [])
+        exploration_id, [committer_id], [], [], [], [committer_id])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
 
     exp_models.ExplorationRightsModel(
@@ -493,6 +494,7 @@ def create_new_exploration_rights(exploration_id, committer_id):
         editor_ids=exploration_rights.editor_ids,
         voice_artist_ids=exploration_rights.voice_artist_ids,
         viewer_ids=exploration_rights.viewer_ids,
+        all_user_ids=exploration_rights.all_user_ids,
         community_owned=exploration_rights.community_owned,
         status=exploration_rights.status,
         viewable_if_private=exploration_rights.viewable_if_private,
@@ -599,7 +601,7 @@ def create_new_collection_rights(collection_id, committer_id):
         committer_id: str. ID of the committer.
     """
     collection_rights = ActivityRights(
-        collection_id, [committer_id], [], [], [])
+        collection_id, [committer_id], [], [], [], [committer_id])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
 
     collection_models.CollectionRightsModel(
@@ -608,6 +610,7 @@ def create_new_collection_rights(collection_id, committer_id):
         editor_ids=collection_rights.editor_ids,
         voice_artist_ids=collection_rights.voice_artist_ids,
         viewer_ids=collection_rights.viewer_ids,
+        all_user_ids=collection_rights.all_user_ids,
         community_owned=collection_rights.community_owned,
         status=collection_rights.status,
         viewable_if_private=collection_rights.viewable_if_private,
