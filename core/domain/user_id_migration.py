@@ -590,7 +590,7 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.viewer_ids))
         collection_models.CollectionRightsModel.put_multi(
             [rights_model], update_last_updated_time=False)
-        return rights_model.all_user_ids > len(original_all_user_ids)
+        return len(rights_model.all_user_ids) > len(original_all_user_ids)
 
     @staticmethod
     def _add_exploration_user_ids(rights_snapshot_model):
@@ -613,7 +613,7 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.viewer_ids))
         exp_models.ExplorationRightsModel.put_multi(
             [rights_model], update_last_updated_time=False)
-        return rights_model.all_user_ids > len(original_all_user_ids)
+        return len(rights_model.all_user_ids) > len(original_all_user_ids)
 
     @staticmethod
     def _add_topic_user_ids(rights_snapshot_model):
@@ -630,7 +630,7 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.manager_ids))
         topic_models.TopicRightsModel.put_multi(
             [rights_model], update_last_updated_time=False)
-        return rights_model.all_user_ids > len(original_all_user_ids)
+        return len(rights_model.all_user_ids) > len(original_all_user_ids)
 
     @classmethod
     def entity_classes_to_map_over(cls):

@@ -1299,7 +1299,8 @@ class AddAllUserIdsSnapshotsOneOffJobTests(test_utils.GenericTestBase):
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
         return [
-            [key, sorted(values)] for key, values in eval_output]
+            [key, sorted(values) if isinstance(values, list) else values]
+            for key, values in eval_output]
 
     def test_one_collection_rights_updated(self):
         collection_model = collection_models.CollectionRightsModel(
@@ -1379,6 +1380,74 @@ class AddAllUserIdsSnapshotsOneOffJobTests(test_utils.GenericTestBase):
               ['top_1_id-1', 'top_1_id-2']]])
         self.assertItemsEqual(
             [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID],
+            topic_models.TopicRightsModel.get_by_id(self.TOP_1_ID).all_user_ids)
+
+    def test_one_collection_rights_not_updated(self):
+        collection_model = collection_models.CollectionRightsModel(
+            id=self.COL_1_ID,
+            owner_ids=[self.USER_1_ID],
+            editor_ids=[self.USER_2_ID],
+            voice_artist_ids=[],
+            viewer_ids=[],
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0
+        )
+        collection_model.save(
+            'cid', 'Created new collection rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS-NOT_UPDATED-CollectionRightsSnapshotContentModel', 1]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID],
+            collection_models.CollectionRightsModel.get_by_id(self.COL_1_ID)
+            .all_user_ids)
+
+    def test_one_exploration_rights_not_updated(self):
+        exp_model = exp_models.ExplorationRightsModel(
+            id=self.EXP_1_ID,
+            owner_ids=[self.USER_1_ID, self.USER_2_ID],
+            editor_ids=[self.USER_2_ID],
+            voice_artist_ids=[],
+            viewer_ids=[],
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID],
+            community_owned=False,
+            status=constants.ACTIVITY_STATUS_PUBLIC,
+            viewable_if_private=False,
+            first_published_msec=0.0)
+        exp_model.save(
+            'cid', 'Created new exploration rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS-NOT_UPDATED-ExplorationRightsSnapshotContentModel', 1]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID],
+            exp_models.ExplorationRightsModel.get_by_id(self.EXP_1_ID)
+            .all_user_ids)
+
+    def test_one_topic_rights_not_updated(self):
+        topic_model = topic_models.TopicRightsModel(
+            id=self.TOP_1_ID,
+            manager_ids=[self.USER_1_ID, self.USER_2_ID],
+            all_user_ids=[self.USER_1_ID, self.USER_2_ID])
+        topic_model.commit(
+            'cid', 'Created new topic rights',
+            [{'cmd': rights_manager.CMD_CREATE_NEW}])
+
+        output = self._run_one_off_job()
+        self.assertEqual(
+            output,
+            [['SUCCESS-NOT_UPDATED-TopicRightsSnapshotContentModel', 1]])
+        self.assertItemsEqual(
+            [self.USER_1_ID, self.USER_2_ID],
             topic_models.TopicRightsModel.get_by_id(self.TOP_1_ID).all_user_ids)
 
     def test_multiple_topic_rights(self):

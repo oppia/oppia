@@ -37,7 +37,7 @@ import python_utils
 
 gae_search_services = models.Registry.import_search_services()
 
-(exp_models) = models.Registry.import_models([models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
