@@ -129,8 +129,9 @@ var CreatorDashboardPage = function() {
     _getExplorationElements(explorationTitle).then(function(elems) {
       if (elems.length === 0) {
         throw new Error(
-          'Could not find exploration tile with name ' + 
-          explorationTitle);
+          'Could not find exploration tile with name ' +
+          explorationTitle
+        );
       }
       var explorationElement = elems[0].element(
         by.css('.protractor-test-title-mask'));
