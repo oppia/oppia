@@ -16,76 +16,77 @@
  * @fileoverview Unit tests for ReviewTestBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-require('domain/review_test/review-test-backend-api.service.ts');
 
-describe('Review test backend API service', function() {
-  var ReviewTestBackendApiService = null;
-  var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
-  var UndoRedoService = null;
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+import { ReviewTestBackendApiService } from
+  'domain/review_test/review-test-backend-api.service';
 
-  beforeEach(angular.mock.inject(function($injector) {
-    ReviewTestBackendApiService = $injector.get(
-      'ReviewTestBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
+describe('Review test backend API service', () => {
+  let reviewTestBackendApiService:
+    ReviewTestBackendApiService = null;
+  let httpTestingController: HttpTestingController;
 
-    sampleDataResults = {
-      story_name: 'Story Name',
-      skill_descriptions: {}
-    };
-  }));
+  var ERROR_STATUS_CODE = 500;
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  var sampleDataResults = {
+    story_name: 'Story Name',
+    skill_descriptions: {}
+  };
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ReviewTestBackendApiService]
+    });
+    reviewTestBackendApiService = TestBed.get(
+      ReviewTestBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an review test data from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/review_test_handler/data/0').respond(
-        sampleDataResults);
-      ReviewTestBackendApiService.fetchReviewTestData('0').then(
+      reviewTestBackendApiService.fetchReviewTestData('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+
+      var req = httpTestingController.expectOne('/review_test_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 
   it('should use the rejection handler if the backend request failed',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect(
-        'GET', '/review_test_handler/data/0').respond(
-        500, 'Error getting review test data.');
-      ReviewTestBackendApiService.fetchReviewTestData('0').then(
+      reviewTestBackendApiService.fetchReviewTestData('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+
+      var req = httpTestingController.expectOne('/review_test_handler/data/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading data.', {
+        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
-    }
+    })
   );
 });
