@@ -137,6 +137,9 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS',
   AppConstants.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS);
+angular.module('oppia').constant(
+  'MAX_UNRELATED_ACTIONS_PER_BLOCK',
+  AppConstants.MAX_UNRELATED_ACTIONS_PER_BLOCK);
 angular.module('oppia').constant('SITE_NAME', AppConstants.SITE_NAME);
 
 angular.module('oppia').constant(

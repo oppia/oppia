@@ -3,27 +3,26 @@
 </div>
 
 <div class="modal-body" style="padding-bottom: 8rem; margin-left:0.5rem; margin-right: 0.5rem;">
-  <div ng-if="maxHidden != 0" class="row oppia-pt2">
-    <button type="button" name="button" ng-click="showRemainingActions(playthroughIndex)" class="oppia-issues-btn-arrow" id="arrowDiv" style="display: block;"><i class="fas fa-arrow-up"></i></button>
+  <div ng-if="canExpandActions()" class="row oppia-pt2">
+    <button type="button" name="button" ng-click="expandActionsToRender()" class="oppia-issues-btn-arrow" id="arrowDiv" style="display: block;"><i class="fas fa-arrow-up"></i></button>
   </div>
   <div class="row oppia-pt2" style="margin-top: 0.5rem;">
-    <div ng-repeat="displayBlock in reversedDisplayBlocks" style="text-align: left; margin-left: 0.2rem;">
-      <div class="remaining-actions<[playthroughIndex]><[getDisplayBlockIndex(displayBlock)]>" ng-if="!isDisplayBlockOnInitDisplay(displayBlock)" style="display: none;">
-        <div ng-repeat="learnerAction in displayBlock" class="oppia-issues-learner-action">
-          <angular-html-bind html-data="renderLearnerAction(learnerAction, getDisplayBlockIndex(displayBlock), getLearnerActionIndex(learnerAction, displayBlock))">
-          </angular-html-bind>
-        </div>
+    <div ng-repeat="action in getActionsToRender() track by $index" class="oppia-issues-learner-action" style="text-align: left; margin-left: 0.2rem;">
+      <div class="oppia-issues-highlight" ng-show="isActionHighlighted($index)">
+        <angular-html-bind html-data="renderLearnerAction(action, getLearnerActionIndex($index))">
+        </angular-html-bind>
       </div>
-    </div>
-    <div ng-if="isDisplayBlockOnInitDisplay(displayBlocks[0])" class="oppia-issues-highlight">
-      <div ng-repeat="learnerAction in displayBlocks[0]" class="oppia-issues-learner-action">
-        <angular-html-bind html-data="renderLearnerAction(learnerAction, getDisplayBlockIndex(displayBlocks[0]), getLearnerActionIndex(learnerAction, displayBlocks[0]))">
+      <div ng-show="!isActionHighlighted($index)">
+        <angular-html-bind html-data="renderLearnerAction(action, getLearnerActionIndex($index))">
         </angular-html-bind>
       </div>
     </div>
+    <div ng-if="issueIsMultipleIncorrectSubmissions" class="oppia-issues-highlight">
+      <angular-html-bind html-data="renderIssueTable()">
+      </angular-html-bind>
+    </div>
   </div>
 </div>
-
 <div class="modal-footer">
   <button type="button" class="btn btn-secondary" ng-click="cancel()">
     Return

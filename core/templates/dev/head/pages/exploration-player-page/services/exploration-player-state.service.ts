@@ -33,7 +33,6 @@ require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/context.service.ts');
 require('services/exploration-features-backend-api.service.ts');
 require('services/exploration-features.service.ts');
-require('services/playthrough-issues.service.ts');
 require('services/playthrough.service.ts');
 require('services/contextual/url.service.ts');
 
@@ -46,7 +45,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService',
-  'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
+  'PlayerTranscriptService', 'PlaythroughService',
   'PretestQuestionBackendApiService',
   'QuestionBackendApiService', 'QuestionPlayerEngineService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
@@ -57,7 +56,7 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService,
-      PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
+      PlayerTranscriptService, PlaythroughService,
       PretestQuestionBackendApiService,
       QuestionBackendApiService, QuestionPlayerEngineService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
@@ -90,7 +89,6 @@ angular.module('oppia').factory('ExplorationPlayerStateService', [
       PlaythroughService.initSession(
         explorationId, returnDict.version,
         returnDict.record_playthrough_probability);
-      PlaythroughIssuesService.initSession(explorationId, returnDict.version);
       PlayerCorrectnessFeedbackEnabledService.init(
         returnDict.correctness_feedback_enabled);
       ExplorationEngineService.init(
