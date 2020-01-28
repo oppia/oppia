@@ -19,6 +19,7 @@
 
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 var SkillEditorPage = function() {
   var EDITOR_URL_PREFIX = '/skill_editor/';

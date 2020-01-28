@@ -138,7 +138,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         """
         # Generate story with old(v1) story contents data.
         self.save_new_story_with_story_contents_schema_v1(
-            self.STORY_ID, self.albert_id, 'A title',
+            self.STORY_ID, 'image.png', self.albert_id, 'A title',
             'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)

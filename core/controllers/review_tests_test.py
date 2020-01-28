@@ -60,6 +60,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.node_1 = {
             'id': self.node_id,
             'title': 'Title 1',
+            'thumbnail_filename': 'image.png',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],
             'prerequisite_skill_ids': [],
@@ -168,6 +169,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         node = {
             'id': node_id,
             'title': 'Title 1',
+            'thumbnail_filename': 'image.png',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_id_3'],
             'prerequisite_skill_ids': [],

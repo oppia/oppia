@@ -381,7 +381,8 @@ class TestBase(unittest.TestCase):
             'acquired_skill_ids': [],
             'id': 'node_1',
             'title': 'Chapter 1',
-            'prerequisite_skill_ids': []}],
+            'prerequisite_skill_ids': [],
+            'thumbnail_filename': u'image.png'}],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2'
     }
@@ -389,7 +390,8 @@ class TestBase(unittest.TestCase):
     VERSION_1_SUBTOPIC_DICT = {
         'skill_ids': [],
         'id': 1,
-        'title': 'A subtitle'
+        'title': 'A subtitle',
+        'thumbnail_filename': 'imgae.png'
     }
 
     # Dictionary-like data structures within sample YAML must be formatted
@@ -1380,8 +1382,8 @@ tags: []
         return story
 
     def save_new_story_with_story_contents_schema_v1(
-            self, story_id, owner_id, title, description, notes,
-            corresponding_topic_id,
+            self, story_id, thumbnail_filename, owner_id, title, description,
+            notes, corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new story with a default version 1 story contents
         data dictionary.
@@ -1397,6 +1399,7 @@ tags: []
 
         Args:
             story_id: str. ID for the story to be created.
+            thumbnail_filename: str|None. Thumbnail filename for the story.
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
             description: str. The high level description of the story.
@@ -1409,6 +1412,7 @@ tags: []
         """
         story_model = story_models.StoryModel(
             id=story_id,
+            thumbnail_filename=thumbnail_filename,
             description=description,
             title=title,
             language_code=language_code,
@@ -1479,7 +1483,7 @@ tags: []
             self, topic_id, owner_id, name, abbreviated_name,
             canonical_name, description,
             canonical_story_references, additional_story_references,
-            uncategorized_skill_ids, next_subtopic_id,
+            uncategorized_skill_ids, next_subtopic_id, thumbnail_filename,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new topic with a default version 1 subtopic
         data dictionary.
@@ -1509,6 +1513,8 @@ tags: []
             uncategorized_skill_ids: list(str). The list of ids of skills that
                 are not part of any subtopic.
             next_subtopic_id: int. The id for the next subtopic.
+            thumbnail_filename: str|None. The thumbnail filename for the
+                subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
         """
