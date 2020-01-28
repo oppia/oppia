@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """A script to check that travis.yml file & protractor.conf.js have the
-same test suites.
+same e2e test suites.
 """
 
 from __future__ import absolute_import  # pylint: disable=import-only-modules
@@ -38,14 +38,15 @@ PROTRACTOR_CONF_FILE_PATH = os.path.join(
 SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST = 'explorationImprovementsTab'
 
 
-def get_e2e_suite_names_from_jobs_travis_yml_file():
-    """Extracts the env/jobs section from the .travis.yml file.
+def get_e2e_suite_names_from_jobs_travis_yaml_file():
+    """Extracts the test suites from env/jobs section from
+    the .travis.yaml file.
 
     Returns:
         list(str): An alphabetically-sorted list of names of test suites
-        from the jobs section in the travis.yml file.
+        from the jobs section in the .travis.yaml file.
     """
-    travis_file_content = read_and_parse_travis_yml_file()
+    travis_file_content = read_and_parse_travis_yaml_file()
     jobs_str = python_utils.convert_to_bytes(travis_file_content['env']['jobs'])
     suites_from_jobs = []
     # The following line extracts the test suite name from the jobs section
@@ -59,14 +60,14 @@ def get_e2e_suite_names_from_jobs_travis_yml_file():
     return sorted(suites_from_jobs)
 
 
-def get_e2e_suite_names_from_script_travis_yml_file():
-    """Extracts the script section from the .travis.yml file.
+def get_e2e_suite_names_from_script_travis_yaml_file():
+    """Extracts the script section from the .travis.yaml file.
 
     Returns:
         list(str): An alphabetically-sorted list of names of test suites
-        from the script section in the travis.yml file.
+        from the script section in the .travis.yaml file.
     """
-    travis_file_content = read_and_parse_travis_yml_file()
+    travis_file_content = read_and_parse_travis_yaml_file()
     script_str = python_utils.convert_to_bytes(travis_file_content['script'])
     # The following line extracts the test suites from patterns like
     # bash scripts/run_e2e_tests.sh --suite="accessibility"
@@ -78,7 +79,7 @@ def get_e2e_suite_names_from_script_travis_yml_file():
 
 
 def get_e2e_suite_names_from_protractor_file():
-    """Extracts the test suites section from the .travis.yml file.
+    """Extracts the test suites section from the protractor.conf.js file.
 
     Returns:
         list(str): An alphabetically-sorted list of names of test suites
@@ -108,11 +109,11 @@ def read_protractor_conf_file():
     return protractor_config_file_content
 
 
-def read_and_parse_travis_yml_file():
-    """Returns the contents of .travis.yml, as a dict.
+def read_and_parse_travis_yaml_file():
+    """Returns the contents of .travis.yaml, as a dict.
 
     Returns:
-        dict. Contents of the travis.yml file parsed as a dict.
+        dict. Contents of the .travis.yaml file parsed as a dict.
     """
     travis_ci_file_content = python_utils.open_file(
         TRAVIS_CI_FILE_PATH, 'r').read()
@@ -120,14 +121,64 @@ def read_and_parse_travis_yml_file():
     return travis_ci_dict
 
 
+def get_e2e_test_filenames_from_protractor_dir():
+    """Extracts the names of the all test files in core/tests/protractor
+    and core/tests/protractor_desktop directory.
+
+    Returns:
+        list(str): An alphabetically-sorted list of of the all test files
+        in core/tests/protractor and core/tests/protractor_desktop directory.
+    """
+    protractor_test_suite_files = []
+    protractor_files = os.path.join(
+        os.getcwd(), 'core', 'tests', 'protractor')
+    protractor_desktop_files = os.path.join(
+        os.getcwd(), 'core', 'tests', 'protractor_desktop')
+    for file_name in os.listdir(protractor_files):
+        protractor_test_suite_files.append(file_name)
+    for file_name in os.listdir(protractor_desktop_files):
+        protractor_test_suite_files.append(file_name)
+
+    return sorted(protractor_test_suite_files)
+
+
+def get_e2e_test_filenames_from_protractor_conf_file():
+    """Extracts the filenames from the suites object of
+    protractor.conf.js file.
+
+    Returns:
+        list(str): An alphabetically-sorted list of filenames extracted
+        from the protractor.conf.js file.
+    """
+    protractor_config_file_content = read_protractor_conf_file()
+    # The following line extracts suite object from protractor.conf.js.
+    suite_object_string = re.compile(
+        r'suites = {([^}]+)}').findall(protractor_config_file_content)[0]
+    test_files_regex = re.compile(r'/([a-zA-Z]*.js)')
+    e2e_test_files = test_files_regex.findall(suite_object_string)
+    return sorted(e2e_test_files)
+
+
 def main():
     """Test the travis ci file and protractor.conf.js to have same
     e2e test suites.
     """
-    python_utils.PRINT('Checking e2e tests are captured in travis.yml...')
+    python_utils.PRINT('Checking all e2e test files are captured '
+                       'in protractor.conf.js...')
+    protractor_test_suite_files = get_e2e_test_filenames_from_protractor_dir()
+    protractor_conf_test_suites = (
+        get_e2e_test_filenames_from_protractor_conf_file())
+
+    if not protractor_test_suite_files == protractor_conf_test_suites:
+        raise Exception(
+            'One or more test file from protractor or protractor_desktop '
+            'directory is missing from protractor.conf.js')
+    python_utils.PRINT('Done!')
+
+    python_utils.PRINT('Checking e2e tests are captured in .travis.yaml...')
     protractor_test_suites = get_e2e_suite_names_from_protractor_file()
-    yaml_jobs = get_e2e_suite_names_from_jobs_travis_yml_file()
-    yaml_scripts = get_e2e_suite_names_from_script_travis_yml_file()
+    yaml_jobs = get_e2e_suite_names_from_jobs_travis_yaml_file()
+    yaml_scripts = get_e2e_suite_names_from_script_travis_yaml_file()
 
     for excluded_test in TEST_SUITES_NOT_RUN_ON_TRAVIS:
         protractor_test_suites.remove(excluded_test)
@@ -143,15 +194,18 @@ def main():
                         'protractor.conf.js are empty.')
 
     if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in yaml_jobs:
-        raise Exception('explorationImprovementsTab is expected to be in '
+        raise Exception(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST +
+                        ' is expected to be in '
                         'the e2e test suites extracted from the jobs section '
-                        'of .travis.yml file, but it is missing.')
+                        'of .travis.yaml file, but it is missing.')
     if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in yaml_scripts:
-        raise Exception('explorationImprovementsTab is expected to be in '
+        raise Exception(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST +
+                        ' is expected to be in '
                         'the e2e test suites extracted from the script section '
-                        'of .travis.yml file, but it is missing.')
+                        'of .travis.yaml file, but it is missing.')
     if SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST not in protractor_test_suites:
-        raise Exception('explorationImprovementsTab is expected to be in '
+        raise Exception(SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST +
+                        ' is expected to be in '
                         'the e2e test suites extracted from the '
                         'protractor.conf.js file, but it is missing.')
 

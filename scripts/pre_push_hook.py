@@ -340,7 +340,7 @@ def does_diff_include_js_or_ts_files(files_to_lint):
 
 
 def does_diff_include_travis_yaml_or_protractor_conf_file(files_to_lint):
-    """Returns true if diff includes travis.yml or protractor.conf.js file.
+    """Returns true if diff includes .travis.yml or protractor.conf.js file.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
@@ -405,8 +405,7 @@ def main(args=None):
                     TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
             if travis_ci_check_status != 0:
                 python_utils.PRINT(
-                    'Push aborted due to failing checks travis'
-                    ' e2e test configuration.')
+                    'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
     return
 

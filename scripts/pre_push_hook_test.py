@@ -526,7 +526,7 @@ class PrePushHookTests(test_utils.GenericTestBase):
                             with self.assertRaises(SystemExit):
                                 pre_push_hook.main(args=[])
         self.assertTrue(
-            'Push aborted due to failing checks travis e2e test configuration.'
+            'Push aborted due to failing e2e test configuration check.'
             in self.print_arr)
 
     def test_main_with_install_arg(self):
