@@ -113,8 +113,8 @@ describe('EndExplorationValidationService', () => {
       validatorService.getAllWarnings(currentState, {}, [], null);
     }).toThrow(
       new Error(
-      'Expected customization arguments to have property:' +
-      'recommendedExplorationIds'));
+        'Expected customization arguments to have property:' +
+        'recommendedExplorationIds'));
   });
 
   it('should not have warnings for 0 or 8 recommendations', () => {
