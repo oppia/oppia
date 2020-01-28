@@ -27,7 +27,7 @@ describe('Misconception object factory', () => {
     beforeEach(() => {
       misconceptionObjectFactory = new MisconceptionObjectFactory();
       misconceptionDict = {
-        id: '1',
+        id: 1,
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
@@ -38,7 +38,7 @@ describe('Misconception object factory', () => {
     it('should create a new misconception', () => {
       var misconception =
         misconceptionObjectFactory.createFromBackendDict(misconceptionDict);
-      expect(misconception.getId()).toEqual('1');
+      expect(misconception.getId()).toEqual(1);
       expect(misconception.getName()).toEqual('test name');
       expect(misconception.getNotes()).toEqual('test notes');
       expect(misconception.getFeedback()).toEqual('test feedback');

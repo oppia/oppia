@@ -43,201 +43,205 @@ import { TestBed } from '@angular/core/testing';
 // require('domain/skill/SkillObjectFactory.ts');
 
 
-describe('Skill object factory',()=>{
-  let skillObjectFactory:SkillObjectFactory;
-  let conceptCardObjectFactorySpy:jasmine.SpyObj<ConceptCardObjectFactory>;
-  let rubricObjectFactorySpy:jasmine.SpyObj<RubricObjectFactory>;
-  let misconceptionObjectFactorySpy:jasmine.SpyObj<MisconceptionObjectFactory>;
-  let validatorServiceSpy:jasmine.SpyObj<ValidatorsService>
-  let misconceptionDict1;
-  let misconceptionDict2;
-  let rubricDict;
-  let skillContentsDict;
-  let skillDict;
-  let skillDifficulties;
-  let subtitledHtmlObjectFactory:SubtitledHtmlObjectFactory
-
-  beforeEach(()=>{
-    const spyConceptCard = jasmine.createSpyObj('ConceptCardObjectFactory', 
-      ['createFromBackendDict','createInterstitialSkill','createInterstitialConceptCard']);
-    const spyMisconception=jasmine.createSpyObj('MisconceptionObjectFactory',
-      ['createFromBackendDict','generateMisconceptionsFromBackendDict']);
-    const spyRubric=jasmine.createSpyObj('RubricObjectFactory',
-      ['createFromBackendDict','generateRubricsFromBackendDict']);
-    const spyValidator=jasmine.createSpyObj('ValidatorService',['hasValidDescription'])
-    TestBed.configureTestingModule({
-      // Provide both the service-to-test and its (spy) dependency
-      providers: [
-        SkillObjectFactory,
-        // If there is no dependency, only master service would work
-        { provide: ConceptCardObjectFactory, useValue: spyConceptCard },
-        { provide: MisconceptionObjectFactory, useValue:spyMisconception},
-        { provide : RubricObjectFactory , useValue:spyRubric},
-        { provide :ValidatorsService,useValue:spyValidator}
-      ]
-    });
+fdescribe('Skill object factory',()=>{
+  describe('SkillObjectFactory',()=>{
+    let skillObjectFactory:SkillObjectFactory;
+    let conceptCardObjectFactorySpy:jasmine.SpyObj<ConceptCardObjectFactory>;
+    let rubricObjectFactorySpy:jasmine.SpyObj<RubricObjectFactory>;
+    let misconceptionObjectFactorySpy:jasmine.SpyObj<MisconceptionObjectFactory>;
+    let validatorServiceSpy:jasmine.SpyObj<ValidatorsService>
+    let misconceptionDict1;
+    let misconceptionDict2;
+    let rubricDict;
+    let skillContentsDict;
+    let skillDict;
+    let skillDifficulties;
+    let subtitledHtmlObjectFactory:SubtitledHtmlObjectFactory
     
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
-    conceptCardObjectFactorySpy = TestBed.get(ConceptCardObjectFactory);
-    rubricObjectFactorySpy = TestBed.get(RubricObjectFactory);
-    misconceptionObjectFactorySpy = TestBed.get(MisconceptionObjectFactory);
-    validatorServiceSpy=TestBed.get(ValidatorsService);
-    skillDifficulties=["Easy", "Medium", "Hard"];
-    misconceptionDict1 = {
-      id: 2,
-      name: 'test name',
-      notes: 'test notes',
-      feedback: 'test feedback',
-      must_be_addressed: true
-    };
-
-    misconceptionDict2 = {
-      id: 4,
-      name: 'test name',
-      notes: 'test notes',
-      feedback: 'test feedback',
-      must_be_addressed: false
-    };
-
-    rubricDict = {
-      difficulty: skillDifficulties[0],
-      explanation: 'explanation'
-    };
-
-    skillContentsDict = {
-      explanation: {
-        html: 'test explanation',
-        content_id: 'explanation',
-      },
-      worked_examples: [
-        {
-          html: 'test worked example 1',
-          content_id: 'worked_example_1',
-        },
-        {
-          html: 'test worked example 2',
-          content_id: 'worked_example_2'
-        }
-      ],
-      recorded_voiceovers: {
-        voiceovers_mapping: {
-          explanation: {},
-          worked_example_1: {},
-          worked_example_2: {}
-        }
-      }
-    };
-    skillDict = {
-      id: 1,
-      description: 'test description',
-      misconceptions: [misconceptionDict1, misconceptionDict2],
-      rubrics: [rubricDict],
-      skill_contents: skillContentsDict,
-      language_code: 'en',
-      version: 3,
-      next_misconception_id: 6,
-      superseding_skill_id: '2',
-      all_questions_merged: false,
-      prerequisite_skill_ids: ['skill_1']
-    };
-  })
-  
-  it('should create a new skill from a backend dictionary', function() {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(skill.getId()).toEqual(1);
-    expect(skill.getDescription()).toEqual('test description');
-    expect(skill.getMisconceptions()).toEqual(
-      [misconceptionObjectFactorySpy.createFromBackendDict(
-        misconceptionDict1),
-      misconceptionObjectFactorySpy.createFromBackendDict(
-        misconceptionDict2)]);
-    expect(skill.getRubrics()).toEqual([
-      rubricObjectFactorySpy.createFromBackendDict(rubricDict)]);
-    expect(skill.getConceptCard()).toEqual(
-      conceptCardObjectFactorySpy.createFromBackendDict(skillContentsDict));
-    expect(skill.getLanguageCode()).toEqual('en');
-    expect(skill.getVersion()).toEqual(3);
-    expect(skill.getSupersedingSkillId()).toEqual('2');
-    expect(skill.getAllQuestionsMerged()).toEqual(false);
-    expect(skill.getPrerequisiteSkillIds()).toEqual(['skill_1']);
-  });
-
-  it('should delete a misconception given its id', function() {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
-    skill.deleteMisconception(2);
-    expect(skill.getMisconceptions()).toEqual(
-      [misconceptionObjectFactorySpy.createFromBackendDict(
-        misconceptionDict2)]);
-  });
-
-  it('should throw validation errors', function() {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
-    skill.getConceptCard().setExplanation(
-      subtitledHtmlObjectFactory.createDefault('', 'review_material'));
-    expect(skill.getValidationIssues()).toEqual([
-      'There should be review material in the concept card.',
-      'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
-      'in rubrics.'
-    ]);
-  });
-
-  it('should add/update a rubric given difficulty',() =>{
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(skill.getRubrics()[0].getExplanation()).toEqual('explanation');
-    expect(skill.getRubrics().length).toEqual(1);
-
-    skill.updateRubricForDifficulty(skillDifficulties[0], 'new explanation');
-    expect(skill.getRubrics()[0].getExplanation()).toEqual('new explanation');
-
-    skill.updateRubricForDifficulty(skillDifficulties[1], 'explanation 2');
-    expect(skill.getRubrics().length).toEqual(2);
-    expect(skill.getRubrics()[1].getExplanation()).toEqual('explanation 2');
-
-    expect(function() {
-      skill.updateRubricForDifficulty('invalid difficulty', 'explanation 2');
-    }).toThrow();
-  });
-
-  it('should get the correct next misconception id', () => {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(skill.getNextMisconceptionId()).toEqual(6);
-    skill.deleteMisconception(4);
-    expect(skill.getNextMisconceptionId()).toEqual(6);
-
-    var misconceptionToAdd1 = misconceptionObjectFactorySpy
-      .createFromBackendDict({
-        id: skill.getNextMisconceptionId(),
+    beforeEach(()=>{
+      const spyConceptCard = jasmine.createSpyObj('ConceptCardObjectFactory', 
+        ['createFromBackendDict','createInterstitialSkill','createInterstitialConceptCard']);
+      const spyMisconception=jasmine.createSpyObj('MisconceptionObjectFactory',
+        ['createFromBackendDict','generateMisconceptionsFromBackendDict']);
+      const spyRubric=jasmine.createSpyObj('RubricObjectFactory',
+        ['createFromBackendDict','generateRubricsFromBackendDict']);
+      const spyValidator=jasmine.createSpyObj('ValidatorService',['hasValidDescription']);
+    
+      TestBed.configureTestingModule({
+        // Provide both the service-to-test and its (spy) dependency
+        providers: [
+          SkillObjectFactory,
+          // If there is no dependency, only master service would work
+          { provide: ConceptCardObjectFactory, useValue: spyConceptCard },
+          { provide: MisconceptionObjectFactory, useValue:spyMisconception},
+          { provide : RubricObjectFactory , useValue:spyRubric},
+          { provide :ValidatorsService,useValue:spyValidator}
+        ]
+      });
+      
+      skillObjectFactory = TestBed.get(SkillObjectFactory);
+      conceptCardObjectFactorySpy = TestBed.get(ConceptCardObjectFactory);
+      rubricObjectFactorySpy = TestBed.get(RubricObjectFactory);
+      misconceptionObjectFactorySpy = TestBed.get(MisconceptionObjectFactory);
+      validatorServiceSpy=TestBed.get(ValidatorsService);
+      subtitledHtmlObjectFactory=TestBed.get(SubtitledHtmlObjectFactory)
+      skillDifficulties=["Easy", "Medium", "Hard"];
+      misconceptionDict1 = {
+        id: 2,
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
         must_be_addressed: true
-      });
-
-    skill.appendMisconception(misconceptionToAdd1);
-    expect(skill.getNextMisconceptionId()).toEqual(7);
-    skill.deleteMisconception(6);
-    expect(skill.getNextMisconceptionId()).toEqual(7);
-  });
-
-  it('should convert to a backend dictionary', () => {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
-    expect(skill.toBackendDict()).toEqual(skillDict);
-  });
-
-  it('should be able to create an interstitial skill', () => {
-    var skill = skillObjectFactory.createInterstitialSkill();
-    expect(skill.getId()).toEqual(null);
-    expect(skill.getDescription()).toEqual('Skill description loading');
-    expect(skill.getMisconceptions()).toEqual([]);
-    expect(skill.getRubrics()).toEqual([]);
-    expect(skill.getConceptCard()).toEqual(
-      conceptCardObjectFactorySpy.createInterstitialConceptCard());
-    expect(skill.getLanguageCode()).toEqual('en');
-    expect(skill.getVersion()).toEqual(1);
-    expect(skill.getSupersedingSkillId()).toEqual(null);
-    expect(skill.getAllQuestionsMerged()).toEqual(false);
-    expect(skill.getPrerequisiteSkillIds()).toEqual([]);
-  });
+      };
+    
+      misconceptionDict2 = {
+        id: 4,
+        name: 'test name',
+        notes: 'test notes',
+        feedback: 'test feedback',
+        must_be_addressed: false
+      };
+    
+      rubricDict = {
+        difficulty: skillDifficulties[0],
+        explanation: 'explanation'
+      };
+    
+      skillContentsDict = {
+        explanation: {
+          html: 'test explanation',
+          content_id: 'explanation',
+        },
+        worked_examples: [
+          {
+            html: 'test worked example 1',
+            content_id: 'worked_example_1',
+          },
+          {
+            html: 'test worked example 2',
+            content_id: 'worked_example_2'
+          }
+        ],
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            explanation: {},
+            worked_example_1: {},
+            worked_example_2: {}
+          }
+        }
+      };
+      skillDict = {
+        id: 1,
+        description: 'test description',
+        misconceptions: [misconceptionDict1, misconceptionDict2],
+        rubrics: [rubricDict],
+        skill_contents: skillContentsDict,
+        language_code: 'en',
+        version: 3,
+        next_misconception_id: 6,
+        superseding_skill_id: '2',
+        all_questions_merged: false,
+        prerequisite_skill_ids: ['skill_1']
+      };
+    })
+    
+    it('should create a new skill from a backend dictionary', function() {
+      var skill = skillObjectFactory.createFromBackendDict(skillDict);
+      expect(skill.getId()).toEqual(1);
+      expect(skill.getDescription()).toEqual('test description');
+      expect(skill.getMisconceptions()).toEqual(
+        [misconceptionObjectFactorySpy.createFromBackendDict(
+          misconceptionDict1),
+        misconceptionObjectFactorySpy.createFromBackendDict(
+          misconceptionDict2)]);
+      expect(skill.getRubrics()).toEqual([
+        rubricObjectFactorySpy.createFromBackendDict(rubricDict)]);
+      expect(skill.getConceptCard()).toEqual(
+        conceptCardObjectFactorySpy.createFromBackendDict(skillContentsDict));
+      expect(skill.getLanguageCode()).toEqual('en');
+      expect(skill.getVersion()).toEqual(3);
+      expect(skill.getSupersedingSkillId()).toEqual('2');
+      expect(skill.getAllQuestionsMerged()).toEqual(false);
+      expect(skill.getPrerequisiteSkillIds()).toEqual(['skill_1']);
+    });
+    
+    it('should delete a misconception given its id',()=> {
+      var skill = skillObjectFactory.createFromBackendDict(skillDict);
+      skill.deleteMisconception(2);
+      expect(skill.getMisconceptions()).toEqual(
+        [misconceptionObjectFactorySpy.createFromBackendDict(
+          misconceptionDict2)]);
+    });
+    
+    it('should throw validation errors', function() {
+      var skill = skillObjectFactory.createFromBackendDict(skillDict);
+      skill.getConceptCard().setExplanation(
+        subtitledHtmlObjectFactory.createDefault('', 'review_material'));
+      expect(skill.getValidationIssues()).toEqual([
+        'There should be review material in the concept card.',
+        'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
+        'in rubrics.'
+      ]);
+    });
+    
+    it('should add/update a rubric given difficulty',() =>{
+      var skill = skillObjectFactory.createFromBackendDict(skillDict);
+      expect(skill.getRubrics()[0].getExplanation()).toEqual('explanation');
+      expect(skill.getRubrics().length).toEqual(1);
+    
+      skill.updateRubricForDifficulty(skillDifficulties[0], 'new explanation');
+      expect(skill.getRubrics()[0].getExplanation()).toEqual('new explanation');
+    
+      skill.updateRubricForDifficulty(skillDifficulties[1], 'explanation 2');
+      expect(skill.getRubrics().length).toEqual(2);
+      expect(skill.getRubrics()[1].getExplanation()).toEqual('explanation 2');
+    
+      expect(function() {
+        skill.updateRubricForDifficulty('invalid difficulty', 'explanation 2');
+      }).toThrow();
+    });
+    
+    it('should get the correct next misconception id', () => {
+      var skill = skillObjectFactory.createFromBackendDict(skillDict);
+      expect(skill.getNextMisconceptionId()).toEqual(6);
+      skill.deleteMisconception(4);
+      expect(skill.getNextMisconceptionId()).toEqual(6);
+    
+      var misconceptionToAdd1 = misconceptionObjectFactorySpy
+        .createFromBackendDict({
+          id: skill.getNextMisconceptionId(),
+          name: 'test name',
+          notes: 'test notes',
+          feedback: 'test feedback',
+          must_be_addressed: true
+        });
+    
+      skill.appendMisconception(misconceptionToAdd1);
+      expect(skill.getNextMisconceptionId()).toEqual(7);
+      skill.deleteMisconception(6);
+      expect(skill.getNextMisconceptionId()).toEqual(7);
+    });
+    
+    it('should convert to a backend dictionary', () => {
+      var skill = skillObjectFactory.createFromBackendDict(skillDict);
+      expect(skill.toBackendDict()).toEqual(skillDict);
+    });
+    
+    it('should be able to create an interstitial skill', () => {
+      var skill = skillObjectFactory.createInterstitialSkill();
+      expect(skill.getId()).toEqual(null);
+      expect(skill.getDescription()).toEqual('Skill description loading');
+      expect(skill.getMisconceptions()).toEqual([]);
+      expect(skill.getRubrics()).toEqual([]);
+      expect(skill.getConceptCard()).toEqual(
+        conceptCardObjectFactorySpy.createInterstitialConceptCard());
+      expect(skill.getLanguageCode()).toEqual('en');
+      expect(skill.getVersion()).toEqual(1);
+      expect(skill.getSupersedingSkillId()).toEqual(null);
+      expect(skill.getAllQuestionsMerged()).toEqual(false);
+      expect(skill.getPrerequisiteSkillIds()).toEqual([]);
+    });
+  })
 })
 
 

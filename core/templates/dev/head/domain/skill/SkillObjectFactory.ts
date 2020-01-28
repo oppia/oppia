@@ -33,8 +33,8 @@ import predConsts from
 export class Skill {
   _id: number;
   _description:string;
-  _misconceptions:Array<Misconception>;
-  _rubrics:Array<Rubric>;
+  _misconceptions:Misconception[];
+  _rubrics:Rubric[];
   _conceptCard:ConceptCard;
   _languageCode:string;
   _version:number;
@@ -45,8 +45,8 @@ export class Skill {
   SKILL_DIFFICULTIES = predConsts.SKILL_DIFFICULTIES
 
 
-  constructor(id:number, description:string, misconceptions:Array<Misconception>,
-     rubrics:Array<Rubric>, conceptCard:ConceptCard, languageCode:string,
+  constructor(id:number, description:string, misconceptions:Misconception[],
+    rubrics:Rubric[], conceptCard:ConceptCard, languageCode:string,
     version:number, nextMisconceptionId:number, supersedingSkillId:string, 
     allQuestionsMerged:boolean, prerequisiteSkillIds:string[] ) {
     this._id = id;
@@ -102,7 +102,7 @@ export class Skill {
     return this._rubrics.slice();
   };
 
-  appendMisconception(newMisconception):void {
+  appendMisconception(newMisconception:Misconception):void {
     this._misconceptions.push(newMisconception);
     this._nextMisconceptionId = this.getIncrementedMisconceptionId(
       newMisconception.getId());
@@ -148,9 +148,9 @@ export class Skill {
     //      this._misconceptions.splice(idx, 1);
     //   }
     // }
-    this._misconceptions.forEach((misc,index)=>{
+    this._misconceptions.forEach((misc:Misconception)=>{
       if(misc.getId() === id){
-        this._misconceptions.splice(index,1)
+        this._misconceptions.splice(this._misconceptions.indexOf(misc),1)
       }
     })
   };
@@ -167,7 +167,9 @@ export class Skill {
     }
     return null;
   };
-
+  getMisconceptionId(index:number){
+    return this._misconceptions[index].getId()
+  }
   updateRubricForDifficulty(difficulty:string, explanation:string) {
     if (this.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
       throw Error('Invalid difficulty value passed');
@@ -186,12 +188,9 @@ export class Skill {
     return {
       id: this._id,
       description: this._description,
-      misconceptions: this._misconceptions.map(misconception => {
-        return misconception.toBackendDict();
-      }),
-      rubrics: this._rubrics.map((rubric)=> {
-        return rubric.toBackendDict();
-      }),
+      misconceptions: this._misconceptions.map(
+        (misconception:Misconception) => {return misconception.toBackendDict()}),
+      rubrics: this._rubrics.map((rubric:Rubric)=> {return rubric.toBackendDict()}),
       skill_contents: this._conceptCard.toBackendDict(),
       language_code: this._languageCode,
       version: this._version,
