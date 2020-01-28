@@ -50,6 +50,19 @@
           <search-bar enable-dropup="false"></search-bar>
         </div>
 
+        <div class="oppia-classroom-div">
+          <div class="oppia-classroom-text">
+            <h2 class="oppia-classroom-h2" translate="I18N_CLASSROOM_CALLOUT_HEADING_2"></h2>
+            <h1 class="oppia-classroom-h1" translate="I18N_CLASSROOM_CALLOUT_HEADING_1"></h1>
+            <p class="oppia-classroom-p" translate="I18N_CLASSROOM_CALLOUT_PARAGRAPH_1"></p>
+            <!-- TODO(iamprayush): Change href to classroom page. -->
+            <a class="btn oppia-dashboard-intro-button oppia-transition-200" translate="I18N_CLASSROOM_CALLOUT_BUTTON" ng-href="/library" href="/library"></a>
+          </div>
+          <div class="oppia-matthew-div">
+            <img src="/assets/images/landing/maths/fractions/matthew_paper.png" alt="">
+          </div>
+        </div>
+
         <div ng-if="$ctrl.libraryGroups.length === 0"
              style="margin: 150px auto; text-align: center; width: 100%;"
              translate="I18N_LIBRARY_NO_EXPLORATION_GROUPS">
@@ -180,6 +193,43 @@
   </div>
 </div>
 <style>
+  .oppia-classroom-div {
+    background-color: whitesmoke;
+    border: 4px solid #04857c;
+    border-radius: 10px;
+    height: 300px;
+    margin: 0px 45px;
+    padding: 30px 45px 45px 45px;
+  }
+  .oppia-classroom-text {
+    width: 62%;
+    float: left;
+  }
+  .oppia-classroom-h1 {
+    color: #033e39;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+  }
+  .oppia-classroom-h2 {
+    color: #033e39;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+  }
+  .oppia-classroom-p {
+    margin-top: 25px;
+    color: #383838;
+    font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
+  }
+  .oppia-matthew-div {
+    float: right;
+    max-height: 255px;
+    overflow: hidden;
+    transform: translateY(11px);
+  }
+  .oppia-matthew-div > img {
+    height: 300px;
+  }
+  .oppia-classroom-text > a {
+    width: 180px;
+  }
   .oppia-group-page-header {
     color: #2c4841;
     font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -303,6 +353,15 @@
     .oppia-library-h2 {
       font-size: 1.75em;
     }
+    .oppia-classroom-h1 {
+      font-size: 2em;
+    }
+    .oppia-classroom-h2 {
+      font-size: 1.0em;
+    }
+    .oppia-classroom-p {
+      font-size: 1.05em;
+    }
   }
   @media (max-width: 629px) {
     .oppia-library-h1 {
@@ -310,6 +369,66 @@
     }
     .oppia-library-h2 {
       font-size: .85em;
+    }
+  }
+  @media (max-width: 992px) {
+    .oppia-classroom-div {
+      margin-top: 100px;
+    }
+  }
+  @media (max-width: 900px) {
+    .oppia-classroom-text {
+      width: 50%;
+    }
+    .oppia-classroom-h1 {
+      font-size: 1.45em;
+    }
+    .oppia-classroom-h2 {
+      font-size: 0.9em;
+    }
+    .oppia-classroom-p {
+      margin-top: 20px;
+      font-size: 0.95em;
+    }
+    .oppia-matthew-div {
+      max-height: 200px;
+      transform: translateY(65px);
+    }
+    .oppia-matthew-div > img {
+      height: 250px;
+    }
+  }
+  @media (max-width: 727px) {
+    .oppia-classroom-div {
+      height: 345px;
+    }
+    .oppia-classroom-text {
+      float: none;
+      width: 100%;
+    }
+    .oppia-classroom-text > a {
+      margin-top: 50px;
+      width: 140px;
+      float: left;
+    }
+    .oppia-matthew-div {
+      max-height: 170px;
+      transform: translateY(-20px);
+    }
+    .oppia-matthew-div > img {
+      height: 200px;
+    }
+  }
+  @media (max-width: 584px) {
+    .oppia-classroom-div {
+      padding: 20px;
+    }
+    .oppia-matthew-div {
+      max-height: 153px;
+      transform: translateY(-10px);
+    }
+    .oppia-matthew-div > img {
+      height: 180px;
     }
   }
 </style>
