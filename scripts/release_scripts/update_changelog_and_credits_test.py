@@ -396,14 +396,37 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
                 update_changelog_and_credits.main()
 
     def test_missing_release_summary_file(self):
+        def mock_get_organization(unused_self, unused_name):
+            return github.Organization.Organization(
+                requester='', headers='', attributes={}, completed='')
+        def mock_check_blocking_bug_issue_count(unused_repo):
+            pass
+        def mock_check_prs_for_current_release_are_released(unused_repo):
+            pass
+        def mock_get_repo(unused_self, unused_repo_name):
+            return self.mock_repo
+
+        get_org_swap = self.swap(
+            github.Github, 'get_organization', mock_get_organization)
+        get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
+        get_org_repo_swap = self.swap(
+            github.Organization.Organization, 'get_repo', mock_get_repo)
+        blocking_bug_swap = self.swap(
+            common, 'check_blocking_bug_issue_count',
+            mock_check_blocking_bug_issue_count)
+        check_prs_swap = self.swap(
+            common, 'check_prs_for_current_release_are_released',
+            mock_check_prs_for_current_release_are_released)
         release_summary_swap = self.swap(
             release_constants, 'RELEASE_SUMMARY_FILEPATH', 'invalid.md')
         with self.main_swap, self.branch_name_swap, release_summary_swap:
-            with self.args_swap, self.getpass_swap, self.assertRaisesRegexp(
-                Exception, (
-                    'Release summary file invalid.md is missing. '
-                    'Please re-run this script.')):
-                update_changelog_and_credits.main()
+            with self.args_swap, self.getpass_swap, blocking_bug_swap:
+                with get_org_swap, get_repo_swap, get_org_repo_swap:
+                    with check_prs_swap, self.assertRaisesRegexp(
+                        Exception, (
+                            'Release summary file invalid.md is missing. '
+                            'Please re-run this script.')):
+                        update_changelog_and_credits.main()
 
     def test_create_branch(self):
         check_function_calls = {
@@ -467,6 +490,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
 
     def test_function_calls(self):
         check_function_calls = {
+            'check_blocking_bug_issue_count_gets_called': False,
+            'check_prs_for_current_release_are_released_gets_called': False,
             'remove_updates_and_delete_branch_gets_called': False,
             'update_changelog_gets_called': False,
             'update_authors_gets_called': False,
@@ -477,6 +502,8 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'open_new_tab_in_browser_if_possible_gets_called': False
         }
         expected_check_function_calls = {
+            'check_blocking_bug_issue_count_gets_called': True,
+            'check_prs_for_current_release_are_released_gets_called': True,
             'remove_updates_and_delete_branch_gets_called': True,
             'update_changelog_gets_called': True,
             'update_authors_gets_called': True,
@@ -486,6 +513,15 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             'create_branch_gets_called': True,
             'open_new_tab_in_browser_if_possible_gets_called': True
         }
+        def mock_get_organization(unused_self, unused_name):
+            return github.Organization.Organization(
+                requester='', headers='', attributes={}, completed='')
+        def mock_check_blocking_bug_issue_count(unused_repo):
+            check_function_calls[
+                'check_blocking_bug_issue_count_gets_called'] = True
+        def mock_check_prs_for_current_release_are_released(unused_repo):
+            check_function_calls[
+                'check_prs_for_current_release_are_released_gets_called'] = True
         def mock_remove_updates_and_delete_branch(
                 unused_repo_fork, unused_target_branch):
             check_function_calls[
@@ -515,6 +551,14 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_gets_called'] = True
 
+        get_org_swap = self.swap(
+            github.Github, 'get_organization', mock_get_organization)
+        blocking_bug_swap = self.swap(
+            common, 'check_blocking_bug_issue_count',
+            mock_check_blocking_bug_issue_count)
+        check_prs_swap = self.swap(
+            common, 'check_prs_for_current_release_are_released',
+            mock_check_prs_for_current_release_are_released)
         remove_updates_swap = self.swap(
             update_changelog_and_credits, 'remove_updates_and_delete_branch',
             mock_remove_updates_and_delete_branch)
@@ -537,15 +581,19 @@ class ChangelogAndCreditsUpdateTests(test_utils.GenericTestBase):
             update_changelog_and_credits, 'create_branch', mock_create_branch)
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         get_repo_swap = self.swap(github.Github, 'get_repo', mock_get_repo)
+        get_org_repo_swap = self.swap(
+            github.Organization.Organization, 'get_repo', mock_get_repo)
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible', mock_open_tab)
 
         with self.branch_name_swap, self.release_summary_swap, self.args_swap:
-            with self.main_swap, self.getpass_swap, input_swap:
+            with self.main_swap, self.getpass_swap, input_swap, check_prs_swap:
                 with remove_updates_swap, update_authors_swap, open_tab_swap:
                     with update_changelog_swap, update_contributors_swap:
                         with update_developer_names_swap, check_order_swap:
                             with create_branch_swap, get_repo_swap:
-                                update_changelog_and_credits.main()
+                                with blocking_bug_swap, get_org_swap:
+                                    with get_org_repo_swap:
+                                        update_changelog_and_credits.main()
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
