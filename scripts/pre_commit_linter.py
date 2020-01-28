@@ -659,7 +659,8 @@ class FileCache(python_utils.OBJECT):
         if key not in self._CACHE_DATA_DICT:
             with python_utils.open_file(filepath, mode) as f:
                 lines = f.readlines()
-                self._CACHE_DATA_DICT[key] = (''.join(lines), tuple(lines))
+                stripped_lines = tuple(line.strip() for line in lines)
+                self._CACHE_DATA_DICT[key] = (''.join(lines), stripped_lines)
         return self._CACHE_DATA_DICT[key]
 
 
@@ -2093,6 +2094,8 @@ class JsTsLintChecksManager(LintChecksManager):
                         file_content)
                 except Exception as e:
                     shutil.rmtree(compiled_js_dir)
+                    python_utils.PRINT(
+                        "Error compiling or parsing file: " + filepath)
                     raise Exception(e)
 
         shutil.rmtree(compiled_js_dir)
