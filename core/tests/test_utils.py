@@ -1483,7 +1483,7 @@ tags: []
             self, topic_id, owner_id, name, abbreviated_name,
             canonical_name, description,
             canonical_story_references, additional_story_references,
-            uncategorized_skill_ids, next_subtopic_id, thumbnail_filename,
+            uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new topic with a default version 1 subtopic
         data dictionary.
@@ -1513,8 +1513,6 @@ tags: []
             uncategorized_skill_ids: list(str). The list of ids of skills that
                 are not part of any subtopic.
             next_subtopic_id: int. The id for the next subtopic.
-            thumbnail_filename: str|None. The thumbnail filename for the
-                subtopic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
         """
