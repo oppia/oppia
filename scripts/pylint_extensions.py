@@ -17,6 +17,7 @@
 """Implements additional custom Pylint checkers to be used as part of
 presubmit checks.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -1383,6 +1384,69 @@ class DocstringChecker(checkers.BaseChecker):
                 is_docstring = False
 
 
+class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
+    """Checks if there is a single empty line below the fileoverview docstring.
+    Note: The check assumes that all files have a file overview. This
+    assumption is justified because Pylint has an inbuilt check
+    (missing-docstring) for missing file overviews.
+    """
+
+    __implements__ = interfaces.IRawChecker
+    name = 'space_between_imports_and_file-overview'
+    priority = -1
+    msgs = {
+        'C0024': (
+            'No empty line used below the fileoverview docstring.',
+            'no-empty-line-provided-below-fileoverview',
+            'please provide an empty line below the fileoverview.'
+        ),
+        'C0025': (
+            'Single empty line should be provided below the fileoverview.',
+            'only-a-single-empty-line-should-be-provided',
+            'please provide an empty line below the fileoverview.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that there is a blank line below
+        file overview docstring.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        triple_quote_counter = 0
+        empty_line_counter = 0
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+            # Single line comment, ignore it.
+            if line.startswith(b'#'):
+                continue
+            triple_quote_counter += line.count(multi_line_indicator)
+
+            if line.endswith(b'"""') and triple_quote_counter == 2:
+                closing_line_index_of_fileoverview = line_num
+                break
+
+        empty_line_check_index = closing_line_index_of_fileoverview
+        if empty_line_check_index < file_length - 1:
+            while file_content[empty_line_check_index + 1] == b'\n':
+                empty_line_counter += 1
+                empty_line_check_index += 1
+
+        if empty_line_counter > 1:
+            self.add_message(
+                'only-a-single-empty-line-should-be-provided',
+                line=closing_line_index_of_fileoverview + 1)
+        elif empty_line_counter == 0:
+            self.add_message(
+                'no-empty-line-provided-below-fileoverview',
+                line=closing_line_index_of_fileoverview + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1403,3 +1467,4 @@ def register(linter):
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(DocstringChecker(linter))
+    linter.register_checker(BlankLineBelowFileOverviewChecker(linter))
