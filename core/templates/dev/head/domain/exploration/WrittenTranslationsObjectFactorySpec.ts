@@ -158,38 +158,39 @@ describe('Written Translations Object Factory', () => {
       'content_1')).toBe(true);
   });
 
-  it('should blah', () => {
-    const writtenTranslationsBackendDict = (
-      writtenTranslationsObjectFactory.createFromBackendDict({
-        translations_mapping: {
-          content_1: {
-            'hi-en': {
-              html: 'This is the old HTML',
-              needs_update: false
-            },
-            en: {
-              html: '',
-              needs_update: false
+  it('should set needs_update to true in all translations from a content',
+    () => {
+      const writtenTranslationsBackendDict = (
+        writtenTranslationsObjectFactory.createFromBackendDict({
+          translations_mapping: {
+            content_1: {
+              'hi-en': {
+                html: 'This is the old HTML',
+                needs_update: false
+              },
+              en: {
+                html: '',
+                needs_update: false
+              }
             }
           }
-        }
-      }));
+        }));
 
-    writtenTranslationsBackendDict.markAllTranslationsAsNeedingUpdate(
-      'content_1');
-    expect(writtenTranslationsBackendDict.getWrittenTranslation(
-      'content_1', 'hi-en')).toEqual(
-      writtenTranslationObjectFactory.createFromBackendDict({
-        html: 'This is the old HTML',
-        needs_update: true
-      }));
-    expect(writtenTranslationsBackendDict.getWrittenTranslation(
-      'content_1', 'en')).toEqual(
-      writtenTranslationObjectFactory.createFromBackendDict({
-        html: '',
-        needs_update: true
-      }));
-    expect(writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
-      'content_1')).toBe(false);
-  });
+      writtenTranslationsBackendDict.markAllTranslationsAsNeedingUpdate(
+        'content_1');
+      expect(writtenTranslationsBackendDict.getWrittenTranslation(
+        'content_1', 'hi-en')).toEqual(
+        writtenTranslationObjectFactory.createFromBackendDict({
+          html: 'This is the old HTML',
+          needs_update: true
+        }));
+      expect(writtenTranslationsBackendDict.getWrittenTranslation(
+        'content_1', 'en')).toEqual(
+        writtenTranslationObjectFactory.createFromBackendDict({
+          html: '',
+          needs_update: true
+        }));
+      expect(writtenTranslationsBackendDict.hasUnflaggedWrittenTranslations(
+        'content_1')).toBe(false);
+    });
 });
