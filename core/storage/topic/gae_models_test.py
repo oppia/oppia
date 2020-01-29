@@ -396,3 +396,70 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
 
         model.manager_ids = ['user_non_id']
         self.assertFalse(model.verify_model_user_ids_exist())
+
+
+class TopicRightsAllUsersModelUnitTest(test_utils.GenericTestBase):
+    """Test the TopicRightsModel class."""
+    TOPIC_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
+
+    def setUp(self):
+        super(TopicRightsAllUsersModelUnitTest, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_TOPIC_MANAGER
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2,
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_TOPIC_MANAGER
+        ).put()
+        topic_models.TopicRightsAllUsersModel(
+            id=self.TOPIC_ID_1,
+            all_user_ids=[self.USER_ID_1, self.USER_ID_2]
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            topic_models.TopicRightsAllUsersModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            topic_models.TopicRightsAllUsersModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            topic_models.TopicRightsAllUsersModel
+            .has_reference_to_user_id(self.USER_ID_2))
+        self.assertFalse(
+            topic_models.TopicRightsAllUsersModel
+            .has_reference_to_user_id(self.USER_ID_3))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            topic_models.TopicRightsAllUsersModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_verify_model_user_ids_exist(self):
+        model = topic_models.TopicRightsAllUsersModel(
+            id=self.TOPIC_ID_1,
+            all_user_ids=[self.USER_ID_1, self.USER_ID_2]
+        )
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.all_user_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.all_user_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.all_user_ids = [feconf.SUGGESTION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.all_user_ids = [self.USER_ID_1, 'user_non_id']
+        self.assertFalse(model.verify_model_user_ids_exist())

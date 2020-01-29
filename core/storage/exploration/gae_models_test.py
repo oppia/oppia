@@ -427,6 +427,73 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertEqual(expected_exploration_ids, exploration_ids)
 
 
+class ExplorationRightsAllUsersModelUnitTest(test_utils.GenericTestBase):
+    """Test the ExplorationRightsModel class."""
+    EXPLORATION_ID_1 = '1'
+    USER_ID_1 = 'id_1'
+    USER_ID_2 = 'id_2'
+    USER_ID_3 = 'id_3'
+
+    def setUp(self):
+        super(ExplorationRightsAllUsersModelUnitTest, self).setUp()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_1,
+            gae_id='gae_1_id',
+            email='some@email.com',
+            role=feconf.ROLE_ID_EXPLORATION_EDITOR
+        ).put()
+        user_models.UserSettingsModel(
+            id=self.USER_ID_2,
+            gae_id='gae_2_id',
+            email='some_other@email.com',
+            role=feconf.ROLE_ID_EXPLORATION_EDITOR
+        ).put()
+        exp_models.ExplorationRightsAllUsersModel(
+            id=self.EXPLORATION_ID_1,
+            all_user_ids=[self.USER_ID_1, self.USER_ID_2]
+        ).put()
+
+    def test_get_deletion_policy(self):
+        self.assertEqual(
+            exp_models.ExplorationRightsAllUsersModel
+            .get_deletion_policy(),
+            base_models.DELETION_POLICY.DELETE)
+
+    def test_has_reference_to_user_id(self):
+        self.assertTrue(
+            exp_models.ExplorationRightsAllUsersModel
+            .has_reference_to_user_id(self.USER_ID_1))
+        self.assertTrue(
+            exp_models.ExplorationRightsAllUsersModel
+            .has_reference_to_user_id(self.USER_ID_2))
+        self.assertFalse(
+            exp_models.ExplorationRightsAllUsersModel
+            .has_reference_to_user_id(self.USER_ID_3))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            exp_models.ExplorationRightsAllUsersModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.CUSTOM)
+
+    def test_verify_model_user_ids_exist(self):
+        model = exp_models.ExplorationRightsAllUsersModel(
+            id=self.EXPLORATION_ID_1,
+            all_user_ids=[self.USER_ID_1, self.USER_ID_2]
+        )
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.all_user_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.all_user_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.all_user_ids = [feconf.SUGGESTION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+
+        model.all_user_ids = [self.USER_ID_1, 'user_non_id']
+        self.assertFalse(model.verify_model_user_ids_exist())
+
+
 class ExplorationCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
     """Test the ExplorationCommitLogEntryModel class."""
 
