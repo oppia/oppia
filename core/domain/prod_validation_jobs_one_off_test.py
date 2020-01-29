@@ -5543,7 +5543,6 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
@@ -5723,7 +5722,6 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
@@ -5856,7 +5854,6 @@ class QuestionSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
@@ -6037,7 +6034,6 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
@@ -6168,7 +6164,6 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
@@ -6389,7 +6384,6 @@ class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(6)]
@@ -6807,7 +6801,6 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
@@ -6815,7 +6808,6 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
         for i in python_utils.RANGE(2):
             skill = skill_domain.Skill.create_default_skill(
                 '%s' % (i + 3),
-                thumbnail_filename='image%d.png' % i,
                 description='description %d' % (i + 3),
                 rubrics=rubrics)
             skill_services.save_new_skill(self.owner_id, skill)
@@ -7028,7 +7020,6 @@ class SkillSnapshotMetadataModelValidatorTests(
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
@@ -7217,7 +7208,6 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
@@ -7356,7 +7346,6 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
@@ -7583,7 +7572,6 @@ class SkillSummaryModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         skills = [skill_domain.Skill.create_default_skill(
             '%s' % i,
-            thumbnail_filename='image%d.png' % i,
             description='description %d' % i,
             rubrics=rubrics
         ) for i in python_utils.RANGE(3)]
@@ -8890,7 +8878,6 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i,
-                thumbnail_filename='image%d.png' % i,
                 description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
@@ -9220,7 +9207,6 @@ class TopicSnapshotMetadataModelValidatorTests(
         skills = [
             skill_domain.Skill.create_default_skill(
                 skill_id='%s' % i,
-                thumbnail_filename='image%d.png' % i,
                 description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
@@ -9413,8 +9399,7 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9574,8 +9559,7 @@ class TopicRightsModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9750,8 +9734,7 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -9955,8 +9938,7 @@ class TopicRightsSnapshotContentModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10114,8 +10096,7 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10397,8 +10378,7 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10621,8 +10601,7 @@ class SubtopicPageModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -10833,8 +10812,7 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -11040,8 +11018,7 @@ class SubtopicPageSnapshotContentModelValidatorTests(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -11208,8 +11185,7 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skills = [
             skill_domain.Skill.create_default_skill(
-                skill_id='%s' % i, thumbnail_filename='image%d.png' % i,
-                description='skill%s' % i, rubrics=rubrics)
+                skill_id='%s' % i, description='skill%s' % i, rubrics=rubrics)
             for i in python_utils.RANGE(9)]
 
         for skill in skills:
@@ -13837,8 +13813,7 @@ class UserSkillMasteryModelValidatorTests(test_utils.GenericTestBase):
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
         skill = skill_domain.Skill.create_default_skill(
-            'skill', thumbnail_filename='image.png',
-            description='description', rubrics=rubrics)
+            'skill', description='description', rubrics=rubrics)
         skill_services.save_new_skill(self.owner_id, skill)
         skill_services.create_user_skill_mastery(
             self.user_id, 'skill', 0.8)

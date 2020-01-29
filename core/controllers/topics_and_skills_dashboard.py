@@ -31,7 +31,6 @@ from core.domain import topic_domain
 from core.domain import topic_fetchers
 from core.domain import topic_services
 import feconf
-import python_utils
 
 
 class TopicsAndSkillsDashboardPage(base.BaseHandler):
