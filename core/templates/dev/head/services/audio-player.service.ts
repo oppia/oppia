@@ -95,6 +95,12 @@ angular.module('oppia').factory('AudioPlayerService', [
       }
     };
 
+    var _replay = function() {
+      if (_currentTrack) {
+        _currentTrack.progress = 0;
+      }
+    };
+
     return {
       load: function(filename) {
         return $q(function(resolve, reject) {
@@ -103,6 +109,9 @@ angular.module('oppia').factory('AudioPlayerService', [
       },
       play: function() {
         _play();
+      },
+      replay: function() {
+        _replay();
       },
       pause: function() {
         _pause();

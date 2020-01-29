@@ -1,6 +1,9 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()">
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div style="width: 560px;">
+      <span class="replay-white-circle" ng-click="onReplayButtonClicked()" ng-if="isAudioPlaying()">
+        <i class="fas fa-undo audio-undo-icon"></i>
+      </span>
       <i class="fas audio-controls-button-icon"
          ng-click="onPlayButtonClicked()"
          ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
@@ -129,6 +132,27 @@
     vertical-align: middle;
   }
 
+  .replay-white-circle {
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: inline-block;
+    font-size: 1.4em;
+    height: 36px;
+    padding: 5px;
+    position: relative;
+    vertical-align: middle;
+    width: 36px;
+  }
+
+  .audio-undo-icon {
+    color: #0D48A1;
+    left: 50%;
+    padding: 0;
+    position: absolute;
+    top: 7px;
+    transform: translateX(-43%);
+  }
+
   .audio-controls-button-image {
     width: 21px;
     height: 21px;
@@ -190,6 +214,7 @@
     left: 0;
     margin-top: -128px;
     position: fixed;
+    text-align: center;
     top: 184px;
     transition: margin-top 0.2s ease-in-out;
     width: 100%;
@@ -219,4 +244,9 @@
     margin-top: -270px;
   }
 
+  @media screen and (max-width: 700px) {
+      audio-bar .slider-section {
+          width: auto;
+      }
+  }
 </style>
