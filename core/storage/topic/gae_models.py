@@ -570,10 +570,23 @@ class TopicRightsAllUsersModel(base_models.BaseModel):
         return cls.query(
             cls.all_user_ids == user_id).get(keys_only=True) is not None
 
+
     @staticmethod
     def get_user_id_migration_policy():
         """TopicRightsAllUsersModel has multiple fields with user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, unused_old_user_id, unused_new_user_id):
+        """This model is used to verify the user ID migration so it will be
+        filled by the AddAllUserIdsOneOffJob and AddAllUserIdsSnapshotsOneOffJob
+        after the migration is done, thus it shouldn't be migrated here.
+
+        Args:
+            unused_old_user_id: str. The old user ID.
+            unused_new_user_id: str. The new user ID.
+        """
+        pass
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in all_user_ids."""
