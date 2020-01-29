@@ -44,7 +44,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
         with travis_ci_file_swap:
             actual_travis_ci_dict = (
                 check_e2e_tests_are_captured_in_ci
-                .read_and_parse_travis_yaml_file())
+                .read_and_parse_travis_yml_file())
             self.assertEqual(EXPECTED_TRAVIS_CI_DICT, actual_travis_ci_dict)
 
     def test_read_protractor_file(self):
@@ -61,7 +61,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             EXPECTED_PROTRACTOR_CONF_FILE, actual_protractor_config_file)
 
     def test_get_e2e_suite_names_from_jobs_travis_yml_file(self):
-        def mock_read_travis_yaml_file():
+        def mock_read_travis_yml_file():
             travis_ci_file = python_utils.open_file(
                 os.path.join(
                     DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
@@ -70,15 +70,15 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         dummy_path = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yaml_file', mock_read_travis_yaml_file)
+            'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
         with dummy_path:
             actual_travis_jobs = (
                 check_e2e_tests_are_captured_in_ci
-                .get_e2e_suite_names_from_jobs_travis_yaml_file())
+                .get_e2e_suite_names_from_jobs_travis_yml_file())
         self.assertEqual(DUMMY_TEST_SUITES, actual_travis_jobs)
 
     def test_get_e2e_suite_names_from_script_travis_yml_file(self):
-        def mock_read_travis_yaml_file():
+        def mock_read_travis_yml_file():
             travis_ci_file = python_utils.open_file(
                 os.path.join(
                     DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
@@ -87,11 +87,11 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         dummy_path = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yaml_file', mock_read_travis_yaml_file)
+            'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
         with dummy_path:
             actual_travis_script = (
                 check_e2e_tests_are_captured_in_ci
-                .get_e2e_suite_names_from_script_travis_yaml_file())
+                .get_e2e_suite_names_from_script_travis_yml_file())
         self.assertEqual(DUMMY_TEST_SUITES, actual_travis_script)
 
     def test_get_e2e_suite_names_from_protractor_file(self):
@@ -123,12 +123,12 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         mock_travis_jobs = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_jobs_travis_yaml_file',
+            'get_e2e_suite_names_from_jobs_travis_yml_file',
             mock_get_e2e_suite_names_from_travis_ci)
 
         mock_travis_scripts = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_script_travis_yaml_file',
+            'get_e2e_suite_names_from_script_travis_yml_file',
             mock_get_e2e_suite_names_from_travis_ci)
 
         mock_tests_to_remove = self.swap(
@@ -154,12 +154,12 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         mock_travis_scripts = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_script_travis_yaml_file',
+            'get_e2e_suite_names_from_script_travis_yml_file',
             mock_get_e2e_suite_names)
 
         mock_travis_jobs = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_jobs_travis_yaml_file',
+            'get_e2e_suite_names_from_jobs_travis_yml_file',
             mock_get_e2e_suite_names)
 
         mock_protractor_test_suites = self.swap(
@@ -175,14 +175,14 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             with self.assertRaisesRegexp(
                 Exception, 'explorationImprovementsTab is expected to be in '
                            'the e2e test suites extracted from the script '
-                           'section of .travis.yaml file, but it is missing.'):
+                           'section of .travis.yml file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
         with mock_travis_jobs:
             with self.assertRaisesRegexp(
                 Exception, 'explorationImprovementsTab is expected to be in '
                            'the e2e test suites extracted from the jobs '
-                           'section of .travis.yaml file, but it is missing.'):
+                           'section of .travis.yml file, but it is missing.'):
                 check_e2e_tests_are_captured_in_ci.main()
 
         with mock_protractor_test_suites, mock_tests_not_on_travis:
@@ -193,7 +193,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                 check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_invalid_travis_jobs_test_suite_length(self):
-        def mock_read_travis_yaml_file():
+        def mock_read_travis_yml_file():
             travis_ci_file = python_utils.open_file(
                 os.path.join(
                     DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
@@ -204,8 +204,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         travis_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yaml_file',
-            mock_read_travis_yaml_file)
+            'read_and_parse_travis_yml_file',
+            mock_read_travis_yml_file)
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
@@ -213,7 +213,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         mock_e2e_travis_jobs = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_jobs_travis_yaml_file',
+            'get_e2e_suite_names_from_jobs_travis_yml_file',
             mock_return_empty_list)
 
         with travis_path_swap, mock_tests_to_remove:
@@ -225,7 +225,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                     check_e2e_tests_are_captured_in_ci.main()
 
     def test_main_with_invalid_travis_script_test_suite_length(self):
-        def mock_read_travis_yaml_file():
+        def mock_read_travis_yml_file():
             travis_ci_file = python_utils.open_file(
                 os.path.join(
                     DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
@@ -236,8 +236,8 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         travis_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yaml_file',
-            mock_read_travis_yaml_file)
+            'read_and_parse_travis_yml_file',
+            mock_read_travis_yml_file)
 
         mock_tests_to_remove = self.swap(
             check_e2e_tests_are_captured_in_ci,
@@ -245,7 +245,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
 
         mock_e2e_travis_script = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'get_e2e_suite_names_from_script_travis_yaml_file',
+            'get_e2e_suite_names_from_script_travis_yml_file',
             mock_return_empty_list)
 
         with travis_path_swap, mock_tests_to_remove:
@@ -319,7 +319,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
                     DUMMY_CONF_FILES, 'dummy_protractor.conf.js'), 'r').read()
             return protractor_config_file
 
-        def mock_read_travis_yaml_file():
+        def mock_read_travis_yml_file():
             travis_ci_file = python_utils.open_file(
                 os.path.join(
                     DUMMY_CONF_FILES, '.dummy_travis.yml'), 'r').read()
@@ -335,7 +335,7 @@ class CheckE2eTestsCapturedInCITests(test_utils.GenericTestBase):
             mock_read_protractor_conf_file)
         travis_path_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
-            'read_and_parse_travis_yaml_file', mock_read_travis_yaml_file)
+            'read_and_parse_travis_yml_file', mock_read_travis_yml_file)
         common_test_swap = self.swap(
             check_e2e_tests_are_captured_in_ci,
             'SAMPLE_TEST_SUITE_THAT_IS_KNOWN_TO_EXIST',
