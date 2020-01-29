@@ -1759,6 +1759,22 @@ class ExplorationModelValidator(BaseModelValidator):
                 snapshot_model_ids),
         }
 
+    @classmethod
+    def _validate_button_text_length(cls, item):
+        for state_name, state in item.states.items():
+            interaction = state['interaction']
+            if interaction['id'] == 'Continue':
+                customization_args = interaction['customization_args']
+                button_text = customization_args['buttonText']
+                if len(button_text['value']) > 50:
+                    cls.errors['button_text_validation'].append((
+                    'Exploration id: %s : State: %s') % (
+                        item.id, state_name))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_button_text_length]
+
 
 class ExplorationSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
