@@ -269,7 +269,7 @@ var createSkillAndAssignTopic = function(
       new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-    skillDescription, material, thumbnailPath, '../data/img.png');
+    skillDescription, material);
   topicsAndSkillsDashboardPage.get();
   topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
   topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);

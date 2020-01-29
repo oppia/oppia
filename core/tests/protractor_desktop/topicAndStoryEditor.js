@@ -83,7 +83,7 @@ describe('Topic editor functionality', function() {
     var skillId = null;
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 1', 'Concept card explanation', '../data/img.png');
+      'Skill 1', 'Concept card explanation');
     browser.getCurrentUrl().then(function(url) {
       skillId = url.split('/')[4];
       topicsAndSkillsDashboardPage.get();
@@ -174,7 +174,7 @@ describe('Topic editor functionality', function() {
   it('should assign a skill to, between, and from subtopics', function() {
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
-      'Skill 2', 'Concept card explanation', '../data/img.png');
+      'Skill 2', 'Concept card explanation');
 
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();

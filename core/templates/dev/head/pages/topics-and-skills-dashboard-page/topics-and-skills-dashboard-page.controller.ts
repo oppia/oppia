@@ -21,8 +21,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require(
-  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
-require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
   'skills-list.directive.ts');
 require(
@@ -145,8 +143,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.newSkillDescription = '';
-                  $scope.thumbnailFilename = null;
-                  $scope.thumbnailDataUrl = null;
                   $scope.rubrics = rubrics;
                   $scope.bindableDict = {
                     displayedConceptCardExplanation: ''
@@ -164,16 +160,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                       explanationObject.getHtml();
                   };
 
-                  $scope.updateThumbnailFilename = function(
-                      newThumbnailFilename) {
-                    $scope.thumbnailFilename = newThumbnailFilename;
-                  };
-
-                  $scope.updateThumbnailDataUrl = function(
-                      newThumbnailDataUrl) {
-                    $scope.thumbnailDataUrl = newThumbnailDataUrl;
-                  };
-
                   $scope.onSaveRubric = function(difficulty, explanation) {
                     for (var idx in $scope.rubrics) {
                       if ($scope.rubrics[idx].getDifficulty() === difficulty) {
@@ -185,8 +171,6 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
                   $scope.createNewSkill = function() {
                     $uibModalInstance.close({
                       description: $scope.newSkillDescription,
-                      thumbnailFilename: $scope.thumbnailFilename,
-                      thumbnailDataUrl: $scope.thumbnailDataUrl,
                       rubrics: $scope.rubrics,
                       explanation: newExplanationObject
                     });
@@ -199,8 +183,7 @@ angular.module('oppia').directive('topicsAndSkillsDashboardPage', [
               ]
             }).result.then(function(result) {
               SkillCreationService.createNewSkill(
-                result.description, result.rubrics, result.explanation, [],
-                result.thumbnailFilename, result.thumbnailDataUrl);
+                result.description, result.rubrics, result.explanation, []);
             });
           };
           ctrl.$onInit = function() {

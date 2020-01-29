@@ -51,9 +51,6 @@ angular.module('oppia').constant(
   'SKILL_PROPERTY_LANGUAGE_CODE',
   SkillDomainConstants.SKILL_PROPERTY_LANGUAGE_CODE);
 angular.module('oppia').constant(
-  'SKILL_PROPERTY_THUMBNAIL_FILENAME',
-  SkillDomainConstants.SKILL_PROPERTY_THUMBNAIL_FILENAME);
-angular.module('oppia').constant(
   'SKILL_CONTENTS_PROPERTY_EXPLANATION',
   SkillDomainConstants.SKILL_CONTENTS_PROPERTY_EXPLANATION);
 angular.module('oppia').constant(

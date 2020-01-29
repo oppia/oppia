@@ -32,7 +32,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
     var Skill = function(
         id, description, misconceptions, rubrics, conceptCard, languageCode,
         version, nextMisconceptionId, supersedingSkillId, allQuestionsMerged,
-        prerequisiteSkillIds, thumbnailFilename) {
+        prerequisiteSkillIds) {
       this._id = id;
       this._description = description;
       this._misconceptions = misconceptions;
@@ -44,7 +44,6 @@ angular.module('oppia').factory('SkillObjectFactory', [
       this._supersedingSkillId = supersedingSkillId;
       this._allQuestionsMerged = allQuestionsMerged;
       this._prerequisiteSkillIds = prerequisiteSkillIds;
-      this._thumbnailFilename = thumbnailFilename;
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
@@ -96,8 +95,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
         next_misconception_id: this._nextMisconceptionId,
         superseding_skill_id: this._supersedingSkillId,
         all_questions_merged: this._allQuestionsMerged,
-        prerequisite_skill_ids: this._prerequisiteSkillIds,
-        thumbnail_filename: this._thumbnailFilename
+        prerequisite_skill_ids: this._prerequisiteSkillIds
       };
     };
 
@@ -113,7 +111,6 @@ angular.module('oppia').factory('SkillObjectFactory', [
       this._supersedingSkillId = skill.getSupersedingSkillId();
       this._allQuestionsMerged = skill.getAllQuestionsMerged();
       this._prerequisiteSkillIds = skill.getPrerequisiteSkillIds();
-      this._thumbnailFilename = skill.getThumbnailFilename();
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
@@ -132,8 +129,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
         skillBackendDict.next_misconception_id,
         skillBackendDict.superseding_skill_id,
         skillBackendDict.all_questions_merged,
-        skillBackendDict.prerequisite_skill_ids,
-        skillBackendDict.thumbnail_filename);
+        skillBackendDict.prerequisite_skill_ids);
     };
 
 
@@ -169,14 +165,6 @@ angular.module('oppia').factory('SkillObjectFactory', [
 
     Skill.prototype.getDescription = function() {
       return this._description;
-    };
-
-    Skill.prototype.setThumbnailFilename = function(thumbnailFilename) {
-      this._thumbnailFilename = thumbnailFilename;
-    };
-
-    Skill.prototype.getThumbnailFilename = function() {
-      return this._thumbnailFilename;
     };
 
     Skill.prototype.getPrerequisiteSkillIds = function() {

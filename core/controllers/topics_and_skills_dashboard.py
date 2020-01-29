@@ -140,12 +140,7 @@ class NewSkillHandler(base.BaseHandler):
         linked_topic_ids = self.payload.get('linked_topic_ids')
         explanation_dict = self.payload.get('explanation_dict')
         rubrics = self.payload.get('rubrics')
-        thumbnail_data_url = self.request.get('image')
-        thumbnail_filename = self.payload.get('thumbnail_filename')
 
-        if not isinstance(thumbnail_filename, python_utils.BASESTRING):
-            raise self.InvalidInputException(
-                'Thumbnail filename should be a string.')
         if not isinstance(rubrics, list):
             raise self.InvalidInputException('Rubrics should be a list.')
 
@@ -170,12 +165,9 @@ class NewSkillHandler(base.BaseHandler):
                     self.user_id, topic.id, new_skill_id)
 
         skill_domain.Skill.require_valid_description(description)
-        fs_services.save_original_and_compressed_versions_of_image(
-            thumbnail_filename, 'skill', new_skill_id,
-            thumbnail_data_url, 'thumbnail')
 
         skill = skill_domain.Skill.create_default_skill(
-            new_skill_id, thumbnail_filename, description, rubrics)
+            new_skill_id, description, rubrics)
         skill.update_explanation(explanation_dict)
         skill_services.save_new_skill(self.user_id, skill)
 

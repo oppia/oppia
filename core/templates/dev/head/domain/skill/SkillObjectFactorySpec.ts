@@ -133,7 +133,6 @@ describe('Skill object factory', function() {
 
       skillDict = {
         id: '1',
-        thumbnail_filename: 'image.png',
         description: 'test description',
         misconceptions: [misconceptionDict1, misconceptionDict2],
         rubrics: [rubricDict],

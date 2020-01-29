@@ -1611,7 +1611,7 @@ tags: []
             [{'cmd': question_domain.CMD_CREATE_NEW}])
 
     def save_new_skill(
-            self, skill_id, owner_id, thumbnail_filename=None,
+            self, skill_id, owner_id,
             description='description', misconceptions=None, rubrics=None,
             skill_contents=None, language_code=constants.DEFAULT_LANGUAGE_CODE,
             prerequisite_skill_ids=None):
@@ -1620,7 +1620,6 @@ tags: []
         Args:
             skill_id: str. ID for the skill to be created.
             owner_id: str. The user_id of the creator of the skill.
-            thumbnail_filename: str|None. The thumbnail filename of the skill.
             description: str. The description of the skill.
             misconceptions: list(Misconception)|None. A list of Misconception
                 objects that contains the various misconceptions of the skill.
@@ -1637,7 +1636,7 @@ tags: []
             Skill. A newly-created skill.
         """
         skill = skill_domain.Skill.create_default_skill(
-            skill_id, thumbnail_filename, description, [])
+            skill_id, description, [])
         if misconceptions is not None:
             skill.misconceptions = misconceptions
             skill.next_misconception_id = len(misconceptions) + 1
