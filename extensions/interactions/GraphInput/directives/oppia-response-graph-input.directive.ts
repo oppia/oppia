@@ -27,18 +27,13 @@ require('services/html-escaper.service.ts');
 require('interactions/interactions-extension.constants.ajs.ts');
 
 angular.module('oppia').directive('oppiaResponseGraphInput', [
-  'GraphDetailService', 'HtmlEscaperService', 'UrlInterpolationService',
-  'GRAPH_INPUT_LEFT_MARGIN',
-  function(
-      GraphDetailService, HtmlEscaperService, UrlInterpolationService,
-      GRAPH_INPUT_LEFT_MARGIN) {
+  'GraphDetailService', 'HtmlEscaperService', 'GRAPH_INPUT_LEFT_MARGIN',
+  function(GraphDetailService, HtmlEscaperService, GRAPH_INPUT_LEFT_MARGIN) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/GraphInput/directives/' +
-        'graph-input-response.directive.html'),
+      template: require('./graph-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
