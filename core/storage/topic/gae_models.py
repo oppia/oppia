@@ -538,3 +538,47 @@ class TopicRightsModel(base_models.VersionedModel):
             post_commit_community_owned=False,
             post_commit_is_private=not topic_rights.topic_is_published
         ).put()
+
+
+class TopicRightsAllUsersModel(base_models.BaseModel):
+    """Temporary storage model for all user ids ever mentioned in the topic
+    rights.
+
+    The id of each instance is the id of the corresponding topic.
+    """
+    # The user_ids of users who are (or were in history) members of manager_ids
+    # in corresponding rights model.
+    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """TopicRightsAllUsersModel are temporary model that will be
+        deleted after user migration.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether TopicRightsAllUsersModel references the given user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.all_user_ids == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TopicRightsAllUsersModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
+        user_ids = [user_id for user_id in self.all_user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)

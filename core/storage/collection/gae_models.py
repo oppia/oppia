@@ -214,10 +214,6 @@ class CollectionRightsModel(base_models.VersionedModel):
     # The user_ids of users who are allowed to view this collection.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
-    # The user_ids of users who are (or were in history) members of owner_ids,
-    # editor_ids, voice_artist_ids or viewer_ids.
-    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
-
     # Whether this collection is owned by the community.
     community_owned = ndb.BooleanProperty(indexed=True, default=False)
     # For private collections, whether this collection can be viewed
@@ -290,8 +286,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 cls.owner_ids == user_id,
                 cls.editor_ids == user_id,
                 cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id,
-                cls.all_user_ids == user_id
+                cls.viewer_ids == user_id
             )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
@@ -311,7 +306,8 @@ class CollectionRightsModel(base_models.VersionedModel):
         """
         migrated_models = []
         for model in cls.query(ndb.OR(
-                cls.owner_ids == old_user_id, cls.editor_ids == old_user_id,
+                cls.owner_ids == old_user_id,
+                cls.editor_ids == old_user_id,
                 cls.voice_artist_ids == old_user_id,
                 cls.viewer_ids == old_user_id)).fetch():
             model.owner_ids = [
@@ -326,11 +322,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             model.viewer_ids = [
                 new_user_id if viewer_id == old_user_id else viewer_id
                 for viewer_id in model.viewer_ids]
-            # These will be set by the AddAllUserIdsOneOffJob.
-            model.all_user_ids = []
             migrated_models.append(model)
-        cls.put_multi(
-            migrated_models, update_last_updated_time=False)
+        cls.put_multi(migrated_models, update_last_updated_time=False)
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
@@ -343,14 +336,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
-
-    def compute_snapshot(self):
-        """Generates a snapshot (dict) from the model property values. Exclude
-        timestamp values and all_user_ids because we don't want to save it into
-        the history for now.
-        """
-        return self.to_dict(
-            exclude=['created_on', 'last_updated', 'all_user_ids'])
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given
@@ -446,6 +431,51 @@ class CollectionRightsModel(base_models.VersionedModel):
             'voiced_collection_ids': voiced_collection_ids,
             'viewable_collection_ids': viewable_collection_ids
         }
+
+
+class CollectionRightsAllUsersModel(base_models.BaseModel):
+    """Temporary storage model for all user ids ever mentioned in the collection
+    rights.
+
+    The id of each instance is the id of the corresponding collection.
+    """
+    # The user_ids of users who are (or were in history) members of owner_ids,
+    # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
+    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """CollectionRightsAllUsersModel are temporary model that will be
+        deleted after user migration.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether CollectionRightsAllUsersModel references the given
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.all_user_ids == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """CollectionRightsAllUsersModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
+        user_ids = [user_id for user_id in self.all_user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
 
 class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

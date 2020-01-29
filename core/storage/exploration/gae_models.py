@@ -246,10 +246,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
-    # The user_ids of users who are (or were in history) members of owner_ids,
-    # editor_ids, voice_artist_ids or viewer_ids.
-    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
-
     # Whether this exploration is owned by the community.
     community_owned = ndb.BooleanProperty(indexed=True, default=False)
     # The exploration id which this exploration was cloned from. If None, this
@@ -329,8 +325,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 cls.owner_ids == user_id,
                 cls.editor_ids == user_id,
                 cls.voice_artist_ids == user_id,
-                cls.viewer_ids == user_id,
-                cls.all_user_ids == user_id
+                cls.viewer_ids == user_id
             )).get(keys_only=True) is not None
             or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
@@ -365,8 +360,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
             model.viewer_ids = [
                 new_user_id if viewer_id == old_user_id else viewer_id
                 for viewer_id in model.viewer_ids]
-            # These will be set by the AddAllUserIdsOneOffJob.
-            model.all_user_ids = []
             migrated_models.append(model)
         cls.put_multi(migrated_models, update_last_updated_time=False)
 
@@ -381,14 +374,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
-
-    def compute_snapshot(self):
-        """Generates a snapshot (dict) from the model property values. Exclude
-        timestamp values and all_user_ids because we don't want to save it into
-        the history for now.
-        """
-        return self.to_dict(
-            exclude=['created_on', 'last_updated', 'all_user_ids'])
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -490,6 +475,51 @@ class ExplorationRightsModel(base_models.VersionedModel):
             'voiced_exploration_ids': voiced_exploration_ids,
             'viewable_exploration_ids': viewable_exploration_ids
         }
+
+
+class ExplorationRightsAllUsersModel(base_models.BaseModel):
+    """Temporary storage model for all user ids ever mentioned in the
+    exploration rights.
+
+    The id of each instance is the id of the corresponding exploration.
+    """
+    # The user_ids of users who are (or were in history) members of owner_ids,
+    # editor_ids, voice_artist_ids or viewer_ids in corresponding rights model.
+    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """ExplorationRightsAllUsersModel are temporary model that will be
+        deleted after user migration.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether ExplorationRightsAllUsersModel references the given
+        user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.query(
+            cls.all_user_ids == user_id).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ExplorationRightsAllUsersModel has multiple fields with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for all the ids in all_user_ids."""
+        user_ids = [user_id for user_id in self.all_user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
 
 class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
