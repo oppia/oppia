@@ -1775,7 +1775,7 @@ class ExplorationModelValidator(BaseModelValidator):
                 if len(button_text['value']) > 50:
                     cls.errors['button_text_validation'].append((
                         'Exploration id: %s : State: %s') % (
-                        item.id, state_name))
+                            item.id, state_name))
 
     @classmethod
     def _get_custom_validation_functions(cls):
