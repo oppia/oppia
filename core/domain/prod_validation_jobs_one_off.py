@@ -1761,6 +1761,12 @@ class ExplorationModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_button_text_length(cls, item):
+        """Validate that text length in Continue interaction
+        is not more than 50
+
+        Args:
+            item: ndb.Model. ExplorationModel to validate.
+        """
         for state_name, state in item.states.items():
             interaction = state['interaction']
             if interaction['id'] == 'Continue':
@@ -1768,7 +1774,7 @@ class ExplorationModelValidator(BaseModelValidator):
                 button_text = customization_args['buttonText']
                 if len(button_text['value']) > 50:
                     cls.errors['button_text_validation'].append((
-                    'Exploration id: %s : State: %s') % (
+                        'Exploration id: %s : State: %s') % (
                         item.id, state_name))
 
     @classmethod
