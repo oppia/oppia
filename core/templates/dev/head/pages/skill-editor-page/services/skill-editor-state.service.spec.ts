@@ -31,13 +31,13 @@ import { QuestionSummaryForOneSkillObjectFactory } from
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+'domain/exploration/RecordedVoiceoversObjectFactory';
 import { SkillRightsObjectFactory } from
-  'domain/skill/SkillRightsObjectFactory';
+'domain/skill/SkillRightsObjectFactory';
 import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
+'domain/exploration/SubtitledHtmlObjectFactory';
 import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+'domain/exploration/VoiceoverObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 import { SkillObjectFactory } from 

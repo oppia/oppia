@@ -1,3 +1,5 @@
+import { Injectable } from "@angular/core";
+
 // Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +17,10 @@
 /**
  * @fileoverview Service to handle the updating of a skill.
  */
-
+import { SkillObjectFactory } from 
+  'domain/skill/SkillObjectFactory.ts'
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/skill-domain.constants.ajs.ts');
 
 angular.module('oppia').factory('SkillUpdateService', [
@@ -59,7 +61,7 @@ angular.module('oppia').factory('SkillUpdateService', [
     var _applyPropertyChange = function(
         skill, propertyName, newValue, oldValue, apply, reverse) {
       _applyChange(skill, CMD_UPDATE_SKILL_PROPERTY, {
-        property_name: propertyName,
+        property_name: propertyName,UndoRedoService,
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
       }, apply, reverse);

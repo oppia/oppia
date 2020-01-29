@@ -41,14 +41,14 @@ export class Skill {
   _nextMisconceptionId:number;
   _supersedingSkillId:string;
   _allQuestionsMerged:boolean;
-  _prerequisiteSkillIds:string[];
+  _prerequisiteSkillIds:number[];
   SKILL_DIFFICULTIES = predConsts.SKILL_DIFFICULTIES
 
 
   constructor(id:number, description:string, misconceptions:Misconception[],
     rubrics:Rubric[], conceptCard:ConceptCard, languageCode:string,
     version:number, nextMisconceptionId:number, supersedingSkillId:string, 
-    allQuestionsMerged:boolean, prerequisiteSkillIds:string[] ) {
+    allQuestionsMerged:boolean, prerequisiteSkillIds:number[] ) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
     this._conceptCard = conceptCard;
@@ -74,7 +74,7 @@ export class Skill {
     return this._description;
   };
 
-  getPrerequisiteSkillIds():string[] {
+  getPrerequisiteSkillIds():number[] {
     return this._prerequisiteSkillIds.slice();
   };
 
@@ -82,13 +82,18 @@ export class Skill {
     this._prerequisiteSkillIds.push(skillId);
   };
 
-  // deletePrerequisiteSkill(skillId : number):void {
-  //   for (var idx in this._prerequisiteSkillIds) {
-  //     if (this._prerequisiteSkillIds[idx] === skillId) {
-  //       this._prerequisiteSkillIds.splice(idx, 1);
-  //     }
-  //   }
-  // };
+  deletePrerequisiteSkill(skillId : number):void {
+    // for (var idx in this._prerequisiteSkillIds) {
+    //   if (this._prerequisiteSkillIds[idx] === skillId) {
+    //     this._prerequisiteSkillIds.splice(idx, 1);
+    //   }
+    // }
+    this._prerequisiteSkillIds.forEach((preReq:number,index)=>{
+     if(preReq === skillId){
+       this._prerequisiteSkillIds.splice(index,1)
+     }
+    });
+  };
 
   getConceptCard():ConceptCard {
     return this._conceptCard;
@@ -132,22 +137,17 @@ export class Skill {
     return this._allQuestionsMerged;
   };
 
-  findMisconceptionById(id:number) {
-    for (var idx in this._misconceptions) {
-      if (this._misconceptions[idx].getId() === id) {
-        return this._misconceptions[idx];
+  findMisconceptionById(id:number):Misconception {
+    this._misconceptions.forEach((mis,index)=>{
+       if(mis.getId() == id){
+        return mis[index]
       }
-    }
-    throw new Error(
-      'Could not find misconception with ID: ' + id);
+    });
+    // throw new Error(
+    //   'Could not find misconception with ID: ' + id);
   };
 
   deleteMisconception(id:number){
-    // for (var idx in this._misconceptions) {
-    //   if (this._misconceptions[idx].getId() === id) {
-    //      this._misconceptions.splice(idx, 1);
-    //   }
-    // }
     this._misconceptions.forEach((misc:Misconception)=>{
       if(misc.getId() === id){
         this._misconceptions.splice(this._misconceptions.indexOf(misc),1)
