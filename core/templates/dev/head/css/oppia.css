@@ -4376,8 +4376,9 @@ div.oppia-issues-learner-action {
   color: #fff;
   cursor: pointer;
   font-size: 24px;
+  height: 150px;
   outline: none;
-  padding: 20px 20px;
+  padding: 20px 15px;
   text-align: center;
 }
 
@@ -4397,7 +4398,7 @@ div.oppia-issues-learner-action {
   color: white;
   font-size: 20px;
   font-weight: bold;
-  height: 70px;
+  height: 90px;
   margin: 15px 0;
   position: relative;
   transform: scale(0.5);
