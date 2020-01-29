@@ -33,33 +33,31 @@ describe('User Email Preferences Service', function() {
     }
   };
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
   beforeEach(function() {
+    angular.mock.module('oppia');
+
     angular.mock.module(function($provide) {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
+      var ugs = new UpgradedServices();
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+        $provide.value(key, value);
+      }
+    });
+
+    angular.mock.inject(function($injector, $q) {
+      UserEmailPreferencesService = $injector
+        .get('UserEmailPreferencesService');
+      CsrfService = $injector.get('CsrfTokenService');
+
+      spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+        var deferred = $q.defer();
+        deferred.resolve('sample-csrf-token');
+        return deferred.promise;
+      });
     });
   });
-
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    UserEmailPreferencesService = $injector.get('UserEmailPreferencesService');
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
-    });
-  }));
 
   it('should successfully intialise the service', function() {
     expect(UserEmailPreferencesService.feedbackNotificationsMuted)
