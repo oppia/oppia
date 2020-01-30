@@ -49,6 +49,9 @@ FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
+RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
+RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
+HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 
 
 def is_windows_os():
@@ -194,11 +197,15 @@ def get_current_release_version_number(release_branch_name):
     Returns:
         str. The version of release.
     """
-    release_match = re.match(r'release-(\d+\.\d+\.\d+)$', release_branch_name)
+    release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
+    release_maintenance_match = re.match(
+        RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name)
     hotfix_match = re.match(
-        r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$', release_branch_name)
+        HOTFIX_BRANCH_REGEX, release_branch_name)
     if release_match:
         return release_match.group(1)
+    elif release_maintenance_match:
+        return release_maintenance_match.group(1)
     elif hotfix_match:
         return hotfix_match.group(1)
     else:
@@ -212,10 +219,12 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    return (
-        bool(re.match(r'release-\d+\.\d+\.\d+$', current_branch_name)) or bool(
-            re.match(
-                r'release-\d+\.\d+\.\d+-hotfix-[1-9]+$', current_branch_name)))
+    release_match = bool(re.match(RELEASE_BRANCH_REGEX, current_branch_name))
+    release_maintenance_match = bool(
+        re.match(RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
+    hotfix_match = bool(
+        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+    return release_match or release_maintenance_match or hotfix_match
 
 
 def verify_current_branch_name(expected_branch_name):
