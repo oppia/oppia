@@ -39,28 +39,10 @@ def get_models_which_should_be_exported():
         list(ndb.Model). List of models whose data should be
         exported.
     """
-    return [
-        collection_models.CollectionRightsModel,
-        email_models.GeneralFeedbackEmailReplyToIdModel,
-        exploration_models.ExplorationRightsModel,
-        feedback_models.GeneralFeedbackMessageModel,
-        feedback_models.GeneralFeedbackThreadModel,
-        feedback_models.GeneralFeedbackThreadUserModel,
-        suggestion_models.GeneralSuggestionModel,
-        topic_models.TopicRightsModel,
-        user_models.CollectionProgressModel,
-        user_models.CompletedActivitiesModel,
-        user_models.ExpUserLastPlaythroughModel,
-        user_models.ExplorationUserDataModel,
-        user_models.IncompleteActivitiesModel,
-        user_models.LearnerPlaylistModel,
-        user_models.StoryProgressModel,
-        user_models.UserContributionsModel,
-        user_models.UserSettingsModel,
-        user_models.UserSkillMasteryModel,
-        user_models.UserStatsModel,
-        user_models.UserSubscriptionsModel
-    ]
+    return [model_class for model_class in
+            models.Registry.get_all_storage_model_classes()
+            if model_class.get_export_policy() !=
+            base_models.EXPORT_POLICY.CONTAINS_USER_DATA]
 
 
 def export_data_for_user(user_id):
