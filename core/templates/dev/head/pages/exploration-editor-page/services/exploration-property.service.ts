@@ -41,7 +41,7 @@ angular.module('oppia').factory('ExplorationPropertyService', [
     return {
       init: function(value) {
         if (this.propertyName === null) {
-          throw 'Exploration property name cannot be null.';
+          throw new Error('Exploration property name cannot be null.');
         }
 
         $log.info('Initializing exploration ' + this.propertyName + ':', value);
@@ -79,7 +79,7 @@ angular.module('oppia').factory('ExplorationPropertyService', [
       // change list, and updates the memento to the displayed value.
       saveDisplayedValue: function() {
         if (this.propertyName === null) {
-          throw 'Exploration property name cannot be null.';
+          throw new Error('Exploration property name cannot be null.');
         }
 
         this.displayed = this._normalize(this.displayed);
