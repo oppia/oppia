@@ -57,13 +57,6 @@ angular.module('oppia').directive('collectionSummaryTile', [
             ACTIVITY_TYPE_COLLECTION, COLLECTION_VIEWER_URL,
             COLLECTION_EDITOR_URL) {
           var ctrl = this;
-          ctrl.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          });
-          ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
-          ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;
-
           ctrl.getLastUpdatedDatetime = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               ctrl.getLastUpdatedMsec());
@@ -91,6 +84,14 @@ angular.module('oppia').directive('collectionSummaryTile', [
 
           ctrl.setHoverState = function(hoverState) {
             ctrl.collectionIsCurrentlyHoveredOver = hoverState;
+          };
+          ctrl.$onInit = function() {
+            ctrl.userIsLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            });
+            ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
+            ctrl.ACTIVITY_TYPE_COLLECTION = ACTIVITY_TYPE_COLLECTION;
           };
         }
       ]

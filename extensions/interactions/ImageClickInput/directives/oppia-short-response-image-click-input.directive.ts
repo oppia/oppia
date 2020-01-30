@@ -36,10 +36,12 @@ angular.module('oppia').directive('oppiaShortResponseImageClickInput', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.clickRegionLabel = (
-          _answer.clickedRegions.length > 0 ? _answer.clickedRegions[0] :
-          'Clicked on image');
+        ctrl.$onInit = function() {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.clickRegionLabel = (
+            _answer.clickedRegions.length > 0 ? _answer.clickedRegions[0] :
+            'Clicked on image');
+        };
       }]
     };
   }

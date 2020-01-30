@@ -44,18 +44,6 @@ angular.module('oppia').directive('hintEditor', [
         '$scope', 'EditabilityService', 'StateHintsService',
         function($scope, EditabilityService, StateHintsService) {
           var ctrl = this;
-          ctrl.isEditable = EditabilityService.isEditable();
-          ctrl.StateHintsService = StateHintsService;
-          ctrl.editHintForm = {};
-          ctrl.hintEditorIsOpen = false;
-
-          ctrl.HINT_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
-          ctrl.hintMemento = null;
-
           ctrl.openHintEditor = function() {
             if (ctrl.isEditable) {
               ctrl.hintMemento = angular.copy(ctrl.hint);
@@ -84,12 +72,25 @@ angular.module('oppia').directive('hintEditor', [
             ctrl.hintEditorIsOpen = false;
           };
 
-          $scope.$on('externalSave', function() {
-            if (ctrl.hintEditorIsOpen &&
-                ctrl.editHintForm.$valid) {
-              ctrl.saveThisHint();
-            }
-          });
+          ctrl.$onInit = function() {
+            $scope.$on('externalSave', function() {
+              if (ctrl.hintEditorIsOpen &&
+                  ctrl.editHintForm.$valid) {
+                ctrl.saveThisHint();
+              }
+            });
+            ctrl.isEditable = EditabilityService.isEditable();
+            ctrl.StateHintsService = StateHintsService;
+            ctrl.editHintForm = {};
+            ctrl.hintEditorIsOpen = false;
+
+            ctrl.HINT_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
+
+            ctrl.hintMemento = null;
+          };
         }
       ]
     };

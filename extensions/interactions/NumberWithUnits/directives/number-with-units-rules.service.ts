@@ -18,8 +18,8 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-// TODO(#7403): Convert this to partial imports.
-import math from 'mathjs';
+
+import { unit } from 'mathjs';
 
 import { NumberWithUnitsObjectFactory } from
   'domain/objects/NumberWithUnitsObjectFactory';
@@ -65,7 +65,7 @@ export class NumberWithUnitsRulesService {
     }
     var answerString = answer.toMathjsCompatibleString();
     var inputsString = inputs.toMathjsCompatibleString();
-    return math.unit(answerString).equals(math.unit(inputsString));
+    return unit(answerString).equals(unit(inputsString));
   }
 }
 

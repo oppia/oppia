@@ -39,12 +39,14 @@ angular.module('oppia').directive('oppiaResponseCodeRepl', [
         '$attrs', 'FocusManagerService',
         function($attrs, FocusManagerService) {
           var ctrl = this;
-          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.$onInit = function() {
+            ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
 
-          if (ctrl.answer.error) {
-            ctrl.errorFocusLabel = FocusManagerService.generateFocusLabel();
-            FocusManagerService.setFocus(ctrl.errorFocusLabel);
-          }
+            if (ctrl.answer.error) {
+              ctrl.errorFocusLabel = FocusManagerService.generateFocusLabel();
+              FocusManagerService.setFocus(ctrl.errorFocusLabel);
+            }
+          };
         }
       ]
     };

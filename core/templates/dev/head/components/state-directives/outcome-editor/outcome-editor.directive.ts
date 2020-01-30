@@ -58,19 +58,9 @@ angular.module('oppia').directive('outcomeEditor', [
             $scope, StateEditorService, StateInteractionIdService,
             ENABLE_PREREQUISITE_SKILLS, INTERACTION_SPECS) {
           var ctrl = this;
-          ctrl.editOutcomeForm = {};
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
           };
-          ctrl.canAddPrerequisiteSkill = (
-            ENABLE_PREREQUISITE_SKILLS &&
-            StateEditorService.isExplorationWhitelisted());
-          ctrl.feedbackEditorIsOpen = false;
-          ctrl.destinationEditorIsOpen = false;
-          ctrl.correctnessLabelEditorIsOpen = false;
-          // TODO(sll): Investigate whether this line can be removed, due to
-          // ctrl.savedOutcome now being set in onExternalSave().
-          ctrl.savedOutcome = angular.copy(ctrl.outcome);
 
           ctrl.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;
@@ -114,14 +104,6 @@ angular.module('oppia').directive('outcomeEditor', [
               }
             }
           };
-
-          $scope.$on('externalSave', function() {
-            onExternalSave();
-          });
-
-          $scope.$on('onInteractionIdChanged', function() {
-            onExternalSave();
-          });
 
           ctrl.isSelfLoop = function(outcome) {
             return (
@@ -224,6 +206,26 @@ angular.module('oppia').directive('outcomeEditor', [
             ctrl.outcome.missingPrerequisiteSkillId =
               ctrl.savedOutcome.missingPrerequisiteSkillId;
             ctrl.destinationEditorIsOpen = false;
+          };
+
+          ctrl.$onInit = function() {
+            $scope.$on('externalSave', function() {
+              onExternalSave();
+            });
+
+            $scope.$on('onInteractionIdChanged', function() {
+              onExternalSave();
+            });
+            ctrl.editOutcomeForm = {};
+            ctrl.canAddPrerequisiteSkill = (
+              ENABLE_PREREQUISITE_SKILLS &&
+              StateEditorService.isExplorationWhitelisted());
+            ctrl.feedbackEditorIsOpen = false;
+            ctrl.destinationEditorIsOpen = false;
+            ctrl.correctnessLabelEditorIsOpen = false;
+            // TODO(sll): Investigate whether this line can be removed, due to
+            // ctrl.savedOutcome now being set in onExternalSave().
+            ctrl.savedOutcome = angular.copy(ctrl.outcome);
           };
         }
       ]

@@ -48,7 +48,9 @@ angular.module('oppia').directive('skillEditorMainTab', [
       controller: [
         '$scope', 'SkillEditorStateService',
         function($scope, SkillEditorStateService) {
-          $scope.hasLoadedSkill = SkillEditorStateService.hasLoadedSkill;
+          $scope.hasLoadedSkill = function() {
+            return SkillEditorStateService.hasLoadedSkill();
+          };
         }
       ]
     };

@@ -90,16 +90,7 @@ angular.module('oppia').directive('stateSolutionEditor', [
             EditabilityService,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION,
             INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION) {
-          $scope.EditabilityService = EditabilityService;
-          $scope.correctAnswer = null;
-          $scope.correctAnswerEditorHtml = '';
-          $scope.inlineSolutionEditorIsActive = false;
-          $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
-            'currentCorrectAnswerEditorHtmlForSolutionEditor');
-          $scope.StateHintsService = StateHintsService;
-          $scope.StateInteractionIdService = StateInteractionIdService;
-          $scope.StateSolutionService = StateSolutionService;
-
+          var ctrl = this;
           $scope.getInvalidSolutionTooltip = function() {
             if (StateEditorService.isInQuestionMode()) {
               return 'This solution doesn\'t correspond to an answer ' +
@@ -258,6 +249,10 @@ angular.module('oppia').directive('stateSolutionEditor', [
                     INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION, 4000);
                 }
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -288,10 +283,24 @@ angular.module('oppia').directive('stateSolutionEditor', [
               StateSolutionService.saveDisplayedValue();
               $scope.onSaveSolution(StateSolutionService.displayed);
               StateEditorService.deleteCurrentSolutionValidity();
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
-
-          StateEditorService.updateStateSolutionEditorInitialised();
+          ctrl.$onInit = function() {
+            $scope.EditabilityService = EditabilityService;
+            $scope.correctAnswer = null;
+            $scope.correctAnswerEditorHtml = '';
+            $scope.inlineSolutionEditorIsActive = false;
+            $scope.SOLUTION_EDITOR_FOCUS_LABEL = (
+              'currentCorrectAnswerEditorHtmlForSolutionEditor');
+            $scope.StateHintsService = StateHintsService;
+            $scope.StateInteractionIdService = StateInteractionIdService;
+            $scope.StateSolutionService = StateSolutionService;
+            StateEditorService.updateStateSolutionEditorInitialised();
+          };
         }
       ]
     };

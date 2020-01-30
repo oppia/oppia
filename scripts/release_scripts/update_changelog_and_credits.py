@@ -464,6 +464,13 @@ def main():
 
     personal_access_token = common.get_personal_access_token()
 
+    g = github.Github(personal_access_token)
+    repo = g.get_organization('oppia').get_repo('oppia')
+    repo_fork = g.get_repo('%s/oppia' % github_username)
+
+    common.check_blocking_bug_issue_count(repo)
+    common.check_prs_for_current_release_are_released(repo)
+
     python_utils.PRINT('Generating release summary...')
     generate_release_info.main(personal_access_token)
 
@@ -471,9 +478,6 @@ def main():
         raise Exception(
             'Release summary file %s is missing. Please re-run '
             'this script.' % release_constants.RELEASE_SUMMARY_FILEPATH)
-
-    g = github.Github(personal_access_token)
-    repo_fork = g.get_repo('%s/oppia' % github_username)
 
     current_release_version_number = common.get_current_release_version_number(
         branch_name)
@@ -489,25 +493,35 @@ def main():
             release_constants.RELEASE_SUMMARY_FILEPATH))
 
     common.ask_user_to_confirm(
-        'Check emails and names for authors and contributors and '
-        'verify that the emails are '
+        'Check emails and names for new authors and new contributors in the '
+        'file: %s and verify that the emails are '
         'correct through welcome emails sent from welcome@oppia.org '
-        '(confirm with Sean in case of doubt).')
+        '(confirm with Sean in case of doubt).' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.open_new_tab_in_browser_if_possible(
         release_constants.CREDITS_FORM_URL)
     common.ask_user_to_confirm(
         'Check the credits form and add any additional contributors '
-        'to the contributor list in release summary file.')
+        'to the contributor list in the file: %s.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
         'Categorize the PR titles in the Uncategorized section of the '
-        'changelog, and arrange the changelog to have user-facing '
-        'categories on top.')
+        'changelog in the file: %s, and arrange the changelog '
+        'to have user-facing categories on top.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
-        'Verify each item is in the correct section and remove '
-        'trivial changes like "Fix lint errors" from the changelog.')
+        'Verify each item is in the correct section in the '
+        'file: %s and remove trivial changes like "Fix lint errors" '
+        'from the changelog.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
     common.ask_user_to_confirm(
-        'Ensure that all items in changelog start with a '
-        'verb in simple present tense.')
+        'Ensure that all items in changelog in the file: %s '
+        'start with a verb in simple present tense.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
+    common.ask_user_to_confirm(
+        'Please save the file: %s with all the changes that '
+        'you have made.' % (
+            release_constants.RELEASE_SUMMARY_FILEPATH))
 
     release_summary_lines = []
     with python_utils.open_file(

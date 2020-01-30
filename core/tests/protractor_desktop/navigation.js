@@ -217,7 +217,14 @@ describe('Static Pages Tour', function() {
   it('shows the error page when an incorrect url is given', function() {
     browser.get('/splashes');
     waitFor.pageToFullyLoad();
-    expect(element(
-      by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+
+    browser.getCurrentUrl().then(function(url) {
+      expect(element(
+        by.css('.protractor-test-error-page')).isPresent()).toBe(true);
+    }, function() {
+      // Note to developers:
+      // Promise is returned by getCurrentUrl which is handled here.
+      // No further action is needed.
+    });
   });
 });

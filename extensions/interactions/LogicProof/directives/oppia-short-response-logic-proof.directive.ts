@@ -34,7 +34,9 @@ angular.module('oppia').directive('oppiaShortResponseLogicProof', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        ctrl.$onInit = function() {
+          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        };
       }]
     };
   }

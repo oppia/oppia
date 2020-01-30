@@ -52,19 +52,12 @@ angular.module('oppia').directive('editorNavigation', [
             ExplorationWarningsService, ImprovementTaskService, RouterService,
             SiteAnalyticsService, StateTutorialFirstTimeService,
             ThreadDataService, UserService, WindowDimensionsService) {
+          var ctrl = this;
           var taskCount = 0;
-          ImprovementTaskService.fetchOpenTaskCount().then(countOfOpenTasks => {
-            taskCount = countOfOpenTasks;
-          });
-
           $scope.getOpenTaskCount = function() {
             return taskCount;
           };
 
-          $scope.popoverControlObject = {
-            postTutorialHelpPopoverIsShown: false
-          };
-          $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
           $scope.isImprovementsTabEnabled = function() {
             return ExplorationFeaturesService.isInitialized() &&
               ExplorationFeaturesService.isImprovementsTabEnabled();
@@ -73,24 +66,6 @@ angular.module('oppia').directive('editorNavigation', [
             return ExplorationFeaturesService.isInitialized() &&
               !ExplorationFeaturesService.isImprovementsTabEnabled();
           };
-
-          $scope.$on('openPostTutorialHelpPopover', function() {
-            if ($scope.isLargeScreen) {
-              $scope.popoverControlObject.postTutorialHelpPopoverIsShown = true;
-              $timeout(function() {
-                $scope.popoverControlObject
-                  .postTutorialHelpPopoverIsShown = false;
-              }, 4000);
-            } else {
-              $scope.popoverControlObject
-                .postTutorialHelpPopoverIsShown = false;
-            }
-          });
-
-          $scope.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
-          });
 
           $scope.showUserHelpModal = function() {
             var explorationId = ContextService.getExplorationId();
@@ -142,30 +117,86 @@ angular.module('oppia').directive('editorNavigation', [
                 $rootScope.$broadcast('openTranslationTutorial');
               }
             }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
-          $scope.countWarnings = ExplorationWarningsService.countWarnings;
-          $scope.getWarnings = ExplorationWarningsService.getWarnings;
-          $scope.hasCriticalWarnings = (
-            ExplorationWarningsService.hasCriticalWarnings);
+          $scope.countWarnings = function() {
+            return ExplorationWarningsService.countWarnings();
+          };
+          $scope.getWarnings = function() {
+            return ExplorationWarningsService.getWarnings();
+          };
+          $scope.hasCriticalWarnings = function() {
+            return ExplorationWarningsService.hasCriticalWarnings;
+          };
 
-          $scope.ExplorationRightsService = ExplorationRightsService;
-          $scope.getActiveTabName = RouterService.getActiveTabName;
-          $scope.selectMainTab = RouterService.navigateToMainTab;
-          $scope.selectTranslationTab = RouterService.navigateToTranslationTab;
-          $scope.selectPreviewTab = RouterService.navigateToPreviewTab;
-          $scope.selectSettingsTab = RouterService.navigateToSettingsTab;
-          $scope.selectStatsTab = RouterService.navigateToStatsTab;
-          $scope.selectImprovementsTab =
-            RouterService.navigateToImprovementsTab;
-          $scope.selectHistoryTab = RouterService.navigateToHistoryTab;
-          $scope.selectFeedbackTab = RouterService.navigateToFeedbackTab;
-          $scope.getOpenThreadsCount = ThreadDataService.getOpenThreadsCount;
+          $scope.getActiveTabName = function() {
+            return RouterService.getActiveTabName();
+          };
+          $scope.selectMainTab = function() {
+            RouterService.navigateToMainTab();
+          };
+          $scope.selectTranslationTab = function() {
+            RouterService.navigateToTranslationTab();
+          };
+          $scope.selectPreviewTab = function() {
+            RouterService.navigateToPreviewTab();
+          };
+          $scope.selectSettingsTab = function() {
+            RouterService.navigateToSettingsTab();
+          };
+          $scope.selectStatsTab = function() {
+            RouterService.navigateToStatsTab();
+          };
+          $scope.selectImprovementsTab = function() {
+            RouterService.navigateToImprovementsTab();
+          };
+          $scope.selectHistoryTab = function() {
+            RouterService.navigateToHistoryTab();
+          };
+          $scope.selectFeedbackTab = function() {
+            RouterService.navigateToFeedbackTab();
+          };
+          $scope.getOpenThreadsCount = function() {
+            return ThreadDataService.getOpenThreadsCount();
+          };
 
-          WindowDimensionsService.registerOnResizeHook(function() {
+          ctrl.$onInit = function() {
+            ImprovementTaskService.fetchOpenTaskCount().then(
+              countOfOpenTasks => {
+                taskCount = countOfOpenTasks;
+              });
+            $scope.popoverControlObject = {
+              postTutorialHelpPopoverIsShown: false
+            };
             $scope.isLargeScreen = (WindowDimensionsService.getWidth() >= 1024);
-          });
+            $scope.$on('openPostTutorialHelpPopover', function() {
+              if ($scope.isLargeScreen) {
+                $scope.popoverControlObject.postTutorialHelpPopoverIsShown = (
+                  true);
+                $timeout(function() {
+                  $scope.popoverControlObject
+                    .postTutorialHelpPopoverIsShown = false;
+                }, 4000);
+              } else {
+                $scope.popoverControlObject
+                  .postTutorialHelpPopoverIsShown = false;
+              }
+            });
+
+            $scope.userIsLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            });
+            $scope.ExplorationRightsService = ExplorationRightsService;
+            WindowDimensionsService.registerOnResizeHook(function() {
+              $scope.isLargeScreen = (
+                WindowDimensionsService.getWidth() >= 1024);
+            });
+          };
         }
       ]
     };

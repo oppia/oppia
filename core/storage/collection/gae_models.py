@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Model for an Oppia collection."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -272,8 +273,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether CollectionRightsModel or its snapshots references the
-        given user.
+        """Check whether CollectionRightsModel references the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -281,21 +281,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        more_results = True
-        cursor = None
-        while more_results:
-            snapshot_content_models, cursor, more_results = (
-                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
-                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
-            for snapshot_content_model in snapshot_content_models:
-                reconstituted_model = cls(
-                    **CollectionRightsModel.transform_dict_to_valid(
-                        snapshot_content_model.content))
-                if any((user_id in reconstituted_model.owner_ids,
-                        user_id in reconstituted_model.editor_ids,
-                        user_id in reconstituted_model.voice_artist_ids,
-                        user_id in reconstituted_model.viewer_ids)):
-                    return True
         return (
             cls.query(ndb.OR(
                 cls.owner_ids == user_id,
@@ -347,7 +332,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
                     self.viewer_ids)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
@@ -713,7 +698,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         user_ids = (self.owner_ids + self.editor_ids + self.viewer_ids +
                     self.contributor_ids)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)

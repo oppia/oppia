@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Job registries."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -42,6 +43,7 @@ import python_utils
 # on the admin dashboard.
 ONE_OFF_JOB_MANAGERS = [
     activity_jobs_one_off.IndexAllActivitiesJobManager,
+    activity_jobs_one_off.ReplaceAdminIdOneOffJob,
     collection_jobs_one_off.CollectionMigrationOneOffJob,
     email_jobs_one_off.EmailHashRegenerationOneOffJob,
     exp_jobs_one_off.ExpSummariesContributorsOneOffJob,
@@ -57,6 +59,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
     feedback_jobs_one_off.FeedbackThreadCacheOneOffJob,
+    feedback_jobs_one_off.GeneralFeedbackThreadUserOneOffJob,
     opportunity_jobs_one_off.ExplorationOpportunitySummaryModelRegenerationJob,
     opportunity_jobs_one_off.SkillOpportunityModelRegenerationJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
@@ -73,6 +76,7 @@ ONE_OFF_JOB_MANAGERS = [
     story_jobs_one_off.StoryMigrationOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
     user_id_migration.GaeIdNotInModelsVerificationJob,
+    user_id_migration.ModelsUserIdsHaveUserSettingsExplorationsVerificationJob,
     user_id_migration.ModelsUserIdsHaveUserSettingsVerificationJob,
     user_id_migration.SnapshotsUserIdMigrationJob,
     user_id_migration.UserIdMigrationJob,

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Common utility functions and classes used by multiple Python scripts."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -30,7 +31,7 @@ import release_constants
 NODE_VERSION = '10.18.0'
 
 # NB: Please ensure that the version is consistent with the version in .yarnrc.
-YARN_VERSION = 'v1.21.1'
+YARN_VERSION = '1.21.1'
 
 COVERAGE_VERSION = '4.5.4'
 
@@ -48,6 +49,9 @@ FRONTEND_DIR = os.path.join(CURR_DIR, 'core', 'templates', 'dev', 'head')
 YARN_PATH = os.path.join(OPPIA_TOOLS_DIR, 'yarn-%s' % YARN_VERSION)
 OS_NAME = platform.system()
 ARCHITECTURE = platform.machine()
+RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
+RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
+HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
 
 
 def is_windows_os():
@@ -193,11 +197,15 @@ def get_current_release_version_number(release_branch_name):
     Returns:
         str. The version of release.
     """
-    release_match = re.match(r'release-(\d+\.\d+\.\d+)$', release_branch_name)
+    release_match = re.match(RELEASE_BRANCH_REGEX, release_branch_name)
+    release_maintenance_match = re.match(
+        RELEASE_MAINTENANCE_BRANCH_REGEX, release_branch_name)
     hotfix_match = re.match(
-        r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$', release_branch_name)
+        HOTFIX_BRANCH_REGEX, release_branch_name)
     if release_match:
         return release_match.group(1)
+    elif release_maintenance_match:
+        return release_maintenance_match.group(1)
     elif hotfix_match:
         return hotfix_match.group(1)
     else:
@@ -211,10 +219,12 @@ def is_current_branch_a_release_branch():
         bool. Whether the current branch is a release branch.
     """
     current_branch_name = get_current_branch_name()
-    return (
-        bool(re.match(r'release-\d+\.\d+\.\d+$', current_branch_name)) or bool(
-            re.match(
-                r'release-\d+\.\d+\.\d+-hotfix-[1-9]+$', current_branch_name)))
+    release_match = bool(re.match(RELEASE_BRANCH_REGEX, current_branch_name))
+    release_maintenance_match = bool(
+        re.match(RELEASE_MAINTENANCE_BRANCH_REGEX, current_branch_name))
+    hotfix_match = bool(
+        re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
+    return release_match or release_maintenance_match or hotfix_match
 
 
 def verify_current_branch_name(expected_branch_name):
@@ -435,6 +445,19 @@ def convert_to_posixpath(file_path):
     if not is_windows_os():
         return file_path
     return file_path.replace('\\', '/')
+
+
+def create_readme(dir_path, readme_content):
+    """Creates a readme in a given dir path with the specified
+    readme content.
+
+    Args:
+        dir_path: str. The path of the dir where the README is to
+            be created.
+        readme_content: str. The content to be written in the README.
+    """
+    with python_utils.open_file(os.path.join(dir_path, 'README.md'), 'w') as f:
+        f.write(readme_content)
 
 
 class CD(python_utils.OBJECT):

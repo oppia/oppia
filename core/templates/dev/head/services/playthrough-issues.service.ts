@@ -21,13 +21,16 @@ require('services/playthrough-issues-backend-api.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvement-modal.service.ts');
 
 angular.module('oppia').factory('PlaythroughIssuesService', [
-  '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',
+  'ImprovementModalService', 'PlaythroughIssuesBackendApiService',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   function(
-      $uibModal, PlaythroughIssuesBackendApiService, UrlInterpolationService,
+      ImprovementModalService, PlaythroughIssuesBackendApiService,
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var issues = null;
@@ -129,148 +132,7 @@ angular.module('oppia').factory('PlaythroughIssuesService', [
       },
       openPlaythroughModal: function(playthroughId, index) {
         this.getPlaythrough(playthroughId).then(function(playthrough) {
-          $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-editor-page/statistics-tab/templates/' +
-              'playthrough-modal.template.html'),
-            backdrop: true,
-            resolve: {
-              playthrough: function() {
-                return playthrough;
-              },
-              playthroughIndex: function() {
-                return index;
-              }
-            },
-            controller: [
-              '$scope', '$uibModalInstance', 'playthroughIndex',
-              'playthrough', 'AlertsService', 'LearnerActionRenderService',
-              function(
-                  $scope, $uibModalInstance, playthroughIndex,
-                  playthrough, AlertsService, LearnerActionRenderService) {
-                $scope.playthroughIndex = playthroughIndex;
-
-                $scope.displayBlocks =
-                  LearnerActionRenderService.getDisplayBlocks(
-                    playthrough.actions);
-                $scope.reversedDisplayBlocks =
-                  $scope.displayBlocks.slice().reverse();
-
-                var blockActionIndexMapping = {};
-                $scope.displayBlocks.reduce(
-                  function(runningTotal, displayBlock, i) {
-                    blockActionIndexMapping[i] =
-                      runningTotal - displayBlock.length;
-                    return blockActionIndexMapping[i];
-                  }, playthrough.actions.length + 1);
-
-                $scope.maxHidden = $scope.displayBlocks.length - 1;
-
-                $scope.getDisplayBlockIndex = function(displayBlock) {
-                  return $scope.displayBlocks.indexOf(displayBlock);
-                };
-
-                $scope.isDisplayBlockOnInitDisplay = function(block) {
-                  return $scope.getDisplayBlockIndex(block) === 0;
-                };
-
-                $scope.createDisplayBlockNavId = function(block) {
-                  return $scope.getDisplayBlockIndex(block) + 1;
-                };
-
-                $scope.renderBlockHtml = function(displayBlock) {
-                  var index = $scope.getDisplayBlockIndex(displayBlock);
-                  return LearnerActionRenderService.renderDisplayBlockHTML(
-                    displayBlock, blockActionIndexMapping[index]);
-                };
-
-                /**
-                 * Returns the index of the learner action wihtin the display
-                 * block.
-                 * @param {LearnerAction} learnerAction.
-                 * @param {LearnerAction[]} displayBlock.
-                 * @returns {int}
-                 */
-                $scope.getLearnerActionIndex = function(
-                    learnerAction, displayBlock) {
-                  return displayBlock.indexOf(learnerAction);
-                };
-
-                /**
-                 * Renders the HTML of the learner action. The index of the
-                 * learner action will be the sum of the starting action index
-                 * of the block (a block is a list of learner actions grouped
-                 * together for display) computed using the
-                 * blockActionIndexMapping field and the index of the learner
-                 * action within the block.
-                 * @param {LearnerAction} learnerAction.
-                 * @param {int} blockIndex - The index of the block among all
-                 *  the display blocks.
-                 * @param {int} actionIndex - The index of the learner action
-                 *  within it's display block.
-                 * @returns {string}
-                 */
-                $scope.renderLearnerAction = function(
-                    learnerAction, blockIndex, actionIndex) {
-                  return LearnerActionRenderService.renderLearnerAction(
-                    learnerAction, blockActionIndexMapping[blockIndex],
-                    actionIndex);
-                };
-
-                var getRemainingActionsElements = function(pIdx, i) {
-                  // We only expect one element to match the below statement and
-                  // thus, we take the first element.
-                  return <HTMLElement>(document.getElementsByClassName(
-                    'remaining-actions' + pIdx.toString() + i.toString())[0]);
-                };
-
-                /**
-                 * Shows the remaining display blocks and the arrow div. If
-                 * there is only one display block, the arrow div is not
-                 * shown at all. If the current shown display block is the
-                 * second last display block, the arrow div is hidden after
-                 * the final display block is shown. Else, the following
-                 * display block is displayed.
-                 */
-                $scope.showRemainingActions = function(pIdx) {
-                  // If there is only one display block left to be shown,
-                  // the arrow is not required.
-                  if ($scope.maxHidden === 1) {
-                    getRemainingActionsElements(pIdx, $scope.maxHidden)
-                      .style.display = 'block';
-                    document.getElementById('arrowDiv').style.display = 'none';
-                  } else {
-                    var currentShown = 0;
-                    var i;
-                    for (i = $scope.maxHidden; i > 0; i--) {
-                      if (getRemainingActionsElements(pIdx, i).style.display ===
-                          'block') {
-                        currentShown = i;
-                        break;
-                      }
-                    }
-                    if (currentShown === 0) {
-                      getRemainingActionsElements(pIdx, currentShown + 1)
-                        .style.display = 'block';
-                    } else if (currentShown === $scope.maxHidden - 1) {
-                      getRemainingActionsElements(pIdx, $scope.maxHidden)
-                        .style.display = 'block';
-                      document.getElementById('arrowDiv').style.display =
-                        'none';
-                    } else {
-                      getRemainingActionsElements(pIdx, currentShown + 1)
-                        .style.display = 'block';
-                    }
-                  }
-                };
-
-                $scope.cancel = function() {
-                  $uibModalInstance.dismiss('cancel');
-                  AlertsService.clearWarnings();
-                };
-              }
-            ]
-          });
+          ImprovementModalService.openPlaythroughModal(playthrough, index);
         });
       },
     };

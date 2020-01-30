@@ -123,38 +123,7 @@ angular.module('oppia').directive('audioTranslationBar', [
             TranslationLanguageService, TranslationStatusService,
             TranslationTabActiveContentIdService, VoiceoverRecordingService,
             RECORDING_TIME_LIMIT) {
-          $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
-          $scope.audioBlob = null;
-          $scope.voiceoverRecorder = null;
-          $scope.unsupportedBrowser = false;
-          $scope.selectedRecording = false;
-          $scope.isAudioAvailable = false;
-          $scope.audioIsUpdating = false;
-          $scope.languageCode = null;
-          $scope.cannotRecord = false;
-          $scope.audioNeedsUpdate = false;
-          $scope.canVoiceover = false;
-          $scope.showRecorderWarning = false;
-          $scope.audioLoadingIndicatorIsShown = false;
-          $scope.checkingMicrophonePermission = false;
-          $scope.audioTimerIsShown = true;
-          $scope.audioIsCurrentlyBeingSaved = false;
-          $scope.elapsedTime = 0;
-          $scope.timerInterval = null;
-          $scope.unsavedAudioIsPlaying = false;
-          $scope.waveSurfer = null;
-
-          document.body.onkeyup = function(e) {
-            if (e.code === 'KeyR' && !$scope.isAudioAvailable) {
-              // Used as shortcut key for recording
-              toggleStartAndStopRecording();
-            }
-          };
-
-          $scope.$on('$destroy', function() {
-            document.body.onkeyup = null;
-          });
-
+          var ctrl = this;
           var saveRecordedVoiceoversChanges = function() {
             StateRecordedVoiceoversService.saveDisplayedValue();
             var stateName = StateEditorService.getActiveStateName();
@@ -351,27 +320,6 @@ angular.module('oppia').directive('audioTranslationBar', [
             }
           };
 
-          $scope.$on('externalSave', function() {
-            if ($scope.voiceoverRecorder.status().isRecording) {
-              $scope.voiceoverRecorder.stopRecord();
-              $scope.voiceoverRecorder.closeRecorder();
-            }
-            AudioPlayerService.stop();
-            AudioPlayerService.clear();
-            $scope.audioBlob = null;
-          });
-
-          $scope.$on('activeContentIdChanged', function() {
-            $scope.initAudioBar();
-          });
-          $scope.$on('activeLanguageChanged', function() {
-            $scope.initAudioBar();
-          });
-
-          $scope.$on('showTranslationTabBusyModal', function() {
-            $scope.openTranslationTabBusyModal();
-          });
-
           $scope.openTranslationTabBusyModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -392,6 +340,10 @@ angular.module('oppia').directive('audioTranslationBar', [
                   };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -483,15 +435,6 @@ angular.module('oppia').directive('audioTranslationBar', [
             }
           };
 
-          $scope.track = {
-            progress: function(progressPercentage) {
-              if (angular.isDefined(progressPercentage)) {
-                AudioPlayerService.setProgress(progressPercentage / 100);
-              }
-              return AudioPlayerService.getProgress() * 100;
-            }
-          };
-
           $scope.openDeleteAudioTranslationModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -515,6 +458,10 @@ angular.module('oppia').directive('audioTranslationBar', [
                 $scope.contentId, $scope.languageCode);
               saveRecordedVoiceoversChanges();
               $scope.initAudioBar();
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -617,9 +564,75 @@ angular.module('oppia').directive('audioTranslationBar', [
                 result.fileSizeBytes);
               saveRecordedVoiceoversChanges();
               $scope.initAudioBar();
+            }, function() {
+              // Note to developers:
+              // Promise returned by uib-modal instance is handled here.
+              // No further action is needed.
             });
           };
-          $scope.initAudioBar();
+
+          ctrl.$onInit = function() {
+            $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
+            $scope.audioBlob = null;
+            $scope.voiceoverRecorder = null;
+            $scope.unsupportedBrowser = false;
+            $scope.selectedRecording = false;
+            $scope.isAudioAvailable = false;
+            $scope.audioIsUpdating = false;
+            $scope.languageCode = null;
+            $scope.cannotRecord = false;
+            $scope.audioNeedsUpdate = false;
+            $scope.canVoiceover = false;
+            $scope.showRecorderWarning = false;
+            $scope.audioLoadingIndicatorIsShown = false;
+            $scope.checkingMicrophonePermission = false;
+            $scope.audioTimerIsShown = true;
+            $scope.audioIsCurrentlyBeingSaved = false;
+            $scope.elapsedTime = 0;
+            $scope.timerInterval = null;
+            $scope.unsavedAudioIsPlaying = false;
+            $scope.waveSurfer = null;
+
+            document.body.onkeyup = function(e) {
+              if (e.code === 'KeyR' && !$scope.isAudioAvailable) {
+                // Used as shortcut key for recording
+                toggleStartAndStopRecording();
+              }
+            };
+
+            $scope.$on('$destroy', function() {
+              document.body.onkeyup = null;
+            });
+            $scope.$on('externalSave', function() {
+              if ($scope.voiceoverRecorder.status().isRecording) {
+                $scope.voiceoverRecorder.stopRecord();
+                $scope.voiceoverRecorder.closeRecorder();
+              }
+              AudioPlayerService.stop();
+              AudioPlayerService.clear();
+              $scope.audioBlob = null;
+            });
+
+            $scope.$on('activeContentIdChanged', function() {
+              $scope.initAudioBar();
+            });
+            $scope.$on('activeLanguageChanged', function() {
+              $scope.initAudioBar();
+            });
+
+            $scope.$on('showTranslationTabBusyModal', function() {
+              $scope.openTranslationTabBusyModal();
+            });
+            $scope.track = {
+              progress: function(progressPercentage) {
+                if (angular.isDefined(progressPercentage)) {
+                  AudioPlayerService.setProgress(progressPercentage / 100);
+                }
+                return AudioPlayerService.getProgress() * 100;
+              }
+            };
+            $scope.initAudioBar();
+          };
         }]
     };
   }]);

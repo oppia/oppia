@@ -36,21 +36,24 @@ angular.module('oppia').directive('selectSkill', [
         '$scope', '$uibModal', '$rootScope',
         function(
             $scope, $uibModal, $rootScope) {
-          $scope.sortedSkillSummaries = $scope.getSortedSkillSummaries();
-          $scope.skillSummariesInitial = [];
-          $scope.skillSummariesFinal = [];
-
-          for (var idx in $scope.sortedSkillSummaries) {
-            if (idx < $scope.getCountOfSkillsToPrioritize()) {
-              $scope.skillSummariesInitial.push(
-                $scope.sortedSkillSummaries[idx]);
-            } else {
-              $scope.skillSummariesFinal.push(
-                $scope.sortedSkillSummaries[idx]);
-            }
-          }
+          var ctrl = this;
           $scope.selectSkill = function(skillId) {
             $scope.selectedSkillId = skillId;
+          };
+          ctrl.$onInit = function() {
+            $scope.sortedSkillSummaries = $scope.getSortedSkillSummaries();
+            $scope.skillSummariesInitial = [];
+            $scope.skillSummariesFinal = [];
+
+            for (var idx in $scope.sortedSkillSummaries) {
+              if (idx < $scope.getCountOfSkillsToPrioritize()) {
+                $scope.skillSummariesInitial.push(
+                  $scope.sortedSkillSummaries[idx]);
+              } else {
+                $scope.skillSummariesFinal.push(
+                  $scope.sortedSkillSummaries[idx]);
+              }
+            }
           };
         }
       ]

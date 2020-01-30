@@ -44,14 +44,6 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
             $attrs, FocusManagerService, NumericInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
           var ctrl = this;
-          ctrl.answer = '';
-          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
-
-          ctrl.NUMERIC_INPUT_FORM_SCHEMA = {
-            type: 'float',
-            ui_config: {}
-          };
-
           var isAnswerValid = function() {
             return (
               ctrl.answer !== undefined &&
@@ -68,9 +60,18 @@ angular.module('oppia').directive('oppiaInteractiveNumericInput', [
           var submitAnswerFn = function() {
             ctrl.submitAnswer(ctrl.answer);
           };
+          ctrl.$onInit = function() {
+            ctrl.answer = '';
+            ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          CurrentInteractionService.registerCurrentInteraction(
-            submitAnswerFn, isAnswerValid);
+            ctrl.NUMERIC_INPUT_FORM_SCHEMA = {
+              type: 'float',
+              ui_config: {}
+            };
+
+            CurrentInteractionService.registerCurrentInteraction(
+              submitAnswerFn, isAnswerValid);
+          };
         }
       ]
     };

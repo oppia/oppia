@@ -40,21 +40,6 @@ angular.module('oppia').directive('skillsMasteryList', [
             $scope, $uibModal, UserService,
             MASTERY_CUTOFF, MASTERY_COLORS) {
           var ctrl = this;
-          ctrl.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          });
-          ctrl.sortedSkillIds = [];
-
-          var degreesOfMastery = ctrl.getDegreesOfMastery();
-          ctrl.skillIdsAndMastery =
-            Object.keys(degreesOfMastery).map(function(skillId) {
-              return {
-                skillId: skillId,
-                mastery: degreesOfMastery[skillId]
-              };
-            });
-
           ctrl.getMasteryPercentage = function(degreeOfMastery) {
             return Math.round(degreeOfMastery * 100);
           };
@@ -98,7 +83,26 @@ angular.module('oppia').directive('skillsMasteryList', [
                   };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
             });
+          };
+          ctrl.$onInit = function() {
+            ctrl.userIsLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            });
+            ctrl.sortedSkillIds = [];
+
+            var degreesOfMastery = ctrl.getDegreesOfMastery();
+            ctrl.skillIdsAndMastery =
+              Object.keys(degreesOfMastery).map(function(skillId) {
+                return {
+                  skillId: skillId,
+                  mastery: degreesOfMastery[skillId]
+                };
+              });
           };
         }
       ]

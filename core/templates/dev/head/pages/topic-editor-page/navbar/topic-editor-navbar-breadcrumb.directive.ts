@@ -34,7 +34,10 @@ angular.module('oppia').directive('topicEditorNavbarBreadcrumb', [
         function(
             $scope, TopicEditorStateService,
             FocusManagerService, TOPIC_NAME_INPUT_FOCUS_LABEL) {
-          $scope.topic = TopicEditorStateService.getTopic();
+          var ctrl = this;
+          ctrl.$onInit = function() {
+            $scope.topic = TopicEditorStateService.getTopic();
+          };
         }
       ]
     };

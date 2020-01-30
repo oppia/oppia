@@ -34,7 +34,9 @@ angular.module('oppia').directive('graphEditor', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.alwaysEditable = true;
+        ctrl.$onInit = function() {
+          ctrl.alwaysEditable = true;
+        };
       }]
     };
   }]);

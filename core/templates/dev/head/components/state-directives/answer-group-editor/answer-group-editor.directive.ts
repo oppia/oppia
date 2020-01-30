@@ -76,13 +76,6 @@ angular.module('oppia').directive('answerGroupEditor', [
             TrainingDataEditorPanelService, ENABLE_ML_CLASSIFIERS,
             ResponsesService) {
           var ctrl = this;
-          ctrl.rulesMemento = null;
-          ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
-          ctrl.editAnswerGroupForm = {};
-          ctrl.misconceptionName = null;
-          ctrl.misconceptionsBySkill =
-            StateEditorService.getMisconceptionsBySkill();
-
           var _getTaggedMisconceptionName = function(skillMisconceptionId) {
             if (skillMisconceptionId !== null) {
               if (typeof skillMisconceptionId === 'string' &&
@@ -103,9 +96,6 @@ angular.module('oppia').directive('answerGroupEditor', [
               }
             }
           };
-
-          _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
-
           ctrl.isInQuestionMode = function() {
             return StateEditorService.isInQuestionMode();
           };
@@ -175,32 +165,20 @@ angular.module('oppia').directive('answerGroupEditor', [
                 misconception.getId(), misconceptionSkillId);
               _getTaggedMisconceptionName(
                 misconceptionSkillId + '-' + misconception.getId());
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
           ctrl.getAnswerChoices = function() {
             return ResponsesService.getAnswerChoices();
           };
-          ctrl.answerChoices = ctrl.getAnswerChoices();
-
-          // Updates answer choices when the interaction requires it -- e.g.,
-          // the rules for multiple choice need to refer to the multiple choice
-          // interaction's customization arguments.
-          // TODO(sll): Remove the need for this watcher, or make it less
-          // ad hoc.
-          $scope.$on('updateAnswerChoices', function() {
-            ctrl.answerChoices = ctrl.getAnswerChoices();
-          });
 
           ctrl.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;
           };
-
-          $scope.$on('externalSave', function() {
-            if (ctrl.isRuleEditorOpen()) {
-              ctrl.saveRules();
-            }
-          });
 
           var getDefaultInputValue = function(varType) {
             // TODO(bhenning): Typed objects in the backend should be required
@@ -392,13 +370,37 @@ angular.module('oppia').directive('answerGroupEditor', [
             return ENABLE_ML_CLASSIFIERS;
           };
 
-          $scope.$on('onInteractionIdChanged', function() {
-            if (ctrl.isRuleEditorOpen()) {
-              ctrl.saveRules();
-            }
-            $scope.$broadcast('updateAnswerGroupInteractionId');
+          ctrl.$onInit = function() {
+            // Updates answer choices when the interaction requires it -- e.g.,
+            // the rules for multiple choice need to refer to the multiple
+            // choice interaction's customization arguments.
+            // TODO(sll): Remove the need for this watcher, or make it less
+            // ad hoc.
+            $scope.$on('updateAnswerChoices', function() {
+              ctrl.answerChoices = ctrl.getAnswerChoices();
+            });
+            $scope.$on('externalSave', function() {
+              if (ctrl.isRuleEditorOpen()) {
+                ctrl.saveRules();
+              }
+            });
+            $scope.$on('onInteractionIdChanged', function() {
+              if (ctrl.isRuleEditorOpen()) {
+                ctrl.saveRules();
+              }
+              $scope.$broadcast('updateAnswerGroupInteractionId');
+              ctrl.answerChoices = ctrl.getAnswerChoices();
+            });
+            ctrl.rulesMemento = null;
+            ctrl.activeRuleIndex = ResponsesService.getActiveRuleIndex();
+            ctrl.editAnswerGroupForm = {};
+            ctrl.misconceptionName = null;
+            ctrl.misconceptionsBySkill =
+              StateEditorService.getMisconceptionsBySkill();
             ctrl.answerChoices = ctrl.getAnswerChoices();
-          });
+
+            _getTaggedMisconceptionName(ctrl.getTaggedSkillMisconceptionId());
+          };
         }
       ]
     };
