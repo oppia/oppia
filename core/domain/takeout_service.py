@@ -41,7 +41,7 @@ def get_models_which_should_be_exported():
     """
     return [model_class for model_class in
             models.Registry.get_all_storage_model_classes()
-            if model_class.get_export_policy() !=
+            if model_class.get_export_policy() ==
             base_models.EXPORT_POLICY.CONTAINS_USER_DATA]
 
 

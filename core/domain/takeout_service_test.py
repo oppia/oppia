@@ -672,15 +672,23 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
 
         models_with_export = (takeout_service
                               .get_models_which_should_be_exported())
+        unimplemented_models_count = 0
         for model in all_models:
             export_policy = model.get_export_policy()
+            print(model.__name__)
             if model in models_with_export:
                 self.assertEqual(
                     base_models.EXPORT_POLICY.CONTAINS_USER_DATA,
                     export_policy
                 )
+            elif export_policy == base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED:
+                unimplemented_models_count += 1
             else:
                 self.assertEqual(
                     base_models.EXPORT_POLICY.NOT_APPLICABLE,
                     export_policy
                 )
+        # TODO(#8523): This number should be reduced to zero. This number
+        # should not be changed by developers under any circumstance. 
+        # Contact @varun-tandon for more information.
+        self.assertEqual(unimplemented_models_count, 24)
