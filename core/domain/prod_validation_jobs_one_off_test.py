@@ -10558,7 +10558,8 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id 0: Subtopic count: 10 does not match '
                 'the total number of subtopics in topic model: '
                 '[{u\'skill_ids\': [u\'0\', u\'1\'], u\'id\': 1, '
-                'u\'title\': u\'subtopic1\'}] "]]'
+                'u\'thumbnail_filename\': None, u\'title\': '
+                'u\'subtopic1\'}] "]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 

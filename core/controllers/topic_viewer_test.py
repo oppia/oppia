@@ -125,6 +125,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 'additional_story_dicts': [],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{
+                    u'thumbnail_filename': u'image.png',
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
                     u'title': u'subtopic_name'}],
@@ -170,6 +171,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'additional_story_dicts': [],
                     'uncategorized_skill_ids': [self.skill_id_1],
                     'subtopics': [{
+                        u'thumbnail_filename': u'image.png',
                         u'skill_ids': [self.skill_id_2],
                         u'id': 1,
                         u'title': u'subtopic_name'}],

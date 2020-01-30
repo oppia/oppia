@@ -141,7 +141,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
     /* eslint-enable dot-notation */
       return new Skill(null, 'Skill description loading',
         [], [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en',
-        1, 0, null, false, [], null);
+        1, 0, null, false, []);
     };
 
     var generateMisconceptionsFromBackendDict = function(

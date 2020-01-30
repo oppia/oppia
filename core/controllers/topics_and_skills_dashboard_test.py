@@ -246,64 +246,6 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
         self.assertEqual(json_response['status_code'], 400)
         self.logout()
 
-
-    def test_skill_creation_in_invalid_thumbnail_filename(self):
-        self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        rubrics = [{
-            'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanation': 'Explanation 1'
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[1],
-            'explanation': 'Explanation 2'
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[2],
-            'explanation': 'Explanation 3'
-        }]
-        payload = {
-            'description': 'Skill Description',
-            'linked_topic_ids': [self.topic_id],
-            'rubrics': rubrics,
-            'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': []
-        }
-        json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token,
-            expected_status_int=400,
-            upload_files=((
-                'image', 'unused_filename', self.original_image_content),))
-        self.assertEqual(json_response['status_code'], 400)
-        self.logout()
-
-    def test_skill_creation_with_no_thumbnail_data_url_supplied(self):
-        self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_new_csrf_token()
-        rubrics = [{
-            'difficulty': constants.SKILL_DIFFICULTIES[0],
-            'explanation': 'Explanation 1'
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[1],
-            'explanation': 'Explanation 2'
-        }, {
-            'difficulty': constants.SKILL_DIFFICULTIES[2],
-            'explanation': 'Explanation 3'
-        }]
-        payload = {
-            'description': 'Skill Description',
-            'linked_topic_ids': [self.topic_id],
-            'rubrics': rubrics,
-            'explanation_dict': state_domain.SubtitledHtml(
-                '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.png'
-        }
-        json_response = self.post_json(
-            self.url, payload, csrf_token=csrf_token,
-            expected_status_int=500)
-        self.assertEqual(json_response['status_code'], 500)
-        self.assertEqual(json_response['error'], 'No image supplied')
-        self.logout()
-
     def test_skill_creation_in_invalid_explanation(self):
         self.login(self.ADMIN_EMAIL)
         csrf_token = self.get_new_csrf_token()
