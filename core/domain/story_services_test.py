@@ -165,11 +165,21 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                     story_domain.INITIAL_NODE_ID),
                 'old_value': self.NODE_ID_1,
                 'new_value': self.NODE_ID_2
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'node_id': self.NODE_ID_2,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME),
+                'old_value': None,
+                'new_value': 'image.png'
             })
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
         story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(
+            story.story_contents.nodes[1].thumbnail_filename, 'image.png')
         self.assertEqual(
             story.story_contents.nodes[1].destination_node_ids,
             [self.NODE_ID_1])
