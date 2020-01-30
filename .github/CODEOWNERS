@@ -14,6 +14,7 @@
 # Angular Migration team
 /core/templates/dev/head/services/contextual/logger.service.ts @bansalnitish
 /core/templates/dev/head/services/UpgradedServices.ts @bansalnitish
+/core/templates/dev/head/services/request-interceptor.service.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 
