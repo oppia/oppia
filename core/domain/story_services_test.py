@@ -665,7 +665,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_update_node_thumbnail_filename_with_invalid_node_id(self):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-            'property_name': story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME),
             'node_id': 'invalid_node',
             'old_value': '',
             'new_value': 'new_image.png'

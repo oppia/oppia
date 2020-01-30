@@ -491,7 +491,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'The subtopic with id invalid_id does not exist.'):
             self.topic.update_subtopic_thumbnail_filename(
                 'invalid_id', 'new title')
-        
+
     def test_cannot_remove_skill_id_from_subtopic_with_invalid_subtopic_id(
             self):
         with self.assertRaisesRegexp(
