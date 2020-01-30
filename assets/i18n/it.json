@@ -212,7 +212,7 @@
 	"I18N_LIBRARY_VIEW_ALL": "Mostra tutto",
 	"I18N_MODAL_CANCEL_BUTTON": "Annulla",
 	"I18N_MODAL_CONTINUE_BUTTON": "Continua",
-	"I18N_PLAYER_AUDIO_EXPAND_TEXT": "Audio",
+	"I18N_PLAYER_AUDIO_EXPAND_TEXT": "Ascolta la lezione",
 	"I18N_PLAYER_AUDIO_LANGUAGE": "Lingua",
 	"I18N_PLAYER_AUDIO_MIGHT_NOT_MATCH_TEXT": "L'audio potrebbe non corrispondere interamente al testo",
 	"I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN": "Non disponibile in <[languageDescription]>",
