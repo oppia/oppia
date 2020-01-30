@@ -39,7 +39,7 @@ class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -51,7 +51,7 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionModel(base_models.VersionedModel):
@@ -213,7 +213,7 @@ class CollectionRightsSnapshotMetadataModel(
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionRightsSnapshotContentModel(
@@ -226,8 +226,7 @@ class CollectionRightsSnapshotContentModel(
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
-
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 class CollectionRightsModel(base_models.VersionedModel):
     """Storage model for rights related to a collection.

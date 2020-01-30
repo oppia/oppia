@@ -38,7 +38,7 @@ class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -50,7 +50,7 @@ class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class TopicModel(base_models.VersionedModel):
@@ -301,7 +301,7 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -313,7 +313,7 @@ class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class SubtopicPageModel(base_models.VersionedModel):
@@ -449,7 +449,7 @@ class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -461,7 +461,7 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class TopicRightsModel(base_models.VersionedModel):

@@ -39,7 +39,7 @@ class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -51,7 +51,7 @@ class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationModel(base_models.VersionedModel):
@@ -244,7 +244,7 @@ class ExplorationRightsSnapshotMetadataModel(
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationRightsSnapshotContentModel(
@@ -257,7 +257,7 @@ class ExplorationRightsSnapshotContentModel(
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationRightsModel(base_models.VersionedModel):

@@ -35,7 +35,7 @@ class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -47,7 +47,7 @@ class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class SkillModel(base_models.VersionedModel):

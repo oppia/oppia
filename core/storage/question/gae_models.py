@@ -43,7 +43,7 @@ class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -55,7 +55,7 @@ class QuestionSnapshotContentModel(base_models.BaseSnapshotContentModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class QuestionModel(base_models.VersionedModel):

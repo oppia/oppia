@@ -34,7 +34,7 @@ class ConfigPropertySnapshotMetadataModel(
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
@@ -46,7 +46,7 @@ class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
         because the export contains the data associated with the most recent
         version.
         """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ConfigPropertyModel(base_models.VersionedModel):
