@@ -479,6 +479,19 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.update_subtopic_title(1, 'new title')
         self.assertEqual(self.topic.subtopics[0].title, 'new title')
 
+    def test_update_subtopic_thumbnail_filename(self):
+        self.assertEqual(len(self.topic.subtopics), 1)
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_filename, 'image.png')
+        self.topic.update_subtopic_thumbnail_filename(1, 'new_image.png')
+        self.assertEqual(
+            self.topic.subtopics[0].thumbnail_filename, 'new_image.png')
+
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id invalid_id does not exist.'):
+            self.topic.update_subtopic_thumbnail_filename(
+                'invalid_id', 'new title')
+        
     def test_cannot_remove_skill_id_from_subtopic_with_invalid_subtopic_id(
             self):
         with self.assertRaisesRegexp(

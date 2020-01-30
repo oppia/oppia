@@ -662,6 +662,22 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Update node title.')
 
+    def test_cannot_update_node_thumbnail_filename_with_invalid_node_id(self):
+        change_list = [story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': story_domain.STORY_NODE_PROPERTY_THUMBNAIL_FILENAME,
+            'node_id': 'invalid_node',
+            'old_value': '',
+            'new_value': 'new_image.png'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The node with id invalid_node is not part of this story'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list,
+                'Update node thumbnail filename.')
+
     def test_cannot_delete_node_with_invalid_node_id(self):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_DELETE_STORY_NODE,
