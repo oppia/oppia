@@ -228,6 +228,7 @@ class CollectionRightsSnapshotContentModel(
         """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
+
 class CollectionRightsModel(base_models.VersionedModel):
     """Storage model for rights related to a collection.
 
