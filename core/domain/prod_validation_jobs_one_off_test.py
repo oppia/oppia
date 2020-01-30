@@ -3476,7 +3476,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for '
                 'button_text_validation of ExplorationModel\', '
-                '[u\'Exploration id: 0 State: Introduction\']'),
+                '[u\'Exploration id: 0 State: Introduction\']]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         run_job_and_check_output(self, expected_output)
 
