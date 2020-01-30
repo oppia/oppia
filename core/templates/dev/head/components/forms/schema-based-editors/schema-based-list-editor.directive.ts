@@ -230,7 +230,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
             }
             if ($scope.len !== $scope.localValue.length) {
               throw new Error('List editor length does not ' +
-              'match length of input value: ' + $scope.len + 
+              'match length of input value: ' + $scope.len +
               ' ' + $scope.localValue);
             }
           }
