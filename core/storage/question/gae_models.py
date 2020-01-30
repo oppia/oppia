@@ -634,7 +634,10 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model data has already been exported as a part of the QuestionModel
+        export_data function, and thus a new export_data function does not
+        need to be defined here.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod

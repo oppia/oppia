@@ -1898,8 +1898,8 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        """Model export_data function has not been written."""
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
     @classmethod
     def apply_deletion_policy(cls, user_id):

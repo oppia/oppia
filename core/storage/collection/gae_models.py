@@ -634,7 +634,10 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does contain data specific to the user."""
+        """Model data has already been exported as a part of the
+        CollectionRightsModel, and thus does not need an export_data
+        function.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod

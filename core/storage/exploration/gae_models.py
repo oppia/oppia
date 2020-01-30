@@ -850,7 +850,10 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model does not contain user data."""
+        """Model data has already been exported as a part of the
+        ExplorationModel and thus does not need a separate export_data
+        function.
+        """
         return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     def verify_model_user_ids_exist(self):
