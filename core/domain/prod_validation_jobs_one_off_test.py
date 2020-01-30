@@ -3444,6 +3444,42 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated ExplorationModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_long_interaction_button_text_failiure(self):
+        exp_services.update_exploration(
+            self.owner_id, '0', [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'new_value': {
+                        'html': '<p>Test</p>',
+                        'content_id': 'content'},
+                    'old_value': {'html': '', 'content_id': 'content'},
+                    'property_name': 'content',
+                    'state_name': 'Introduction'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'new_value': 'Continue',
+                    'old_value': None,
+                    'property_name': 'widget_id',
+                    'state_name': 'Introduction'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'new_value': {'buttonText': {'value': 'a' * 51}},
+                    'old_value': {},
+                    'property_name': 'widget_customization_args',
+                    'state_name': 'Introduction'
+                })
+            ], 'Changes.')
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'button_text_validation of ExplorationModel\', '
+                '[u\'Exploration id: 0 State: Introduction\']'),
+            u'[u\'fully-validated ExplorationModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
 
 class ExplorationSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
