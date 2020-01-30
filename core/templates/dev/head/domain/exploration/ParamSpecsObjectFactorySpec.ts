@@ -41,6 +41,8 @@ describe('ParamSpecs', () => {
 
   it('should be undefined for missing param names', () => {
     expect(emptyParamSpecs.getParamDict()[paramName]).not.toBeDefined();
+    expect(emptyParamSpecs.getParamSpec(paramName)).not.toBeDefined();
+    expect(emptyParamSpecs.getParamNames().length).toBe(0);
   });
 
   it('should add param when missing', () => {
@@ -49,6 +51,8 @@ describe('ParamSpecs', () => {
     expect(emptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBe(true);
     // No longer empty.
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(paramSpec);
+    expect(emptyParamSpecs.getParamSpec(paramName)).toBe(paramSpec);
+    expect(emptyParamSpecs.getParamNames()).toEqual([paramName]);
   });
 
   it('should not overwrite existing params', () => {
@@ -61,5 +65,27 @@ describe('ParamSpecs', () => {
     expect(emptyParamSpecs.addParamIfNew(paramName, newParamSpec)).toBe(false);
     expect(emptyParamSpecs.getParamDict()[paramName]).not.toBe(newParamSpec);
     expect(emptyParamSpecs.getParamDict()[paramName]).toBe(oldParamSpec);
+  });
+
+  it('should convert a param specs to backend dict correctly', () => {
+    const paramSpec = paramSpecObjectFactory.createDefault();
+    const expectedParamSpecBackendDict = {
+      [paramName]: paramSpec.toBackendDict()
+    };
+    emptyParamSpecs.addParamIfNew(paramName, paramSpec);
+
+    expect(emptyParamSpecs.toBackendDict()).toEqual(
+      expectedParamSpecBackendDict);
+  });
+
+  it('should create a non empty param specs', () => {
+    const paramSpec = paramSpecObjectFactory.createDefault();
+    const nonEmptyParamSpecs = paramSpecsObjectFactory.createFromBackendDict({
+      [paramName]: paramSpec.toBackendDict()
+    });
+
+    expect(nonEmptyParamSpecs.addParamIfNew(paramName, paramSpec)).toBe(false);
+    expect(nonEmptyParamSpecs.getParamNames()).toEqual([paramName]);
+    expect(nonEmptyParamSpecs.getParamSpec(paramName)).toBeDefined();
   });
 });
