@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/common.py."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -198,6 +199,11 @@ class CommonTests(test_utils.GenericTestBase):
             common.get_current_release_version_number('release-1.2.3-hotfix-1'),
             '1.2.3')
 
+    def test_get_current_release_version_number_with_maintenance_branch(self):
+        self.assertEqual(
+            common.get_current_release_version_number(
+                'release-maintenance-1.2.3'), '1.2.3')
+
     def test_get_current_release_version_number_with_invalid_branch(self):
         with self.assertRaisesRegexp(
             Exception, 'Invalid branch name: invalid-branch.'):
@@ -213,6 +219,13 @@ class CommonTests(test_utils.GenericTestBase):
     def test_is_current_branch_a_release_branch_with_hotfix_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return 'On branch release-1.2.3-hotfix-1'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_release_branch(), True)
+
+    def test_is_current_branch_a_release_branch_with_maintenance_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch release-maintenance-1.2.3'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
@@ -576,3 +589,13 @@ class CommonTests(test_utils.GenericTestBase):
         with is_windows_swap:
             actual_file_path = common.convert_to_posixpath(original_filepath)
         self.assertEqual(actual_file_path, original_filepath)
+
+    def test_create_readme(self):
+        try:
+            os.makedirs('readme_test_dir')
+            common.create_readme('readme_test_dir', 'Testing readme.')
+            with python_utils.open_file('readme_test_dir/README.md', 'r') as f:
+                self.assertEqual(f.read(), 'Testing readme.')
+        finally:
+            if os.path.exists('readme_test_dir'):
+                shutil.rmtree('readme_test_dir')

@@ -20,6 +20,7 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/browser-checker.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/ItemSelectionInput/directives/' +
@@ -31,10 +32,10 @@ require('services/contextual/window-dimensions.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
-  'HtmlEscaperService', 'ItemSelectionInputRulesService',
-  'UrlInterpolationService', function(
-      HtmlEscaperService, ItemSelectionInputRulesService,
-      UrlInterpolationService) {
+  'BrowserCheckerService', 'HtmlEscaperService',
+  'ItemSelectionInputRulesService', 'UrlInterpolationService', function(
+      BrowserCheckerService, HtmlEscaperService,
+      ItemSelectionInputRulesService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -63,9 +64,22 @@ angular.module('oppia').directive('oppiaInteractiveItemSelectionInput', [
               ctrl.selectionCount < ctrl.minAllowableSelectionCount);
           };
 
-          ctrl.submitMultipleChoiceAnswer = function(index) {
+          ctrl.submitMultipleChoiceAnswer = function(event, index) {
+            // Deselect previously selected option.
+            var selectedElement = (
+              document.querySelector(
+                'button.multiple-choice-option.selected'));
+            if (selectedElement) {
+              selectedElement.classList.remove('selected');
+            }
+            // Selected current option.
+            event.currentTarget.classList.add('selected');
+            ctrl.userSelections = {};
             ctrl.userSelections[ctrl.choices[index]] = true;
-            ctrl.submitAnswer(ctrl.userSelections);
+            ctrl.notEnoughSelections = false;
+            if (!BrowserCheckerService.isMobileDevice()) {
+              ctrl.submitAnswer(ctrl.userSelections);
+            }
           };
 
           ctrl.submitAnswer = function() {
