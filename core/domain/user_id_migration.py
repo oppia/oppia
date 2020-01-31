@@ -217,7 +217,7 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 The model that contains the old user IDs.
         """
         content_dict = (
-            collection_models.CollectionRightsModel.transform_dict_to_valid(
+            collection_models.CollectionRightsModel.convert_to_valid_dict(
                 rights_snapshot_model.content))
         reconstituted_rights_model = (
             collection_models.CollectionRightsModel(**content_dict))
@@ -247,7 +247,7 @@ class SnapshotsUserIdMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 The model that contains the old user IDs.
         """
         content_dict = (
-            exp_models.ExplorationRightsModel.transform_dict_to_valid(
+            exp_models.ExplorationRightsModel.convert_to_valid_dict(
                 rights_snapshot_model.content))
         reconstituted_rights_model = (
             exp_models.ExplorationRightsModel(**content_dict))
@@ -580,7 +580,7 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         collection rights model.
         """
         content_dict = (
-            collection_models.CollectionRightsModel.transform_dict_to_valid(
+            collection_models.CollectionRightsModel.convert_to_valid_dict(
                 rights_snapshot_model.content))
         reconstituted_rights_model = (
             collection_models.CollectionRightsModel(**content_dict))
@@ -601,7 +601,7 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         exploration rights model.
         """
         content_dict = (
-            exp_models.ExplorationRightsModel.transform_dict_to_valid(
+            exp_models.ExplorationRightsModel.convert_to_valid_dict(
                 rights_snapshot_model.content))
         reconstituted_rights_model = (
             exp_models.ExplorationRightsModel(**content_dict))

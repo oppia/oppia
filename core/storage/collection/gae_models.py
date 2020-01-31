@@ -242,7 +242,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @staticmethod
-    def transform_dict_to_valid(model_dict):
+    def convert_to_valid_dict(model_dict):
         """Replace invalid fields and values in the CollectionRightsModel dict.
 
         Some old CollectionRightsSnapshotContentModels can contain fields

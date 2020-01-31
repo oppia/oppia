@@ -3395,7 +3395,10 @@ class TopicRightsAllUsersModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {'topic_rights_ids': (topic_models.TopicRightsModel, [item.id])}
+        return {
+            'topic_rights_ids': (
+                topic_models.TopicRightsModel, [item.id])
+        }
 
 
 class TopicCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):

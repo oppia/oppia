@@ -406,9 +406,6 @@ class TopicRightsModel(base_models.VersionedModel):
     # The user_ids of the managers of this topic.
     manager_ids = ndb.StringProperty(indexed=True, repeated=True)
 
-    # The user_ids of users who are (or were in history) members of manager_ids.
-    all_user_ids = ndb.StringProperty(indexed=True, repeated=True)
-
     # Whether this topic is published.
     topic_is_published = ndb.BooleanProperty(
         indexed=True, required=True, default=False)

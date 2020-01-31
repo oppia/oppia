@@ -167,38 +167,38 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             exp_models.ExplorationRightsModel.get_deletion_policy(),
             base_models.DELETION_POLICY.KEEP_IF_PUBLIC)
 
-    def test_transform_dict_to_valid_format_basic(self):
+    def test_convert_to_valid_dict_format_basic(self):
         transformed_dict = (
             exp_models.ExplorationRightsModel
-            .transform_dict_to_valid(self.exp_1_dict))
+            .convert_to_valid_dict(self.exp_1_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
-    def test_transform_dict_to_valid_format_all_viewer_ids(self):
+    def test_convert_to_valid_dict_format_all_viewer_ids(self):
         broken_dict = dict(**self.exp_1_dict)
         broken_dict['all_viewer_ids'] = [self.USER_ID_1, self.USER_ID_2]
 
         transformed_dict = (
             exp_models.ExplorationRightsModel
-            .transform_dict_to_valid(broken_dict))
+            .convert_to_valid_dict(broken_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
-    def test_transform_dict_to_valid_format_status(self):
+    def test_convert_to_valid_dict_format_status(self):
         broken_dict = dict(**self.exp_1_dict)
         broken_dict['status'] = 'publicized'
 
         transformed_dict = (
             exp_models.ExplorationRightsModel
-            .transform_dict_to_valid(broken_dict))
+            .convert_to_valid_dict(broken_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
-    def test_transform_dict_to_valid_format_translator_ids(self):
+    def test_convert_to_valid_dict_format_translator_ids(self):
         broken_dict = dict(**self.exp_1_dict)
         del broken_dict['voice_artist_ids']
         broken_dict['translator_ids'] = [self.USER_ID_1]
 
         transformed_dict = (
             exp_models.ExplorationRightsModel
-            .transform_dict_to_valid(broken_dict))
+            .convert_to_valid_dict(broken_dict))
         self.assertEqual(transformed_dict, self.exp_1_dict)
 
     def test_has_reference_to_user_id(self):
