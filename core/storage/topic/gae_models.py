@@ -615,7 +615,7 @@ class TopicRightsModel(base_models.VersionedModel):
             this user manages.
         """
         managed_topics = cls.get_all().filter(cls.manager_ids == user_id)
-        managed_topic_ids = [col.key.id() for col in managed_topics]
+        managed_topic_ids = [right.id for right in managed_topics]
 
         return {
             'managed_topic_ids': managed_topic_ids

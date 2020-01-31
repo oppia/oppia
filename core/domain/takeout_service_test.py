@@ -34,11 +34,13 @@ import utils
 
 (
     base_models, collection_models, email_models,
-    exploration_models, feedback_models, topic_models,
-    suggestion_models, user_models) = models.Registry.import_models([
+    exploration_models, feedback_models, skill_models, topic_models,
+    suggestion_models, user_models, story_models, question_models,
+    config_models) = models.Registry.import_models([
         models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-        models.NAMES.exploration, models.NAMES.feedback, models.NAMES.topic,
-        models.NAMES.suggestion, models.NAMES.user])
+        models.NAMES.exploration, models.NAMES.feedback,  models.NAMES.skill,
+        models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user, 
+        models.NAMES.story, models.NAMES.question, models.NAMES.config])
 
 
 class TakeoutServiceUnitTests(test_utils.GenericTestBase):
@@ -661,7 +663,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         all_models = models.Registry.get_all_storage_model_classes() 
         models_with_export = (takeout_service
                               .get_models_which_should_be_exported())
-        unimplemented_models_count = 0
+        unimplemented_models = set()
         for model in all_models:
             export_policy = model.get_export_policy()
             if model in models_with_export:
@@ -670,7 +672,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                     export_policy
                 )
             elif export_policy == base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED:
-                unimplemented_models_count += 1
+                unimplemented_models.add(model)
             else:
                 self.assertEqual(
                     base_models.EXPORT_POLICY.NOT_APPLICABLE,
@@ -679,4 +681,31 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         # TODO(#8523): This number should be reduced to zero. This number
         # should not be changed by developers under any circumstance.
         # Contact @varun-tandon for more information.
-        self.assertEqual(unimplemented_models_count, 24)
+        print([model.__name__ for model in unimplemented_models])
+        expected_unimplemented = {
+            collection_models.CollectionRightsSnapshotContentModel,
+            collection_models.CollectionRightsSnapshotMetadataModel,
+            collection_models.CollectionSnapshotContentModel,
+            collection_models.CollectionSnapshotMetadataModel,
+            skill_models.SkillSnapshotMetadataModel,
+            skill_models.SkillSnapshotContentModel,
+            topic_models.SubtopicPageSnapshotContentModel,
+            topic_models.SubtopicPageSnapshotMetadataModel,
+            topic_models.TopicRightsSnapshotContentModel,
+            topic_models.TopicRightsSnapshotMetadataModel,
+            topic_models.TopicSnapshotContentModel,
+            topic_models.TopicSnapshotMetadataModel,
+            user_models.UserContributionScoringModel,
+            story_models.StorySnapshotContentModel,
+            story_models.StorySnapshotMetadataModel,
+            question_models.QuestionSnapshotContentModel,
+            question_models.QuestionSnapshotMetadataModel,
+            exploration_models.ExplorationRightsSnapshotContentModel,
+            exploration_models.ExplorationRightsSnapshotMetadataModel,
+            exploration_models.ExplorationSnapshotContentModel,
+            exploration_models.ExplorationSnapshotMetadataModel,
+            suggestion_models.GeneralVoiceoverApplicationModel,
+            config_models.ConfigPropertySnapshotContentModel,
+            config_models.ConfigPropertySnapshotMetadataModel
+        }
+        self.assertEqual(unimplemented_models, expected_unimplemented)

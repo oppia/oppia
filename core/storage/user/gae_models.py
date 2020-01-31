@@ -326,8 +326,8 @@ class CompletedActivitiesModel(base_models.BaseModel):
             dict. A dict with two keys, 'completed_exploration_ids'
             and 'completed_collection_ids'. The corresponding values are
             lists of the IDs of the explorations and collections,
-            respectively, which the given user has completed. If the
-            user_id is invalid, returns an empty dict.
+            respectively, which the given user has completed. If their is no
+            model for the given user_id, the function returns an empty dict.
         """
         user_model = CompletedActivitiesModel.get(user_id, strict=False)
         if not user_model:
