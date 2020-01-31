@@ -217,10 +217,10 @@ var TopicEditorPage = function() {
   this.addSubtopic = function(title) {
     addSubtopicCard.click();
     newSubtopicTitlefield.sendKeys(title);
-    confirmSubtopicCreationButton.click();
-    waitFor.invisibilityOf(
+    waitFor.elementToBeClickable(
       confirmSubtopicCreationButton,
-      'Add subtopic modal takes too long to disappear');
+      'Confirm subtopic creation button takes too long to be clickable');
+    confirmSubtopicCreationButton.click();
     waitFor.pageToFullyLoad();
   };
 
