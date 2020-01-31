@@ -46,8 +46,6 @@ angular.module('oppia').directive('collectionNodeEditor', [
             CollectionEditorStateService, CollectionLinearizerService,
             CollectionUpdateService, AlertsService) {
           var ctrl = this;
-          ctrl.collection = CollectionEditorStateService.getCollection();
-
           // Deletes this collection node from the frontend collection
           // object and also updates the changelist.
           ctrl.deleteNode = function() {
@@ -82,6 +80,9 @@ angular.module('oppia').directive('collectionNodeEditor', [
                 'Internal collection editor error. Could not shift node ' +
                 'right with ID: ' + explorationId);
             }
+          };
+          ctrl.$onInit = function() {
+            ctrl.collection = CollectionEditorStateService.getCollection();
           };
         }
       ]

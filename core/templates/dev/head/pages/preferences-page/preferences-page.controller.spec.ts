@@ -73,6 +73,11 @@ describe('Preferences Controller', function() {
         $rootScope: $rootScope,
         AlertsService: mockAlertsService
       });
+      // Refer: https://www.codelord.net/2017/01/09/
+      // unit-testing-angular-components-with-%24componentcontroller/
+      // Angular and $componentController does not take care of
+      // $onInit lifecycle hook, so we need to call it explicitly.
+      ctrl.$onInit();
     }));
 
     it('should show that editor role notifications checkbox is true by default',

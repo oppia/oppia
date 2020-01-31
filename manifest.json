@@ -114,9 +114,9 @@
     },
     "frontend": {
       "angular": {
-        "version": "1.5.8",
+        "version": "1.7.9",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8",
+        "url": "https://ajax.googleapis.com/ajax/libs/angularjs/1.7.9",
         "targetDirPrefix": "angularjs-",
         "files": [
           "angular.js", "angular.min.js", "angular.min.js.map", "angular-animate.js",
@@ -152,9 +152,9 @@
         "targetDirPrefix": "lamejs-"
       },
       "angularTest": {
-        "version": "1.5.8",
+        "version": "1.7.9",
         "downloadFormat": "files",
-        "url": "https://code.angularjs.org/1.5.8",
+        "url": "https://code.angularjs.org/1.7.9",
         "targetDirPrefix": "angularjs-",
         "files": ["angular-mocks.js", "angular-scenario.js"]
       },
@@ -181,9 +181,9 @@
         }
       },
       "angularCookiesRev": {
-        "version": "1.5.8",
+        "version": "1.7.9",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.5.8.zip",
+        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.7.9.zip",
         "rootDirPrefix": "bower-angular-cookies-",
         "targetDirPrefix": "bower-angular-cookies-",
         "bundle": {
@@ -246,8 +246,8 @@
       "popperJs": {
         "version": "1.15.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/FezVrasta/popper.js/archive/v1.15.0.zip",
-        "rootDirPrefix": "popper.js-",
+        "url": "https://github.com/popperjs/popper-core/archive/v1.15.0.zip",
+        "rootDirPrefix": "popper-core-",
         "targetDirPrefix": "popperJs-",
         "bundle": {
           "js": ["dist/umd/popper.js"]

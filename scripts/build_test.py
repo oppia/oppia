@@ -15,12 +15,12 @@
 # limitations under the License.
 
 """Unit tests for scripts/build.py."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 # pylint: disable=invalid-name
 import collections
-import json
 import os
 import random
 import re
@@ -39,16 +39,8 @@ TEST_SOURCE_DIR = os.path.join('core', 'tests', 'build_sources')
 
 MOCK_ASSETS_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'assets', '')
 MOCK_ASSETS_OUT_DIR = os.path.join(TEST_DIR, 'static', 'assets', '')
-
 MOCK_EXTENSIONS_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'extensions', '')
-MOCK_EXTENSIONS_COMPILED_JS_DIR = os.path.join(
-    TEST_SOURCE_DIR, 'local_compiled_js', 'extensions', '')
-
 MOCK_TEMPLATES_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'templates', '')
-MOCK_TEMPLATES_COMPILED_JS_DIR = os.path.join(
-    TEST_SOURCE_DIR, 'local_compiled_js', 'templates', '')
-
-MOCK_COMPILED_JS_DIR = os.path.join(TEST_SOURCE_DIR, 'compiled_js_dir', '')
 
 MOCK_TSC_OUTPUT_LOG_FILEPATH = os.path.join(
     TEST_SOURCE_DIR, 'mock_tsc_output_log.txt')
@@ -192,11 +184,8 @@ class BuildTests(test_utils.GenericTestBase):
             build._compare_file_count([EMPTY_DIR], [MOCK_ASSETS_DEV_DIR])
 
         # Test when one of the lists contain multiple directories.
-        MOCK_EXTENSIONS_DIR_LIST = [
-            MOCK_EXTENSIONS_DEV_DIR, MOCK_EXTENSIONS_COMPILED_JS_DIR]
-        target_dir_file_count = build.get_file_count(
-            MOCK_EXTENSIONS_DEV_DIR) + build.get_file_count(
-                MOCK_EXTENSIONS_COMPILED_JS_DIR)
+        MOCK_EXTENSIONS_DIR_LIST = [MOCK_EXTENSIONS_DEV_DIR]
+        target_dir_file_count = build.get_file_count(MOCK_EXTENSIONS_DEV_DIR)
 
         # Ensure that MOCK_EXTENSIONS_DIR has at least 1 file.
         assert target_dir_file_count > 0
@@ -247,26 +236,13 @@ class BuildTests(test_utils.GenericTestBase):
             build._verify_filepath_hash(hashed_base_filename, file_hashes)
 
     def test_process_html(self):
-        """Test process_html removes whitespaces and adds hash to filepaths."""
-        BASE_HTML_SOURCE_PATH = os.path.join(
-            MOCK_TEMPLATES_DEV_DIR, 'base.html')
-        BASE_JS_RELATIVE_PATH = os.path.join('pages', 'Base.js')
-        BASE_JS_FILE_URL = 'pages/Base.js'
-        BASE_JS_SOURCE_PATH = os.path.join(
-            MOCK_TEMPLATES_COMPILED_JS_DIR, BASE_JS_RELATIVE_PATH)
+        """Test process_html removes whitespaces."""
+        BASE_HTML_SOURCE_PATH = (
+            os.path.join(MOCK_TEMPLATES_DEV_DIR, 'base.html'))
 
-        build._ensure_files_exist([BASE_HTML_SOURCE_PATH, BASE_JS_SOURCE_PATH])
+        build._ensure_files_exist([BASE_HTML_SOURCE_PATH])
         # Prepare a file_stream object from python_utils.string_io().
         minified_html_file_stream = python_utils.string_io()
-        # Obtain actual file hashes of /templates to add hash to all filepaths
-        # within the HTML file. The end result will look like:
-        # E.g <script ... App.js></script>
-        # --> <script ... App.[hash].js></script>.
-        # Only need to hash Base.js.
-        with self.swap(build, 'FILE_EXTENSIONS_TO_IGNORE', ('.html',)):
-            file_hashes = build.get_file_hashes(MOCK_TEMPLATES_DEV_DIR)
-            file_hashes.update(
-                build.get_file_hashes(MOCK_TEMPLATES_COMPILED_JS_DIR))
 
         # Assert that base.html has white spaces and has original filepaths.
         with python_utils.open_file(
@@ -276,36 +252,22 @@ class BuildTests(test_utils.GenericTestBase):
                 source_base_file_content, r'\s{2,}',
                 msg='No white spaces detected in %s unexpectedly'
                 % BASE_HTML_SOURCE_PATH)
-            # Look for templates/pages/Base.js in source_base_file_content.
-            self.assertIn(
-                BASE_JS_FILE_URL, source_base_file_content)
 
         # Build base.html file.
         with python_utils.open_file(
             BASE_HTML_SOURCE_PATH, 'r') as source_base_file:
-            build.process_html(
-                source_base_file, minified_html_file_stream, file_hashes)
+            build.process_html(source_base_file, minified_html_file_stream)
 
         minified_html_file_content = minified_html_file_stream.getvalue()
         self.assertNotRegexpMatches(
             minified_html_file_content, r'\s{2,}',
             msg='All white spaces must be removed from %s' %
             BASE_HTML_SOURCE_PATH)
-        # Assert that hashes are inserted into filenames in base.html.
-        # Final filepath in base.html example:
-        # /build/templates/head/pages/Base.081ce90f17ecdf07701d83cb860985c2.js.
-        final_filename = build._insert_hash(
-            BASE_JS_FILE_URL, file_hashes[BASE_JS_RELATIVE_PATH])
-        # Look for templates/pages/Base.081ce90f17ecdf07701d83cb860985c2.js in
-        # minified_html_file_content.
-        self.assertIn(final_filename, minified_html_file_content)
 
     def test_should_file_be_built(self):
         """Test should_file_be_built returns the correct boolean value for
         filepath that should be built.
         """
-        service_js_filepath = os.path.join(
-            'local_compiled_js', 'core', 'pages', 'AudioService.js')
         service_ts_filepath = os.path.join('core', 'pages', 'AudioService.ts')
         spec_js_filepath = os.path.join('core', 'pages', 'AudioServiceSpec.js')
         protractor_filepath = os.path.join('extensions', 'protractor.js')
@@ -318,7 +280,6 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertFalse(build.should_file_be_built(spec_js_filepath))
         self.assertFalse(build.should_file_be_built(protractor_filepath))
-        self.assertTrue(build.should_file_be_built(service_js_filepath))
 
         self.assertFalse(build.should_file_be_built(service_ts_filepath))
 
@@ -330,7 +291,6 @@ class BuildTests(test_utils.GenericTestBase):
         # ALL JS files that ends with ...Service.js should not be built.
         with self.swap(
             build, 'JS_FILENAME_SUFFIXES_TO_IGNORE', ('Service.js',)):
-            self.assertFalse(build.should_file_be_built(service_js_filepath))
             self.assertTrue(build.should_file_be_built(spec_js_filepath))
 
     def test_hash_should_be_inserted(self):
@@ -518,13 +478,12 @@ class BuildTests(test_utils.GenericTestBase):
         the same number of build tasks as the number of files in the source
         directory.
         """
-        asset_hashes = build.get_file_hashes(MOCK_ASSETS_DEV_DIR)
         tasks = collections.deque()
 
         self.assertEqual(len(tasks), 0)
         # Build all files.
         tasks = build.generate_build_tasks_to_build_all_files_in_directory(
-            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, asset_hashes)
+            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR)
         total_file_count = build.get_file_count(MOCK_ASSETS_DEV_DIR)
         self.assertEqual(len(tasks), total_file_count)
 
@@ -535,13 +494,12 @@ class BuildTests(test_utils.GenericTestBase):
         new_filename = 'manifest.json'
         recently_changed_filenames = [
             os.path.join(MOCK_ASSETS_DEV_DIR, new_filename)]
-        asset_hashes = build.get_file_hashes(MOCK_ASSETS_DEV_DIR)
         build_tasks = collections.deque()
 
         self.assertEqual(len(build_tasks), 0)
         build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
             MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR,
-            recently_changed_filenames, asset_hashes)
+            recently_changed_filenames)
         self.assertEqual(len(build_tasks), len(recently_changed_filenames))
 
         build_tasks.clear()
@@ -552,8 +510,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(build_tasks), 0)
         build_tasks += build.generate_build_tasks_to_build_files_from_filepaths(
-            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, svg_filepaths,
-            asset_hashes)
+            MOCK_ASSETS_DEV_DIR, MOCK_ASSETS_OUT_DIR, svg_filepaths)
         self.assertEqual(len(build_tasks), len(svg_filepaths))
 
     def test_generate_build_tasks_to_build_directory(self):
@@ -562,31 +519,22 @@ class BuildTests(test_utils.GenericTestBase):
         """
         EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
-            'compiled_js_dir': MOCK_EXTENSIONS_COMPILED_JS_DIR,
             'staging_dir': os.path.join(
                 TEST_DIR, 'backend_prod_files', 'extensions', ''),
             'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', '')
         }
         file_hashes = build.get_file_hashes(MOCK_EXTENSIONS_DEV_DIR)
-        compiled_js_file_hashes = build.get_file_hashes(
-            MOCK_EXTENSIONS_COMPILED_JS_DIR)
         build_dir_tasks = collections.deque()
         build_all_files_tasks = (
             build.generate_build_tasks_to_build_all_files_in_directory(
                 MOCK_EXTENSIONS_DEV_DIR,
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
-                file_hashes))
-        build_all_files_tasks += (
-            build.generate_build_tasks_to_build_all_files_in_directory(
-                MOCK_EXTENSIONS_COMPILED_JS_DIR,
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
-                compiled_js_file_hashes))
+                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']))
         self.assertGreater(len(build_all_files_tasks), 0)
 
         # Test for building all files when staging dir does not exist.
         self.assertEqual(len(build_dir_tasks), 0)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, file_hashes)
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
@@ -597,10 +545,8 @@ class BuildTests(test_utils.GenericTestBase):
             EXTENSIONS_DIRNAMES_TO_DIRPATHS['staging_dir'])
         self.assertEqual(len(build_dir_tasks), 0)
 
-        source_hashes = file_hashes
-        source_hashes.update(compiled_js_file_hashes)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, source_hashes)
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
@@ -620,7 +566,7 @@ class BuildTests(test_utils.GenericTestBase):
         # Test for only building files that need to be rebuilt.
         self.assertEqual(len(build_dir_tasks), 0)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, build_dir_tasks)
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         file_extensions_to_always_rebuild = ('.html', '.py',)
         always_rebuilt_filepaths = build.get_filepaths_by_extensions(
             MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
@@ -639,32 +585,22 @@ class BuildTests(test_utils.GenericTestBase):
 
         EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
             'dev_dir': MOCK_EXTENSIONS_DEV_DIR,
-            'compiled_js_dir': MOCK_EXTENSIONS_COMPILED_JS_DIR,
             'staging_dir': os.path.join(
                 TEST_DIR, 'backend_prod_files', 'extensions', ''),
             'out_dir': os.path.join(TEST_DIR, 'build', 'extensions', '')
         }
 
-        file_hashes = build.get_file_hashes(MOCK_EXTENSIONS_DEV_DIR)
-        compiled_js_file_hashes = build.get_file_hashes(
-            MOCK_EXTENSIONS_COMPILED_JS_DIR)
         build_dir_tasks = collections.deque()
         build_all_files_tasks = (
             build.generate_build_tasks_to_build_all_files_in_directory(
                 MOCK_EXTENSIONS_DEV_DIR,
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
-                file_hashes))
-        build_all_files_tasks += (
-            build.generate_build_tasks_to_build_all_files_in_directory(
-                MOCK_EXTENSIONS_COMPILED_JS_DIR,
-                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir'],
-                compiled_js_file_hashes))
+                EXTENSIONS_DIRNAMES_TO_DIRPATHS['out_dir']))
         self.assertGreater(len(build_all_files_tasks), 0)
 
         # Test for building all files when staging dir does not exist.
         self.assertEqual(len(build_dir_tasks), 0)
         build_dir_tasks += build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, file_hashes)
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         self.assertEqual(len(build_dir_tasks), len(build_all_files_tasks))
 
         build.safe_delete_directory_tree(TEST_DIR)
@@ -676,7 +612,7 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(len(build_dir_tasks), 0)
 
         build_dir_tasks = build.generate_build_tasks_to_build_directory(
-            EXTENSIONS_DIRNAMES_TO_DIRPATHS, {})
+            EXTENSIONS_DIRNAMES_TO_DIRPATHS)
         file_extensions_to_always_rebuild = ('.py', '.js', '.html')
         always_rebuilt_filepaths = build.get_filepaths_by_extensions(
             MOCK_EXTENSIONS_DEV_DIR, file_extensions_to_always_rebuild)
@@ -688,8 +624,7 @@ class BuildTests(test_utils.GenericTestBase):
 
         # Test that 'some_file.js' is not rebuilt, i.e it is built for the first
         # time.
-        self.assertEqual(
-            len(build_dir_tasks), len(always_rebuilt_filepaths) + 1)
+        self.assertEqual(len(build_dir_tasks), len(always_rebuilt_filepaths))
         self.assertIn('some_file.js', always_rebuilt_filepaths)
         self.assertNotIn('some_file.js', build_dir_tasks)
 
@@ -732,79 +667,6 @@ class BuildTests(test_utils.GenericTestBase):
             file_hashes, MOCK_TEMPLATES_DEV_DIR)
         self.assertEqual(
             len(delete_tasks), build.get_file_count(MOCK_TEMPLATES_DEV_DIR))
-
-    def test_compiled_js_dir_validation(self):
-        """Test that build.COMPILED_JS_DIR is validated correctly with
-        outDir in build.TSCONFIG_FILEPATH.
-        """
-        build.require_compiled_js_dir_to_be_valid()
-
-        out_dir = ''
-        with python_utils.open_file(build.TSCONFIG_FILEPATH, 'r') as f:
-            config_data = json.load(f)
-            out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
-        # Escape the special characters, like '\', in the file paths.
-        # The '\' character is usually seem in Windows style path.
-        # https://docs.python.org/2/library/os.html#os.sep
-        # https://docs.python.org/2/library/re.html#regular-expression-syntax
-        error_message = ('COMPILED_JS_DIR: %s does not match the output '
-                         'directory in %s: %s' % (
-                             re.escape(MOCK_COMPILED_JS_DIR),
-                             re.escape(build.TSCONFIG_FILEPATH),
-                             re.escape(out_dir)))
-        with self.assertRaisesRegexp(
-            Exception, error_message), self.swap(
-                build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR):
-            build.require_compiled_js_dir_to_be_valid()
-
-    def test_compiled_js_dir_is_deleted_before_compilation(self):
-        """Test that compiled_js_dir is deleted before a fresh compilation."""
-        def mock_check_call(unused_cmd):
-            pass
-        def mock_require_compiled_js_dir_to_be_valid():
-            pass
-
-        with self.swap(
-            build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR), self.swap(
-                build, 'require_compiled_js_dir_to_be_valid',
-                mock_require_compiled_js_dir_to_be_valid):
-
-            if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
-                os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
-
-            with self.swap(subprocess, 'check_call', mock_check_call):
-                build.compile_typescript_files('.')
-                self.assertFalse(
-                    os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
-
-    def test_compiled_js_dir_is_deleted_before_watch_mode_compilation(self):
-        """Test that compiled_js_dir is deleted before a fresh watch mode
-        compilation.
-        """
-        # pylint: disable=unused-argument
-        def mock_call(unused_cmd, shell, stdout):
-            pass
-        def mock_popen(unused_cmd, stdout):
-            pass
-        # pylint: enable=unused-argument
-        def mock_require_compiled_js_dir_to_be_valid():
-            pass
-
-        with self.swap(
-            build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR), self.swap(
-                build, 'require_compiled_js_dir_to_be_valid',
-                mock_require_compiled_js_dir_to_be_valid):
-
-            if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
-                os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
-
-            with self.swap(subprocess, 'Popen', mock_popen), self.swap(
-                subprocess, 'call', mock_call), self.swap(
-                    build, 'TSC_OUTPUT_LOG_FILEPATH',
-                    MOCK_TSC_OUTPUT_LOG_FILEPATH):
-                build.compile_typescript_files_continuously('.')
-                self.assertFalse(
-                    os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
     def test_generate_app_yaml(self):
         mock_dev_yaml_filepath = 'mock_app_dev.yaml'
@@ -891,13 +753,11 @@ class BuildTests(test_utils.GenericTestBase):
         check_function_calls = {
             'build_using_webpack_gets_called': False,
             'ensure_files_exist_gets_called': False,
-            'compile_typescript_files_gets_called': False,
             'compare_file_count_gets_called': False
         }
         expected_check_function_calls = {
             'build_using_webpack_gets_called': True,
             'ensure_files_exist_gets_called': True,
-            'compile_typescript_files_gets_called': True,
             'compare_file_count_gets_called': True
         }
 
@@ -907,9 +767,6 @@ class BuildTests(test_utils.GenericTestBase):
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_compile_typescript_files(unused_project_dir):
-            check_function_calls['compile_typescript_files_gets_called'] = True
-
         def mock_compare_file_count(unused_first_dir, unused_second_dir):
             check_function_calls['compare_file_count_gets_called'] = True
 
@@ -917,13 +774,11 @@ class BuildTests(test_utils.GenericTestBase):
             build, '_ensure_files_exist', mock_ensure_files_exist)
         build_using_webpack_swap = self.swap(
             build, 'build_using_webpack', mock_build_using_webpack)
-        compile_typescript_files_swap = self.swap(
-            build, 'compile_typescript_files', mock_compile_typescript_files)
         compare_file_count_swap = self.swap(
             build, '_compare_file_count', mock_compare_file_count)
 
         with ensure_files_exist_swap, build_using_webpack_swap, (
-            compile_typescript_files_swap), compare_file_count_swap:
+            compare_file_count_swap):
             build.main(args=['--prod_env'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
@@ -931,58 +786,38 @@ class BuildTests(test_utils.GenericTestBase):
     def test_build_with_watcher(self):
         check_function_calls = {
             'ensure_files_exist_gets_called': False,
-            'compile_typescript_files_continuously_gets_called': False
         }
         expected_check_function_calls = {
             'ensure_files_exist_gets_called': True,
-            'compile_typescript_files_continuously_gets_called': True
         }
 
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_compile_typescript_files_continuously(unused_project_dir):
-            check_function_calls[
-                'compile_typescript_files_continuously_gets_called'] = True
-
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        compile_typescript_files_continuously_swap = self.swap(
-            build, 'compile_typescript_files_continuously',
-            mock_compile_typescript_files_continuously)
-
-        with ensure_files_exist_swap, (
-            compile_typescript_files_continuously_swap):
-            build.main(args=['--enable_watcher'])
+        with ensure_files_exist_swap:
+            build.main(args=[])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
     def test_cannot_minify_third_party_libs_in_dev_mode(self):
         check_function_calls = {
             'ensure_files_exist_gets_called': False,
-            'compile_typescript_files_gets_called': False
         }
         expected_check_function_calls = {
             'ensure_files_exist_gets_called': True,
-            'compile_typescript_files_gets_called': True
         }
 
         def mock_ensure_files_exist(unused_filepaths):
             check_function_calls['ensure_files_exist_gets_called'] = True
 
-        def mock_compile_typescript_files(unused_project_dir):
-            check_function_calls['compile_typescript_files_gets_called'] = True
-
         ensure_files_exist_swap = self.swap(
             build, '_ensure_files_exist', mock_ensure_files_exist)
-        compile_typescript_files_swap = self.swap(
-            build, 'compile_typescript_files', mock_compile_typescript_files)
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception,
             'minify_third_party_libs_only should not be set in non-prod mode.')
-
-        with ensure_files_exist_swap, compile_typescript_files_swap, (
-            assert_raises_regexp_context_manager):
+        with ensure_files_exist_swap, assert_raises_regexp_context_manager:
             build.main(args=['--minify_third_party_libs_only'])
 
         self.assertEqual(check_function_calls, expected_check_function_calls)

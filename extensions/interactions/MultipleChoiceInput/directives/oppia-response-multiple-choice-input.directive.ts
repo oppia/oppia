@@ -36,9 +36,11 @@ angular.module('oppia').directive('oppiaResponseMultipleChoiceInput', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
-        ctrl.response = _choices[_answer];
+        ctrl.$onInit = function() {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
+          ctrl.response = _choices[_answer];
+        };
       }]
     };
   }

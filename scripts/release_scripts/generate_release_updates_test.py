@@ -59,14 +59,16 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         mail_file_swap = self.swap(
             generate_release_updates,
             'RELEASE_MAIL_MESSAGE_FILEPATH', temp_mail_file)
-        with self.input_swap, mail_file_swap:
+        with self.branch_name_swap, self.input_swap, mail_file_swap:
             (
                 generate_release_updates
                 .create_new_file_with_release_message_template())
             with python_utils.open_file(temp_mail_file, 'r') as f:
                 self.assertEqual(
                     f.read(),
-                    generate_release_updates.RELEASE_MAIL_MESSAGE_TEMPLATE)
+                    generate_release_updates.RELEASE_MAIL_MESSAGE_TEMPLATE % (
+                        tuple(['1.2.3'] + (
+                            generate_release_updates.SECTIONS_TO_ADD))))
 
     def test_validate_release_message_with_valid_message(self):
         mail_file_swap = self.swap(
@@ -150,16 +152,42 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
                     'the release_info.py script and re-run this script.')):
                 generate_release_updates.main()
 
+    def test_create_group_for_next_release(self):
+        check_function_calls = {
+            'open_new_tab_in_browser_if_possible_gets_called': False,
+            'ask_user_to_confirm_gets_called': False
+        }
+        expected_check_function_calls = {
+            'open_new_tab_in_browser_if_possible_gets_called': True,
+            'ask_user_to_confirm_gets_called': True
+        }
+        def mock_open_new_tab_in_browser_if_possible(unused_url):
+            check_function_calls[
+                'open_new_tab_in_browser_if_possible_gets_called'] = True
+        def mock_ask_user_to_confirm(unused_msg):
+            check_function_calls['ask_user_to_confirm_gets_called'] = True
+
+        open_tab_swap = self.swap(
+            common, 'open_new_tab_in_browser_if_possible',
+            mock_open_new_tab_in_browser_if_possible)
+        ask_user_swap = self.swap(
+            common, 'ask_user_to_confirm', mock_ask_user_to_confirm)
+        with open_tab_swap, ask_user_swap:
+            generate_release_updates.create_group_for_next_release()
+        self.assertEqual(check_function_calls, expected_check_function_calls)
+
     def test_function_calls(self):
         check_function_calls = {
             'create_new_file_with_release_message_template_gets_called': False,
             'validate_release_message_gets_called': False,
             'prompt_user_to_send_announcement_email_gets_called': False,
+            'create_group_for_next_release': False,
         }
         expected_check_function_calls = {
             'create_new_file_with_release_message_template_gets_called': True,
             'validate_release_message_gets_called': True,
             'prompt_user_to_send_announcement_email_gets_called': True,
+            'create_group_for_next_release': True,
         }
         def mock_create_new_file_with_release_message_template():
             check_function_calls[
@@ -170,6 +198,8 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         def mock_prompt_user_to_send_announcement_email():
             check_function_calls[
                 'prompt_user_to_send_announcement_email_gets_called'] = True
+        def mock_create_group_for_next_release():
+            check_function_calls['create_group_for_next_release'] = True
         def mock_exists(unused_filepath):
             return True
         def mock_remove(unused_filepath):
@@ -188,10 +218,13 @@ class GenerateReleaseUpdatesTests(test_utils.GenericTestBase):
         send_swap = self.swap(
             generate_release_updates, 'prompt_user_to_send_announcement_email',
             mock_prompt_user_to_send_announcement_email)
+        create_group_swap = self.swap(
+            generate_release_updates, 'create_group_for_next_release',
+            mock_create_group_for_next_release)
         exists_swap = self.swap(os.path, 'exists', mock_exists)
         remove_swap = self.swap(os, 'remove', mock_remove)
 
-        with self.branch_name_swap, release_summary_swap:
+        with self.branch_name_swap, release_summary_swap, create_group_swap:
             with write_swap, check_swap, send_swap, exists_swap, remove_swap:
                 generate_release_updates.main()
 

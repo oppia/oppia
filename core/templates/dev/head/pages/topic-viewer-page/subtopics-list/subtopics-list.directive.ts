@@ -35,11 +35,9 @@ angular.module('oppia').directive('subtopicsList', [
         'WindowDimensionsService', '$scope', '$timeout', 'UrlService',
         function(
             WindowDimensionsService, $scope, $timeout, UrlService) {
+          var ctrl = this;
           var SUBTOPIC_TILE_WIDTH_PX = 310;
-          $scope.leftmostCardIndices = 0;
           var MAX_NUM_TILES_PER_ROW = 4;
-          $scope.tileDisplayCount = 0;
-          $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
           var initCarousels = function() {
             $scope.subtopics = $scope.getSubtopics();
             if (!$scope.subtopics) {
@@ -110,30 +108,33 @@ angular.module('oppia').directive('subtopicsList', [
             });
           };
 
-          var topicViewerWindowCutoffPx = 895;
-          $scope.topicViewerWindowIsNarrow = (
-            WindowDimensionsService.getWidth() <= topicViewerWindowCutoffPx);
-
-          WindowDimensionsService.registerOnResizeHook(function() {
-            $scope.topicViewerWindowIsNarrow = (
-              WindowDimensionsService.getWidth() <= topicViewerWindowCutoffPx);
-            $scope.$apply();
-          });
-
           $scope.incrementLeftmostCardIndex = function() {
             $scope.leftmostCardIndices++;
           };
           $scope.decrementLeftmostCardIndex = function() {
             $scope.leftmostCardIndices--;
           };
-          $timeout(function() {
-            initCarousels();
-          }, 390);
-
-          $(window).resize(function() {
-            initCarousels();
-            $scope.$apply();
-          });
+          ctrl.$onInit = function() {
+            $scope.leftmostCardIndices = 0;
+            $scope.tileDisplayCount = 0;
+            $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
+            var topicViewerWindowCutoffPx = 895;
+            $scope.topicViewerWindowIsNarrow = (
+              WindowDimensionsService.getWidth() <= topicViewerWindowCutoffPx);
+            WindowDimensionsService.registerOnResizeHook(function() {
+              $scope.topicViewerWindowIsNarrow = (
+                WindowDimensionsService.getWidth() <= topicViewerWindowCutoffPx
+              );
+              $scope.$apply();
+            });
+            $timeout(function() {
+              initCarousels();
+            }, 390);
+            $(window).resize(function() {
+              initCarousels();
+              $scope.$apply();
+            });
+          };
         }
       ]
     };

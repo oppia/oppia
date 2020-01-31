@@ -108,6 +108,14 @@ angular.module('oppia').factory('CurrentInteractionService', [
         }
       },
       isSubmitButtonDisabled: function() {
+        /* The submit button should be disabled if the current interaction
+         * did not register a _submitAnswerFn. This could occur in
+         * low-bandwidth scenarios where the interaction has not finished
+         * loading.
+         */
+        if (_submitAnswerFn === null) {
+          return true;
+        }
         /* Returns whether or not the Submit button should be disabled based on
          * the validity of the current answer. If the interaction does not pass
          * in a _validityCheckFn, then _validityCheckFn will be null and by

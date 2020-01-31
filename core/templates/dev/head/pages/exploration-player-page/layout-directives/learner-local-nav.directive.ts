@@ -61,19 +61,6 @@ angular.module('oppia').directive('learnerLocalNav', [
             UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
             FLAG_EXPLORATION_URL_TEMPLATE) {
           var ctrl = this;
-          ctrl.explorationId = ExplorationEngineService.getExplorationId();
-          ReadOnlyExplorationBackendApiService
-            .loadExploration(ctrl.explorationId)
-            .then(function(exploration) {
-              ctrl.canEdit = exploration.can_edit;
-            });
-          ctrl.username = '';
-          $rootScope.loadingMessage = 'Loading';
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.username = userInfo.getUsername();
-            $rootScope.loadingMessage = '';
-          });
-
           ctrl.getFeedbackPopoverUrl = function() {
             return UrlInterpolationService.getDirectiveTemplateUrl(
               FEEDBACK_POPOVER_PATH);
@@ -128,7 +115,7 @@ angular.module('oppia').directive('learnerLocalNav', [
                 result.report_text);
               $http.post(flagExplorationUrl, {
                 report_text: report
-              }).error(function(error) {
+              }, function(error) {
                 AlertsService.addWarning(error);
               });
               $uibModal.open({
@@ -144,7 +131,29 @@ angular.module('oppia').directive('learnerLocalNav', [
                     };
                   }
                 ]
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
+            });
+          };
+          ctrl.$onInit = function() {
+            ctrl.explorationId = ExplorationEngineService.getExplorationId();
+            ReadOnlyExplorationBackendApiService
+              .loadExploration(ctrl.explorationId)
+              .then(function(exploration) {
+                ctrl.canEdit = exploration.can_edit;
+              });
+            ctrl.username = '';
+            $rootScope.loadingMessage = 'Loading';
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.username = userInfo.getUsername();
+              $rootScope.loadingMessage = '';
             });
           };
         }

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """File for compiling and checking typescript."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -25,7 +26,7 @@ import sys
 import python_utils
 
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
-TSCONFIG_FILEPATH = 'tsconfig-for-compile-check.json'
+TSCONFIG_FILEPATH = 'tsconfig.json'
 
 
 def validate_compiled_js_dir():

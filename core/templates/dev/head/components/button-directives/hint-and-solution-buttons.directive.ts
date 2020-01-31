@@ -54,17 +54,7 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_OPENED, INTERACTION_SPECS, StatsReportingService) {
           var ctrl = this;
-          ctrl.hintIndexes = [];
           var _editorPreviewMode = ContextService.isInExplorationEditorPage();
-          // Represents the index of the currently viewed hint.
-          ctrl.activeHintIndex = null;
-          ctrl.displayedCard = null;
-          ctrl.solutionModalIsActive = false;
-          ctrl.currentlyOnLatestCard = true;
-          ctrl.isHintConsumed = HintsAndSolutionManagerService.isHintConsumed;
-          ctrl.isSolutionConsumed = (
-            HintsAndSolutionManagerService.isSolutionConsumed);
-
           var resetLocalHintsArray = function() {
             ctrl.hintIndexes = [];
             var numHints = HintsAndSolutionManagerService.getNumHints();
@@ -99,7 +89,8 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
               ctrl.displaySolutionModal();
             } else {
               var interstitialModalPromise = (
-                HintAndSolutionModalService.displaySolutionInterstitialModal());
+                HintAndSolutionModalService
+                  .displaySolutionInterstitialModal());
               interstitialModalPromise.result.then(function() {
                 ctrl.displaySolutionModal();
               }, function() {
@@ -122,28 +113,43 @@ angular.module('oppia').directive('hintAndSolutionButtons', [
             });
           };
 
-          $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
-            ctrl.displayedCard = newCard;
-            HintsAndSolutionManagerService.reset(
-              newCard.getHints(), newCard.getSolution()
-            );
-            resetLocalHintsArray();
-          });
-
           ctrl.isTooltipVisible = function() {
             return HintsAndSolutionManagerService.isHintTooltipOpen();
           };
 
-          $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
-            var displayedCardIndex =
-              PlayerPositionService.getDisplayedCardIndex();
-            ctrl.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
-              displayedCardIndex);
-            if (ctrl.currentlyOnLatestCard) {
+          ctrl.isHintConsumed = function(hintIndex) {
+            return HintsAndSolutionManagerService.isHintConsumed(hintIndex);
+          };
+
+          ctrl.isSolutionConsumed = function() {
+            return HintsAndSolutionManagerService.isSolutionConsumed();
+          };
+
+          ctrl.$onInit = function() {
+            ctrl.hintIndexes = [];
+            // Represents the index of the currently viewed hint.
+            ctrl.activeHintIndex = null;
+            ctrl.displayedCard = null;
+            ctrl.solutionModalIsActive = false;
+            ctrl.currentlyOnLatestCard = true;
+            resetLocalHintsArray();
+            $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
+              ctrl.displayedCard = newCard;
+              HintsAndSolutionManagerService.reset(
+                newCard.getHints(), newCard.getSolution()
+              );
               resetLocalHintsArray();
-            }
-          });
-          resetLocalHintsArray();
+            });
+            $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function(evt) {
+              var displayedCardIndex =
+                PlayerPositionService.getDisplayedCardIndex();
+              ctrl.currentlyOnLatestCard = PlayerTranscriptService.isLastCard(
+                displayedCardIndex);
+              if (ctrl.currentlyOnLatestCard) {
+                resetLocalHintsArray();
+              }
+            });
+          };
         }
       ]
     };

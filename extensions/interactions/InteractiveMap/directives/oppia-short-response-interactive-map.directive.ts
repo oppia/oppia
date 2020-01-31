@@ -36,12 +36,14 @@ angular.module('oppia').directive('oppiaShortResponseInteractiveMap', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
-        ctrl.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
-        ctrl.formattedCoords += ', ';
-        ctrl.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
-        ctrl.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
+        ctrl.$onInit = function() {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
+          ctrl.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
+          ctrl.formattedCoords += ', ';
+          ctrl.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
+          ctrl.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
+        };
       }]
     };
   }

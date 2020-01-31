@@ -51,12 +51,8 @@ angular.module('oppia').directive('improvementsTab', [
       controller: [
         '$scope', 'ImprovementTaskService', 'ImprovementsDisplayService',
         function($scope, ImprovementTaskService, ImprovementsDisplayService) {
+          var ctrl = this;
           var fetchedTasks = [];
-          ImprovementTaskService.fetchTasks().then(function(tasks) {
-            fetchedTasks = tasks;
-          });
-
-          $scope.onlyShowOpenTasks = true;
 
           $scope.getStatusCssClass = function(status) {
             return ImprovementsDisplayService.getStatusCssClass(status);
@@ -88,6 +84,13 @@ angular.module('oppia').directive('improvementsTab', [
 
           $scope.getOpenTaskCount = function() {
             return fetchedTasks.filter($scope.isTaskOpen).length;
+          };
+
+          ctrl.$onInit = function() {
+            ImprovementTaskService.fetchTasks().then(function(tasks) {
+              fetchedTasks = tasks;
+            });
+            $scope.onlyShowOpenTasks = true;
           };
         }
       ],

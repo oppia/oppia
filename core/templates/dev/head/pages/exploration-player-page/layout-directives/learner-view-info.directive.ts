@@ -53,14 +53,6 @@ angular.module('oppia').directive('learnerViewInfo', [
           var ctrl = this;
           var explorationId = ContextService.getExplorationId();
           var expInfo = null;
-
-          ctrl.explorationTitle = 'Loading...';
-          ReadOnlyExplorationBackendApiService.fetchExploration(
-            explorationId, UrlService.getExplorationVersionFromUrl())
-            .then(function(response) {
-              ctrl.explorationTitle = response.exploration.title;
-            });
-
           ctrl.showInformationCard = function() {
             if (expInfo) {
               openInformationCardModal();
@@ -181,6 +173,14 @@ angular.module('oppia').directive('learnerViewInfo', [
                 }
               ]
             });
+          };
+          ctrl.$onInit = function() {
+            ctrl.explorationTitle = 'Loading...';
+            ReadOnlyExplorationBackendApiService.fetchExploration(
+              explorationId, UrlService.getExplorationVersionFromUrl())
+              .then(function(response) {
+                ctrl.explorationTitle = response.exploration.title;
+              });
           };
         }
       ]

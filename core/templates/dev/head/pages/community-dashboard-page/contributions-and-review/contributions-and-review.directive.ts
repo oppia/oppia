@@ -53,6 +53,7 @@ angular.module('oppia').directive('contributionsAndReview', [
         function(
             $filter, $uibModal, ContributionAndReviewService,
             QuestionObjectFactory, UserService) {
+          var ctrl = this;
           var SUGGESTION_LABELS = {
             review: {
               text: 'Awaiting review',
@@ -67,38 +68,6 @@ angular.module('oppia').directive('contributionsAndReview', [
               color: '#e76c8c'
             }
           };
-          var ctrl = this;
-          ctrl.isAdmin = false;
-          ctrl.userDetailsLoading = true;
-          ctrl.userIsLoggedIn = false;
-          ctrl.contributions = {};
-          ctrl.contributionSummaries = [];
-          ctrl.contributionsDataLoading = true;
-          ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
-          ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
-          ctrl.activeReviewTab = '';
-          ctrl.reviewTabs = [
-            {
-              suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
-              text: 'Review Questions'
-            },
-            {
-              suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
-              text: 'Review Translations'
-            }
-          ];
-          ctrl.activeContributionTab = '';
-          ctrl.contributionTabs = [
-            {
-              suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
-              text: 'Questions'
-            },
-            {
-              suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
-              text: 'Translations'
-            }
-          ];
-
           var getQuestionContributionsSummary = function() {
             var questionContributionsSummaryList = [];
             Object.keys(ctrl.contributions).forEach(function(key) {
@@ -385,16 +354,48 @@ angular.module('oppia').directive('contributionsAndReview', [
             }
           };
 
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.isAdmin = userInfo.isAdmin();
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-            ctrl.userDetailsLoading = false;
-            if (ctrl.isAdmin) {
-              ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
-            } else if (ctrl.userIsLoggedIn) {
-              ctrl.switchToContributionsTab(ctrl.SUGGESTION_TYPE_QUESTION);
-            }
-          });
+          ctrl.$onInit = function() {
+            ctrl.isAdmin = false;
+            ctrl.userDetailsLoading = true;
+            ctrl.userIsLoggedIn = false;
+            ctrl.contributions = {};
+            ctrl.contributionSummaries = [];
+            ctrl.contributionsDataLoading = true;
+            ctrl.SUGGESTION_TYPE_QUESTION = 'add_question';
+            ctrl.SUGGESTION_TYPE_TRANSLATE = 'translate_content';
+            ctrl.activeReviewTab = '';
+            ctrl.reviewTabs = [
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+                text: 'Review Questions'
+              },
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+                text: 'Review Translations'
+              }
+            ];
+            ctrl.activeContributionTab = '';
+            ctrl.contributionTabs = [
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_QUESTION,
+                text: 'Questions'
+              },
+              {
+                suggestionType: ctrl.SUGGESTION_TYPE_TRANSLATE,
+                text: 'Translations'
+              }
+            ];
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.isAdmin = userInfo.isAdmin();
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              ctrl.userDetailsLoading = false;
+              if (ctrl.isAdmin) {
+                ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
+              } else if (ctrl.userIsLoggedIn) {
+                ctrl.switchToContributionsTab(ctrl.SUGGESTION_TYPE_QUESTION);
+              }
+            });
+          };
         }
       ]
     };

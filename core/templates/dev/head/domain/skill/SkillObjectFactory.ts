@@ -24,10 +24,11 @@ require('services/validators.service.ts');
 
 angular.module('oppia').factory('SkillObjectFactory', [
   'ConceptCardObjectFactory', 'MisconceptionObjectFactory',
-  'RubricObjectFactory', 'ValidatorsService', 'SKILL_DIFFICULTIES',
-  function(
+  'RubricObjectFactory', 'ValidatorsService', 'INVALID_NAME_CHARS',
+  'SKILL_DIFFICULTIES', function(
       ConceptCardObjectFactory, MisconceptionObjectFactory,
-      RubricObjectFactory, ValidatorsService, SKILL_DIFFICULTIES) {
+      RubricObjectFactory, ValidatorsService, INVALID_NAME_CHARS,
+      SKILL_DIFFICULTIES) {
     var Skill = function(
         id, description, misconceptions, rubrics, conceptCard, languageCode,
         version, nextMisconceptionId, supersedingSkillId, allQuestionsMerged,
@@ -66,6 +67,15 @@ angular.module('oppia').factory('SkillObjectFactory', [
           'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
           'in rubrics.');
       }
+      this.getMisconceptions().forEach(misconception => {
+        INVALID_NAME_CHARS.forEach(character => {
+          if (misconception.getName().indexOf(character) !== -1) {
+            issues.push(
+              'Misconception ' + misconception.getName() +
+              ' has invalid character.');
+          }
+        });
+      });
       return issues;
     };
 

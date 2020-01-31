@@ -128,7 +128,7 @@ angular.module('oppia').directive('questionPlayer', [
       controller: [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
-        '$sanitize', '$timeout', '$uibModal', '$window',
+        '$sanitize', '$uibModal', '$window',
         'AlertsService', 'HtmlEscaperService',
         'QuestionBackendApiService', 'SkillMasteryBackendApiService',
         'UrlService', 'UserService', 'COLORS_FOR_PASS_FAIL_MODE',
@@ -139,7 +139,7 @@ angular.module('oppia').directive('questionPlayer', [
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
-            $sanitize, $timeout, $uibModal, $window,
+            $sanitize, $uibModal, $window,
             AlertsService, HtmlEscaperService,
             QuestionBackendApiService, SkillMasteryBackendApiService,
             UrlService, UserService, COLORS_FOR_PASS_FAIL_MODE,
@@ -148,12 +148,6 @@ angular.module('oppia').directive('questionPlayer', [
             VIEW_HINT_PENALTY_FOR_MASTERY,
             WRONG_ANSWER_PENALTY, WRONG_ANSWER_PENALTY_FOR_MASTERY) {
           var ctrl = this;
-          ctrl.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.canCreateCollections = userInfo.canCreateCollections();
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          });
-
           var initResults = function() {
             $scope.resultsLoaded = false;
             ctrl.currentQuestion = 0;
@@ -163,8 +157,6 @@ angular.module('oppia').directive('questionPlayer', [
             ctrl.scorePerSkillMapping = {};
             ctrl.testIsPassed = true;
           };
-          initResults();
-          ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           var getStaticImageUrl = function(url) {
             return UrlInterpolationService.getStaticImageUrl(url);
           };
@@ -268,6 +260,9 @@ angular.module('oppia').directive('questionPlayer', [
                   };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
             });
           };
 
@@ -549,40 +544,54 @@ angular.module('oppia').directive('questionPlayer', [
                   };
                 }
               ]
+            }).result.then(function() {}, function() {
+              // This callback is triggered when the Cancel button is
+              // clicked. No further action is needed.
             });
           };
 
-          $rootScope.$on('currentQuestionChanged', function(event, result) {
-            updateCurrentQuestion(result + 1);
-          });
+          ctrl.$onInit = function() {
+            $rootScope.$on('currentQuestionChanged', function(event, result) {
+              updateCurrentQuestion(result + 1);
+            });
 
-          $rootScope.$on('totalQuestionsReceived', function(event, result) {
-            updateTotalQuestions(result);
-          });
+            $rootScope.$on('totalQuestionsReceived', function(event, result) {
+              updateTotalQuestions(result);
+            });
 
-          $rootScope.$on('questionSessionCompleted', function(event, result) {
-            $location.hash(HASH_PARAM +
-              encodeURIComponent(JSON.stringify(result)));
-          });
+            $rootScope.$on('questionSessionCompleted', function(event, result) {
+              $location.hash(HASH_PARAM +
+                encodeURIComponent(JSON.stringify(result)));
+            });
 
-          $scope.$on('$locationChangeSuccess', function(event) {
-            var hashContent = $location.hash();
-            if (!hashContent || hashContent.indexOf(HASH_PARAM) === -1) {
-              return;
-            }
-            var resultHashString = decodeURIComponent(
-              hashContent.substring(hashContent.indexOf(
-                HASH_PARAM) + HASH_PARAM.length));
-            if (resultHashString) {
-              initResults();
-              var questionStateData = JSON.parse(resultHashString);
-              calculateScores(questionStateData);
-              if (ctrl.userIsLoggedIn) {
-                calculateMasteryDegrees(questionStateData);
+            $scope.$on('$locationChangeSuccess', function(event) {
+              var hashContent = $location.hash();
+              if (!hashContent || hashContent.indexOf(HASH_PARAM) === -1) {
+                return;
               }
-              ctrl.testIsPassed = hasUserPassedTest();
-            }
-          });
+              var resultHashString = decodeURIComponent(
+                hashContent.substring(hashContent.indexOf(
+                  HASH_PARAM) + HASH_PARAM.length));
+              if (resultHashString) {
+                initResults();
+                var questionStateData = JSON.parse(resultHashString);
+                calculateScores(questionStateData);
+                if (ctrl.userIsLoggedIn) {
+                  calculateMasteryDegrees(questionStateData);
+                }
+                ctrl.testIsPassed = hasUserPassedTest();
+              }
+            });
+            ctrl.userIsLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.canCreateCollections = userInfo.canCreateCollections();
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            });
+            // The initResults function is written separately since it is also
+            // called in $scope.$on when some external events are triggered.
+            initResults();
+            ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          };
         }
       ]
     };

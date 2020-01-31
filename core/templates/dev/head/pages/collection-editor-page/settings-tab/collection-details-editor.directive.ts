@@ -52,23 +52,6 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             TAG_REGEX) {
           var ctrl = this;
-          ctrl.collection = CollectionEditorStateService.getCollection();
-          ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
-            COLLECTION_TITLE_INPUT_FOCUS_LABEL);
-          ctrl.hasPageLoaded = (
-            CollectionEditorStateService.hasLoadedCollection);
-          ctrl.CATEGORY_LIST_FOR_SELECT2 = ALL_CATEGORIES.map(
-            function(category) {
-              return {
-                id: category,
-                text: category
-              };
-            }
-          );
-
-          ctrl.languageListForSelect = SUPPORTED_CONTENT_LANGUAGES;
-          ctrl.TAG_REGEX = TAG_REGEX;
-
           var refreshSettingsTab = function() {
             ctrl.displayedCollectionTitle = ctrl.collection.getTitle();
             ctrl.displayedCollectionObjective = (
@@ -95,9 +78,6 @@ angular.module('oppia').directive('collectionDetailsEditor', [
               });
             }
           };
-
-          $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
-          $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
 
           ctrl.updateCollectionTitle = function() {
             CollectionUpdateService.setCollectionTitle(
@@ -139,6 +119,26 @@ angular.module('oppia').directive('collectionDetailsEditor', [
             }
             CollectionUpdateService.setCollectionTags(
               ctrl.collection, ctrl.displayedCollectionTags);
+          };
+          ctrl.hasPageLoaded = function() {
+            return CollectionEditorStateService.hasLoadedCollection();
+          };
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_COLLECTION_INITIALIZED, refreshSettingsTab);
+            $scope.$on(EVENT_COLLECTION_REINITIALIZED, refreshSettingsTab);
+            ctrl.collection = CollectionEditorStateService.getCollection();
+            ctrl.COLLECTION_TITLE_INPUT_FOCUS_LABEL = (
+              COLLECTION_TITLE_INPUT_FOCUS_LABEL);
+            ctrl.CATEGORY_LIST_FOR_SELECT2 = ALL_CATEGORIES.map(
+              function(category) {
+                return {
+                  id: category,
+                  text: category
+                };
+              }
+            );
+            ctrl.languageListForSelect = SUPPORTED_CONTENT_LANGUAGES;
+            ctrl.TAG_REGEX = TAG_REGEX;
           };
         }
       ]

@@ -41,6 +41,8 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
+        var demoExplorationIds = [];
+
         ctrl.reloadExploration = function(explorationId) {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
@@ -65,12 +67,6 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
           });
         };
 
-        ctrl.numDummyExpsToPublish = 0;
-        ctrl.numDummyExpsToGenerate = 0;
-        ctrl.DEMO_COLLECTIONS = {};
-        ctrl.DEMO_EXPLORATIONS = {};
-        ctrl.reloadingAllExplorationPossible = false;
-        var demoExplorationIds = [];
         ctrl.reloadAllExplorations = function() {
           if (!ctrl.reloadingAllExplorationPossible) {
             return;
@@ -119,14 +115,6 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
             });
           }
         };
-
-        AdminDataService.getDataAsync().then(function(response) {
-          ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
-          ctrl.DEMO_COLLECTIONS = response.demo_collections;
-          demoExplorationIds = response.demo_exploration_ids;
-          ctrl.reloadingAllExplorationPossible = true;
-        });
-
         ctrl.generateDummyExplorations = function() {
           // Generate dummy explorations with random title.
           if (ctrl.numDummyExpsToPublish > ctrl.numDummyExpsToGenerate) {
@@ -186,6 +174,19 @@ angular.module('oppia').directive('adminDevModeActivitiesTab', [
               'Server error: ' + errorResponse.data.error);
           });
           AdminTaskManagerService.finishTask();
+        };
+        ctrl.$onInit = function() {
+          ctrl.numDummyExpsToPublish = 0;
+          ctrl.numDummyExpsToGenerate = 0;
+          ctrl.DEMO_COLLECTIONS = {};
+          ctrl.DEMO_EXPLORATIONS = {};
+          ctrl.reloadingAllExplorationPossible = false;
+          AdminDataService.getDataAsync().then(function(response) {
+            ctrl.DEMO_EXPLORATIONS = response.demo_explorations;
+            ctrl.DEMO_COLLECTIONS = response.demo_collections;
+            demoExplorationIds = response.demo_exploration_ids;
+            ctrl.reloadingAllExplorationPossible = true;
+          });
         };
       }]
     };

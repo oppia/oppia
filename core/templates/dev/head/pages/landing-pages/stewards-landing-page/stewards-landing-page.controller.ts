@@ -40,19 +40,6 @@ angular.module('oppia').directive('stewardsLandingPage', [
             $scope, $timeout, $window, SiteAnalyticsService,
             UrlInterpolationService, UrlService, WindowDimensionsService) {
           var ctrl = this;
-          ctrl.TAB_NAME_PARENTS = 'Parents';
-          ctrl.TAB_NAME_TEACHERS = 'Teachers';
-          ctrl.TAB_NAME_NONPROFITS = 'NGOs';
-          ctrl.TAB_NAME_VOLUNTEERS = 'Volunteers';
-
-          var URL_PATTERNS_TO_TAB_NAMES = {
-            '/parents': ctrl.TAB_NAME_PARENTS,
-            '/teachers': ctrl.TAB_NAME_TEACHERS,
-            '/partners': ctrl.TAB_NAME_NONPROFITS,
-            '/nonprofits': ctrl.TAB_NAME_NONPROFITS,
-            '/volunteers': ctrl.TAB_NAME_VOLUNTEERS
-          };
-
           ctrl.setActiveTabName = function(newActiveTabName) {
             ctrl.activeTabName = newActiveTabName;
             ctrl.buttonDefinitions = getButtonDefinitions(newActiveTabName);
@@ -129,25 +116,37 @@ angular.module('oppia').directive('stewardsLandingPage', [
             return windowWidthPx <= 890;
           };
 
-          ctrl.windowIsNarrow = isWindowNarrow(
-            WindowDimensionsService.getWidth());
-          WindowDimensionsService.registerOnResizeHook(function() {
+          ctrl.$onInit = function() {
+            ctrl.TAB_NAME_PARENTS = 'Parents';
+            ctrl.TAB_NAME_TEACHERS = 'Teachers';
+            ctrl.TAB_NAME_NONPROFITS = 'NGOs';
+            ctrl.TAB_NAME_VOLUNTEERS = 'Volunteers';
+            // Set the initial tab name based on the URL; default to
+            // TAB_NAME_PARENTS.
+            var initialPathname = UrlService.getPathname();
+            ctrl.activeTabName = ctrl.TAB_NAME_PARENTS;
+            var URL_PATTERNS_TO_TAB_NAMES = {
+              '/parents': ctrl.TAB_NAME_PARENTS,
+              '/teachers': ctrl.TAB_NAME_TEACHERS,
+              '/partners': ctrl.TAB_NAME_NONPROFITS,
+              '/nonprofits': ctrl.TAB_NAME_NONPROFITS,
+              '/volunteers': ctrl.TAB_NAME_VOLUNTEERS
+            };
+            for (var urlPattern in URL_PATTERNS_TO_TAB_NAMES) {
+              if (initialPathname.indexOf(urlPattern) === 0) {
+                ctrl.activeTabName = URL_PATTERNS_TO_TAB_NAMES[urlPattern];
+                break;
+              }
+            }
+            ctrl.buttonDefinitions = getButtonDefinitions(ctrl.activeTabName);
             ctrl.windowIsNarrow = isWindowNarrow(
               WindowDimensionsService.getWidth());
-            $scope.$apply();
-          });
-
-          // Set the initial tab name based on the URL; default to
-          // TAB_NAME_PARENTS.
-          var initialPathname = UrlService.getPathname();
-          ctrl.activeTabName = ctrl.TAB_NAME_PARENTS;
-          for (var urlPattern in URL_PATTERNS_TO_TAB_NAMES) {
-            if (initialPathname.indexOf(urlPattern) === 0) {
-              ctrl.activeTabName = URL_PATTERNS_TO_TAB_NAMES[urlPattern];
-              break;
-            }
-          }
-          ctrl.buttonDefinitions = getButtonDefinitions(ctrl.activeTabName);
+            WindowDimensionsService.registerOnResizeHook(function() {
+              ctrl.windowIsNarrow = isWindowNarrow(
+                WindowDimensionsService.getWidth());
+              $scope.$apply();
+            });
+          };
         }
       ]
     };

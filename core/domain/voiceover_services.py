@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Functions to perform actions related to voiceover application."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
