@@ -4058,6 +4058,7 @@ title: Old Title
             })], 'Changed interaction_solutions.')
 
         exploration = exp_fetchers.get_exploration_by_id(self.NEW_EXP_ID)
+
         self.assertEqual(
             exploration.init_state.interaction.solution.to_dict(),
             solution)
