@@ -450,7 +450,7 @@ class TopicRightsModel(base_models.VersionedModel):
             model.manager_ids = [
                 new_user_id if manager_id == old_user_id else manager_id
                 for manager_id in model.manager_ids]
-            # These will be set by the AddAllUserIdsOneOffJob.
+            # These will be set by the AddAllUserIdsVerificationJob.
             model.all_user_ids = []
             migrated_models.append(model)
         cls.put_multi(
@@ -541,6 +541,9 @@ class TopicRightsAllUsersModel(base_models.BaseModel):
     """Temporary storage model for all user ids ever mentioned in the topic
     rights.
 
+    TODO (#8529): This model should be deleted after the user ID migration is
+    completed.
+
     The id of each instance is the id of the corresponding topic.
     """
     # The user_ids of users who are (or were in history) members of manager_ids
@@ -567,7 +570,6 @@ class TopicRightsAllUsersModel(base_models.BaseModel):
         return cls.query(
             cls.all_user_ids == user_id).get(keys_only=True) is not None
 
-
     @staticmethod
     def get_user_id_migration_policy():
         """TopicRightsAllUsersModel has multiple fields with user ID."""
@@ -575,9 +577,12 @@ class TopicRightsAllUsersModel(base_models.BaseModel):
 
     @classmethod
     def migrate_model(cls, unused_old_user_id, unused_new_user_id):
-        """This model is used to verify the user ID migration so it will be
-        filled by the AddAllUserIdsOneOffJob and AddAllUserIdsSnapshotsOneOffJob
-        after the migration is done, thus it shouldn't be migrated here.
+        """This model is used to verify that the user ID migration of
+        TopicRightsSnapshotContentModel was successful. The content is filled by
+        the AddAllUserIdsVerificationJob and
+        AddAllUserIdsSnapshotsVerificationJob before the
+        GaeIdNotInModelsVerificationJob is run, thus it shouldn't be migrated by
+        this method.
 
         Args:
             unused_old_user_id: str. The old user ID.

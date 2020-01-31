@@ -1144,7 +1144,7 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJobTests(
             ['SUCCESS - ExplorationSnapshotMetadataModel', 3], output)
 
 
-class AddAllUserIdsOneOffJobTests(test_utils.GenericTestBase):
+class AddAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
 
     COL_1_ID = 'col_1_id'
     EXP_1_ID = 'exp_1_id'
@@ -1157,14 +1157,14 @@ class AddAllUserIdsOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = user_id_migration.AddAllUserIdsOneOffJob.create_new()
-        user_id_migration.AddAllUserIdsOneOffJob.enqueue(job_id)
+        job_id = user_id_migration.AddAllUserIdsVerificationJob.create_new()
+        user_id_migration.AddAllUserIdsVerificationJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            user_id_migration.AddAllUserIdsOneOffJob.get_output(job_id))
+            user_id_migration.AddAllUserIdsVerificationJob.get_output(job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]
         return eval_output
@@ -1277,7 +1277,7 @@ class AddAllUserIdsOneOffJobTests(test_utils.GenericTestBase):
             .all_user_ids)
 
 
-class AddAllUserIdsSnapshotsOneOffJobTests(test_utils.GenericTestBase):
+class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
 
     COL_1_ID = 'col_1_id'
     EXP_1_ID = 'exp_1_id'
@@ -1290,14 +1290,16 @@ class AddAllUserIdsSnapshotsOneOffJobTests(test_utils.GenericTestBase):
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = user_id_migration.AddAllUserIdsSnapshotsOneOffJob.create_new()
-        user_id_migration.AddAllUserIdsSnapshotsOneOffJob.enqueue(job_id)
+        job_id = (
+            user_id_migration.AddAllUserIdsSnapshotsVerificationJob
+            .create_new())
+        user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            user_id_migration.AddAllUserIdsSnapshotsOneOffJob.get_output(
+            user_id_migration.AddAllUserIdsSnapshotsVerificationJob.get_output(
                 job_id))
         eval_output = [ast.literal_eval(stringified_item) for
                        stringified_item in stringified_output]

@@ -518,7 +518,7 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJob(
         return SEPARATE_MODEL_CLASSES
 
 
-class AddAllUserIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class AddAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     """For every rights model merge the data from all the user id fields
     together and put them in a new all_user_ids field.
     """
@@ -568,7 +568,7 @@ class AddAllUserIdsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, len(ids))
 
 
-class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     """For every snapshot of a rights model, merge the data from all the user id
     fields together and put them in the all_user_ids field of the appropriate
     rights model.
@@ -652,8 +652,9 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if all_users_model is None:
                 yield ('FAILURE-%s' % class_name, rights_snapshot_model.id)
                 return
-            updated = AddAllUserIdsSnapshotsOneOffJob._add_collection_user_ids(
-                rights_snapshot_model, all_users_model)
+            updated = (
+                AddAllUserIdsSnapshotsVerificationJob._add_collection_user_ids(
+                    rights_snapshot_model, all_users_model))
         elif isinstance(
                 rights_snapshot_model,
                 exp_models.ExplorationRightsSnapshotContentModel):
@@ -663,8 +664,9 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if all_users_model is None:
                 yield ('FAILURE-%s' % class_name, rights_snapshot_model.id)
                 return
-            updated = AddAllUserIdsSnapshotsOneOffJob._add_exploration_user_ids(
-                rights_snapshot_model, all_users_model)
+            updated = (
+                AddAllUserIdsSnapshotsVerificationJob._add_exploration_user_ids(
+                    rights_snapshot_model, all_users_model))
         elif isinstance(
                 rights_snapshot_model,
                 topic_models.TopicRightsSnapshotContentModel):
@@ -673,7 +675,7 @@ class AddAllUserIdsSnapshotsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if all_users_model is None:
                 yield ('FAILURE-%s' % class_name, rights_snapshot_model.id)
                 return
-            updated = AddAllUserIdsSnapshotsOneOffJob._add_topic_user_ids(
+            updated = AddAllUserIdsSnapshotsVerificationJob._add_topic_user_ids(
                 rights_snapshot_model, all_users_model)
         if updated:
             yield ('SUCCESS-UPDATED-%s' % class_name, rights_snapshot_model.id)
