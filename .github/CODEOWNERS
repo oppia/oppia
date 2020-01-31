@@ -12,7 +12,8 @@
 #   can be optimized further.
 
 # Angular Migration team
-/core/templates/dev/head/services/contextual/logger.service*.ts @bansalnitish
+/core/templates/dev/head/services/contextual/logger.service.ts @bansalnitish
+/core/templates/dev/head/services/contextual/logger.service.spec.ts @bansalnitish
 /core/templates/dev/head/services/UpgradedServices.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796

@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for DeviceInfoService.
  */
+
 import { TestBed } from '@angular/core/testing';
 
 import { DeviceInfoService } from
@@ -35,7 +36,7 @@ describe('Device Info Service', () => {
     wrs = TestBed.get(WindowRef);
   });
 
-  it('should evaluates when a device is a mobile device ', () => {
+  it('should evaluate when a device is a mobile device ', () => {
     spyOnProperty(wrs.nativeWindow, 'navigator').and.callFake(() => ({
       userAgent: mobileUserAgent
     }));
@@ -44,7 +45,7 @@ describe('Device Info Service', () => {
     expect(dis.isMobileUserAgent()).toBe(true);
   });
 
-  it('should evaluates when a device is not a mobile device', () => {
+  it('should evaluate when a device is not a mobile device', () => {
     spyOnProperty(wrs.nativeWindow, 'navigator').and.callFake(() => ({
       userAgent: desktopUserAgent
     }));
