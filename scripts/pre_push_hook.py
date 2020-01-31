@@ -339,19 +339,19 @@ def does_diff_include_js_or_ts_files(files_to_lint):
     return False
 
 
-def does_diff_include_travis_yaml_or_protractor_conf_file(files_to_lint):
-    """Returns true if diff includes .travis.yml or protractor.conf.js file.
+def does_diff_include_travis_yml_or_js_files(files_to_lint):
+    """Returns true if diff includes .travis.yml or Javascript files.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
 
     Returns:
         bool. Whether the diff contains changes in travis.yml or
-        protractor.conf.js file.
+        Javascript files.
     """
 
     for filename in files_to_lint:
-        if (filename.endswith('protractor.conf.js') or
+        if (filename.endswith('.js') or
                 filename.endswith('.travis.yml')):
             return True
     return False
@@ -399,7 +399,7 @@ def main(args=None):
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
-            if does_diff_include_travis_yaml_or_protractor_conf_file(
+            if does_diff_include_travis_yml_or_js_files(
                     files_to_lint):
                 travis_ci_check_status = start_python_script(
                     TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
