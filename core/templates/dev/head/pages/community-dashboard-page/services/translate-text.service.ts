@@ -17,8 +17,13 @@
  * fields.
  */
 
+require(
+  'pages/community-dashboard-page/services/' +
+  'translate-text-backend-api.service.ts');
+
 angular.module('oppia').factory('TranslateTextService', [
-  '$http', function($http) {
+  '$http', 'TranslateTextBackendService',
+  function($http, TranslateTextBackendService) {
     var stateWiseContents = null;
     var stateWiseContentIds = {};
     var activeStateName = null;
@@ -62,16 +67,13 @@ angular.module('oppia').factory('TranslateTextService', [
         stateNamesList = [];
         activeExpId = expId;
         activeExpVersion = null;
-        $http.get(
-          '/gettranslatabletexthandler', {
-            params: {
-              exp_id: expId,
-              language_code: languageCode
-            }
-          }).then(
-          function(response) {
-            stateWiseContents = response.data.state_names_to_content_id_mapping;
-            activeExpVersion = response.data.version;
+        TranslateTextBackendService.getTranslatableTextHandler({
+          exp_id: expId,
+          language_code: languageCode
+        }).then(
+          function(data) {
+            stateWiseContents = data.state_names_to_content_id_mapping;
+            activeExpVersion = data.version;
             for (var stateName in stateWiseContents) {
               stateNamesList.push(stateName);
               var contentIds = [];
