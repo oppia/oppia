@@ -218,6 +218,10 @@ var TopicEditorPage = function() {
     addSubtopicCard.click();
     newSubtopicTitlefield.sendKeys(title);
     confirmSubtopicCreationButton.click();
+    waitFor.invisibilityOf(
+      confirmSubtopicCreationButton,
+      'Add subtopic modal takes too long to disappear');
+    waitFor.pageToFullyLoad();
   };
 
   this.dragSkillToSubtopic = function(skillIndex, subtopicIndex) {
