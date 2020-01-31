@@ -1796,36 +1796,27 @@ class State(python_utils.OBJECT):
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_interaction_solution(self, solution_dict):
-        """Update the solution of interaction.
+    def update_interaction_solution(self, solution):
+      """Update the solution of interaction.
 
-        Args:
-            solution_dict: dict or None. The dict representation of
-                Solution object.
+      Args:
+          solution: object or None. The Solution object.
+      """
+      old_content_id_list = []
+      new_content_id_list = []
+      if self.interaction.solution:
+        old_content_id_list.append(
+            self.interaction.solution.explanation.content_id)
 
-        Raises:
-            Exception: 'solution_dict' is not a dict.
-        """
-        old_content_id_list = []
-        new_content_id_list = []
-        if self.interaction.solution:
-            old_content_id_list.append(
-                self.interaction.solution.explanation.content_id)
+      if solution is not None:
+        self.interaction.solution = solution
+        new_content_id_list.append(
+            self.interaction.solution.explanation.content_id)
+      else:
+        self.interaction.solution = None
 
-        if solution_dict is not None:
-            if not isinstance(solution_dict, dict):
-                raise Exception(
-                    'Expected solution to be a dict, received %s'
-                    % solution_dict)
-            self.interaction.solution = Solution.from_dict(
-                self.interaction.id, solution_dict)
-            new_content_id_list.append(
-                self.interaction.solution.explanation.content_id)
-        else:
-            self.interaction.solution = None
-
-        self._update_content_ids_in_assets(
-            old_content_id_list, new_content_id_list)
+      self._update_content_ids_in_assets(
+          old_content_id_list, new_content_id_list)
 
     def update_recorded_voiceovers(self, recorded_voiceovers):
         """Update the recorded_voiceovers of a state.
