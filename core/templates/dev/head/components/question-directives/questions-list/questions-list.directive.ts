@@ -140,7 +140,7 @@ angular.module('oppia').directive('questionsList', [
             }
           };
 
-          ctrl.saveAndPublishQuestion = function() {
+          ctrl.saveAndPublishQuestion = function(commitMessage) {
             var validationErrors = ctrl.question.validate(
               ctrl.misconceptionsBySkill);
 
@@ -165,7 +165,7 @@ angular.module('oppia').directive('questionsList', [
                 ctrl.questionIsBeingSaved = true;
                 // TODO(tjiang11): Allow user to specify a commit message.
                 EditableQuestionBackendApiService.updateQuestion(
-                  ctrl.questionId, ctrl.question.getVersion(), 'blank',
+                  ctrl.questionId, ctrl.question.getVersion(), commitMessage,
                   QuestionUndoRedoService.getCommittableChangeList()).then(
                   function() {
                     QuestionUndoRedoService.clearChanges();
@@ -628,7 +628,38 @@ angular.module('oppia').directive('questionsList', [
                         'correspond to a correct answer';
                       return;
                     }
-                    $uibModalInstance.close(returnArray);
+                    if (QuestionUndoRedoService.hasChanges() ||
+                      returnArray.length > 0) {
+                      var modalInstance = $uibModal.open({
+                        templateUrl:
+                             UrlInterpolationService.getDirectiveTemplateUrl(
+                               '/components/question-directives' +
+                               '/modal-templates/' +
+                               'question-editor-save-modal.template.html'),
+                        backdrop: true,
+                        controller: [
+                          '$scope', '$uibModalInstance',
+                          function($scope, $uibModalInstance) {
+                            $scope.save = function(commitMessage) {
+                              $uibModalInstance.close(commitMessage);
+                            };
+                            $scope.cancel = function() {
+                              $uibModalInstance.dismiss('cancel');
+                            };
+                          }
+                        ]
+                      });
+
+                      modalInstance.result.then(function(commitMessage) {
+                        var returnModalObject = {
+                          array: returnArray,
+                          commitMessage: commitMessage
+                        };
+                        $uibModalInstance.close(returnModalObject);
+                      });
+                    } else {
+                      $uibModalInstance.dismiss('cancel');
+                    }
                   };
                   // Checking if Question contains all requirement to enable
                   // Save and Publish Question
@@ -669,12 +700,12 @@ angular.module('oppia').directive('questionsList', [
               ]
             });
 
-            modalInstance.result.then(function(array) {
+            modalInstance.result.then(function(modalObject) {
               $location.hash(null);
               ctrl.editorIsOpen = false;
-              if (array.length > 0) {
+              if (modalObject.array.length > 0) {
                 EditableQuestionBackendApiService.editQuestionSkillLinks(
-                  questionId, array, questionDifficulty).then(
+                  questionId, modalObject.array, questionDifficulty).then(
                   data => {
                     $timeout(function() {
                       QuestionsListService.resetPageNumber();
@@ -682,11 +713,11 @@ angular.module('oppia').directive('questionsList', [
                       ctrl.getQuestionSummariesAsync(
                         ctrl.selectedSkillIds, true, true
                       );
-                      ctrl.saveAndPublishQuestion();
+                      ctrl.saveAndPublishQuestion(modalObject.commitMessage);
                     }, 500);
                   });
               } else {
-                ctrl.saveAndPublishQuestion();
+                ctrl.saveAndPublishQuestion(modalObject.commitMessage);
               }
             }, function() {
               ctrl.editorIsOpen = false;
