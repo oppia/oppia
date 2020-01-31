@@ -29,10 +29,6 @@ describe('Url Service', () => {
   let origin = 'http://sample.com';
 
   beforeEach(() => {
-    windowRef = TestBed.get(WindowRef);
-  });
-
-  beforeEach(() => {
     mockLocation = {
       href: origin + pathname,
       origin: origin,
@@ -42,6 +38,7 @@ describe('Url Service', () => {
     };
 
     urlService = TestBed.get(UrlService);
+    windowRef = TestBed.get(WindowRef);
     spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
       location: mockLocation}));
   });
