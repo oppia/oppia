@@ -62,6 +62,13 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 
 describe('Image preloader service', function() {
+  var abas, ips, eof, ecs, ifof;
+  var $httpBackend = null;
+  var UrlInterpolationService;
+  var $rootScope = null;
+  var explorationDict;
+  var requestUrl1, requestUrl2, requestUrl3, requestUrl4;
+
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module('oppia', function($provide) {
@@ -139,12 +146,6 @@ describe('Image preloader service', function() {
     }
   }));
 
-  var abas, ips, eof, ecs;
-  var $httpBackend = null;
-  var UrlInterpolationService;
-  var $rootScope = null;
-  var explorationDict;
-  var requestUrl1, requestUrl2, requestUrl3, requestUrl4, requestUrl5;
   beforeEach(angular.mock.inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
     UrlInterpolationService = $injector.get('UrlInterpolationService');
@@ -153,6 +154,8 @@ describe('Image preloader service', function() {
     ecs = $injector.get('ContextService');
     abas = $injector.get('AssetsBackendApiService');
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
+    spyOn(ecs, 'getEntityType').and.returnValue('exploration');
+    spyOn(ecs, 'getEntityId').and.returnValue('1');
     $rootScope = $injector.get('$rootScope');
     explorationDict = {
       id: 1,
@@ -469,12 +472,17 @@ describe('Image preloader service', function() {
     ips.kickOffImagePreloader(exploration.getInitialState().name);
   }));
 
+  it('should service have started after init call', function() {
+    expect(ips.inExplorationPlayer()).toBe(true);
+  });
+
   it('should maintain the correct number of download requests in queue',
     function() {
       $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
       $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
       $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
       $httpBackend.expect('GET', requestUrl4).respond(201, 'image data 4');
+      // Max files to download simultaneously is 3.
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
       expect(ips.isLoadingImageFile(
         'sIMChoice1_height_32_width_42.png')).toBe(true);
@@ -486,6 +494,8 @@ describe('Image preloader service', function() {
         's6Hint1_height_60_width_60.png')).toBe(false);
       $httpBackend.flush(1);
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+      expect(ips.isLoadingImageFile(
+        's6Hint1_height_60_width_60.png')).toBe(true);
       $httpBackend.flush(1);
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(2);
       $httpBackend.flush(1);
@@ -510,7 +520,9 @@ describe('Image preloader service', function() {
       's6Hint1_height_60_width_60.png')).toBe(true);
   });
 
-  it('should verify that preloader starts when state changes', function() {
+  it('should start preloader when state changes and there is at least' +
+    ' one file downloading', function() {
+    $httpBackend.expect('GET', requestUrl4).respond(201, 'image data 4');
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
     expect(ips.isLoadingImageFile(
       's6Hint1_height_60_width_60.png')).toBe(false);
@@ -518,6 +530,27 @@ describe('Image preloader service', function() {
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
     expect(ips.isLoadingImageFile(
       's6Hint1_height_60_width_60.png')).toBe(true);
+    $httpBackend.flush(1);
+    expect(ips.isLoadingImageFile(
+      's6Hint1_height_60_width_60.png')).toBe(false);
+  });
+
+  it('should not start preloader when state changes and there is no' +
+    ' file downloading', function() {
+    $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
+    $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
+    $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
+    $httpBackend.expect('GET', requestUrl4).respond(201, 'image data 4');
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+    $httpBackend.flush(3);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
+    ips.onStateChange('State 6');
+    expect(ips.isLoadingImageFile(
+      's6Hint1_height_60_width_60.png')).toBe(true);
+    $httpBackend.flush(1);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(0);
+    expect(ips.isLoadingImageFile(
+      's6Hint1_height_60_width_60.png')).toBe(false);
   });
 
   it('should check that there is sync between AssetsBackendApi Service and' +
@@ -572,5 +605,122 @@ describe('Image preloader service', function() {
         'sol_height_ds_width_60.png');
     }).toThrowError(
       /it does not contain dimensions/);
+  });
+
+  it('should get image url', function() {
+    $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
+    $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
+    $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
+    $httpBackend.expect('GET', requestUrl4).respond(201, 'image data 4');
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+    expect(ips.isLoadingImageFile(
+      'sIMChoice1_height_32_width_42.png')).toBe(true);
+    $httpBackend.flush(1);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+
+    expect(ips.isLoadingImageFile(
+      'sIMChoice1_height_32_width_42.png')).toBe(false);
+
+    var sucessHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    ips.getImageUrl('sIMChoice1_height_32_width_42.png').then(
+      sucessHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(sucessHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should get image url when first loading fails and the second' +
+    ' one is successful', function() {
+    $httpBackend.expect('GET', requestUrl1).respond(404);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+    expect(ips.isInFailedDownload(
+      'sIMChoice1_height_32_width_42.png')).toBe(false);
+    $httpBackend.flush(1);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(0);
+
+    expect(ips.isInFailedDownload(
+      'sIMChoice1_height_32_width_42.png')).toBe(true);
+
+    var sucessHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
+    ips.getImageUrl('sIMChoice1_height_32_width_42.png').then(
+      sucessHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(ips.isInFailedDownload(
+      'sIMChoice1_height_32_width_42.png')).toBe(false);
+    expect(sucessHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should not get image url when loading image fails in both requests',
+    function() {
+      $httpBackend.expect('GET', requestUrl1).respond(404);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+      expect(ips.isInFailedDownload(
+        'sIMChoice1_height_32_width_42.png')).toBe(false);
+      $httpBackend.flush(1);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(0);
+
+      expect(ips.isInFailedDownload(
+        'sIMChoice1_height_32_width_42.png')).toBe(true);
+
+      var sucessHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect('GET', requestUrl1).respond(404);
+      ips.getImageUrl('sIMChoice1_height_32_width_42.png').then(
+        sucessHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(ips.isInFailedDownload(
+        'sIMChoice1_height_32_width_42.png')).toBe(true);
+      expect(sucessHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    });
+
+  it('should call the successful callback when loading an image after' +
+    ' trying to get its image url', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    ips.getImageUrl('sIMChoice1_height_32_width_42.png').then(
+      successHandler, failHandler);
+
+    $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+    expect(ips.isLoadingImageFile(
+      'sIMChoice1_height_32_width_42.png')).toBe(true);
+    $httpBackend.flush(1);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(0);
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should call the failed callback when loading an image fails after' +
+  ' trying to get its image url', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    ips.getImageUrl('sIMChoice1_height_32_width_42.png').then(
+      successHandler, failHandler);
+
+    $httpBackend.expect('GET', requestUrl1).respond(404);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+    expect(ips.isInFailedDownload(
+      'sIMChoice1_height_32_width_42.png')).toBe(false);
+    $httpBackend.flush(1);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(0);
+    expect(ips.isInFailedDownload(
+      'sIMChoice1_height_32_width_42.png')).toBe(true);
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalled();
   });
 });
