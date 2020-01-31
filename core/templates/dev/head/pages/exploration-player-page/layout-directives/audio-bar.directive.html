@@ -1,7 +1,7 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()">
   <div ng-if="audioBarIsExpanded" class="audio-controls">
     <div style="width: 560px;">
-      <span class="replay-white-circle" ng-click="onReplayButtonClicked()" ng-if="isAudioPlaying()">
+      <span class="oppia-replay-white-circle" ng-click="onReplayButtonClicked()" ng-if="isAudioPlaying()">
         <i class="fas fa-undo audio-undo-icon"></i>
       </span>
       <i class="fas audio-controls-button-icon"
@@ -132,8 +132,8 @@
     vertical-align: middle;
   }
 
-  .replay-white-circle {
-    background-color: #ffffff;
+  .oppia-replay-white-circle {
+    background-color: #fff;
     border-radius: 50%;
     display: inline-block;
     font-size: 1.4em;
