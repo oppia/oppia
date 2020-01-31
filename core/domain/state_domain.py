@@ -1796,15 +1796,11 @@ class State(python_utils.OBJECT):
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_interaction_solution(self, solution_dict):
+    def update_interaction_solution(self, solution):
         """Update the solution of interaction.
 
         Args:
-            solution_dict: dict or None. The dict representation of
-                Solution object.
-
-        Raises:
-            Exception: 'solution_dict' is not a dict.
+            solution: object or None. The Solution object.
         """
         old_content_id_list = []
         new_content_id_list = []
@@ -1812,13 +1808,8 @@ class State(python_utils.OBJECT):
             old_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
 
-        if solution_dict is not None:
-            if not isinstance(solution_dict, dict):
-                raise Exception(
-                    'Expected solution to be a dict, received %s'
-                    % solution_dict)
-            self.interaction.solution = Solution.from_dict(
-                self.interaction.id, solution_dict)
+        if solution is not None:
+            self.interaction.solution = solution
             new_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
         else:

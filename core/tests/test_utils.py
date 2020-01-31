@@ -2152,13 +2152,16 @@ class AppEngineTestBase(TestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
+        solution = state_domain.Solution.from_dict(
+            state.interaction.id, solution_dict
+        )
         hints_list = [{
             'hint_content': {
                 'content_id': 'hint_1',
                 'html': '<p>This is a hint.</p>'
             }
         }]
-        state.update_interaction_solution(solution_dict)
+        state.update_interaction_solution(solution)
         state.update_interaction_hints(hints_list)
         state.interaction.customization_args = {
             'placeholder': 'Enter text here',
