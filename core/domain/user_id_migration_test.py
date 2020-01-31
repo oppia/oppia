@@ -1222,7 +1222,7 @@ class AddAllUserIdsVerificationJobTests(test_utils.GenericTestBase):
             topic_models.TopicRightsAllUsersModel.get_by_id(self.TOP_1_ID)
             .all_user_ids)
 
-    def test_multiple_topic_rights(self):
+    def test_multiple_rights(self):
         collection_models.CollectionRightsModel.put_multi([
             collection_models.CollectionRightsModel(
                 id=self.COL_1_ID,
@@ -1532,7 +1532,7 @@ class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
             output,
             [['FAILURE-TopicRightsSnapshotContentModel', ['top_1_id-1']]])
 
-    def test_multiple_topic_rights(self):
+    def test_multiple_rights(self):
         collection_models.CollectionRightsAllUsersModel(
             id=self.COL_1_ID,
             all_user_ids=[]
