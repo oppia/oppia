@@ -17,15 +17,20 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
 import { UrlService } from 'services/contextual/url.service';
+import { WindowRef } from './window-ref.service';
 
 describe('Url Service', () => {
   let urlService: UrlService;
+  let windowRef;
   let sampleHash = 'sampleHash';
   let pathname = '/embed';
   let mockLocation = null;
   let origin = 'http://sample.com';
+
+  beforeEach(() => {
+    windowRef = TestBed.get(WindowRef);
+  });
 
   beforeEach(() => {
     mockLocation = {
@@ -37,12 +42,12 @@ describe('Url Service', () => {
     };
 
     urlService = TestBed.get(UrlService);
-    spyOn(urlService, 'getCurrentLocation').and.returnValue(mockLocation);
+    spyOnProperty(windowRef, 'nativeWindow').and.callFake(() => ({
+      location: mockLocation}));
   });
 
   it('should return correct query value list for each query field', () => {
     expect(urlService.getQueryFieldValuesAsList('field1')).toEqual([]);
-
     mockLocation.search = '?field1=value1&' +
       'field2=value2&field1=value3&field1=value4&field2=value5&' +
       'field1=value6&field1=value%3F%3D%20%266';
