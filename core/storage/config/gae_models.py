@@ -30,9 +30,8 @@ class ConfigPropertySnapshotMetadataModel(
 
     @staticmethod
     def get_export_policy():
-        """Model relates to version history of entity. Not included in export
-        because the export contains the data associated with the most recent
-        version.
+        """This model's export_data function has not been implemented yet.
+        However, it is pending implementation per #8523.
         """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
@@ -42,9 +41,8 @@ class ConfigPropertySnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """Model relates to version history of entity. Not included in export
-        because the export contains the data associated with the most recent
-        version.
+        """This model's export_data function has not been implemented yet.
+        However, it is pending implementation per #8523.
         """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 

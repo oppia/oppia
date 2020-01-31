@@ -1898,7 +1898,9 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """Model export_data function has not been written."""
+        """This model's export_data function has not been implemented yet.
+        However, it is pending implementation per #8523.
+        """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
     @classmethod

@@ -658,18 +658,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         export policy CONTAINS_USER_DATA, and that all other models have
         export policy NOT_APPLICABLE.
         """
-        all_models = []
-        model_names_list = [
-            model_name
-            for model_name in dir(models.NAMES)
-            if not model_name.startswith('__') and model_name != 'base_model'
-        ]
-        model_modules = models.Registry.import_models(model_names_list)
-        for model_module in model_modules:
-            for _, obj in inspect.getmembers(model_module):
-                if inspect.isclass(obj):
-                    all_models.append(obj)
-
+        all_models = models.Registry.get_all_storage_model_classes() 
         models_with_export = (takeout_service
                               .get_models_which_should_be_exported())
         unimplemented_models_count = 0
