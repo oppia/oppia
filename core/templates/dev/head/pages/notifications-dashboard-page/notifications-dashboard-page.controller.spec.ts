@@ -33,8 +33,8 @@ describe('Notifications Dashboard Page', function() {
   beforeEach(angular.mock.inject(function($injector, $compile, $rootScope) {
     $httpBackend = $injector.get('$httpBackend');
     $scope = $rootScope.$new();
-    var a = $injector.get('notificationsDashboardPageDirective')[0];
-    ctrl = $injector.instantiate(a.controller, {
+    var directive = $injector.get('notificationsDashboardPageDirective')[0];
+    ctrl = $injector.instantiate(directive.controller, {
       $rootScope: $scope
     });
   }));
