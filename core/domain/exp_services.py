@@ -373,7 +373,10 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
-                    state.update_interaction_solution(change.new_value)
+                    solution = state_domain.Solution.from_dict(
+                        state.interaction.id, change.new_value
+                    )
+                    state.update_interaction_solution(solution)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
