@@ -425,12 +425,9 @@ class TopicRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        return (
-            cls.query(ndb.OR(
-                cls.manager_ids == user_id,
-                cls.all_user_ids == user_id
-            )).get(keys_only=True) is not None
-            or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
+        return (cls.query(
+            cls.manager_ids == user_id).get(keys_only=True) is not None
+                or cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
 
     @staticmethod
     def get_user_id_migration_policy():
