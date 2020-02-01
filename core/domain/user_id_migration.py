@@ -586,6 +586,7 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
             collection_models.CollectionRightsModel(**content_dict))
 
         original_all_user_ids = list(all_users_model.all_user_ids)
+        print(original_all_user_ids)
         all_users_model.all_user_ids = list(
             set(all_users_model.all_user_ids) |
             set(reconstituted_rights_model.owner_ids) |
@@ -593,6 +594,9 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids))
         all_users_model.put()
+        print(original_all_user_ids)
+        print(all_users_model.all_user_ids)
+        print(len(all_users_model.all_user_ids) > len(original_all_user_ids))
         return len(all_users_model.all_user_ids) > len(original_all_user_ids)
 
     @staticmethod

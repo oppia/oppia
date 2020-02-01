@@ -1554,7 +1554,7 @@ class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
             owner_ids=[self.USER_1_ID],
             editor_ids=[],
             voice_artist_ids=[],
-            viewer_ids=[self.USER_2_ID],
+            viewer_ids=[],
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
@@ -1563,7 +1563,7 @@ class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
         collection_model.save(
             'cid', 'Created new collection rights',
             [{'cmd': rights_manager.CMD_CREATE_NEW}])
-        collection_model.editor_ids = [self.USER_3_ID, self.USER_4_ID]
+        collection_model.editor_ids = [self.USER_1_ID, self.USER_4_ID]
         collection_model.save(
             'cid', 'Add editors',
             [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
