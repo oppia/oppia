@@ -1735,8 +1735,9 @@ class CollectionRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
             collection.add_node('%s' % (index * 2 + 1))
             collection_services.save_new_collection(self.owner_id, collection)
 
-        user_id_migration.AddAllUserIdsVerificationJob.enqueue(
-            user_id_migration.AddAllUserIdsVerificationJob.create_new())
+        user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotsVerificationJob.create_new()
+        )
         self.process_and_flush_pending_tasks()
 
         self.model_instance_0 = (
@@ -4293,8 +4294,9 @@ class ExplorationRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
-        user_id_migration.AddAllUserIdsVerificationJob.enqueue(
-            user_id_migration.AddAllUserIdsVerificationJob.create_new())
+        user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotsVerificationJob.create_new()
+        )
         self.process_and_flush_pending_tasks()
 
         self.model_instance_0 = (
@@ -10269,8 +10271,9 @@ class TopicRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
             topic.language_code = language_codes[index]
             topic_services.save_new_topic(self.owner_id, topic)
 
-        user_id_migration.AddAllUserIdsVerificationJob.enqueue(
-            user_id_migration.AddAllUserIdsVerificationJob.create_new())
+        user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(
+            user_id_migration.AddAllUserIdsSnapshotsVerificationJob.create_new()
+        )
         self.process_and_flush_pending_tasks()
 
         self.model_instance_0 = (
