@@ -178,89 +178,139 @@ describe('Interactions', function() {
     users.logout();
   });
 
-  it('publish and play exploration successfully', function() {
+  fit('publish and play exploration successfully', function() {
     /*
      * This suite should be expanded as new interaction's e2e utility is added.
      */
     users.createAndLoginUser(
-      'explorationEditor@interactions.com', 'explorationEditor');
+      'CodeRepl@interactions.com', 'CodeRepl');
     workflow.createExploration();
-
-    explorationEditorMainTab.setStateName('Graph');
+    explorationEditorMainTab.setStateName("CodeEditor");
     explorationEditorMainTab.setContent(forms.toRichText(
-      'Draw a complete graph with the given vertices.'));
-    var graphDictForInput = {
-      vertices: [[277, 77], [248, 179], [405, 144]]
-    };
-    explorationEditorMainTab.setInteraction('GraphInput', graphDictForInput);
-    var graphDictForResponse = {
-      edges: [[0, 1], [1, 2], [0, 2]],
-      vertices: [[277, 77], [248, 179], [405, 144]]
-    };
-    explorationEditorMainTab.addResponse(
-      'GraphInput', forms.toRichText('Good job!'), 'MathExp',
-      true, 'IsIsomorphicTo', graphDictForResponse);
+      'Write a python program to print "Hello World".'));
+    explorationEditorMainTab.setInteraction('CodeRepl',"hello");
+    // the rule is from rule_template.json
+    explorationEditorMainTab.addResponse('CodeRepl',forms.toRichText('Good job!'),
+      'End',true,"CodeEquals",'print("Hello World")')
     var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText(
-      'A complete graph is a graph in which each pair of graph vertices is ' +
-      'connected by an edge.'));
-
-    explorationEditorMainTab.moveToState('MathExp');
-    explorationEditorMainTab.setContent(function(richTextEditor) {
-      richTextEditor.appendPlainText(
-        'Please simplify the following expression: ');
-      // Some Latex styling is expected here.
-      richTextEditor.addRteComponent(
-        'Math', '16x^{12}/4x^2');
-    });
-
-    explorationEditorMainTab.setInteraction('MathExpressionInput');
-    // Proper Latex styling for rule spec is required.
-    explorationEditorMainTab.addResponse(
-      'MathExpressionInput', forms.toRichText('Good job!'), 'End', true,
-      'IsMathematicallyEquivalentTo', '\\frac{16x^{12}}{4x^{2}}');
-    // Expecting answer to be 4x^10
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText(
-      'A simplified expression should be smaller than the original.'));
-
+    responseEditor.setFeedback(forms.toRichText("Use the print() function"));
+    
     explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setContent(forms.toRichText('Congratulations, you have finished!'));
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Regression Test Exploration');
+    explorationEditorSettingsTab.setTitle('CodeRepl Test Exploration');
     explorationEditorSettingsTab.setObjective(
       'To publish and play this exploration');
-    explorationEditorSettingsTab.setCategory('Logic');
+    explorationEditorSettingsTab.setCategory('Programming');
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
-    users.logout();
+    
+    users.logout()
 
-    users.createAndLoginUser('graphLearner@interactions.com', 'graphLearner');
+    users.createAndLoginUser('codeReplLearner@interactions.com', 'codeReplLearner');
     libraryPage.get();
-    libraryPage.findExploration('Regression Test Exploration');
-    libraryPage.playExploration('Regression Test Exploration');
+    libraryPage.findExploration('CodeRepl Test Exploration');
+    libraryPage.playExploration('CodeRepl Test Exploration');
     explorationPlayerPage.expectExplorationNameToBe(
-      'Regression Test Exploration');
-
-    // Play Graph Input interaction.
+      'CodeRepl Test Exploration');
     explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'Draw a complete graph with the given vertices.'));
-    var graphDictForAnswer = {
-      edges: [[1, 2], [1, 0], [0, 2]]
-    };
-    explorationPlayerPage.submitAnswer('GraphInput', graphDictForAnswer);
+        'Write a python program to print "Hello World".'));
+    explorationPlayerPage.submitAnswer('CodeRepl','print("Hello World")');
     explorationPlayerPage.expectLatestFeedbackToMatch(
       forms.toRichText('Good job!'));
     explorationPlayerPage.clickThroughToNextCard();
 
-    // Play Math Expression Input interaction.
-    explorationPlayerPage.submitAnswer('MathExpressionInput', '4 * x^(10)');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('Good job!'));
-    explorationPlayerPage.clickThroughToNextCard();
+    // // Play Math Expression Input interaction.
+    // explorationPlayerPage.submitAnswer('MathExpressionInput', '4 * x^(10)');
+    // explorationPlayerPage.expectLatestFeedbackToMatch(
+    //   forms.toRichText('Good job!'));
+    // explorationPlayerPage.clickThroughToNextCard();
 
     explorationPlayerPage.expectExplorationToBeOver();
     users.logout();
+
+
+
+    // users.createAndLoginUser(
+    //   'explorationEditor@interactions.com', 'explorationEditor');
+    // workflow.createExploration();
+    // explorationEditorMainTab.setStateName('Graph');
+    // explorationEditorMainTab.setContent(forms.toRichText(
+    //   'Draw a complete graph with the given vertices.'));
+    // var graphDictForInput = {
+    //   vertices: [[277, 77], [248, 179], [405, 144]]
+    // };
+    // explorationEditorMainTab.setInteraction('GraphInput', graphDictForInput);
+    // var graphDictForResponse = {
+    //   edges: [[0, 1], [1, 2], [0, 2]],
+    //   vertices: [[277, 77], [248, 179], [405, 144]]
+    // };
+    // explorationEditorMainTab.addResponse(
+    //   'GraphInput', forms.toRichText('Good job!'), 'MathExp',
+    //   true, 'IsIsomorphicTo', graphDictForResponse);
+    // var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    // responseEditor.setFeedback(forms.toRichText(
+    //   'A complete graph is a graph in which each pair of graph vertices is ' +
+    //   'connected by an edge.'));
+
+    // explorationEditorMainTab.moveToState('MathExp');
+    // explorationEditorMainTab.setContent(function(richTextEditor) {
+    //   richTextEditor.appendPlainText(
+    //     'Please simplify the following expression: ');
+    //   // Some Latex styling is expected here.
+    //   richTextEditor.addRteComponent(
+    //     'Math', '16x^{12}/4x^2');
+    // });
+
+    // explorationEditorMainTab.setInteraction('MathExpressionInput');
+    // // Proper Latex styling for rule spec is required.
+    // explorationEditorMainTab.addResponse(
+    //   'MathExpressionInput', forms.toRichText('Good job!'), 'End', true,
+    //   'IsMathematicallyEquivalentTo', '\\frac{16x^{12}}{4x^{2}}');
+    // // Expecting answer to be 4x^10
+    // var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    // responseEditor.setFeedback(forms.toRichText(
+    //   'A simplified expression should be smaller than the original.'));
+
+    // explorationEditorMainTab.moveToState('End');
+    // explorationEditorMainTab.setInteraction('EndExploration');
+    // explorationEditorPage.navigateToSettingsTab();
+    // explorationEditorSettingsTab.setTitle('Regression Test Exploration');
+    // explorationEditorSettingsTab.setObjective(
+    //   'To publish and play this exploration');
+    // explorationEditorSettingsTab.setCategory('Logic');
+    // explorationEditorPage.saveChanges();
+    // workflow.publishExploration();
+    // users.logout();
+
+    // users.createAndLoginUser('graphLearner@interactions.com', 'graphLearner');
+    // libraryPage.get();
+    // libraryPage.findExploration('Regression Test Exploration');
+    // libraryPage.playExploration('Regression Test Exploration');
+    // explorationPlayerPage.expectExplorationNameToBe(
+    //   'Regression Test Exploration');
+
+    // // Play Graph Input interaction.
+    // explorationPlayerPage.expectContentToMatch(forms.toRichText(
+    //   'Draw a complete graph with the given vertices.'));
+    // var graphDictForAnswer = {
+    //   edges: [[1, 2], [1, 0], [0, 2]]
+    // };
+    // explorationPlayerPage.submitAnswer('GraphInput', graphDictForAnswer);
+    // explorationPlayerPage.expectLatestFeedbackToMatch(
+    //   forms.toRichText('Good job!'));
+    // explorationPlayerPage.clickThroughToNextCard();
+
+    // // Play Math Expression Input interaction.
+    // explorationPlayerPage.submitAnswer('MathExpressionInput', '4 * x^(10)');
+    // explorationPlayerPage.expectLatestFeedbackToMatch(
+    //   forms.toRichText('Good job!'));
+    // explorationPlayerPage.clickThroughToNextCard();
+
+    // explorationPlayerPage.expectExplorationToBeOver();
+    // users.logout();
+
   });
 
   afterEach(function() {
