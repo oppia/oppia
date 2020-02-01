@@ -1554,7 +1554,7 @@ class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
             owner_ids=[self.USER_1_ID],
             editor_ids=[],
             voice_artist_ids=[],
-            viewer_ids=[],
+            viewer_ids=[self.USER_2_ID],
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
             viewable_if_private=False,
@@ -1617,7 +1617,7 @@ class AddAllUserIdsSnapshotsVerificationJobTests(test_utils.GenericTestBase):
              ['top_1_id-1', 'top_1_id-2', 'top_2_id-1', 'top_2_id-2']], output)
 
         self.assertItemsEqual(
-            [self.USER_1_ID, self.USER_3_ID, self.USER_4_ID],
+            [self.USER_1_ID, self.USER_2_ID, self.USER_3_ID, self.USER_4_ID],
             collection_models.CollectionRightsAllUsersModel
             .get_by_id(self.COL_1_ID).all_user_ids)
         self.assertItemsEqual(
