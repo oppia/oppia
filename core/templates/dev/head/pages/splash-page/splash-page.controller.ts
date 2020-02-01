@@ -27,7 +27,7 @@ angular.module('oppia').directive('splashPage', [function() {
     restrict: 'E',
     scope: {},
     bindToController: {},
-    template: require('!html-loader!./splash-page.directive.html'),
+    template: require('./splash-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',

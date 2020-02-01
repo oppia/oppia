@@ -22,7 +22,6 @@
 
 require('interactions/codemirrorRequires.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/CodeRepl/directives/code-repl-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -31,19 +30,17 @@ require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveCodeRepl', [
   '$timeout', 'CodeReplRulesService', 'HtmlEscaperService',
-  'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
+  'EVENT_NEW_CARD_AVAILABLE',
   function(
       $timeout, CodeReplRulesService, HtmlEscaperService,
-      UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
+      EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         getLastAnswer: '&lastAnswer',
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/CodeRepl/directives/' +
-        'code-repl-interaction.directive.html'),
+      template: require('./code-repl-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',

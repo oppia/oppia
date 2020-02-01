@@ -26,7 +26,7 @@ angular.module('oppia').directive('i18nFooter', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require('!html-loader!./i18n-footer.directive.html'),
+      template: require('./i18n-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$timeout', '$translate', 'UserService',

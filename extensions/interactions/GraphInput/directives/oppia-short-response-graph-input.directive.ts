@@ -20,19 +20,15 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponseGraphInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/GraphInput/directives/' +
-        'graph-input-short-response.directive.html'),
+      template: require('./graph-input-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

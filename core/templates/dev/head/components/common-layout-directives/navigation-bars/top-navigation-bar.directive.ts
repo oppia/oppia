@@ -33,8 +33,7 @@ angular.module('oppia').directive('topNavigationBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require(
-        '!html-loader!./top-navigation-bar.directive.html'),
+      template: require('./top-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',

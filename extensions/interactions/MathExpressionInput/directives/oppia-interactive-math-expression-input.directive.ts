@@ -41,9 +41,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/MathExpressionInput/directives/' +
-        'math-expression-input-interaction.directive.html'),
+      template: require('./math-expression-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', '$element', 'LABEL_FOR_CLEARING_FOCUS',

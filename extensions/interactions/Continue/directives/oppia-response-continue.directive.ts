@@ -20,18 +20,15 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponseContinue', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/Continue/directives/' +
-        'continue-response.directive.html'),
+      template: require('./continue-response.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'HtmlEscaperService',

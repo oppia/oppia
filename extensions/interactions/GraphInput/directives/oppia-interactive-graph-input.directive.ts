@@ -22,7 +22,6 @@
 
 require('interactions/GraphInput/directives/graph-viz.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/GraphInput/directives/graph-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -31,20 +30,16 @@ require('services/contextual/url.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveGraphInput', [
-  'GraphInputRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE',
+  'GraphInputRulesService', 'HtmlEscaperService', 'EVENT_NEW_CARD_AVAILABLE',
   function(
-      GraphInputRulesService, HtmlEscaperService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE) {
+      GraphInputRulesService, HtmlEscaperService, EVENT_NEW_CARD_AVAILABLE) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         getLastAnswer: '&lastAnswer',
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/GraphInput/directives/' +
-        'graph-input-interaction.directive.html'),
+      template: require('./graph-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
