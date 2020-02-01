@@ -212,6 +212,10 @@ exports.config = {
   // (Note that the hint tooltip has a 60-second timeout.)
   allScriptsTimeout: 180000,
 
+
+  // How long to wait for a page to load.
+  getPageTimeout: 20000,
+
   // ----- What tests to run -----
   //
   // When run without a command line parameter, all suites will run. If run
