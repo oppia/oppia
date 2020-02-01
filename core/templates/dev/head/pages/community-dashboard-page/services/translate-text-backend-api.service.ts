@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview A service to make http calls present inside servicees related
- * to community-dashboard-page services
+ * to translate-text service
  */
 
 angular.module('oppia').factory('TranslateTextBackendService', [
