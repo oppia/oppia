@@ -252,7 +252,8 @@ export class UpgradedServices {
     upgradedServices['BackgroundMaskService'] = new BackgroundMaskService();
     upgradedServices['baseInteractionValidationService'] =
       new baseInteractionValidationService();
-    upgradedServices['BrowserCheckerService'] = new BrowserCheckerService();
+    upgradedServices['BrowserCheckerService'] = new BrowserCheckerService(
+      new WindowRef());
     upgradedServices['CamelCaseToHyphensPipe'] = new CamelCaseToHyphensPipe();
     upgradedServices['ClassifierObjectFactory'] = new ClassifierObjectFactory();
     upgradedServices['CodeNormalizerService'] = new CodeNormalizerService();
