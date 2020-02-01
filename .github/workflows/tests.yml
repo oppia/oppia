@@ -15,3 +15,5 @@ jobs:
           architecture: 'x64'
       - name: Install third party
         run: python -m scripts.install_third_party_libs
+      - name: Check e2e tests captured in CI
+        run: python -m scripts.check_e2e_tests_are_captured_in_ci

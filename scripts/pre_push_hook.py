@@ -351,8 +351,7 @@ def does_diff_include_travis_yml_or_js_files(files_to_lint):
     """
 
     for filename in files_to_lint:
-        if (filename.endswith('.js') or
-                filename.endswith('.travis.yml')):
+        if filename.endswith('.js') or filename.endswith('.travis.yml'):
             return True
     return False
 
@@ -399,8 +398,7 @@ def main(args=None):
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
                 sys.exit(1)
-            if does_diff_include_travis_yml_or_js_files(
-                    files_to_lint):
+            if does_diff_include_travis_yml_or_js_files(files_to_lint):
                 travis_ci_check_status = start_python_script(
                     TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
             if travis_ci_check_status != 0:
