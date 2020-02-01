@@ -30,16 +30,26 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('services/playthrough-issues-backend-api.service.ts');
 
 describe('PlaythroughIssuesBackendApiService', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'LearnerActionObjectFactory', new LearnerActionObjectFactory());
-    $provide.value(
-      'PlaythroughIssueObjectFactory', new PlaythroughIssueObjectFactory());
-    $provide.value(
-      'PlaythroughObjectFactory', new PlaythroughObjectFactory(
-        new LearnerActionObjectFactory()));
-  }));
+  var PlaythroughIssuesBackendApiService = null;
+  var $httpBackend = null;
+  var PlaythroughIssueObjectFactory = null;
+  var PlaythroughObjectFactory = null;
+  var CsrfService = null;
+  var backendIssues = [{
+    issue_type: 'MultipleIncorrectSubmissions',
+    issue_customization_args: {
+      state_name: {
+        value: 'state_name1'
+      },
+      num_times_answered_incorrectly: {
+        value: 7
+      }
+    },
+    playthrough_ids: ['playthrough_id2'],
+    schema_version: 1,
+    is_valid: true
+  }];
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -47,63 +57,71 @@ describe('PlaythroughIssuesBackendApiService', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    this.PlaythroughIssuesBackendApiService =
+  beforeEach(angular.mock.inject(function($injector, $q) {
+    PlaythroughIssuesBackendApiService =
       $injector.get('PlaythroughIssuesBackendApiService');
-    this.$httpBackend = $injector.get('$httpBackend');
-    this.piof = $injector.get('PlaythroughIssueObjectFactory');
-    this.pof = $injector.get('PlaythroughObjectFactory');
+    $httpBackend = $injector.get('$httpBackend');
+    PlaythroughIssueObjectFactory = $injector.get(
+      'PlaythroughIssueObjectFactory');
+    PlaythroughObjectFactory = $injector.get('PlaythroughObjectFactory');
+
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
   }));
 
   afterEach(function() {
-    this.$httpBackend.verifyNoOutstandingExpectation();
-    this.$httpBackend.verifyNoOutstandingRequest();
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
   });
 
   describe('.fetch', function() {
     it('returns the issues data provided by the backend', function() {
-      var backendIssues = [{
-        issue_type: 'EarlyQuit',
-        issue_customization_args: {
-          state_name: {
-            value: 'state_name1'
-          },
-          time_spent_in_exp_in_msecs: {
-            value: 200
-          }
-        },
-        playthrough_ids: ['playthrough_id1'],
-        schema_version: 1,
-        is_valid: true
-      }, {
-        issue_type: 'MultipleIncorrectSubmissions',
-        issue_customization_args: {
-          state_name: {
-            value: 'state_name1'
-          },
-          num_times_answered_incorrectly: {
-            value: 7
-          }
-        },
-        playthrough_ids: ['playthrough_id2'],
-        schema_version: 1,
-        is_valid: true
-      }];
-
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      this.$httpBackend.expectGET(
+      $httpBackend.expectGET(
         '/issuesdatahandler/7?exp_version=1'
       ).respond(backendIssues);
 
-      this.PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
+      PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
         successHandler, failureHandler);
-      this.$httpBackend.flush();
+      $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        backendIssues.map(this.piof.createFromBackendDict));
+        backendIssues.map(PlaythroughIssueObjectFactory.createFromBackendDict));
       expect(failureHandler).not.toHaveBeenCalled();
     });
+
+    it('should not fetch an issue when another issue was already fetched',
+      function() {
+        var successHandler = jasmine.createSpy('success');
+        var failureHandler = jasmine.createSpy('failure');
+        $httpBackend.expectGET(
+          '/issuesdatahandler/7?exp_version=1'
+        ).respond(backendIssues);
+
+        PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
+          successHandler, failureHandler);
+        $httpBackend.flush();
+
+        expect(successHandler).toHaveBeenCalledWith(
+          backendIssues.map(
+            PlaythroughIssueObjectFactory.createFromBackendDict));
+        expect(failureHandler).not.toHaveBeenCalled();
+
+        // Try to fetch another issue
+        PlaythroughIssuesBackendApiService.fetchIssues('8', 1).then(
+          successHandler, failureHandler);
+
+        expect(successHandler).toHaveBeenCalledWith(
+          backendIssues.map(
+            PlaythroughIssueObjectFactory.createFromBackendDict));
+        expect(failureHandler).not.toHaveBeenCalled();
+      });
 
     it('returns the playthrough data provided by the backend', function() {
       var backendPlaythrough = {
@@ -131,17 +149,66 @@ describe('PlaythroughIssuesBackendApiService', function() {
 
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      this.$httpBackend.expectGET(
+      $httpBackend.expectGET(
         '/playthroughdatahandler/7/1'
       ).respond(backendPlaythrough);
 
-      this.PlaythroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
+      PlaythroughIssuesBackendApiService.fetchPlaythrough('7', '1').then(
         successHandler, failureHandler);
-      this.$httpBackend.flush();
+      $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        this.pof.createFromBackendDict(backendPlaythrough));
+        PlaythroughObjectFactory.createFromBackendDict(backendPlaythrough));
       expect(failureHandler).not.toHaveBeenCalled();
     });
+  });
+
+  describe('.resolve', function() {
+    it('should resolve an issue', function() {
+      var successHandler = jasmine.createSpy('success');
+      var failureHandler = jasmine.createSpy('failure');
+      var explorationId = '7';
+      var playthroughIssue = PlaythroughIssueObjectFactory
+        .createFromBackendDict(backendIssues[0]);
+      $httpBackend.expectGET(
+        '/issuesdatahandler/7?exp_version=1'
+      ).respond(backendIssues);
+      $httpBackend.expectPOST('/resolveissuehandler/' + explorationId)
+        .respond(200);
+
+      PlaythroughIssuesBackendApiService.fetchIssues('7', 1).then(
+        function() {
+          PlaythroughIssuesBackendApiService.resolveIssue(
+            playthroughIssue, explorationId, 1).then(
+            successHandler, failureHandler);
+
+          // resolveIssue does not return any resolve promise method.
+          expect(successHandler).not.toHaveBeenCalled();
+          expect(failureHandler).not.toHaveBeenCalled();
+        });
+      $httpBackend.flush();
+    });
+
+    it('should use the rejection handler when try to get non fetched issue',
+      function() {
+        var explorationId = '7';
+        var playthroughIssue = PlaythroughIssueObjectFactory
+          .createFromBackendDict(backendIssues[0]);
+
+        var successHandler = jasmine.createSpy('success');
+        var failHandler = jasmine.createSpy('fail');
+
+        $httpBackend.expectPOST('/resolveissuehandler/' + explorationId)
+          .respond(200);
+        PlaythroughIssuesBackendApiService.resolveIssue(
+          playthroughIssue, explorationId, 1).then(successHandler, failHandler);
+        $httpBackend.flush();
+
+        expect(successHandler).not.toHaveBeenCalled();
+        expect(failHandler)
+          .toHaveBeenCalledWith(
+            new Error('An issue which was not fetched from the backend has ' +
+            'been resolved'));
+      });
   });
 });

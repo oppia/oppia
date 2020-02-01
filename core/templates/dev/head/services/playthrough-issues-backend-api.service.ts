@@ -83,9 +83,10 @@ angular.module('oppia').factory('PlaythroughIssuesBackendApiService', [
           exp_issue_dict: issueToResolve.toBackendDict(),
           exp_version: expVersion
         }).then(function() {
-          var issueIndex = cachedIssues.findIndex(function(issue) {
-            return angular.equals(issue, issueToResolve);
-          });
+          var issueIndex = cachedIssues !== null ?
+            cachedIssues.findIndex(function(issue) {
+              return angular.equals(issue, issueToResolve);
+            }) : -1;
           if (issueIndex === -1) {
             var invalidIssueError = new Error(
               'An issue which was not fetched from the backend has been ' +
