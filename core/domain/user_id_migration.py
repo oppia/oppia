@@ -520,8 +520,98 @@ class ModelsUserIdsHaveUserSettingsExplorationsVerificationJob(
 
 class AddAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     """For every rights model merge the data from all the user id fields
-    together and put them in a new all_user_ids field.
+    together and put them in the all_user_ids field of an appropriate
+    RightsAllUsersModel.
     """
+
+    @staticmethod
+    def _add_collection_user_ids(rights_model, all_users_model):
+        """Compare the existing CollectionRightsAllUsersModel with the user IDs
+        in the CollectionRightsModel, if some of the user IDs from snapshots are
+        not in the parent rights model return them.
+
+        Args:
+            rights_model: CollectionRightsModel. The current rights model.
+            all_users_model: CollectionRightsAllUsersModel. The model with the
+                user IDs collected from the snapshots.
+
+        Returns:
+            list(str). List of user IDs that are in snapshots but not in the
+            parent rights model.
+        """
+        user_ids_only_in_snapshots = []
+        all_user_ids = (
+            set(rights_model.owner_ids) |
+            set(rights_model.editor_ids) |
+            set(rights_model.voice_artist_ids) |
+            set(rights_model.viewer_ids))
+        if not all_user_ids.issuperset(set(all_users_model.all_user_ids)):
+            user_ids_only_in_snapshots = list(
+                set(all_users_model.all_user_ids) - all_user_ids)
+            all_user_ids = set(all_users_model.all_user_ids) | all_user_ids
+        collection_models.CollectionRightsAllUsersModel(
+            id=rights_model.id,
+            all_user_ids=list(all_user_ids)
+        ).put()
+        return user_ids_only_in_snapshots
+
+    @staticmethod
+    def _add_exploration_user_ids(rights_model, all_users_model):
+        """Compare the existing ExplorationRightsAllUsersModel with the user IDs
+        in the ExplorationRightsModel, if some of the user IDs from snapshots
+        are not in the parent rights model return them.
+
+        Args:
+            rights_model: ExplorationRightsModel. The current rights model.
+            all_users_model: ExplorationRightsAllUsersModel. The model with the
+                user IDs collected from the snapshots.
+
+        Returns:
+            list(str). List of user IDs that are in snapshots but not in the
+            parent rights model.
+        """
+        user_ids_only_in_snapshots = []
+        all_user_ids = (
+            set(rights_model.owner_ids) |
+            set(rights_model.editor_ids) |
+            set(rights_model.voice_artist_ids) |
+            set(rights_model.viewer_ids))
+        if not all_user_ids.issuperset(set(all_users_model.all_user_ids)):
+            user_ids_only_in_snapshots = list(
+                set(all_users_model.all_user_ids) - all_user_ids)
+            all_user_ids = set(all_users_model.all_user_ids) | all_user_ids
+        exp_models.ExplorationRightsAllUsersModel(
+            id=rights_model.id,
+            all_user_ids=list(all_user_ids)
+        ).put()
+        return user_ids_only_in_snapshots
+
+    @staticmethod
+    def _add_topic_user_ids(rights_model, all_users_model):
+        """Compare the existing TopicRightsAllUsersModel with the user IDs in
+        the TopicRightsModel, if some of the user IDs from snapshots are not in
+        the parent rights model return them.
+
+        Args:
+            rights_model: TopicRightsModel. The current rights model.
+            all_users_model: TopicRightsAllUsersModel. The model with the
+                user IDs collected from the snapshots.
+
+        Returns:
+            list(str). List of user IDs that are in snapshots but not in the
+            parent rights model.
+        """
+        user_ids_only_in_snapshots = []
+        all_user_ids = set(rights_model.manager_ids)
+        if not all_user_ids.issuperset(set(all_users_model.all_user_ids)):
+            user_ids_only_in_snapshots = list(
+                set(all_users_model.all_user_ids) - all_user_ids)
+            all_user_ids = set(all_users_model.all_user_ids) | all_user_ids
+        topic_models.TopicRightsAllUsersModel(
+            id=rights_model.id,
+            all_user_ids=list(all_user_ids)
+        ).put()
+        return user_ids_only_in_snapshots
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -533,45 +623,61 @@ class AddAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(rights_model):
         """Implements the map function for this job."""
-        if isinstance(rights_model, collection_models.CollectionRightsModel):
-            all_user_ids = list(
-                set(rights_model.owner_ids) |
-                set(rights_model.editor_ids) |
-                set(rights_model.voice_artist_ids) |
-                set(rights_model.viewer_ids))
-            collection_models.CollectionRightsAllUsersModel(
-                id=rights_model.id,
-                all_user_ids=all_user_ids
-            ).put()
-        elif isinstance(rights_model, exp_models.ExplorationRightsModel):
-            all_user_ids = list(
-                set(rights_model.owner_ids) |
-                set(rights_model.editor_ids) |
-                set(rights_model.voice_artist_ids) |
-                set(rights_model.viewer_ids))
-            exp_models.ExplorationRightsAllUsersModel(
-                id=rights_model.id,
-                all_user_ids=all_user_ids
-            ).put()
-        elif isinstance(rights_model, topic_models.TopicRightsModel):
-            all_user_ids = rights_model.manager_ids
-            topic_models.TopicRightsAllUsersModel(
-                id=rights_model.id,
-                all_user_ids=all_user_ids
-            ).put()
         class_name = rights_model.__class__.__name__
-        yield ('SUCCESS-%s' % class_name, rights_model.id)
+        if isinstance(rights_model, collection_models.CollectionRightsModel):
+            all_users_model = (
+                collection_models.CollectionRightsAllUsersModel.get_by_id(
+                    rights_model.id))
+            if all_users_model is None:
+                yield ('FAILURE-%s' % class_name, rights_model.id)
+                return
+            user_ids_only_in_snapshots = (
+                AddAllUserIdsVerificationJob._add_collection_user_ids(
+                    rights_model, all_users_model))
+
+        elif isinstance(rights_model, exp_models.ExplorationRightsModel):
+            all_users_model = (
+                exp_models.ExplorationRightsAllUsersModel.get_by_id(
+                    rights_model.id))
+            if all_users_model is None:
+                yield ('FAILURE-%s' % class_name, rights_model.id)
+                return
+            user_ids_only_in_snapshots = (
+                AddAllUserIdsVerificationJob._add_exploration_user_ids(
+                    rights_model, all_users_model))
+
+        elif isinstance(rights_model, topic_models.TopicRightsModel):
+            all_users_model = (
+                topic_models.TopicRightsAllUsersModel.get_by_id(
+                    rights_model.id))
+            if all_users_model is None:
+                yield ('FAILURE-%s' % class_name, rights_model.id)
+                return
+            user_ids_only_in_snapshots = (
+                AddAllUserIdsVerificationJob._add_topic_user_ids(
+                    rights_model, all_users_model))
+
+        if user_ids_only_in_snapshots:
+            yield (
+                'SUCCESS-NOT_SUBSET-%s' % class_name,
+                (rights_model.id, user_ids_only_in_snapshots))
+        else:
+            yield ('SUCCESS-SUBSET-%s' % class_name, rights_model.id)
+
 
     @staticmethod
     def reduce(key, ids):
         """Implements the reduce function for this job."""
-        yield (key, len(ids))
+        if key.startswith('SUCCESS-SUBSET'):
+            yield (key, len(ids))
+        else:
+            yield (key, ids)
 
 
 class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     """For every snapshot of a rights model, merge the data from all the user id
-    fields together and put them in the all_user_ids field of the appropriate
-    rights model.
+    fields together and put them in the all_user_ids field of an appropriate
+    RightsAllUsersModel.
     """
 
     @staticmethod
@@ -584,9 +690,6 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
                 rights_snapshot_model.content))
         reconstituted_rights_model = (
             collection_models.CollectionRightsModel(**content_dict))
-
-        original_all_user_ids = list(all_users_model.all_user_ids)
-        print(original_all_user_ids)
         all_users_model.all_user_ids = list(
             set(all_users_model.all_user_ids) |
             set(reconstituted_rights_model.owner_ids) |
@@ -594,10 +697,6 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids))
         all_users_model.put()
-        print(original_all_user_ids)
-        print(all_users_model.all_user_ids)
-        print(len(all_users_model.all_user_ids) > len(original_all_user_ids))
-        return len(all_users_model.all_user_ids) > len(original_all_user_ids)
 
     @staticmethod
     def _add_exploration_user_ids(rights_snapshot_model, all_users_model):
@@ -609,8 +708,6 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
                 rights_snapshot_model.content))
         reconstituted_rights_model = (
             exp_models.ExplorationRightsModel(**content_dict))
-
-        original_all_user_ids = list(all_users_model.all_user_ids)
         all_users_model.all_user_ids = list(
             set(all_users_model.all_user_ids) |
             set(reconstituted_rights_model.owner_ids) |
@@ -618,7 +715,6 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
             set(reconstituted_rights_model.voice_artist_ids) |
             set(reconstituted_rights_model.viewer_ids))
         all_users_model.put()
-        return len(all_users_model.all_user_ids) > len(original_all_user_ids)
 
     @staticmethod
     def _add_topic_user_ids(rights_snapshot_model, all_users_model):
@@ -627,13 +723,10 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
         """
         reconstituted_rights_model = topic_models.TopicRightsModel(
             **rights_snapshot_model.content)
-
-        original_all_user_ids = list(all_users_model.all_user_ids)
         all_users_model.all_user_ids = list(
             set(all_users_model.all_user_ids) |
             set(reconstituted_rights_model.manager_ids))
         all_users_model.put()
-        return len(all_users_model.all_user_ids) > len(original_all_user_ids)
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -646,51 +739,46 @@ class AddAllUserIdsSnapshotsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def map(rights_snapshot_model):
         """Implements the map function for this job."""
         class_name = rights_snapshot_model.__class__.__name__
-        updated = False
+        rights_model_id = rights_snapshot_model.get_unversioned_instance_id()
         if isinstance(
                 rights_snapshot_model,
                 collection_models.CollectionRightsSnapshotContentModel):
             all_users_model = (
                 collection_models.CollectionRightsAllUsersModel.get_by_id(
-                    rights_snapshot_model.get_unversioned_instance_id()))
+                    rights_model_id))
             if all_users_model is None:
-                yield ('FAILURE-%s' % class_name, rights_snapshot_model.id)
-                return
-            updated = (
-                AddAllUserIdsSnapshotsVerificationJob._add_collection_user_ids(
-                    rights_snapshot_model, all_users_model))
+                all_users_model = (
+                    collection_models.CollectionRightsAllUsersModel(
+                        id=rights_model_id,
+                        all_user_ids=[]))
+            AddAllUserIdsSnapshotsVerificationJob._add_collection_user_ids(
+                rights_snapshot_model, all_users_model)
         elif isinstance(
                 rights_snapshot_model,
                 exp_models.ExplorationRightsSnapshotContentModel):
             all_users_model = (
                 exp_models.ExplorationRightsAllUsersModel.get_by_id(
-                    rights_snapshot_model.get_unversioned_instance_id()))
+                    rights_model_id))
             if all_users_model is None:
-                yield ('FAILURE-%s' % class_name, rights_snapshot_model.id)
-                return
-            updated = (
-                AddAllUserIdsSnapshotsVerificationJob._add_exploration_user_ids(
-                    rights_snapshot_model, all_users_model))
+                all_users_model = exp_models.ExplorationRightsAllUsersModel(
+                    id=rights_model_id,
+                    all_user_ids=[])
+            AddAllUserIdsSnapshotsVerificationJob._add_exploration_user_ids(
+                rights_snapshot_model, all_users_model)
         elif isinstance(
                 rights_snapshot_model,
                 topic_models.TopicRightsSnapshotContentModel):
             all_users_model = topic_models.TopicRightsAllUsersModel.get_by_id(
-                rights_snapshot_model.get_unversioned_instance_id())
+                rights_model_id)
             if all_users_model is None:
-                yield ('FAILURE-%s' % class_name, rights_snapshot_model.id)
-                return
-            updated = AddAllUserIdsSnapshotsVerificationJob._add_topic_user_ids(
+                all_users_model = topic_models.TopicRightsAllUsersModel(
+                    id=rights_model_id,
+                    all_user_ids=[])
+            AddAllUserIdsSnapshotsVerificationJob._add_topic_user_ids(
                 rights_snapshot_model, all_users_model)
-        if updated:
-            yield ('SUCCESS-UPDATED-%s' % class_name, rights_snapshot_model.id)
-        else:
-            yield (
-                'SUCCESS-NOT_UPDATED-%s' % class_name, rights_snapshot_model.id)
+        yield ('SUCCESS-%s' % class_name, rights_snapshot_model.id)
 
     @staticmethod
     def reduce(key, ids):
         """Implements the reduce function for this job."""
-        if key.startswith('SUCCESS-NOT_UPDATED'):
-            yield (key, len(ids))
-        else:
-            yield (key, ids)
+        yield (key, len(ids))
