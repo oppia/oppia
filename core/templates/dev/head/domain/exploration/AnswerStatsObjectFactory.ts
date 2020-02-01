@@ -60,6 +60,26 @@ export class AnswerStats {
     this.isAddressed = isAddressed;
   }
 
+  /** @returns {*} */
+  getAnswer() {
+    return this.answer;
+  }
+
+  /** @returns {string} */
+  getAnswerHtml() {
+    return this.answerHtml;
+  }
+
+  /** @returns {number} */
+  getFrequency() {
+    return this.frequency;
+  }
+
+  /** @returns {boolean} */
+  getIsAddressed() {
+    return this.isAddressed;
+  }
+
   /** @returns {answer, frequency: number} */
   toBackendDict(): IAnswerStatsBackendDict {
     return {

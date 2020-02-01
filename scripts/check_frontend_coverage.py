@@ -43,6 +43,7 @@ FULLY_COVERED_FILENAMES = [
     'AnswerClassificationResultObjectFactory.ts',
     'AnswerDetailsImprovementTaskObjectFactory.ts',
     'AnswerGroupObjectFactory.ts',
+    'AnswerStatsObjectFactory.ts',
     'app.constants.ajs.ts',
     'app.constants.ts',
     'apply-validation.directive.ts',
@@ -198,8 +199,10 @@ FULLY_COVERED_FILENAMES = [
     'objects-domain.constants.ts',
     'OutcomeObjectFactory.ts',
     'page-title.service.ts',
+    'ParamChangeObjectFactory.ts',
     'ParamChangesObjectFactory.ts',
     'ParamMetadataObjectFactory.ts',
+    'ParamSpecObjectFactory.ts',
     'ParamSpecsObjectFactory.ts',
     'ParamTypeObjectFactory.ts',
     'pencil-code-editor-rules.service.ts',
@@ -208,6 +211,7 @@ FULLY_COVERED_FILENAMES = [
     'PlaythroughObjectFactory.ts',
     'practice-session-page.constants.ajs.ts',
     'practice-session-page.constants.ts',
+    'PredictionResultObjectFactory.ts',
     'question-domain.constants.ajs.ts',
     'question-domain.constants.ts',
     'question-player-state.service.ts',
@@ -262,6 +266,7 @@ FULLY_COVERED_FILENAMES = [
     'state-solution.service.ts',
     'state-top-answers-stats-backend-api.service.ts',
     'state-written-translations.service.ts',
+    'StateObjectFactory.ts',
     'statistics-domain.constants.ajs.ts',
     'statistics-domain.constants.ts',
     'StopwatchObjectFactory.ts',
@@ -330,6 +335,7 @@ FULLY_COVERED_FILENAMES = [
     'wrap-text-with-ellipsis.filter.ts',
     'wrap-text-with-ellipsis.pipe.ts',
     'WrittenTranslationObjectFactory.ts',
+    'WrittenTranslationsObjectFactory.ts',
 ]
 
 

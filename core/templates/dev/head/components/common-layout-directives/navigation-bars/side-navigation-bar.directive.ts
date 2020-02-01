@@ -24,8 +24,7 @@ angular.module('oppia').directive('sideNavigationBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require(
-        '!html-loader!./side-navigation-bar.directive.html'),
+      template: require('./side-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$window', function($window) {
         var ctrl = this;
