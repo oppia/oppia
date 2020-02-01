@@ -36,16 +36,19 @@ angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
         for (var i = 0; i < explorationIds.length; i++) {
           returnValue.push(null);
         }
-        return $q.resolve(returnValue);
+
+        if (errorCallback) {
+          errorCallback(returnValue);
+        }
+        return;
       }
 
       var explorationSummaryDataUrl = EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
 
       $http.get(explorationSummaryDataUrl, {
         params: {
-          stringified_exp_ids: JSON.stringify(explorationIds),
-          include_private_explorations: JSON.stringify(
-            includePrivateExplorations)
+          stringified_exp_ids: explorationIds,
+          include_private_explorations: includePrivateExplorations
         }
       }).then(function(response) {
         var summaries = angular.copy(response.data.summaries);
@@ -58,9 +61,9 @@ angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
           }
           successCallback(summaries);
         }
-      }, function(errorResponse) {
+      })['catch'](function(errorResponse) {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.data || errorResponse);
         }
       });
     };
