@@ -79,26 +79,24 @@ angular.module('oppia').factory('ThreadDataService', [
       });
 
       return $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
-        _data.feedbackThreads = res[0].data.feedback_thread_dicts.map(
+        let [threadsResponse, suggestionsResponse] = res.map(r => r.data);
+        _data.feedbackThreads = threadsResponse.feedback_thread_dicts.map(
           FeedbackThreadObjectFactory.createFromBackendDict);
 
         _data.suggestionThreads = [];
-        var suggestionThreads = res[0].data.suggestion_thread_dicts;
-        if (suggestionThreads.length !== res[1].data.suggestions.length) {
+        if (threadsResponse.suggestion_thread_dicts.length !==
+            suggestionsResponse.suggestions.length) {
           $log.error('Number of suggestion threads doesn\'t match number of' +
                      'suggestion objects');
+          return _data;
         }
         // TODO(brianrodri@): Move this pairing logic into the backend.
-        for (var i = 0; i < suggestionThreads.length; i++) {
-          for (var j = 0; j < res[1].data.suggestions.length; j++) {
-            var suggestion = (
-              SuggestionObjectFactory.createFromBackendDict(
-                res[1].data.suggestions[j]));
-            if (suggestionThreads[i].thread_id === suggestion.getThreadId()) {
-              var suggestionThread = (
+        for (let threadDict of threadsResponse.suggestion_thread_dicts) {
+          for (let suggestionDict of suggestionsResponse.suggestions) {
+            if (threadDict.thread_id === suggestionDict.thread_id) {
+              _data.suggestionThreads.push(
                 SuggestionThreadObjectFactory.createFromBackendDicts(
-                  suggestionThreads[i], res[1].data.suggestions[j]));
-              _data.suggestionThreads.push(suggestionThread);
+                  threadDict, suggestionDict));
               break;
             }
           }
