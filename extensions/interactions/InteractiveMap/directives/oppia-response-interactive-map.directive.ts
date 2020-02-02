@@ -32,9 +32,7 @@ angular.module('oppia').directive('oppiaResponseInteractiveMap', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/InteractiveMap/directives/' +
-        'interactive-map-response.directive.html'),
+      template: require('./interactive-map-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
