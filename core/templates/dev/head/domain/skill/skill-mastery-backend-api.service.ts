@@ -17,16 +17,24 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { CsrfTokenService } from 'services/csrf-token.service';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SkillMasteryBackendApiService {
-  constructor(private httpClient: HttpClient) {}
+  token = null;
+  constructor(private httpClient: HttpClient,
+              private csrfTokenService: CsrfTokenService) {
+    this.csrfTokenService.initializeToken();
+    this.csrfTokenService.getTokenAsync().then((token) => {
+      this.token = token;
+    });
+  }
 
   _fetchSkillMasteryDegrees(skillIds: Array<string>,
       successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -52,8 +60,17 @@ export class SkillMasteryBackendApiService {
     let putData = {
       mastery_change_per_skill: masteryPerSkillMapping
     };
+
+    const body = new HttpParams()
+      .set('payload', JSON.stringify(putData))
+      .set('csrf_token', this.token)
+      .set('source', document.URL);
+
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/x-www-form-urlencoded');
+
     this.httpClient.put(SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE,
-      putData).toPromise().then((response: any) => {
+      body, {headers}).toPromise().then((response: any) => {
       if (successCallback) {
         successCallback();
       }
