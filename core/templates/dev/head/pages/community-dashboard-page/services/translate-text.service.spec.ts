@@ -20,7 +20,7 @@ require(
   'pages/community-dashboard-page/services/' +
   'translate-text.service.ts');
 
-fdescribe('TranslateTextService', function() {
+describe('TranslateTextService', function() {
   var TranslateTextService = null;
   var $httpBackend = null;
   var mockStateWiseTextForTranslation = null;
