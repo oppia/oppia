@@ -24,14 +24,14 @@ export class Voiceover {
   filename: string;
   fileSizeBytes: number;
   needsUpdate: boolean;
-  duration: number;
+  durationSecs: number;
 
   constructor(filename: string, fileSizeBytes: number, needsUpdate: boolean,
-      duration: number) {
+      durationSecs: number) {
     this.filename = filename;
     this.fileSizeBytes = fileSizeBytes;
     this.needsUpdate = needsUpdate;
-    this.duration = duration;
+    this.durationSecs = durationSecs;
   }
 
   markAsNeedingUpdate(): void {
@@ -55,7 +55,7 @@ export class Voiceover {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
       needs_update: this.needsUpdate,
-      duration: this.duration
+      duration_secs: this.durationSecs
     };
   }
 }
@@ -65,8 +65,8 @@ export class Voiceover {
 })
 export class VoiceoverObjectFactory {
   createNew(filename: string, fileSizeBytes: number,
-      duration: number): Voiceover {
-    return new Voiceover(filename, fileSizeBytes, false, duration);
+      durationSecs: number): Voiceover {
+    return new Voiceover(filename, fileSizeBytes, false, durationSecs);
   }
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
@@ -78,7 +78,7 @@ export class VoiceoverObjectFactory {
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,
       translationBackendDict.needs_update,
-      translationBackendDict.duration);
+      translationBackendDict.duration_secs);
   }
 }
 

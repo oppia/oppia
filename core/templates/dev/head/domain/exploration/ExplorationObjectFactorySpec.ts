@@ -50,13 +50,13 @@ describe('Exploration object factory', () => {
                 filename: 'myfile1.mp3',
                 file_size_bytes: 210000,
                 needs_update: false,
-                duration: 2.1
+                duration_secs: 2.1
               },
               'hi-en': {
                 filename: 'myfile3.mp3',
                 file_size_bytes: 430000,
                 needs_update: false,
-                duration: 4.3
+                duration_secs: 4.3
               }
             },
             default_outcome: {}
@@ -95,7 +95,7 @@ describe('Exploration object factory', () => {
                 filename: 'myfile2.mp3',
                 file_size_bytes: 120000,
                 needs_update: false,
-                duration: 1.2
+                duration_secs: 1.2
               }
             },
             default_outcome: {}
@@ -161,13 +161,13 @@ describe('Exploration object factory', () => {
           filename: 'myfile3.mp3',
           file_size_bytes: 430000,
           needs_update: false,
-          duration: 4.3
+          duration_secs: 4.3
         })],
         'second state': [vof.createFromBackendDict({
           filename: 'myfile2.mp3',
           file_size_bytes: 120000,
           needs_update: false,
-          duration: 1.2
+          duration_secs: 1.2
         })]
       });
       expect(exploration.getAllVoiceovers('en')).toEqual({
@@ -175,7 +175,7 @@ describe('Exploration object factory', () => {
           filename: 'myfile1.mp3',
           file_size_bytes: 210000,
           needs_update: false,
-          duration: 2.1
+          duration_secs: 2.1
         })],
         'second state': []
       });

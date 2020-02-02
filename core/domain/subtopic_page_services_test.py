@@ -126,7 +126,7 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
                         'filename': 'test.mp3',
                         'file_size_bytes': 100,
                         'needs_update': False,
-                        'duration': 7.213
+                        'duration_secs': 7.213
                     }
                 }
             }

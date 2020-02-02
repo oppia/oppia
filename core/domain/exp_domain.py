@@ -2335,8 +2335,8 @@ class Exploration(python_utils.OBJECT):
     @classmethod
     def _convert_states_v30_dict_to_v31_dict(cls, states_dict):
         """Converts from version 30 to 31. Version 31 updates the
-        Voiceover model to have an initialized duration attribute of 0.0.
-        This will be updated when a new mp3 audio file is uploaded
+        Voiceover model to have an initialized duration_secs attribute
+        of 0.0. This will be updated when a new mp3 audio file is uploaded
         for the exploration.
 
         Args:
@@ -2353,11 +2353,11 @@ class Exploration(python_utils.OBJECT):
                           ['voiceovers_mapping'])
             for content_id in voiceovers.keys():
                 for language_code in voiceovers[content_id].keys():
-                    # Initialize duration with 0.0 for every voiceover
+                    # Initialize duration_secs with 0.0 for every voiceover
                     # recording under Content, Feedback, Hints, and Solutions.
                     # This is necessary to keep the state functional
                     # when migrating to v31.
-                    voiceovers[content_id][language_code]['duration'] = 0.0
+                    voiceovers[content_id][language_code]['duration_secs'] = 0.0
         return states_dict
 
 

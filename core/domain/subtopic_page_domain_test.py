@@ -132,7 +132,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'test.mp3',
                         'file_size_bytes': 100,
                         'needs_update': False,
-                        'duration': 1.5
+                        'duration_secs': 1.5
                     }
                 }
             }
@@ -312,7 +312,7 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                             'filename': 'test.mp3',
                             'file_size_bytes': 100,
                             'needs_update': False,
-                            'duration': 0.34343
+                            'duration_secs': 0.34343
                         }
                     }
                 }

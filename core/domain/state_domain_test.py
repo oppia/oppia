@@ -651,9 +651,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid duration'
+            utils.ValidationError, 'Expected duration_secs to be a float'
             ):
-            with self.swap(audio_voiceover, 'duration', -3.45):
+            with self.swap(audio_voiceover, 'duration_secs', 0):
+                audio_voiceover.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected duration_secs to be a float'
+            ):
+            with self.swap(audio_voiceover, 'duration_secs', 0.0):
+                audio_voiceover.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid duration in seconds'
+            ):
+            with self.swap(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
 
     def test_written_translation_validation(self):
@@ -1041,7 +1051,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
-                        'duration': 8.1
+                        'duration_secs': 8.1
                     }
                 },
                 'default_outcome': {}
@@ -1128,7 +1138,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
-                        'duration': 6.1
+                        'duration_secs': 6.1
                     }
                 },
                 'hint_2': {
@@ -1136,7 +1146,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'filename4.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
-                        'duration': 7.5
+                        'duration_secs': 7.5
                     }
                 },
                 'default_outcome': {}
@@ -1723,13 +1733,13 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
                         'needs_update': True,
-                        'duration': 1.1
+                        'duration_secs': 1.1
                     },
                     'hi': {
                         'filename': 'abc.mp3',
                         'file_size_bytes': 1234,
                         'needs_update': False,
-                        'duration': 1.3
+                        'duration_secs': 1.3
                     }
                 },
                 'feedback_1': {
@@ -1737,13 +1747,13 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
                         'needs_update': False,
-                        'duration': 1.1
+                        'duration_secs': 1.1
                     },
                     'en': {
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
                         'needs_update': False,
-                        'duration': 1.3
+                        'duration_secs': 1.3
                     }
                 }
             }
@@ -1803,7 +1813,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
                         'needs_update': False,
-                        'duration': 1.1
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1825,7 +1835,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
                         'needs_update': False,
-                        'duration': 1.1
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1897,7 +1907,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
                         'needs_update': False,
-                        'duration': 1.1
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1918,7 +1928,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
                         'needs_update': False,
-                        'duration': 1.1
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -1938,7 +1948,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
                         'filename': 'xyz.mp3',
                         'file_size_bytes': 123,
                         'needs_update': False,
-                        'duration': 1.1
+                        'duration_secs': 1.1
                     }
                 }
             }
@@ -2005,16 +2015,16 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception, 'Expected needs_update to be a bool'):
             self.voiceover.validate()
 
-    def test_validate_non_float_duration(self):
+    def test_validate_non_float_duration_secs(self):
         self.voiceover.validate()
-        self.voiceover.duration = 'duration'
+        self.voiceover.duration_secs = 'duration_secs'
         with self.assertRaisesRegexp(
-            Exception, 'Expected duration to be a float'):
+            Exception, 'Expected duration_secs to be a float'):
             self.voiceover.validate()
 
     def test_validate_negative_duration_seconds(self):
         self.voiceover.validate()
-        self.voiceover.duration = -1.45
+        self.voiceover.duration_secs = -1.45
         with self.assertRaisesRegexp(
-            Exception, 'Invalid duration'):
+            Exception, 'Invalid duration in seconds'):
             self.voiceover.validate()

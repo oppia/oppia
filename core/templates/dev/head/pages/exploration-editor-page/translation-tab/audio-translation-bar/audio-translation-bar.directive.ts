@@ -297,8 +297,8 @@ angular.module('oppia').directive('audioTranslationBar', [
               }
               StateRecordedVoiceoversService.displayed.addVoiceover(
                 contentId, languageCode, filename, recordedAudioFile.size,
-                response.duration);
-              $scope.duration = Math.floor(response.duration);
+                response.duration_secs);
+              $scope.duration_secs = Math.floor(response.duration_secs);
               saveRecordedVoiceoversChanges();
               AlertsService.addSuccessMessage(
                 'Succesfuly uploaded recorded audio.');
@@ -430,7 +430,8 @@ angular.module('oppia').directive('audioTranslationBar', [
               $scope.isLoadingAudio = true;
               $scope.selectedRecording = false;
               $scope.audioNeedsUpdate = audioTranslationObject.needsUpdate;
-              $scope.duration = Math.floor(audioTranslationObject.duration);
+              $scope.duration_secs =
+                Math.floor(audioTranslationObject.duration_secs);
             } else {
               $scope.isAudioAvailable = false;
               $scope.audioBlob = null;
@@ -540,7 +541,7 @@ angular.module('oppia').directive('audioTranslationBar', [
                           languageCode: languageCode,
                           filename: generatedFilename,
                           fileSizeBytes: uploadedFile.size,
-                          duration: response.duration
+                          duration_secs: response.duration_secs
                         });
                       }, function(errorResponse) {
                         $scope.errorMessage = (
@@ -565,8 +566,8 @@ angular.module('oppia').directive('audioTranslationBar', [
               }
               StateRecordedVoiceoversService.displayed.addVoiceover(
                 $scope.contentId, $scope.languageCode, result.filename,
-                result.fileSizeBytes, result.duration);
-              $scope.duration = Math.floor(result.duration);
+                result.fileSizeBytes, result.duration_secs);
+              $scope.duration_secs = Math.floor(result.duration_secs);
               saveRecordedVoiceoversChanges();
               $scope.initAudioBar();
             }, function() {

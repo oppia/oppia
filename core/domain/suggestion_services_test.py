@@ -866,7 +866,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
                         'needs_update': False,
-                        'duration': 42.43
+                        'duration_secs': 42.43
                     }
                 },
                 'default_outcome': {}

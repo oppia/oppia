@@ -100,7 +100,7 @@ class AudioUploadHandler(base.BaseHandler):
 
         mimetype = audio.mime[0]
         # Fetch the audio file duration from the Mutagen metadata.
-        duration = audio.info.length
+        duration_secs = audio.info.length
 
         # For a strange, unknown reason, the audio variable must be
         # deleted before opening cloud storage. If not, cloud storage
@@ -117,7 +117,7 @@ class AudioUploadHandler(base.BaseHandler):
             '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)
 
-        self.render_json({'filename': filename, 'duration': duration})
+        self.render_json({'filename': filename, 'duration_secs': duration_secs})
 
 
 class StartedTranslationTutorialEventHandler(base.BaseHandler):

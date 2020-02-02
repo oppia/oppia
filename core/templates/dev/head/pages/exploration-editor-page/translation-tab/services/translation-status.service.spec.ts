@@ -210,7 +210,7 @@ describe('Translation status service', function() {
                   needs_update: false,
                   filename: 'filename1.mp3',
                   file_size_bytes: 43467,
-                  duration: 4.3
+                  duration_secs: 4.3
                 }
               },
               feedback_1: {}
@@ -367,7 +367,7 @@ describe('Translation status service', function() {
                   needs_update: false,
                   filename: 'content-en-s86jb5zajs.mp3',
                   file_size_bytes: 38870,
-                  duration: 38.8
+                  duration_secs: 38.8
                 }
               }
             }

@@ -217,7 +217,7 @@ class Question(python_utils.OBJECT):
     @classmethod
     def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
         """Converts from version 30 to 31. Version 31 updates the
-        Voiceover model to have an initialized duration attribute of 0.0.
+        Voiceover model to have an initialized duration_secs attribute of 0.0.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
@@ -232,11 +232,11 @@ class Question(python_utils.OBJECT):
                       ['voiceovers_mapping'])
         for content_id in voiceovers.keys():
             for language_code in voiceovers[content_id].keys():
-                # Initialize duration with 0.0 for every voiceover
+                # Initialize duration_secs with 0.0 for every voiceover
                 # recording under Content, Feedback, Hints, and Solutions.
                 # This is necessary to keep the state functional
                 # when migrating to v31.
-                voiceovers[content_id][language_code]['duration'] = 0.0
+                voiceovers[content_id][language_code]['duration_secs'] = 0.0
         return question_state_dict
 
 
