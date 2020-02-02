@@ -33,8 +33,7 @@ require(
 
 describe('retrieving threads service', function() {
   var expId = '12345';
-  beforeEach(
-    angular.mock.module('oppia', TranslatorProviderForTests));
+  beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module(function($provide) {
@@ -53,10 +52,10 @@ describe('retrieving threads service', function() {
     }
   }));
 
-  var ThreadDataService, httpBackend;
-  beforeEach(angular.mock.inject(function($httpBackend, _ThreadDataService_) {
+  var ThreadDataService, $httpBackend;
+  beforeEach(angular.mock.inject(function(_$httpBackend_, _ThreadDataService_) {
     ThreadDataService = _ThreadDataService_;
-    httpBackend = $httpBackend;
+    $httpBackend = _$httpBackend_;
   }));
 
   it('should retrieve feedback threads', function(done) {
@@ -81,7 +80,7 @@ describe('retrieving threads service', function() {
       }
     ];
 
-    var mockGeneralSuggestionThreads = [
+    var mockSuggestions = [
       {
         assigned_reviewer_id: null,
         author_name: 'author_1',
@@ -107,7 +106,7 @@ describe('retrieving threads service', function() {
         thread_id: 'exp_1.1234'
       }
     ];
-    var feedbackThreadsForSuggestionThreads = [
+    var mockSuggestionThreads = [
       {
         description: 'Suggestion',
         last_updated: 1441870501231.642,
@@ -119,26 +118,24 @@ describe('retrieving threads service', function() {
         thread_id: 'exp_1.1234'
       }
     ];
-    httpBackend.whenGET('/threadlisthandler/' + expId).respond({
-      feedback_thread_dicts: mockFeedbackThreads,
-      suggestion_thread_dicts: feedbackThreadsForSuggestionThreads
-    });
 
-    httpBackend.whenGET(
+    $httpBackend.whenGET('/threadlisthandler/' + expId).respond({
+      feedback_thread_dicts: mockFeedbackThreads,
+      suggestion_thread_dicts: mockSuggestionThreads
+    });
+    $httpBackend.whenGET(
       '/suggestionlisthandler?target_type=exploration&target_id=' + expId
-    ).respond({ suggestions: mockGeneralSuggestionThreads });
+    ).respond({ suggestions: mockSuggestions });
 
     ThreadDataService.fetchThreads().then(threadData => {
-      for (var i = 0; i < mockFeedbackThreads.length; i++) {
-        expect(threadData.feedbackThreads)
-          .toContain(mockFeedbackThreads[i]);
+      for (let feedbackThread of mockFeedbackThreads) {
+        expect(threadData.feedbackThreads).toContain(feedbackThread);
       }
 
-      for (var i = 0; i < mockGeneralSuggestionThreads.length; i++) {
-        expect(threadData.suggestionThreads)
-          .toContain(mockGeneralSuggestionThreads[i]);
+      for (let suggestionThread of mockSuggestionThreads) {
+        expect(threadData.suggestionThreads).toContain(suggestionThread);
       }
     }).then(done, done.fail);
-    httpBackend.flush();
+    $httpBackend.flush();
   });
 });
