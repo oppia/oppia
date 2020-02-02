@@ -140,7 +140,7 @@ angular.module('oppia').directive('questionsList', [
             }
           };
 
-          ctrl.saveAndPublishQuestion = function(commitMessage) {
+          ctrl.saveAndPublishQuestion = function(commitMessage = 'blank') {
             var validationErrors = ctrl.question.validate(
               ctrl.misconceptionsBySkill);
 
@@ -517,7 +517,10 @@ angular.module('oppia').directive('questionsList', [
                 function(
                     $scope, $uibModalInstance, StateEditorService,
                     UndoRedoService) {
-                  var returnArray = [];
+                  var returnModalObject = {
+                    array: [],
+                    commitMessage: 'blank'
+                  };
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.associatedSkillSummaries =
@@ -526,7 +529,7 @@ angular.module('oppia').directive('questionsList', [
                   $scope.misconceptionsBySkill = misconceptionsBySkill;
                   $scope.canEditQuestion = canEditQuestion;
                   $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
-
+                  $scope.isChangeCommited = false;
                   if (!newQuestionIsBeingCreated) {
                     $scope.validationError = $scope.question.validate(
                       $scope.misconceptionsBySkill);
@@ -547,7 +550,7 @@ angular.module('oppia').directive('questionsList', [
                         'A question should be linked to at least one skill.');
                       return;
                     }
-                    returnArray.push({
+                    returnModalObject.array.push({
                       id: skillId,
                       task: 'remove'
                     });
@@ -558,7 +561,7 @@ angular.module('oppia').directive('questionsList', [
                   };
                   $scope.undo = function() {
                     $scope.associatedSkillSummaries = associatedSkillSummaries;
-                    returnArray = [];
+                    returnModalObject.array = [];
                   };
                   $scope.addSkill = function() {
                     var skillsInSameTopicCount =
@@ -609,12 +612,43 @@ angular.module('oppia').directive('questionsList', [
                       $scope.associatedSkillSummaries.push(
                         SkillSummaryObjectFactory.create(
                           summary.id, summary.description));
-                      returnArray.push({
+                      returnModalObject.array.push({
                         id: summary.id,
                         task: 'add'
                       });
                     });
                   };
+                  $scope.commit = function() {
+                    var modalInstance = $uibModal.open({
+                      templateUrl:
+                             UrlInterpolationService.getDirectiveTemplateUrl(
+                               '/components/question-directives' +
+                               '/modal-templates/' +
+                               'question-editor-save-modal.template.html'),
+                      backdrop: true,
+                      controller: [
+                        '$scope', '$uibModalInstance',
+                        function($scope, $uibModalInstance) {
+                          $scope.save = function(commitMessage) {
+                            $uibModalInstance.close(commitMessage);
+                          };
+                          $scope.cancel = function() {
+                            $uibModalInstance.dismiss('cancel');
+                          };
+                        }
+                      ]
+                    });
+
+                    modalInstance.result.then(function(commitMessage) {
+                      returnModalObject.commitMessage = commitMessage;
+                      $scope.isChangeCommited = true;
+                    });
+                  };
+                  $scope.isCommitButtonDisabled = function() {
+                    return !(QuestionUndoRedoService.hasChanges() ||
+                        returnModalObject.array.length > 0);
+                  };
+
 
                   $scope.done = function() {
                     $scope.validationError = $scope.question.validate(
@@ -628,44 +662,14 @@ angular.module('oppia').directive('questionsList', [
                         'correspond to a correct answer';
                       return;
                     }
-                    if (QuestionUndoRedoService.hasChanges() ||
-                      returnArray.length > 0) {
-                      var modalInstance = $uibModal.open({
-                        templateUrl:
-                             UrlInterpolationService.getDirectiveTemplateUrl(
-                               '/components/question-directives' +
-                               '/modal-templates/' +
-                               'question-editor-save-modal.template.html'),
-                        backdrop: true,
-                        controller: [
-                          '$scope', '$uibModalInstance',
-                          function($scope, $uibModalInstance) {
-                            $scope.save = function(commitMessage) {
-                              $uibModalInstance.close(commitMessage);
-                            };
-                            $scope.cancel = function() {
-                              $uibModalInstance.dismiss('cancel');
-                            };
-                          }
-                        ]
-                      });
-
-                      modalInstance.result.then(function(commitMessage) {
-                        var returnModalObject = {
-                          array: returnArray,
-                          commitMessage: commitMessage
-                        };
-                        $uibModalInstance.close(returnModalObject);
-                      });
-                    } else {
-                      $uibModalInstance.dismiss('cancel');
-                    }
+                    $uibModalInstance.close(returnModalObject);
                   };
                   // Checking if Question contains all requirement to enable
                   // Save and Publish Question
                   $scope.isSaveButtonDisabled = function() {
                     return $scope.question.validate(
-                      $scope.misconceptionsBySkill);
+                      $scope.misconceptionsBySkill) ||
+                      (!$scope.isChangeCommited && ctrl.questionIsBeingUpdated);
                   };
 
                   $scope.cancel = function() {

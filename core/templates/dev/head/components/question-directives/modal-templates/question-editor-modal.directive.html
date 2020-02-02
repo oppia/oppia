@@ -45,6 +45,11 @@
           ng-disabled="isSaveButtonDisabled()">
     Done
   </button>
+  <button class="btn btn-success protractor-test-save-question-button"
+          ng-click="commit()"
+          ng-disabled="isCommitButtonDisabled()">
+    Commit
+  </button>
 </div>
 <style>
   .question-skill-id {
