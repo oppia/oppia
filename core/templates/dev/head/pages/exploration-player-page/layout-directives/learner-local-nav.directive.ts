@@ -16,7 +16,6 @@
  * @fileoverview Directive for the local navigation in the learner view.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require(
@@ -36,15 +35,12 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').directive('learnerLocalNav', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/layout-directives/' +
-        'learner-local-nav.directive.html'),
+      template: require('./learner-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$rootScope', '$uibModal', 'AlertsService',
