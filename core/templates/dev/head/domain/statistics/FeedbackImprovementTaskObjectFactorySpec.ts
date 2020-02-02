@@ -266,7 +266,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
           this.button = this.task.getActionButtons()[0];
         });
 
-        it('opens a thread modal', function(done) {
+        it('opens a thread modal', function() {
           var spy = spyOn(ImprovementModalService, 'openFeedbackThread');
 
           this.button.execute();

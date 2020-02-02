@@ -124,10 +124,8 @@ describe('retrieving threads service', function() {
     });
 
     httpBackend.whenGET(
-      '/generalsuggestionlisthandler?target_type=exploration' +
-      '&target_id=' + expId).respond({
-      suggestions: mockGeneralSuggestionThreads
-    });
+      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+    ).respond({ suggestions: mockGeneralSuggestionThreads });
 
     ThreadDataService.fetchThreads().then(threadData => {
       for (var i = 0; i < mockFeedbackThreads.length; i++) {
