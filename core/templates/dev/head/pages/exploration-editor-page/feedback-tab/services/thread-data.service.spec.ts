@@ -131,7 +131,7 @@ describe('retrieving threads service', function() {
     ThreadDataService.fetchThreads().then(threadData => {
       for (let feedbackThread of mockFeedbackThreads) {
         expect(threadData.feedbackThreads).toContain(jasmine.objectContaining(
-          { threadId: feedbackThread.thread_id }))
+          { threadId: feedbackThread.thread_id }));
       }
 
       for (let suggestionThread of mockSuggestionThreads) {
