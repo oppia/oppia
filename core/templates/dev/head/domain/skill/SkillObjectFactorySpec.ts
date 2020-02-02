@@ -44,7 +44,7 @@ import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normaliz
 // require('domain/skill/SkillObjectFactory.ts');
 
 
-fdescribe('Skill object factory',()=>{
+describe('Skill object factory',()=>{
   describe('SkillObjectFactory',()=>{
     let skillObjectFactory;
     let conceptCardObjectFactory;
@@ -73,7 +73,7 @@ fdescribe('Skill object factory',()=>{
       subtitledHtmlObjectFactory=TestBed.get(SubtitledHtmlObjectFactory)
       skillDifficulties=["Easy", "Medium", "Hard"];
       misconceptionDict1 = {
-        id: 2,
+        id: '2',
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
@@ -81,7 +81,7 @@ fdescribe('Skill object factory',()=>{
       };
     
       misconceptionDict2 = {
-        id: 4,
+        id: '4',
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback',
@@ -117,23 +117,23 @@ fdescribe('Skill object factory',()=>{
         }
       };
       skillDict = {
-        id: 1,
+        id: '1',
         description: 'test description',
         misconceptions: [misconceptionDict1, misconceptionDict2],
         rubrics: [rubricDict],
         skill_contents: skillContentsDict,
         language_code: 'en',
         version: 3,
-        next_misconception_id: 6,
+        next_misconception_id: '6',
         superseding_skill_id: '2',
         all_questions_merged: false,
-        prerequisite_skill_ids: [1]
+        prerequisite_skill_ids: ['skill_1']
       };
     })
     
     it('should create a new skill from a backend dictionary', function() {
       var skill = skillObjectFactory.createFromBackendDict(skillDict);
-      expect(skill.getId()).toEqual(1);
+      expect(skill.getId()).toEqual('1');
       expect(skill.getDescription()).toEqual('test description');
       expect(skill.getMisconceptions()).toEqual(
         [misconceptionObjectFactory.createFromBackendDict(
@@ -148,17 +148,18 @@ fdescribe('Skill object factory',()=>{
       expect(skill.getVersion()).toEqual(3);
       expect(skill.getSupersedingSkillId()).toEqual('2');
       expect(skill.getAllQuestionsMerged()).toEqual(false);
-      expect(skill.getPrerequisiteSkillIds()).toEqual([1]);
+      expect(skill.getPrerequisiteSkillIds()).toEqual(['skill_1']);
     });
 
     it('Should find misconception by id',()=>{
       var skill = skillObjectFactory.createFromBackendDict(skillDict);
-      expect(skill.findMisconceptionById(4)).toEqual(skill)
+      expect(skill.findMisconceptionById('4')).toEqual(
+        misconceptionObjectFactory.createFromBackendDict(misconceptionDict2))
     });
 
     it('should delete a misconception given its id',()=> {
       var skill = skillObjectFactory.createFromBackendDict(skillDict);
-      skill.deleteMisconception(2);
+      skill.deleteMisconception('2');
       expect(skill.getMisconceptions()).toEqual(
         [misconceptionObjectFactory.createFromBackendDict(
           misconceptionDict2)]);
@@ -194,9 +195,9 @@ fdescribe('Skill object factory',()=>{
     
     it('should get the correct next misconception id', () => {
       var skill = skillObjectFactory.createFromBackendDict(skillDict);
-      expect(skill.getNextMisconceptionId()).toEqual(6);
+      expect(skill.getNextMisconceptionId()).toEqual('6');
       skill.deleteMisconception(4);
-      expect(skill.getNextMisconceptionId()).toEqual(6);
+      expect(skill.getNextMisconceptionId()).toEqual('6');
     
       var misconceptionToAdd1 = misconceptionObjectFactory
         .createFromBackendDict({
@@ -208,9 +209,9 @@ fdescribe('Skill object factory',()=>{
         });
     
       skill.appendMisconception(misconceptionToAdd1);
-      expect(skill.getNextMisconceptionId()).toEqual(7);
+      expect(skill.getNextMisconceptionId()).toEqual('7');
       skill.deleteMisconception(6);
-      expect(skill.getNextMisconceptionId()).toEqual(7);
+      expect(skill.getNextMisconceptionId()).toEqual('7');
     });
     
     it('should convert to a backend dictionary', () => {

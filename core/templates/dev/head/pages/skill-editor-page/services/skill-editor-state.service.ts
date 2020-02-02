@@ -107,6 +107,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
     return {
       loadSkill: function(skillId) {
         _skillIsBeingLoaded = true;
+
         EditableSkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
@@ -117,19 +118,24 @@ angular.module('oppia').factory('SkillEditorStateService', [
               [skillId], true, false
             );
             _skillIsBeingLoaded = false;
+            _skillIsInitialized = true;
           }, function(error) {
             AlertsService.addWarning();
             _skillIsBeingLoaded = false;
+            _skillIsInitialized = false;
+
           });
         SkillRightsBackendApiService.fetchSkillRights(
           skillId).then(function(newBackendSkillRightsObject) {
           _updateSkillRights(newBackendSkillRightsObject);
           _skillIsBeingLoaded = false;
+          _skillIsInitialized = true;
         }, function(error) {
           AlertsService.addWarning(
             error ||
             'There was an error when loading the skill rights.');
           _skillIsBeingLoaded = false;
+          _skillIsInitialized = false;
         });
       },
 

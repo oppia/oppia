@@ -21,14 +21,14 @@ import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
 export class Misconception {
-  _id: number;
+  _id: string;
   _name: string;
   _notes: string;
   _feedback: string;
   _mustBeAddressed: boolean;
 
   constructor(
-      id: number, name: string, notes: string, feedback: string,
+      id: string, name: string, notes: string, feedback: string,
       mustBeAddressed: boolean) {
     this._id = id;
     this._name = name;
@@ -47,7 +47,7 @@ export class Misconception {
     };
   }
 
-  getId(): number {
+  getId(): string {
     return this._id;
   }
 
@@ -97,7 +97,7 @@ export class MisconceptionObjectFactory {
       misconceptionBackendDict.must_be_addressed);
   }
   create(
-      id: number, name: string, notes: string,
+      id: string, name: string, notes: string,
       feedback: string, mustBeAddressed: boolean): Misconception {
     return new Misconception(id, name, notes, feedback, mustBeAddressed);
   }

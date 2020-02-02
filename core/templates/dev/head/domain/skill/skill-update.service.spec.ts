@@ -32,23 +32,20 @@ import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
 import { SkillObjectFactory } from 
   'domain/skill/SkillObjectFactory.ts'
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 import { TestBed } from '@angular/core/testing';
-import { ValidatorsService } from 'services/validators.service';
 import { NormalizeWhitespacePipe } from 'filters/string-utility-filters/normalize-whitespace.pipe';
 // ^^^ This block is to be removed.
 
 require('App.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/skill-update.service.ts');
-
 describe('Skill update service', function() {
   var SkillUpdateService = null,
     subtitledHtmlObjectFactory = null,
@@ -87,11 +84,12 @@ describe('Skill update service', function() {
     });
     skillObjectFactory=TestBed.get(SkillObjectFactory)
     misconceptionObjectFactory=TestBed.get(MisconceptionObjectFactory);
+    rubricObjectFactory=TestBed.get(RubricObjectFactory)
     conceptCardObjectFactory=TestBed.get(ConceptCardObjectFactory);
     subtitledHtmlObjectFactory=TestBed.get(SubtitledHtmlObjectFactory)
     skillDifficulties=["Easy", "Medium", "Hard"];
     var misconceptionDict1 = {
-      id: 2,
+      id: '2',
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
@@ -99,7 +97,7 @@ describe('Skill update service', function() {
     };
 
     var misconceptionDict2 = {
-      id: 4,
+      id: '4',
       name: 'test name',
       notes: 'test notes',
       feedback: 'test feedback',
@@ -137,21 +135,21 @@ describe('Skill update service', function() {
     };
 
     skillDict = {
-      id: 1,
+      id: '1',
       description: 'test description',
       misconceptions: [misconceptionDict1, misconceptionDict2],
       rubrics: [rubricDict],
       skill_contents: skillContentsDict,
       language_code: 'en',
       version: 3,
-      prerequisite_skill_ids: [1]
+      prerequisite_skill_ids: ['skill_1']
     };
   })
   beforeEach(angular.mock.inject(function($injector) {
     SkillUpdateService = $injector.get('SkillUpdateService');
     UndoRedoService = $injector.get('UndoRedoService');
   }));
-
+  
   it('should set/unset the skill description', function() {
     var skill = skillObjectFactory.createFromBackendDict(skillDict);
     SkillUpdateService.setSkillDescription(skill, 'new description');
@@ -195,7 +193,7 @@ describe('Skill update service', function() {
   it('should add a misconception', function() {
     var skill = skillObjectFactory.createFromBackendDict(skillDict);
     var aNewMisconceptionDict = {
-      id: 7,
+      id: '7',
       name: 'test name 3',
       notes: 'test notes 3',
       feedback: 'test feedback 3',
@@ -218,7 +216,7 @@ describe('Skill update service', function() {
     SkillUpdateService.deleteMisconception(skill, '2');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'delete_skill_misconception',
-      misconception_id: 2
+      misconception_id: '2'
     }]);
     expect(skill.getMisconceptions().length).toEqual(1);
     UndoRedoService.undoChange(skill);
@@ -239,10 +237,10 @@ describe('Skill update service', function() {
 
   it('should delete a prerequisite skill', function() {
     var skill = skillObjectFactory.createFromBackendDict(skillDict);
-    SkillUpdateService.deletePrerequisiteSkill(skill, 1);
+    SkillUpdateService.deletePrerequisiteSkill(skill, 'skill_1');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'delete_prerequisite_skill',
-      skill_id: 1
+      skill_id: 'skill_1'
     }]);
     expect(skill.getPrerequisiteSkillIds().length).toEqual(0);
     UndoRedoService.undoChange(skill);
@@ -269,53 +267,53 @@ describe('Skill update service', function() {
   it('should update the name of a misconception', function() {
     var skill = skillObjectFactory.createFromBackendDict(skillDict);
     SkillUpdateService.updateMisconceptionName(
-      skill, 2, skill.findMisconceptionById(2).getName(), 'new name');
+      skill, '2', skill.findMisconceptionById('2').getName(), 'new name');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_misconceptions_property',
       property_name: 'name',
       old_value: 'test name',
       new_value: 'new name',
-      misconception_id: 2
+      misconception_id: '2'
     }]);
-    expect(skill.findMisconceptionById(2).getName()).toEqual('new name');
+    expect(skill.findMisconceptionById('2').getName()).toEqual('new name');
     UndoRedoService.undoChange(skill);
-    expect(skill.findMisconceptionById(2).getName()).toEqual('test name');
+    expect(skill.findMisconceptionById('2').getName()).toEqual('test name');
   });
 
   it('should update the notes of a misconception', function() {
     var skill = skillObjectFactory.createFromBackendDict(skillDict);
     SkillUpdateService.updateMisconceptionNotes(
-      skill, 2, skill.findMisconceptionById(2).getNotes(), 'new notes');
+      skill, '2', skill.findMisconceptionById('2').getNotes(), 'new notes');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_misconceptions_property',
       property_name: 'notes',
       old_value: 'test notes',
       new_value: 'new notes',
-      misconception_id: 2
+      misconception_id: '2'
     }]);
-    expect(skill.findMisconceptionById(2).getNotes()).toEqual('new notes');
+    expect(skill.findMisconceptionById('2').getNotes()).toEqual('new notes');
     UndoRedoService.undoChange(skill);
-    expect(skill.findMisconceptionById(2).getNotes()).toEqual('test notes');
+    expect(skill.findMisconceptionById('2').getNotes()).toEqual('test notes');
   });
 
   it('should update the feedback of a misconception', function() {
     var skill = skillObjectFactory.createFromBackendDict(skillDict);
     SkillUpdateService.updateMisconceptionFeedback(
       skill,
-      2,
-      skill.findMisconceptionById(2).getFeedback(),
+      '2',
+      skill.findMisconceptionById('2').getFeedback(),
       'new feedback');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_misconceptions_property',
       property_name: 'feedback',
       old_value: 'test feedback',
       new_value: 'new feedback',
-      misconception_id: 2
+      misconception_id: '2'
     }]);
-    expect(skill.findMisconceptionById(2).getFeedback())
+    expect(skill.findMisconceptionById('2').getFeedback())
       .toEqual('new feedback');
     UndoRedoService.undoChange(skill);
-    expect(skill.findMisconceptionById(2).getFeedback())
+    expect(skill.findMisconceptionById('2').getFeedback())
       .toEqual('test feedback');
   });
 
@@ -323,20 +321,20 @@ describe('Skill update service', function() {
     var skill = skillObjectFactory.createFromBackendDict(skillDict);
     SkillUpdateService.updateMisconceptionMustBeAddressed(
       skill,
-      2,
-      skill.findMisconceptionById(2).isMandatory(),
+      '2',
+      skill.findMisconceptionById('2').isMandatory(),
       false);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_misconceptions_property',
       property_name: 'must_be_addressed',
       old_value: true,
       new_value: false,
-      misconception_id: 2
+      misconception_id: '2'
     }]);
-    expect(skill.findMisconceptionById(2).isMandatory())
+    expect(skill.findMisconceptionById('2').isMandatory())
       .toEqual(false);
     UndoRedoService.undoChange(skill);
-    expect(skill.findMisconceptionById(2).isMandatory())
+    expect(skill.findMisconceptionById('2').isMandatory())
       .toEqual(true);
   });
 
@@ -458,3 +456,411 @@ describe('Skill update service', function() {
         'test worked example 2', 'worked_example_2')]);
   });
 });
+// describe('Skill update service', function() {
+//   var SkillUpdateService = null,
+//     subtitledHtmlObjectFactory = null,
+//     skillObjectFactory = null,
+//     misconceptionObjectFactory = null,
+//     rubricObjectFactory = null,
+//     skillDifficulties = null,
+//     UndoRedoService = null;
+//   var skillDict = null;
+// beforeEach(angular.mock.module('oppia'));
+// beforeEach(angular.mock.module('oppia', function($provide) {
+//     $provide.value(
+//       'AudioLanguageObjectFactory', new AudioLanguageObjectFactory());
+//     $provide.value(
+//       'AutogeneratedAudioLanguageObjectFactory',
+//       new AutogeneratedAudioLanguageObjectFactory());
+//     $provide.value('ChangeObjectFactory', new ChangeObjectFactory());
+//     $provide.value(
+//       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
+//     $provide.value(
+//       'RubricObjectFactory', new RubricObjectFactory());
+//     $provide.value(
+//       'RecordedVoiceoversObjectFactory',
+//       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
+//     $provide.value(
+//       'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
+//     $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
+//   }));
+//   beforeEach(angular.mock.module('oppia', function($provide) {
+//     var ugs = new UpgradedServices();
+//     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+//       $provide.value(key, value);
+//     }
+//   }));
+
+//   beforeEach(angular.mock.inject(function($injector) {
+//     SkillUpdateService = $injector.get('SkillUpdateService');
+//     skillObjectFactory = $injector.get('SkillObjectFactory');
+//     subtitledHtmlObjectFactory = $injector.get('SubtitledHtmlObjectFactory');
+//     misconceptionObjectFactory = $injector.get('MisconceptionObjectFactory');
+//     rubricObjectFactory = $injector.get('RubricObjectFactory');
+//     UndoRedoService = $injector.get('UndoRedoService');
+//     skillDifficulties = $injector.get('SKILL_DIFFICULTIES');
+
+//     var misconceptionDict1 = {
+//       id: 2,
+//       name: 'test name',
+//       notes: 'test notes',
+//       feedback: 'test feedback',
+//       must_be_addressed: true
+//     };
+
+//     var misconceptionDict2 = {
+//       id: 4,
+//       name: 'test name',
+//       notes: 'test notes',
+//       feedback: 'test feedback',
+//       must_be_addressed: true
+//     };
+
+//     var rubricDict = {
+//       difficulty: skillDifficulties[0],
+//       explanation: 'explanation'
+//     };
+
+
+//     var skillContentsDict = {
+//       explanation: {
+//         html: 'test explanation',
+//         content_id: 'explanation',
+//       },
+//       worked_examples: [
+//         {
+//           html: 'test worked example 1',
+//           content_id: 'worked_example_1',
+//         },
+//         {
+//           html: 'test worked example 2',
+//           content_id: 'worked_example_2'
+//         }
+//       ],
+//       recorded_voiceovers: {
+//         voiceovers_mapping: {
+//           explanation: {},
+//           worked_example_1: {},
+//           worked_example_2: {}
+//         }
+//       }
+//     };
+
+//     skillDict = {
+//       id: 1,
+//       description: 'test description',
+//       misconceptions: [misconceptionDict1, misconceptionDict2],
+//       rubrics: [rubricDict],
+//       skill_contents: skillContentsDict,
+//       language_code: 'en',
+//       version: 3,
+//       prerequisite_skill_ids: [1]
+//     };
+//   }));
+
+//   it('should set/unset the skill description', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.setSkillDescription(skill, 'new description');
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_skill_property',
+//       property_name: 'description',
+//       old_value: 'test description',
+//       new_value: 'new description'
+//     }]);
+//     expect(skill.getDescription()).toEqual('new description');
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getDescription()).toEqual('test description');
+//   });
+
+//   it('should set/unset the concept card explanation', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.setConceptCardExplanation(
+//       skill, subtitledHtmlObjectFactory.createDefault(
+//         'new explanation', 'explanation'));
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_skill_contents_property',
+//       property_name: 'explanation',
+//       old_value: {
+//         html: 'test explanation',
+//         content_id: 'explanation'
+//       },
+//       new_value: {
+//         html: 'new explanation',
+//         content_id: 'explanation'
+//       }
+//     }]);
+//     expect(skill.getConceptCard().getExplanation()).toEqual(
+//       subtitledHtmlObjectFactory.createDefault(
+//         'new explanation', 'explanation'));
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getConceptCard().getExplanation()).toEqual(
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test explanation', 'explanation'));
+//   });
+
+//   it('should add a misconception', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     var aNewMisconceptionDict = {
+//       id: 7,
+//       name: 'test name 3',
+//       notes: 'test notes 3',
+//       feedback: 'test feedback 3',
+//       must_be_addressed: true
+//     };
+//     var aNewMisconception =
+//       misconceptionObjectFactory.createFromBackendDict(aNewMisconceptionDict);
+//     SkillUpdateService.addMisconception(skill, aNewMisconception);
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'add_skill_misconception',
+//       new_misconception_dict: aNewMisconceptionDict
+//     }]);
+//     expect(skill.getMisconceptions().length).toEqual(3);
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getMisconceptions().length).toEqual(2);
+//   });
+
+//   it('should delete a misconception', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.deleteMisconception(skill, 2);
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'delete_skill_misconception',
+//       misconception_id: '2'
+//     }]);
+//     expect(skill.getMisconceptions().length).toEqual(1);
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getMisconceptions().length).toEqual(2);
+//   });
+
+//   it('should add a prerequisite skill', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.addPrerequisiteSkill(skill, 1);
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'add_prerequisite_skill',
+//       skill_id: 1
+//     }]);
+//     expect(skill.getPrerequisiteSkillIds().length).toEqual(2);
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
+//   });
+
+//   it('should delete a prerequisite skill', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.deletePrerequisiteSkill(skill, 'skill_1');
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'delete_prerequisite_skill',
+//       skill_id: 'skill_1'
+//     }]);
+//     expect(skill.getPrerequisiteSkillIds().length).toEqual(0);
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getPrerequisiteSkillIds().length).toEqual(1);
+//   });
+
+//   it('should update a rubric', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     expect(skill.getRubrics().length).toEqual(1);
+//     SkillUpdateService.updateRubricForDifficulty(
+//       skill, skillDifficulties[0], 'new explanation');
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_rubrics',
+//       difficulty: skillDifficulties[0],
+//       explanation: 'new explanation'
+//     }]);
+//     expect(skill.getRubrics().length).toEqual(1);
+//     expect(skill.getRubrics()[0].getExplanation()).toEqual('new explanation');
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getRubrics().length).toEqual(1);
+//     expect(skill.getRubrics()[0].getExplanation()).toEqual('explanation');
+//   });
+
+//   it('should update the name of a misconception', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.updateMisconceptionName(
+//       skill, '2', skill.findMisconceptionById('2').getName(), 'new name');
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_skill_misconceptions_property',
+//       property_name: 'name',
+//       old_value: 'test name',
+//       new_value: 'new name',
+//       misconception_id: 2
+//     }]);
+//     expect(skill.findMisconceptionById(2).getName()).toEqual('new name');
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.findMisconceptionById(2).getName()).toEqual('test name');
+//   });
+
+//   it('should update the notes of a misconception', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.updateMisconceptionNotes(
+//       skill, 2, skill.findMisconceptionById(2).getNotes(), 'new notes');
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_skill_misconceptions_property',
+//       property_name: 'notes',
+//       old_value: 'test notes',
+//       new_value: 'new notes',
+//       misconception_id: 2
+//     }]);
+//     expect(skill.findMisconceptionById(2).getNotes()).toEqual('new notes');
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.findMisconceptionById(2).getNotes()).toEqual('test notes');
+//   });
+
+//   it('should update the feedback of a misconception', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.updateMisconceptionFeedback(
+//       skill,
+//       2,
+//       skill.findMisconceptionById(2).getFeedback(),
+//       'new feedback');
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_skill_misconceptions_property',
+//       property_name: 'feedback',
+//       old_value: 'test feedback',
+//       new_value: 'new feedback',
+//       misconception_id: 2
+//     }]);
+//     expect(skill.findMisconceptionById(2).getFeedback())
+//       .toEqual('new feedback');
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.findMisconceptionById(2).getFeedback())
+//       .toEqual('test feedback');
+//   });
+
+//   it('should update the feedback of a misconception', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.updateMisconceptionMustBeAddressed(
+//       skill,
+//       '2',
+//       skill.findMisconceptionById(2).isMandatory(),
+//       false);
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_skill_misconceptions_property',
+//       property_name: 'must_be_addressed',
+//       old_value: true,
+//       new_value: false,
+//       misconception_id: 2
+//     }]);
+//     expect(skill.findMisconceptionById(2).isMandatory())
+//       .toEqual(false);
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.findMisconceptionById(2).isMandatory())
+//       .toEqual(true);
+//   });
+
+//   it('should add a worked example', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.addWorkedExample(skill,
+//       subtitledHtmlObjectFactory.createDefault(
+//         'a new worked example', 'worked_example_3'));
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_skill_contents_property',
+//       property_name: 'worked_examples',
+//       old_value: [
+//         {
+//           html: 'test worked example 1',
+//           content_id: 'worked_example_1',
+//         },
+//         {
+//           html: 'test worked example 2',
+//           content_id: 'worked_example_2'
+//         }],
+//       new_value: [
+//         {
+//           html: 'test worked example 1',
+//           content_id: 'worked_example_1',
+//         },
+//         {
+//           html: 'test worked example 2',
+//           content_id: 'worked_example_2'
+//         },
+//         {
+//           html: 'a new worked example',
+//           content_id: 'worked_example_3'
+//         }]
+//     }]);
+//     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 1', 'worked_example_1'),
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 2', 'worked_example_2'),
+//       subtitledHtmlObjectFactory.createDefault(
+//         'a new worked example', 'worked_example_3')]);
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 1', 'worked_example_1'),
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 2', 'worked_example_2')]);
+//   });
+
+//   it('shoud delete a worked example', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.deleteWorkedExample(skill, 0);
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_skill_contents_property',
+//       property_name: 'worked_examples',
+//       old_value: [
+//         {
+//           html: 'test worked example 1',
+//           content_id: 'worked_example_1',
+//         },
+//         {
+//           html: 'test worked example 2',
+//           content_id: 'worked_example_2'
+//         }
+//       ],
+//       new_value: [
+//         {
+//           html: 'test worked example 2',
+//           content_id: 'worked_example_2'
+//         }
+//       ]
+//     }]);
+//     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 2', 'worked_example_2')]);
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 1', 'worked_example_1'),
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 2', 'worked_example_2')]);
+//   });
+
+//   it('should update a worked example', function() {
+//     var skill = skillObjectFactory.createFromBackendDict(skillDict);
+//     SkillUpdateService.updateWorkedExample(skill, 0, 'new content');
+//     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+//       cmd: 'update_skill_contents_property',
+//       property_name: 'worked_examples',
+//       old_value: [
+//         {
+//           html: 'test worked example 1',
+//           content_id: 'worked_example_1',
+//         },
+//         {
+//           html: 'test worked example 2',
+//           content_id: 'worked_example_2'
+//         }],
+//       new_value: [
+//         {
+//           html: 'new content',
+//           content_id: 'worked_example_1',
+//         },
+//         {
+//           html: 'test worked example 2',
+//           content_id: 'worked_example_2'
+//         }]
+//     }]);
+//     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
+//       subtitledHtmlObjectFactory.createDefault(
+//         'new content', 'worked_example_1'),
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 2', 'worked_example_2')]);
+//     UndoRedoService.undoChange(skill);
+//     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 1', 'worked_example_1'),
+//       subtitledHtmlObjectFactory.createDefault(
+//         'test worked example 2', 'worked_example_2')]);
+//   });
+// });

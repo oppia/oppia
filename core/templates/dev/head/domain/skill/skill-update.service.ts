@@ -17,12 +17,10 @@ import { Injectable } from "@angular/core";
 /**
  * @fileoverview Service to handle the updating of a skill.
  */
-import { SkillObjectFactory } from 
-  'domain/skill/SkillObjectFactory.ts'
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/skill/skill-domain.constants.ajs.ts');
-
+require('domain/skill/SkillObjectFactory.ts');
 angular.module('oppia').factory('SkillUpdateService', [
   'ChangeObjectFactory',
   'UndoRedoService', 'CMD_ADD_PREREQUISITE_SKILL',

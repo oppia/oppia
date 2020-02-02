@@ -31,24 +31,24 @@ import predConsts from
  './../../../../../../assets/constants'
 
 export class Skill {
-  _id: number;
+  _id: string;
   _description:string;
   _misconceptions:Misconception[];
   _rubrics:Rubric[];
   _conceptCard:ConceptCard;
   _languageCode:string;
   _version:number;
-  _nextMisconceptionId:number;
+  _nextMisconceptionId:string;
   _supersedingSkillId:string;
   _allQuestionsMerged:boolean;
-  _prerequisiteSkillIds:number[];
+  _prerequisiteSkillIds:string[];
   SKILL_DIFFICULTIES = predConsts.SKILL_DIFFICULTIES
 
 
-  constructor(id:number, description:string, misconceptions:Misconception[],
+  constructor(id:string, description:string, misconceptions:Misconception[],
     rubrics:Rubric[], conceptCard:ConceptCard, languageCode:string,
-    version:number, nextMisconceptionId:number, supersedingSkillId:string, 
-    allQuestionsMerged:boolean, prerequisiteSkillIds:number[] ) {
+    version:number, nextMisconceptionId:string, supersedingSkillId:string, 
+    allQuestionsMerged:boolean, prerequisiteSkillIds:string[] ) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
     this._conceptCard = conceptCard;
@@ -62,7 +62,7 @@ export class Skill {
     this._prerequisiteSkillIds = prerequisiteSkillIds;
   }
   
-  getId():number {
+  getId():string {
     return this._id;
   };
   
@@ -74,21 +74,16 @@ export class Skill {
     return this._description;
   };
 
-  getPrerequisiteSkillIds():number[] {
+  getPrerequisiteSkillIds():string[] {
     return this._prerequisiteSkillIds.slice();
   };
 
-  addPrerequisiteSkill(skillId):void {
+  addPrerequisiteSkill(skillId:string):void {
     this._prerequisiteSkillIds.push(skillId);
   };
 
-  deletePrerequisiteSkill(skillId : number):void {
-    // for (var idx in this._prerequisiteSkillIds) {
-    //   if (this._prerequisiteSkillIds[idx] === skillId) {
-    //     this._prerequisiteSkillIds.splice(idx, 1);
-    //   }
-    // }
-    this._prerequisiteSkillIds.forEach((preReq:number,index)=>{
+  deletePrerequisiteSkill(skillId : string):void {
+    this._prerequisiteSkillIds.forEach((preReq:string,index)=>{
      if(preReq === skillId){
        this._prerequisiteSkillIds.splice(index,1)
      }
@@ -121,12 +116,12 @@ export class Skill {
     return this._version;
   };
 
-  getNextMisconceptionId():number {
+  getNextMisconceptionId():string {
     return this._nextMisconceptionId;
   };
 
-  getIncrementedMisconceptionId(id:number) {
-    return id + 1;
+  getIncrementedMisconceptionId(id:string) {
+    return (parseInt(id) + 1).toString();
   };
 
   getSupersedingSkillId():string {
@@ -137,17 +132,17 @@ export class Skill {
     return this._allQuestionsMerged;
   };
 
-  findMisconceptionById(id:number):Misconception {
-    this._misconceptions.forEach((mis,index)=>{
-       if(mis.getId() == id){
-        return mis[index]
+  findMisconceptionById(id:string){ 
+    var resMis = null
+    this._misconceptions.forEach((mis:Misconception) => {
+       if(mis.getId() === id){
+        resMis = mis;
       }
     });
-    // throw new Error(
-    //   'Could not find misconception with ID: ' + id);
+    return resMis
   };
 
-  deleteMisconception(id:number){
+  deleteMisconception(id:string){
     this._misconceptions.forEach((misc:Misconception)=>{
       if(misc.getId() === id){
         this._misconceptions.splice(this._misconceptions.indexOf(misc),1)
@@ -228,7 +223,7 @@ export class SkillObjectFactory {
   createInterstitialSkill():Skill {
     return new Skill(null, 'Skill description loading',
       [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(), 'en',
-      1, 0, null, false, []);
+      1, '0', null, false, []);
   };
   hasValidDescription(description:string) {
     /* eslint-enable dot-notation */
@@ -264,8 +259,8 @@ export class SkillObjectFactory {
     });
   };
 }
-angular.module('oppia').factory('ConceptCardObjectFactory', 
-  downgradeInjectable(ConceptCardObjectFactory));
+angular.module('oppia').factory('SkillObjectFactory', 
+  downgradeInjectable(SkillObjectFactory));
 // require('domain/skill/ConceptCardObjectFactory.ts');
 // require('domain/skill/MisconceptionObjectFactory.ts');
 // require('domain/skill/RubricObjectFactory.ts');

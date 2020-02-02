@@ -104,6 +104,8 @@ import { LocalStorageService } from 'services/local-storage.service';
 import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory'
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 /* eslint-disable max-len */
@@ -138,6 +140,8 @@ import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
   'domain/exploration/RecordedVoiceoversObjectFactory';
+import { RubricObjectFactory } from
+  'domain/skill/RubricObjectFactory';
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
@@ -232,6 +236,8 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { from } from 'rxjs';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
 @Injectable({
   providedIn: 'root'
@@ -284,6 +290,8 @@ export class UpgradedServices {
     upgradedServices['LearnerAnswerInfoObjectFactory'] =
       new LearnerAnswerInfoObjectFactory();
     upgradedServices['LoggerService'] = new LoggerService();
+    upgradedServices['MisconceptionObjectFactory'] =
+      new MisconceptionObjectFactory()
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
@@ -294,6 +302,8 @@ export class UpgradedServices {
       new PlaythroughIssueObjectFactory();
     upgradedServices['ReadOnlyStoryNodeObjectFactory'] =
       new ReadOnlyStoryNodeObjectFactory();
+    upgradedServices['RubricObjectFactory'] =
+      new RubricObjectFactory();
     upgradedServices['RuleObjectFactory'] = new RuleObjectFactory();
     upgradedServices['StateImprovementSuggestionService'] =
       new StateImprovementSuggestionService();
@@ -465,6 +475,9 @@ export class UpgradedServices {
       upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
+    upgradedServices['ValidatorsService'] =new ValidatorsService(
+      upgradedServices['AlertService'],
+      upgradedServices['NormalizeWhitespacePipe'])
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
@@ -475,6 +488,12 @@ export class UpgradedServices {
         upgradedServices['CamelCaseToHyphensPipe'],
         upgradedServices['ExtensionTagAssemblerService'],
         upgradedServices['HtmlEscaperService']);
+    upgradedServices['SkillObjectFactory'] =
+    new SkillObjectFactory(
+      upgradedServices['ConceptCardObjectFactory'],
+      upgradedServices['MisconceptionObjectFactory'],
+      upgradedServices['RubricObjectFactory'],
+      upgradedServices['ValidatorsService']);
     upgradedServices['StateCardObjectFactory'] =
         new StateCardObjectFactory(
           upgradedServices['AudioTranslationLanguageService']);
