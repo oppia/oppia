@@ -94,8 +94,7 @@ GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc', '.DS_Store')
 
 JS_FILEPATHS_NOT_TO_BUILD = (
     os.path.join(
-        'core', 'templates', 'dev', 'head', 'expressions',
-        'expression-parser.service.js'),
+        'core', 'templates', 'dev', 'head', 'expressions', 'parser.js'),
     os.path.join('extensions', 'ckeditor_plugins', 'pre', 'plugin.js')
 )
 
