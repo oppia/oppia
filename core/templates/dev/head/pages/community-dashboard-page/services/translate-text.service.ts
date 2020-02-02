@@ -19,7 +19,7 @@
 
 require(
   'pages/community-dashboard-page/services/' +
-  'translate-text-backend-api.service.ts');
+  'translation-suggestion-backend-api.service.ts');
 
 angular.module('oppia').factory('TranslateTextService', [
   'TranslateTextBackendService',
@@ -70,9 +70,9 @@ angular.module('oppia').factory('TranslateTextService', [
         TranslateTextBackendService.getTranslatableText({
           expId, languageCode
         }).then(
-          function(data) {
-            stateWiseContents = data.state_names_to_content_id_mapping;
-            activeExpVersion = data.version;
+          function(stateNamesToContentIdMapping, expVersion) {
+            stateWiseContents = stateNamesToContentIdMapping;
+            activeExpVersion = expVersion;
             for (var stateName in stateWiseContents) {
               stateNamesList.push(stateName);
               var contentIds = [];
@@ -93,10 +93,11 @@ angular.module('oppia').factory('TranslateTextService', [
       },
       suggestTranslatedText: function(
           translationHtml, languageCode, successCallback) {
-        TranslateTextBackendService.suggestTranslatedText(
+        var contentHtml = stateWiseContents[activeStateName][activeContentId];
+        TranslateTextBackendService.suggestTranslation(
           translationHtml, languageCode, activeExpId, activeExpVersion,
-          activeContentId, activeStateName, stateWiseContentIds)
-          .then(successCallback());
+          activeContentId, activeStateName, contentHtml)
+          .then(successCallback);
       }
     };
   }]);

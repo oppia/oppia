@@ -13,23 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview A service to make http calls present inside servicees related
- * to translate-text service
+ * @fileoverview A backend API service for translation suggestions
  */
 
 angular.module('oppia').factory('TranslateTextBackendService', [
   '$http', '$q',
-  function(
-      $http, $q) {
-    var fetchTranslatableText = function(params, successCallback,
+  function($http, $q) {
+    var fetchTranslatableText = function(expId, languageCode, successCallback,
         errorCallback) {
       $http.get(
-        '/gettranslatabletexthandler', {
-          params: params
-        })
+        '/gettranslatabletexthandler', { params: {
+          exp_id: expId,
+          language_code: languageCode
+        }})
         .then(function(response) {
           if (successCallback) {
-            successCallback(response.data);
+            successCallback(
+              response.data.state_names_to_content_id_mapping,
+              response.data.version);
           }
         }, function() {
           if (errorCallback) {
@@ -38,56 +39,48 @@ angular.module('oppia').factory('TranslateTextBackendService', [
         });
     };
 
-    var makeSuggestTranslateTextRequest = function(data, successCallback,
+    var suggestTranslation = function(data, successCallback,
         errorCallback) {
-      $http.post(
-        '/suggestionhandler/',
-        data
-      )
-        .then(function(response) {
-          if (successCallback) {
-            successCallback(response.data);
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+      $http.post('/suggestionhandler/', data).then(function(response) {
+        if (successCallback) {
+          successCallback(response.data);
+        }
+      }, function() {
+        if (errorCallback) {
+          errorCallback();
+        }
+      });
     };
 
     return {
       getTranslatableText: function(expId, languageCode) {
         return $q(function(resolve, reject) {
-          var params = {
-            exp_id: expId,
-            language_code: languageCode
-          };
-          fetchTranslatableText(params, resolve, reject);
+          fetchTranslatableText(expId, languageCode, resolve, reject);
         });
       },
-      suggestTranslatedText: function(
-          translationHtml, languageCode, activeExpId,
-          activeExpVersion, activeContentId, activeStateName,
-          stateWiseContents) {
+      suggestTranslation: function(
+          translationHtml, languageCode, expId,
+          expVersion, contentId, stateName,
+          contentHtml) {
         var data = {
           suggestion_type: 'translate_content',
           target_type: 'exploration',
           description: 'Adds translation',
-          target_id: activeExpId,
-          target_version_at_submission: activeExpVersion,
+          target_id: expId,
+          target_version_at_submission: expVersion,
           assigned_reviewer_id: null,
           final_reviewer_id: null,
           change: {
             cmd: 'add_translation',
-            content_id: activeContentId,
-            state_name: activeStateName,
+            content_id: contentId,
+            state_name: stateName,
             language_code: languageCode,
-            content_html: stateWiseContents[activeStateName][activeContentId],
+            content_html: contentHtml,
             translation_html: translationHtml
           }
         };
         return $q(function(resolve, reject) {
-          makeSuggestTranslateTextRequest(data, resolve, reject);
+          suggestTranslation(data, resolve, reject);
         });
       }
     };
