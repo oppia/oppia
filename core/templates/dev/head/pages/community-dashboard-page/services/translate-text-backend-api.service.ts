@@ -21,7 +21,7 @@ angular.module('oppia').factory('TranslateTextBackendService', [
   '$http', '$q',
   function(
       $http, $q) {
-    var fetchTranslatableTextHandler = function(params, successCallback,
+    var fetchTranslatableText = function(params, successCallback,
         errorCallback) {
       $http.get(
         '/gettranslatabletexthandler', {
@@ -56,13 +56,13 @@ angular.module('oppia').factory('TranslateTextBackendService', [
     };
 
     return {
-      getTranslatableTextHandler: function(expId, languageCode) {
+      getTranslatableText: function(expId, languageCode) {
         return $q(function(resolve, reject) {
           var params = {
             exp_id: expId,
             language_code: languageCode
           };
-          fetchTranslatableTextHandler(params, resolve, reject);
+          fetchTranslatableText(params, resolve, reject);
         });
       },
       suggestTranslatedText: function(
