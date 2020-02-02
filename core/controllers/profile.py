@@ -362,7 +362,9 @@ class PendingAccountDeletionPage(base.BaseHandler):
     scheduled for deletion are logged out instantly when they try to login.
     """
 
-    @acl_decorators.open_access
+    REDIRECT_DELETED_USERS = False
+
+    @acl_decorators.require_scheduled_for_deletion_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
         if not constants.ENABLE_ACCOUNT_DELETION:

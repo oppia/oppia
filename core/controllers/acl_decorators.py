@@ -1540,6 +1540,39 @@ def require_user_id_else_redirect_to_homepage(handler):
     return test_login
 
 
+def require_scheduled_for_deletion_else_redirect_to_homepage(handler):
+    """Decorator that checks if a user_id is associated to the current
+    session. If not, the user is redirected to the main page.
+    Note that the user may not yet have registered.
+
+    Args:
+        handler: function. The function to be decorated.
+
+    Returns:
+        function. The newly decorated function that now also checks
+            if a given user_id is associated with the current
+            session.
+    """
+
+    def test_login(self, **kwargs):
+        """Checks if the user for the current session is logged in.
+        If not, redirects the user to the home page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if not self.user_id or not self.user_is_scheduled_for_deletion:
+            self.redirect('/')
+            return
+        return handler(self, **kwargs)
+    test_login.__wrapped__ = True
+
+    return test_login
+
+
 def can_edit_topic(handler):
     """Decorator to check whether the user can edit given topic."""
 

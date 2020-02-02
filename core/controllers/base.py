@@ -117,6 +117,9 @@ class BaseHandler(webapp2.RequestHandler):
     # not completed signup in to the signup page. This ensures that logged-in
     # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
+    # Whether to redirect requests corresponding to a logged-in user who is in
+    # the process of being deleted.
+    REDIRECT_DELETED_USERS = True
 
     # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
@@ -210,9 +213,8 @@ class BaseHandler(webapp2.RequestHandler):
                 b'https://oppiatestserver.appspot.com', permanent=True)
             return
 
-        if self.user_is_scheduled_for_deletion:
-            self.redirect(
-                '/logout?redirect_url=%s' % feconf.PENDING_ACCOUNT_DELETION_URL)
+        if self.REDIRECT_DELETED_USERS and self.user_is_scheduled_for_deletion:
+            self.redirect(feconf.PENDING_ACCOUNT_DELETION_URL)
             return
 
         if self.partially_logged_in:
@@ -619,6 +621,7 @@ class CsrfTokenHandler(BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     REDIRECT_UNFINISHED_SIGNUPS = False
+    REDIRECT_DELETED_USERS = False
 
     def get(self):
         csrf_token = CsrfTokenManager.create_csrf_token(

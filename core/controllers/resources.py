@@ -125,6 +125,7 @@ class PromoBarHandler(base.BaseHandler):
     # This prevents partially logged in user from being logged out
     # during user registration.
     REDIRECT_UNFINISHED_SIGNUPS = False
+    REDIRECT_DELETED_USERS = False
 
     @acl_decorators.open_access
     def get(self):
