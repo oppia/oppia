@@ -192,12 +192,11 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
 
       spyOn(ThreadDataService, 'fetchThreads').and
         .returnValue($q.resolve(threads));
-      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages').and
-        .callFake(done);
+      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages');
 
       FeedbackImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
-        expect(fetchMessagesSpy).toHaveBeenCalledTimes(threads.feedbackThreads
-          .length);
+        expect(fetchMessagesSpy)
+          .toHaveBeenCalledTimes(threads.feedbackThreads.length);
         expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
         expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);
@@ -267,7 +266,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
           this.button = this.task.getActionButtons()[0];
         });
 
-        it('opens a thread modal', function() {
+        it('opens a thread modal', function(done) {
           var spy = spyOn(ImprovementModalService, 'openFeedbackThread');
 
           this.button.execute();

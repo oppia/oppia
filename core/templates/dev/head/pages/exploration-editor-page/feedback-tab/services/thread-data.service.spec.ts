@@ -59,7 +59,7 @@ describe('retrieving threads service', function() {
     httpBackend = $httpBackend;
   }));
 
-  it('should retrieve feedback threads', function() {
+  it('should retrieve feedback threads', function(done) {
     var mockFeedbackThreads = [
       {
         last_updated: 1441870501230.642,
@@ -139,7 +139,7 @@ describe('retrieving threads service', function() {
         expect(threadData.suggestionThreads)
           .toContain(mockGeneralSuggestionThreads[i]);
       }
-    });
+    }).then(done, done.fail);
     httpBackend.flush();
   });
 });
