@@ -127,13 +127,16 @@ describe('retrieving threads service', function() {
       '/suggestionlisthandler?target_type=exploration&target_id=' + expId
     ).respond({ suggestions: mockSuggestions });
 
+
     ThreadDataService.fetchThreads().then(threadData => {
       for (let feedbackThread of mockFeedbackThreads) {
-        expect(threadData.feedbackThreads).toContain(feedbackThread);
+        expect(threadData.feedbackThreads).toContain(jasmine.objectContaining(
+          { threadId: feedbackThread.thread_id }))
       }
 
       for (let suggestionThread of mockSuggestionThreads) {
-        expect(threadData.suggestionThreads).toContain(suggestionThread);
+        expect(threadData.suggestionThreads).toContain(jasmine.objectContaining(
+          { threadId: suggestionThread.thread_id }));
       }
     }).then(done, done.fail);
     $httpBackend.flush();
