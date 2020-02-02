@@ -16,7 +16,10 @@
  * @fileoverview Unit tests for the UserEmailPreferencesService.
  */
 
+// TODO(#7222): Remove the following block of unnnecessary imports once
+// the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+// ^^^ This block is to be removed.
 
 // eslint-disable-next-line max-len
 require('pages/exploration-editor-page/services/user-email-preferences.service.ts');
@@ -50,6 +53,7 @@ describe('User Email Preferences Service', function() {
       UserEmailPreferencesService = $injector
         .get('UserEmailPreferencesService');
       CsrfService = $injector.get('CsrfTokenService');
+      httpBackend = $injector.get('$httpBackend');
 
       spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
         var deferred = $q.defer();
@@ -57,6 +61,11 @@ describe('User Email Preferences Service', function() {
         return deferred.promise;
       });
     });
+  });
+
+  afterEach(function() {
+    httpBackend.verifyNoOutstandingExpectation();
+    httpBackend.verifyNoOutstandingRequest();
   });
 
   it('should successfully intialise the service', function() {
@@ -85,34 +94,23 @@ describe('User Email Preferences Service', function() {
         .toBe(true);
     });
 
-  describe('Testing backend related functions', function() {
-    beforeEach(angular.mock.inject(function($injector) {
-      httpBackend = $injector.get('$httpBackend');
-    }));
-
-    afterEach(function() {
-      httpBackend.verifyNoOutstandingExpectation();
-      httpBackend.verifyNoOutstandingRequest();
+  it('should successfully set the feedback notification preferences',
+    function() {
+      httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
+        .respond(200, sampleResponse);
+      UserEmailPreferencesService.setFeedbackNotificationPreferences(false);
+      httpBackend.flush();
+      expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
+        .toBe(false);
     });
 
-    it('should successfully set the feedback notification preferences',
-      function() {
-        httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
-          .respond(200, sampleResponse);
-        UserEmailPreferencesService.setFeedbackNotificationPreferences(false);
-        httpBackend.flush();
-        expect(UserEmailPreferencesService.areFeedbackNotificationsMuted())
-          .toBe(false);
-      });
-
-    it('should successfully set the suggestion notification preferences',
-      function() {
-        httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
-          .respond(200, sampleResponse);
-        UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
-        httpBackend.flush();
-        expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
-          .toBe(false);
-      });
-  });
+  it('should successfully set the suggestion notification preferences',
+    function() {
+      httpBackend.expectPUT('/createhandler/notificationpreferences/' + expId)
+        .respond(200, sampleResponse);
+      UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
+      httpBackend.flush();
+      expect(UserEmailPreferencesService.areSuggestionNotificationsMuted())
+        .toBe(false);
+    });
 });
