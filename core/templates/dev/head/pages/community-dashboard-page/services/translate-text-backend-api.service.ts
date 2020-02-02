@@ -38,10 +38,56 @@ angular.module('oppia').factory('TranslateTextBackendService', [
         });
     };
 
+    var makeSuggestTranslateTextRequest = function(data, successCallback,
+        errorCallback) {
+      $http.post(
+        '/suggestionhandler/',
+        data
+      )
+        .then(function(response) {
+          if (successCallback) {
+            successCallback(response.data);
+          }
+        }, function() {
+          if (errorCallback) {
+            errorCallback();
+          }
+        });
+    };
+
     return {
-      getTranslatableTextHandler: function(params) {
+      getTranslatableTextHandler: function(expId, languageCode) {
         return $q(function(resolve, reject) {
+          var params = {
+            exp_id: expId,
+            language_code: languageCode
+          };
           fetchTranslatableTextHandler(params, resolve, reject);
+        });
+      },
+      suggestTranslatedText: function(
+          translationHtml, languageCode, activeExpId,
+          activeExpVersion, activeContentId, activeStateName,
+          stateWiseContents) {
+        var data = {
+          suggestion_type: 'translate_content',
+          target_type: 'exploration',
+          description: 'Adds translation',
+          target_id: activeExpId,
+          target_version_at_submission: activeExpVersion,
+          assigned_reviewer_id: null,
+          final_reviewer_id: null,
+          change: {
+            cmd: 'add_translation',
+            content_id: activeContentId,
+            state_name: activeStateName,
+            language_code: languageCode,
+            content_html: stateWiseContents[activeStateName][activeContentId],
+            translation_html: translationHtml
+          }
+        };
+        return $q(function(resolve, reject) {
+          makeSuggestTranslateTextRequest(data, resolve, reject);
         });
       }
     };
