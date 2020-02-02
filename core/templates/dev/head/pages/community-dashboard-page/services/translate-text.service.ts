@@ -22,8 +22,8 @@ require(
   'translate-text-backend-api.service.ts');
 
 angular.module('oppia').factory('TranslateTextService', [
-  '$http', 'TranslateTextBackendService',
-  function($http, TranslateTextBackendService) {
+  'TranslateTextBackendService',
+  function(TranslateTextBackendService) {
     var stateWiseContents = null;
     var stateWiseContentIds = {};
     var activeStateName = null;
@@ -67,9 +67,8 @@ angular.module('oppia').factory('TranslateTextService', [
         stateNamesList = [];
         activeExpId = expId;
         activeExpVersion = null;
-        TranslateTextBackendService.getTranslatableTextHandler({
-          exp_id: expId,
-          language_code: languageCode
+        TranslateTextBackendService.getTranslatableText({
+          expId, languageCode
         }).then(
           function(data) {
             stateWiseContents = data.state_names_to_content_id_mapping;
@@ -94,25 +93,10 @@ angular.module('oppia').factory('TranslateTextService', [
       },
       suggestTranslatedText: function(
           translationHtml, languageCode, successCallback) {
-        var url = '/suggestionhandler/';
-        var data = {
-          suggestion_type: 'translate_content',
-          target_type: 'exploration',
-          description: 'Adds translation',
-          target_id: activeExpId,
-          target_version_at_submission: activeExpVersion,
-          assigned_reviewer_id: null,
-          final_reviewer_id: null,
-          change: {
-            cmd: 'add_translation',
-            content_id: activeContentId,
-            state_name: activeStateName,
-            language_code: languageCode,
-            content_html: stateWiseContents[activeStateName][activeContentId],
-            translation_html: translationHtml
-          }
-        };
-        $http.post(url, data).then(successCallback);
+        TranslateTextBackendService.suggestTranslatedText(
+          translationHtml, languageCode, activeExpId, activeExpVersion,
+          activeContentId, activeStateName, stateWiseContentIds)
+          .then(successCallback());
       }
     };
   }]);
