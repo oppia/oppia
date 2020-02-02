@@ -52,7 +52,7 @@ import collections
 import contextlib
 import fnmatch
 import glob
-import multiprocessing
+import multiprocessing.dummy
 import os
 import re
 import shutil
@@ -607,8 +607,8 @@ import html.parser  # isort:skip
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
 _MESSAGE_TYPE_FAILED = 'FAILED'
 _TARGET_STDOUT = python_utils.string_io()
-_STDOUT_LIST = multiprocessing.Manager().list()
-_FILES = multiprocessing.Manager().dict()
+_STDOUT_LIST = multiprocessing.dummy.Manager().list()
+_FILES = multiprocessing.dummy.Manager().dict()
 
 
 class FileCache(python_utils.OBJECT):
@@ -681,11 +681,11 @@ def _lint_all_files(
         verbose_mode_enabled: bool. True if verbose mode is enabled.
 
     Returns:
-        linting_processes: list(multiprocessing.Process). A list of linting
+        linting_processes: list(multiprocessing.dummy.Process). A list of linting
         processes.
-        result_queues: list(multiprocessing.Queue). A list of queues to put
+        result_queues: list(multiprocessing.dummy.Queue). A list of queues to put
         results of tests.
-        stdout_queus: list(multiprocessing.Queue). A list of queues to store
+        stdout_queus: list(multiprocessing.dummy.Queue). A list of queues to store
         Stylelint outputs.
     """
 
@@ -721,17 +721,17 @@ def _lint_all_files(
 
     linting_processes = []
 
-    js_and_ts_result = multiprocessing.Queue()
+    js_and_ts_result = multiprocessing.dummy.Queue()
 
-    linting_processes.append(multiprocessing.Process(
+    linting_processes.append(multiprocessing.dummy.Process(
         target=_lint_js_and_ts_files, args=(
             node_path, eslint_path, js_and_ts_files_to_lint,
             js_and_ts_result, verbose_mode_enabled)))
 
-    css_in_html_result = multiprocessing.Queue()
-    css_in_html_stdout = multiprocessing.Queue()
+    css_in_html_result = multiprocessing.dummy.Queue()
+    css_in_html_stdout = multiprocessing.dummy.Queue()
 
-    linting_processes.append(multiprocessing.Process(
+    linting_processes.append(multiprocessing.dummy.Process(
         target=_lint_css_files, args=(
             node_path,
             stylelint_path,
@@ -739,10 +739,10 @@ def _lint_all_files(
             html_filepaths, css_in_html_stdout,
             css_in_html_result, verbose_mode_enabled)))
 
-    css_result = multiprocessing.Queue()
-    css_stdout = multiprocessing.Queue()
+    css_result = multiprocessing.dummy.Queue()
+    css_stdout = multiprocessing.dummy.Queue()
 
-    linting_processes.append(multiprocessing.Process(
+    linting_processes.append(multiprocessing.dummy.Process(
         target=_lint_css_files, args=(
             node_path,
             stylelint_path,
@@ -750,17 +750,17 @@ def _lint_all_files(
             css_filepaths, css_stdout,
             css_result, verbose_mode_enabled)))
 
-    py_result = multiprocessing.Queue()
+    py_result = multiprocessing.dummy.Queue()
 
-    linting_processes.append(multiprocessing.Process(
+    linting_processes.append(multiprocessing.dummy.Process(
         target=_lint_py_files,
         args=(
             config_pylint, config_pycodestyle, py_filepaths,
             py_result, verbose_mode_enabled)))
 
-    py_result_for_python3_compatibility = multiprocessing.Queue()
+    py_result_for_python3_compatibility = multiprocessing.dummy.Queue()
 
-    linting_processes.append(multiprocessing.Process(
+    linting_processes.append(multiprocessing.dummy.Process(
         target=_lint_py_files_for_python3_compatibility,
         args=(
             py_filepaths, py_result_for_python3_compatibility,
@@ -1433,8 +1433,8 @@ def _lint_css_files(
         stylelint_path: str. Path to the Stylelint binary.
         config_path: str. Path to the configuration file.
         files_to_lint: list(str). A list of filepaths to lint.
-        stdout:  multiprocessing.Queue. A queue to store Stylelint outputs.
-        result: multiprocessing.Queue. A queue to put results of test.
+        stdout:  multiprocessing.dummy.Queue. A queue to store Stylelint outputs.
+        result: multiprocessing.dummy.Queue. A queue to put results of test.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     start_time = time.time()
@@ -1493,7 +1493,7 @@ def _lint_js_and_ts_files(
         node_path: str. Path to the node binary.
         eslint_path: str. Path to the ESLint binary.
         files_to_lint: list(str). A list of filepaths to lint.
-        result: multiprocessing.Queue. A queue to put results of test.
+        result: multiprocessing.dummy.Queue. A queue to put results of test.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     start_time = time.time()
@@ -1552,7 +1552,7 @@ def _lint_py_files(
         config_pylint: str. Path to the .pylintrc file.
         config_pycodestyle: str. Path to the tox.ini file.
         files_to_lint: list(str). A list of filepaths to lint.
-        result: multiprocessing.Queue. A queue to put results of test.
+        result: multiprocessing.dummy.Queue. A queue to put results of test.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     start_time = time.time()
@@ -1614,7 +1614,7 @@ def _lint_py_files_for_python3_compatibility(
 
     Args:
         files_to_lint: list(str). A list of filepaths to lint.
-        result: multiprocessing.Queue. A queue to put results of test.
+        result: multiprocessing.dummy.Queue. A queue to put results of test.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     start_time = time.time()
@@ -1823,7 +1823,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         os.environ['PATH'] = '%s/bin:' % NODE_DIR + os.environ['PATH']
 
         self.verbose_mode_enabled = verbose_mode_enabled
-        self.process_manager = multiprocessing.Manager().dict()
+        self.process_manager = multiprocessing.dummy.Manager().dict()
 
     @abc.abstractproperty
     def all_filepaths(self):
@@ -1834,7 +1834,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         """Run multiple checks in parallel."""
         processes = []
         for check in checks:
-            p = multiprocessing.Process(target=check)
+            p = multiprocessing.dummy.Process(target=check)
             processes.append(p)
             p.start()
 
@@ -3159,8 +3159,8 @@ def main(args=None):
         python_utils.PRINT('---------------------------')
 
 
-NAME_SPACE = multiprocessing.Manager().Namespace()
-PROCESSES = multiprocessing.Manager().dict()
+NAME_SPACE = multiprocessing.dummy.Manager().Namespace()
+PROCESSES = multiprocessing.dummy.Manager().dict()
 NAME_SPACE.files = FileCache()
 FILE_CACHE = NAME_SPACE.files
 
