@@ -79,7 +79,7 @@ export class LocalStorageService {
       explorationId: string, changeList: any,
       draftChangeListId: number): void {
     let localSaveKey = this._createExplorationDraftKey(explorationId);
-    if (this.storage) {
+    if (this.isStorageAvailable()) {
       let draftDict = this.explorationDraftObjectFactory.toLocalStorageDict(
         changeList, draftChangeListId);
       this.storage.setItem(localSaveKey, JSON.stringify(draftDict));
@@ -94,7 +94,7 @@ export class LocalStorageService {
    *   else null.
    */
   getExplorationDraft(explorationId: string): ExplorationDraft | null {
-    if (this.storage) {
+    if (this.isStorageAvailable()) {
       let draftDict = JSON.parse(
         this.storage.getItem(this._createExplorationDraftKey(explorationId)));
       if (draftDict) {
@@ -111,7 +111,7 @@ export class LocalStorageService {
    *   to be removed.
    */
   removeExplorationDraft(explorationId: string): void {
-    if (this.storage) {
+    if (this.isStorageAvailable()) {
       this.storage.removeItem(this._createExplorationDraftKey(explorationId));
     }
   }
@@ -121,7 +121,7 @@ export class LocalStorageService {
    * @param languageCode
    */
   updateLastSelectedTranslationLanguageCode(languageCode: string): void {
-    if (this.storage) {
+    if (this.isStorageAvailable()) {
       this.storage.setItem(
         this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY, languageCode);
     }
@@ -132,7 +132,7 @@ export class LocalStorageService {
    *   translation if it exists, else null.
    */
   getLastSelectedTranslationLanguageCode(): string | null {
-    if (this.storage) {
+    if (this.isStorageAvailable()) {
       return (
         this.storage.getItem(this.LAST_SELECTED_TRANSLATION_LANGUAGE_KEY));
     }
