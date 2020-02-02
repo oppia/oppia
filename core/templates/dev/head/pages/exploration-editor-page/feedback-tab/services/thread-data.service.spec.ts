@@ -84,7 +84,7 @@ describe('retrieving threads service', function() {
       {
         assigned_reviewer_id: null,
         author_name: 'author_1',
-        change_cmd: {
+        change: {
           new_value: {
             html: 'new content html',
             audio_translation: {}
