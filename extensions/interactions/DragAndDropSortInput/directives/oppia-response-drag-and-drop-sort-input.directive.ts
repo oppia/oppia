@@ -16,19 +16,15 @@
  * @fileoverview Directive for the DragAndDropSortInput response.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponseDragAndDropSortInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/DragAndDropSortInput/directives/' +
-        'drag-and-drop-sort-input-response.directive.html'),
+      template: require('./drag-and-drop-sort-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

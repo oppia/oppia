@@ -26,16 +26,16 @@ describe('LocalStorageService', () => {
   describe('behavior in editor', () => {
     let localStorageService = null;
     let explorationDraftObjectFactory = null;
-    let explorationIdOne = '100';
-    let draftChangeListIdOne = 2;
-    let changeList = [];
-    let explorationIdTwo = '101';
-    let draftChangeListIdTwo = 1;
-    let draftDictOne = {
+    const explorationIdOne = '100';
+    const draftChangeListIdOne = 2;
+    const changeList = [];
+    const explorationIdTwo = '101';
+    const draftChangeListIdTwo = 1;
+    const draftDictOne = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListIdOne
     };
-    let draftDictTwo = {
+    const draftDictTwo = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListIdTwo
     };
@@ -53,6 +53,10 @@ describe('LocalStorageService', () => {
         draftDictTwo);
     });
 
+    it('should verify that storage is available', () => {
+      expect(localStorageService.isStorageAvailable()).toBe(true);
+    });
+
     it('should correctly save the draft', () => {
       localStorageService.saveExplorationDraft(explorationIdOne,
         changeList, draftChangeListIdOne);
@@ -64,12 +68,47 @@ describe('LocalStorageService', () => {
         explorationIdTwo)).toEqual(draftTwo);
     });
 
+    it('should correctly change and save a draft', () => {
+      localStorageService.saveExplorationDraft(explorationIdOne,
+        changeList, draftChangeListIdOne);
+      expect(localStorageService.getExplorationDraft(
+        explorationIdOne)).toEqual(draftOne);
+
+      const draftChangeListIdOneChanged = 3;
+      const draftOneChanged = explorationDraftObjectFactory
+        .createFromLocalStorageDict({
+          draftChanges: changeList,
+          draftChangeListId: draftChangeListIdOneChanged
+        });
+      localStorageService.saveExplorationDraft(explorationIdOne,
+        changeList, draftChangeListIdOneChanged);
+      expect(localStorageService.getExplorationDraft(
+        explorationIdOne)).toEqual(draftOneChanged);
+    });
+
     it('should correctly remove the draft', () => {
       localStorageService.saveExplorationDraft(explorationIdTwo,
         changeList, draftChangeListIdTwo);
       localStorageService.removeExplorationDraft(explorationIdTwo);
       expect(localStorageService.getExplorationDraft(
         explorationIdTwo)).toBeNull();
+    });
+
+    it('should correctly save a language code', () => {
+      localStorageService.updateLastSelectedTranslationLanguageCode('en');
+      expect(localStorageService.getLastSelectedTranslationLanguageCode())
+        .toBe('en');
+
+      localStorageService.updateLastSelectedTranslationLanguageCode('hi');
+      expect(localStorageService.getLastSelectedTranslationLanguageCode())
+        .toBe('hi');
+    });
+
+    it('should not save a language code when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+      localStorageService.updateLastSelectedTranslationLanguageCode('en');
+      expect(localStorageService.getLastSelectedTranslationLanguageCode())
+        .toBeNull();
     });
   });
 });
