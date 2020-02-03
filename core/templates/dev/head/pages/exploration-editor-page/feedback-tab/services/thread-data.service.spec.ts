@@ -98,12 +98,11 @@ describe('retrieving threads service', function() {
         last_updated: 1528564605944.896,
         score_category: 'content.Algebra',
         status: 'received',
-        suggestion_id: 'exploration.exp_1.1234',
+        suggestion_id: 'exp_1.1234',
         suggestion_type: 'edit_exploration_state_content',
         target_id: 'exp_1',
         target_type: 'exploration',
         target_version_at_submission: 1,
-        thread_id: 'exp_1.1234'
       }
     ];
     var mockSuggestionThreads = [
