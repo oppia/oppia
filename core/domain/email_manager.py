@@ -384,8 +384,8 @@ def send_dummy_mail(email_address):
     email_services.send_mail(
         system_name_email, email_address, email_subject,
         email_body, email_body.replace('\n', '<br/>'), bcc_admin=False)
-    
-   
+
+
 def send_mail_to_admin(email_subject, email_body):
     """Send an email to the admin email address.
 

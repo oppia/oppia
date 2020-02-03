@@ -146,7 +146,8 @@ class DummyMailTest(test_utils.GenericTestBase):
             self.assertEqual(messages[0].to, dummy_reciever_address)
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
-            self.assertIn('This is a test mail from Oppia.', messages[0].html.decode())
+            self.assertIn(
+                'This is a test mail from Oppia.', messages[0].html.decode())
 
 
 class EmailRightsTest(test_utils.GenericTestBase):
