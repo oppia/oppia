@@ -4515,8 +4515,9 @@ div.oppia-issues-learner-action {
 }
 
 .oppia-issues-learner-action-table {
-  width: 100%;
   border: 1px solid black;
+  margin-bottom: 2em;
+  width: 100%;
 }
 
 /* To fix the shifting of tooltip when text is too long. */

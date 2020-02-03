@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Exploration models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -218,31 +219,6 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
                 exp_models.ExplorationRightsModel
                 .has_reference_to_user_id(self.USER_ID_3))
 
-            # We remove the USER_ID_4 from the exploration to verify that the
-            # USER_ID_4 is still found in ExplorationRightsSnapshotContentModel.
-            exp_model = (
-                exp_models.ExplorationRightsModel.get_by_id(
-                    self.EXPLORATION_ID_4))
-            exp_model.owner_ids = [self.USER_ID_1]
-            exp_model.editor_ids = [self.USER_ID_1]
-            exp_model.voice_artist_ids = [self.USER_ID_1]
-            exp_model.viewer_ids = [self.USER_ID_1]
-            exp_model.commit(
-                self.USER_ID_COMMITTER, 'Changed collection rights',
-                [{'cmd': rights_manager.CMD_CHANGE_ROLE}])
-
-            snapshot_id = (
-                exp_models.ExplorationRightsModel.get_snapshot_id(
-                    exp_model.id, 1))
-            exp_snapshot_model = (
-                exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
-                    snapshot_id))
-            exp_snapshot_model.content['all_viewer_ids'] = ['id1']
-            exp_snapshot_model.put()
-            self.assertTrue(
-                exp_models.ExplorationRightsModel
-                .has_reference_to_user_id(self.USER_ID_4))
-
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             exp_models.ExplorationRightsModel
@@ -349,6 +325,10 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.owner_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.owner_ids = [feconf.SUGGESTION_BOT_USER_ID]
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [self.USER_ID_1, 'user_non_id']
@@ -926,6 +906,10 @@ class ExpSummaryModelUnitTest(test_utils.GenericTestBase):
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.owner_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.owner_ids = [feconf.SUGGESTION_BOT_USER_ID]
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.owner_ids = [self.USER_ID_1_NEW, 'user_non_id']

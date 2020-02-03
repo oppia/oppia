@@ -1,5 +1,11 @@
-<input type="text" ng-model="$ctrl.localValue.label" class="form-control">
+<input type="text" ng-model="$ctrl.localValue.label" class="form-control" ui-validate="'$ctrl.isValidFraction($value)'">
 
-<div class="oppia-form-error">
+<div class="oppia-form-error oppia-fraction-error">
   <[$ctrl.getWarningText()]>
 </div>
+
+<style>
+  .oppia-fraction-error {
+    position: absolute;
+  }
+</style>
