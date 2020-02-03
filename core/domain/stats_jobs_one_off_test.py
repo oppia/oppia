@@ -1549,7 +1549,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
 
     def test_job_correctly_calculates_stats_for_missing_commit_log_models(self):
         class MockExplorationCommitLogEntryModel(
-            base_models.BaseCommitLogEntryModel):
+                base_models.BaseCommitLogEntryModel):
 
             @classmethod
             def _get_instance_id(cls, exp_id, exp_version):
