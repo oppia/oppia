@@ -633,6 +633,7 @@ class DataExtractionQueryHandler(base.BaseHandler):
         }
         self.render_json(response)
 
+
 class SendDummyMailHandler(base.BaseHandler):
     """This function handles sending test emails."""
 
