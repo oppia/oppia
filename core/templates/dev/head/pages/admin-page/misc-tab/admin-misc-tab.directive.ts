@@ -146,12 +146,10 @@ angular.module('oppia').directive('adminMiscTab', [
 
 
         ctrl.dummyMail = function() {
-          console.log(ctrl.dummyMailId)
-
-          var SendMailUrl=SEND_DUMMY_MAIL_HANDLER_URL + '?';
+          var SendMailUrl = SEND_DUMMY_MAIL_HANDLER_URL + '?';
           SendMailUrl += 'emailId=' + encodeURIComponent(ctrl.dummyMailId);
           $window.open(SendMailUrl);
-        }
+        };
 
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (

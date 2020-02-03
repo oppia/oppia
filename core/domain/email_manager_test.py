@@ -115,6 +115,7 @@ class EmailToAdminTest(test_utils.GenericTestBase):
 
 
 class DummyMailTest(test_utils.GenericTestBase):
+    """Test that emails are correctly sent to the testing email id."""
 
     def test_sending_emails(self):
         dummy_system_name = 'DUMMY_SYSTEM_NAME'
@@ -143,7 +144,8 @@ class DummyMailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
             self.assertEqual(messages[0].to, dummy_reciever_address)
-            self.assertEqual(messages[0].subject.decode(), 'Test Mail')
+            self.assertEqual(
+                messages[0].subject.decode(), 'Test Mail')
             self.assertIn('This is a test mail from Oppia.', messages[0].html.decode())
 
 

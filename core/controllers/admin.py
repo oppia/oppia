@@ -640,9 +640,9 @@ class SendDummyMailHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        data=self.request.get('emailId')
+        data = self.request.get('emailId')
         response = {
-            'msg': "Success! Mail sent",
+            'msg': 'Success! Mail sent',
             'data': data
         }
         email_manager.send_dummy_mail(data)
