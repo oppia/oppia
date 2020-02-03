@@ -117,6 +117,7 @@
 /scripts/docstrings_checker.py @kevinlee12
 /scripts/docstrings_checker_test.py @kevinlee12
 /scripts/install_chrome_on_travis.py @kevinlee12
+/scripts/install_chrome_on_travis_test.py @kevinlee12
 /scripts/install_prerequisites.sh @kevinlee12
 /scripts/install_third_party.py @kevinlee12
 /scripts/install_third_party_libs.py @kevinlee12
@@ -134,7 +135,8 @@
 /scripts/release_scripts/deploy.py @ankita240796 @kevinlee12
 /scripts/release_scripts/deploy_test.py @ankita24079 @kevinlee12
 /scripts/run_backend_tests.py @kevinlee12
-/scripts/run_e2e_tests.sh @kevinlee12
+/scripts/run_e2e_tests.py @kevinlee12
+/scripts/run_e2e_tests_test.py @kevinlee12
 /scripts/run_frontend_tests.py @kevinlee12
 /scripts/run_performance_tests.py @kevinlee12
 /scripts/run_presubmit_checks.py @kevinlee12

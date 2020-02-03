@@ -73,6 +73,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(common.OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
     os.path.join(common.OPPIA_TOOLS_DIR, 'selenium-3.13.0'),
     os.path.join(common.OPPIA_TOOLS_DIR, 'Pillow-6.0.0'),
+    os.path.join(common.OPPIA_TOOLS_DIR, 'psutil-%s' % common.PSUTIL_VERSION),
     common.CURR_DIR,
     os.path.join(common.THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
     os.path.join(common.THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
