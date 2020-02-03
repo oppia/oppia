@@ -64,8 +64,7 @@ export class ConceptCard {
     workedExamples.forEach((workedExample: SubtitledHtml) => {
       contentIds.add(workedExample.getContentId());
     });
-    return contentIds;   
-
+    return contentIds;
   }
 
   getExplanation(): SubtitledHtml {
