@@ -90,7 +90,7 @@ angular.module('oppia').factory('ThreadDataService', [
         // TODO(brianrodri@): Move this pairing logic into the backend.
         for (let threadDict of threadsResponse.suggestion_thread_dicts) {
           for (let suggestionDict of suggestionsResponse.suggestions) {
-            if (threadDict.thread_id === suggestionDict.thread_id) {
+            if (threadDict.thread_id === suggestionDict.suggestion_id) {
               _data.suggestionThreads.push(
                 SuggestionThreadObjectFactory.createFromBackendDicts(
                   threadDict, suggestionDict));
