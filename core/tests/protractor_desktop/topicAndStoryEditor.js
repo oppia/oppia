@@ -182,8 +182,8 @@ describe('Topic editor functionality', function() {
 
     topicEditorPage.get(topicId);
     topicEditorPage.moveToSubtopicsTab();
-    topicEditorPage.addSubtopic('Subtopic 1');
-    topicEditorPage.addSubtopic('Subtopic 2');
+    topicEditorPage.addSubtopic('Subtopic1');
+    topicEditorPage.addSubtopic('Subtopic2');
     topicEditorPage.saveTopic('Added subtopics.');
 
     topicEditorPage.expectSubtopicToHaveSkills(0, []);
