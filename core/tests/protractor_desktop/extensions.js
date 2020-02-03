@@ -130,7 +130,7 @@ describe('Interactions', function() {
       var interaction = interactions.INTERACTIONS[interactionId];
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
-
+        console.log(test)
         explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
@@ -198,29 +198,32 @@ describe('Interactions', function() {
     explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setContent(forms.toRichText('Congratulations, you have finished!'));
     explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('CodeRepl Test Exploration');
-    explorationEditorSettingsTab.setObjective(
-      'To publish and play this exploration');
-    explorationEditorSettingsTab.setCategory('Programming');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
+    explorationEditorMainTab.moveToState('CodeEditor');
+    explorationEditorPage.navigateToPreviewTab();
+    // explorationEditorPage.navigateToSettingsTab();
+    // explorationEditorSettingsTab.setTitle('CodeRepl Test Exploration');
+    // explorationEditorSettingsTab.setObjective(
+    //   'To publish and play this exploration');
+    // explorationEditorSettingsTab.setCategory('Programming');
+    // explorationEditorPage.saveChanges();
+    // workflow.publishExploration();
     
-    users.logout()
+    // users.logout()
 
-    users.createAndLoginUser('codeReplLearner@interactions.com', 'codeReplLearner');
-    libraryPage.get();
-    libraryPage.findExploration('CodeRepl Test Exploration');
-    libraryPage.playExploration('CodeRepl Test Exploration');
-    explorationPlayerPage.expectExplorationNameToBe(
-      'CodeRepl Test Exploration');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-        'Write a python program to print "Hello World".'));
+    // users.createAndLoginUser('codeReplLearner@interactions.com', 'codeReplLearner');
+    // libraryPage.get();
+    // libraryPage.findExploration('CodeRepl Test Exploration');
+    // libraryPage.playExploration('CodeRepl Test Exploration');
+    // explorationPlayerPage.expectExplorationNameToBe(
+    //   'CodeRepl Test Exploration');
+    // explorationPlayerPage.expectContentToMatch(forms.toRichText(
+    //     'Write a python program to print "Hello World".'));
     explorationPlayerPage.submitAnswer('CodeRepl','print("Hello World")');
     explorationPlayerPage.expectLatestFeedbackToMatch(
       forms.toRichText('Good job!'));
+    browser.sleep(10000)
     explorationPlayerPage.clickThroughToNextCard();
-
+    
     // // Play Math Expression Input interaction.
     // explorationPlayerPage.submitAnswer('MathExpressionInput', '4 * x^(10)');
     // explorationPlayerPage.expectLatestFeedbackToMatch(

@@ -19,19 +19,19 @@
 
 var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = function(interactionEditor,a) {
-    console.log("this is testing")
-    console.log(interactionEditor)
-    console.log("this is testing")
-    console.log(a)
-    // var temp = interactionEditor.element(by.css(".protractor-test-interaction-editor"));
-    // console.log(temp)
-    // alert("this is testing")
+var customizeInteraction = function(interactionEditor,initialCode) {
+    // browser.executeScript("var editor = $('.CodeMirror')[0].CodeMirror;editor.setValue('"+initialCode+"');");
+};
+
+var expectInteractionDetailsToMatch = function(elem) {
+  // expect(
+  //   elem.element(by.css('.CodeMirror')).isPresent()
+  // ).toBe(true);
 };
 
 var submitAnswer = function(conversationInput, answerCode) {
-    var test = conversationInput.element(by.css(
-      '.CodeMirror'));
+    // var test = conversationInput.element(by.css(
+    //   '.CodeMirror'));
     browser.executeScript("var editor = $('.CodeMirror')[0].CodeMirror;editor.setValue('"+answerCode+"');");
     var submitAnswerButton = element(by.css(
       '.protractor-test-submit-answer-button'));
@@ -40,6 +40,19 @@ var submitAnswer = function(conversationInput, answerCode) {
     submitAnswerButton.click();
   };
 
+var answerObjectType = 'CodeString';
+
+var testSuite = [{
+  interactionArguments: ['# You can enter the Code below'],
+  ruleArguments: ['CodeEquals', 'print("Hello World")'],
+  expectedInteractionDetails: ['# You can enter the Code below'],
+  wrongAnswers: ['print("Hello")'],
+  correctAnswers: ['print("Hello World")']
+}];
+
 exports.customizeInteraction = customizeInteraction;
+exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.answerObjectType = answerObjectType;
+exports.testSuite = testSuite;
 
