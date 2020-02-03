@@ -45,7 +45,7 @@ angular.module('oppia').factory('PretestQuestionBackendApiService', [
       $http.get(pretestDataUrl).then(function(response) {
         var pretestQuestionDicts =
           angular.copy(response.data.pretest_question_dicts);
-        var pretestQuestionObjects = pretestQuestionDicts.map(
+        var pretestQuestions = pretestQuestionDicts.map(
           function(questionDict) {
             return QuestionObjectFactory.createFromBackendDict(
               questionDict);
@@ -53,7 +53,7 @@ angular.module('oppia').factory('PretestQuestionBackendApiService', [
         );
         _cursor = response.data.next_start_cursor;
         if (successCallback) {
-          successCallback(pretestQuestionObjects);
+          successCallback(pretestQuestions);
         }
       }, function(errorResponse) {
         if (errorCallback) {

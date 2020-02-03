@@ -27,8 +27,8 @@ import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Pretest question backend API service', function() {
   var PretestQuestionBackendApiService = null;
-  var responseDictionaries = null;
-  var pretestQuestionObjects = null;
+  var responseDict = null;
+  var pretestQuestions = null;
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;
@@ -53,7 +53,7 @@ describe('Pretest question backend API service', function() {
     QuestionObjectFactory = $injector.get('QuestionObjectFactory');
 
     // Sample question object returnable from the backend
-    responseDictionaries = {
+    responseDict = {
       pretest_question_dicts: [{
         id: 'question_id',
         question_state_data: {
@@ -135,9 +135,9 @@ describe('Pretest question backend API service', function() {
       }],
       next_start_cursor: null
     };
-    pretestQuestionObjects = [
+    pretestQuestions = [
       QuestionObjectFactory.createFromBackendDict(
-        responseDictionaries.pretest_question_dicts[0])
+        responseDict.pretest_question_dicts[0])
     ];
   }));
 
@@ -153,13 +153,12 @@ describe('Pretest question backend API service', function() {
 
       $httpBackend.expect(
         'GET', '/pretest_handler/expId?story_id=storyId&cursor=').respond(
-        responseDictionaries);
+        responseDict);
       PretestQuestionBackendApiService.fetchPretestQuestions(
         'expId', 'storyId').then(successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        pretestQuestionObjects);
+      expect(successHandler).toHaveBeenCalledWith(pretestQuestions);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

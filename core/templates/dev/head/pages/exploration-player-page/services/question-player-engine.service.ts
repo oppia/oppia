@@ -156,10 +156,10 @@ angular.module('oppia').factory('QuestionPlayerEngineService', [
        *   - initHtml {string}, an HTML string representing the content of the
        *       first state.
        */
-      init: function(questionObjects, successCallback) {
+      init: function(Questions, successCallback) {
         answerIsBeingProcessed = false;
-        for (var i = 0; i < questionObjects.length; i++) {
-          questions.push(questionObjects[i]);
+        for (var i = 0; i < Questions.length; i++) {
+          questions.push(Questions[i]);
         }
         _loadInitialQuestion(successCallback);
       },
