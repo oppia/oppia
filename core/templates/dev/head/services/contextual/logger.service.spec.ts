@@ -25,35 +25,35 @@ describe('Logger Service', () => {
     ls = TestBed.get(LoggerService);
   });
 
-  it('should console a debug message', () => {
+  it('should display debug message on the console', () => {
     const debugSpy = spyOn(console, 'debug').and.stub();
     ls.debug('Debug message');
 
     expect(debugSpy).toHaveBeenCalled();
   });
 
-  it('should console a info message', () => {
+  it('should display info message on the console', () => {
     const infoSpy = spyOn(console, 'info').and.stub();
     ls.info('Info message');
 
     expect(infoSpy).toHaveBeenCalled();
   });
 
-  it('should console a warn message', () => {
+  it('should display warn message on the console', () => {
     const warnSpy = spyOn(console, 'warn').and.stub();
     ls.warn('Warn message');
 
     expect(warnSpy).toHaveBeenCalled();
   });
 
-  it('should console a error message', () => {
+  it('should display error message on the console', () => {
     const errorSpy = spyOn(console, 'error').and.stub();
     ls.error('Error message');
 
     expect(errorSpy).toHaveBeenCalled();
   });
 
-  it('should console a message', () => {
+  it('should display message on the console', () => {
     const logSpy = spyOn(console, 'log').and.stub();
     ls.log('Log message');
 

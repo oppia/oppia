@@ -54,7 +54,13 @@ describe('Device Info Service', () => {
     expect(dis.isMobileUserAgent()).toBe(false);
   });
 
-  it('should not have touch events', () => {
+  it('should not have touch events on desktop device', () => {
     expect(dis.hasTouchEvents()).toBe(false);
+  });
+
+  it('should have touch events on mobile device', () => {
+    wrs.nativeWindow.ontouchstart = () => {};
+    expect(dis.hasTouchEvents()).toBe(true);
+    delete wrs.nativeWindow.ontouchstart;
   });
 });
