@@ -221,23 +221,19 @@ var ExplorationEditorTranslationTab = function() {
       deleteRecordButton,
       'Delete Record button is not clickable');
     deleteRecordButton.click();
-    waitFor.pageToFullyLoad();
-  };
-
-  this.confirmDeleteAudioRecord = function() {
     waitFor.elementToBeClickable(
       confirmDeleteRecordButton,
-      'Confirm record deletion button is not clickable');
+      'The confirm record deletion button is not clickable');
     confirmDeleteRecordButton.click();
     waitFor.pageToFullyLoad();
   };
 
-  this.uploadAudioRecord = function(imgPath) {
+  this.uploadAudioRecord = function(audioPath) {
     waitFor.elementToBeClickable(
       uploadAudioButton,
       'Audio Record button is not clickable');
     uploadAudioButton.click();
-    absPath = path.resolve(__dirname, imgPath);
+    absPath = path.resolve(__dirname, audioPath);
     return audioUploadInput.sendKeys(absPath);
   };
 
