@@ -1297,10 +1297,10 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                     exp.id, version - 1)
                 old_states = prev_exp.states
                 new_states = exp_at_version.states
-                change_list = []
+                inferred_change_list = []
                 for old_state in old_states:
                     if old_state not in new_states:
-                        change_list.append(
+                        inferred_change_list.append(
                             exp_domain.ExplorationChange({
                                 'cmd': exp_domain.CMD_DELETE_STATE,
                                 'state_name': old_state
@@ -1308,15 +1308,16 @@ class RegenerateMissingV2StatsModelsOneOffJob(
 
                 for new_state in new_states:
                     if new_state not in old_states:
-                        change_list.append(
+                        inferred_change_list.append(
                             exp_domain.ExplorationChange({
                                 'cmd': exp_domain.CMD_ADD_STATE,
                                 'state_name': new_state
                             }))
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
-                    change_list)
+                    inferred_change_list)
 
-                all_models[version - 1].delete()
+                if all_models[version - 1] is not None:
+                    all_models[version - 1].delete()
                 new_exp_stats_dicts.append(
                     stats_services.get_stats_for_new_exp_version(
                         exp.id, version, exp_at_version.states,

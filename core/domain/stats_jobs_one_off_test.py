@@ -31,6 +31,7 @@ from core.domain import stats_jobs_one_off
 from core.domain import stats_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
+import core.storage.base_model.gae_models as base_models
 from core.tests import test_utils
 import feconf
 import python_utils
@@ -1547,19 +1548,27 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
             self.assertEqual(model, None)
 
     def test_job_correctly_calculates_stats_for_missing_commit_log_models(self):
-        def mock_put(unused_self):
-            pass
+        class MockExplorationCommitLogEntryModel(
+            base_models.BaseCommitLogEntryModel):
+
+            @classmethod
+            def _get_instance_id(cls, exp_id, exp_version):
+                return 'exploration-%s-%s' % (exp_id, exp_version)
+
+            def put(self):
+                return
 
         with self.swap(
-            exp_models.ExplorationCommitLogEntryModel, 'put', mock_put):
+            exp_models, 'ExplorationCommitLogEntryModel',
+            MockExplorationCommitLogEntryModel):
 
-            exp_id_1 = 'EXP_ID_1'
-            exp = self.save_new_valid_exploration(exp_id_1, 'owner_id')
+            exp_id_2 = 'EXP_ID_2'
+            exp = self.save_new_valid_exploration(exp_id_2, 'owner_id')
             state_name = exp.init_state_name
 
             change_list = []
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, exp_id_2, change_list, '')
             change_list = [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
@@ -1568,10 +1577,10 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
                 })
             ]
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, exp_id_2, change_list, '')
 
             exp_services.revert_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id_1, 3, 2)
+                feconf.SYSTEM_COMMITTER_ID, exp_id_2, 3, 2)
 
             change_list = [
                 exp_domain.ExplorationChange({
@@ -1581,7 +1590,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
                 })
             ]
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, exp_id_2, change_list, '')
             change_list = [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
@@ -1589,7 +1598,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
                 })
             ]
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, exp_id_2, change_list, '')
             change_list = [
                 exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
@@ -1597,18 +1606,20 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
                 })
             ]
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id_1, change_list, '')
-        exp = exp_fetchers.get_exploration_by_id(exp_id_1)
+                feconf.SYSTEM_COMMITTER_ID, exp_id_2, change_list, '')
+        exp = exp_fetchers.get_exploration_by_id(exp_id_2)
         self.assertEqual(exp.version, 7)
 
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 4)
-        model = stats_models.ExplorationStatsModel.get(model_id)
-        model.delete()
+        for i in python_utils.RANGE(4, exp.version + 1):
+            model_id = stats_models.ExplorationStatsModel.get_entity_id(
+                exp_id_2, i)
+            model = stats_models.ExplorationStatsModel.get(model_id)
+            model.delete()
 
         for i in python_utils.RANGE(1, 7):
             commit_log_model = (
-                exp_models.ExplorationCommitLogEntryModel.get_commit(exp.id, i))
+                exp_models.ExplorationCommitLogEntryModel.get_commit(
+                    exp_id_2, i))
             self.assertIsNone(commit_log_model)
 
         output = self.run_one_off_job()
@@ -1616,7 +1627,7 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
 
         all_models = (
             stats_models.ExplorationStatsModel.get_multi_stats_models(
-                [exp_domain.ExpVersionReference(exp.id, version)
+                [exp_domain.ExpVersionReference(exp_id_2, version)
                  for version in python_utils.RANGE(1, exp.version + 1)]))
         for model in all_models:
             self.assertNotEqual(model, None)
