@@ -38,24 +38,6 @@ angular.module('oppia').directive('adminJobsTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.HUMAN_READABLE_CURRENT_TIME = '';
-        ctrl.CONTINUOUS_COMPUTATIONS_DATA = {};
-        ctrl.ONE_OFF_JOB_SPECS = {};
-        ctrl.UNFINISHED_JOB_DATA = {};
-        ctrl.AUDIT_JOB_SPECS = {};
-        ctrl.RECENT_JOB_DATA = {};
-        AdminDataService.getDataAsync().then(function(response) {
-          ctrl.HUMAN_READABLE_CURRENT_TIME = (
-            response.human_readeable_current_time);
-          ctrl.CONTINUOUS_COMPUTATIONS_DATA = (
-            response.continuous_computations_data);
-          ctrl.ONE_OFF_JOB_SPECS = response.one_off_job_specs;
-          ctrl.UNFINISHED_JOB_DATA = response.unfinished_job_data;
-          ctrl.AUDIT_JOB_SPECS = response.audit_job_specs;
-          ctrl.RECENT_JOB_DATA = response.recent_job_data;
-        });
-
-        ctrl.showingJobOutput = false;
         ctrl.showJobOutput = function(jobId) {
           var adminJobOutputUrl = UrlInterpolationService.interpolateUrl(
             ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
@@ -130,6 +112,26 @@ angular.module('oppia').directive('adminJobsTab', [
             ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
+        };
+        ctrl.$onInit = function() {
+          ctrl.HUMAN_READABLE_CURRENT_TIME = '';
+          ctrl.CONTINUOUS_COMPUTATIONS_DATA = {};
+          ctrl.ONE_OFF_JOB_SPECS = {};
+          ctrl.UNFINISHED_JOB_DATA = {};
+          ctrl.AUDIT_JOB_SPECS = {};
+          ctrl.RECENT_JOB_DATA = {};
+          AdminDataService.getDataAsync().then(function(response) {
+            ctrl.HUMAN_READABLE_CURRENT_TIME = (
+              response.human_readeable_current_time);
+            ctrl.CONTINUOUS_COMPUTATIONS_DATA = (
+              response.continuous_computations_data);
+            ctrl.ONE_OFF_JOB_SPECS = response.one_off_job_specs;
+            ctrl.UNFINISHED_JOB_DATA = response.unfinished_job_data;
+            ctrl.AUDIT_JOB_SPECS = response.audit_job_specs;
+            ctrl.RECENT_JOB_DATA = response.recent_job_data;
+          });
+
+          ctrl.showingJobOutput = false;
         };
       }]
     };

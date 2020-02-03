@@ -35,52 +35,9 @@ angular.module('oppia').directive('aboutPage', [
         '$window', 'UrlInterpolationService',
         function($window, UrlInterpolationService) {
           var ctrl = this;
-          // Define constants
-          ctrl.TAB_ID_ABOUT = 'about';
-          ctrl.TAB_ID_FOUNDATION = 'foundation';
-          ctrl.TAB_ID_CREDITS = 'credits';
-
           var activeTabClass = 'oppia-about-tabs-active';
           var hash = window.location.hash.slice(1);
           var visibleContent = 'oppia-about-visible-content';
-
-          var activateTab = function(tabName) {
-            $("a[id='" + tabName + "']").parent().addClass(
-              activeTabClass
-            ).siblings().removeClass(activeTabClass);
-            $('.' + tabName).addClass(visibleContent).siblings().removeClass(
-              visibleContent
-            );
-          };
-
-          if (hash === ctrl.TAB_ID_FOUNDATION || hash === 'license') {
-            activateTab(ctrl.TAB_ID_FOUNDATION);
-          }
-
-          if (hash === ctrl.TAB_ID_CREDITS) {
-            activateTab(ctrl.TAB_ID_CREDITS);
-          }
-
-          if (hash === ctrl.TAB_ID_ABOUT) {
-            activateTab(ctrl.TAB_ID_ABOUT);
-          }
-
-          window.onhashchange = function() {
-            var hashChange = window.location.hash.slice(1);
-            if (hashChange === ctrl.TAB_ID_FOUNDATION || (
-              hashChange === 'license')) {
-              activateTab(ctrl.TAB_ID_FOUNDATION);
-              // Ensure page goes to the license section
-              if (hashChange === 'license') {
-                $window.reload(true);
-              }
-            } else if (hashChange === ctrl.TAB_ID_CREDITS) {
-              activateTab(ctrl.TAB_ID_CREDITS);
-            } else if (hashChange === ctrl.TAB_ID_ABOUT) {
-              activateTab(ctrl.TAB_ID_ABOUT);
-            }
-          };
-
           var listOfNamesToThank = [
             'Alex Kauffmann', 'Allison Barros',
             'Amy Latten', 'Brett Barros',
@@ -97,19 +54,69 @@ angular.module('oppia').directive('aboutPage', [
             'Vikrant Nanda', 'Vinamrata Singal',
             'Yarin Feigenbaum'];
 
+          var activateTab = function(tabName) {
+            $("a[id='" + tabName + "']").parent().addClass(
+              activeTabClass
+            ).siblings().removeClass(activeTabClass);
+            $('.' + tabName).addClass(visibleContent).siblings().removeClass(
+              visibleContent
+            );
+          };
+
           ctrl.onTabClick = function(tabName) {
             // Update hash
             window.location.hash = '#' + tabName;
             activateTab(tabName);
           };
-          ctrl.listOfNames = listOfNamesToThank
-            .slice(0, listOfNamesToThank.length - 1).join(', ') +
-            ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
-          ctrl.aboutPageMascotImgUrl = UrlInterpolationService
-            .getStaticImageUrl('/general/about_page_mascot.png');
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+          ctrl.$onInit = function() {
+            // Define constants
+            ctrl.TAB_ID_ABOUT = 'about';
+            ctrl.TAB_ID_FOUNDATION = 'foundation';
+            ctrl.TAB_ID_CREDITS = 'credits';
+
+            if (hash === ctrl.TAB_ID_FOUNDATION || hash === 'license') {
+              activateTab(ctrl.TAB_ID_FOUNDATION);
+            }
+
+            if (hash === ctrl.TAB_ID_CREDITS) {
+              activateTab(ctrl.TAB_ID_CREDITS);
+            }
+
+            if (hash === ctrl.TAB_ID_ABOUT) {
+              activateTab(ctrl.TAB_ID_ABOUT);
+            }
+            ctrl.listOfNames = listOfNamesToThank
+              .slice(0, listOfNamesToThank.length - 1).join(', ') +
+              ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
+            ctrl.aboutPageMascotImgUrl = UrlInterpolationService
+              .getStaticImageUrl('/general/about_page_mascot.png');
+            ctrl.listOfNames = listOfNamesToThank
+              .slice(0, listOfNamesToThank.length - 1).join(', ') +
+              ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
+            ctrl.aboutPageMascotImgUrl = UrlInterpolationService
+              .getStaticImageUrl('/general/about_page_mascot.png');
+            window.onhashchange = function() {
+              var hashChange = window.location.hash.slice(1);
+              if (hashChange === ctrl.TAB_ID_FOUNDATION || (
+                hashChange === 'license')) {
+                activateTab(ctrl.TAB_ID_FOUNDATION);
+                // Ensure page goes to the license section
+                if (hashChange === 'license') {
+                  $window.reload(true);
+                }
+              } else if (hashChange === ctrl.TAB_ID_CREDITS) {
+                activateTab(ctrl.TAB_ID_CREDITS);
+              } else if (hashChange === ctrl.TAB_ID_ABOUT) {
+                activateTab(ctrl.TAB_ID_ABOUT);
+              }
+            };
+          };
         }
       ]
     };

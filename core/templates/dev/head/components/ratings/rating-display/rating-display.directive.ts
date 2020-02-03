@@ -45,18 +45,11 @@ angular.module('oppia').directive('ratingDisplay', [
         };
       },
       controller: ['$scope', function($scope) {
+        var ctrl = this;
         var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
-        $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
-          return {
-            cssClass: 'far fa-star',
-            value: starValue
-          };
-        });
-
         var STATUS_ACTIVE = 'active';
         var STATUS_INACTIVE = 'inactive';
         var STATUS_RATING_SET = 'rating_set';
-        $scope.status = STATUS_INACTIVE;
 
         var displayValue = function(ratingValue) {
           for (var i = 0; i < $scope.stars.length; i++) {
@@ -72,11 +65,6 @@ angular.module('oppia').directive('ratingDisplay', [
             }
           }
         };
-
-        displayValue($scope.ratingValue);
-        $scope.$watch('ratingValue', function() {
-          displayValue($scope.ratingValue);
-        });
 
         $scope.clickStar = function(starValue) {
           if ($scope.isEditable && $scope.status === STATUS_ACTIVE) {
@@ -102,6 +90,20 @@ angular.module('oppia').directive('ratingDisplay', [
 
         $scope.getCursorStyle = function() {
           return 'cursor: ' + ($scope.isEditable ? 'pointer' : 'auto');
+        };
+        ctrl.$onInit = function() {
+          $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
+            return {
+              cssClass: 'far fa-star',
+              value: starValue
+            };
+          });
+
+          $scope.status = STATUS_INACTIVE;
+          displayValue($scope.ratingValue);
+          $scope.$watch('ratingValue', function() {
+            displayValue($scope.ratingValue);
+          });
         };
       }]
     };

@@ -27,7 +27,7 @@ angular.module('oppia').directive('promoBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require('!html-loader!./promo-bar.directive.html'),
+      template: require('./promo-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {
@@ -57,20 +57,17 @@ angular.module('oppia').directive('promoBar', [
               return false;
             }
           };
-
-          PromoBarService.getPromoBarData().then(function(promoBarObject) {
-            ctrl.promoBarIsEnabled = promoBarObject.promoBarEnabled;
-            ctrl.promoBarMessage = promoBarObject.promoBarMessage;
-          });
-
-          // TODO(bhenning): Utilize cookies for tracking when a promo is
-          // dismissed. Cookies allow for a longer-lived memory of whether the
-          // promo is dismissed.
-          ctrl.promoIsVisible = !isPromoDismissed();
-
           ctrl.dismissPromo = function() {
             ctrl.promoIsVisible = false;
             setPromoDismissed(true);
+          };
+          ctrl.$onInit = function() {
+            PromoBarService.getPromoBarData().then(function(promoBarObject) {
+              ctrl.promoBarIsEnabled = promoBarObject.promoBarEnabled;
+              ctrl.promoBarMessage = promoBarObject.promoBarMessage;
+            });
+
+            ctrl.promoIsVisible = !isPromoDismissed();
           };
         }
       ]

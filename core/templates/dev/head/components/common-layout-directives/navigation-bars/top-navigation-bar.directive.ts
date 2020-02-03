@@ -33,8 +33,7 @@ angular.module('oppia').directive('topNavigationBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require(
-        '!html-loader!./top-navigation-bar.directive.html'),
+      template: require('./top-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
@@ -47,63 +46,23 @@ angular.module('oppia').directive('topNavigationBar', [
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
             DebouncerService, DeviceInfoService, LOGOUT_URL) {
           var ctrl = this;
-          ctrl.isModerator = null;
-          ctrl.isAdmin = null;
-          ctrl.isTopicManager = null;
-          ctrl.isSuperAdmin = null;
-          ctrl.userIsLoggedIn = null;
-          ctrl.username = '';
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            if (userInfo.getPreferredSiteLanguageCode()) {
-              $translate.use(userInfo.getPreferredSiteLanguageCode());
-            }
-            ctrl.isModerator = userInfo.isModerator();
-            ctrl.isAdmin = userInfo.isAdmin();
-            ctrl.isTopicManager = userInfo.isTopicManager();
-            ctrl.isSuperAdmin = userInfo.isSuperAdmin();
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-            ctrl.username = userInfo.getUsername();
-            if (ctrl.username) {
-              ctrl.profilePageUrl = UrlInterpolationService.interpolateUrl(
-                '/profile/<username>', {
-                  username: ctrl.username
-                });
-            }
-
-            if (ctrl.userIsLoggedIn) {
-              // Show the number of unseen notifications in the navbar and page
-              // title, unless the user is already on the dashboard page.
-              $http.get('/notificationshandler').then(function(response) {
-                var data = response.data;
-                if ($window.location.pathname !== '/') {
-                  ctrl.numUnseenNotifications = data.num_unseen_notifications;
-                  if (ctrl.numUnseenNotifications > 0) {
-                    $window.document.title = (
-                      '(' + ctrl.numUnseenNotifications + ') ' +
-                      $window.document.title);
-                  }
-                }
-              });
-            }
-          });
-          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            ctrl.profilePictureDataUrl = dataUrl;
-          });
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'collection_editor',
             'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
             'story_editor'];
-          ctrl.currentUrl = window.location.pathname.split('/')[1];
-          ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
+          var currentWindowWidth = WindowDimensionsService.getWidth();
+          // The order of the elements in this array specifies the order in
+          // which they will be hidden. Earlier elements will be hidden first.
+          var NAV_ELEMENTS_ORDER = [
+            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
+            'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
+          var truncateNavbarDebounced =
+            DebouncerService.debounce(truncateNavbar, 500);
+
           ctrl.getStaticImageUrl = function(imagePath) {
             return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
-          ctrl.logoutUrl = LOGOUT_URL;
-          ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
-          ctrl.standardNavIsShown = (
-            NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);
-
           ctrl.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
             UserService.getLoginUrlAsync().then(
@@ -118,17 +77,9 @@ angular.module('oppia').directive('topNavigationBar', [
               }
             );
           };
-
-          ctrl.googleSignInIconUrl = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/google_signin_buttons/google_signin.svg'));
           ctrl.onLogoutButtonClicked = function() {
             $window.localStorage.removeItem('last_uploaded_audio_lang');
           };
-          ctrl.ACTION_OPEN = NavigationService.ACTION_OPEN;
-          ctrl.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
-          ctrl.KEYBOARD_EVENT_TO_KEY_CODES =
-          NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
           /**
            * Opens the submenu.
            * @param {object} evt
@@ -160,8 +111,8 @@ angular.module('oppia').directive('topNavigationBar', [
            * @param {object} evt
            * @param {String} menuName - name of menu to perform action
            * on(aboutMenu/profileMenu)
-           * @param {object} eventsTobeHandled - Map keyboard events('Enter') to
-           * corresponding actions to be performed(open/close).
+           * @param {object} eventsTobeHandled - Map keyboard events('Enter')
+           * to corresponding actions to be performed(open/close).
            *
            * @example
            *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
@@ -171,47 +122,6 @@ angular.module('oppia').directive('topNavigationBar', [
             ctrl.activeMenuName = NavigationService.activeMenuName;
           };
 
-          // Close the submenu if focus or click occurs anywhere outside of
-          // the menu or outside of its parent (which opens submenu on hover).
-          angular.element(document).on('click', function(evt) {
-            if (!angular.element(evt.target).closest('li').length) {
-              ctrl.activeMenuName = '';
-              $scope.$applyAsync();
-            }
-          });
-
-          ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-          var currentWindowWidth = WindowDimensionsService.getWidth();
-          ctrl.navElementsVisibilityStatus = {};
-          // The order of the elements in this array specifies the order in
-          // which they will be hidden. Earlier elements will be hidden first.
-          var NAV_ELEMENTS_ORDER = [
-            'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
-            'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
-          for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
-            ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
-          }
-
-          WindowDimensionsService.registerOnResizeHook(function() {
-            ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-            $scope.$applyAsync();
-            // If window is resized larger, try displaying the hidden elements.
-            if (currentWindowWidth < WindowDimensionsService.getWidth()) {
-              for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
-                if (
-                  !ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
-                  ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
-                    true;
-                }
-              }
-            }
-
-            // Close the sidebar, if necessary.
-            SidebarStatusService.closeSidebar();
-            ctrl.sidebarIsShown = SidebarStatusService.isSidebarShown();
-            currentWindowWidth = WindowDimensionsService.getWidth();
-            truncateNavbarDebounced();
-          });
           ctrl.isSidebarShown = function() {
             if (SidebarStatusService.isSidebarShown()) {
               angular.element(document.body).addClass('oppia-stop-scroll');
@@ -275,7 +185,7 @@ angular.module('oppia').directive('topNavigationBar', [
                     false;
                   // Force a digest cycle to hide element immediately.
                   // Otherwise it would be hidden after the next call.
-                  // This is due to setTimeout use in debounce.
+                  // This is due to $timeout use in debounce.
                   $scope.$applyAsync();
                   $timeout(truncateNavbar, 50);
                   return;
@@ -284,17 +194,112 @@ angular.module('oppia').directive('topNavigationBar', [
             }
           };
 
-          var truncateNavbarDebounced =
-            DebouncerService.debounce(truncateNavbar, 500);
+          ctrl.$onInit = function() {
+            ctrl.isModerator = null;
+            ctrl.isAdmin = null;
+            ctrl.isTopicManager = null;
+            ctrl.isSuperAdmin = null;
+            ctrl.userIsLoggedIn = null;
+            ctrl.username = '';
+            ctrl.currentUrl = window.location.pathname.split('/')[1];
+            ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
+            ctrl.logoutUrl = LOGOUT_URL;
+            ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
+            ctrl.standardNavIsShown = (
+              NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);
+            ctrl.googleSignInIconUrl = (
+              UrlInterpolationService.getStaticImageUrl(
+                '/google_signin_buttons/google_signin.svg'));
+            ctrl.ACTION_OPEN = NavigationService.ACTION_OPEN;
+            ctrl.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
+            ctrl.KEYBOARD_EVENT_TO_KEY_CODES =
+            NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
+            ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+            ctrl.navElementsVisibilityStatus = {};
 
-          // The function needs to be run after i18n. A timeout of 0 appears to
-          // run after i18n in Chrome, but not other browsers. The function will
-          // check if i18n is complete and set a new timeout if it is not. Since
-          // a timeout of 0 works for at least one browser, it is used here.
-          $timeout(truncateNavbar, 0);
-          $scope.$on('searchBarLoaded', function() {
-            $timeout(truncateNavbar, 100);
-          });
+            // Close the submenu if focus or click occurs anywhere outside of
+            // the menu or outside of its parent (which opens submenu on hover).
+            angular.element(document).on('click', function(evt) {
+              if (!angular.element(evt.target).closest('li').length) {
+                ctrl.activeMenuName = '';
+                $scope.$applyAsync();
+              }
+            });
+
+            $scope.$on('searchBarLoaded', function() {
+              $timeout(truncateNavbar, 100);
+            });
+
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              if (userInfo.getPreferredSiteLanguageCode()) {
+                $translate.use(userInfo.getPreferredSiteLanguageCode());
+              }
+              ctrl.isModerator = userInfo.isModerator();
+              ctrl.isAdmin = userInfo.isAdmin();
+              ctrl.isTopicManager = userInfo.isTopicManager();
+              ctrl.isSuperAdmin = userInfo.isSuperAdmin();
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+              ctrl.username = userInfo.getUsername();
+              if (ctrl.username) {
+                ctrl.profilePageUrl = UrlInterpolationService.interpolateUrl(
+                  '/profile/<username>', {
+                    username: ctrl.username
+                  });
+              }
+
+              if (ctrl.userIsLoggedIn) {
+                // Show the number of unseen notifications in the navbar and
+                // page title, unless the user is already on the dashboard page.
+                $http.get('/notificationshandler').then(function(response) {
+                  var data = response.data;
+                  if ($window.location.pathname !== '/') {
+                    ctrl.numUnseenNotifications = data.num_unseen_notifications;
+                    if (ctrl.numUnseenNotifications > 0) {
+                      $window.document.title = (
+                        '(' + ctrl.numUnseenNotifications + ') ' +
+                        $window.document.title);
+                    }
+                  }
+                });
+              }
+            });
+            UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
+              ctrl.profilePictureDataUrl = dataUrl;
+            });
+
+            for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
+              ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
+            }
+
+            WindowDimensionsService.registerOnResizeHook(function() {
+              ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+              $scope.$applyAsync();
+              // If window is resized larger, try displaying the hidden
+              // elements.
+              if (
+                currentWindowWidth < WindowDimensionsService.getWidth()) {
+                for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
+                  if (
+                    !ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
+                    ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
+                      true;
+                  }
+                }
+              }
+
+              // Close the sidebar, if necessary.
+              SidebarStatusService.closeSidebar();
+              ctrl.sidebarIsShown = SidebarStatusService.isSidebarShown();
+              currentWindowWidth = WindowDimensionsService.getWidth();
+              truncateNavbarDebounced();
+            });
+            // The function needs to be run after i18n. A timeout of 0 appears
+            // to run after i18n in Chrome, but not other browsers. The function
+            // will check if i18n is complete and set a new timeout if it is
+            // not. Since a timeout of 0 works for at least one browser,
+            // it is used here.
+            $timeout(truncateNavbar, 0);
+          };
         }
       ]
     };

@@ -58,11 +58,7 @@ angular.module('oppia').directive('skillsList', [
             EditableTopicBackendApiService, EditableSkillBackendApiService,
             TopicsAndSkillsDashboardBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
-          $scope.SKILL_HEADINGS = [
-            'description', 'worked_examples_count', 'misconception_count'
-          ];
-
-          $scope.highlightedIndex = null;
+          var ctrl = this;
           $scope.highlightColumns = function(index) {
             $scope.highlightedIndex = index;
           };
@@ -158,6 +154,10 @@ angular.module('oppia').directive('skillsList', [
                   }
                 }
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -198,7 +198,18 @@ angular.module('oppia').directive('skillsList', [
                     EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 }, 100);
               });
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
+          };
+
+          ctrl.$onInit = function() {
+            $scope.SKILL_HEADINGS = [
+              'description', 'worked_examples_count', 'misconception_count'
+            ];
+            $scope.highlightedIndex = null;
           };
         }
       ]

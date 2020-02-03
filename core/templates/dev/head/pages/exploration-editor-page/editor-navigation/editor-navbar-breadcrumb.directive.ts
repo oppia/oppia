@@ -35,16 +35,7 @@ angular.module('oppia').directive('editorNavbarBreadcrumb', [
         function(
             $scope, ExplorationTitleService, RouterService,
             FocusManagerService, EXPLORATION_TITLE_INPUT_FOCUS_LABEL) {
-          $scope.navbarTitle = null;
-          $scope.$on('explorationPropertyChanged', function() {
-            var _MAX_TITLE_LENGTH = 20;
-            $scope.navbarTitle = ExplorationTitleService.savedMemento;
-            if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
-              $scope.navbarTitle = (
-                $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...');
-            }
-          });
-
+          var ctrl = this;
           $scope.editTitle = function() {
             RouterService.navigateToSettingsTab();
             FocusManagerService.setFocus(EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
@@ -68,6 +59,19 @@ angular.module('oppia').directive('editorNavbarBreadcrumb', [
               return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
                 RouterService.getActiveTabName()];
             }
+          };
+          ctrl.$onInit = function() {
+            $scope.navbarTitle = null;
+            $scope.$on('explorationPropertyChanged', function() {
+              var _MAX_TITLE_LENGTH = 20;
+              $scope.navbarTitle = ExplorationTitleService.savedMemento;
+              if (
+                $scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
+                $scope.navbarTitle = (
+                  $scope.navbarTitle.substring(
+                    0, _MAX_TITLE_LENGTH - 3) + '...');
+              }
+            });
           };
         }
       ]

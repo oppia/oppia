@@ -33,8 +33,10 @@ angular.module('oppia').directive('libraryFooter', [
         '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
         function($window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
           var ctrl = this;
-          var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
-          ctrl.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
+          ctrl.$onInit = function() {
+            var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
+            ctrl.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
+          };
         }
       ]
     };

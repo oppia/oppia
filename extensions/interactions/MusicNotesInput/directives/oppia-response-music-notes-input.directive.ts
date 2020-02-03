@@ -20,35 +20,33 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponseMusicNotesInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/MusicNotesInput/directives/' +
-        'music-notes-input-response.directive.html'),
+      template: require('./music-notes-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        var _notes = [];
-        for (var i = 0; i < _answer.length; i++) {
-          if (_answer[i].readableNoteName) {
-            _notes.push(_answer[i].readableNoteName);
+        ctrl.$onInit = function() {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          var _notes = [];
+          for (var i = 0; i < _answer.length; i++) {
+            if (_answer[i].readableNoteName) {
+              _notes.push(_answer[i].readableNoteName);
+            }
           }
-        }
 
-        if (_notes.length > 0) {
-          ctrl.displayedAnswer = _notes.join(', ');
-        } else {
-          ctrl.displayedAnswer = 'No answer given.';
-        }
+          if (_notes.length > 0) {
+            ctrl.displayedAnswer = _notes.join(', ');
+          } else {
+            ctrl.displayedAnswer = 'No answer given.';
+          }
+        };
       }]
     };
   }

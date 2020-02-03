@@ -26,7 +26,6 @@ describe('ImageUploadHelperService', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('$sce', {});
     $provide.value('AssetsBackendApiService', {});
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {

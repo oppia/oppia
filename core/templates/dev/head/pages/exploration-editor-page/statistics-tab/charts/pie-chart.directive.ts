@@ -28,45 +28,48 @@ angular.module('oppia').directive('pieChart', [function() {
       options: '&'
     },
     controller: ['$scope', '$element', function($scope, $element) {
-      if (!$.isArray($scope.data())) {
-        return;
-      }
-      var options = $scope.options();
-      var chart = null;
+      var ctrl = this;
+      ctrl.$onInit = function() {
+        if (!$.isArray($scope.data())) {
+          return;
+        }
+        var options = $scope.options();
+        var chart = null;
 
-      // Need to wait for load statement in editor template to finish.
-      // https://stackoverflow.com/questions/42714876/
-      google.charts.setOnLoadCallback(function() {
-        if (!chart) {
-          chart = new google.visualization.PieChart($element[0]);
-        }
-      });
-      var redrawChart = function() {
-        if (chart !== null) {
-          chart.draw(google.visualization.arrayToDataTable($scope.data()), {
-            title: options.title,
-            pieHole: options.pieHole,
-            pieSliceTextStyle: {
-              color: options.pieSliceTextStyleColor,
-            },
-            pieSliceBorderColor: options.pieSliceBorderColor,
-            pieSliceText: 'none',
-            chartArea: {
-              left: options.left,
-              width: options.chartAreaWidth
-            },
-            colors: options.colors,
-            height: options.height,
-            legend: {
-              position: options.legendPosition || 'none'
-            },
-            width: options.width
-          });
-        }
+        // Need to wait for load statement in editor template to finish.
+        // https://stackoverflow.com/questions/42714876/
+        google.charts.setOnLoadCallback(function() {
+          if (!chart) {
+            chart = new google.visualization.PieChart($element[0]);
+          }
+        });
+        var redrawChart = function() {
+          if (chart !== null) {
+            chart.draw(google.visualization.arrayToDataTable($scope.data()), {
+              title: options.title,
+              pieHole: options.pieHole,
+              pieSliceTextStyle: {
+                color: options.pieSliceTextStyleColor,
+              },
+              pieSliceBorderColor: options.pieSliceBorderColor,
+              pieSliceText: 'none',
+              chartArea: {
+                left: options.left,
+                width: options.chartAreaWidth
+              },
+              colors: options.colors,
+              height: options.height,
+              legend: {
+                position: options.legendPosition || 'none'
+              },
+              width: options.width
+            });
+          }
+        };
+
+        $scope.$watch('data()', redrawChart);
+        $(window).resize(redrawChart);
       };
-
-      $scope.$watch('data()', redrawChart);
-      $(window).resize(redrawChart);
     }]
   };
 }]);

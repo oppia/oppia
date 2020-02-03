@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/Continue/directives/continue-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -29,15 +28,13 @@ require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveContinue', [
-  'ContinueRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
-  function(ContinueRulesService, HtmlEscaperService, UrlInterpolationService) {
+  'ContinueRulesService', 'HtmlEscaperService',
+  function(ContinueRulesService, HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/Continue/directives/' +
-        'continue-interaction.directive.html'),
+      template: require('./continue-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'WindowDimensionsService',
@@ -46,13 +43,8 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
             $attrs, WindowDimensionsService,
             CurrentInteractionService, ContextService) {
           var ctrl = this;
-          ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
-            $attrs.buttonTextWithValue);
           var DEFAULT_BUTTON_TEXT = 'Continue';
           var DEFAULT_HUMAN_READABLE_ANSWER = 'Please continue.';
-
-          ctrl.isInEditorMode = ContextService.isInExplorationEditorMode();
-
           ctrl.submitAnswer = function() {
             // We used to show "(Continue)" to indicate a 'continue' action when
             // the learner browses through the history of the exploration, but
@@ -67,9 +59,15 @@ angular.module('oppia').directive('oppiaInteractiveContinue', [
             CurrentInteractionService.onSubmit(
               humanReadableAnswer, ContinueRulesService);
           };
+          ctrl.$onInit = function() {
+            ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
+              $attrs.buttonTextWithValue);
 
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitAnswer, null);
+            ctrl.isInEditorMode = ContextService.isInExplorationEditorMode();
+
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitAnswer, null);
+          };
         }
       ]
     };

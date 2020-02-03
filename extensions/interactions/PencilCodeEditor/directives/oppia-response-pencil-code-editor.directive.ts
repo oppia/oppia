@@ -20,24 +20,22 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponsePencilCodeEditor', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/PencilCodeEditor/directives/' +
-        'pencil-code-editor-response.directive.html'),
+      template: require('./pencil-code-editor-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.answerCode = HtmlEscaperService.escapedJsonToObj(
-          $attrs.answer).code;
+        ctrl.$onInit = function() {
+          ctrl.answerCode = HtmlEscaperService.escapedJsonToObj(
+            $attrs.answer).code;
+        };
       }]
     };
   }

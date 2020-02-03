@@ -37,8 +37,10 @@ angular.module('oppia').directive('oppiaNoninteractiveMath', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.rawLatex = HtmlEscaperService.escapedJsonToObj(
-          $attrs.rawLatexWithValue);
+        ctrl.$onInit = function() {
+          ctrl.rawLatex = HtmlEscaperService.escapedJsonToObj(
+            $attrs.rawLatexWithValue);
+        };
       }]
     };
   }

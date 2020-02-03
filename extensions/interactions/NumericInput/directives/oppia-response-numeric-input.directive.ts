@@ -20,27 +20,25 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponseNumericInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/NumericInput/directives/' +
-        'numeric-input-response.directive.html'),
+      template: require('./numeric-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        // If the answer is an integer, omit the fractional part.
-        if (ctrl.answer % 1 === 0) {
-          ctrl.answer = Math.round(ctrl.answer);
-        }
+        ctrl.$onInit = function() {
+          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          // If the answer is an integer, omit the fractional part.
+          if (ctrl.answer % 1 === 0) {
+            ctrl.answer = Math.round(ctrl.answer);
+          }
+        };
       }]
     };
   }

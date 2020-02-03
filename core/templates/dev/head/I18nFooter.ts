@@ -26,7 +26,7 @@ angular.module('oppia').directive('i18nFooter', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require('!html-loader!./i18n-footer.directive.html'),
+      template: require('./i18n-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$timeout', '$translate', 'UserService',
@@ -38,19 +38,6 @@ angular.module('oppia').directive('i18nFooter', [
           // Changes the language of the translations.
           var preferencesDataUrl = '/preferenceshandler/data';
           var siteLanguageUrl = '/save_site_language';
-          ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
-
-          // The $timeout seems to be necessary for the dropdown to show
-          // anything at the outset, if the default language is not English.
-          $timeout(function() {
-            // $translate.use() returns undefined until the language file is
-            // fully loaded, which causes a blank field in the dropdown, hence
-            // we use $translate.proposedLanguage() as suggested in
-            // http://stackoverflow.com/a/28903658
-            ctrl.currentLanguageCode = $translate.use() ||
-              $translate.proposedLanguage();
-          }, 50);
-
           ctrl.changeLanguage = function() {
             $translate.use(ctrl.currentLanguageCode);
             UserService.getUserInfoAsync().then(function(userInfo) {
@@ -60,6 +47,21 @@ angular.module('oppia').directive('i18nFooter', [
                 });
               }
             });
+          };
+          ctrl.$onInit = function() {
+            ctrl.supportedSiteLanguages = SUPPORTED_SITE_LANGUAGES;
+
+            // The $timeout seems to be necessary for the dropdown
+            // to show anything at the outset, if the default language
+            // is not English.
+            $timeout(function() {
+              // $translate.use() returns undefined until the language
+              // file is fully loaded, which causes a blank field
+              // in the dropdown, hence we use $translate.proposedLanguage()
+              // as suggested in http://stackoverflow.com/a/28903658
+              ctrl.currentLanguageCode = $translate.use() ||
+                $translate.proposedLanguage();
+            }, 50);
           };
         }
       ]

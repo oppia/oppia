@@ -23,9 +23,9 @@ require('services/rte-helper.service.ts');
 require('services/context.service.ts');
 
 angular.module('oppia').run([
-  '$timeout', '$compile', '$rootScope', 'RteHelperService',
+  '$compile', '$rootScope', '$timeout', 'RteHelperService',
   'HtmlEscaperService', 'ContextService',
-  function($timeout, $compile, $rootScope, RteHelperService,
+  function($compile, $rootScope, $timeout, RteHelperService,
       HtmlEscaperService, ContextService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {

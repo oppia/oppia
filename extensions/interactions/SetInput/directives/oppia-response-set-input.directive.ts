@@ -20,23 +20,21 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponseSetInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/SetInput/directives/' +
-        'set-input-response.directive.html'),
+      template: require('./set-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        ctrl.$onInit = function() {
+          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        };
       }]
     };
   }

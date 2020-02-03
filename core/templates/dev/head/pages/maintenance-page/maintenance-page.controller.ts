@@ -24,13 +24,15 @@ angular.module('oppia').controller('Maintenance', [
   'UrlInterpolationService', 'DEV_MODE',
   function($rootScope, $scope, DocumentAttributeCustomizationService,
       UrlInterpolationService, DEV_MODE) {
-    $scope.currentLang = 'en';
-    $rootScope.DEV_MODE = DEV_MODE;
+    var ctrl = this;
     $scope.getStaticImageUrl = function(imagePath) {
       return UrlInterpolationService.getStaticImageUrl(imagePath);
     };
-
-    DocumentAttributeCustomizationService.addAttribute(
-      'lang', $scope.currentLang);
+    ctrl.$onInit = function() {
+      $scope.currentLang = 'en';
+      $rootScope.DEV_MODE = DEV_MODE;
+      DocumentAttributeCustomizationService.addAttribute(
+        'lang', $scope.currentLang);
+    };
   }
 ]);

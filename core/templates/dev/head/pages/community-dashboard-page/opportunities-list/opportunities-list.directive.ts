@@ -41,7 +41,9 @@ angular.module('oppia').directive('opportunitiesList', [
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
+        ctrl.$onInit = function() {
+          ctrl.showMoreOpportunities = $scope.onLoadMoreOpportunities;
+        };
       }]
     };
   }]);

@@ -46,13 +46,6 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
         '$scope', '$filter', '$timeout', 'FocusManagerService',
         function($scope, $filter, $timeout, FocusManagerService) {
           var ctrl = this;
-          ctrl.hasLoaded = false;
-          ctrl.isUserCurrentlyTyping = false;
-          ctrl.hasFocusedAtLeastOnce = false;
-
-          ctrl.labelForErrorFocusTarget =
-            FocusManagerService.generateFocusLabel();
-
           ctrl.validate = function(localValue) {
             return $filter('isFloat')(localValue) !== undefined;
           };
@@ -101,16 +94,22 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               ctrl.isUserCurrentlyTyping = true;
             }
           };
+          ctrl.$onInit = function() {
+            ctrl.hasLoaded = false;
+            ctrl.isUserCurrentlyTyping = false;
+            ctrl.hasFocusedAtLeastOnce = false;
 
-          if (ctrl.localValue === undefined) {
-            ctrl.localValue = 0.0;
-          }
-
-          // This prevents the red 'invalid input' warning message from flashing
-          // at the outset.
-          $timeout(function() {
-            ctrl.hasLoaded = true;
-          });
+            ctrl.labelForErrorFocusTarget =
+              FocusManagerService.generateFocusLabel();
+            if (ctrl.localValue === undefined) {
+              ctrl.localValue = 0.0;
+            }
+            // This prevents the red 'invalid input' warning message from
+            // flashing at the outset.
+            $timeout(function() {
+              ctrl.hasLoaded = true;
+            });
+          };
         }
       ]
     };

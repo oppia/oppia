@@ -41,7 +41,6 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
         function(ExplorationEngineService, ExplorationHtmlFormatterService,
             LearnerAnswerInfoService, PlayerTranscriptService) {
           var ctrl = this;
-          ctrl.answerDetails = null;
           var interaction = ExplorationEngineService.getState().interaction;
           ctrl.submitLearnerAnswerInfo = function() {
             LearnerAnswerInfoService.recordLearnerAnswerInfo(
@@ -59,6 +58,9 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
             return ExplorationHtmlFormatterService.getAnswerHtml(
               LearnerAnswerInfoService.getCurrentAnswer(), interaction.id,
               interaction.customizationArgs);
+          };
+          ctrl.$onInit = function() {
+            ctrl.answerDetails = null;
           };
         }
       ]
