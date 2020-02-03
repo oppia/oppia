@@ -472,7 +472,7 @@ describe('Image preloader service', function() {
     ips.kickOffImagePreloader(exploration.getInitialState().name);
   }));
 
-  it('should service have started after init call', function() {
+  it('should be in exploration player after init is called', function() {
     expect(ips.inExplorationPlayer()).toBe(true);
   });
 
