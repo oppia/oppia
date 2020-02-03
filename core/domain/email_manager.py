@@ -369,14 +369,20 @@ def send_job_failure_email(job_id):
             mail_body.replace('\n', '<br/>'))
 
 
-def send_dummy_mail(emailId):
+def send_dummy_mail(email_address):
+    """Send an email to the specified email address.
+    
+    Args:
+        email_address: str. Email address of the reciever
+    
+    """
     email_subject = 'Test Mail'
     email_body = 'This is a test mail from Oppia.'
     system_name_email = '%s <%s>' % (
         feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
 
     email_services.send_mail(
-        system_name_email, emailId , email_subject,
+        system_name_email, email_address , email_subject,
         email_body, email_body.replace('\n', '<br/>'), bcc_admin=False)
     
    
