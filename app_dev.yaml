@@ -41,6 +41,10 @@ handlers:
   static_dir: third_party/static
   secure: always
   expiration: "90d"
+- url: /security.txt
+  static_files: assets/security.txt
+  upload: assets/security.txt
+  secure: always
 
 # DEVELOPMENT STATIC
 - url: /webpack_bundles
