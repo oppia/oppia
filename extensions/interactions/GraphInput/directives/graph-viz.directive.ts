@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/GraphInput/directives/graph-detail.service.ts');
 require('services/contextual/device-info.service.ts');
 require('services/stateful/focus-manager.service.ts');
@@ -28,7 +27,7 @@ require('services/stateful/focus-manager.service.ts');
 require('interactions/interactions-extension.constants.ajs.ts');
 
 angular.module('oppia').directive('graphViz', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -44,9 +43,7 @@ angular.module('oppia').directive('graphViz', [
         canEditOptions: '=',
         isInteractionActive: '&interactionIsActive'
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/GraphInput/directives/' +
-        'graph-viz.directive.html'),
+      template: require('./graph-viz.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$attrs', '$document',
