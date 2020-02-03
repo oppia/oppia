@@ -24,7 +24,7 @@ angular.module('oppia').directive('warningLoader', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require('!html-loader!./warning-loader.directive.html'),
+      template: require('./warning-loader.directive.html'),
       controllerAs: '$ctrl',
       controller: ['AlertsService',
         function(AlertsService) {
