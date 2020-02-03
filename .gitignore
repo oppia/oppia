@@ -21,6 +21,7 @@ coverage.xml
 .viminfo
 .vscode/*
 libpeerconnection.log
+readme_test_dir/*
 tsc_output_log.txt
 dev_output.txt
 tmpcompiledjs*
