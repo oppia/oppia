@@ -18,18 +18,16 @@ skill_id_2end
  * instances of Skill objects.
  */
 import { ConceptCardObjectFactory , ConceptCard} from 
- './ConceptCardObjectFactory'
+  'domain/skill/ConceptCardObjectFactory'
 import { MisconceptionObjectFactory , Misconception } from
- './MisconceptionObjectFactory'
+  'domain/skill/MisconceptionObjectFactory'
 import { RubricObjectFactory, Rubric } from
- './RubricObjectFactory'
+  'domain/skill/RubricObjectFactory';
 import { ValidatorsService } from
- 'services/validators.service.ts'
+  'services/validators.service.ts'
 import { Injectable } from '@angular/core'
-import { downgradeInjectable } 
-  from '@angular/upgrade/static';
-import predConsts from
- './../../../../../../assets/constants'
+import { downgradeInjectable } from '@angular/upgrade/static';
+import predConsts from './../../../../../../assets/constants';
 
 export class Skill {
   _id: string;
@@ -152,7 +150,12 @@ export class Skill {
         resMis = mis;
       }
     });
-    return resMis || 'Cannot find Misconception by Id : ' + id;
+    if(resMis){
+      return resMis;
+    }
+    else{
+      throw new Error('Cannot find Misconception by Id : ' + id);
+    }
   };
 
   deleteMisconception(id:string){

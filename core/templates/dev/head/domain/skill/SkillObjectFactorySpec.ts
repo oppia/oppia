@@ -24,10 +24,12 @@ import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts'
 import { ValidatorsService } from 'services/validators.service';
-import { ConceptCardObjectFactory } from './ConceptCardObjectFactory';
+import { ConceptCardObjectFactory } from
+  'domain/skill/ConceptCardObjectFactory';
 import { TestBed } from '@angular/core/testing';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
+import predConsts from './../../../../../../assets/constants';
 
 describe('Skill object factory', () => {
   let skillObjectFactory;
@@ -55,7 +57,7 @@ describe('Skill object factory', () => {
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
     validatorService = TestBed.get(ValidatorsService);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory)
-    skillDifficulties = ["Easy", "Medium", "Hard"];
+    skillDifficulties = predConsts.SKILL_DIFFICULTIES;
     misconceptionDict1 = {
       id: '2',
       name: 'test name',
