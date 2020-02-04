@@ -717,16 +717,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(default_outcome.to_dict())
         exploration.validate()
 
-        solution_dict = {
-            'answer_is_exclusive': True,
-            'correct_answer': 'hello_world!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': 'hello_world is a string'
-            }
-        }
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=init_state.interaction.id,
+            answer_is_exclusive=True,
+            correct_answer='hello_world!',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='hello_world is a string'
+            )
         )
         init_state.update_interaction_solution(solution)
         self._assert_validation_error(
@@ -7596,17 +7594,14 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         }]
         state2.update_interaction_hints(hint_list2)
 
-        solution_dict = {
-            'interaction_id': '',
-            'answer_is_exclusive': True,
-            'correct_answer': 'Answer1',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>This is solution for state1</p>'
-            }
-        }
-        solution = state_domain.Solution.from_dict(
-            state1.interaction.id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=state1.interaction.id,
+            answer_is_exclusive=True,
+            correct_answer='Answer1',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='<p>This is solution for state1</p>'
+            )
         )
         state1.update_interaction_solution(solution)
 

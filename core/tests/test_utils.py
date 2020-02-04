@@ -2144,16 +2144,14 @@ class AppEngineTestBase(TestBase):
         state = state_domain.State.create_default_state(
             default_dest_state_name, is_initial_state=True)
         state.interaction.id = 'TextInput'
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'Solution',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>This is a solution.</p>'
-            }
-        }
-        solution = state_domain.Solution.from_dict(
-            state.interaction.id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=state.interaction.id,
+            answer_is_exclusive=False,
+            correct_answer='Solution',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='<p>This is a solution.</p>'
+            )
         )
         hints_list = [{
             'hint_content': {

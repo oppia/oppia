@@ -272,18 +272,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         })
         init_state.update_interaction_hints(hints_list)
 
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'helloworld!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            },
-        }
-        solution = state_domain.Solution.from_dict(
-            interaction_id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=interaction_id,
+            answer_is_exclusive=False,
+            correct_answer='helloworld!',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='<p>hello_world is a string</p>',
+            )
         )
-
         init_state.update_interaction_solution(solution)
 
         written_translations_dict = {
@@ -688,16 +685,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         })
         init_state.update_interaction_hints(hints_list)
 
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'helloworld!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            },
-        }
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=init_state.interaction.id,
+            answer_is_exclusive=False,
+            correct_answer='helloworld!',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='<p>hello_world is a string</p>',
+            )
         )
 
         init_state.update_interaction_solution(solution)
@@ -764,16 +759,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 state_domain.Solution.from_dict(
                     init_state.interaction.id, solution_dict))
 
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'hello_world!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            }
-        }
-        solution = state_domain.Solution.from_dict(
-            interaction_id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=interaction_id,
+            answer_is_exclusive=False,
+            correct_answer='hello_world!',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='<p>hello_world is a string</p>'
+            )
         )
         init_state.update_interaction_solution(solution)
         exploration.validate()
@@ -814,16 +807,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exploration.init_state.interaction.solution, None)
 
         hints_list = []
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'hello_world!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            }
-        }
-        solution = state_domain.Solution.from_dict(
-            exploration.init_state.interaction.id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=exploration.init_state.interaction.id,
+            answer_is_exclusive=False,
+            correct_answer='hello_world!',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='<p>hello_world is a string</p>'
+            )
         )
         hints_list.append({
             'hint_content': {
@@ -835,16 +826,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.update_interaction_solution(solution)
         exploration.validate()
 
-        solution_dict = {
-            'answer_is_exclusive': 1,
-            'correct_answer': 'hello_world!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            }
-        }
-        solution = state_domain.Solution.from_dict(
-            exploration.init_state.interaction.id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=exploration.init_state.interaction.id,
+            answer_is_exclusive=1,
+            correct_answer='hello_world!',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='<p>hello_world is a string</p>',
+            )
         )
 
         exploration.init_state.update_interaction_solution(solution)
@@ -948,16 +937,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list = [state_domain.Hint(subtitled_html)]
 
         exploration.init_state.interaction.hints = hints_list
-        solution_dict = {
-            'answer_is_exclusive': True,
-            'correct_answer': 'hello_world!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            }
-        }
-        solution = state_domain.Solution.from_dict(
-            exploration.init_state.interaction.id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=exploration.init_state.interaction.id,
+            answer_is_exclusive=True,
+            correct_answer='hello_world!',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='<p>hello_world is a string</p>',
+            )
         )
 
         exploration.init_state.update_interaction_solution(solution)

@@ -1800,7 +1800,7 @@ class State(python_utils.OBJECT):
         """Update the solution of interaction.
 
         Args:
-            solution: object or None. The Solution object.
+            solution: Solution or None. The Solution object.
         """
         old_content_id_list = []
         new_content_id_list = []
