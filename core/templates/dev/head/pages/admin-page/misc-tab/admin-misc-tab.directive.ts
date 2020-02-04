@@ -146,8 +146,7 @@ angular.module('oppia').directive('adminMiscTab', [
 
 
         ctrl.dummyMail = function() {
-          var SendMailUrl = SEND_DUMMY_MAIL_HANDLER_URL + '?';
-          SendMailUrl += 'emailId=' + encodeURIComponent(ctrl.dummyMailId);
+          var SendMailUrl = SEND_DUMMY_MAIL_HANDLER_URL
           $window.open(SendMailUrl);
         };
 
