@@ -45,7 +45,6 @@ export class Skill {
   _prerequisiteSkillIds:string[];
   SKILL_DIFFICULTIES = predConsts.SKILL_DIFFICULTIES
 
-
   constructor(id:string, description:string, misconceptions:Misconception[],
     rubrics:Rubric[], conceptCard:ConceptCard, languageCode:string,
     version:number, nextMisconceptionId:string, supersedingSkillId:string, 
@@ -147,13 +146,13 @@ export class Skill {
   };
 
   findMisconceptionById(id:string){ 
-    var resMis:any = 'Cannot find Misconception by Id : ' + id;
+    var resMis
     this._misconceptions.forEach((mis:Misconception) => {
        if(mis.getId() === id){
         resMis = mis;
       }
     });
-    return resMis
+    return resMis || 'Cannot find Misconception by Id : ' + id;
   };
 
   deleteMisconception(id:string){
