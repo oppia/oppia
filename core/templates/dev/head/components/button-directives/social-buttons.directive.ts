@@ -24,7 +24,7 @@ angular.module('oppia').directive('socialButtons', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      template: require('!html-loader!./social-buttons.directive.html'),
+      template: require('./social-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

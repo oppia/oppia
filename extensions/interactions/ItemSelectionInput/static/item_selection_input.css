@@ -1,4 +1,11 @@
 /* The following is needed so that the radio button does not show. */
+.item-selection-info-text {
+  font-weight: bold;
+  font-size: 1em;
+  padding-bottom: 10px;
+  display: block;
+}
+
 .item-selection-input-radio-button {
   display: none;
 }
@@ -62,12 +69,7 @@ md-checkbox.item-selection-input-checkbox .md-label {
   display: table-cell;
 }
 
-.multiple-choice-option:hover {
-  color: #115FD4;
-}
-
-.multiple-choice-option:hover .multiple-choice-inner-radio-button,
-.multiple-choice-option:focus .multiple-choice-inner-radio-button {
+.multiple-choice-option.selected .multiple-choice-inner-radio-button {
   background-color: #115FD4;
   border-radius: 50%;
   display: block;
@@ -76,16 +78,28 @@ md-checkbox.item-selection-input-checkbox .md-label {
   width: 8px;
 }
 
-.multiple-choice-option:hover .multiple-choice-outer-adio-button {
+.multiple-choice-option:focus .multiple-choice-outer-radio-button {
   border-color: #115FD4;
 }
 
-.multiple-choice-outer-radio-button {
-  border: 2px solid #0D48A1;
-  border-radius: 50%;
-  display: inline-block;
-  height: 16px;
-  margin-bottom: -1px;
-  margin-right: 12px;
-  width: 16px;
+/* Hover pseudo-class should only be used in desktops because it
+ * breaks functionality on mobile.
+ */
+@media screen and (min-width: 800px) {
+  .multiple-choice-option:hover {
+    color: #115FD4;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-inner-radio-button {
+    background-color: #115FD4;
+    border-radius: 50%;
+    display: block;
+    height: 8px;
+    margin: 2px;
+    width: 8px;
+  }
+
+  .multiple-choice-option:hover .multiple-choice-outer-radio-button {
+    border-color: #115FD4;
+  }
 }
