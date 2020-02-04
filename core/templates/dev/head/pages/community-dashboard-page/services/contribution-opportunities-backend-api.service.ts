@@ -59,9 +59,11 @@ angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
       });
     };
     return {
-      fetchSkillOpportunities: function(cursor, successCallback) {
+      fetchSkillOpportunities: function(
+          cursor, successCallback, shouldFetchAll = false) {
         var params = {
-          cursor: cursor
+          cursor: cursor,
+          shouldFetchAll: shouldFetchAll
         };
         return _fetchOpportunities(
           OPPORTUNITY_TYPE_SKILL, params, successCallback);
