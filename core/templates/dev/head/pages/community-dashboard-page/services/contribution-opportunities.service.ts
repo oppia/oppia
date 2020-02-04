@@ -31,13 +31,14 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     var moreTranslationOpportunitiesAvailable = true;
     var moreVoiceoverOpportunitiesAvailable = true;
 
-    var _getSkillOpportunities = function(cursor, successCallback) {
+    var _getSkillOpportunities = function(
+        cursor, successCallback, shouldFetchAll=false) {
       ContributionOpportunitiesBackendApiService.fetchSkillOpportunities(
         cursor, function(opportunities, nextCursor, more) {
           skillOpportunitiesCursor = nextCursor;
           moreSkillOpportunitiesAvailable = more;
           successCallback(opportunities, more);
-        });
+        }, shouldFetchAll);
     };
     var _getTranslationOpportunities = function(
         languageCode, cursor, successCallback) {
@@ -59,8 +60,8 @@ angular.module('oppia').factory('ContributionOpportunitiesService', [
     };
 
     return {
-      getSkillOpportunities: function(successCallback) {
-        _getSkillOpportunities('', successCallback);
+      getSkillOpportunities: function(successCallback, shouldFetchAll=false) {
+        _getSkillOpportunities('', successCallback, shouldFetchAll);
       },
       getTranslationOpportunities: function(languageCode, successCallback) {
         _getTranslationOpportunities(languageCode, '', successCallback);

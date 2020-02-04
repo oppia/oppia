@@ -492,13 +492,14 @@ def get_skill_opportunity_from_model(model):
         model.id, model.skill_description, model.question_count)
 
 
-def get_skill_opportunities(cursor):
+def get_skill_opportunities(cursor, shouldFetchAll=False):
     """Returns a list of skill opportunities available for questions.
 
     Args:
         cursor: str or None. If provided, the list of returned entities
             starts from this datastore cursor. Otherwise, the returned
             entities start from the beginning of the full list of entities.
+        shouldFetchAll: bool. If True, returns all entities.
 
     Returns:
         3-tuple(opportunities, cursor, more). where:
@@ -514,7 +515,7 @@ def get_skill_opportunities(cursor):
     page_size = feconf.OPPORTUNITIES_PAGE_SIZE
     skill_opportunity_models, cursor, more = (
         opportunity_models.SkillOpportunityModel
-        .get_skill_opportunities(page_size, cursor))
+        .get_skill_opportunities(page_size, cursor, shouldFetchAll))
     opportunities = []
     for skill_opportunity_model in skill_opportunity_models:
         skill_opportunity = (

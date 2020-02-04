@@ -208,7 +208,8 @@ class SkillOpportunityModel(base_models.BaseModel):
         return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
-    def get_skill_opportunities(cls, page_size, urlsafe_start_cursor):
+    def get_skill_opportunities(
+            cls, page_size, urlsafe_start_cursor, shouldFetchAll=False):
         """Returns a list of skill opportunities available for adding questions.
 
         Args:
@@ -217,6 +218,7 @@ class SkillOpportunityModel(base_models.BaseModel):
                 returned entities starts from this datastore cursor.
                 Otherwise, the returned entities start from the beginning
                 of the full list of entities.
+            shouldFetchAll: bool. If True, returns all entities.
 
         Returns:
             3-tuple of (results, cursor, more) as described in fetch_page() at:
@@ -235,9 +237,12 @@ class SkillOpportunityModel(base_models.BaseModel):
             start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
         else:
             start_cursor = None
-
-        results, cursor, more = cls.get_all().order(
-            cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
+        if shouldFetchAll:
+            results, cursor, more = cls.get_all().order(
+                cls.created_on).fetch_page(page_size, start_cursor=start_cursor)
+        else:
+            results = cls.get_all().order(cls.created_on).fetch()
+            cursor, more = (None, False)
         return (results, (cursor.urlsafe() if cursor else None), more)
 
     @classmethod
