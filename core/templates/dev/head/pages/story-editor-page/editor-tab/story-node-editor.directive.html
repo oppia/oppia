@@ -28,6 +28,9 @@
   <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
     <input class="protractor-test-exploration-id-input" type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
     <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!canSaveExpId || (explorationId === currentExplorationId)">Save</button>
+    <span class="form-text" style="font-size: smaller; color: red;" ng-if="!expIdIsValid">
+      <em>Please enter a valid exploration id</em>
+    </span>
   </form>
   <label style="padding-top: 2em;" class="form-heading"> Prerequisite Skill IDs </label>
   <div class="oppia-placeholder">
