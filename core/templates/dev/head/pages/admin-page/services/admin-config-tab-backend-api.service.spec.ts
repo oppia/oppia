@@ -68,7 +68,6 @@ describe('Admin Config Tab Backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
-
   it('should save new config properties',
     function() {
       let successHandler = jasmine.createSpy('success');
