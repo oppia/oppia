@@ -76,7 +76,7 @@ import { ExplorationHtmlFormatterService } from
   'services/exploration-html-formatter.service';
 import { ExplorationObjectFactory } from
   'domain/exploration/ExplorationObjectFactory';
-import { ExpressionParserService } from "expressions/expression-parser.service";
+import { ExpressionParserService } from 'expressions/expression-parser.service';
 import { ExtensionTagAssemblerService } from
   'services/extension-tag-assembler.service';
 import { ExtractImageFilenamesFromStateService } from

@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Expression Parser Service.
  */
 
- import { ExpressionParserService } from "expressions/expression-parser.service";
+import { ExpressionParserService } from 'expressions/expression-parser.service';
 
 describe('Expression parser service', () => {
   let eps : ExpressionParserService;
