@@ -17,9 +17,9 @@
 skill_id_2end
  * instances of Skill objects.
  */
-import { ConceptCardObjectFactory , ConceptCard} from 
+import { ConceptCardObjectFactory, ConceptCard } from
   'domain/skill/ConceptCardObjectFactory'
-import { MisconceptionObjectFactory , Misconception } from
+import { MisconceptionObjectFactory, Misconception } from
   'domain/skill/MisconceptionObjectFactory'
 import { RubricObjectFactory, Rubric } from
   'domain/skill/RubricObjectFactory';
@@ -31,22 +31,22 @@ import predConsts from './../../../../../../assets/constants';
 
 export class Skill {
   _id: string;
-  _description:string;
-  _misconceptions:Misconception[];
-  _rubrics:Rubric[];
-  _conceptCard:ConceptCard;
-  _languageCode:string;
-  _version:number;
-  _nextMisconceptionId:string;
-  _supersedingSkillId:string;
-  _allQuestionsMerged:boolean;
-  _prerequisiteSkillIds:string[];
+  _description: string;
+  _misconceptions: Misconception[];
+  _rubrics: Rubric[];
+  _conceptCard: ConceptCard;
+  _languageCode: string;
+  _version: number;
+  _nextMisconceptionId: string;
+  _supersedingSkillId: string;
+  _allQuestionsMerged: boolean;
+  _prerequisiteSkillIds: string[];
   SKILL_DIFFICULTIES = predConsts.SKILL_DIFFICULTIES
 
-  constructor(id:string, description:string, misconceptions:Misconception[],
-    rubrics:Rubric[], conceptCard:ConceptCard, languageCode:string,
-    version:number, nextMisconceptionId:string, supersedingSkillId:string, 
-    allQuestionsMerged:boolean, prerequisiteSkillIds:string[] ) {
+  constructor(id: string, description: string, misconceptions: Misconception[],
+    rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
+    version: number, nextMisconceptionId: string, supersedingSkillId: string,
+    allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
     this._conceptCard = conceptCard;
@@ -60,7 +60,7 @@ export class Skill {
     this._prerequisiteSkillIds = prerequisiteSkillIds;
   }
 
-  copyFromSkill(skill:Skill):void{
+  copyFromSkill(skill: Skill): void {
     this._id = skill.getId();
     this._description = skill.getDescription();
     this._misconceptions = skill.getMisconceptions();
@@ -73,104 +73,104 @@ export class Skill {
     this._allQuestionsMerged = skill.getAllQuestionsMerged();
     this._prerequisiteSkillIds = skill.getPrerequisiteSkillIds();
   };
-  getId():string {
+  getId(): string {
     return this._id;
   };
-  
-  setDescription(description:string):void {
+
+  setDescription(description: string): void {
     this._description = description;
   };
 
-  getDescription():string {
+  getDescription(): string {
     return this._description;
   };
 
-  getPrerequisiteSkillIds():string[] {
+  getPrerequisiteSkillIds(): string[] {
     return this._prerequisiteSkillIds.slice();
   };
 
-  addPrerequisiteSkill(skillId:string):void {
+  addPrerequisiteSkill(skillId: string): void {
     this._prerequisiteSkillIds.push(skillId);
   };
 
-  deletePrerequisiteSkill(skillId : string):void {
-    this._prerequisiteSkillIds.forEach((preReq:string,index)=>{
-     if(preReq === skillId){
-       this._prerequisiteSkillIds.splice(index,1)
-     }
+  deletePrerequisiteSkill(skillId: string): void {
+    this._prerequisiteSkillIds.forEach((preReq: string, index) => {
+      if (preReq === skillId) {
+        this._prerequisiteSkillIds.splice(index, 1)
+      }
     });
   };
 
-  getConceptCard():ConceptCard {
+  getConceptCard(): ConceptCard {
     return this._conceptCard;
   };
 
-  getMisconceptions() : Array<Misconception>{
+  getMisconceptions(): Array<Misconception> {
     return this._misconceptions.slice();
   };
 
-  getRubrics():Array<Rubric> {
+  getRubrics(): Array<Rubric> {
     return this._rubrics.slice();
   };
 
-  appendMisconception(newMisconception:Misconception):void {
+  appendMisconception(newMisconception: Misconception): void {
     this._misconceptions.push(newMisconception);
     this._nextMisconceptionId = this.getIncrementedMisconceptionId(
       newMisconception.getId());
   };
 
-  getLanguageCode():string {
+  getLanguageCode(): string {
     return this._languageCode;
   };
 
-  getVersion():number {
+  getVersion(): number {
     return this._version;
   };
 
-  getNextMisconceptionId():string {
+  getNextMisconceptionId(): string {
     return this._nextMisconceptionId;
   };
 
-  getIncrementedMisconceptionId(id:string) {
+  getIncrementedMisconceptionId(id: string) {
     return (parseInt(id) + 1).toString();
   };
 
-  getSupersedingSkillId():string {
+  getSupersedingSkillId(): string {
     return this._supersedingSkillId;
   };
 
-  getAllQuestionsMerged():boolean {
+  getAllQuestionsMerged(): boolean {
     return this._allQuestionsMerged;
   };
 
-  findMisconceptionById(id:string){ 
+  findMisconceptionById(id: string) {
     var resMis
-    this._misconceptions.forEach((mis:Misconception) => {
-       if(mis.getId() === id){
+    this._misconceptions.forEach((mis: Misconception) => {
+      if (mis.getId() === id) {
         resMis = mis;
       }
     });
-    if(resMis){
+    if (resMis) {
       return resMis;
     }
-    else{
+    else {
       throw new Error('Cannot find Misconception by Id : ' + id);
     }
   };
 
-  deleteMisconception(id:string){
-    this._misconceptions.forEach((misc:Misconception) => {
-      if(misc.getId() === id){
-        this._misconceptions.splice(this._misconceptions.indexOf(misc),1)
+  deleteMisconception(id: string) {
+    this._misconceptions.forEach((misc: Misconception) => {
+      if (misc.getId() === id) {
+        this._misconceptions.splice(this._misconceptions.indexOf(misc), 1)
       }
     })
   };
 
-  getMisconceptionAtIndex(idx:number) {
+  getMisconceptionAtIndex(idx: number) {
     return this._misconceptions[idx];
   };
 
-  getRubricExplanation(difficulty:string) {
+  getRubricExplanation(difficulty: string) {
     for (var idx in this._rubrics) {
       if (this._rubrics[idx].getDifficulty() === difficulty) {
         return this._rubrics[idx].getExplanation();
@@ -178,10 +178,10 @@ export class Skill {
     }
     return null;
   };
-  getMisconceptionId(index:number){
+  getMisconceptionId(index: number) {
     return this._misconceptions[index].getId()
   }
-  updateRubricForDifficulty(difficulty:string, explanation:string) {
+  updateRubricForDifficulty(difficulty: string, explanation: string) {
     if (this.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
       throw Error('Invalid difficulty value passed');
     }
@@ -200,8 +200,10 @@ export class Skill {
       id: this._id,
       description: this._description,
       misconceptions: this._misconceptions.map(
-        (misconception:Misconception) => {return misconception.toBackendDict()}),
-      rubrics: this._rubrics.map((rubric:Rubric)=> {return rubric.toBackendDict()}),
+        (misconception: Misconception) => {
+          return misconception.toBackendDict()}),
+      rubrics: this._rubrics.map((rubric: Rubric) => {
+        return rubric.toBackendDict()}),
       skill_contents: this._conceptCard.toBackendDict(),
       language_code: this._languageCode,
       version: this._version,
@@ -211,7 +213,7 @@ export class Skill {
       prerequisite_skill_ids: this._prerequisiteSkillIds
     };
   };
-  getValidationIssues():string[] {
+  getValidationIssues(): string[] {
     var issues = [];
     if (this.getConceptCard().getExplanation().getHtml() === '') {
       issues.push(
@@ -231,30 +233,32 @@ export class Skill {
   providedIn: 'root'
 })
 export class SkillObjectFactory {
-  constructor(private conceptCardObjectFactory : ConceptCardObjectFactory,
-    private misconceptionObjectFactory:MisconceptionObjectFactory,
+  constructor(private conceptCardObjectFactory: ConceptCardObjectFactory,
+    private misconceptionObjectFactory: MisconceptionObjectFactory,
     private rubricObjectFactory: RubricObjectFactory,
-    private validatorService :ValidatorsService){
+    private validatorService: ValidatorsService) {
   }
-  createInterstitialSkill():Skill {
+  createInterstitialSkill(): Skill {
     return new Skill(null, 'Skill description loading',
-      [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(), 'en',
-      1, '0', null, false, []);
+      [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(),
+      'en',1, '0', null, false, []);
   };
-  hasValidDescription(description:string) {
+  hasValidDescription(description: string) {
     var allowDescriptionToBeBlank = false;
     var showWarnings = true;
     return this.validatorService.isValidEntityName(
       description, showWarnings, allowDescriptionToBeBlank);
   };
 
-  createFromBackendDict(skillBackendDict):Skill {
+  createFromBackendDict(skillBackendDict): Skill {
     return new Skill(
       skillBackendDict.id,
       skillBackendDict.description,
-      this.generateMisconceptionsFromBackendDict(skillBackendDict.misconceptions),
+      this.generateMisconceptionsFromBackendDict(
+        skillBackendDict.misconceptions),
       this.generateRubricsFromBackendDict(skillBackendDict.rubrics),
-      this.conceptCardObjectFactory.createFromBackendDict(skillBackendDict.skill_contents),
+      this.conceptCardObjectFactory.createFromBackendDict(
+        skillBackendDict.skill_contents),
       skillBackendDict.language_code,
       skillBackendDict.version,
       skillBackendDict.next_misconception_id,
@@ -274,5 +278,5 @@ export class SkillObjectFactory {
     });
   };
 }
-angular.module('oppia').factory('SkillObjectFactory', 
+angular.module('oppia').factory('SkillObjectFactory',
   downgradeInjectable(SkillObjectFactory));
