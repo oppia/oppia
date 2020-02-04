@@ -17,10 +17,8 @@
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-
-import { CsrfTokenService } from 'services/csrf-token.service';
 
 export interface Query {
   id: string,
@@ -43,11 +41,8 @@ export class EmailDashboardDataService {
   currentPageIndex: number = -1;
 
   constructor(
-    private http: HttpClient,
-    private csrfTokenService: CsrfTokenService
-  ) {
-    this.csrfTokenService.initializeToken();
-  }
+    private http: HttpClient
+  ) {}
 
   fetchQueriesPage(pageSize, cursor): Promise<Object> {
     let params: any = {
@@ -77,20 +72,11 @@ export class EmailDashboardDataService {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
 
-    return this.csrfTokenService.getTokenAsync().then((token) => {
-      const body = new HttpParams()
-        .set('payload', JSON.stringify({data: data}))
-        .set('csrf_token', token)
-        .set('source', document.URL);
-      const headers = new HttpHeaders()
-        .set('Content-Type', 'application/x-www-form-urlencoded');
-
-      return this.http.post(this.QUERY_DATA_URL, body.toString(), {
-        headers: headers}).toPromise().then((data: any) => {
-        var newQueries = [data.query];
-        this.queries = newQueries.concat(this.queries);
-        return this.queries.slice(startQueryIndex, endQueryIndex);
-      });
+    return this.http.post(this.QUERY_DATA_URL, {
+      data: data}).toPromise().then((data: any) => {
+      var newQueries = [data.query];
+      this.queries = newQueries.concat(this.queries);
+      return this.queries.slice(startQueryIndex, endQueryIndex);
     });
   }
 
