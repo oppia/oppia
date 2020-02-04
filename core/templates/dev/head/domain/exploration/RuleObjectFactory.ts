@@ -30,9 +30,16 @@ export class Rule {
     this.type = type;
     this.inputs = inputs;
   }
+
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because the return type is a dict with underscore_cased keys which
   // gives tslint errors against underscore_casing in favor of camelCasing.
+  getInput(): any {
+    return this.inputs;
+  }
+  getType(): string {
+    return this.type;
+  }
   toBackendDict(): any {
     return {
       rule_type: this.type,
