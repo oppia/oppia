@@ -92,7 +92,8 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
               }
             };
             if (ctrl.buttonText) {
-              ctrl.schema.ui_config.add_element_text = $translate.instant(ctrl.buttonText);
+              ctrl.schema.ui_config.add_element_text = $translate.instant(
+                ctrl.buttonText);
             }
 
             // Adds an input field by default
