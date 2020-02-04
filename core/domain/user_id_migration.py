@@ -528,7 +528,8 @@ class AddAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def _add_collection_user_ids(rights_model, all_users_model):
         """Compare the existing CollectionRightsAllUsersModel with the user IDs
         in the CollectionRightsModel, if some of the user IDs from snapshots are
-        not in the parent rights model return them.
+        not in the parent rights model add them to the
+        CollectionRightsAllUsersModel and return them.
 
         Args:
             rights_model: CollectionRightsModel. The current rights model.
@@ -559,7 +560,8 @@ class AddAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def _add_exploration_user_ids(rights_model, all_users_model):
         """Compare the existing ExplorationRightsAllUsersModel with the user IDs
         in the ExplorationRightsModel, if some of the user IDs from snapshots
-        are not in the parent rights model return them.
+        are not in the parent rights model add them to the
+        ExplorationRightsAllUsersModel and return them.
 
         Args:
             rights_model: ExplorationRightsModel. The current rights model.
@@ -590,7 +592,8 @@ class AddAllUserIdsVerificationJob(jobs.BaseMapReduceOneOffJobManager):
     def _add_topic_user_ids(rights_model, all_users_model):
         """Compare the existing TopicRightsAllUsersModel with the user IDs in
         the TopicRightsModel, if some of the user IDs from snapshots are not in
-        the parent rights model return them.
+        the parent rights model add them to the TopicRightsAllUsersModel and
+        return them.
 
         Args:
             rights_model: TopicRightsModel. The current rights model.
