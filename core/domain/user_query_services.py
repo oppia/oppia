@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain object for a parameters of a query."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
