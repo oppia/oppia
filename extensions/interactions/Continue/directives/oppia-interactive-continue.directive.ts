@@ -20,7 +20,6 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('interactions/Continue/directives/continue-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
@@ -29,15 +28,13 @@ require('services/html-escaper.service.ts');
 require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveContinue', [
-  'ContinueRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
-  function(ContinueRulesService, HtmlEscaperService, UrlInterpolationService) {
+  'ContinueRulesService', 'HtmlEscaperService',
+  function(ContinueRulesService, HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/Continue/directives/' +
-        'continue-interaction.directive.html'),
+      template: require('./continue-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'WindowDimensionsService',
