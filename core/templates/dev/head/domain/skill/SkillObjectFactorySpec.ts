@@ -217,8 +217,4 @@ describe('Skill object factory', () => {
     expect(skill.getAllQuestionsMerged()).toEqual(false);
     expect(skill.getPrerequisiteSkillIds()).toEqual([]);
   });
-})
-
-
-
-
+});
