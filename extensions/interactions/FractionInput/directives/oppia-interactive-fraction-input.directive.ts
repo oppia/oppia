@@ -17,7 +17,6 @@
  */
 
 require('domain/objects/FractionObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/FractionInput/directives/' +
   'fraction-input-rules.service.ts');
@@ -30,15 +29,12 @@ require('services/stateful/focus-manager.service.ts');
 require('domain/objects/objects-domain.constants.ajs.ts');
 
 angular.module('oppia').directive('oppiaInteractiveFractionInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/FractionInput/directives/' +
-        'fraction-input-interaction.directive.html'),
+      template: require('./fraction-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'FractionInputRulesService',
