@@ -1275,16 +1275,22 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                 first_missing_version = version + 1
                 break
 
+        # If no stats models are missing, we are good.
         if first_missing_version is None:
             yield ('No change', exp.id)
             return
 
+        # The first model cannot be missing. It should only be missing for
+        # revert commits and the first change cannot be a revert commit.
         if first_missing_version == 1:
             yield ('Missing model at version 1', exp.id)
             return
 
         new_exp_stats_dicts = []
 
+        # From the version just before the first missing version to the latest
+        # version of the exploration stats were incorrectly calculated. So we
+        # recalculate stats for all these versions.
         for version in python_utils.RANGE(
                 first_missing_version - 1, exp.version + 1):
             commit_log = exp_models.ExplorationCommitLogEntryModel.get_commit(
@@ -1292,12 +1298,17 @@ class RegenerateMissingV2StatsModelsOneOffJob(
             exp_at_version = exp_models.ExplorationModel.get_version(
                 exp.id, version)
 
+            # If commit log models are missing (we noticed this on prod), we
+            # manually calculate a diff between adjacent versions.
             if commit_log is None:
                 prev_exp = exp_models.ExplorationModel.get_version(
                     exp.id, version - 1)
                 old_states = prev_exp.states
                 new_states = exp_at_version.states
                 inferred_change_list = []
+
+                # If a state isn't present in the new version, we consider it as
+                # a deletion.
                 for old_state in old_states:
                     if old_state not in new_states:
                         inferred_change_list.append(
@@ -1306,6 +1317,8 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                                 'state_name': old_state
                             }))
 
+                # If a new state is present in the new version, we consider it
+                # as an addition.
                 for new_state in new_states:
                     if new_state not in old_states:
                         inferred_change_list.append(
@@ -1316,8 +1329,13 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     inferred_change_list)
 
+                # If there are existing stats models for this version, which was
+                # incorrectly calculated before, we delete it. If it already
+                # doesn't exist, for the case when commit log entries are
+                # missing we don't raise an error.
                 if all_models[version - 1] is not None:
                     all_models[version - 1].delete()
+
                 new_exp_stats_dicts.append(
                     stats_services.get_stats_for_new_exp_version(
                         exp.id, version, exp_at_version.states,
@@ -1329,13 +1347,17 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
 
-                # Delete all old models.
+                # If there are existing stats models for this version, which was
+                # incorrectly calculated before, we delete it. If it already
+                # doesn't exist, we make sure that the commit_type is revert
+                # (this is the only case where we expect a missing model). If it
+                # is not a revert then we throw an error.
                 if all_models[version - 1] is None:
                     if commit_log.commit_type != 'revert':
                         yield ('Missing model without revert commit', exp.id)
                         return
 
-                    # Is a revert commit.
+                    # It is a revert commit, so we calculate stats accordingly.
                     revert_to_version = (
                         commit_log.commit_cmds[0]['version_number'])
                     new_exp_stats_dicts.append(
@@ -1343,6 +1365,7 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                             exp.id, version, exp_at_version.states, None,
                             revert_to_version).to_dict())
                 else:
+                    # The model already exists, so we delete it and recalculate.
                     all_models[version - 1].delete()
                     new_exp_stats_dicts.append(
                         stats_services.get_stats_for_new_exp_version(
