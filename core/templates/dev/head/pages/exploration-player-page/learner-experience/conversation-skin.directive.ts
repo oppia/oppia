@@ -701,6 +701,9 @@ angular.module('oppia').directive('conversationSkin', [
                           story_id: storyId
                         });
                   }
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the directive is migrated to angular
+                  $rootScope.$apply();
                 });
               } else {
                 ExplorationRecommendationsService.getRecommendedSummaryDicts(
