@@ -17,6 +17,7 @@
  */
 import { ConceptCardObjectFactory, ConceptCard } from
   'domain/skill/ConceptCardObjectFactory'
+import { downgradeInjectable } from '@angular/upgrade/static';
 import { MisconceptionObjectFactory, Misconception } from
   'domain/skill/MisconceptionObjectFactory'
 import { RubricObjectFactory, Rubric } from
@@ -24,7 +25,6 @@ import { RubricObjectFactory, Rubric } from
 import { ValidatorsService } from
   'services/validators.service.ts'
 import { Injectable } from '@angular/core'
-import { downgradeInjectable } from '@angular/upgrade/static';
 import predConsts from './../../../../../../assets/constants';
 
 export class Skill {

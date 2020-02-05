@@ -15,21 +15,20 @@
 /**
  * @fileoverview Unit tests for SkillObjectFactory.
  */
-
-import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory';
-import { RubricObjectFactory } from
-  'domain/skill/RubricObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts'
-import { ValidatorsService } from 'services/validators.service';
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
-import { TestBed } from '@angular/core/testing';
+import { MisconceptionObjectFactory } from
+  'domain/skill/MisconceptionObjectFactory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 import predConsts from './../../../../../../assets/constants';
+import { RubricObjectFactory } from
+  'domain/skill/RubricObjectFactory';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts'
+import { SubtitledHtmlObjectFactory } from
+  'domain/exploration/SubtitledHtmlObjectFactory';
+import { TestBed } from '@angular/core/testing';
+import { ValidatorsService } from 'services/validators.service';
 
 describe('Skill object factory', () => {
   let skillObjectFactory;
@@ -51,13 +50,13 @@ describe('Skill object factory', () => {
         NormalizeWhitespacePipe,
       ]
     });
-    skillObjectFactory = TestBed.get(SkillObjectFactory);
     conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
-    rubricObjectFactory = TestBed.get(RubricObjectFactory);
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
-    validatorService = TestBed.get(ValidatorsService);
-    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory)
+    rubricObjectFactory = TestBed.get(RubricObjectFactory);
     skillDifficulties = predConsts.SKILL_DIFFICULTIES;
+    skillObjectFactory = TestBed.get(SkillObjectFactory);
+    subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
+    validatorService = TestBed.get(ValidatorsService);
     misconceptionDict1 = {
       id: '2',
       name: 'test name',

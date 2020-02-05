@@ -38,7 +38,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('domain/skill/skill-update.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
-fdescribe('Skill editor state service', function() {
+describe('Skill editor state service', function() {
   var SkillEditorStateService = null, $q, $rootScope,
     SkillObjectFactory = null, SkillUpdateService = null,
     skillRightsObjectFactory = null;
