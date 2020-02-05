@@ -105,7 +105,7 @@ import { LoggerService } from 'services/contextual/logger.service';
 import { MetaTagCustomizationService } from
   'services/contextual/meta-tag-customization.service';
 import { MisconceptionObjectFactory } from
-  'domain/skill/MisconceptionObjectFactory'
+  'domain/skill/MisconceptionObjectFactory';
 import { NormalizeWhitespacePipe } from
   'filters/string-utility-filters/normalize-whitespace.pipe';
 /* eslint-disable max-len */
@@ -291,7 +291,7 @@ export class UpgradedServices {
       new LearnerAnswerInfoObjectFactory();
     upgradedServices['LoggerService'] = new LoggerService();
     upgradedServices['MisconceptionObjectFactory'] =
-      new MisconceptionObjectFactory()
+      new MisconceptionObjectFactory();
     upgradedServices['NormalizeWhitespacePunctuationAndCasePipe'] =
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
@@ -475,9 +475,9 @@ export class UpgradedServices {
       upgradedServices['SkillSummaryObjectFactory']);
     upgradedServices['TextInputRulesService'] = new TextInputRulesService(
       upgradedServices['NormalizeWhitespacePipe']);
-    upgradedServices['ValidatorsService'] =new ValidatorsService(
+    upgradedServices['ValidatorsService'] = new ValidatorsService(
       upgradedServices['AlertService'],
-      upgradedServices['NormalizeWhitespacePipe'])
+      upgradedServices['NormalizeWhitespacePipe']);
     upgradedServices['UrlInterpolationService'] = new UrlInterpolationService(
       upgradedServices['AlertsService'], upgradedServices['UrlService'],
       upgradedServices['UtilsService']);
