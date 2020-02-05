@@ -45,7 +45,7 @@ describe('Topic viewer backend API service', function() {
     $provide.value(
       'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
         new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
-          new SkillSummaryObjectFactory()));
+        new SkillSummaryObjectFactory()));
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();

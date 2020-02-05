@@ -21,10 +21,10 @@ require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/topic_viewer/ReadOnlyTopicObjectFactory');
 
 angular.module('oppia').factory('TopicViewerBackendApiService', [
-  '$http', '$q', 'ReadOnlyTopicObjectFactory','UrlInterpolationService',
+  '$http', '$q', 'ReadOnlyTopicObjectFactory', 'UrlInterpolationService',
   'TOPIC_DATA_URL_TEMPLATE',
   function($http, $q, ReadOnlyTopicObjectFactory, UrlInterpolationService,
-  TOPIC_DATA_URL_TEMPLATE) {
+      TOPIC_DATA_URL_TEMPLATE) {
     var readOnlyTopic = null;
     var _fetchTopicData = function(topicName, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(

@@ -58,12 +58,12 @@ export class ReadOnlyTopic {
     return this._topicId;
   }
 
-  //Return type is any as there is no usage
+  // Return type is any as there is no usage
   getCanonicalStories(): any {
     return this._canonicalStories.slice();
   }
 
-  //Return type is any as there is no usage
+  // Return type is any as there is no usage
   getAdditionalStories(): any {
     return this._additionalStories.slice();
   }
@@ -76,19 +76,19 @@ export class ReadOnlyTopic {
     return this._subtopics.slice();
   }
 
-  //Return type any as no appropriate class found for object construction
+  // Return type any as no appropriate class found for object construction
   getDegreesOfMastery(): any {
     return this._degreesOfMastery;
   }
 
-  //Return Type any as no appropriate class found for object construction
+  // Return Type any as no appropriate class found for object construction
   getSkillDescriptions(): any {
     return this._skillDescriptions;
   }
 }
 
 @Injectable({
-  providedIn: "root"
+  providedIn: 'root'
 })
 
 export class ReadOnlyTopicObjectFactory {
@@ -98,9 +98,9 @@ export class ReadOnlyTopicObjectFactory {
   constructor(
     private subtopicObjectFactory: SubtopicObjectFactory,
     private skillSummaryObjectFactory: SkillSummaryObjectFactory) {
-      this._subtopicObjectFactory = subtopicObjectFactory;
-      this._skillSummaryObjectFactory = skillSummaryObjectFactory;
-    }
+    this._subtopicObjectFactory = subtopicObjectFactory;
+    this._skillSummaryObjectFactory = skillSummaryObjectFactory;
+  }
 
   createFromBackendDict(topicDataDict: any): ReadOnlyTopic {
     let subtopics = topicDataDict.subtopics.map((subtopic: Subtopic) => {
@@ -108,8 +108,8 @@ export class ReadOnlyTopicObjectFactory {
         subtopic, topicDataDict.skill_descriptions);
     });
 
-    let uncategorizedSkills = topicDataDict.uncategorized_skill_ids.map(
-      (skillId: string) => {
+    let uncategorizedSkills =
+    topicDataDict.uncategorized_skill_ids.map((skillId: string) => {
         return this._skillSummaryObjectFactory.create(
           skillId, topicDataDict.skill_descriptions[skillId]);
     });

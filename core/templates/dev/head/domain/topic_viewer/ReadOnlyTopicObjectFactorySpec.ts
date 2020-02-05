@@ -85,9 +85,9 @@ describe('Topic Data Object Factory', () => {
     expect(_sampleReadOnlyTopic.getSubtopics()[0]._title).toEqual(
       'subtopic_name');
     expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0]._id).
-      toEqual("skill_id_2");
+      toEqual('skill_id_2');
     expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0].
-      _description).toEqual("Skill Description 2");
+      _description).toEqual('Skill Description 2');
   });
 
   it('should get the values as expected', () => {
