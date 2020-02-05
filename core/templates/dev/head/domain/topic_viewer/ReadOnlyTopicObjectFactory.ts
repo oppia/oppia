@@ -110,8 +110,8 @@ export class ReadOnlyTopicObjectFactory {
 
     let uncategorizedSkills =
     topicDataDict.uncategorized_skill_ids.map((skillId: string) => {
-        return this._skillSummaryObjectFactory.create(
-          skillId, topicDataDict.skill_descriptions[skillId]);
+      return this._skillSummaryObjectFactory.create(
+        skillId, topicDataDict.skill_descriptions[skillId]);
     });
 
     return new ReadOnlyTopic(
