@@ -13,9 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating frontskill_id_2
-skill_id_2end
- * instances of Skill objects.
+ * @fileoverview Factory for creating frontend skills
  */
 import { ConceptCardObjectFactory, ConceptCard } from
   'domain/skill/ConceptCardObjectFactory'
@@ -59,7 +57,6 @@ export class Skill {
     this._supersedingSkillId = supersedingSkillId;
     this._prerequisiteSkillIds = prerequisiteSkillIds;
   }
-
   copyFromSkill(skill: Skill): void {
     this._id = skill.getId();
     this._description = skill.getDescription();
@@ -241,7 +238,7 @@ export class SkillObjectFactory {
   createInterstitialSkill(): Skill {
     return new Skill(null, 'Skill description loading',
       [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(),
-      'en',1, '0', null, false, []);
+      'en', 1, '0', null, false, []);
   };
   hasValidDescription(description: string) {
     var allowDescriptionToBeBlank = false;

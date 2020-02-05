@@ -145,6 +145,7 @@ import { RubricObjectFactory } from
 import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
 import { SidebarStatusService } from 'domain/sidebar/sidebar-status.service';
 import { SiteAnalyticsService } from 'services/site-analytics.service';
+import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 import { SolutionObjectFactory } from
@@ -237,7 +238,6 @@ import { WrittenTranslationObjectFactory } from
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
 import { from } from 'rxjs';
-import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory';
 
 @Injectable({
   providedIn: 'root'

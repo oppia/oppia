@@ -116,7 +116,7 @@ angular.module('oppia').factory('SkillEditorStateService', [
         EditableSkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
-            _updateSkill(newBackendSkillObject.skill);
+            _updateSkill(newBackendSkillObject);
             _updateGroupedSkillSummaries(
               newBackendSkillObject.groupedSkillSummaries);
             QuestionsListService.getQuestionSummariesAsync(
