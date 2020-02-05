@@ -24,6 +24,10 @@ describe('Window Dimensions Service', () => {
 
   beforeEach(() => {
     wds = TestBed.get(WindowDimensionsService);
+    // Avoid 'Property innerWidth does not have access type get' error
+    Object.defineProperty(window, 'innerWidth', {
+      get: () => undefined
+    });
   });
 
   describe('getWidth', () => {
