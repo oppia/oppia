@@ -1,5 +1,125 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.8.9 (01 Feb 2020)
+------------------------
+Speed improvements
+* Moved no-script tag to be injected using webpack (#8325)
+* Fix #6732: Remove files from tsconfig.json (#8148)
+
+Lesson analytics
+* Stop indexing the cached last_nonempty_message_text (#8367)
+
+Translations
+* Fixes: 8350 Translation tab button text overflow (#8364)
+
+Release Team
+* Minor automation changes for branch cut (#8222)
+* Fix initial release prep script (#8204)
+* Update release info script for new changelog labels (#8291)
+
+QA Team
+* Milestone 1 (3rd PR) - Increase coverage for learner-answer-details-data.service.ts (#8180)
+* Add sourceMap on tsconfig in order to fix test coverage issues (#8213)
+* Milestone 1 (2nd PR) - Increase coverage for easy tests  (#8164)
+* Add simple e2e test for community dashboard page. (#8162)
+* Milestone 1 (1st PR) - Increase coverage for easy tests (#8136)
+
+Miscellaneous
+* Remove extra file pattern from karma conf (#8323)
+* Fix part of #7427 Add args, raises in exp_domain.py (#8288)
+* Fix part of #7450: Modify private method in collection_services_test (#8287)
+* Report Topic names in addition to Entity id for the abbreviated_name audit job (#8253)
+* Fix part of #7450: Modify test method in InteractionUnitTests (#8201)
+* Fix #7429, #7659: Set model fields as required (#8185)
+* Wipeout 4.2: Implement pre deletion on the backend (#8182)
+* Fix part of #7427: Add args, raises in base.py (#8176)
+* Make SkillEditorTest's private method to be public (#8163)
+* Fix part of #7450: Changed ConfigPropertyRegistryTests from private to public interface (#8158)
+* Fix part of #7450: modify private methods in html_validation_service files  (#8156)
+* Fix part of #7427: Adds args, returns and raises in docstrings of utils.py (#8134)
+* Wipeout 3.5: User ID migration (#8097)
+
+Learner/Creator experience
+* Fix #8384: Adds frontend skill validation (#8436)
+* Fix new structures issues (#8363)
+* Removed QuestionRights and SkillRights models (#8337)
+* Fix #8199: Adds 16:9 aspect ratio cropping for topic thumbnail (#8303)
+* Fix #8192: Added search bar to classroom page (#8270)
+* Fixes #6601 modified checks for enabling and disabling the submit button in the suggestion modal  (#8251)
+* Renames the 'concept' RTE element to 'skillreview' (#8227)
+* Fix #8126: Removed the error message for intermediate fraction expressions (#8149)
+* Fix #8127: Multiple response audio highlight issue fix (#8140)
+* Added a 'link concept card' RTE button (#8122)
+* Introduce message cache to threads (#8091)
+* Fix #8019: Adds abbreviated topic name and thumbnail fields in… (#8067)
+
+Angular Migration
+* Migrate StorySummaryObjectFactory to angular (#8326)
+* Migrate StateTopAnswersStatsBackendApiService to angular (#8280)
+* Migrate ExplorationFeaturesBackendApiService to angular and add tests (#8246)
+* Angular Migration ConceptCardObjectFactory (#8229)
+* Migrate ReadOnlyStoryNodeObjectFactory and StoryPlaythroughObjectFact… (#8220)
+* Angular Migrating PlayerPosition and TopicObjectFactory (#8200)
+* Upgrades CodeReplRulesService to Angular (#8195)
+* Angular Migration: SuggestionThreadObjectFactory and ExtractImageFilenamesFromStateService (#8188)
+* Migrating AudioTranslationService, StateObject, Playertranscript (#8183)
+* Upgrades ExplorationObjectFactory to Angular (#8177)
+* Upgrade PythonProgramTokenizer and CodeReplPredictionService (#8137)
+* Angular 8 Service Migration DebugInfo, TopicSummaryObjectFactory (#8135)
+* Upgrades BrowserCheck and LanguageUtil Service to Angular (#8115)
+
+Community contribution and dashboar
+* Fix #8007: Add one off job to regenerate skill opportunity models  (#8243)
+* Fix part of #7471: Frontend changes for question suggestion integration (#8057)
+
+Data handling
+* Wipeout 4.3: Full deletion process (#8335)
+* Store trained classifier data on file system (#8268)
+
+Bug fixes
+* Fix #7041: Fixes race condition issue on editor page relead (#8321)
+* Adds correct path for the dir in skip_files of app_dev.yaml (#8309)
+* Fixes #8184: Force refresh and prevent submitting new message while one message is being submitted (#8290)
+* Fixes return type of Classroom backed api service to be TopicSummaryO… (#8147)
+* Fix part of #8015: Return ReadOnlySubtopicPageData instead of ReadOnlySubtopicPageDict (#8121)
+
+Developer experience
+* Decrease parallelization (#8333)
+* Remove code climate coverage (#8317)
+* Update yarn lock file (#8316)
+* Fix part of #7450 Added new function to avoid calling a private method from user_query_jobs_one_off_test.py (#8310)
+* Introduce Github Action for lint checks (#8306)
+* Update node packages (#8305)
+* Revert "Halt a protractor suite once the first test fails." (#8304)
+* Reconfigure circleci cache (#8299)
+* Fix #7852: Update skulpt to v1.1.0 and get rid of the requirement to build it locally. (#8298)
+* Update Codeowner file to reflect change in username (#8322)
+* Move fileUploadFeatures and topicAndStoryEditor E2E tests to CircleCI (#8312)
+* Fixes #8289: Adding profile features to travis and fixing the tests (#8294)
+* Removes feconf.py.bak file after updating the feconf.py file while running e2e tests (#8292)
+* Try switching back to ChromeHeadless. (#8286)
+* Use a mock for speechSynthesis to prevent flakiness in Karma tests. (#8283)
+* Halt a protractor suite once the first test fails. (#8279)
+* Remove master branch from Travis. Update CONTRIBUTING.md to match wiki home page. (#8278)
+* Fixes #8265: Resolve comments from 8233 (#8276)
+* Increase browser timeout (#8275)
+* Upgrade node from v10.15.3 to v10.18.0. (#8266)
+* Increase concurrent runs for CircleCI (#8264)
+* Fixes #8260: Adding adminPage e2e test to travis.yml (#8261)
+* fixes #8258: fix .eslintrc file trailing commas and ordering. (#8259)
+* Change chrome headless flags and modify voice test (#8233)
+* Fix #8123 (#8198)
+* Update yarn version (#8187)
+* Lesson analytics temporary ownership handoff to seanlip (#8170)
+* Fixes frontend text issues on develop (#8167)
+* Fix #8118: Ensuring use of 'pip2' or 'pip2.7' during installati… (#8153)
+* Update serialize-javascript and other js dependencies (#8151)
+* Reinstate test whose removal caused backend coverage to drop. (#8186)
+* Fix #8023: Introduce direct coverage integration (#8145)
+* Optimize the backend test runner (#8141)
+* Fix build.py is not working correctly on Windows  (#8139)
+
+
 v2.8.8 (30 Dec 2019)
 ------------------------
 Bug fixes
