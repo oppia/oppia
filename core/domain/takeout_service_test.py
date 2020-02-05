@@ -18,7 +18,6 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
-import inspect
 
 from constants import constants
 from core.domain import exp_domain
@@ -38,8 +37,8 @@ import utils
     suggestion_models, user_models, story_models, question_models,
     config_models) = models.Registry.import_models([
         models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-        models.NAMES.exploration, models.NAMES.feedback,  models.NAMES.skill,
-        models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user, 
+        models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
+        models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
         models.NAMES.story, models.NAMES.question, models.NAMES.config])
 
 
@@ -660,7 +659,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         export policy CONTAINS_USER_DATA, and that all other models have
         export policy NOT_APPLICABLE.
         """
-        all_models = models.Registry.get_all_storage_model_classes() 
+        all_models = models.Registry.get_all_storage_model_classes()
         models_with_export = (takeout_service
                               .get_models_which_should_be_exported())
         unimplemented_models = set()
@@ -681,7 +680,6 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         # TODO(#8523): This number should be reduced to zero. This number
         # should not be changed by developers under any circumstance.
         # Contact @varun-tandon for more information.
-        print([model.__name__ for model in unimplemented_models])
         expected_unimplemented = {
             collection_models.CollectionRightsSnapshotContentModel,
             collection_models.CollectionRightsSnapshotMetadataModel,
