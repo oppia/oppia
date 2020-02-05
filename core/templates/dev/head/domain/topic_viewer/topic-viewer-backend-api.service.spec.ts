@@ -19,10 +19,12 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/ReadOnlyTopicObjectFactory';
 // ^^^ This block is to be removed.
-import { TopicDataObjectFactory } from
-  'domain/topic_viewer/TopicDataObjectFactory';
-
 
 require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 
@@ -34,9 +36,17 @@ describe('Topic viewer backend API service', function() {
   var $httpBackend = null;
   var UndoRedoService = null;
   var sampleDataResultsObjects = null;
-  let topicDataObjectFactory = new TopicDataObjectFactory();
+  let readOnlyTopicObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value(
+      'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
+    $provide.value(
+      'ReadOnlyObjectFactory', new ReadOnlyTopicObjectFactory(
+        new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
+          new SkillSummaryObjectFactory()));
+  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -47,6 +57,7 @@ describe('Topic viewer backend API service', function() {
   beforeEach(angular.mock.inject(function($injector) {
     TopicViewerBackendApiService = $injector.get(
       'TopicViewerBackendApiService');
+    readOnlyTopicObjectFactory = $injector.get('ReadOnlyTopicObjectFactory');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
@@ -80,7 +91,7 @@ describe('Topic viewer backend API service', function() {
       }
     };
 
-    sampleDataResultsObjects = topicDataObjectFactory.createFromBackendDict(
+    sampleDataResultsObjects = readOnlyTopicObjectFactory.createFromBackendDict(
       sampleDataResults);
   }));
 

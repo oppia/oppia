@@ -17,16 +17,15 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
-
-import { TopicDataObjectFactory } from
-  'domain/topic_viewer/TopicDataObjectFactory';
+require('domain/topic_viewer/ReadOnlyTopicObjectFactory');
 
 angular.module('oppia').factory('TopicViewerBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'TOPIC_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, TOPIC_DATA_URL_TEMPLATE) {
-    var topicDataObject = null;
+  '$http', '$q', 'ReadOnlyTopicObjectFactory','UrlInterpolationService',
+  'TOPIC_DATA_URL_TEMPLATE',
+  function($http, $q, ReadOnlyTopicObjectFactory, UrlInterpolationService,
+  TOPIC_DATA_URL_TEMPLATE) {
+    var readOnlyTopic = null;
     var _fetchTopicData = function(topicName, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
         TOPIC_DATA_URL_TEMPLATE, {
@@ -34,10 +33,10 @@ angular.module('oppia').factory('TopicViewerBackendApiService', [
         });
 
       $http.get(topicDataUrl).then(function(response) {
-        topicDataObject = new TopicDataObjectFactory().createFromBackendDict(
+        readOnlyTopic = ReadOnlyTopicObjectFactory.createFromBackendDict(
           angular.copy(response.data));
         if (successCallback) {
-          successCallback(topicDataObject);
+          successCallback(readOnlyTopic);
         }
       }, function(errorResponse) {
         if (errorCallback) {

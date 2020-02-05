@@ -134,6 +134,8 @@ import { PlaythroughIssueObjectFactory } from
 import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/ReadOnlyTopicObjectFactory';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -482,6 +484,10 @@ export class UpgradedServices {
       upgradedServices['SubtopicObjectFactory'],
       upgradedServices['StoryReferenceObjectFactory'],
       upgradedServices['SkillSummaryObjectFactory']);
+    upgradedServices['ReadOnlyTopicObjectFactory'] =
+      new ReadOnlyTopicObjectFactory(
+        upgradedServices['SubtopicObjectFactory'],
+        upgradedServices['SkillSummaryObjectFactory']);
 
     // Group 5: Services depending on groups 1-4.
     upgradedServices['SolutionObjectFactory'] =
