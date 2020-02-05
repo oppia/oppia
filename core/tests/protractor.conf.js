@@ -214,7 +214,7 @@ exports.config = {
 
 
   // How long to wait for a page to load.
-  getPageTimeout: 60000,
+  getPageTimeout: 100000,
 
   // ----- What tests to run -----
   //
