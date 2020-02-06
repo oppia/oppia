@@ -137,7 +137,7 @@ class DummyMailTest(test_utils.GenericTestBase):
             self.assertEqual(len(messages), 0)
 
             # Send an email.
-            email_manager.send_dummy_mail(dummy_reciever_address)
+            email_manager.send_dummy_mail_to_admin()
 
             # Make sure emails are sent.
             messages = self.mail_stub.get_sent_messages(
