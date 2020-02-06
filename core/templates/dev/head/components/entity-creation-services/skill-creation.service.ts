@@ -18,13 +18,16 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require(
+  'core/templates/dev/head/components/' +
+  'entity-creation-services/skill-creation-backend-api.service.ts')
 
 angular.module('oppia').factory('SkillCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
-  'UrlInterpolationService',
+  'SkillCreationBackendService','UrlInterpolationService',
   function(
       $http, $rootScope, $timeout, $window, AlertsService,
-      UrlInterpolationService) {
+      SkillCreationBackendService, UrlInterpolationService) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
     var skillCreationInProgress = false;
@@ -41,6 +44,7 @@ angular.module('oppia').factory('SkillCreationService', [
         skillCreationInProgress = true;
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating skill';
+        SkillCreationBackendService.createSkill()
         $http.post('/skill_editor_handler/create_new', {
           description: description,
           linked_topic_ids: linkedTopicIds,
