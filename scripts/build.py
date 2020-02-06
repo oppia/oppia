@@ -139,7 +139,7 @@ minify third-party libraries and/or generate a build directory.
 """)
 
 _PARSER.add_argument(
-    '--prod_env', action='store_true', default=False, dest='prod_mode')
+    '--prod_env', action='store_true', default=False, dest='prod_env')
 _PARSER.add_argument(
     '--deploy_mode', action='store_true', default=False, dest='deploy_mode')
 _PARSER.add_argument(
@@ -1258,10 +1258,10 @@ def main(args=None):
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
-    if options.minify_third_party_libs_only and not options.prod_mode:
+    if options.minify_third_party_libs_only and not options.prod_env:
         raise Exception(
             'minify_third_party_libs_only should not be set in non-prod mode.')
-    if options.prod_mode:
+    if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         if not options.minify_third_party_libs_only:
             hashes = generate_hashes()
