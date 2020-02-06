@@ -159,7 +159,11 @@ class StorageModelsTest(test_utils.GenericTestBase):
         export policy CONTAINS_USER_DATA, and that all other models have
         export policy NOT_APPLICABLE.
         """
-        all_models = models.Registry.get_all_storage_model_classes()
+        all_models = [
+            clazz
+            for clazz in self._get_model_classes()
+            if not clazz.__name__ in self.BASE_CLASSES
+        ]
         models_with_export = (takeout_service
                               .get_models_which_should_be_exported())
         unimplemented_models = set()
