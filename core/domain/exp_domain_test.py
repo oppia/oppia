@@ -1214,16 +1214,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         })
         init_state.update_interaction_hints(hints_list)
 
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': 'helloworld!',
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            },
-        }
-        solution = state_domain.Solution.from_dict(
-            init_state.interaction.id, solution_dict
+        solution = state_domain.Solution(
+            interaction_id=init_state.interaction.id,
+            answer_is_exclusive=True,
+            correct_answer='helloworld!',
+            explanation=state_domain.SubtitledHtml(
+                content_id='solution',
+                html='<p>hello_world is a string</p>'
+            )
         )
         init_state.update_interaction_solution(solution)
 

@@ -744,22 +744,21 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
         })
         init_state.update_interaction_hints(hints_list)
-        solution_dict = {
-            'answer_is_exclusive': False,
-            'correct_answer': [0, 0],
-            'explanation': {
-                'content_id': 'solution',
-                'html': '<p>hello_world is a string</p>'
-            }
-        }
+
 
         # Object type of answer must match that of correct_answer.
         with self.assertRaises(AssertionError):
-            init_state.interaction.solution = (
-                state_domain.Solution.from_dict(
-                    init_state.interaction.id, solution_dict))
+            init_state.interaction.solution = state_domain.Solution(
+                interaction_id=interaction_id,
+                answer_is_exclusive=False,
+                correct_answer=[0, 0],
+                explanation=state_domain.SubtitledHtml(
+                    content_id='solution',
+                    html='<p>hello_world is a string</p>'
+                )
+            )
 
-        solution = state_domain.Solution(
+        new_solution = state_domain.Solution(
             interaction_id=interaction_id,
             answer_is_exclusive=False,
             correct_answer='hello_world!',
@@ -768,7 +767,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 html='<p>hello_world is a string</p>'
             )
         )
-        init_state.update_interaction_solution(solution)
+
+        init_state.update_interaction_solution(new_solution)
         exploration.validate()
 
     def test_validate_state_solicit_answer_details(self):
