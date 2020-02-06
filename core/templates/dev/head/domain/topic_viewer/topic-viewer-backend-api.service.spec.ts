@@ -13,18 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for TopicViewerBackendApiService.
- */
+* @fileoverview Unit tests for TopicViewerBackendApiService.
+*/
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/ReadOnlyTopicObjectFactory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
-import { ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/ReadOnlyTopicObjectFactory';
+import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+
 
 require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 

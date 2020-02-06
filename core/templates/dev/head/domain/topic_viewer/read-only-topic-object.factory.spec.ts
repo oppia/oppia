@@ -13,18 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ReadOnlyTopicObjectFactory.
-   */
-
+* @fileoverview Tests for ReadOnlyTopicObjectFactory.
+*/
 import { TestBed } from '@angular/core/testing';
 
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/ReadOnlyTopicObjectFactory';
-
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
-
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 
 describe('Topic Data Object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;

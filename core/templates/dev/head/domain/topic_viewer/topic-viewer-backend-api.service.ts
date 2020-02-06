@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to get topic data.
- */
+* @fileoverview Service to get topic data.
+*/
 
-require('domain/utilities/url-interpolation.service.ts');
+require('domain/topic_viewer/ReadOnlyTopicObjectFactory')
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
-require('domain/topic_viewer/ReadOnlyTopicObjectFactory');
+require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('TopicViewerBackendApiService', [
   '$http', '$q', 'ReadOnlyTopicObjectFactory', 'UrlInterpolationService',
-  'TOPIC_DATA_URL_TEMPLATE',
-  function($http, $q, ReadOnlyTopicObjectFactory, UrlInterpolationService,
-      TOPIC_DATA_URL_TEMPLATE) {
+  'TOPIC_DATA_URL_TEMPLATE', function(
+    $http, $q, ReadOnlyTopicObjectFactory, UrlInterpolationService,
+    TOPIC_DATA_URL_TEMPLATE) {
     var readOnlyTopic = null;
     var _fetchTopicData = function(topicName, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(

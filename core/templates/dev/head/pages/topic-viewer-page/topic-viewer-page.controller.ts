@@ -13,20 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the topic viewer.
- */
+* @fileoverview Directive for the topic viewer.
+*/
 
 require('base-components/base-content.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('components/skills-mastery-list/skills-mastery-list.directive.ts');
+require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 require(
   'pages/topic-viewer-page/stories-list/' +
   'topic-viewer-stories-list.directive.ts');
 require('pages/topic-viewer-page/subtopics-list/subtopics-list.directive.ts');
 require('pages/topic-viewer-page/practice-tab/practice-tab.directive.ts');
-require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
 require('services/contextual/url.service.ts');
@@ -65,13 +65,13 @@ angular.module('oppia').directive('topicViewerPage', [
 
             $rootScope.loadingMessage = 'Loading';
             TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
-              function(topicData) {
-                ctrl.topicId = topicData.getTopicId();
+              function(readOnlyTopic) {
+                ctrl.topicId = readOnlyTopic.getTopicId();
                 ctrl.canonicalStoriesList =
-                  topicData.getCanonicalStories();
-                ctrl.degreesOfMastery = topicData.getDegreesOfMastery();
-                ctrl.subtopics = topicData.getSubtopics();
-                ctrl.skillDescriptions = topicData.getSkillDescriptions();
+                  readOnlyTopic.getCanonicalStories();
+                ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
+                ctrl.subtopics = readOnlyTopic.getSubtopics();
+                ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
                 $rootScope.loadingMessage = '';
               },
               function(errorResponse) {

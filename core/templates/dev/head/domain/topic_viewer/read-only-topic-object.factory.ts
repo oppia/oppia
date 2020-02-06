@@ -13,19 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating instances of frontend topic-data domain
- * objects.
- */
+* @fileoverview Factory for creating instances of ReadOnlyTopic from
+* topic data domain objects.
+*/
 
 import { downgradeInjectable } from '@angular/upgrade/static';
-
 import { Injectable } from '@angular/core';
-
-import { Subtopic, SubtopicObjectFactory } from
-  'domain/topic/SubtopicObjectFactory';
 
 import { SkillSummary, SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
+import { Subtopic, SubtopicObjectFactory } from
+  'domain/topic/SubtopicObjectFactory';
 
 export class ReadOnlyTopic {
   _topicName: string;
