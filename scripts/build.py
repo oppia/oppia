@@ -130,7 +130,6 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
 HASH_BLOCK_SIZE = 2**20
 
 APP_DEV_YAML_FILEPATH = 'app_dev.yaml'
-APP_PROD_YAML_FILEPATH = 'app_prod.yaml'
 APP_YAML_FILEPATH = 'app.yaml'
 
 _PARSER = argparse.ArgumentParser(description="""
