@@ -76,7 +76,9 @@ var TopicsAndSkillsDashboardPage = function() {
   var abbreviatedTopicNameField = element(
     by.css('.protractor-test-new-abbreviated-topic-name-field'));
   this.get = function() {
+    browser.waitForAngularEnabled(false);
     browser.get(DASHBOARD_URL);
+    browser.waitForAngularEnabled(true);
     waitFor.pageToFullyLoad();
   };
 
