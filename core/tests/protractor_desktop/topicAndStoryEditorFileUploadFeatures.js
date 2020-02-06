@@ -48,6 +48,9 @@ describe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
     browser.getCurrentUrl().then(function(url) {
       topicId = url.split('/')[4];
+      if (topicId === null) {
+        throw new Error('Topic id is null for url: ' + url);
+      }
     });
   });
 

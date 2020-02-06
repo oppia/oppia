@@ -106,7 +106,9 @@ var TopicEditorPage = function() {
   };
 
   this.get = function(topicId) {
+    browser.waitForAngularEnabled(false);
     browser.get(EDITOR_URL_PREFIX + topicId);
+    browser.waitForAngularEnabled(true);
     return waitFor.pageToFullyLoad();
   };
 
