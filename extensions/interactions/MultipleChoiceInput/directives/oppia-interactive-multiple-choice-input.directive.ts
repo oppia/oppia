@@ -21,7 +21,6 @@
  */
 
 require('domain/utilities/browser-checker.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
@@ -31,17 +30,15 @@ require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMultipleChoiceInput', [
   'BrowserCheckerService', 'HtmlEscaperService',
-  'MultipleChoiceInputRulesService', 'UrlInterpolationService',
+  'MultipleChoiceInputRulesService',
   function(
       BrowserCheckerService, HtmlEscaperService,
-      MultipleChoiceInputRulesService, UrlInterpolationService) {
+      MultipleChoiceInputRulesService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/MultipleChoiceInput/directives/' +
-        'multiple-choice-input-interaction.directive.html'),
+      template: require('./multiple-choice-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'CurrentInteractionService',
