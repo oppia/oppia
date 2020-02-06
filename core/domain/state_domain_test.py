@@ -226,18 +226,18 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }))
         interaction_id = 'TextInput'
         init_state.update_interaction_id(interaction_id)
-        default_outcome_dict = {
-            'dest': 'Introduction',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>The default outcome.</p>'},
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'param_changes': [],
-            'refresher_exploration_id': None
-        }
-
-        init_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            dest='Introduction',
+            feedback=state_domain.SubtitledHtml(
+                content_id='default_outcome',
+                html='<p>The default outcome.</p>',
+            ),
+            param_changes=[],
+            labelled_as_correct=False,
+            refresher_exploration_id=None,
+            missing_prerequisite_skill_id=None,
+        )
+        init_state.update_interaction_default_outcome(default_outcome)
 
         answer_group_dict = {
             'outcome': {
@@ -898,19 +898,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_default_outcome(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        default_outcome_dict = {
-            'dest': 'Introduction',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': ''},
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'param_changes': [],
-            'refresher_exploration_id': None
-        }
-
+        default_outcome = state_domain.Outcome(
+            dest='Introduction',
+            feedback=state_domain.SubtitledHtml(
+                content_id='default_outcome',
+                html='',
+            ),
+            param_changes=[],
+            labelled_as_correct=False,
+            refresher_exploration_id=None,
+            missing_prerequisite_skill_id=None,
+        )
         exploration.init_state.update_interaction_default_outcome(
-            default_outcome_dict)
+            default_outcome
+        )
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'default_outcome',

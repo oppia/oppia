@@ -289,7 +289,7 @@ class AdminHandler(base.BaseHandler):
         state.update_recorded_voiceovers(recorded_voiceovers)
         state.update_written_translations(written_translations)
         solution = state_domain.Solution(
-                'TextInput', False, 'Solution', state_domain.SubtitledHtml(
+            'TextInput', False, 'Solution', state_domain.SubtitledHtml(
                     'solution', '<p>This is a solution.</p>'))
         hints_list = [
             state_domain.Hint(
@@ -307,7 +307,7 @@ class AdminHandler(base.BaseHandler):
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
-                True, [], None, None).to_dict()
+                True, [], None, None)
         )
         question = question_domain.Question(
             question_id, state,
