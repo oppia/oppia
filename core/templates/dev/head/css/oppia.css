@@ -4359,7 +4359,7 @@ div.oppia-issues-learner-action {
   margin-bottom: 2em;
 }
 
-.oppia-issues-hexagon-text {
+.oppia-issues-rectangle-text {
   position: absolute;
   z-index: 1000;
   width: 100%;
@@ -4393,7 +4393,7 @@ div.oppia-issues-learner-action {
 }
 
 /* Values below were experimentally generated using 'http://csshexagon.com' */
-.oppia-hexagon {
+.oppia-rectangle {
   background-color: transparent;
   color: white;
   font-size: 20px;
@@ -4405,8 +4405,8 @@ div.oppia-issues-learner-action {
   width: 200px;
 }
 
-.oppia-hexagon:before,
-.oppia-hexagon:after {
+.oppia-rectangle:before,
+.oppia-rectangle:after {
   background-color: inherit;
   content: "";
   position: absolute;
@@ -4419,11 +4419,11 @@ div.oppia-issues-learner-action {
   left: 27.2893px;
 }
 
-.oppia-hexagon:before {
+.oppia-rectangle:before {
   top: -70.7107px;
 }
 
-.oppia-hexagon:after {
+.oppia-rectangle:after {
   bottom: -70.7107px;
 }
 
