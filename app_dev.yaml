@@ -17,7 +17,11 @@ inbound_services:
 
 default_expiration: "10m"
 handlers:
-# PRODUCTION STATIC
+# PRODUCTION STATIC START
+- url: /third_party/static
+  static_dir: third_party/static
+  secure: always
+  expiration: "90d"
 - url: /favicon.ico
   static_files: assets/favicon.ico
   upload: assets/favicon.ico
@@ -37,16 +41,11 @@ handlers:
   static_dir: build
   secure: always
   expiration: "90d"
-- url: /third_party/static
-  static_dir: third_party/static
-  secure: always
-  expiration: "90d"
-- url: /security.txt
-  static_files: assets/security.txt
-  upload: assets/security.txt
-  secure: always
+# PRODUCTION STATIC END
 
-# DEVELOPMENT STATIC
+# DEVELOPMENT STATIC START
+# Please do not modify the above comment.
+# It is required for correct generation of app.yaml in prod_env.
 - url: /webpack_bundles
   static_dir: webpack_bundles
   secure: always
@@ -56,14 +55,6 @@ handlers:
   static_dir: assets
   secure: always
   application_readable: true
-  expiration: "0"
-# Serve js scripts and css files under core/templates/dev/head.
-# This regex allows us to recursively serve js scripts.
-# "\1" inserts text captured by the capture group in the URL pattern.
-- url: /templates/dev/head/(.*\.(css))$
-  static_files: core/templates/dev/head/\1
-  upload: core/templates/dev/head/(.*\.(css))$
-  secure: always
   expiration: "0"
 - url: /templates/dev/head/(.*\.(js))$
   static_files: local_compiled_js/core/templates/dev/head/\1
@@ -76,10 +67,6 @@ handlers:
   secure: always
   expiration: "0"
   application_readable: true
-- url: /third_party/generated
-  static_dir: third_party/generated
-  secure: always
-  expiration: "0"
 - url: /extensions/interactions/(.*)/static/(.*\.(css|png))
   static_files: extensions/interactions/\1/static/\2
   upload: extensions/interactions/(.*)/static/(.*\.(css|png))
@@ -95,8 +82,35 @@ handlers:
   upload: extensions/(interactions|rich_text_components)/(.*)/directives/(.*\.(html))
   secure: always
   expiration: "0"
+- url: /extensions/visualizations/(.*\.html)
+  static_files: extensions/visualizations/\1
+  upload: extensions/visualizations/(.*\.html)
+  secure: always
+  expiration: "0"
+- url: /extensions/objects/templates/(.*\.html)
+  static_files: extensions/objects/templates/\1
+  upload: extensions/objects/templates/(.*\.html)
+  secure: always
+  expiration: "0"
+# Please do not modify the below comment.
+# It is required for correct generation of app.yaml in prod_env.
+# DEVELOPMENT STATIC END
+
+# COMMON FOR DEV AND PROD
+- url: /third_party/generated
+  static_dir: third_party/generated
+  secure: always
+  expiration: "0"
+# Serve js scripts and css files under core/templates/dev/head.
+# This regex allows us to recursively serve js scripts.
+# "\1" inserts text captured by the capture group in the URL pattern.
+- url: /templates/dev/head/(.*\.(css))$
+  static_files: core/templates/dev/head/\1
+  upload: core/templates/dev/head/(.*\.(css))$
+  secure: always
+  expiration: "0"
 # Serve js scripts for gadgets, interactions, rich_text_components, custom ckeditor plugins
-# and objects under extensions in dev mode. This regex allows us to recursively serve js
+# and objects under extensions. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
 # groups from the url pattern.
 - url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
@@ -107,16 +121,6 @@ handlers:
 - url: /extensions/ckeditor_plugins/(.*\.(js))$
   static_files: extensions/ckeditor_plugins/\1
   upload: extensions/ckeditor_plugins/(.*\.(js))$
-  secure: always
-  expiration: "0"
-- url: /extensions/visualizations/(.*\.html)
-  static_files: extensions/visualizations/\1
-  upload: extensions/visualizations/(.*\.html)
-  secure: always
-  expiration: "0"
-- url: /extensions/objects/templates/(.*\.html)
-  static_files: extensions/objects/templates/\1
-  upload: extensions/objects/templates/(.*\.html)
   secure: always
   expiration: "0"
 
@@ -269,6 +273,7 @@ skip_files:
 - ^(.*/)Spec.js$
 # Typescript files
 - ^core/(.*/)?.*\.ts$
+- ^extensions/(.*/)?.*\.ts$
 # Typescript output log file
 - ^(.*/)tsc_output_log.txt$
 # Other folders to ignore
