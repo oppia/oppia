@@ -371,8 +371,7 @@ def send_job_failure_email(job_id):
 
 
 def send_dummy_mail_to_admin():
-    """Send an email to the specified email address.
-    """
+    """Send an email to the specified email address."""
     email_subject = 'Test Mail'
     email_body = 'This is a test mail from Oppia.'
     system_name_email = '%s <%s>' % (
