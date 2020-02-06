@@ -25,9 +25,10 @@ from core.tests import test_utils
 
 (
     base_models, collection_models, email_models,
-    exploration_models, feedback_models, skill_models, topic_models,
-    suggestion_models, user_models, story_models, question_models,
-    config_models) = models.Registry.import_models([
+    exploration_models, feedback_models, skill_models,
+    topic_models, suggestion_models, user_models,
+    story_models, question_models, config_models
+    ) = models.Registry.import_models([
         models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
         models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
         models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
@@ -176,14 +177,16 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     base_models.EXPORT_POLICY.NOT_APPLICABLE,
                     export_policy
                 )
-        # TODO(#8523): This number should be reduced to zero. This number
-        # should not be changed by developers under any circumstance.
+        # TODO(#8523): This list should not be modified under any circumstance.
+        # The export_data functions for the models in this list will eventually
+        # be implemented, and the TO_BE_IMPLEMENTED value will be removed.
         # Contact @varun-tandon for more information.
         expected_unimplemented = {
             collection_models.CollectionRightsSnapshotContentModel,
             collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionSnapshotContentModel,
             collection_models.CollectionSnapshotMetadataModel,
+            collection_models.CollectionModel,
             skill_models.SkillSnapshotMetadataModel,
             skill_models.SkillSnapshotContentModel,
             topic_models.SubtopicPageSnapshotContentModel,

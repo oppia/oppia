@@ -326,11 +326,11 @@ class CompletedActivitiesModel(base_models.BaseModel):
             dict. A dict with two keys, 'completed_exploration_ids'
             and 'completed_collection_ids'. The corresponding values are
             lists of the IDs of the explorations and collections,
-            respectively, which the given user has completed. If their is no
+            respectively, which the given user has completed. If there is no
             model for the given user_id, the function returns an empty dict.
         """
         user_model = CompletedActivitiesModel.get(user_id, strict=False)
-        if not user_model:
+        if user_model is None:
             return {}
 
         return {
@@ -405,7 +405,7 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             the user_id is invalid, returns None.
         """
         user_model = IncompleteActivitiesModel.get(user_id, strict=False)
-        if not user_model:
+        if user_model is None:
             return {}
 
         return {
@@ -612,7 +612,7 @@ class LearnerPlaylistModel(base_models.BaseModel):
             If the user_id is invalid, returns None instead.
         """
         user_model = LearnerPlaylistModel.get(user_id, strict=False)
-        if not user_model:
+        if user_model is None:
             return {}
 
         return {
@@ -689,7 +689,7 @@ class UserContributionsModel(base_models.BaseModel):
             explorations), or None if the user_id is invalid.
         """
         user_model = UserContributionsModel.get(user_id, strict=False)
-        if not user_model:
+        if user_model is None:
             return {}
 
         return {
@@ -1072,7 +1072,7 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
                 dict format.
         """
         user_model = UserStatsModel.get(user_id, strict=False)
-        if not user_model:
+        if user_model is None:
             return {}
 
         weekly_stats = user_model.weekly_creator_stats_list
@@ -1898,9 +1898,10 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
     @classmethod

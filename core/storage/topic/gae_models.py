@@ -34,9 +34,10 @@ class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
@@ -45,9 +46,10 @@ class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
@@ -295,9 +297,10 @@ class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
@@ -306,9 +309,10 @@ class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
@@ -441,9 +445,10 @@ class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
@@ -452,9 +457,10 @@ class TopicRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 

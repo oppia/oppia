@@ -35,9 +35,10 @@ class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
@@ -46,9 +47,10 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
@@ -93,7 +95,7 @@ class CollectionModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -207,9 +209,10 @@ class CollectionRightsSnapshotMetadataModel(
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
@@ -219,9 +222,10 @@ class CollectionRightsSnapshotContentModel(
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
         return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 

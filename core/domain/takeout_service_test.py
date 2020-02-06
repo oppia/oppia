@@ -33,9 +33,10 @@ import utils
 
 (
     base_models, collection_models, email_models,
-    exploration_models, feedback_models, skill_models, topic_models,
-    suggestion_models, user_models, story_models, question_models,
-    config_models) = models.Registry.import_models([
+    exploration_models, feedback_models, skill_models,
+    topic_models, suggestion_models, user_models,
+    story_models, question_models, config_models
+    ) = models.Registry.import_models([
         models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
         models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
         models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
@@ -250,7 +251,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             manager_ids=[self.USER_ID_1],
             topic_is_published=True
         ).commit(
-            'commiter_id',
+            'committer_id',
             'New topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}])
         topic_models.TopicRightsModel(
@@ -258,7 +259,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             manager_ids=[self.USER_ID_1],
             topic_is_published=True
         ).commit(
-            'commiter_id',
+            'committer_id',
             'New topic rights',
             [{'cmd': topic_domain.CMD_CREATE_NEW}])
 
