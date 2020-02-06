@@ -379,7 +379,7 @@ def send_dummy_mail_to_admin():
         feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
 
     email_services.send_mail(
-        system_name_email,feconf.ADMIN_EMAIL_ADDRESS , email_subject,
+        system_name_email, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
         email_body, email_body.replace('\n', '<br/>'), bcc_admin=False)
 
 
