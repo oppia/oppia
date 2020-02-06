@@ -19,8 +19,8 @@ angular.module('oppia').factory('SkillCreationBackendService', [
   '$http', '$q',
   function(
       $http, $q) {
-    var _createSkill = function(successCallback, errorCallback) {
-      $http.post('/skill_editor_handler/create_new',)
+    var _createSkill = function(successCallback, errorCallback, backendDict ) {
+      $http.post('/skill_editor_handler/create_new', backendDict)
         .then(function(response) {
           if (successCallback) {
             successCallback(response.data);
@@ -33,9 +33,9 @@ angular.module('oppia').factory('SkillCreationBackendService', [
     };
 
     return {
-      createCollection: function() {
+      createSkill: function(backendDict) {
         return $q(function(resolve, reject) {
-          _createSkill(resolve, reject);
+          _createSkill(resolve, reject, backendDict);
         });
       }
     };
