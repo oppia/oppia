@@ -17,6 +17,35 @@ inbound_services:
 
 default_expiration: "10m"
 handlers:
+# PRODUCTION STATIC
+- url: /favicon.ico
+  static_files: assets/favicon.ico
+  upload: assets/favicon.ico
+  secure: always
+- url: /robots.txt
+  static_files: assets/robots.txt
+  upload: assets/robots.txt
+  secure: always
+- url: /sitemap.xml
+  static_files: assets/sitemap.xml
+  upload: assets/sitemap.xml
+  secure: always
+- url: /mapreduce/pipeline/images
+  static_dir: third_party/gae-mapreduce-1.9.22.0/mapreduce/lib/pipeline/ui/images
+  secure: always
+- url: /build
+  static_dir: build
+  secure: always
+  expiration: "90d"
+- url: /third_party/static
+  static_dir: third_party/static
+  secure: always
+  expiration: "90d"
+- url: /security.txt
+  static_files: assets/security.txt
+  upload: assets/security.txt
+  secure: always
+
 # DEVELOPMENT STATIC
 - url: /webpack_bundles
   static_dir: webpack_bundles
@@ -47,10 +76,6 @@ handlers:
   secure: always
   expiration: "0"
   application_readable: true
-- url: /third_party/static
-  static_dir: third_party/static
-  secure: always
-  expiration: "90d"
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always
