@@ -542,7 +542,8 @@ class DeployTests(test_utils.GenericTestBase):
         with self.swap(subprocess, 'Popen', mock_popen):
             deploy.build_scripts()
         self.assertEqual(
-            cmd_tokens, ['python', '-m', 'scripts.build', '--prod_env'])
+            cmd_tokens,
+            ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
 
     def test_build_failure(self):
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)
@@ -557,7 +558,8 @@ class DeployTests(test_utils.GenericTestBase):
         with popen_swap, self.assertRaisesRegexp(Exception, 'Build failed.'):
             deploy.build_scripts()
         self.assertEqual(
-            cmd_tokens, ['python', '-m', 'scripts.build', '--prod_env'])
+            cmd_tokens,
+            ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'])
 
     def test_deploy_application(self):
         check_function_calls = {

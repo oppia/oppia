@@ -224,7 +224,7 @@ def build_scripts():
     # Do a build, while outputting to the terminal.
     python_utils.PRINT('Building and minifying scripts...')
     build_process = subprocess.Popen(
-        ['python', '-m', 'scripts.build', '--prod_env'],
+        ['python', '-m', 'scripts.build', '--prod_env', '--deploy_mode'],
         stdout=subprocess.PIPE)
     while True:
         line = build_process.stdout.readline().strip()
