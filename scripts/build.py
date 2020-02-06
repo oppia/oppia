@@ -147,11 +147,11 @@ _PARSER.add_argument(
     dest='minify_third_party_libs_only')
 
 
-def generate_app_yaml(is_deploy_mode=False):
+def generate_app_yaml(deploy_mode=False):
     """Generate app.yaml from app_dev.yaml.
 
     Args:
-        is_deploy_mode: bool. Whether the script is being called
+        deploy_mode: bool. Whether the script is being called
         from deploy script.
     """
     prod_file_prefix = 'build/'
@@ -167,7 +167,7 @@ def generate_app_yaml(is_deploy_mode=False):
     # both in prod & non-prod mode). This line is not required when app.yaml
     # is generated during deployment. So, we remove this if the build process
     # is being run from the deploy script.
-    if is_deploy_mode:
+    if deploy_mode:
         content = content.replace('version: default', '')
     if os.path.isfile(APP_YAML_FILEPATH):
         os.remove(APP_YAML_FILEPATH)
@@ -1266,7 +1266,7 @@ def main(args=None):
         if not options.minify_third_party_libs_only:
             hashes = generate_hashes()
             build_using_webpack()
-            generate_app_yaml(is_deploy_mode=options.deploy_mode)
+            generate_app_yaml(deploy_mode=options.deploy_mode)
             generate_build_directory(hashes)
 
     save_hashes_to_file(dict())
