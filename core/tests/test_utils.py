@@ -2145,13 +2145,8 @@ class AppEngineTestBase(TestBase):
             default_dest_state_name, is_initial_state=True)
         state.interaction.id = 'TextInput'
         solution = state_domain.Solution(
-            interaction_id=state.interaction.id,
-            answer_is_exclusive=False,
-            correct_answer='Solution',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='<p>This is a solution.</p>'
-            )
+            state.interaction.id, False, 'Solution',
+            state_domain.SubtitledHtml('solution', '<p>This is a solution.</p>')
         )
         hints_list = [{
             'hint_content': {

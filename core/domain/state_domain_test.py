@@ -273,12 +273,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_hints(hints_list)
 
         solution = state_domain.Solution(
-            interaction_id=interaction_id,
-            answer_is_exclusive=False,
-            correct_answer='helloworld!',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='<p>hello_world is a string</p>',
+            interaction_id, False, 'helloworld!',
+            state_domain.SubtitledHtml(
+                'solution', '<p>hello_world is a string</p>'
             )
         )
         init_state.update_interaction_solution(solution)
@@ -686,12 +683,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_hints(hints_list)
 
         solution = state_domain.Solution(
-            interaction_id=init_state.interaction.id,
-            answer_is_exclusive=False,
-            correct_answer='helloworld!',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='<p>hello_world is a string</p>',
+            init_state.interaction.id, False, 'helloworld!',
+            state_domain.SubtitledHtml(
+                'solution', '<p>hello_world is a string</p>'
             )
         )
 
@@ -749,22 +743,16 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         # Object type of answer must match that of correct_answer.
         with self.assertRaises(AssertionError):
             init_state.interaction.solution = state_domain.Solution(
-                interaction_id=interaction_id,
-                answer_is_exclusive=False,
-                correct_answer=[0, 0],
-                explanation=state_domain.SubtitledHtml(
-                    content_id='solution',
-                    html='<p>hello_world is a string</p>'
+                interaction_id, False, [0, 0],
+                state_domain.SubtitledHtml(
+                    'solution', '<p>hello_world is a string</p>'
                 )
             )
 
         new_solution = state_domain.Solution(
-            interaction_id=interaction_id,
-            answer_is_exclusive=False,
-            correct_answer='hello_world!',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='<p>hello_world is a string</p>'
+            interaction_id, False, 'hello_world!',
+            state_domain.SubtitledHtml(
+                'solution', '<p>hello_world is a string</p>'
             )
         )
 
@@ -808,12 +796,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         hints_list = []
         solution = state_domain.Solution(
-            interaction_id=exploration.init_state.interaction.id,
-            answer_is_exclusive=False,
-            correct_answer='hello_world!',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='<p>hello_world is a string</p>'
+            exploration.init_state.interaction.id, False, 'hello_world!',
+            state_domain.SubtitledHtml(
+                'solution', '<p>hello_world is a string</p>'
             )
         )
         hints_list.append({
@@ -827,12 +812,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         solution = state_domain.Solution(
-            interaction_id=exploration.init_state.interaction.id,
-            answer_is_exclusive=1,
-            correct_answer='hello_world!',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='<p>hello_world is a string</p>',
+            exploration.init_state.interaction.id, 1, 'hello_world!',
+            state_domain.SubtitledHtml(
+                'solution', '<p>hello_world is a string</p>'
             )
         )
 
@@ -938,12 +920,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.interaction.hints = hints_list
         solution = state_domain.Solution(
-            interaction_id=exploration.init_state.interaction.id,
-            answer_is_exclusive=True,
-            correct_answer='hello_world!',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='<p>hello_world is a string</p>',
+            exploration.init_state.interaction.id, True, 'hello_world!',
+            state_domain.SubtitledHtml(
+                'solution', '<p>hello_world is a string</p>'
             )
         )
 

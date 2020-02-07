@@ -718,13 +718,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         solution = state_domain.Solution(
-            interaction_id=init_state.interaction.id,
-            answer_is_exclusive=True,
-            correct_answer='hello_world!',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='hello_world is a string'
-            )
+            init_state.interaction.id, True, 'hello_world!',
+            state_domain.SubtitledHtml('solution', 'hello_world is a string')
         )
         init_state.update_interaction_solution(solution)
         self._assert_validation_error(
@@ -1215,12 +1210,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_hints(hints_list)
 
         solution = state_domain.Solution(
-            interaction_id=init_state.interaction.id,
-            answer_is_exclusive=True,
-            correct_answer='helloworld!',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='<p>hello_world is a string</p>'
+            init_state.interaction.id, True, 'helloworld!',
+            state_domain.SubtitledHtml(
+                'solution', '<p>hello_world is a string</p>'
             )
         )
         init_state.update_interaction_solution(solution)
@@ -7593,12 +7585,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state2.update_interaction_hints(hint_list2)
 
         solution = state_domain.Solution(
-            interaction_id=state1.interaction.id,
-            answer_is_exclusive=True,
-            correct_answer='Answer1',
-            explanation=state_domain.SubtitledHtml(
-                content_id='solution',
-                html='<p>This is solution for state1</p>'
+            state1.interaction.id, True, 'Answer1',
+            state_domain.SubtitledHtml(
+                'solution', '<p>This is solution for state1</p>'
             )
         )
         state1.update_interaction_solution(solution)
