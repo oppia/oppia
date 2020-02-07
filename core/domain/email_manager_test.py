@@ -120,7 +120,7 @@ class DummyMailTest(test_utils.GenericTestBase):
     def test_sending_emails(self):
         dummy_system_name = 'DUMMY_SYSTEM_NAME'
         dummy_system_address = 'dummy@system.com'
-        dummy_reciever_address = 'admin@system.com'
+        dummy_receiver_address = 'admin@system.com'
 
         send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         system_name_ctx = self.swap(
@@ -128,12 +128,12 @@ class DummyMailTest(test_utils.GenericTestBase):
         system_email_ctx = self.swap(
             feconf, 'SYSTEM_EMAIL_ADDRESS', dummy_system_address)
         admin_email_ctx = self.swap(
-            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_reciever_address)
+            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_receiver_address)
 
         with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
             # Make sure there are no emails already sent.
             messages = self.mail_stub.get_sent_messages(
-                to=dummy_reciever_address)
+                to=dummy_receiver_address)
             self.assertEqual(len(messages), 0)
 
             # Send an email.
@@ -141,11 +141,11 @@ class DummyMailTest(test_utils.GenericTestBase):
 
             # Make sure emails are sent.
             messages = self.mail_stub.get_sent_messages(
-                to=dummy_reciever_address)
+                to=dummy_receiver_address)
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
-            self.assertEqual(messages[0].to, dummy_reciever_address)
+            self.assertEqual(messages[0].to, dummy_receiver_address)
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
             self.assertIn(
