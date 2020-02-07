@@ -1048,19 +1048,24 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         result_collections = search_services.search_collections('Welcome', 2)[0]
         self.assertEqual(result_collections, [])
 
+
 class SendDummyMailTest(test_utils.GenericTestBase):
-    """"Tests for sending test mails to admin"""
+    """"Tests for sending test mails to admin."""
 
     def setUp(self):
         super(SendDummyMailTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-    
+
     def test_send_dummy_mail(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         generated_response = self.get_json(
             '/sendDummyMailToAdminHandler'
         )
         if feconf.CAN_SEND_EMAILS:
-            self.assertEqual(generated_response['msg'],'Success! Mail sent to admin.')
+            self.assertEqual(
+                generated_response['msg'],
+                'Success! Mail sent to admin.')
         else:
-            self.assertEqual(generated_response['msg'],'Sorry! This app cannot send Mail.')
+            self.assertEqual(
+                generated_response['msg'],
+                'Sorry! This app cannot send Mail.')
