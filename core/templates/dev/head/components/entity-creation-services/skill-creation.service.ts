@@ -24,7 +24,7 @@ angular.module('oppia').factory('SkillCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
   'SkillCreationBackendService','UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $window, AlertsService,
+      $rootScope, $timeout, $window, AlertsService,
       SkillCreationBackendService, UrlInterpolationService) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
@@ -41,14 +41,14 @@ angular.module('oppia').factory('SkillCreationService', [
         }
         skillCreationInProgress = true;
         AlertsService.clearWarnings();
-        let backendDic = {
+        let backendDict = {
           description: description,
           linked_topic_ids: linkedTopicIds,
           explanation_dict: explanation,
           rubrics: rubrics
         };
         $rootScope.loadingMessage = 'Creating skill';
-        SkillCreationBackendService.createSkill(backendDic)
+        SkillCreationBackendService.createSkill(backendDict)
         .then(function(response) {
           $timeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(

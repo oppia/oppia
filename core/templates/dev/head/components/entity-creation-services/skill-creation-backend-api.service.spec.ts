@@ -69,9 +69,9 @@ fdescribe('Skill Creation backend service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
+      $httpBackend.expectPOST('/skill_editor_handler/create_new', skillCreationBackendDict).respond(
         SUCCESS_STATUS_CODE, {skillId: SAMPLE_SKILL_ID});
-        SkillCreationBackendService.createSkill(skillCreationBackendDict).then(
+        SkillCreationBackendService.createSkill('test_des_1','test_id_11','explaination',rubricDict).then(
         successHandler, failHandler);
 
       $httpBackend.flush();
@@ -87,9 +87,9 @@ fdescribe('Skill Creation backend service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
+      $httpBackend.expectPOST('/skill_editor_handler/create_new',skillCreationBackendDict).respond(
         ERROR_STATUS_CODE);
-        SkillCreationBackendService.createSkill(skillCreationBackendDict).then(
+        SkillCreationBackendService.createSkill('test_des_1','test_id_11','explaination',rubricDict).then(
         successHandler, failHandler);
 
       $httpBackend.flush();

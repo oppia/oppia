@@ -15,27 +15,36 @@
 /**
  * @fileoverview Service for posting the skills
  */
+// require('')
 angular.module('oppia').factory('SkillCreationBackendService', [
   '$http', '$q',
   function(
       $http, $q) {
-    var _createSkill = function(successCallback, errorCallback, backendDict ) {
+    var _createSkill = function(successCallback, errorCallback,
+      description, rubrics, explanation, linkedTopicIds) {
+      let backendDict = {
+        description: description,
+        linked_topic_ids: linkedTopicIds,
+        explanation_dict: explanation,
+        rubrics: rubrics
+      };
       $http.post('/skill_editor_handler/create_new', backendDict)
         .then(function(response) {
           if (successCallback) {
-            successCallback(response.data);
+            successCallback(response.data.skillId);
           }
-        }, function() {
+        }, function(errorResponse) {
           if (errorCallback) {
-            errorCallback();
+            errorCallback(errorResponse.data);
           }
         });
     };
 
     return {
-      createSkill: function(backendDict) {
+      createSkill: function(description, rubrics, explanation, linkedTopicIds) {
         return $q(function(resolve, reject) {
-          _createSkill(resolve, reject, backendDict);
+          _createSkill(resolve, reject, description,
+            rubrics, explanation, linkedTopicIds);
         });
       }
     };
