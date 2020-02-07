@@ -32,10 +32,10 @@ require('services/debouncer.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
-  '$timeout', 'MathExpressionInputRulesService',
+  '$timeout', '$translate', 'MathExpressionInputRulesService',
   'UrlInterpolationService',
   function(
-      $timeout, MathExpressionInputRulesService,
+      $timeout, $translate, MathExpressionInputRulesService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -148,8 +148,18 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             });
           };
 
+          ctrl.getLatexErrorText = function() {
+            if (guppyInstance.latex().includes('=')) {
+              return $translate.instant('I18N_MATH_EXPRESSION_ERROR');
+            }
+            return '';
+          };
+
           ctrl.isCurrentAnswerValid = function() {
             var latexAnswer = guppyInstance.latex();
+            if (latexAnswer.includes('=')) {
+              return false;
+            }
             try {
               MathExpression.fromLatex(latexAnswer);
             } catch (e) {

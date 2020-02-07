@@ -5,3 +5,7 @@
         ng-click="$ctrl.startMobileMathInput()">
 </button>
 <textarea ng-if="$ctrl.mobileOverlayIsShown" id="fakeInputForMathExpression" class="oppia-mathexpression-input-hidden-text"></textarea>
+
+<div class="oppia-form-error" style="position: absolute;">
+    <[$ctrl.getLatexErrorText()]>
+</div>
