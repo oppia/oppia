@@ -641,8 +641,14 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
 
     @acl_decorators.can_access_admin_page
     def get(self):
-        response = {
-            'msg': 'Success! Mail sent to admin.',
-        }
-        email_manager.send_dummy_mail_to_admin()
-        self.render_json(response)
+        if feconf.CAN_SEND_EMAILS:
+            response = {
+                'msg': 'Success! Mail sent to admin.',
+            }
+            email_manager.send_dummy_mail_to_admin()
+            self.render_json(response)
+        else:
+            response = {
+                'msg': 'Sorry! This app cannot send Mail.',
+            }
+            self.render_json(response)
