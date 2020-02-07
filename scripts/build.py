@@ -149,6 +149,7 @@ _PARSER.add_argument(
 
 def generate_app_yaml(deploy_mode=False):
     """Generate app.yaml from app_dev.yaml.
+
     Args:
         deploy_mode: bool. Whether the script is being called
         from deploy script.
