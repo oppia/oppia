@@ -34,9 +34,9 @@
       <div class="oppia-opportunities-tabs-explanation" data-tab-name="<[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]>">
         <[$ctrl.tabsDetails[$ctrl.activeTabName].description]>
       </div>
-      <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'" class="oppia-opportunities-search-container">
+      <div ng-if="$ctrl.activeTabName === 'submitQuestionTab' && $ctrl.showSearchBar" class="oppia-opportunities-search-container">
         <i class="fas fa-search oppia-opportunities-search-icon"></i>
-        <input type="text" class="form-control oppia-opportunities-search protractor-test-skill-name-input" placeholder="Search skills" ng-model="$ctrl.skillFilterText">
+        <input type="text" class="form-control oppia-opportunities-search protractor-test-skill-name-input" placeholder="Search skills" ng-model="$ctrl.filterText">
       </div>
       <div class="oppia-dashboard-language-container" ng-if="$ctrl.showLanguageSelector()">
         <span class="oppia-dashboard-language-container-label"><[$ctrl.tabsDetails[$ctrl.activeTabName].tabName]> in:</span>
@@ -52,7 +52,7 @@
     <contributions-and-review></contributions-and-review>
   </div>
   <div ng-if="$ctrl.activeTabName === 'submitQuestionTab'">
-    <question-opportunities skill-filter-text="<[$ctrl.filterText]>"></question-opportunities>
+    <question-opportunities filter-text="<[$ctrl.filterText]>"></question-opportunities>
   </div>
   <div ng-if="$ctrl.activeTabName === 'translateTextTab'">
     <translation-opportunities></translation-opportunities>
