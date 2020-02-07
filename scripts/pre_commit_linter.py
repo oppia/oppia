@@ -40,6 +40,7 @@ CUSTOMIZATION OPTIONS
 
 Note that the root folder MUST be named 'oppia'.
  """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -100,7 +101,7 @@ EXCLUDED_PATHS = (
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
     'extensions/interactions/LogicProof/static/js/generatedParser.ts',
-    'core/templates/dev/head/expressions/expression-parser.service.js')
+    'core/templates/dev/head/expressions/parser.js')
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
@@ -576,6 +577,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-3.13.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.7'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
     os.path.join('third_party', 'bleach-3.1.0'),
