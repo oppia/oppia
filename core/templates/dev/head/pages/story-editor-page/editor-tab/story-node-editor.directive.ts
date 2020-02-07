@@ -80,18 +80,10 @@ angular.module('oppia').directive('storyNodeEditor', [
             }
           };
           var _isExpIdValid = function(expId) {
-            // If user has not yet entered an exploration id
-            if (expId === null) {
-              return true;
-            }
-            ExplorationSummaryBackendApiService.loadPublicExplorationSummaries(
-              [expId]).then(function(summaries) {
-              if (summaries.length !== 1) {
-                return false;
-              } else {
-                return true;
-              }
-            });
+            return ExplorationSummaryBackendApiService.
+              loadPublicExplorationSummaries([expId]).then(function(summaries) {
+                return summaries.length === 1;
+              });
           };
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
@@ -112,7 +104,13 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.editableOutline = $scope.getOutline();
             $scope.explorationId = $scope.getExplorationId();
             $scope.currentExplorationId = $scope.explorationId;
-            $scope.expIdIsValid = _isExpIdValid($scope.currentExplorationId);
+            $scope.expIdIsValid = true;
+            if ($scope.currentExplorationId) {
+              _isExpIdValid($scope.currentExplorationId).then(
+                function(response) {
+                  $scope.expIdIsValid = response;
+                });
+            }
             $scope.nodeTitleEditorIsShown = false;
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
@@ -149,10 +147,14 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.updateExplorationId = function(explorationId) {
-            StoryUpdateService.setStoryNodeExplorationId(
-              $scope.story, $scope.getId(), explorationId);
-            $scope.currentExplorationId = explorationId;
-            $scope.expIdIsValid = _isExpIdValid($scope.currentExplorationId);
+            _isExpIdValid(explorationId).then(function(response) {
+              $scope.expIdIsValid = response;
+              if ($scope.expIdIsValid) {
+                StoryUpdateService.setStoryNodeExplorationId(
+                  $scope.story, $scope.getId(), explorationId);
+                $scope.currentExplorationId = explorationId;
+              }
+            });
           };
 
           $scope.removePrerequisiteSkillId = function(skillId) {
