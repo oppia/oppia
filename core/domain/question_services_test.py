@@ -792,4 +792,4 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                                          'filename': 'test.mp3',
                                          'file_size_bytes': 100,
                                          'needs_update': False,
-                                         'duration_secs': 0.0}}}})
+                                         'duration_secs': 0.1}}}})
