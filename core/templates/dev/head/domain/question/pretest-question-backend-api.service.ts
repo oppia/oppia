@@ -16,49 +16,65 @@
  * @fileoverview Service to receive questions as pretests for an exploration.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-require('domain/question/question-domain.constants.ajs.ts');
+import cloneDeep from 'lodash/cloneDeep';
 
-angular.module('oppia').factory('PretestQuestionBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'PRETEST_QUESTIONS_URL_TEMPLATE',
-  function(
-      $http, $q, UrlInterpolationService, PRETEST_QUESTIONS_URL_TEMPLATE) {
-    var _cursor = '';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { QuestionDomainConstants } from
+  'domain/question/question-domain.constants';
 
-    var _fetchPretestQuestions = function(
-        explorationId, storyId, successCallback, errorCallback) {
-      if (!storyId || !storyId.match(/^[a-zA-Z0-9]+$/i)) {
-        successCallback([]);
-        return;
-      }
-      var pretestDataUrl = UrlInterpolationService.interpolateUrl(
-        PRETEST_QUESTIONS_URL_TEMPLATE, {
-          exploration_id: explorationId,
-          story_id: storyId,
-          cursor: _cursor
-        });
+@Injectable({
+  providedIn: 'root'
+})
+export class PretestQuestionBackendApiService {
+  _cursor: string = '';
 
-      $http.get(pretestDataUrl).then(function(response) {
-        var pretestQuestionDicts =
-          angular.copy(response.data.pretest_question_dicts);
-        _cursor = response.data.next_start_cursor;
-        if (successCallback) {
-          successCallback(pretestQuestionDicts);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient
+  ) {}
+
+  _fetchPretestQuestions(explorationId: string, storyId: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    if (!storyId || !storyId.match(/^[a-zA-Z0-9]+$/i)) {
+      successCallback([]);
+      return;
+    }
+
+    var pretestDataUrl = this.urlInterpolationService.interpolateUrl(
+      QuestionDomainConstants.PRETEST_QUESTIONS_URL_TEMPLATE, {
+        exploration_id: explorationId,
+        story_id: storyId,
+        cursor: this._cursor
       });
-    };
 
-    return {
-      fetchPretestQuestions: function(explorationId, storyId) {
-        return $q(function(resolve, reject) {
-          _fetchPretestQuestions(explorationId, storyId, resolve, reject);
-        });
+    this.http.get(pretestDataUrl).toPromise().then((data: any) => {
+      var pretestQuestionDicts = (
+        cloneDeep(data.pretest_question_dicts));
+      this._cursor = data.next_start_cursor;
+      if (successCallback) {
+        successCallback(pretestQuestionDicts);
       }
-    };
+    }, (error) => {
+      if (errorCallback) {
+        errorCallback(error);
+      }
+    });
   }
-]);
+
+  fetchPretestQuestions(explorationId: string,
+      storyId: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchPretestQuestions(explorationId, storyId, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'PretestQuestionBackendApiService',
+  downgradeInjectable(PretestQuestionBackendApiService));
