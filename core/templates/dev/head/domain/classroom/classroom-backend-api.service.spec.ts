@@ -16,60 +16,47 @@
  * @fileoverview Unit tests for ClassroomBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { ClassroomBackendApiService } from
+  'domain/classroom/classroom-backend-api.service';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-require('domain/classroom/classroom-backend-api.service.ts');
 
 describe('Classroom backend API service', function() {
-  var ClassroomBackendApiService = null;
-  var responseDictionaries = null;
-  var sampleDataResultsObjects = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
-  var UndoRedoService = null;
-  var topicSummaryObjectFactory = null;
+  let classroomBackendApiService:
+    ClassroomBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let topicSummaryObjectFactory:
+    TopicSummaryObjectFactory = null;
+  let responseDictionaries = {
+    topic_summary_dicts: [{
+      name: 'Topic name',
+      description: 'Topic description',
+      canonical_story_count: 4,
+      subtopic_count: 5,
+      total_skill_count: 20,
+      uncategorized_skill_count: 5
+    }, {
+      name: 'Topic name 2',
+      description: 'Topic description 2',
+      canonical_story_count: 3,
+      subtopic_count: 2,
+      total_skill_count: 10,
+      uncategorized_skill_count: 3
+    }]
+  };
+  let sampleDataResultsObjects = null;
 
-  beforeEach(angular.mock.module('oppia'));
-
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    ClassroomBackendApiService = $injector.get(
-      'ClassroomBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
-    topicSummaryObjectFactory = $injector.get('TopicSummaryObjectFactory');
-
-    // Sample topic object returnable from the backend
-    responseDictionaries = {
-      topic_summary_dicts: [{
-        name: 'Topic name',
-        description: 'Topic description',
-        canonical_story_count: 4,
-        subtopic_count: 5,
-        total_skill_count: 20,
-        uncategorized_skill_count: 5
-      }, {
-        name: 'Topic name 2',
-        description: 'Topic description 2',
-        canonical_story_count: 3,
-        subtopic_count: 2,
-        total_skill_count: 10,
-        uncategorized_skill_count: 3
-      }]
-    };
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
+    classroomBackendApiService = TestBed.get(ClassroomBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+    topicSummaryObjectFactory = TestBed.get(TopicSummaryObjectFactory);
 
     // Sample topic object returnable from the backend
     sampleDataResultsObjects = {
@@ -80,27 +67,30 @@ describe('Classroom backend API service', function() {
           responseDictionaries.topic_summary_dicts[1])
       ]
     };
-  }));
+  });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch classroom data from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/classroom_data_handler/0').respond(
-        responseDictionaries);
-      ClassroomBackendApiService.fetchClassroomData('0').then(
+      classroomBackendApiService.fetchClassroomData('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+
+      let req = httpTestingController.expectOne(
+        '/classroom_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(responseDictionaries);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
         sampleDataResultsObjects.topic_summary_objects);
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 });
