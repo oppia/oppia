@@ -147,9 +147,9 @@ angular.module('oppia').directive('adminMiscTab', [
 
         ctrl.sendDummyMailToAdmin = function() {
           $http.get(SEND_DUMMY_MAIL_HANDLER_URL).then(function(response) {
-            ctrl.setStatusMessage(response.data.msg)
+            ctrl.setStatusMessage(response.data.msg);
           }, function(errorResponse) {
-            ctrl.setStatusMessage('Server error: ' + errorResponse.data.error)
+            ctrl.setStatusMessage('Server error: ' + errorResponse.data.error);
           });
         };
 
