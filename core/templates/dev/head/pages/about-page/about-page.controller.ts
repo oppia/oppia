@@ -95,12 +95,12 @@ angular.module('oppia').directive('aboutPage', [
               .slice(0, listOfNamesToThank.length - 1).join(', ') +
               ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
             ctrl.aboutPageMascotImgUrl = UrlInterpolationService
-              .getStaticImageUrl('/general/about_page_mascot.png');
+              .getStaticImageUrl('/general/about_page_mascot.webp');
             ctrl.listOfNames = listOfNamesToThank
               .slice(0, listOfNamesToThank.length - 1).join(', ') +
               ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
             ctrl.aboutPageMascotImgUrl = UrlInterpolationService
-              .getStaticImageUrl('/general/about_page_mascot.png');
+              .getStaticImageUrl('/general/about_page_mascot.webp');
             window.onhashchange = function() {
               var hashChange = window.location.hash.slice(1);
               if (hashChange === ctrl.TAB_ID_FOUNDATION || (

@@ -215,7 +215,7 @@ angular.module('oppia').directive('tutorCard', [
                 '/avatar/oppia_avatar_100px.svg'));
 
             $scope.profilePicture = UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_blue_72px.png');
+              '/avatar/user_blue_72px.webp');
 
             if (!_editorPreviewMode) {
               UserService.getProfileImageDataUrlAsync()

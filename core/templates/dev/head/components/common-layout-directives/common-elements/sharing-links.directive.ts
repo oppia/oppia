@@ -85,7 +85,7 @@ angular.module('oppia').directive('sharingLinks', [
                 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR));
 
             ctrl.classroomUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/classroom.png');
+              '/general/classroom.webp');
           };
         }
       ]

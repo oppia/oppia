@@ -578,7 +578,7 @@ angular.module('oppia').directive('stateResponses', [
             $scope.stateSolicitAnswerDetailsService = (
               StateSolicitAnswerDetailsService);
             $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.png');
+              '/general/drag_dots.webp');
             $scope.$on('initializeAnswerGroups', function(evt, data) {
               ResponsesService.init(data);
               $scope.answerGroups = ResponsesService.getAnswerGroups();

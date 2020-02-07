@@ -263,7 +263,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_email = 'user@example.com'
         expected_gravatar_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
-            'gravatar_example.png')
+            'gravatar_example.webp')
         with python_utils.open_file(
             expected_gravatar_filepath, 'rb', encoding=None) as f:
             gravatar = f.read()
@@ -322,7 +322,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_default_identicon_data_url(self):
         identicon_filepath = os.path.join(
             self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
-            'user_blue_72px.png')
+            'user_blue_72px.webp')
         identicon_data_url = utils.convert_png_to_data_url(identicon_filepath)
         self.assertEqual(
             identicon_data_url, user_services.DEFAULT_IDENTICON_DATA_URL)

@@ -181,7 +181,7 @@ angular.module('oppia').directive('questionPlayer', [
             var iconHtml = '';
             if (actionButtonType === 'BOOST_SCORE') {
               iconHtml = '<img class="action-button-icon" src="' +
-              getStaticImageUrl('/icons/rocket@2x.png') + '"/>';
+              getStaticImageUrl('/icons/rocket@2x.webp') + '"/>';
             } else if (actionButtonType === 'RETRY_SESSION') {
               iconHtml = '<i class="material-icons md-36 ' +
               'action-button-icon">&#xE5D5</i>';

@@ -203,7 +203,7 @@ describe('User Service', function() {
 
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.png'));
+        '/avatar/user_blue_72px.webp'));
     });
     $httpBackend.flush();
   });
@@ -225,7 +225,7 @@ describe('User Service', function() {
         200, sampleUserInfoBackendObject);
       UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
         expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
-          '/avatar/user_blue_72px.png'));
+          '/avatar/user_blue_72px.webp'));
       });
       $httpBackend.flush();
     });

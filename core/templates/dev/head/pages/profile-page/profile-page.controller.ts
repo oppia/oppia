@@ -48,7 +48,7 @@ angular.module('oppia').directive('profilePage', [
           var profileDataUrl = (
             '/profilehandler/data/' + UrlService.getUsernameFromProfileUrl());
           var DEFAULT_PROFILE_PICTURE_URL = UrlInterpolationService
-            .getStaticImageUrl('/general/no_profile_picture.png');
+            .getStaticImageUrl('/general/no_profile_picture.webp');
 
           ctrl.getLocaleDateString = function(millisSinceEpoch) {
             return DateTimeFormatService.getLocaleDateString(millisSinceEpoch);

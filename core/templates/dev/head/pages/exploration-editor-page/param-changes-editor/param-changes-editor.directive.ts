@@ -261,7 +261,7 @@ angular.module('oppia').directive('paramChangesEditor', [
               }
             };
             $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/general/drag_dots.png');
+              '/general/drag_dots.webp');
           };
         }
       ]

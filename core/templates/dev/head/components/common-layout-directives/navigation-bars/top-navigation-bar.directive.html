@@ -8,12 +8,20 @@
 
   <a class="oppia-navbar-brand-name oppia-transition-200 protractor-test-oppia-main-logo d-none d-sm-block" href="/"
      focus-on="<[::$ctrl.LABEL_FOR_CLEARING_FOCUS]>">
-    <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo"
-         ng-class="$ctrl.windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'" alt="Oppia Home">
+     <picture>
+      <source type="image/webp" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_white.webp')]>">
+      <source type="image/jpeg" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_white.png')]>">
+      <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_white.png')]>" class="oppia-logo"
+           ng-class="$ctrl.windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'" alt="Oppia Home">
+    </picture>
   </a>
   <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
   <a style="display: none;">
-    <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image" alt="Oppia Home">
+    <picture>
+      <source type="image/webp" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_mint.webp')]>">
+      <source type="image/jpeg" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>">
+      <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image" alt="Oppia Home">
+    </picture>
   </a>
 </div>
 

@@ -99,7 +99,7 @@ angular.module('oppia').directive('adminNavbar', [
           });
 
           ctrl.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/logo/288x128_logo_white.png');
+            '/logo/288x128_logo_white.webp');
 
           ctrl.logoutUrl = LOGOUT_URL;
 

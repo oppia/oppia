@@ -60,7 +60,7 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.editableName = $scope.topic.getName();
             $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
-            var placeholderImageUrl = '/icons/story-image-icon.png';
+            var placeholderImageUrl = '/icons/story-image-icon.webp';
             if (!$scope.topic.getThumbnailFilename()) {
               $scope.editableThumbnailDataUrl = (
                 UrlInterpolationService.getStaticImageUrl(

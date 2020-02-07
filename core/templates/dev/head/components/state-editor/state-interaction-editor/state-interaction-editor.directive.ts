@@ -444,7 +444,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             $scope.customizationModalReopened = false;
 
             $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_blue_72px.png');
+              '/avatar/user_blue_72px.webp');
             $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/avatar/user_black_72px.png');
             $scope.$on('stateEditorInitialized', function(evt, stateData) {

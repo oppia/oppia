@@ -37,7 +37,7 @@ angular.module('oppia').directive('profileLinkImage', [
           var ctrl = this;
           var DEFAULT_PROFILE_IMAGE_PATH = (
             UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_blue_72px.png'));
+              '/avatar/user_blue_72px.webp'));
           ctrl.isUsernameLinkable = function(username) {
             return SYSTEM_USER_IDS.indexOf(username) === -1;
           };
