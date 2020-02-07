@@ -69,16 +69,6 @@ angular.module('oppia').directive('questionOpportunities', [
             MisconceptionObjectFactory, QuestionObjectFactory,
             QuestionUndoRedoService, SkillObjectFactory) {
           var ctrl = this;
-
-          $scope.$watch('filterText', function(newText) {
-            if (newText) {
-              ctrl.opportunities = [];
-              ctrl.opportunitiesAreLoading = true;
-              ContributionOpportunitiesService.getSkillOpportunities(
-                updateWithNewOpportunities, true);
-            }
-          });
-
           var getOpportunity = function(skillId) {
             for (var index in ctrl.opportunities) {
               if (ctrl.opportunities[index].id === skillId) {
@@ -113,7 +103,7 @@ angular.module('oppia').directive('questionOpportunities', [
 
           ctrl.onLoadMoreOpportunities = function() {
             if (!ctrl.opportunitiesAreLoading &&
-                ctrl.moreOpportunitiesAvailable && !$scope.filterText) {
+                ctrl.moreOpportunitiesAvailable) {
               ctrl.opportunitiesAreLoading = true;
               ContributionOpportunitiesService.getMoreSkillOpportunities(
                 updateWithNewOpportunities);
