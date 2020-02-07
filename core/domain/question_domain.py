@@ -232,11 +232,15 @@ class Question(python_utils.OBJECT):
                       ['voiceovers_mapping'])
         for content_id in voiceovers.keys():
             for language_code in voiceovers[content_id].keys():
-                # Initialize duration_secs with 0.0 for every voiceover
+                # Initialize duration_secs with 0.1 for every voiceover
                 # recording under Content, Feedback, Hints, and Solutions.
                 # This is necessary to keep the state functional
                 # when migrating to v31.
-                voiceovers[content_id][language_code]['duration_secs'] = 0.0
+                # Using 0.1 as a temporary value because js uses 0.0 as 0.
+                # The reason is probably 0 == 0.0 and doesn't need to be
+                # represented as 0.0. Fun fact some processor(s) represent
+                # 0 using the same reasoning for both floats and ints.
+                voiceovers[content_id][language_code]['duration_secs'] = 0.1
         return question_state_dict
 
 
