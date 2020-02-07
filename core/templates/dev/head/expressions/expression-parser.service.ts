@@ -13,24 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for ConstructTranslationIdsService.
+ * @fileoverview Service used to parse expressions. See
+ * oppia/core/templates/dev/head/expressions/README.txt for further details.
  */
 
-import { TestBed } from '@angular/core/testing';
-import { ConstructTranslationIdsService } from
-  'services/construct-translation-ids.service';
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-describe('Construct Translation Ids Service', () => {
-  let ctis;
+import parser from 'expressions/parser';
 
-  beforeEach(() => {
-    ctis = TestBed.get(ConstructTranslationIdsService);
-  });
+@Injectable({
+  providedIn: 'root'
+})
+export class ExpressionParserService {
+  parse = parser.parse;
+  SyntaxError = parser.SyntaxError;
+}
 
-  it('should get library id', () => {
-    expect(ctis.getLibraryId('categories', 'Algorithms'))
-      .toBe('I18N_LIBRARY_CATEGORIES_ALGORITHMS');
-
-    expect(ctis.getLibraryId('', '')).toBe('I18N_LIBRARY__');
-  });
-});
+angular.module('oppia').factory(
+  'ServiceName', downgradeInjectable(ExpressionParserService)
+);
