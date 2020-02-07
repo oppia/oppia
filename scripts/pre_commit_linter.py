@@ -101,7 +101,7 @@ EXCLUDED_PATHS = (
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
     'extensions/interactions/LogicProof/static/js/generatedParser.ts',
-    'core/templates/dev/head/expressions/expression-parser.service.js')
+    'core/templates/dev/head/expressions/parser.js')
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
