@@ -1478,15 +1478,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         state3.update_interaction_customization_args(customization_args_dict3)
 
         default_outcome1 = state_domain.Outcome(
-            dest='state2',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html='<p>Default outcome for state1</p>',
-            ),
-            param_changes=[],
-            labelled_as_correct=False,
-            refresher_exploration_id=None,
-            missing_prerequisite_skill_id=None,
+            'state2', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], None, None
         )
         state1.update_interaction_default_outcome(default_outcome1)
 

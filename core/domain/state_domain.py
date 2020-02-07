@@ -1727,14 +1727,16 @@ class State(python_utils.OBJECT):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome: Outcome object representing the Outcome domain
+            default_outcome: Outcome object representing the Outcome.
         """
         old_content_id_list = []
         new_content_id_list = []
         if self.interaction.default_outcome:
             old_content_id_list.append(
                 self.interaction.default_outcome.feedback.content_id)
-            self.interaction.default_outcome = default_outcome
+
+        if default_outcome:
+            self.interaction.default_outcome = copy.copy(default_outcome)
             new_content_id_list.append(
                 self.interaction.default_outcome.feedback.content_id)
         else:
@@ -1789,26 +1791,26 @@ class State(python_utils.OBJECT):
             old_content_id_list, new_content_id_list)
 
     def update_interaction_solution(self, solution):
-      """Update the solution of interaction.
+        """Update the solution of interaction.
 
-      Args:
+        Args:
           solution: object or None. The Solution object.
-      """
-      old_content_id_list = []
-      new_content_id_list = []
-      if self.interaction.solution:
-        old_content_id_list.append(
-            self.interaction.solution.explanation.content_id)
+        """
+        old_content_id_list = []
+        new_content_id_list = []
+        if self.interaction.solution:
+            old_content_id_list.append(
+                self.interaction.solution.explanation.content_id)
 
-      if solution is not None:
-        self.interaction.solution = solution
-        new_content_id_list.append(
-            self.interaction.solution.explanation.content_id)
-      else:
-        self.interaction.solution = None
+        if solution is not None:
+            self.interaction.solution = solution
+            new_content_id_list.append(
+                self.interaction.solution.explanation.content_id)
+        else:
+            self.interaction.solution = None
 
-      self._update_content_ids_in_assets(
-          old_content_id_list, new_content_id_list)
+        self._update_content_ids_in_assets(
+            old_content_id_list, new_content_id_list)
 
     def update_recorded_voiceovers(self, recorded_voiceovers):
         """Update the recorded_voiceovers of a state.

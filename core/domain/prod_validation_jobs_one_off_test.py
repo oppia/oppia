@@ -11605,15 +11605,9 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
         end_state.update_interaction_id('EndExploration')
 
         default_outcome = state_domain.Outcome(
-            dest='End',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html='<p>Introduction</p>',
-            ),
-            param_changes=[],
-            labelled_as_correct=False,
-            refresher_exploration_id=None,
-            missing_prerequisite_skill_id=None,
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
         )
         intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
@@ -11797,15 +11791,9 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             end_state.update_interaction_id('EndExploration')
 
             default_outcome = state_domain.Outcome(
-                dest='End',
-                feedback=state_domain.SubtitledHtml(
-                    content_id='default_outcome',
-                    html='<p>Introduction</p>',
-                ),
-                param_changes=[],
-                labelled_as_correct=False,
-                refresher_exploration_id=None,
-                missing_prerequisite_skill_id=None,
+                'End', state_domain.SubtitledHtml(
+                    'default_outcome', '<p>Introduction</p>'),
+                False, [], None, None
             )
             intro_state.update_interaction_default_outcome(default_outcome)
             end_state.update_interaction_default_outcome(None)
@@ -11989,16 +11977,10 @@ class ExpUserLastPlaythroughModelValidatorTests(
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome = state_domain.Outcome.from_dict(
-            dest='End',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html='<p>Introduction</p>',
-            ),
-            param_changes=[],
-            labelled_as_correct=False,
-            refresher_exploration_id=None,
-            missing_prerequisite_skill_id=None,
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
         )
         intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
@@ -12153,15 +12135,9 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
         end_state.update_interaction_id('EndExploration')
 
         default_outcome = state_domain.Outcome(
-            dest='End',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html='<p>Introduction</p>',
-            ),
-            param_changes=[],
-            labelled_as_correct=False,
-            refresher_exploration_id=None,
-            missing_prerequisite_skill_id=None,
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
         )
         intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)

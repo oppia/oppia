@@ -780,15 +780,9 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         end_state.update_interaction_id('EndExploration')
 
         default_outcome = state_domain.Outcome(
-            dest='End',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html='<p>Introduction</p>',
-            ),
-            labelled_as_correct=False,
-            param_changes=[],
-            refresher_exploration_id=None,
-            missing_prerequisite_skill_id=None,
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'
+            ), False, [], None, None
         )
         intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
@@ -1757,31 +1751,22 @@ class ExplorationContentValidationJobForCKEditorTests(
         }
 
         default_outcome1 = state_domain.Outcome(
-            dest='State2',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html='<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
-            ),
-            labelled_as_correct=False,
-            param_changes=[],
-            refresher_exploration_id=None,
-            missing_prerequisite_skill_id=None,
+            'State2', state_domain.SubtitledHtml(
+                'default_outcome',
+                '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
+            ), False, [], None, None
         )
         default_outcome2 = state_domain.Outcome(
-            dest='State1',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html=(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
                     '<pre>Hello this is <b> testing '
                     '<oppia-noninteractive-image filepath-with-value="amp;quot;'
                     'random.png&amp;quot;"></oppia-noninteractive-image> in '
                     '</b>progress</pre>'
                 )
-            ),
-            labelled_as_correct=False,
-            param_changes=[],
-            refresher_exploration_id=None,
-            missing_prerequisite_skill_id=None,
+            ), False, [], None, None,
         )
 
         mock_validate_context = self.swap(
@@ -1936,20 +1921,16 @@ class InteractionCustomizationArgsValidationJobTests(
             )
         }
         default_outcome2 = state_domain.Outcome(
-            dest='State1',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html=(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
                     '<p><oppia-noninteractive-link text-with-value="'
                     '&amp;quot;What is a link?&amp;quot;" url-with-'
                     'value="&amp;quot;htt://link.com&amp'
                     ';quot;"></oppia-noninteractive-link></p>'
                 )
-            ),
-            labelled_as_correct=False,
-            param_changes=[],
-            refresher_exploration_id=None,
-            missing_prerequisite_skill_id=None,
+            ), False, [], None, None
         )
         content3_dict = {
             'content_id': 'content',

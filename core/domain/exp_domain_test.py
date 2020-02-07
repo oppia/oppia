@@ -1537,15 +1537,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['DEF'])
 
         default_outcome = state_domain.Outcome(
-            dest='DEF',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html='<p>Default outcome for state1</p>',
-            ),
-            param_changes=[],
-            labelled_as_correct=False,
-            refresher_exploration_id='refresher_exploration_id',
-            missing_prerequisite_skill_id=None,
+            'DEF', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], 'refresher_exploration_id', None,
         )
         exploration.init_state.update_interaction_default_outcome(
             default_outcome
@@ -7572,15 +7566,9 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state4.update_interaction_customization_args(customization_args_dict4)
 
         default_outcome = state_domain.Outcome(
-            dest='state2',
-            feedback=state_domain.SubtitledHtml(
-                content_id='default_outcome',
-                html='<p>Default outcome for state1</p>',
-            ),
-            param_changes=[],
-            labelled_as_correct=False,
-            refresher_exploration_id=None,
-            missing_prerequisite_skill_id=None,
+            'state2', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], None, None
         )
         state1.update_interaction_default_outcome(default_outcome)
 
