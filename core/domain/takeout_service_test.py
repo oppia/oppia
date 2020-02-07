@@ -37,10 +37,10 @@ import utils
     topic_models, suggestion_models, user_models,
     story_models, question_models, config_models
 ) = models.Registry.import_models([
-        models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
-        models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
-        models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
-        models.NAMES.story, models.NAMES.question, models.NAMES.config])
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
+    models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
+    models.NAMES.story, models.NAMES.question, models.NAMES.config])
 
 
 class TakeoutServiceUnitTests(test_utils.GenericTestBase):
