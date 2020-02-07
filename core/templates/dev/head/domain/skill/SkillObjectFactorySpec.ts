@@ -29,7 +29,7 @@ import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { TestBed } from '@angular/core/testing';
 
-describe('Skill object factory', () => {
+fdescribe('Skill object factory', () => {
   let skillObjectFactory;
   let conceptCardObjectFactory;
   let rubricObjectFactory;
@@ -51,7 +51,7 @@ describe('Skill object factory', () => {
     conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
     rubricObjectFactory = TestBed.get(RubricObjectFactory);
-    skillDifficulties = ['easy', 'medium', 'hard'];
+    skillDifficulties = ['Easy', 'Medium', 'Hard']
     skillObjectFactory = TestBed.get(SkillObjectFactory);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
     misconceptionDict1 = {
@@ -172,7 +172,7 @@ describe('Skill object factory', () => {
 
     expect(() => {
       skill.updateRubricForDifficulty('invalid difficulty', 'explanation 2');
-    }).toThrow();
+    }).toThrow('hey');
   });
 
   it('should get the correct next misconception id', () => {

@@ -25,7 +25,7 @@ import { RubricObjectFactory, Rubric } from
   'domain/skill/RubricObjectFactory';
 import { ValidatorsService } from
   'services/validators.service.ts';
-// import predConsts from 'assets/constants';
+// import skill from './../../../../../../assets/constants';
 
 export class Skill {
   _id: string;
@@ -39,7 +39,7 @@ export class Skill {
   _supersedingSkillId: string;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
-  SKILL_DIFFICULTIES = ['easy', 'medium', 'hard'];
+  SKILL_DIFFICULTIES : string[] = ['Easy', 'medium', 'Hard'];
 
   constructor(id: string, description: string, misconceptions: Misconception[],
       rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
@@ -180,17 +180,18 @@ export class Skill {
   }
 
   updateRubricForDifficulty(difficulty: string, explanation: string) {
-    if (this.SKILL_DIFFICULTIES.indexOf(difficulty) === -1) {
-      throw Error('Invalid difficulty value passed');
-    }
-    for (var idx in this._rubrics) {
-      if (this._rubrics[idx].getDifficulty() === difficulty) {
-        this._rubrics[idx].setExplanation(explanation);
-        return;
+    if (this.SKILL_DIFFICULTIES.includes(difficulty)) {
+      for (var idx in this._rubrics) {
+        if (this._rubrics[idx].getDifficulty() === difficulty) {
+          this._rubrics[idx].setExplanation(explanation);
+          return;
+        }
       }
+      const rubricObjectFactory = new RubricObjectFactory();
+      this._rubrics.push(rubricObjectFactory.create(difficulty, explanation));
+    } else{
+      throw new Error('Invalid difficulty value passed');
     }
-    const rubricObjectFactory = new RubricObjectFactory();
-    this._rubrics.push(rubricObjectFactory.create(difficulty, explanation));
   }
 
   toBackendDict() {
