@@ -53,16 +53,17 @@ describe('Window Dimensions Service', () => {
 
     it('should get window width by clientWidth', () => {
       spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(null);
-      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth').and
-        .returnValue(1000);
+      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth')
+        .and.returnValue(1000);
       expect(wds.getWidth()).toEqual(1000);
     });
 
     it('should get window width by document clientWidth', () => {
       spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(null);
-      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth').and
-        .returnValue(null);
-      spyOnProperty(wr.nativeWindow.document.body, 'clientWidth').and.returnValue(1000);
+      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth')
+        .and.returnValue(null);
+      spyOnProperty(wr.nativeWindow.document.body, 'clientWidth')
+        .and.returnValue(1000);
       expect(wds.getWidth()).toEqual(1000);
     });
   });
