@@ -49,30 +49,32 @@ import release_constants
 from scripts import common
 
 
-def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
-    """Checks that the new version name matches the expected pattern.
+def release_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
+    """Checks that the release version name matches the expected pattern.
 
     Args:
-        arg: str. The new version name.
+        arg: str. The release version name.
         pattern: RegularExpression. The pattern that release version should
             match.
 
     Raises:
-        argparse.ArgumentTypeError: The new version name does not match
+        argparse.ArgumentTypeError: The release version name does not match
             the pattern.
 
     Returns:
-        str. The new version name with correct pattern.
+        str. The release version name with correct pattern.
     """
     if not pattern.match(arg):
         raise argparse.ArgumentTypeError(
-            'The format of "new_version" should be: x.x.x')
+            'The format of "release_version" should be: x.x.x')
     return arg
 
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--new_version', help='new version to be released', type=new_version_type)
+    '--release_version',
+    help='version of the release for which the hotfix is being created',
+    type=release_version_type)
 _PARSER.add_argument('--hotfix_number', default=0)
 
 
@@ -225,10 +227,10 @@ def execute_branch_cut():
     """Pushes the new release branch to Github."""
 
     parsed_args = _PARSER.parse_args()
-    if parsed_args.new_version:
-        target_version = parsed_args.new_version
+    if parsed_args.release_version:
+        target_version = parsed_args.release_version
     else:
-        raise Exception('ERROR: A "new_version" arg must be specified.')
+        raise Exception('ERROR: A "release_version" arg must be specified.')
 
     # Construct the new branch name.
     hotfix_number = int(parsed_args.hotfix_number)

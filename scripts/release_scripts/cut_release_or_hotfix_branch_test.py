@@ -304,20 +304,20 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
                 .verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
                     'upstream', '1.2.3', 3))
 
-    def test_exception_is_raised_for_invalid_new_version(self):
+    def test_exception_is_raised_for_invalid_release_version(self):
         with self.assertRaisesRegexp(
             argparse.ArgumentTypeError,
-            'The format of "new_version" should be: x.x.x'):
-            cut_release_or_hotfix_branch.new_version_type('invalid')
+            'The format of "release_version" should be: x.x.x'):
+            cut_release_or_hotfix_branch.release_version_type('invalid')
 
-    def test_no_exception_is_raised_for_valid_new_version(self):
-        cut_release_or_hotfix_branch.new_version_type('1.2.3')
+    def test_no_exception_is_raised_for_valid_release_version(self):
+        cut_release_or_hotfix_branch.release_version_type('1.2.3')
 
-    def test_missing_new_version(self):
+    def test_missing_release_version(self):
         args_swap = self.swap(
             sys, 'argv', ['cut_release_or_hotfix_branch.py'])
         with args_swap, self.assertRaisesRegexp(
-            Exception, 'ERROR: A "new_version" arg must be specified.'):
+            Exception, 'ERROR: A "release_version" arg must be specified.'):
             cut_release_or_hotfix_branch.execute_branch_cut()
 
     def test_exception_is_raised_if_travis_is_failing(self):
@@ -327,7 +327,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         input_swap = self.swap(python_utils, 'INPUT', mock_input)
         args_swap = self.swap(
             sys, 'argv',
-            ['cut_release_or_hotfix_branch.py', '--new_version=1.2.3'])
+            ['cut_release_or_hotfix_branch.py', '--release_version=1.2.3'])
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.verify_target_branch_swap:
                 with self.verify_target_version_swap, self.open_tab_swap:
@@ -350,7 +350,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_function_calls_for_release_branch(self):
         args_swap = self.swap(
             sys, 'argv',
-            ['cut_release_or_hotfix_branch.py', '--new_version=1.2.3'])
+            ['cut_release_or_hotfix_branch.py', '--release_version=1.2.3'])
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
                 with self.verify_target_branch_swap:
@@ -368,7 +368,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         args_swap = self.swap(
             sys, 'argv',
             [
-                'cut_release_or_hotfix_branch.py', '--new_version=1.2.3',
+                'cut_release_or_hotfix_branch.py', '--release_version=1.2.3',
                 '--hotfix_number=3'])
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
@@ -389,7 +389,7 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         args_swap = self.swap(
             sys, 'argv',
             [
-                'cut_release_or_hotfix_branch.py', '--new_version=1.2.3',
+                'cut_release_or_hotfix_branch.py', '--release_version=1.2.3',
                 '--hotfix_number=1'])
         with self.verify_local_repo_swap, self.verify_branch_name_swap:
             with self.get_remote_alias_swap, self.check_call_swap:
