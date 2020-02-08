@@ -192,7 +192,9 @@ def main():
         release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
     common.ask_user_to_confirm(
         'Please copy the names of the jobs to be run for this release along '
-        'with author names, author mail ids & instruction docs.')
+        'with author names, author mail ids & instruction docs.\n'
+        'Note: For new jobs, copy only those that have been successfully run '
+        'on backup server.')
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_DRIVE_URL)
     common.ask_user_to_confirm(
