@@ -72,14 +72,16 @@ angular.module('oppia').directive('feedbackTab', [
           };
           // Fetches the threads again if any thread is updated.
           ctrl.fetchUpdatedThreads = function() {
-            return ThreadDataService.fetchThreads().then(threadData => {
-              ctrl.threadData = threadData;
-              ctrl.threadIsUpdated = false;
+            var threadPromise = ThreadDataService.fetchThreads().then(data => {
+              ctrl.threadData = data;
+              return data;
             });
+            ctrl.threadIsStale = false;
+            return threadPromise;
           };
           ctrl.onBackButtonClicked = function() {
             ctrl.clearActiveThread();
-            if (ctrl.threadIsUpdated) {
+            if (ctrl.threadIsStale) {
               ctrl.fetchUpdatedThreads();
             }
           };
@@ -175,7 +177,7 @@ angular.module('oppia').directive('feedbackTab', [
               AlertsService.addWarning('Invalid message status: ' + tmpStatus);
               return;
             }
-            ctrl.threadIsUpdated = true;
+            ctrl.threadIsStale = true;
             ctrl.messageSendingInProgress = true;
             ThreadDataService.addNewMessage(
               threadId, tmpText, tmpStatus, function() {
@@ -219,7 +221,7 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
             ctrl.activeThread = null;
             ctrl.userIsLoggedIn = null;
-            ctrl.threadIsUpdated = false;
+            ctrl.threadIsStale = false;
             $rootScope.loadingMessage = 'Loading';
             var userInfoPromise = UserService.getUserInfoAsync();
             userInfoPromise.then(function(userInfo) {
