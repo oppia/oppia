@@ -185,32 +185,26 @@ angular.module('oppia').directive('storyViewerPage', [
                   storyNodes[i].getExplorationSummaryObject(
                   ).thumbnail_bg_color.length === 7) {
                   // Adds a 50% opacity to the color.
-                  var hexCode = storyNodes[i].getExplorationSummaryObject(
+                  let hexCode = storyNodes[i].getExplorationSummaryObject(
                   ).thumbnail_bg_color;
                   // Changes the luminosity level of the faded color.
                   // Signed value, negative => darker.
-                  var lum = 0.5;
+                  let lum = 0.5;
+                  let thumbnailColor = '#';
 
-                  var red = parseInt(
-                    Number('0x' + hexCode.substring(1, 3)), 10);
-                  red = Math.round(
+                  let red = parseInt(hexCode.substring(1, 3), 16);
+                  thumbnailColor += Math.round(
                     Math.min(Math.max(0, red + (red * lum)), 255)).toString(16);
 
-                  var green = parseInt(
-                    Number('0x' + hexCode.substring(3, 5)), 10);
-                  green = Math.round(
+                  let green = parseInt(hexCode.substring(3, 5), 16);
+                  thumbnailColor += Math.round(
                     Math.min(
                       Math.max(0, green + (green * lum)), 255)).toString(16);
 
-                  var blue = parseInt(
-                    Number('0x' + hexCode.substring(5, 7)), 10);
-                  blue = Math.round(
+                  let blue = parseInt(hexCode.substring(5, 7), 16);
+                  thumbnailColor += Math.round(
                     Math.min(
                       Math.max(0, blue + (blue * lum)), 255)).toString(16);
-
-                  thumbnailColor =
-                    '#' + red.toString(16) + green.toString(16) +
-                    blue.toString(16);
                 }
               } else {
                 thumbnailColor = storyNodes[i].getExplorationSummaryObject(
