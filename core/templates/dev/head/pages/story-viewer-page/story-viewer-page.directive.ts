@@ -92,9 +92,6 @@ angular.module('oppia').directive('storyViewerPage', [
             ctrl.explorationCardIsShown = true;
             ctrl.currentExplorationId = storyNode.getExplorationId();
             ctrl.summaryToPreview = storyNode.getExplorationSummaryObject();
-            if (!ctrl.isSummaryTileVisible(storyNode)) {
-              ctrl.summaryToPreview.thumbnail_bg_color = 'grey';
-            }
             ctrl.completedNode = storyNode.isCompleted();
             ctrl.currentNodeId = storyNode.getId();
           };
@@ -184,7 +181,37 @@ angular.module('oppia').directive('storyViewerPage', [
               if (!storyNodes[i].isCompleted() &&
                 (storyNodes[i].getId() !==
                 ctrl.storyPlaythroughObject.getNextPendingNodeId())) {
-                thumbnailColor = 'grey';
+                if (
+                  storyNodes[i].getExplorationSummaryObject(
+                  ).thumbnail_bg_color.length === 7) {
+                  // Adds a 50% opacity to the color.
+                  var hexCode = storyNodes[i].getExplorationSummaryObject(
+                  ).thumbnail_bg_color;
+                  // Changes the luminosity level of the faded color.
+                  // Signed value, negative => darker.
+                  var lum = 0.5;
+
+                  var red = parseInt(
+                    Number('0x' + hexCode.substring(1, 3)), 10);
+                  red = Math.round(
+                    Math.min(Math.max(0, red + (red * lum)), 255)).toString(16);
+
+                  var green = parseInt(
+                    Number('0x' + hexCode.substring(3, 5)), 10);
+                  green = Math.round(
+                    Math.min(
+                      Math.max(0, green + (green * lum)), 255)).toString(16);
+
+                  var blue = parseInt(
+                    Number('0x' + hexCode.substring(5, 7)), 10);
+                  blue = Math.round(
+                    Math.min(
+                      Math.max(0, blue + (blue * lum)), 255)).toString(16);
+
+                  thumbnailColor =
+                    '#' + red.toString(16) + green.toString(16) +
+                    blue.toString(16);
+                }
               } else {
                 thumbnailColor = storyNodes[i].getExplorationSummaryObject(
                 ).thumbnail_bg_color;
@@ -250,6 +277,17 @@ angular.module('oppia').directive('storyViewerPage', [
                   storyDataDict.story_title + ' - Oppia');
                 ctrl.storyTitle = storyDataDict.story_title;
                 ctrl.storyDescription = storyDataDict.story_description;
+
+                // Taking the characteristics of the first chapter as
+                // placeholder to be displayed on the right, since all
+                // explorations in a chapter should have the same category, and
+                // hence the same characteristics.
+                ctrl.thumbnailBgColor =
+                  ctrl.storyPlaythroughObject.getInitialNode().
+                    getExplorationSummaryObject().thumbnail_bg_color;
+                ctrl.thumbnailIconUrl =
+                  ctrl.storyPlaythroughObject.getInitialNode().
+                    getExplorationSummaryObject().thumbnail_icon_url;
                 $rootScope.loadingMessage = '';
                 ctrl.generatePathParameters();
                 // TODO(#8521): Remove the use of $rootScope.$apply()
