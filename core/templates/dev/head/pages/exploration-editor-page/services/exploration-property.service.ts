@@ -89,10 +89,6 @@ angular.module('oppia').factory('ExplorationPropertyService', [
           return;
         }
 
-        if (angular.equals(this.displayed, this.savedMemento)) {
-          return;
-        }
-
         AlertsService.clearWarnings();
 
         var newBackendValue = angular.copy(this.displayed);
