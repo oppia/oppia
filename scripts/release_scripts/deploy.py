@@ -455,9 +455,13 @@ def execute_deployment():
 
     install_third_party_libs.main()
 
-    if not common.is_current_branch_a_release_branch():
+    if common.is_current_branch_a_test_branch() and (
+            app_name == APP_NAME_OPPIASERVER):
+        raise Exception('Test branch cannot be deployed to prod.')
+    if not (common.is_current_branch_a_release_branch() or (
+            common.is_current_branch_a_test_branch())):
         raise Exception(
-            'The deployment script must be run from a release branch.')
+            'The deployment script must be run from a release or test branch.')
     if custom_version is not None:
         current_release_version = custom_version.replace(
             DOT_CHAR, HYPHEN_CHAR)
