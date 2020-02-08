@@ -412,6 +412,8 @@ class UserInfoHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
+        # The following headers are added to prevent caching of this response.
+        self.response.cache_control.no_store = True
         if self.username:
             user_actions = user_services.UserActionsInfo(self.user_id).actions
             user_settings = user_services.get_user_settings(
