@@ -1061,7 +1061,7 @@ class SendDummyMailTest(test_utils.GenericTestBase):
         csrf_token = self.get_new_csrf_token()
         generated_response = self.post_json(
             '/sendDummyMailToAdminHandler', {
-                'action' : 'send_mail_to_admin'
+                'action': 'send_mail_to_admin'
             },
             csrf_token=csrf_token)
         if feconf.CAN_SEND_EMAILS:
