@@ -26,6 +26,7 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from core.domain import exp_fetchers
+from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -111,6 +112,11 @@ def apply_change_list(story_id, change_list):
             if change.cmd == story_domain.CMD_ADD_STORY_NODE:
                 story.add_node(change.node_id, change.title)
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
+                for node in story.story_contents.nodes:
+                    if node.id == change.node_id:
+                        exp_services.update_exploration_story_link(
+                            node.exploration_id, '', story.id)
+                        break
                 story.delete_node(change.node_id)
             elif (change.cmd ==
                   story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS):
@@ -141,6 +147,8 @@ def apply_change_list(story_id, change_list):
                       story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
                     story.update_node_exploration_id(
                         change.node_id, change.new_value)
+                    exp_services.update_exploration_story_link(
+                        change.old_value, change.new_value, story.id)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
