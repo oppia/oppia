@@ -18,7 +18,7 @@
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
-import { Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 
