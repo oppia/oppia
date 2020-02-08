@@ -195,7 +195,7 @@ plugins:
             with open\(|= open\(
           annotation: "Please use python_utils.open_file() instead of open()."
           path_patterns:
-            - "**/*.py"
+            - "**/[^utils]*.py"
 
         no-stringIO:
           pattern: StringIO

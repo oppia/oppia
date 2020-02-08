@@ -84,6 +84,10 @@ _PARSER.add_argument(
     '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
+_PARSER.add_argument(
+    '--circleci',
+    help='Running in CircleCI environment',
+    action='store_true')
 
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
@@ -536,8 +540,6 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party_libs.py',
     '/.github/']
 
-# Check if project is running in CircleCI.
-IS_CI = os.getenv('CIRCLECI')
 
 # NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
 NODE_DIR = os.path.abspath(
@@ -670,7 +672,7 @@ class FileCache(python_utils.OBJECT):
 
 def _lint_all_files(
         js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
-        css_filepaths, verbose_mode_enabled):
+        css_filepaths, verbose_mode_enabled, is_ci):
     """This function is used to check if node-eslint dependencies are
     installed and pass ESLint binary path and lint all the files(JS, Python,
     HTML, CSS) with their respective third party linters.
@@ -682,6 +684,7 @@ def _lint_all_files(
         html_filepaths: list(str). The list of HTML filepaths to be linted.
         css_filepaths: list(str). The list of CSS filepaths to be linted.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
+        is_ci: bool. True if running in CircleCI environment.
 
     Returns:
         linting_processes: list(multiprocessing.Process). A list of linting
@@ -692,7 +695,7 @@ def _lint_all_files(
         Stylelint outputs.
     """
 
-    if IS_CI:
+    if is_ci:
         python_utils.PRINT('Starting Python linter...')
     else:
         python_utils.PRINT(
@@ -728,7 +731,7 @@ def _lint_all_files(
 
     linting_processes = []
 
-    if not IS_CI:
+    if not is_ci:
         js_and_ts_result = multiprocessing.Queue()
 
         linting_processes.append(multiprocessing.Process(
@@ -778,7 +781,7 @@ def _lint_all_files(
         process.daemon = False
         process.start()
 
-    if IS_CI:
+    if is_ci:
         result_queues = [py_result, py_result_for_python3_compatibility]
     else:
         result_queues = [
@@ -786,7 +789,7 @@ def _lint_all_files(
             py_result_for_python3_compatibility
         ]
 
-    if not IS_CI:
+    if not is_ci:
         stdout_queus = [
             css_in_html_stdout, css_stdout
         ]
@@ -2005,24 +2008,31 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         self.process_manager['bad_pattern'] = summary_messages
         _STDOUT_LIST.append(stdout)
 
-    def _check_patterns(self):
-        """Run checks relate to bad patterns."""
-        if IS_CI:
+    def _check_patterns(self, is_ci):
+        """Run checks relate to bad patterns.
+
+        Args:
+            is_ci: bool. True if running in CircleCI environment.
+        """
+        if is_ci:
             methods = [self._check_mandatory_patterns]
         else:
             methods = [self._check_bad_patterns, self._check_mandatory_patterns]
         self._run_multiple_checks(*methods)
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(self, is_ci):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
+
+        Args:
+            is_ci: bool. True if running in CircleCI environment.
 
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
-        self._check_patterns()
+        self._check_patterns(is_ci)
         mandatory_patterns_messages = self.process_manager['mandatory']
-        if not IS_CI:
+        if not is_ci:
             pattern_messages = self.process_manager['bad_pattern']
             return (
                 mandatory_patterns_messages + pattern_messages)
@@ -2750,9 +2760,12 @@ class JsTsLintChecksManager(LintChecksManager):
         ]
         super(JsTsLintChecksManager, self)._run_multiple_checks(*methods)
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(self, is_ci):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
+
+        Args:
+            is_ci: bool. True if running in CircleCI environment.
 
         Returns:
             all_messages: str. All the messages returned by the lint checks.
@@ -2763,7 +2776,7 @@ class JsTsLintChecksManager(LintChecksManager):
             self._get_expressions_from_parsed_script())
 
         common_messages = super(
-            JsTsLintChecksManager, self).perform_all_lint_checks()
+            JsTsLintChecksManager, self).perform_all_lint_checks(is_ci)
 
         super(JsTsLintChecksManager, self)._run_multiple_checks(
             self._check_extra_js_files,
@@ -3037,16 +3050,19 @@ class OtherLintChecksManager(LintChecksManager):
 
         return summary_messages
 
-    def perform_all_lint_checks(self):
+    def perform_all_lint_checks(self, is_ci):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
+
+        Args:
+            is_ci: bool. True if running in CircleCI environment.
 
         Returns:
             all_messages: str. All the messages returned by the lint checks.
         """
 
         common_messages = super(
-            OtherLintChecksManager, self).perform_all_lint_checks()
+            OtherLintChecksManager, self).perform_all_lint_checks(is_ci)
         # division_operator_messages = self._check_division_operator()
         # import_order_messages = self._check_import_order()
         self._check_import()
@@ -3133,6 +3149,9 @@ def main(args=None):
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
+    # If code is running in circleci and arguments contains --circleci flag it
+    # will be made True.
+    is_ci = bool(parsed_args.circleci)
     all_filepaths = _get_all_filepaths(parsed_args.path, parsed_args.files)
 
     if len(all_filepaths) == 0:
@@ -3145,7 +3164,7 @@ def main(args=None):
     categorize_files(all_filepaths)
     linting_processes, result_queues, result_stdout = _lint_all_files(
         _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
-        _FILES['.css'], verbose_mode_enabled)
+        _FILES['.css'], verbose_mode_enabled, is_ci)
     code_owner_message = _check_codeowner_file(verbose_mode_enabled)
     # Pylint requires to provide paramter "this_bases" and "d", guess due to
     # meta class.
@@ -3154,8 +3173,8 @@ def main(args=None):
     other_lint_checks_manager = OtherLintChecksManager(   # pylint: disable=no-value-for-parameter
         verbose_mode_enabled)
     all_messages = code_owner_message
-    js_message = js_ts_lint_checks_manager.perform_all_lint_checks()
-    other_messages = other_lint_checks_manager.perform_all_lint_checks()
+    js_message = js_ts_lint_checks_manager.perform_all_lint_checks(is_ci)
+    other_messages = other_lint_checks_manager.perform_all_lint_checks(is_ci)
     all_messages += js_message + other_messages
 
     all_messages += _join_linting_process(
