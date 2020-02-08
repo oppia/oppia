@@ -44,7 +44,7 @@ export class EmailDashboardDataService {
     private http: HttpClient
   ) {}
 
-  fetchQueriesPage(pageSize, cursor): Promise<Object> {
+  fetchQueriesPage(pageSize: number, cursor: string): Promise<Object> {
     let params: any = {
       num_queries_to_fetch: pageSize
     };
@@ -68,6 +68,10 @@ export class EmailDashboardDataService {
     return this.latestCursor;
   }
 
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'data' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
   submitQuery(data: any): Promise<Array<Query>> {
     var startQueryIndex = this.currentPageIndex * this.QUERIES_PER_PAGE;
     var endQueryIndex = (this.currentPageIndex + 1) * this.QUERIES_PER_PAGE;
