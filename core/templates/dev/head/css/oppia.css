@@ -4359,7 +4359,7 @@ div.oppia-issues-learner-action {
   margin-bottom: 2em;
 }
 
-.oppia-issues-rectangle-text {
+.oppia-issues-playthrough-rectangle-text {
   position: absolute;
   z-index: 1000;
   width: 100%;
@@ -4392,7 +4392,7 @@ div.oppia-issues-learner-action {
   transform: translateY(4px);
 }
 
-.oppia-rectangle {
+.oppia-issues-playthrough-rectangle {
   background-color: transparent;
   color: white;
   font-size: 20px;
@@ -4404,8 +4404,8 @@ div.oppia-issues-learner-action {
   width: 200px;
 }
 
-.oppia-rectangle:before,
-.oppia-rectangle:after {
+.oppia-issues-playthrough-rectangle:before,
+.oppia-issues-playthrough-rectangle:after {
   background-color: inherit;
   content: "";
   position: absolute;
@@ -4418,11 +4418,11 @@ div.oppia-issues-learner-action {
   left: 27.2893px;
 }
 
-.oppia-rectangle:before {
+.oppia-issues-playthrough-rectangle:before {
   top: -70.7107px;
 }
 
-.oppia-rectangle:after {
+.oppia-issues-playthrough-rectangle:after {
   bottom: -70.7107px;
 }
 
