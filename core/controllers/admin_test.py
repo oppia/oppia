@@ -1058,9 +1058,12 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
     def test_send_dummy_mail(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        generated_response = self.get_json(
-            '/sendDummyMailToAdminHandler'
-        )
+        csrf_token = self.get_new_csrf_token()
+        generated_response = self.post_json(
+            '/sendDummyMailToAdminHandler', {
+                'action' : 'send mail to admin'
+            },
+            csrf_token=csrf_token)
         if feconf.CAN_SEND_EMAILS:
             self.assertEqual(
                 generated_response['msg'],

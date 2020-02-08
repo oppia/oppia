@@ -637,10 +637,8 @@ class DataExtractionQueryHandler(base.BaseHandler):
 class SendDummyMailToAdminHandler(base.BaseHandler):
     """This function handles sending test emails."""
 
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
     @acl_decorators.can_access_admin_page
-    def get(self):
+    def post(self):
         if feconf.CAN_SEND_EMAILS:
             response = {
                 'msg': 'Success! Mail sent to admin.',
