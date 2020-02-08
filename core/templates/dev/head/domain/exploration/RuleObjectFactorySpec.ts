@@ -19,22 +19,25 @@ import { TestBed } from '@angular/core/testing';
 import { RuleObjectFactory, Rule } from
   'domain/exploration/RuleObjectFactory';
 
-describe('RuleObjectFactory', () => {
+fdescribe('RuleObjectFactory', () => {
   let ruleObjectFactory;
   let ruleBackendDict: any;
-
+  let inputBackend
   beforeEach(() => {
     ruleObjectFactory = TestBed.get(RuleObjectFactory);
+    inputBackend = {
+      'x': [['<p>list_of_sets_of_html_strings</p>']]
+    }
     ruleBackendDict = {
       rule_type: 'rule_type_1',
-      inputs: 'input_1'
+      inputs: inputBackend
     };
   });
 
   it('should creat new rule', () => {
     var rules =
       ruleObjectFactory.createFromBackendDict(ruleBackendDict);
-    expect(rules.getInput()).toEqual('input_1');
+    expect(rules.getInput()).toEqual(inputBackend);
     expect(rules.getType()).toEqual('rule_type_1');
   });
 
@@ -46,8 +49,8 @@ describe('RuleObjectFactory', () => {
 
   it('should creat a new rule from creatNew()', () => {
     var rules =
-      ruleObjectFactory.createNew('rule_type_1', 'input_1');
-    expect(rules.getInput()).toEqual('input_1');
+      ruleObjectFactory.createNew('rule_type_1', inputBackend);
+    expect(rules.getInput()).toEqual(inputBackend);
     expect(rules.getType()).toEqual('rule_type_1');
   });
 });

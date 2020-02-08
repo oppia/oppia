@@ -17,6 +17,13 @@
  * domain objects.
  */
 
+export interface RuleInputInterface{
+  [propName: string ]: any;
+}
+export interface backEndDict{
+  rule_type: string,
+  inputs: RuleInputInterface
+}
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
@@ -25,8 +32,8 @@ export class Rule {
   // TODO(#7165): Replace 'any' with the exact type. This has been typed
   // as 'any' since 'inputs' is a complex object having varying types. A general
   // type needs to be found.
-  inputs: any;
-  constructor(type: string, inputs: any) {
+  inputs: RuleInputInterface;
+  constructor(type: string, inputs: RuleInputInterface) {
     this.type = type;
     this.inputs = inputs;
   }
@@ -34,13 +41,13 @@ export class Rule {
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because the return type is a dict with underscore_cased keys which
   // gives tslint errors against underscore_casing in favor of camelCasing.
-  getInput(): any {
+  getInput(): RuleInputInterface {
     return this.inputs;
   }
   getType(): string {
     return this.type;
   }
-  toBackendDict(): any {
+  toBackendDict(): backEndDict {
     return {
       rule_type: this.type,
       inputs: this.inputs
@@ -52,13 +59,13 @@ export class Rule {
   providedIn: 'root'
 })
 export class RuleObjectFactory {
-  createNew(type: string, inputs: any): Rule {
+  createNew(type: string, inputs: RuleInputInterface): Rule {
     return new Rule(type, inputs);
   }
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'ruleDict' is a dict with underscore_cased keys which
   // gives tslint errors against underscore_casing in favor of camelCasing.
-  createFromBackendDict(ruleDict: any): Rule {
+  createFromBackendDict(ruleDict: backEndDict): Rule {
     return new Rule(ruleDict.rule_type, ruleDict.inputs);
   }
 }
