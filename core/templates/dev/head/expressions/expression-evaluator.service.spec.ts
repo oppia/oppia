@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('App.ts');
 require('expressions/expression-evaluator.service.ts');
-require('expressions/expression-parser.service.js');
+require('expressions/expression-parser.service.ts');
 require('expressions/expression-syntax-tree.service.ts');
 require('services/utils.service.ts');
 
