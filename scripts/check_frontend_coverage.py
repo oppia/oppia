@@ -330,6 +330,7 @@ FULLY_COVERED_FILENAMES = [
     'undo-redo.service.ts',
     'UpgradedServices.ts',
     'url.service.ts',
+    'user-email-preferences.service.ts',
     'user-exploration-permissions.service.ts',
     'user.service.ts',
     'UserInfoObjectFactory.ts',
