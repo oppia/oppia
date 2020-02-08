@@ -4372,7 +4372,7 @@ div.oppia-issues-learner-action {
   background-color: #009A8B;
   border: none;
   border-radius: 15px;
-  box-shadow: 10px 0px #008080;
+  box-shadow: 10px 0 #008080;
   color: #fff;
   cursor: pointer;
   font-size: 24px;
@@ -4392,7 +4392,6 @@ div.oppia-issues-learner-action {
   transform: translateY(4px);
 }
 
-/* Values below were experimentally generated using 'http://csshexagon.com' */
 .oppia-rectangle {
   background-color: transparent;
   color: white;
