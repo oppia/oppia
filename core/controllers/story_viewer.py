@@ -110,6 +110,8 @@ class StoryProgressHandler(base.BaseHandler):
             node for node in story.story_contents.get_ordered_nodes()
         ]
 
+        next_exp_ids = []
+        next_node_id = None
         if not node_id in completed_node_ids:
             story_services.record_completed_node_in_story_context(
                 self.user_id, story_id, node_id)
@@ -119,13 +121,11 @@ class StoryProgressHandler(base.BaseHandler):
             completed_node_ids = [
                 completed_node.id for completed_node in completed_nodes]
 
-        next_exp_ids = []
-        next_node_id = None
-        for node in ordered_nodes:
-            if node.id not in completed_node_ids:
-                next_exp_ids = [node.exploration_id]
-                next_node_id = node.id
-                break
+            for node in ordered_nodes:
+                if node.id not in completed_node_ids:
+                    next_exp_ids = [node.exploration_id]
+                    next_node_id = node.id
+                    break
 
         ready_for_review_test = False
         exp_summaries = (
