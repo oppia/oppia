@@ -29,7 +29,7 @@ describe('Voiceover object factory', () => {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
-      durationSecs: 10.0
+      duration_secs: 10.0
     });
   });
 
@@ -39,7 +39,7 @@ describe('Voiceover object factory', () => {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: true,
-      durationSecs: 10.0
+      duration_secs: 10.0
     }));
   });
 
@@ -49,7 +49,7 @@ describe('Voiceover object factory', () => {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: true,
-      durationSecs: 10.0
+      duration_secs: 10.0
     }));
 
     voiceover.toggleNeedsUpdateAttribute();
@@ -57,7 +57,7 @@ describe('Voiceover object factory', () => {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
-      durationSecs: 10.0
+      duration_secs: 10.0
     }));
   });
 
@@ -66,7 +66,7 @@ describe('Voiceover object factory', () => {
       filename: 'a.mp3',
       file_size_bytes: 200000,
       needs_update: false,
-      durationSecs: 10.0
+      duration_secs: 10.0
     });
   });
 
@@ -76,7 +76,7 @@ describe('Voiceover object factory', () => {
         filename: 'filename.mp3',
         file_size_bytes: 100000,
         needs_update: false,
-        durationSecs: 5.0
+        duration_secs: 5.0
       })
     );
   });

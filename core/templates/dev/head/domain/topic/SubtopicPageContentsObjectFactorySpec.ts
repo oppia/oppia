@@ -49,7 +49,7 @@ describe('Subtopic page contents object factory', () => {
             filename: 'test.mp3',
             file_size_bytes: 100,
             needs_update: false,
-            durationSecs: 0.2
+            duration_secs: 0.2
           }
         }
       }
@@ -82,7 +82,7 @@ describe('Subtopic page contents object factory', () => {
       filename: 'test.mp3',
       file_size_bytes: 100,
       needs_update: false,
-      durationSecs: 0.2
+      duration_secs: 0.2
     });
   });
 

@@ -34,13 +34,13 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename1.mp3',
           file_size_bytes: 100000,
           needs_update: false,
-          durationSecs: 10.0
+          duration_secs: 10.0
         },
         hi: {
           filename: 'filename2.mp3',
           file_size_bytes: 11000,
           needs_update: false,
-          durationSecs: 0.11
+          duration_secs: 0.11
         }
       },
       default_outcome: {
@@ -48,13 +48,13 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename3.mp3',
           file_size_bytes: 3000,
           needs_update: false,
-          durationSecs: 0.33
+          duration_secs: 0.33
         },
         hi: {
           filename: 'filename4.mp3',
           file_size_bytes: 5000,
           needs_update: false,
-          durationSecs: 0.5
+          duration_secs: 0.5
         }
       },
       feedback_1: {
@@ -62,13 +62,13 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename5.mp3',
           file_size_bytes: 2000,
           needs_update: false,
-          durationSecs: 0.2
+          duration_secs: 0.2
         },
         hi: {
           filename: 'filename6.mp3',
           file_size_bytes: 9000,
           needs_update: false,
-          durationSecs: 0.9
+          duration_secs: 0.9
         }
       },
       feedback_2: {
@@ -76,13 +76,13 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename7.mp3',
           file_size_bytes: 1000,
           needs_update: false,
-          durationSecs: 0.1
+          duration_secs: 0.1
         },
         hi: {
           filename: 'filename8.mp3',
           file_size_bytes: 600,
           needs_update: false,
-          durationSecs: 0.06
+          duration_secs: 0.06
         }
       },
       hint_1: {
@@ -90,13 +90,13 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename9.mp3',
           file_size_bytes: 104000,
           needs_update: false,
-          durationSecs: 10.4
+          duration_secs: 10.4
         },
         hi: {
           filename: 'filename10.mp3',
           file_size_bytes: 1000,
           needs_update: true,
-          durationSecs: 0.1
+          duration_secs: 0.1
         }
       },
       hint_2: {},
@@ -105,13 +105,13 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename13.mp3',
           file_size_bytes: 15080,
           needs_update: false,
-          durationSecs: 1.5
+          duration_secs: 1.5
         },
         hi: {
           filename: 'filename14.mp3',
           file_size_bytes: 10500,
           needs_update: false,
-          durationSecs: 1.05
+          duration_secs: 1.05
         }
       }
     }
@@ -140,13 +140,13 @@ describe('RecordedVoiceovers object factory', () => {
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
-        durationSecs: 10.0
+        duration_secs: 10.0
       }),
       hi: vof.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: false,
-        durationSecs: 0.11
+        duration_secs: 0.11
       })
     });
   });
@@ -158,7 +158,7 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename9.mp3',
           file_size_bytes: 104000,
           needs_update: false,
-          durationSecs: 10.4
+          duration_secs: 10.4
         }));
     });
 
@@ -169,13 +169,13 @@ describe('RecordedVoiceovers object factory', () => {
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: true,
-        durationSecs: 10.0
+        duration_secs: 10.0
       }),
       hi: vof.createFromBackendDict({
         filename: 'filename2.mp3',
         file_size_bytes: 11000,
         needs_update: true,
-        durationSecs: 0.11
+        duration_secs: 0.11
       })
     });
   });
@@ -222,7 +222,7 @@ describe('RecordedVoiceovers object factory', () => {
         filename: 'filename11.mp3',
         file_size_bytes: 1000,
         needs_update: false,
-        durationSecs: 0.1
+        duration_secs: 0.1
       })
     });
     expect(() => {
@@ -237,7 +237,7 @@ describe('RecordedVoiceovers object factory', () => {
         filename: 'filename1.mp3',
         file_size_bytes: 100000,
         needs_update: false,
-        durationSecs: 10.0
+        duration_secs: 10.0
       })
     });
   });
@@ -250,7 +250,7 @@ describe('RecordedVoiceovers object factory', () => {
           filename: 'filename2.mp3',
           file_size_bytes: 11000,
           needs_update: true,
-          durationSecs: 0.11
+          duration_secs: 0.11
         }));
     });
 

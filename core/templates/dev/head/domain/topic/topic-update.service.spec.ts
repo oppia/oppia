@@ -155,7 +155,7 @@ describe('Topic update service', function() {
                 filename: 'test.mp3',
                 file_size_bytes: 100,
                 needs_update: false,
-                durationSecs: 0.1
+                duration_secs: 0.1
               }
             }
           }
@@ -621,7 +621,7 @@ describe('Topic update service', function() {
               filename: 'test.mp3',
               file_size_bytes: 100,
               needs_update: false,
-              durationSecs: 0.1
+              duration_secs: 0.1
             }
           }
         }
@@ -641,7 +641,7 @@ describe('Topic update service', function() {
               filename: 'test.mp3',
               file_size_bytes: 100,
               needs_update: false,
-              durationSecs: 0.1
+              duration_secs: 0.1
             }
           }
         }
@@ -661,7 +661,7 @@ describe('Topic update service', function() {
               filename: 'test.mp3',
               file_size_bytes: 100,
               needs_update: false,
-              durationSecs: 0.1
+              duration_secs: 0.1
             }
           }
         }
@@ -703,7 +703,7 @@ describe('Topic update service', function() {
             filename: 'test_2.mp3',
             file_size_bytes: 1000,
             needs_update: false,
-            durationSecs: 1.0
+            duration_secs: 1.0
           }
         }
       }
@@ -724,7 +724,7 @@ describe('Topic update service', function() {
               filename: 'test.mp3',
               file_size_bytes: 100,
               needs_update: false,
-              durationSecs: 0.1
+              duration_secs: 0.1
             }
           }
         }
