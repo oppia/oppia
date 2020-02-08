@@ -15,9 +15,6 @@
 /**
  * @fileoverview Service to check if user is on a mobile device.
  */
-
-
-
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
