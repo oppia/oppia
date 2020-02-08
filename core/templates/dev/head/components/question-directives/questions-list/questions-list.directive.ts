@@ -529,7 +529,7 @@ angular.module('oppia').directive('questionsList', [
                   $scope.misconceptionsBySkill = misconceptionsBySkill;
                   $scope.canEditQuestion = canEditQuestion;
                   $scope.newQuestionIsBeingCreated = newQuestionIsBeingCreated;
-                  $scope.isChangeCommited = false;
+
                   if (!newQuestionIsBeingCreated) {
                     $scope.validationError = $scope.question.validate(
                       $scope.misconceptionsBySkill);
@@ -618,7 +618,19 @@ angular.module('oppia').directive('questionsList', [
                       });
                     });
                   };
-                  $scope.commit = function() {
+                  $scope.saveAndcommit = function() {
+                    $scope.validationError = $scope.question.validate(
+                      $scope.misconceptionsBySkill);
+                    if ($scope.validationError) {
+                      return;
+                    }
+                    if (!StateEditorService.isCurrentSolutionValid()) {
+                      $scope.validationError =
+                        'The solution is invalid and does not ' +
+                        'correspond to a correct answer';
+                      return;
+                    }
+
                     var modalInstance = $uibModal.open({
                       templateUrl:
                              UrlInterpolationService.getDirectiveTemplateUrl(
@@ -641,10 +653,10 @@ angular.module('oppia').directive('questionsList', [
 
                     modalInstance.result.then(function(commitMessage) {
                       returnModalObject.commitMessage = commitMessage;
-                      $scope.isChangeCommited = true;
+                      $uibModalInstance.close(returnModalObject);
                     });
                   };
-                  $scope.isCommitButtonDisabled = function() {
+                  $scope.isSaveAndCommitButtonDisabled = function() {
                     return !(QuestionUndoRedoService.hasChanges() ||
                         returnModalObject.array.length > 0);
                   };
@@ -668,8 +680,7 @@ angular.module('oppia').directive('questionsList', [
                   // Save and Publish Question
                   $scope.isSaveButtonDisabled = function() {
                     return $scope.question.validate(
-                      $scope.misconceptionsBySkill) ||
-                      (!$scope.isChangeCommited && ctrl.questionIsBeingUpdated);
+                      $scope.misconceptionsBySkill);
                   };
 
                   $scope.cancel = function() {
