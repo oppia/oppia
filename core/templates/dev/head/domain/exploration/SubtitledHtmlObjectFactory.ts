@@ -16,7 +16,10 @@
  * @fileoverview Factory for creating new frontend instances of SubtitledHtml
  * domain objects.
  */
-
+export interface SubtitledHtmlBackendInterface {
+  'content_id': string,
+  'html': string
+}
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -44,11 +47,7 @@ export class SubtitledHtml {
     return !this._html;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): SubtitledHtmlBackendInterface {
     return {
       html: this._html,
       content_id: this._contentId
@@ -64,11 +63,8 @@ export class SubtitledHtml {
   providedIn: 'root'
 })
 export class SubtitledHtmlObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'subtitledHtmlBackendDict' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(subtitledHtmlBackendDict: any): SubtitledHtml {
+  createFromBackendDict(
+      subtitledHtmlBackendDict: SubtitledHtmlBackendInterface): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }

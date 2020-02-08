@@ -15,18 +15,34 @@
 /**
  * @fileoverview Factory for creating frontend skills
  */
-import { ConceptCardObjectFactory, ConceptCard } from
+
+import { ConceptCardObjectFactory, ConceptCard,
+  ConceptCardBackendInterface } from
   'domain/skill/ConceptCardObjectFactory';
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
-import { MisconceptionObjectFactory, Misconception } from
+import { MisconceptionObjectFactory, Misconception,
+  MisconceptionBackendInterface } from
   'domain/skill/MisconceptionObjectFactory';
-import { RubricObjectFactory, Rubric } from
+import { RubricObjectFactory, Rubric, RubricBackendInterface } from
   'domain/skill/RubricObjectFactory';
 import { ValidatorsService } from
   'services/validators.service.ts';
-// import skill from './../../../../../../assets/constants';
+const constants = require('constants.ts');
 
+export interface SkillBackendInterface {
+  'id': string,
+  'description': string,
+  'misconceptions': MisconceptionBackendInterface[],
+  'rubrics': RubricBackendInterface[],
+  'skill_contents': ConceptCardBackendInterface
+  'language_code': string,
+  'version': number,
+  'next_misconception_id': string,
+  'superseding_skill_id': string;
+  'all_questions_merged': boolean;
+  'prerequisite_skill_ids': string[];
+}
 export class Skill {
   _id: string;
   _description: string;
@@ -39,7 +55,7 @@ export class Skill {
   _supersedingSkillId: string;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
-  SKILL_DIFFICULTIES : string[] = ['Easy', 'medium', 'Hard'];
+  SKILL_DIFFICULTIES : string[] = constants.SKILL_DIFFICULTIES;
 
   constructor(id: string, description: string, misconceptions: Misconception[],
       rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
@@ -189,12 +205,12 @@ export class Skill {
       }
       const rubricObjectFactory = new RubricObjectFactory();
       this._rubrics.push(rubricObjectFactory.create(difficulty, explanation));
-    } else{
+    } else {
       throw new Error('Invalid difficulty value passed');
     }
   }
 
-  toBackendDict() {
+  toBackendDict(): SkillBackendInterface {
     return {
       id: this._id,
       description: this._description,
@@ -251,7 +267,7 @@ export class SkillObjectFactory {
       description, showWarnings, allowDescriptionToBeBlank);
   }
 
-  createFromBackendDict(skillBackendDict): Skill {
+  createFromBackendDict(skillBackendDict: SkillBackendInterface): Skill {
     return new Skill(
       skillBackendDict.id,
       skillBackendDict.description,

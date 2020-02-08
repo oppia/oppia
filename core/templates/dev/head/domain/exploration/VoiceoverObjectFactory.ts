@@ -16,7 +16,11 @@
  * @fileoverview Factory for creating new frontend instances of
  * Voiceover domain objects.
  */
-
+export interface VoiceoverInterface {
+  'filename': string,
+  'file_size_bytes': number,
+  'needs_update': boolean
+}
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -44,10 +48,7 @@ export class Voiceover {
     return this.fileSizeBytes / NUM_BYTES_IN_MB;
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' since 'toBackendDict' returns a dict with underscore_cased keys which
-  // gives tslint errors against underscore_casing in favor of camelCasing.
-  toBackendDict(): any {
+  toBackendDict(): VoiceoverInterface {
     return {
       filename: this.filename,
       file_size_bytes: this.fileSizeBytes,
@@ -64,11 +65,8 @@ export class VoiceoverObjectFactory {
     return new Voiceover(filename, fileSizeBytes, false);
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' since 'translationBackendDict' is a dict with underscore_cased keys
-  // which gives tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(translationBackendDict: any): Voiceover {
+  createFromBackendDict(
+      translationBackendDict: VoiceoverInterface): Voiceover {
     return new Voiceover(
       translationBackendDict.filename,
       translationBackendDict.file_size_bytes,

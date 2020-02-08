@@ -28,8 +28,9 @@ import { SkillObjectFactory } from 'domain/skill/SkillObjectFactory.ts';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 import { TestBed } from '@angular/core/testing';
+const constants = require('constants.ts');
 
-fdescribe('Skill object factory', () => {
+describe('Skill object factory', () => {
   let skillObjectFactory;
   let conceptCardObjectFactory;
   let rubricObjectFactory;
@@ -51,7 +52,7 @@ fdescribe('Skill object factory', () => {
     conceptCardObjectFactory = TestBed.get(ConceptCardObjectFactory);
     misconceptionObjectFactory = TestBed.get(MisconceptionObjectFactory);
     rubricObjectFactory = TestBed.get(RubricObjectFactory);
-    skillDifficulties = ['Easy', 'Medium', 'Hard']
+    skillDifficulties = constants.SKILL_DIFFICULTIES;
     skillObjectFactory = TestBed.get(SkillObjectFactory);
     subtitledHtmlObjectFactory = TestBed.get(SubtitledHtmlObjectFactory);
     misconceptionDict1 = {
@@ -172,7 +173,7 @@ fdescribe('Skill object factory', () => {
 
     expect(() => {
       skill.updateRubricForDifficulty('invalid difficulty', 'explanation 2');
-    }).toThrow('hey');
+    }).toThrow();
   });
 
   it('should get the correct next misconception id', () => {

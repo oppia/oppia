@@ -19,7 +19,10 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-
+export interface RubricBackendInterface {
+  'difficulty': string,
+  'explanation': string
+}
 export class Rubric {
   _difficulty: string;
   _explanation: string;
@@ -29,7 +32,7 @@ export class Rubric {
     this._explanation = explanation;
   }
 
-  toBackendDict(): {difficulty: string; explanation: string;} {
+  toBackendDict(): RubricBackendInterface {
     return {
       difficulty: this._difficulty,
       explanation: this._explanation
@@ -53,9 +56,7 @@ export class Rubric {
   providedIn: 'root'
 })
 export class RubricObjectFactory {
-  createFromBackendDict(rubricBackendDict: {
-      difficulty: string; explanation: string;
-    }): Rubric {
+  createFromBackendDict(rubricBackendDict: RubricBackendInterface): Rubric {
     return new Rubric(
       rubricBackendDict.difficulty,
       rubricBackendDict.explanation);
