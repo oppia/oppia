@@ -19,7 +19,7 @@
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/ReadOnlyTopicObjectFactory';
+  'domain/topic_viewer/read-only-topic-object.factory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';

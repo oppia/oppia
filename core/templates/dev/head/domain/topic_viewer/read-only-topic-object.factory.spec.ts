@@ -18,12 +18,13 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/ReadOnlyTopicObjectFactory';
+  'domain/topic_viewer/read-only-topic-object.factory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
-import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { SubtopicObjectFactory } from
+  'domain/topic/SubtopicObjectFactory';
 
-describe('Topic Data Object Factory', () => {
+fdescribe('Topic Data Object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
   let _sampleReadOnlyTopic: ReadOnlyTopic = null;
 
@@ -65,19 +66,19 @@ describe('Topic Data Object Factory', () => {
       sampleTopicDataDict);
   });
 
-  it('should check the values of topic name and id', () => {
+  fit('should check the values of topic name and id', () => {
     expect(_sampleReadOnlyTopic.getTopicName()).toEqual('topic_name');
     expect(_sampleReadOnlyTopic.getTopicId()).toEqual('topic_id');
   });
 
-  it('should check value of uncategorized skill object', () => {
+  fit('should check value of uncategorized skill object', () => {
     expect(_sampleReadOnlyTopic.getUncategorizedSkills()[0]._id).toEqual(
       'skill_id_1');
     expect(_sampleReadOnlyTopic.getUncategorizedSkills()[0]._description).
       toEqual('Skill Description 1');
   });
 
-  it('should check values of Subtopic object', () => {
+  fit('should check values of Subtopic object', () => {
     expect(_sampleReadOnlyTopic.getSubtopics()[0]._id).toEqual(1);
     expect(_sampleReadOnlyTopic.getSubtopics()[0]._title).toEqual(
       'subtopic_name');
@@ -87,7 +88,14 @@ describe('Topic Data Object Factory', () => {
       _description).toEqual('Skill Description 2');
   });
 
-  it('should get the values as expected', () => {
+  fit('should check type and values of Skill Description', () => {
+    expect(_sampleReadOnlyTopic.getSkillDescriptions()).toEqual({
+      skill_id_1: 'Skill Description 1',
+      skill_id_2: 'Skill Description 2'
+    });
+  });
+
+  fit('should get the values as expected', () => {
     expect(_sampleReadOnlyTopic.getCanonicalStories()[0]).toEqual({
       id: '0',
       title: 'Story Title',
@@ -98,11 +106,6 @@ describe('Topic Data Object Factory', () => {
       id: '1',
       title: 'Story Title',
       description: 'Story Description',
-    });
-
-    expect(_sampleReadOnlyTopic.getSkillDescriptions()).toEqual({
-      skill_id_1: 'Skill Description 1',
-      skill_id_2: 'Skill Description 2'
     });
 
     expect(_sampleReadOnlyTopic.getDegreesOfMastery()).toEqual({

@@ -16,7 +16,7 @@
 * @fileoverview Service to get topic data.
 */
 
-require('domain/topic_viewer/ReadOnlyTopicObjectFactory')
+require('domain/topic_viewer/read-only-topic-object.factory')
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 

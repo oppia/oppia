@@ -25,6 +25,14 @@ import { SkillSummary, SkillSummaryObjectFactory } from
 import { Subtopic, SubtopicObjectFactory } from
   'domain/topic/SubtopicObjectFactory';
 
+export interface ISkillDescriptions {
+  [skill_id: string]: string | null  ;
+}
+
+export interface IDegreesOfMastery {
+  [skill_id: string]: number | null;
+}
+
 export class ReadOnlyTopic {
   _topicName: string;
   _topicId: string;
@@ -32,12 +40,13 @@ export class ReadOnlyTopic {
   _additionalStories: any;
   _uncategorizedSkills: Array<SkillSummary>;
   _subtopics: Array<Subtopic>;
-  _degreesOfMastery: any;
-  _skillDescriptions: any;
+  _degreesOfMastery: IDegreesOfMastery;
+  _skillDescriptions: ISkillDescriptions;
 
   constructor(topicName: string, topicId: string, canonicalStories: any,
       additionalStories: any, uncategorizedSkills: Array<SkillSummary>,
-      subtopics: Array<Subtopic>, degreesOfMastery: any, skillDescriptions) {
+      subtopics: Array<Subtopic>, degreesOfMastery: IDegreesOfMastery,
+      skillDescriptions: ISkillDescriptions) {
     this._topicName = topicName;
     this._topicId = topicId;
     this._canonicalStories = canonicalStories;
@@ -56,12 +65,10 @@ export class ReadOnlyTopic {
     return this._topicId;
   }
 
-  // Return type is any as there is no usage
   getCanonicalStories(): any {
     return this._canonicalStories.slice();
   }
 
-  // Return type is any as there is no usage
   getAdditionalStories(): any {
     return this._additionalStories.slice();
   }
@@ -74,13 +81,11 @@ export class ReadOnlyTopic {
     return this._subtopics.slice();
   }
 
-  // Return type any as no appropriate class found for object construction
-  getDegreesOfMastery(): any {
+  getDegreesOfMastery(): IDegreesOfMastery {
     return this._degreesOfMastery;
   }
 
-  // Return Type any as no appropriate class found for object construction
-  getSkillDescriptions(): any {
+  getSkillDescriptions(): ISkillDescriptions {
     return this._skillDescriptions;
   }
 }
@@ -105,19 +110,18 @@ export class ReadOnlyTopicObjectFactory {
       return this._subtopicObjectFactory.create(
         subtopic, topicDataDict.skill_descriptions);
     });
-
     let uncategorizedSkills =
     topicDataDict.uncategorized_skill_ids.map((skillId: string) => {
       return this._skillSummaryObjectFactory.create(
         skillId, topicDataDict.skill_descriptions[skillId]);
     });
+    let degreesOfMastery: IDegreesOfMastery = topicDataDict.degrees_of_mastery;
+    let skillDescriptions: ISkillDescriptions = topicDataDict.skill_descriptions;
 
     return new ReadOnlyTopic(
       topicDataDict.topic_name, topicDataDict.topic_id,
       topicDataDict.canonical_story_dicts, topicDataDict.additional_story_dicts,
-      uncategorizedSkills, subtopics, topicDataDict.degrees_of_mastery,
-      topicDataDict.skill_descriptions
-    );
+      uncategorizedSkills, subtopics, degreesOfMastery, skillDescriptions);
   }
 }
 

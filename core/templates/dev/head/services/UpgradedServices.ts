@@ -135,7 +135,7 @@ import { PlaythroughObjectFactory } from
   'domain/statistics/PlaythroughObjectFactory';
 import { PythonProgramTokenizer } from 'classifiers/python-program.tokenizer';
 import { ReadOnlyTopicObjectFactory } from
-  'domain/topic_viewer/ReadOnlyTopicObjectFactory';
+  'domain/topic_viewer/read-only-topic-object.factory';
 import { ReadOnlyStoryNodeObjectFactory } from
   'domain/story_viewer/ReadOnlyStoryNodeObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
