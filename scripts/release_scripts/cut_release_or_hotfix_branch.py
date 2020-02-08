@@ -179,11 +179,11 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
 
     last_hotfix_number = 0
     release_branch_exists = False
-    hotfix_branch_name_regex = '^%s/release-%s-hotfix-\\d*$' % (
+    hotfix_branch_name_regex = '^remotes/%s/release-%s-hotfix-\\d*$' % (
         remote_alias, target_version)
     for branch_name in all_branches:
         branch_name = branch_name.lstrip().rstrip()
-        if branch_name == '%s/release-%s' % (
+        if branch_name == 'remotes/%s/release-%s' % (
                 remote_alias, target_version):
             release_branch_exists = True
         if re.match(hotfix_branch_name_regex, branch_name):

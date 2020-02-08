@@ -262,10 +262,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_exception_is_raised_for_invalid_new_hotfix_number(self):
         def mock_check_output(unused_cmd_tokens):
             return (
-                'branch1\nupstream/branch2\nupstream/release-1.2.3-hotfix-2\n'
-                'upstream/release-1.2.3-hotfix-1\n'
-                'upstream/release-1.2.2-hotfix-3\n'
-                'upstream/release-1.2.3\n')
+                'branch1\nremotes/upstream/branch2\n'
+                'remotes/upstream/release-1.2.3-hotfix-2\n'
+                'remotes/upstream/release-1.2.3-hotfix-1\n'
+                'remotes/upstream/release-1.2.2-hotfix-3\n'
+                'remotes/upstream/release-1.2.3\n')
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -278,9 +279,10 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_exception_is_raised_for_missing_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return (
-                'branch1\nupstream/branch2\nupstream/release-1.2.3-hotfix-2\n'
-                'upstream/release-1.2.3-hotfix-1\n'
-                'upstream/release-1.2.3-hotfix-3\n')
+                'branch1\nremotes/upstream/branch2\n'
+                'remotes/upstream/release-1.2.3-hotfix-2\n'
+                'remotes/upstream/release-1.2.3-hotfix-1\n'
+                'remotes/upstream/release-1.2.3-hotfix-3\n')
 
         check_output_swap = self.swap(
             subprocess, 'check_output', mock_check_output)
@@ -293,10 +295,11 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
     def test_no_exception_is_raised_for_valid_new_hotfix_number(self):
         def mock_check_output(unused_cmd_tokens):
             return (
-                'branch1\nupstream/branch2\nupstream/release-1.2.3-hotfix-2\n'
-                'upstream/release-1.2.3-hotfix-1\n'
-                'upstream/release-1.2.2-hotfix-3\n'
-                'upstream/release-1.2.3\n')
+                'branch1\nremotes/upstream/branch2\n'
+                'remotes/upstream/release-1.2.3-hotfix-2\n'
+                'remotes/upstream/release-1.2.3-hotfix-1\n'
+                'remotes/upstream/release-1.2.2-hotfix-3\n'
+                'remotes/upstream/release-1.2.3\n')
 
         with self.swap(subprocess, 'check_output', mock_check_output):
             (
