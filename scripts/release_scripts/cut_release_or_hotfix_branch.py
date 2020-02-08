@@ -252,10 +252,11 @@ def execute_branch_cut():
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
 
-    # The release coordinator should verify that tests are passing on develop
-    # before checking out the release branch.
+    # The release coordinator should verify that tests are passing on the parent
+    # branch before checking out the new branch.
     common.open_new_tab_in_browser_if_possible(
-        'https://github.com/oppia/oppia#oppia----')
+        'https://travis-ci.org/oppia/oppia/branches?'
+        'utm_medium=notification&utm_source=github_status')
     while True:
         if not hotfix_number:
             branch_to_check = 'develop'
