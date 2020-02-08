@@ -1736,7 +1736,7 @@ class State(python_utils.OBJECT):
                 self.interaction.default_outcome.feedback.content_id)
 
         if default_outcome:
-            self.interaction.default_outcome = copy.copy(default_outcome)
+            self.interaction.default_outcome = default_outcome
             new_content_id_list.append(
                 self.interaction.default_outcome.feedback.content_id)
         else:
