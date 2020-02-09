@@ -744,8 +744,8 @@ angular.module('oppia').directive('filepathEditor', [
           CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
-              url: require(imageUploadUrl
-                 + ctrl.entityType + '/' + ctrl.entityId
+              url: require(imageUploadUrl +
+                 ctrl.entityType + '/' + ctrl.entityId
               ),
               data: form,
               processData: false,
