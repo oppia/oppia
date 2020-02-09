@@ -18,12 +18,10 @@
 
 import { TestBed } from '@angular/core/testing';
 
-import {
-  StorySummaryObjectFactory,
-  StorySummary
-} from 'domain/story/StorySummaryObjectFactory';
+import { StorySummary, StorySummaryObjectFactory } from
+  'domain/story/StorySummaryObjectFactory';
 
-fdescribe('Story summary object factory', () => {
+describe('Story summary object factory', () => {
   let factory: StorySummaryObjectFactory;
   let _sampleStorySummary: StorySummary;
 
