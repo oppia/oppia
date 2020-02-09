@@ -167,6 +167,9 @@
                        xlink:href="">
                 </image>
               </pattern>
+              <filter id="circle-shadow">
+                <feDropShadow dx="5" dy="5" stdDeviation="0.5" flood-opacity="0.5"/>
+              </filter>
             </defs>
             <circle ng-show="node.getExplorationId() === $ctrl.nextExplorationId &&
               $index !== $ctrl.activeHighlightedIconIndex"
@@ -188,7 +191,8 @@
                     r="42"
                     fill="url(#image0<[$index]>)"
                     stroke="#006553"
-                    stroke-width="2"/>
+                    stroke-width="2"
+                    filter="url(#circle-shadow)"/>
           </svg>
         </a>
         <img ng-src="<[$ctrl.getStaticImageUrl('/general/mobile_path_segment.svg')]>">
