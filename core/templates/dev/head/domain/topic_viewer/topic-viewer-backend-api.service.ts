@@ -33,6 +33,7 @@ angular.module('oppia').factory('TopicViewerBackendApiService', [
         });
 
       $http.get(topicDataUrl).then(function(response) {
+        console.log(response.data);
         readOnlyTopic = ReadOnlyTopicObjectFactory.createFromBackendDict(
           angular.copy(response.data));
         if (successCallback) {

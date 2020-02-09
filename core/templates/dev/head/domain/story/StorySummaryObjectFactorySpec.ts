@@ -23,7 +23,7 @@ import {
   StorySummary
 } from 'domain/story/StorySummaryObjectFactory';
 
-describe('Story summary object factory', () => {
+fdescribe('Story summary object factory', () => {
   let factory: StorySummaryObjectFactory;
   let _sampleStorySummary: StorySummary;
 
@@ -34,6 +34,7 @@ describe('Story summary object factory', () => {
       id: 'sample_story_id',
       title: 'Story title',
       node_count: 5,
+      description: 'Description',
       story_is_published: true
     };
     _sampleStorySummary = factory.createFromBackendDict(
@@ -41,10 +42,11 @@ describe('Story summary object factory', () => {
     );
   });
 
-  it('should be able to get all the values', () => {
+  fit('should be able to get all the values', () => {
     expect(_sampleStorySummary.getId()).toEqual('sample_story_id');
     expect(_sampleStorySummary.getTitle()).toEqual('Story title');
     expect(_sampleStorySummary.getNodeCount()).toEqual(5);
+    expect(_sampleStorySummary.getDescription()).toEqual('Description');
     expect(_sampleStorySummary.isStoryPublished()).toBe(true);
   });
 });

@@ -22,6 +22,8 @@ import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
+import { StorySummaryObjectFactory } from
+  'domain/story/StorySummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
