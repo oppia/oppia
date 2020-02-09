@@ -486,18 +486,18 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_deletion_policy():
+        """Collection commit log is deleted only if the corresponding collection
+        is not public.
+        """
+        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
         """This model's export_data function implementation is still pending.
 
         TODO(#8523): Implement this function.
         """
-        return base_models.DELETION_POLICY.TO_BE_IMPLEMENTED
-
-    @staticmethod
-    def get_export_policy():
-        """This model is only stored for archive purposes. The commit log of
-        entities is not related to personal user data.
-        """
-        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
     @classmethod
     def _get_instance_id(cls, collection_id, version):
