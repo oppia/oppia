@@ -25,7 +25,7 @@ require('domain/exploration/ParamSpecsObjectFactory');
 require('domain/exploration/ParamSpecObjectFactory');
 
 
-fdescribe('Exploration Property Service', function() {
+describe('Exploration Property Service', function() {
   var ExplorationPropertyService;
   var ParamChangesObjectFactory;
   var ParamSpecsObjectFactory;
