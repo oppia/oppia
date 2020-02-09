@@ -18,20 +18,20 @@
 // require('')
 angular.module('oppia').factory('SkillCreationBackendService', [
   '$http', '$q',
-  function(
-      $http, $q) {
+  function($http, $q) {
     var _createSkill = function(successCallback, errorCallback,
       description, rubrics, explanation, linkedTopicIds) {
-      let backendDict = {
+      let postData = {
         description: description,
         linked_topic_ids: linkedTopicIds,
         explanation_dict: explanation,
         rubrics: rubrics
       };
-      $http.post('/skill_editor_handler/create_new', backendDict)
+      $http.post('/skill_editor_handler/create_new', postData)
         .then(function(response) {
+          let skillId = response.data.skill_id;
           if (successCallback) {
-            successCallback(response.data.skillId);
+            successCallback(skillId);
           }
         }, function(errorResponse) {
           if (errorCallback) {

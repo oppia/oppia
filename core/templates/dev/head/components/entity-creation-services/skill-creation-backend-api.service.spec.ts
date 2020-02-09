@@ -27,8 +27,7 @@ fdescribe('Skill Creation backend service', function() {
   var $rootScope = null;
   var SAMPLE_SKILL_ID = 'hyuy4GUlvTqJ';
   var SUCCESS_STATUS_CODE = 200;
-  var ERROR_STATUS_CODE = 500;
-  var skillCreationBackendDict = null;
+  var ERROR_STATUS_CODE = 404;
   var rubricDict = null;
   beforeEach(angular.mock.module('oppia'));
 
@@ -46,15 +45,8 @@ fdescribe('Skill Creation backend service', function() {
     $rootScope = $injector.get('$rootScope');
 
     rubricDict = {
-      difficulty: 'easy',
+      difficulty: 'Easy',
       explanation: 'test explanation'
-    };
-
-    skillCreationBackendDict = {
-      description: 'test_des_1',
-      linked_topic_ids: 'test_id_11',
-      explanation_dict: 'explaination',
-      rubrics: rubricDict
     };
 
   }));
@@ -69,13 +61,13 @@ fdescribe('Skill Creation backend service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/skill_editor_handler/create_new', skillCreationBackendDict).respond(
+      $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
         SUCCESS_STATUS_CODE, {skillId: SAMPLE_SKILL_ID});
-        SkillCreationBackendService.createSkill('test_des_1','test_id_11','explaination',rubricDict).then(
+      SkillCreationBackendService.createSkill('test_des_1',rubricDict,'explaination',['test_id_11']).then(
         successHandler, failHandler);
 
-      $httpBackend.flush();
-      $rootScope.$digest();
+      // $httpBackend.flush();
+      $rootScope.$apply();
 
       expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
@@ -87,14 +79,12 @@ fdescribe('Skill Creation backend service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/skill_editor_handler/create_new',skillCreationBackendDict).respond(
+      $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
         ERROR_STATUS_CODE);
-        SkillCreationBackendService.createSkill('test_des_1','test_id_11','explaination',rubricDict).then(
+      SkillCreationBackendService.createSkill('test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
         successHandler, failHandler);
-
-      $httpBackend.flush();
-      $rootScope.$digest();
-
+      // $httpBackend.flush();
+        $rootScope.$apply();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalled();
       done();
