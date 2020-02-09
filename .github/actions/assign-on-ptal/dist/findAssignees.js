@@ -19,7 +19,7 @@ function findAssignees(body) {
             }
         }
     });
-    console.log("Assigning these members: " + result);
+    console.log('Assigning these members: ' + result);
     return result;
 }
 exports.findAssignees = findAssignees;

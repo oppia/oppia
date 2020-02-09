@@ -20,6 +20,6 @@ export function findAssignees(body: string): Array<string> {
     }
   })
   
-  console.log("Assigning these members: " + result);
+  console.log('Assigning these members: ' + result);
   return result;
 }

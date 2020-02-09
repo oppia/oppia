@@ -15,22 +15,22 @@ const RestClient_1 = require("typed-rest-client/RestClient");
 const Handlers_1 = require("typed-rest-client/Handlers");
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        let repoToken = process.env["INPUT_REPO-TOKEN"];
+        let repoToken = process.env['INPUT_REPO-TOKEN'];
         if (!repoToken) {
-            throw new Error("Input `repo-token` not provided");
+            throw new Error('Input `repo-token` not provided');
         }
         let eventPath = process.env.GITHUB_EVENT_PATH;
         if (!eventPath) {
-            throw new Error("Event is not present");
+            throw new Error('Event is not present');
         }
         let eventBuffer = yield fs_1.promises.readFile(eventPath, {
-            encoding: "utf8"
+            encoding: 'utf8'
         });
         let event = JSON.parse(eventBuffer);
         let payload = buildPayload_1.buildAssigneesPayload(event);
-        let client = new RestClient_1.RestClient("auto-assign-using-ptal-action", "https://api.github.com", [new Handlers_1.BasicCredentialHandler("token", repoToken)], {
+        let client = new RestClient_1.RestClient('auto-assign-using-ptal-action', 'https://api.github.com', [new Handlers_1.BasicCredentialHandler('token', repoToken)], {
             headers: {
-                Accept: "application/vnd.github.v3+json"
+                Accept: 'application/vnd.github.v3+json'
             }
         });
         yield client.create(payload.url, payload.body);

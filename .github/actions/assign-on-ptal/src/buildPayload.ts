@@ -1,4 +1,4 @@
-import { findAssignees } from "./findAssignees";
+import { findAssignees } from './findAssignees';
 export interface AssigneesRequestData {
   url: string;
   body: {
@@ -8,19 +8,19 @@ export interface AssigneesRequestData {
 
 export function buildAssigneesPayload(event: any): AssigneesRequestData {
   if (!event.repository) {
-    throw new Error("Repository not given in event payload.");
+    throw new Error('Repository not given in event payload.');
   }
 
   if (!event.issue) {
-    throw new Error("Event is not an issue or a pull-request event.");
+    throw new Error('Event is not an issue or a pull-request event.');
   }
 
   if (!event.issue.user) {
-    throw new Error("Event does not contain user information.");
+    throw new Error('Event does not contain user information.');
   }
 
   if (!event.issue.user.login) {
-    throw new Error("User payload is malformed.");
+    throw new Error('User payload is malformed.');
   }
 
   // console.log(JSON.stringify(event, undefined, 2));
