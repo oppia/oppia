@@ -95,7 +95,7 @@ class CollectionModel(base_models.VersionedModel):
     @staticmethod
     def get_export_policy():
         """Model does not contain user data."""
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -486,10 +486,11 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Collection commit log is deleted only if the corresponding collection
-        is not public.
+        """This model's export_data function implementation is still pending.
+
+        TODO(#8523): Implement this function.
         """
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+        return base_models.DELETION_POLICY.TO_BE_IMPLEMENTED
 
     @staticmethod
     def get_export_policy():

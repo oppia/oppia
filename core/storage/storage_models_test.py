@@ -190,7 +190,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
             collection_models.CollectionRightsSnapshotMetadataModel,
             collection_models.CollectionSnapshotContentModel,
             collection_models.CollectionSnapshotMetadataModel,
-            collection_models.CollectionModel,
+            collection_models.CollectionCommitLogEntryModel,
             skill_models.SkillSnapshotMetadataModel,
             skill_models.SkillSnapshotContentModel,
             topic_models.SubtopicPageSnapshotContentModel,
