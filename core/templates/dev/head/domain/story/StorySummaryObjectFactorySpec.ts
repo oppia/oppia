@@ -40,7 +40,7 @@ describe('Story summary object factory', () => {
     );
   });
 
-  fit('should be able to get all the values', () => {
+  it('should be able to get all the values', () => {
     expect(_sampleStorySummary.getId()).toEqual('sample_story_id');
     expect(_sampleStorySummary.getTitle()).toEqual('Story title');
     expect(_sampleStorySummary.getNodeCount()).toEqual(5);
