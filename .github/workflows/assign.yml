@@ -1,0 +1,22 @@
+name: Assign members based on comments
+on: [issue_comment]
+
+jobs:
+  assign:
+    runs-on:  ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2 
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - name: npm install
+        run: npm install ./.github/actions/assign-on-ptal
+      - name: Auto assign on PTAL
+        uses: ./.github/actions/assign-on-ptal
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}

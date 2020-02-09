@@ -1,0 +1,23 @@
+{
+  "name": "assign-on-ptal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write ./**/*.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.2.2",
+    "@actions/github": "^2.1.0",
+    "typed-rest-client": "^1.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^13.7.0",
+    "prettier": "^1.19.1",
+    "typescript": "^3.7.5"
+  }
+}

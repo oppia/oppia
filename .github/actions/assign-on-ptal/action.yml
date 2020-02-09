@@ -1,0 +1,11 @@
+name: 'Auto-assign based on PTAL'
+description: 'This action auto-assigns the thread to the member whenever it reads `@someone PTAL` in the comments.'
+inputs:
+  repo-token:
+    description: "The GITHUB_TOKEN secret"
+outputs:
+  assignee: # id of output
+    description: 'The member assigned to the thread'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
