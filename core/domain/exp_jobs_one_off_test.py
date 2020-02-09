@@ -1536,24 +1536,26 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
 
-        hint_list1 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint2',
-                'html': '<p>Hello, this is html2 for state1</p>'
-            }
-        }]
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>'
+                )
+            ),
+        ]
 
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state2</p>'
+                )
+            )
+        ]
 
         state1.update_interaction_hints(hint_list1)
         state2.update_interaction_hints(hint_list2)
@@ -1584,24 +1586,23 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration1.states['State1']
         state2 = exploration1.states['State2']
 
-        hint_list1 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint2',
-                'html': '<p>Hello, this is html2 for state1</p>'
-            }
-        }]
-
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state2</p>'
-            }
-        }]
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>')
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>')
+            ),
+        ]
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state2</p>'
+                )
+            )
+        ]
 
         state1.update_interaction_hints(hint_list1)
 
@@ -1616,12 +1617,13 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         state1 = exploration2.states['State1']
 
-        hint_list1 = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }]
+        hint_list1 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+        ]
 
         state1.update_interaction_hints(hint_list1)
 
@@ -1656,17 +1658,18 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
         state1 = exploration.states['State1']
 
-        hint_list = [{
-            'hint_content': {
-                'content_id': 'hint1',
-                'html': '<p>Hello, this is html1 for state1</p>'
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint2',
-                'html': '<p>Hello, this is html2 for state1</p>'
-            }
-        }]
+        hint_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint1', '<p>Hello, this is html1 for state1</p>'
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint2', '<p>Hello, this is html2 for state1</p>'
+                )
+            )
+        ]
 
         state1.update_interaction_hints(hint_list)
         exp_services.save_new_exploration(self.albert_id, exploration)

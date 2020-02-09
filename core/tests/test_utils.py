@@ -2152,12 +2152,11 @@ class AppEngineTestBase(TestBase):
                 'html': '<p>This is a solution.</p>'
             }
         }
-        hints_list = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': '<p>This is a hint.</p>'
-            }
-        }]
+        hints_list = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml('hint_1', '<p>This is a hint.</p>')
+            )
+        ]
         state.update_interaction_solution(solution_dict)
         state.update_interaction_hints(hints_list)
         state.interaction.customization_args = {

@@ -1490,23 +1490,24 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
         }
         state1.update_interaction_default_outcome(default_outcome_dict1)
 
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': (
-                    '<p>Hello, this is html1 for state2</p>'
-                    '<oppia-noninteractive-image filepath-with-value="'
-                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+        hint_list2 = [
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_1',
+                    (
+                        '<p>Hello, this is html1 for state2</p>'
+                        '<oppia-noninteractive-image filepath-with-value="'
+                        '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                        '"&amp;quot;&amp;quot;" alt-with-value='
+                        '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     )
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
+                )
+            ),
+            state_domain.Hint(
+                state_domain.SubtitledHtml(
+                    'hint_2', '<p>Hello, this is html2 for state2</p>')
+            ),
+        ]
         state2.update_interaction_hints(hint_list2)
 
         answer_group_list2 = [{
