@@ -284,14 +284,16 @@ export class SkillObjectFactory {
       skillBackendDict.prerequisite_skill_ids);
   }
 
-  generateMisconceptionsFromBackendDict(misconceptionsBackendDicts) {
+  generateMisconceptionsFromBackendDict(
+      misconceptionsBackendDicts : MisconceptionBackendInterface[]) {
     return misconceptionsBackendDicts.map(misconceptionsBackendDict => {
       return this.misconceptionObjectFactory.createFromBackendDict(
         misconceptionsBackendDict);
     });
   }
 
-  generateRubricsFromBackendDict(rubricBackendDicts) {
+  generateRubricsFromBackendDict(
+      rubricBackendDicts : RubricBackendInterface[]) {
     return rubricBackendDicts.map((rubricBackendDict) => {
       return this.rubricObjectFactory.createFromBackendDict(rubricBackendDict);
     });

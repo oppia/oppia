@@ -30,7 +30,7 @@ export interface voice {
 }
 export interface VoiceoverMapping {
   [propName: string]: {
-    [propName: string]: voice
+    [propName: string]: Voiceover
   }
 }
 import { Injectable } from '@angular/core';
@@ -39,14 +39,11 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { VoiceoverObjectFactory, VoiceoverInterface, Voiceover } from
   'domain/exploration/VoiceoverObjectFactory';
 export class RecordedVoiceovers {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'voiceoversMapping' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   voiceoversMapping: VoiceoverMapping;
   _voiceoverObjectFactory: VoiceoverObjectFactory;
   constructor(
-      voiceoversMapping: VoiceoverMapping, voiceoverObjectFactory: VoiceoverObjectFactory) {
+      voiceoversMapping: VoiceoverMapping,
+      voiceoverObjectFactory: VoiceoverObjectFactory) {
     this.voiceoversMapping = voiceoversMapping;
     this._voiceoverObjectFactory = voiceoverObjectFactory;
   }
@@ -55,17 +52,10 @@ export class RecordedVoiceovers {
     return Object.keys(this.voiceoversMapping);
   }
 
-  // TODO(#7165): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with varying keys and the correct
-  // type needs to be found.
-  getBindableVoiceovers(contentId: string): any {
+  getBindableVoiceovers(contentId: string): {[propName: string]: voice} {
     return this.voiceoversMapping[contentId];
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because the return type is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
   getVoiceover(contentId: string, langCode: string): voice {
     return this.voiceoversMapping[contentId][langCode];
   }
