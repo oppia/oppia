@@ -1,0 +1,4 @@
+Contact: admin@oppia.org
+Preferred-Languages: en
+Canonical: https://www.oppia.org/security.txt
+Acknowledgements: https://www.oppia.org/about#credits
