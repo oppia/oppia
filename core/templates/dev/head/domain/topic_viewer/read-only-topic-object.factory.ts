@@ -30,11 +30,11 @@ import { Subtopic, SubtopicObjectFactory } from
   'domain/topic/SubtopicObjectFactory';
 
 export interface ISkillDescriptions {
-  [skill_id: string]: string | null  ;
+  [skillId: string]: string | null;
 }
 
 export interface IDegreesOfMastery {
-  [skill_id: string]: number | null;
+  [skillId: string]: number | null;
 }
 
 export class ReadOnlyTopic {
@@ -115,10 +115,10 @@ export class ReadOnlyTopicObjectFactory {
     var storyReferenceObjectFactory = new StoryReferenceObjectFactory();
     let storySummaryArray: Array<StorySummary> =
     storyDicts.map((storyDict: any) => {
-      return new StorySummary( storyDict['id'], storyDict['title'],
-        storyDict['node_count'], storyDict['description'],
-        storyReferenceObjectFactory.createFromStoryId(storyDict['id']).
-        isStoryPublished());
+      return new StorySummary( storyDict.id, storyDict.title,
+        storyDict.node_count, storyDict.description,
+        storyReferenceObjectFactory.createFromStoryId(storyDict.id).
+          isStoryPublished());
     });
     return storySummaryArray;
   }
@@ -136,7 +136,8 @@ export class ReadOnlyTopicObjectFactory {
         skillId, topicDataDict.skill_descriptions[skillId]);
     });
     let degreesOfMastery: IDegreesOfMastery = topicDataDict.degrees_of_mastery;
-    let skillDescriptions: ISkillDescriptions = topicDataDict.skill_descriptions;
+    let skillDescriptions: ISkillDescriptions =
+      topicDataDict.skill_descriptions;
     let canonicalStories: Array<StorySummary> = this.getStorySummaryArray(
       topicDataDict.canonical_story_dicts);
     let additionalStories: Array<StorySummary> = this.getStorySummaryArray(

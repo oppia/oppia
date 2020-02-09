@@ -16,15 +16,15 @@
 * @fileoverview Service to get topic data.
 */
 
-require('domain/topic_viewer/read-only-topic-object.factory')
+require('domain/topic_viewer/read-only-topic-object.factory');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').factory('TopicViewerBackendApiService', [
   '$http', '$q', 'ReadOnlyTopicObjectFactory', 'UrlInterpolationService',
   'TOPIC_DATA_URL_TEMPLATE', function(
-    $http, $q, ReadOnlyTopicObjectFactory, UrlInterpolationService,
-    TOPIC_DATA_URL_TEMPLATE) {
+      $http, $q, ReadOnlyTopicObjectFactory, UrlInterpolationService,
+      TOPIC_DATA_URL_TEMPLATE) {
     var readOnlyTopic = null;
     var _fetchTopicData = function(topicName, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -33,7 +33,6 @@ angular.module('oppia').factory('TopicViewerBackendApiService', [
         });
 
       $http.get(topicDataUrl).then(function(response) {
-        console.log(response.data);
         readOnlyTopic = ReadOnlyTopicObjectFactory.createFromBackendDict(
           angular.copy(response.data));
         if (successCallback) {
