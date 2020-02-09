@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Directive for the topic viewer.
-*/
+ * @fileoverview Directive for the topic viewer.
+ */
 
 require('base-components/base-content.directive.ts');
 require(

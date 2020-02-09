@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for TopicViewerBackendApiService.
-*/
+ * @fileoverview Unit tests for TopicViewerBackendApiService.
+ */
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.

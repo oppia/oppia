@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /**
-* @fileoverview Factory for creating instances of ReadOnlyTopic from
-* topic data domain objects.
-*/
+ * @fileoverview Factory for creating instances of ReadOnlyTopic from
+ * topic data domain objects.
+ */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';

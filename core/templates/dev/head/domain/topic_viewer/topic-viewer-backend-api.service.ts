@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Service to get topic data.
-*/
+ * @fileoverview Service to get topic data.
+ */
 
 require('domain/topic_viewer/read-only-topic-object.factory');
 require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');

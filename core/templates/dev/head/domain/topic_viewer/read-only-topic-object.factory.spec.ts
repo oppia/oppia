@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Tests for read-only-topic-object.factory.ts
-*/
+ * @fileoverview Tests for read-only-topic-object.factory.ts
+ */
 import { TestBed } from '@angular/core/testing';
 
 import { ReadOnlyTopic, ReadOnlyTopicObjectFactory } from
