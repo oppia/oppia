@@ -25,7 +25,7 @@ require('domain/exploration/ParamSpecsObjectFactory');
 require('domain/exploration/ParamSpecObjectFactory');
 
 
-describe('Exploration Property Service', function() {
+fdescribe('Exploration Property Service', function() {
   var ExplorationPropertyService;
   var ParamChangesObjectFactory;
   var ParamSpecsObjectFactory;
@@ -61,7 +61,7 @@ describe('Exploration Property Service', function() {
   it('should create a new exploration properties object', function() {
     expect(function() {
       ExplorationPropertyService.init('initial value');
-    }).toThrow('Exploration property name cannot be null.');
+    }).toThrow(new Error('Exploration property name cannot be null.'));
 
     ExplorationPropertyService.propertyName = 'property_1';
     ExplorationPropertyService.init('initial value');
@@ -95,7 +95,7 @@ describe('Exploration Property Service', function() {
   it('should save the displayed value when init is not called', function() {
     expect(function() {
       ExplorationPropertyService.saveDisplayedValue();
-    }).toThrow('Exploration property name cannot be null.');
+    }).toThrow(new Error('Exploration property name cannot be null.'));
 
     ExplorationPropertyService.propertyName = 'property_1';
     ExplorationPropertyService.saveDisplayedValue();
