@@ -16,28 +16,15 @@
  * @fileoverview Unit tests for Expression Parser Service.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { ExpressionParserService } from 'expressions/expression-parser.service';
 
-require('expressions/expression-parser.service.js');
+describe('Expression parser service', () => {
+  let eps : ExpressionParserService;
+  beforeEach(() => {
+    eps = new ExpressionParserService();
+  });
 
-describe('Expression parser service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  var eps = null;
-  beforeEach(angular.mock.inject(function($injector) {
-    eps = $injector.get('ExpressionParserService');
-  }));
-
-  it('should parse to a correct tree', function() {
+  it('should parse to a correct tree', () => {
     [
       [10, '10'],
       [32, '0x20'],
@@ -87,7 +74,7 @@ describe('Expression parser service', function() {
       [undefined, 'abc()('],
       [undefined, '()'],
       [undefined, '*100']
-    ].forEach(function(test) {
+    ].forEach((test) => {
       // 'expected' should be either a JavaScript primitive value that would be
       //   the result of evaluating 'expression', or undefined (which means
       //   that the parser is expected to fail).
