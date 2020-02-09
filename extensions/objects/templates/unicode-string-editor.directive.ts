@@ -21,8 +21,7 @@
 // in via initArgs.
 
 angular.module('oppia').directive('unicodeStringEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -31,8 +30,8 @@ angular.module('oppia').directive('unicodeStringEditor', [
         getInitArgs: '&',
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/unicode-string-editor.directive.html'),
+      template: require(
+        './objects/templates/unicode-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

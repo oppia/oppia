@@ -22,16 +22,15 @@
 // in via initArgs.
 
 angular.module('oppia').directive('graphPropertyEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/graph-property-editor.directive.html'),
+      template: require(
+        './objects/templates/graph-property-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

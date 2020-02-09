@@ -21,16 +21,15 @@
 // in via initArgs.
 
 angular.module('oppia').directive('nonnegativeIntEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/nonnegative-int-editor.directive.html'),
+      template: require(
+        './objects/templates/nonnegative-int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

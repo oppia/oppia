@@ -23,16 +23,15 @@
 // This directive is based on the UnicodeString directive.
 
 angular.module('oppia').directive('htmlEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/html-editor.directive.html'),
+      template: require(
+        './objects/templates/html-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

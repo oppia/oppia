@@ -17,8 +17,7 @@
  */
 
 angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -26,8 +25,8 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
         getInitArgs: '&',
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/' +
+      template: require(
+        './objects/templates/' +
         'list-of-sets-of-html-strings-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {

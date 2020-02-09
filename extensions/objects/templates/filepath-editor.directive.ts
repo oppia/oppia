@@ -19,7 +19,6 @@
 // This directive can only be used in the context of an exploration.
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
@@ -31,17 +30,17 @@ var gifshot = require('gifshot');
 
 angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
-  'CsrfTokenService', 'ImageUploadHelperService', 'UrlInterpolationService',
+  'CsrfTokenService', 'ImageUploadHelperService',
   function($sce, AlertsService, AssetsBackendApiService, ContextService,
-      CsrfTokenService, ImageUploadHelperService, UrlInterpolationService) {
+      CsrfTokenService, ImageUploadHelperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/filepath-editor.directive.html'),
+      template: require(
+        './objects/templates/filepath-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
@@ -741,16 +740,12 @@ angular.module('oppia').directive('filepathEditor', [
             filename: ImageUploadHelperService.generateImageFilename(
               dimensions.height, dimensions.width, imageType)
           }));
-          var imageUploadUrlTemplate = '/createhandler/imageupload/' +
-            '<entity_type>/<entity_id>';
+          var imageUploadUrl = './createhandler/imageupload/';
           CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
-              url: UrlInterpolationService.interpolateUrl(
-                imageUploadUrlTemplate, {
-                  entity_type: ctrl.entityType,
-                  entity_id: ctrl.entityId
-                }
+              url: require(imageUploadUrl
+                 + ctrl.entityType + '/' + ctrl.entityId
               ),
               data: form,
               processData: false,
