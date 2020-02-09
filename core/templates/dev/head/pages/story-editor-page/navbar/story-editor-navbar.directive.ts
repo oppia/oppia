@@ -91,6 +91,16 @@ angular.module('oppia').directive('storyEditorNavbar', [
               if (summaries.length !== explorationIds.length) {
                 $scope.validationIssues.push(
                   'Some explorations in story are not published.');
+              } else if (summaries.length > 0) {
+                var commonExpCategory = summaries[0].category;
+                for (var idx in summaries) {
+                  if (summaries[idx].category !== commonExpCategory) {
+                    $scope.validationIssues.push(
+                      'All explorations in story should have the same category'
+                    );
+                    break;
+                  }
+                }
               }
             });
           };

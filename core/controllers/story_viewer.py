@@ -99,8 +99,6 @@ class StoryProgressHandler(base.BaseHandler):
             raise self.PageNotFoundException(e)
 
         story = story_fetchers.get_story_by_id(story_id)
-        completed_nodes = []
-
         completed_nodes = story_fetchers.get_completed_nodes_in_story(
             self.user_id, story_id)
         completed_node_ids = [
