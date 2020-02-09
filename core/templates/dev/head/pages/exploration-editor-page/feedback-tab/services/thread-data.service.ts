@@ -75,7 +75,7 @@ angular.module('oppia').factory('ThreadDataService', [
 
       return threadsById[threadId] =
         SuggestionThreadObjectFactory.createFromBackendDicts(
-          threadBackendDict, suggestionBackendDictsByThreadId[threadId]));
+          threadBackendDict, suggestionBackendDictsByThreadId[threadId]);
     };
 
     // Cached number of open threads requiring action.
@@ -91,18 +91,17 @@ angular.module('oppia').factory('ThreadDataService', [
         return $q.all([suggestionPromise, threadPromise]).then(response => {
           let [suggestionResponse, threadResponse] = response.map(r => r.data);
 
-          let suggestionBackendDictsByThreadId =
-            Object.fromEntries(suggestionResponse.suggestions.map(
-              backendDict => [
-                getThreadIdFromSuggestionBackendDict(backendDict), backendDict
-              ]
-            ));
+          let suggestionBackendDictsByThreadId = {};
+          suggestionResponse.suggestions.forEach(backendDict => {
+            let threadId = getThreadIdFromSuggestionBackendDict(backendDict);
+            suggestionBackendDictsByThreadId[threadId] = backendDict;
+          });
 
           return {
             feedbackThreads: threadResponse.feedback_thread_dicts.map(
               assignFeedbackThread),
             suggestionThreads: threadResponse.suggestion_thread_dicts.map(
-              d => assignSuggestionThread(d, suggestionBackendDictsByThreadId))
+              t => assignSuggestionThread(t, suggestionBackendDictsByThreadId))
           };
         });
       },
@@ -126,7 +125,7 @@ angular.module('oppia').factory('ThreadDataService', [
           text: newText
         }).then(() => {
           openThreadsCount += 1;
-          return fetchThreads();
+          return this.fetchThreads();
         }, err => {
           AlertsService.addWarning('Error creating new thread: ' + err + '.');
         }).then(onSuccess);
@@ -158,7 +157,7 @@ angular.module('oppia').factory('ThreadDataService', [
               openThreadsCount += 1;
             }
           }
-          return fetchMessages(threadId);
+          return this.fetchMessages(threadId);
         }).then(onSuccess, onFailure);
       },
       resolveSuggestion: function(
