@@ -409,16 +409,7 @@
     "is_linear": false,
     "display_mode": "inline",
     "id": "SetInput",
-    "customization_arg_specs": [
-      {
-        "description": "Customize the \"Add\" button text:",
-        "name": "buttonText",
-        "schema": {
-          "type": "unicode"
-        },
-        "default_value": "Add item"
-      }
-    ],
+    "customization_arg_specs": [],
     "is_terminal": false,
     "default_outcome_heading": null,
     "rule_descriptions": {
