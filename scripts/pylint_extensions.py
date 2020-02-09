@@ -36,7 +36,7 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
-DATA_TYPES = ['int', 'str', 'float', 'bool']
+DATA_TYPES = ['int.', 'str.', 'float.', 'bool.']
 
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
@@ -1196,6 +1196,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
         """
 
         in_multi_line_comment = False
+        space_at_beginning = True
         multi_line_indicator = b'"""'
         file_content = read_from_node(node)
         file_length = len(file_content)
@@ -1251,12 +1252,15 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             # shebang expression at the start of a bash script which
             # loses function when a space is added.
             if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
+                space_at_beginning = False
                 self.add_message(
                     'no-space-at-beginning', line=line_num + 1)
 
-            # Check if comment contains version info or data type.
-            if line.startswith(b'#'):
-                data_type_is_present = any(word in line for word in DATA_TYPES)
+            # Check if comment contains version info or data type
+            # at the beginning.
+            if line.startswith(b'#') and len(line) > 1 and space_at_beginning:
+                word = line.split()[1]
+                data_type_is_present = word in DATA_TYPES
                 if data_type_is_present or re.search(br'^# v[0-9]+ .*$', line):
                     continue
 
