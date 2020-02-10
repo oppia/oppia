@@ -28,7 +28,7 @@
   <form class="form-horizontal" role="form" ng-submit="updateExplorationId(explorationId)">
     <input class="protractor-test-exploration-id-input" type="text" ng-model="explorationId" ng-change="checkCanSaveExpId()">
     <button type="submit" class="protractor-test-exploration-id-save-button btn btn-success btn-sm" ng-disabled="!canSaveExpId || (explorationId === currentExplorationId)">Save</button>
-    <span class="form-text" style="font-size: smaller; color: red;" ng-if="!expIdIsValid">
+    <span class="form-text error-message" ng-if="!expIdIsValid">
       <em>Please enter a valid exploration id.</em>
     </span>
   </form>
@@ -133,7 +133,7 @@
     margin-top: 1.5vh;
   }
   story-editor .error-message {
-    font-size: smaller;
     color: red;
+    font-size: 13px;
   }
 </style>
