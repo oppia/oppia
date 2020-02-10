@@ -976,8 +976,7 @@ class CollectionModelValidator(BaseModelValidator):
                 collection_models.CollectionSnapshotContentModel,
                 snapshot_model_ids),
             'all_users_model_ids': (
-                collection_models.CollectionRightsAllUsersModelValidator,
-                [item.id])
+                collection_models.CollectionRightsAllUsersModel, [item.id])
         }
 
 
@@ -1774,7 +1773,7 @@ class ExplorationModelValidator(BaseModelValidator):
                 exp_models.ExplorationSnapshotContentModel,
                 snapshot_model_ids),
             'all_users_model_ids': (
-                exp_models.ExplorationRightsAllUsersModelValidator, [item.id])
+                exp_models.ExplorationRightsAllUsersModel, [item.id])
         }
 
 
@@ -3236,7 +3235,7 @@ class TopicModelValidator(BaseModelValidator):
                 ['%s-%s' % (
                     item.id, subtopic['id']) for subtopic in item.subtopics]),
             'all_users_model_ids': (
-                topic_models.TopicRightsAllUsersModelValidator, [item.id])
+                topic_models.TopicRightsAllUsersModel, [item.id])
         }
 
     @classmethod
