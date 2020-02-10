@@ -34,4 +34,10 @@ describe('IdGenerationService', () => {
     let id2 = idGenerationService.generateNewId();
     expect(id1).not.toEqual(id2);
   });
+
+  it('should generate id with 10 digits when random string is less than' +
+    ' 10 of length', function() {
+    spyOn(Number.prototype, 'toString').and.returnValue('0.abcdefhij');
+    expect(idGenerationService.generateNewId()).toBe('abcdefhij0');
+  });
 });
