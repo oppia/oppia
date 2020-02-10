@@ -38,7 +38,7 @@ angular.module('oppia').directive('logicQuestionEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/logic-question-editor.directive.html'),
+        './logic-question-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

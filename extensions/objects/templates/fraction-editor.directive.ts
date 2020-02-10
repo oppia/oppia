@@ -27,7 +27,7 @@ angular.module('oppia').directive('fractionEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/fraction-editor.directive.html'),
+        './fraction-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

@@ -33,7 +33,7 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/image-with-regions-editor.directive.html'),
+        './image-with-regions-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$uibModal',
@@ -478,8 +478,7 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
           ctrl.resetEditor = function() {
             $uibModal.open({
               template: require(
-                './objects/templates/' +
-                'image-with-regions-reset-confirmation.directive.html'),
+                './image-with-regions-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [

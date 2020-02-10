@@ -26,7 +26,7 @@ angular.module('oppia').directive('numberWithUnitsEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/number-with-units-editor.directive.html'),
+        './number-with-units-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

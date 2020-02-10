@@ -25,7 +25,7 @@ angular.module('oppia').directive('realEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/real-editor.directive.html'),
+        './real-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

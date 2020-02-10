@@ -32,7 +32,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/math-latex-string-editor.directive.html'),
+        './math-latex-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

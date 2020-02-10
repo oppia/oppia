@@ -28,7 +28,7 @@ angular.module('oppia').directive('parameterNameEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/parameter-name-editor.directive.html'),
+        './parameter-name-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'ExplorationParamSpecsService',

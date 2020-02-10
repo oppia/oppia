@@ -31,7 +31,7 @@ angular.module('oppia').directive('unicodeStringEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/unicode-string-editor.directive.html'),
+        './unicode-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

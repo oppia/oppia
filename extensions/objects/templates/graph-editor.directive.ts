@@ -29,7 +29,7 @@ angular.module('oppia').directive('graphEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/graph-editor.directive.html'),
+        './graph-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

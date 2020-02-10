@@ -29,7 +29,7 @@ angular.module('oppia').directive('logicErrorCategoryEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/logic-error-category-editor.directive.html'),
+        './logic-error-category-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

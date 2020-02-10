@@ -26,8 +26,7 @@ angular.module('oppia').directive('listOfSetsOfHtmlStringsEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/' +
-        'list-of-sets-of-html-strings-editor.directive.html'),
+        './list-of-sets-of-html-strings-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

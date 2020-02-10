@@ -29,7 +29,7 @@ angular.module('oppia').directive('intEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/int-editor.directive.html'),
+        './int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

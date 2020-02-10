@@ -17,7 +17,8 @@
  */
 
 angular.module('oppia').directive('coordTwoDimEditor', [
-  function() {
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
@@ -51,24 +52,25 @@ angular.module('oppia').directive('coordTwoDimEditor', [
               focus: true,
               draggable: true,
               icon: {
-                iconUrl: require(
-                  './interactions/InteractiveMap/static/marker-icon.png'),
+                iconUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon.png'),
                 // The size of the icon image in pixels.
                 iconSize: [25, 41],
                 // The coordinates of the "tip" of the icon.
                 iconAnchor: [12, 41],
-                shadowUrl: require(
-                  './interactions/InteractiveMap/static/marker-shadow.png'),
+                shadowUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-shadow.png'),
                 // The size of the shadow image in pixels.
                 shadowSize: [41, 41],
                 // The coordinates of the "tip" of the shadow.
                 shadowAnchor: [13, 41],
                 // The URL to a retina sized version of the icon image.
                 // Used for Retina screen devices.
-                iconRetinaUrl: require(
-                  './interactions/InteractiveMap/static/marker-icon-2x.png'),
-                shadowRetinaUrl: require(
-                  './interactions/InteractiveMap/static/marker-shadow.png')
+                iconRetinaUrl: UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-icon-2x.png'),
+                shadowRetinaUrl:
+                UrlInterpolationService.getExtensionResourceUrl(
+                  '/interactions/InteractiveMap/static/marker-shadow.png')
               }
             }
           };
@@ -90,6 +92,6 @@ angular.module('oppia').directive('coordTwoDimEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/coord-two-dim-editor.directive.html'),
+        './coord-two-dim-editor.directive.html'),
     };
   }]);

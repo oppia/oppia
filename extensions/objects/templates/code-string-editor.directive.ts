@@ -30,7 +30,7 @@ angular.module('oppia').directive('codeStringEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/code-string-editor.directive.html'),
+        './code-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

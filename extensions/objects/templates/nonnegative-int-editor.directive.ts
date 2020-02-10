@@ -29,7 +29,7 @@ angular.module('oppia').directive('nonnegativeIntEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/nonnegative-int-editor.directive.html'),
+        './nonnegative-int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

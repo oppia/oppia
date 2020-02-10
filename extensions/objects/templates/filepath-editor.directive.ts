@@ -40,7 +40,7 @@ angular.module('oppia').directive('filepathEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/filepath-editor.directive.html'),
+        './filepath-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

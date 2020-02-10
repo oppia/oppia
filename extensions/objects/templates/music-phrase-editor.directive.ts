@@ -28,7 +28,7 @@ angular.module('oppia').directive('musicPhraseEditor', [
         value: '='
       },
       template: require(
-        './objects/templates/music-phrase-editor.directive.html'),
+        './music-phrase-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

@@ -43,6 +43,6 @@ angular.module('oppia').directive('booleanEditor', [
       bindToController: {
         value: '='
       },
-      template: require('./objects/templates/boolean-editor.directive.html'),
+      template: require('./boolean-editor.directive.html'),
     };
   }]);
