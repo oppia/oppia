@@ -975,6 +975,9 @@ class CollectionModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 collection_models.CollectionSnapshotContentModel,
                 snapshot_model_ids),
+            'all_users_model_ids': (
+                collection_models.CollectionRightsAllUsersModelValidator,
+                [item.id])
         }
 
 
@@ -1105,7 +1108,9 @@ class CollectionRightsAllUsersModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         return {
             'collection_rights_ids': (
-                collection_models.CollectionRightsModel, [item.id])
+                collection_models.CollectionRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -1768,6 +1773,8 @@ class ExplorationModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 exp_models.ExplorationSnapshotContentModel,
                 snapshot_model_ids),
+            'all_users_model_ids': (
+                exp_models.ExplorationRightsAllUsersModelValidator, [item.id])
         }
 
 
@@ -1902,7 +1909,9 @@ class ExplorationRightsAllUsersModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         return {
             'exploration_rights_ids': (
-                exp_models.ExplorationRightsModel, [item.id])
+                exp_models.ExplorationRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
@@ -3225,7 +3234,9 @@ class TopicModelValidator(BaseModelValidator):
             'subtopic_page_ids': (
                 topic_models.SubtopicPageModel,
                 ['%s-%s' % (
-                    item.id, subtopic['id']) for subtopic in item.subtopics])
+                    item.id, subtopic['id']) for subtopic in item.subtopics]),
+            'all_users_model_ids': (
+                topic_models.TopicRightsAllUsersModelValidator, [item.id])
         }
 
     @classmethod
@@ -3397,7 +3408,9 @@ class TopicRightsAllUsersModelValidator(BaseModelValidator):
     def _get_external_id_relationships(cls, item):
         return {
             'topic_rights_ids': (
-                topic_models.TopicRightsModel, [item.id])
+                topic_models.TopicRightsModel, [item.id]),
+            'all_user_ids': (
+                user_models.UserSettingsModel, item.all_user_ids)
         }
 
 
