@@ -36,9 +36,7 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
-        var contextIsLessonRelated = (
-          ContextService.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR ||
-          ContextService.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR);
+        var contextIsLessonRelated = ContextService.isContextLessonRelated();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&

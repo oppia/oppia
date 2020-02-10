@@ -312,6 +312,9 @@ def delete_story(committer_id, story_id, force_deletion=False):
     story_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_STORY_DELETED,
         force_deletion=force_deletion)
+    for node in story.story_contents.nodes:
+        exp_services.update_exploration_story_link(
+            node.exploration_id, None, story.id)
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.

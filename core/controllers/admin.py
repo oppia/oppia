@@ -414,6 +414,8 @@ class AdminHandler(base.BaseHandler):
                     '%s%d' % (story_domain.NODE_ID_PREFIX, 2)])
             story.update_node_exploration_id(
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 1), '0')
+            exp_services.update_exploration_story_link(None, '0', story.id)
+            exp_services.update_exploration_story_link(None, '16', story.id)
 
             story.add_node(
                 '%s%d' % (story_domain.NODE_ID_PREFIX, 2), 'Dummy Chapter 2')

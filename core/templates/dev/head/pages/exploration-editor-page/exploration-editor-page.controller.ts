@@ -251,7 +251,9 @@ angular.module('oppia').directive('explorationEditorPage', [
             ]).then(function(combinedData) {
               var explorationData = combinedData[0];
               var featuresData = combinedData[1];
-
+              if (explorationData.context) {
+                ContextService.setContextIsLessonRelated();
+              }
               ExplorationFeaturesService.init(explorationData, featuresData);
 
               ExplorationStatesService.init(explorationData.states);

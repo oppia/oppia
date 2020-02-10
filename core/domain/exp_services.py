@@ -246,10 +246,10 @@ def update_exploration_story_link(old_exp_id, new_exp_id, story_id):
     Args:
         old_exp_id: str|None. The ID of the old exploration linked to story
             (if any).
-        new_exp_id: str. The ID of the new exploration linked to story.
+        new_exp_id: str|None. The ID of the new exploration linked to story.
         story_id: str. The ID of the story.
     """
-    if old_exp_id != '':
+    if old_exp_id and old_exp_id != '':
         old_exploration_context_model = (
             exp_models.ExplorationContextModel.get_by_id(
                 old_exp_id))
@@ -257,7 +257,7 @@ def update_exploration_story_link(old_exp_id, new_exp_id, story_id):
             old_exploration_context_model.delete()
 
     if (
-        new_exp_id != '' and
+        new_exp_id and new_exp_id != '' and
         exp_fetchers.get_exploration_summary_by_id(new_exp_id) is not None):
         new_exploration_context_model = exp_models.ExplorationContextModel(
             id=new_exp_id,

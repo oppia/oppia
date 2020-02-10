@@ -41,9 +41,12 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
           ctrl.openConceptCard = function() {
             var skillId = skillSummary.id;
             var skillDescription = ctrl.skillDescription;
-            var removeCustomEntityContext =
-              ContextService.removeCustomEntityContext;
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
+            // The catch at the end was needed according to this thread:
+            // https://github.com/angular-ui/bootstrap/issues/6501, where in
+            // AngularJS 1.6.3, $uibModalInstance.cancel() throws console error.
+            // The catch prevents that when clicking outside as well as for
+            // cancel.
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/components/concept-card/concept-card-modal.template.html'
@@ -59,11 +62,15 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
                   $scope.isInTestMode = false;
 
                   $scope.closeModal = function() {
-                    removeCustomEntityContext();
                     $uibModalInstance.dismiss('cancel');
                   };
                 }
               ]
+            }).result.catch(function(res) {
+              ContextService.removeCustomEntityContext();
+              if (!(res === 'cancel' || res === 'escape key press')) {
+                throw res;
+              }
             });
           };
           ctrl.$onInit = function() {
