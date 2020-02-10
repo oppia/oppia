@@ -22,19 +22,6 @@ import os
 import subprocess
 import sys
 
-# These libraries need to be installed before running or importing any script.
-TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
-# Download and install pyyaml.
-if not os.path.exists(os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'pyyaml==5.1.2', '--target',
-        os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')])
-
-# Download and install future.
-if not os.path.exists(os.path.join('third_party', 'future-0.17.1')):
-    subprocess.check_call([
-        sys.executable, '-m', 'pip', 'install', 'future==0.17.1', '--target',
-        os.path.join('third_party', 'future-0.17.1')])
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -150,6 +137,15 @@ def ensure_pip_library_is_installed(package, version, path):
     if not os.path.exists(exact_lib_path):
         python_utils.PRINT('Installing %s' % package)
         pip_install(package, version, exact_lib_path)
+
+
+# These libraries need to be installed before running or importing any script.
+TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
+
+ensure_pip_library_is_installed(
+    'pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2'))
+ensure_pip_library_is_installed(
+    'future', '0.17.1', os.path.join('third_party', 'future-0.17.1'))
 
 
 def main():
