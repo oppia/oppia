@@ -96,7 +96,8 @@ angular.module('oppia').directive('storyEditorNavbar', [
                 for (var idx in summaries) {
                   if (summaries[idx].category !== commonExpCategory) {
                     $scope.validationIssues.push(
-                      'All explorations in story should have the same category'
+                      'The explorations with IDs ' + summaries[0].id + ' and ' +
+                      summaries[idx].id + ' have different categories.'
                     );
                     break;
                   }
