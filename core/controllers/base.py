@@ -84,6 +84,7 @@ class LogoutPage(webapp2.RequestHandler):
         url_to_redirect_to = (
             python_utils.convert_to_bytes(
                 self.request.get('redirect_url', '/')))
+        self.request.referrer = self.request.uri
         self.redirect(url_to_redirect_to)
 
 
@@ -209,17 +210,19 @@ class BaseHandler(webapp2.RequestHandler):
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            self.redirect(
+            return self.redirect(
                 b'https://oppiatestserver.appspot.com', permanent=True)
-            return
 
         if self.REDIRECT_DELETED_USERS and self.user_is_scheduled_for_deletion:
-            self.redirect(feconf.PENDING_ACCOUNT_DELETION_URL)
-            return
+            return self.redirect(feconf.PENDING_ACCOUNT_DELETION_URL)
+
+        if (self.request.referrer and
+                self.request.referrer.endswith(
+                    feconf.PENDING_ACCOUNT_DELETION_URL)):
+            return self.redirect('/logout?redirect_url=%s' % self.request.uri)
 
         if self.partially_logged_in:
-            self.redirect('/logout?redirect_url=%s' % self.request.uri)
-            return
+            return self.redirect('/logout?redirect_url=%s' % self.request.uri)
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:
