@@ -115,6 +115,11 @@ class UserSettingsModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def apply_deletion_policy(cls, user_id):
         """Delete instance of UserSettingsModel for the user.
@@ -277,6 +282,11 @@ class CompletedActivitiesModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def apply_deletion_policy(cls, user_id):
         """Delete instance of CompletedActivitiesModel for the user.
@@ -313,15 +323,15 @@ class CompletedActivitiesModel(base_models.BaseModel):
             user_id: str. The user_id denotes which user's data to extract.
 
         Returns:
-            dict or None. A dict with two keys, 'completed_exploration_ids'
+            dict. A dict with two keys, 'completed_exploration_ids'
             and 'completed_collection_ids'. The corresponding values are
             lists of the IDs of the explorations and collections,
-            respectively, which the given user has completed. If the
-            user_id is invalid, returns None.
+            respectively, which the given user has completed. If there is no
+            model for the given user_id, the function returns an empty dict.
         """
         user_model = CompletedActivitiesModel.get(user_id, strict=False)
-        if not user_model:
-            return None
+        if user_model is None:
+            return {}
 
         return {
             'completed_exploration_ids': user_model.exploration_ids,
@@ -346,6 +356,11 @@ class IncompleteActivitiesModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -390,8 +405,8 @@ class IncompleteActivitiesModel(base_models.BaseModel):
             the user_id is invalid, returns None.
         """
         user_model = IncompleteActivitiesModel.get(user_id, strict=False)
-        if not user_model:
-            return None
+        if user_model is None:
+            return {}
 
         return {
             'incomplete_exploration_ids': user_model.exploration_ids,
@@ -422,6 +437,11 @@ class ExpUserLastPlaythroughModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -544,6 +564,11 @@ class LearnerPlaylistModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def apply_deletion_policy(cls, user_id):
         """Delete instance of LearnerPlaylistModel for the user.
@@ -587,8 +612,8 @@ class LearnerPlaylistModel(base_models.BaseModel):
             If the user_id is invalid, returns None instead.
         """
         user_model = LearnerPlaylistModel.get(user_id, strict=False)
-        if not user_model:
-            return None
+        if user_model is None:
+            return {}
 
         return {
             'playlist_exploration_ids': user_model.exploration_ids,
@@ -617,6 +642,11 @@ class UserContributionsModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -659,8 +689,8 @@ class UserContributionsModel(base_models.BaseModel):
             explorations), or None if the user_id is invalid.
         """
         user_model = UserContributionsModel.get(user_id, strict=False)
-        if not user_model:
-            return None
+        if user_model is None:
+            return {}
 
         return {
             'created_exploration_ids': user_model.created_exploration_ids,
@@ -718,6 +748,11 @@ class UserEmailPreferencesModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
     def get_user_id_migration_policy():
         """UserEmailPreferencesModel has ID that contains user ID and needs to
         be replaced.
@@ -751,6 +786,11 @@ class UserSubscriptionsModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -845,6 +885,13 @@ class UserSubscribersModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
+    def get_export_policy():
+        """This model is not included because it contains data about other
+        users.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
     def get_user_id_migration_policy():
         """UserSubscribersModel has ID that contains user ID and needs to be
         replaced.
@@ -891,6 +938,11 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
             bool. Whether the model for user_id exists.
         """
         return cls.get_by_id(user_id) is not None
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
     def get_user_id_migration_policy():
@@ -957,6 +1009,11 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def apply_deletion_policy(cls, user_id):
         """Delete instance of UserStatsModel for the user.
@@ -1015,8 +1072,8 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
                 dict format.
         """
         user_model = UserStatsModel.get(user_id, strict=False)
-        if not user_model:
-            return None
+        if user_model is None:
+            return {}
 
         weekly_stats = user_model.weekly_creator_stats_list
         weekly_stats_constructed = []
@@ -1092,6 +1149,11 @@ class ExplorationUserDataModel(base_models.BaseModel):
         """
         ndb.delete_multi(
             cls.query(cls.user_id == user_id).fetch(keys_only=True))
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -1241,6 +1303,11 @@ class CollectionProgressModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -1407,6 +1474,11 @@ class StoryProgressModel(base_models.BaseModel):
         relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -1600,6 +1672,13 @@ class UserQueryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.DELETE
 
+    @staticmethod
+    def get_export_policy():
+        """Model is not exported since this is a computed model
+        and the information already exists in other exported models.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def apply_deletion_policy(cls, user_id):
         """Delete instances of UserQueryModel for the user.
@@ -1690,6 +1769,11 @@ class UserBulkEmailsModel(base_models.BaseModel):
         return cls.get_by_id(user_id) is not None
 
     @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
     def get_user_id_migration_policy():
         """UserBulkEmailsModel has ID that contains user ID and needs to be
         replaced.
@@ -1718,6 +1802,11 @@ class UserSkillMasteryModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -1806,6 +1895,14 @@ class UserContributionScoringModel(base_models.BaseModel):
         information relevant to the one user.
         """
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
     @classmethod
     def apply_deletion_policy(cls, user_id):
@@ -1977,6 +2074,14 @@ class PendingDeletionRequestModel(base_models.BaseModel):
         deleted.
         """
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not need to exported as it temporarily holds user
+        requests for data deletion, and does not contain any information
+        relevant to the user for data export.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

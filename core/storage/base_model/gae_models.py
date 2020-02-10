@@ -46,6 +46,12 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'NOT_APPLICABLE'
 )
 
+EXPORT_POLICY = utils.create_enum( # pylint: disable=invalid-name
+    'CONTAINS_USER_DATA',
+    'NOT_APPLICABLE',
+    'TO_BE_IMPLEMENTED'
+)
+
 # Types of user id migration policies. The pragma comment is needed because
 # Enums are evaluated as classes in Python and they should use PascalCase,
 # but using UPPER_CASE seems more appropriate here.
@@ -153,6 +159,16 @@ class BaseModel(ndb.Model):
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def get_export_policy():
+        """This method should be implemented by subclasses.
 
         Raises:
             NotImplementedError: The method is not overwritten in a derived

@@ -18,22 +18,29 @@ from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import datetime
+
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import takeout_service
+from core.domain import topic_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
 
 (
-    collection_models, email_models, exploration_models, feedback_models,
-    suggestion_models, user_models) = models.Registry.import_models([
-        models.NAMES.collection, models.NAMES.email, models.NAMES.exploration,
-        models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user])
+    base_models, collection_models, email_models,
+    exploration_models, feedback_models, skill_models,
+    topic_models, suggestion_models, user_models,
+    story_models, question_models, config_models
+) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.collection, models.NAMES.email,
+    models.NAMES.exploration, models.NAMES.feedback, models.NAMES.skill,
+    models.NAMES.topic, models.NAMES.suggestion, models.NAMES.user,
+    models.NAMES.story, models.NAMES.question, models.NAMES.config])
 
 
 class TakeoutServiceUnitTests(test_utils.GenericTestBase):
@@ -43,6 +50,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     USER_GAE_ID_1 = 'gae_1'
     THREAD_ID_1 = 'thread_id_1'
     THREAD_ID_2 = 'thread_id_2'
+    TOPIC_ID_1 = 'topic_id_1'
+    TOPIC_ID_2 = 'topic_id_2'
     USER_1_REPLY_TO_ID_1 = 'user_1_reply_to_id_thread_1'
     USER_1_REPLY_TO_ID_2 = 'user_1_reply_to_id_thread_2'
     USER_1_ROLE = feconf.ROLE_ID_ADMIN
@@ -76,6 +85,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
     GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
+    MESSAGE_IDS_READ_BY_USER = [0, 1]
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
     DEGREE_OF_MASTERY = 0.5
@@ -235,6 +245,24 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'reviewer_1', self.CHANGE_CMD, self.SCORE_CATEGORY,
             'exploration.exp1.thread_1')
 
+        # Setup for TopicRightsModel.
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_ID_1,
+            manager_ids=[self.USER_ID_1],
+            topic_is_published=True
+        ).commit(
+            'committer_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_ID_2,
+            manager_ids=[self.USER_ID_1],
+            topic_is_published=True
+        ).commit(
+            'committer_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+
         # Setup for ExplorationRightsModel.
         exploration_models.ExplorationRightsModel(
             id=self.EXPLORATION_IDS[0],
@@ -320,8 +348,8 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'viewable_collection_ids': [],
             'voiced_collection_ids': []
         }
-        completed_activities_data = None
-        contribution_data = None
+        completed_activities_data = {}
+        contribution_data = {}
         exploration_rights_data = {
             'editable_exploration_ids': [],
             'owned_exploration_ids': [],
@@ -332,10 +360,11 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
         reply_to_data = {}
         general_feedback_message_data = {}
         general_feedback_thread_data = {}
+        general_feedback_thread_user_data = {}
         general_suggestion_data = {}
         last_playthrough_data = {}
-        learner_playlist_data = None
-        incomplete_activities_data = None
+        learner_playlist_data = {}
+        incomplete_activities_data = {}
         settings_data = {
             'email': 'user1@example.com',
             'role': feconf.ROLE_ID_ADMIN,
@@ -357,7 +386,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'preferred_audio_language_code': None
         }
         skill_data = {}
-        stats_data = None
+        stats_data = {}
         story_progress_data = {}
         subscriptions_data = {
             'activity_ids': [],
@@ -365,6 +394,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'creator_ids': [],
             'general_feedback_thread_ids': [],
             'last_checked': None
+        }
+        topic_rights_data = {
+            'managed_topic_ids': []
         }
         expected_export = {
             'user_stats_data': stats_data,
@@ -377,9 +409,12 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': incomplete_activities_data,
             'exp_user_last_playthrough_data': last_playthrough_data,
             'learner_playlist_data': learner_playlist_data,
+            'topic_rights_data': topic_rights_data,
             'collection_progress_data': collection_progress_data,
             'story_progress_data': story_progress_data,
             'general_feedback_thread_data': general_feedback_thread_data,
+            'general_feedback_thread_user_data':
+                general_feedback_thread_user_data,
             'general_feedback_message_data': general_feedback_message_data,
             'collection_rights_data': collection_rights_data,
             'general_suggestion_data': general_suggestion_data,
@@ -500,6 +535,9 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
                                  get(thread_id).last_updated)
             }
         }
+        expected_general_feedback_thread_user_data = {
+            thread_id: self.MESSAGE_IDS_READ_BY_USER
+        }
         expected_general_feedback_message_data = {
             thread_id + '.0': {
                 'thread_id': thread_id,
@@ -582,6 +620,10 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'last_checked': None
         }
 
+        expected_topic_data = {
+            'managed_topic_ids': [self.TOPIC_ID_1, self.TOPIC_ID_2]
+        }
+
         expected_export = {
             'user_stats_data': expected_stats_data,
             'user_settings_data': expected_settings_data,
@@ -593,10 +635,13 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'incomplete_activities_data': expected_incomplete_activities_data,
             'exp_user_last_playthrough_data': expected_last_playthrough_data,
             'learner_playlist_data': expected_learner_playlist_data,
+            'topic_rights_data': expected_topic_data,
             'collection_progress_data': expected_collection_progress_data,
             'story_progress_data': expected_story_progress_data,
             'general_feedback_thread_data':
                 expected_general_feedback_thread_data,
+            'general_feedback_thread_user_data':
+                expected_general_feedback_thread_user_data,
             'general_feedback_message_data':
                 expected_general_feedback_message_data,
             'collection_rights_data':
