@@ -53,7 +53,7 @@ angular.module('oppia').factory('ThreadDataService', [
       return threadsById[threadId] || null;
     };
 
-    let assignFeedbackThread = function(threadBackendDict) {
+    let storeFeedbackThread = function(threadBackendDict) {
       let threadId = threadBackendDict.thread_id;
 
       return threadsById[threadId] =
@@ -64,7 +64,7 @@ angular.module('oppia').factory('ThreadDataService', [
       return suggestionBackendDict.suggestion_id;
     };
 
-    let assignSuggestionThread = function(
+    let storeSuggestionThread = function(
         threadBackendDict, suggestionBackendDictsByThreadId) {
       let threadId = threadBackendDict.thread_id;
 
@@ -99,9 +99,9 @@ angular.module('oppia').factory('ThreadDataService', [
 
           return {
             feedbackThreads: threadResponse.feedback_thread_dicts.map(
-              assignFeedbackThread),
+              storeFeedbackThread),
             suggestionThreads: threadResponse.suggestion_thread_dicts.map(
-              t => assignSuggestionThread(t, suggestionBackendDictsByThreadId))
+              t => storeSuggestionThread(t, suggestionBackendDictsByThreadId))
           };
         });
       },
