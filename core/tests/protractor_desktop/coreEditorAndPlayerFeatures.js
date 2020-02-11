@@ -176,6 +176,80 @@ describe('Enable correctness feedback and set correctness', function() {
       testEnableCorrectnessInPlayerPage();
     });
 
+  it('should show Learn Again button correctly', function() {
+    // Turn on correctness feedback first.
+    enableCorrectnessFeedbackSetting();
+
+    // Go to main tab to create interactions.
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.setStateName('First');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'Select the right option.'));
+
+    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      forms.toRichText('Correct!'),
+      forms.toRichText('Wrong!')
+    ]);
+    explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', forms.toRichText('Good!'),
+      'Second', true, 'Equals', 'Correct!');
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('Wrong!'));
+    responseEditor = explorationEditorMainTab.getResponseEditor(0);
+    responseEditor.markAsCorrect();
+
+    explorationEditorMainTab.moveToState('Second');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'Select the right option.'));
+
+    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      forms.toRichText('Correct!'),
+      forms.toRichText('Wrong!')
+    ]);
+    explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', forms.toRichText('Good!'),
+      'End', true, 'Equals', 'Correct!');
+    explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', forms.toRichText('Wrong!'),
+      'First', false, 'Equals', 'Wrong!');
+
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+
+    libraryPage.get();
+    libraryPage.findExploration(explorationTitle);
+    libraryPage.playExploration(explorationTitle);
+
+    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(
+      null, ['MultipleChoiceInput', 'Wrong!']);
+    explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(
+      null, ['MultipleChoiceInput', 'Wrong!']);
+    explorationPlayerPage.expectNextCardButtonTextToBe('LEARN AGAIN');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.submitAnswer.apply(null, correctOptions[0]);
+    explorationPlayerPage.expectNextCardButtonTextToBe('CONTINUE');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
+  });
+
   afterEach(function() {
     libraryPage.get();
     currentExplorationIndex += 1;

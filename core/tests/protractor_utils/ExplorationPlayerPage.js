@@ -24,6 +24,7 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var ExplorationPlayerPage = function() {
   var conversationInput = element(
     by.css('.protractor-test-conversation-input'));
+  var nextCardButton = element(by.css('.protractor-test-next-card-button'));
   var suggestionDescriptionInput = element(
     by.css('.protractor-test-suggestion-description-input'));
   var closeSuggestionModalButton = element(
@@ -89,6 +90,11 @@ var ExplorationPlayerPage = function() {
     waitFor.elementToBeClickable(suggestionPopupLink,
       'Suggest changes button taking too long to appear');
     suggestionPopupLink.click();
+  };
+
+  this.expectNextCardButtonTextToBe = function(text) {
+    var buttonText = nextCardButton.getText();
+    expect(buttonText).toMatch(text);
   };
 
   this.fillAndSubmitSuggestion = function(
