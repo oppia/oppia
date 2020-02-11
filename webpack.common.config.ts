@@ -684,14 +684,9 @@ module.exports = {
       test: /\.css$/,
       include: [
         path.resolve(__dirname, 'extensions'),
-        path.resolve(__dirname, 'core/templates/dev/head'),
         path.resolve(__dirname, 'node_modules'),
       ],
       use: ['style-loader', 'css-loader']
-    },
-    {
-      test: /\.(ttf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
-      loader: 'file-loader',
     }]
   },
   optimization: {

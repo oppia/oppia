@@ -243,6 +243,16 @@
           "js": ["dist/umd/popper.js"]
         }
       },
+      "bootstrap": {
+        "version": "4.3.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip",
+        "rootDir": "bootstrap-4.3.1-dist",
+        "targetDirPrefix": "bootstrap-",
+        "bundle": {
+          "js": ["js/bootstrap.js"]
+        }
+      },
       "bowerAngularTranslateLoaderPartial": {
         "version": "2.18.1",
         "downloadFormat": "files",

@@ -16,10 +16,7 @@
  * @fileoverview Module for the donate page.
  */
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'css/oppia.css';
 
-import 'bootstrap';
 import 'core-js/es7/reflect';
 import 'zone.js';
 
@@ -70,7 +67,8 @@ const downgradedModule = downgradeModule(bootstrapFn);
 declare var angular: any;
 
 angular.module('oppia', [
-  require('angular-cookies'), 'pascalprecht.translate', 'toastr', 'ui.bootstrap',
+  require('angular-cookies'), 'pascalprecht.translate', 'toastr',
+  'ui.bootstrap',
   downgradedModule
 ])
   // This directive is the downgraded version of the Angular component to

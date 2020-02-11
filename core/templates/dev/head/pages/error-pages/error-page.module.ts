@@ -16,10 +16,7 @@
  * @fileoverview Module for the error page.
  */
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'css/oppia.css';
 
-import 'bootstrap';
 import 'core-js/es7/reflect';
 import 'zone.js';
 
