@@ -15,15 +15,16 @@
 /**
  * @fileoverview Unit test for exporation-feature-service
  */
-import { ExplorationFeaturesService } from
-  'services/exploration-features.service';
+
 import { TestBed } from '@angular/core/testing';
+import { ExplorationFeaturesService, IExplorationData, IFeatureData} from
+  'services/exploration-features.service';
 
 describe('ExplorationFeatureService', () => {
-  let explorationFeatureService;
-  let featureData;
-  let explorationData;
-  let explorationData2;
+  let explorationFeatureService: ExplorationFeaturesService = null;
+  let featureData: IFeatureData = null;
+  let explorationData: IExplorationData = null;
+  let explorationData2: IExplorationData = null;
 
   beforeEach(() => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
@@ -32,7 +33,8 @@ describe('ExplorationFeatureService', () => {
       is_exploration_whitelisted: true,
     };
     explorationData = {
-      param_changes: ['param_1', 'param_2']
+      param_changes: ['param_1', 'param_2'],
+      states: {}
     };
     explorationData2 = {
       param_changes: [],
@@ -52,6 +54,7 @@ describe('ExplorationFeatureService', () => {
     expect(explorationFeatureService.isPlaythroughRecordingEnabled())
       .toEqual(true);
   });
+
   it('should init the exploration from state', () => {
     explorationFeatureService.init(explorationData2, featureData);
     expect(explorationFeatureService.isInitialized()).toEqual(true);

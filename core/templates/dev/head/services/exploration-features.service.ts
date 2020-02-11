@@ -16,7 +16,8 @@
  * @fileoverview Service for determining the visibility of advanced features in
  *               the exploration editor.
  */
-export interface ExplorationDataInterface {
+
+export interface IExplorationData {
   'param_changes': string[],
   'states': {
     [propsName : string]: {
@@ -24,26 +25,28 @@ export interface ExplorationDataInterface {
     }
   }
 }
-export interface FeatureDataInterface {
-  'is_improvements_tab_enabled': boolean,
+export interface IFeatureData {
   'is_exploration_whitelisted': boolean,
+  'is_improvements_tab_enabled': boolean
 }
-import { Injectable } from '@angular/core';
+
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class ExplorationFeaturesService {
   static serviceIsInitialized = false;
   static settings = {
+    areParametersEnabled: false,
     isImprovementsTabEnabled: false,
-    isPlaythroughRecordingEnabled: false,
-    areParametersEnabled: false
+    isPlaythroughRecordingEnabled: false
   };
 
-  init(explorationData: ExplorationDataInterface,
-      featuresData: FeatureDataInterface): void {
+  init(explorationData: IExplorationData,
+      featuresData: IFeatureData): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
     }
