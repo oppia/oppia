@@ -26,12 +26,6 @@ var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
 var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 
-//
-var customThumbnail = element(
-  by.css('.protractor-test-custom-photo'));
-var thumbnailClickable = element(
-  by.css('.protractor-test-photo-clickable'));
-//
 var thumbnailUploadInput = element(
   by.css('.protractor-test-photo-upload-input'));
 var thumbnailCropper = element(

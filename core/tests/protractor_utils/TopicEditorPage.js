@@ -93,11 +93,11 @@ var TopicEditorPage = function() {
     by.css('.protractor-test-select-skill-dropdown'));
   var subtopicThumbnailImageElement = element(
     by.css('.subtopic-thumbnail .protractor-test-custom-photo'));
-  var subtopicThumbnailClickable = element(
+  var subtopicThumbnailButton = element(
     by.css('.subtopic-thumbnail .protractor-test-photo-clickable'));
   var topicThumbnailImageElement = element(
     by.css('.thumbnail-editor .protractor-test-custom-photo'));
-  var topicThumbnailClickable = element(
+  var topicThumbnailButton = element(
     by.css('.thumbnail-editor .protractor-test-photo-clickable'));
   var dragAndDrop = function(fromElement, toElement) {
     browser.executeScript(dragAndDropScript, fromElement, toElement);
@@ -117,11 +117,11 @@ var TopicEditorPage = function() {
   };
 
   this.submitTopicThumbnail = function(imgPath) {
-    return workflow.submitThumbnail(topicThumbnailClickable, imgPath);
+    return workflow.submitThumbnail(topicThumbnailButton, imgPath);
   };
 
   this.submitSubtopicThumbnail = function(imgPath) {
-    return workflow.submitThumbnail(subtopicThumbnailClickable, imgPath);
+    return workflow.submitThumbnail(subtopicThumbnailButton, imgPath);
   };
 
   this.publishTopic = function() {

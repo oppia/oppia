@@ -104,11 +104,11 @@ var StoryEditorPage = function() {
     by.css('.protractor-test-warnings-text'));
   var storyThumbnailImageElement = element(
     by.css('.story-thumbnail .protractor-test-custom-photo'));
-  var storyThumbnailClickable = element(
+  var storyThumbnailButton = element(
     by.css('.story-thumbnail .protractor-test-photo-clickable'));
   var chapterThumbnailImageElement = element(
     by.css('.story-node-thumbnail .protractor-test-custom-photo'));
-  var chapterThumbnailClickable = element(
+  var chapterThumbnailButton = element(
     by.css('.story-node-thumbnail .protractor-test-photo-clickable'));
   this.get = function(storyId) {
     browser.get(EDITOR_URL_PREFIX + storyId);
@@ -124,11 +124,11 @@ var StoryEditorPage = function() {
   };
 
   this.submitStoryThumbnail = function(imgPath) {
-    return workflow.submitThumbnail(storyThumbnailClickable, imgPath);
+    return workflow.submitThumbnail(storyThumbnailButton, imgPath);
   };
 
   this.submitChapterThumbnail = function(imgPath) {
-    return workflow.submitThumbnail(chapterThumbnailClickable, imgPath);
+    return workflow.submitThumbnail(chapterThumbnailButton, imgPath);
   };
 
   this.publishStory = function() {

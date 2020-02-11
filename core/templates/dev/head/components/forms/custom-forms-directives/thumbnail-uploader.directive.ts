@@ -34,7 +34,7 @@ angular.module('oppia').directive('thumbnailUploader', [
       restrict: 'E',
       scope: {
         disabled: '=',
-        filename: '=',
+        getFilename: '&filename',
         updateFilename: '=',
         updateThumbnailDataUrl: '='
       },
@@ -48,7 +48,7 @@ angular.module('oppia').directive('thumbnailUploader', [
             AlertsService, ContextService, CsrfTokenService,
             ImageUploadHelperService) {
           var placeholderImageUrl = '/icons/story-image-icon.png';
-          if (!$scope.filename) {
+          if (!$scope.getFilename()) {
             $scope.editableThumbnailDataUrl = (
               UrlInterpolationService.getStaticImageUrl(
                 placeholderImageUrl));
@@ -56,7 +56,7 @@ angular.module('oppia').directive('thumbnailUploader', [
             $scope.editableThumbnailDataUrl = (
               ImageUploadHelperService
                 .getTrustedResourceUrlForThumbnailFilename(
-                  $scope.filename,
+                  $scope.getFilename(),
                   ContextService.getEntityType(),
                   ContextService.getEntityId()));
           }
