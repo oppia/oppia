@@ -151,6 +151,7 @@ FULLY_COVERED_FILENAMES = [
     'ImprovementActionButtonObjectFactory.ts',
     'improvements-display.service.ts',
     'improvements.service.ts',
+    'id-generation.service.ts',
     'interaction-details-cache.service.ts',
     'interaction-specs.constants.ajs.ts',
     'interaction-specs.constants.ts',
