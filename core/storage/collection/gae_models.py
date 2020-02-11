@@ -32,12 +32,26 @@ from google.appengine.ext import ndb
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionModel(base_models.VersionedModel):
@@ -77,6 +91,11 @@ class CollectionModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Collection is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -187,13 +206,27 @@ class CollectionModel(base_models.VersionedModel):
 class CollectionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionRightsModel(base_models.VersionedModel):
@@ -240,6 +273,11 @@ class CollectionRightsModel(base_models.VersionedModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @staticmethod
     def transform_dict_to_valid(model_dict):
@@ -453,6 +491,14 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+        TODO(#8523): Implement this function.
+        """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+
     @classmethod
     def _get_instance_id(cls, collection_id, version):
         """This function returns the generated id for the get_commit function
@@ -586,6 +632,14 @@ class CollectionSummaryModel(base_models.BaseModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model data has already been exported as a part of the
+        CollectionRightsModel, and thus does not need an export_data
+        function.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
