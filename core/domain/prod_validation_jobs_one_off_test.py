@@ -758,6 +758,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             collection.add_node('%s' % (index * 2))
             collection.add_node('%s' % (index * 2 + 1))
             collection_services.save_new_collection(self.owner_id, collection)
+            collection_models.CollectionRightsAllUsersModel(
+                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = collection_models.CollectionModel.get_by_id('0')
         self.model_instance_1 = collection_models.CollectionModel.get_by_id('1')
@@ -3400,8 +3402,10 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             language_code=language_codes[i]
         ) for i in python_utils.RANGE(3)]
 
-        for exp in explorations:
+        for index, exp in enumerate(explorations):
             exp_services.save_new_exploration(self.owner_id, exp)
+            exp_models.ExplorationRightsAllUsersModel(
+                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = exp_models.ExplorationModel.get_by_id('0')
         self.model_instance_1 = exp_models.ExplorationModel.get_by_id('1')
@@ -9100,6 +9104,8 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
                     'new_subtopic_id': 1,
                     'skill_id': '%s' % (index * 3 + 1)
                 })], 'Changes.')
+            topic_models.TopicRightsAllUsersModel(
+                id='%s' % index, all_user_ids=[self.owner_id]).put()
 
         self.model_instance_0 = topic_models.TopicModel.get_by_id('0')
         self.model_instance_1 = topic_models.TopicModel.get_by_id('1')

@@ -653,6 +653,13 @@ class TopicRightsAllUsersModel(base_models.BaseModel):
             cls.all_user_ids == user_id).get(keys_only=True) is not None
 
     @staticmethod
+    def get_export_policy():
+        """This model is only used for migration purposes. All the data
+        contained in this model are already exported through TopicRightsModel.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
     def get_user_id_migration_policy():
         """TopicRightsAllUsersModel has multiple fields with user ID."""
         return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
