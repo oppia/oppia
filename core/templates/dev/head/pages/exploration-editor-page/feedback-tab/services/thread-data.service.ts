@@ -49,6 +49,8 @@ angular.module('oppia').factory('ThreadDataService', [
     // The messages of the thread objects are updated lazily.
     let threadsById = {};
 
+    let cachedThreads = null;
+
     let getThreadById = function(threadId) {
       return threadsById[threadId] || null;
     };
@@ -82,13 +84,16 @@ angular.module('oppia').factory('ThreadDataService', [
     let openThreadsCount = 0;
 
     return {
-      fetchThreads: function() {
+      fetchThreads: function(useCache = false) {
+        if (useCache && cachedThreads !== null) {
+          return cachedThreads;
+        }
         let suggestionPromise = $http.get(SUGGESTION_LIST_HANDLER_URL, {
           params: { target_type: 'exploration', target_id: expId }
         });
         let threadPromise = $http.get(THREAD_LIST_HANDLER_URL);
 
-        return $q.all([suggestionPromise, threadPromise]).then(response => {
+        cachedThreads = $q.all([suggestionPromise, threadPromise]).then(res => {
           let [suggestionResponse, threadResponse] = response.map(r => r.data);
 
           let suggestionBackendDictsByThreadId = {};
@@ -104,6 +109,7 @@ angular.module('oppia').factory('ThreadDataService', [
               t => storeSuggestionThread(t, suggestionBackendDictsByThreadId))
           };
         });
+        return cachedThreads;
       },
       fetchMessages: function(threadId) {
         return $http.get(THREAD_HANDLER_URL + '/' + threadId).then(response => {
