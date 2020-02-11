@@ -196,19 +196,13 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
         suggestionThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
       };
 
-      spyOn(ThreadDataService, 'fetchThreads').and.callFake(function() {
-        ThreadDataService.data = threads;
-        var deferred = $q.defer();
-        deferred.resolve();
-        return deferred.promise;
-      });
-      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages').and
-        .callFake(done);
-      spyOn(ThreadDataService, 'getData').and.returnValue(threads);
+      spyOn(ThreadDataService, 'fetchThreads').and
+        .returnValue($q.resolve(threads));
+      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages');
 
       SuggestionImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
-        expect(fetchMessagesSpy).toHaveBeenCalledTimes(threads.suggestionThreads
-          .length);
+        expect(fetchMessagesSpy)
+          .toHaveBeenCalledTimes(threads.suggestionThreads.length);
         expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
         expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);
