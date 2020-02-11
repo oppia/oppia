@@ -145,6 +145,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """General suggestion needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralSuggestionModel exists for the user.
@@ -512,6 +517,14 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         return cls.query(ndb.AND(
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for author_id and
