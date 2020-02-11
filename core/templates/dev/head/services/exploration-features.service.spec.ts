@@ -29,16 +29,18 @@ describe('ExplorationFeatureService', () => {
     explorationFeatureService = TestBed.get(ExplorationFeaturesService);
     featureData = {
       is_improvements_tab_enabled: true,
-      is_exploration_whitelisted: true
+      is_exploration_whitelisted: true,
     };
     explorationData = {
       param_changes: ['param_1', 'param_2']
     };
     explorationData2 = {
       param_changes: [],
-      state: [{
-        param_changes: ['param_1', 'param_2']
-      }]
+      states: {
+        'state_a': {
+          param_changes: ['param_1', 'param_2']
+        }
+      }
     };
   });
 

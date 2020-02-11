@@ -16,7 +16,18 @@
  * @fileoverview Service for determining the visibility of advanced features in
  *               the exploration editor.
  */
-
+export interface ExplorationDataInterface {
+  'param_changes': string[],
+  'states': {
+    [propsName : string]: {
+      'param_changes': string[]
+    }
+  }
+}
+export interface FeatureDataInterface {
+  'is_improvements_tab_enabled': boolean,
+  'is_exploration_whitelisted': boolean,
+}
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
@@ -31,11 +42,8 @@ export class ExplorationFeaturesService {
     areParametersEnabled: false
   };
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'explorationData' and 'featuresData' are dicts with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
-  init(explorationData: any, featuresData: any): void {
+  init(explorationData: ExplorationDataInterface,
+      featuresData: FeatureDataInterface): void {
     if (ExplorationFeaturesService.serviceIsInitialized) {
       return;
     }
