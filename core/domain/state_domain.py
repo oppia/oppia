@@ -1727,7 +1727,7 @@ class State(python_utils.OBJECT):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome: Outcome object representing the Outcome.
+            default_outcome: Outcome. Object representing the new Outcome.
         """
         old_content_id_list = []
         new_content_id_list = []
