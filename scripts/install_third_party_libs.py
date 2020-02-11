@@ -44,7 +44,7 @@ for PACKAGE, VERSION, INSTALL_PATH in PRE_IMPORT:
             sys.executable, '-m', 'pip', 'install',
             '%s==%s' % (PACKAGE, VERSION), '--target', INSTALL_PATH,
             '--user', '--prefix=', '--system'])
-    elif not returncode:
+    elif returncode:
         raise Exception('Error installing package')
 
 
