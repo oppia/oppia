@@ -29,11 +29,11 @@ require('services/html-escaper.service.ts');
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
   'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImagePreloaderService',
-  'UrlInterpolationService', 'LOADING_INDICATOR_URL',
+  'UrlInterpolationService', 'ENTITY_TYPE', 'LOADING_INDICATOR_URL'
   function(
       AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImagePreloaderService,
-      UrlInterpolationService, LOADING_INDICATOR_URL) {
+      UrlInterpolationService, ENTITY_TYPE, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -52,7 +52,11 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
           ctrl.isLoadingIndicatorShown = false;
           ctrl.isTryAgainShown = false;
 
-          if (ImagePreloaderService.inExplorationPlayer()) {
+          // If viewing a concept card in the exploration player, don't use the
+          // preloader service.
+          if (
+            ImagePreloaderService.inExplorationPlayer() &&
+            !ContextService.getEntityType() === ENTITY_TYPE.SKILL) {
             ctrl.isLoadingIndicatorShown = true;
             ctrl.dimensions = (
               ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
