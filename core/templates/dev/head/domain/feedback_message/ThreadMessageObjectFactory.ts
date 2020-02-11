@@ -50,11 +50,11 @@ export class ThreadMessage {
     return this.text.length > 0;
   }
 
-  holdsStatusUpdate(): boolean {
+  hasStatusUpdate(): boolean {
     return this.updatedStatus !== null;
   }
 
-  holdsSubjectUpdate(): boolean {
+  hasSubjectUpdate(): boolean {
     return this.updatedSubject !== null;
   }
 }
