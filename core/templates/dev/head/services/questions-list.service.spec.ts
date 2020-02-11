@@ -49,7 +49,7 @@ describe('Questions List Service', function() {
       'QuestionSummaryForOneSkillObjectFactory',
       new QuestionSummaryForOneSkillObjectFactory(
         new QuestionSummaryObjectFactory));
-  }))
+  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -74,9 +74,9 @@ describe('Questions List Service', function() {
 
   it('should handle page number changes', function() {
     expect(qls.getCurrentPageNumber()).toBe(0);
-    qls.incrementPageNumber()
+    qls.incrementPageNumber();
     expect(qls.getCurrentPageNumber()).toBe(1);
-    qls.incrementPageNumber()
+    qls.incrementPageNumber();
     expect(qls.getCurrentPageNumber()).toBe(2);
     qls.decrementPageNumber();
     expect(qls.getCurrentPageNumber()).toBe(1);
@@ -88,7 +88,7 @@ describe('Questions List Service', function() {
     function() {
       $httpBackend.expect(
         'GET', '/questions_list_handler/?cursor=').respond(
-      sampleResponse);
+        sampleResponse);
       var skillIds = [];
       qls.getQuestionSummariesAsync(skillIds, false, false);
       $httpBackend.verifyNoOutstandingRequest();
@@ -104,7 +104,7 @@ describe('Questions List Service', function() {
 
     expect(qls.getCurrentPageNumber()).toBe(0);
     expect(qls.isLastQuestionBatch()).toBe(true);
-    
+
     $httpBackend.expect(
       'GET', '/questions_list_handler/1?cursor=').respond(
       sampleResponse);
@@ -124,16 +124,16 @@ describe('Questions List Service', function() {
 
     expect(qls.getCurrentPageNumber()).toBe(0);
     expect(qls.isLastQuestionBatch()).toBe(true);
-    
+
     // Try to get questions again before incresing pagenumber
     qls.getQuestionSummariesAsync(skillIds, true, true);
     $httpBackend.verifyNoOutstandingRequest();
-    
+
     // Increase page number
     qls.incrementPageNumber();
     expect(qls.getCurrentPageNumber()).toBe(1);
     expect(qls.isLastQuestionBatch()).toBe(false);
-    
+
     $httpBackend.expect(
       'GET', '/questions_list_handler/1?cursor=').respond(
       sampleResponse);
@@ -144,23 +144,23 @@ describe('Questions List Service', function() {
 
   it('should get more than one question summary with history reseted',
     function() {
-    var skillIds = ['1', '2'];
-    $httpBackend.expect(
-      'GET', '/questions_list_handler/1%2C2?cursor=').respond(
-      sampleResponse);
-    qls.getQuestionSummariesAsync(skillIds, true, true);
-    $httpBackend.flush();
+      var skillIds = ['1', '2'];
+      $httpBackend.expect(
+        'GET', '/questions_list_handler/1%2C2?cursor=').respond(
+        sampleResponse);
+      qls.getQuestionSummariesAsync(skillIds, true, true);
+      $httpBackend.flush();
 
-    expect(qls.getCurrentPageNumber()).toBe(0);
-    expect(qls.isLastQuestionBatch()).toBe(true);
-    expect(broadcastSpy).toHaveBeenCalled();
+      expect(qls.getCurrentPageNumber()).toBe(0);
+      expect(qls.isLastQuestionBatch()).toBe(true);
+      expect(broadcastSpy).toHaveBeenCalled();
 
-    $httpBackend.expect(
-      'GET', '/questions_list_handler/1%2C2?cursor=').respond(
-      sampleResponse);
-    qls.getQuestionSummariesAsync(skillIds, true, true);
-    $httpBackend.flush();
-  });
+      $httpBackend.expect(
+        'GET', '/questions_list_handler/1%2C2?cursor=').respond(
+        sampleResponse);
+      qls.getQuestionSummariesAsync(skillIds, true, true);
+      $httpBackend.flush();
+    });
 
   it('should get cached question summaries', function() {
     var skillIds = ['1'];
