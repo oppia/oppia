@@ -150,8 +150,8 @@ angular.module('oppia').directive('adminMiscTab', [
             .then(function(response) {
               ctrl.setStatusMessage(response.data.msg);
             }, function(errorResponse) {
-              ctrl.setStatusMessage('Server error: ' +
-                errorResponse.data.error);
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
             });
         };
 
