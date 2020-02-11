@@ -40,7 +40,8 @@ angular.module('oppia').factory('FatigueDetectionService', [
       },
       displayTakeBreakMessage: function() {
         $uibModal.open({
-          template: require('pages/exploration-player-page/templates/' +
+          template: require(
+            'pages/exploration-player-page/templates/' +
             'take-break-modal.template.html'),
           backdrop: 'static',
           resolve: {},

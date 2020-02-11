@@ -73,8 +73,8 @@ angular.module('oppia').directive('learnerViewInfo', [
           var openInformationCardModal = function() {
             $uibModal.open({
               animation: true,
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-player-page/templates/' +
+              template: require(
+                'pages/exploration-player-page/templates/' +
                 'information-card-modal.directive.html'),
               windowClass: 'oppia-modal-information-card',
               resolve: {
