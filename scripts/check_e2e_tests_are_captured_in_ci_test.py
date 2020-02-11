@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/check_e2e_tests_are_captured_in_ci.py."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -357,10 +358,10 @@ EXPECTED_TRAVIS_CI_DICT = {
         },
     'script': [
         'if [ "RUN_E2E_TESTS_ONEWORD" == \'true\' ]; '
-        'then travis_retry bash scripts/run_e2e_tests.sh'
+        'then travis_retry python -m scripts.run_e2e_tests'
         ' --suite="oneword" --prod_env; fi',
         'if [ "RUN_E2E_TESTS_TWO_WORDS" == \'true\' ]; '
-        'then travis_retry bash scripts/run_e2e_tests.sh'
+        'then travis_retry python -m scripts.run_e2e_tests'
         ' --suite="twoWords" --prod_env; fi']}
 
 EXPECTED_PROTRACTOR_CONF_FILE = """var path = require('path')
