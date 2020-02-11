@@ -116,8 +116,8 @@ export class ContextService {
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR ||
       this.getPageContext() ===
         ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
-        this.contextIsLessonRelated);
-    )
+        this.contextIsLessonRelated
+    );
   }
 
   setContextIsLessonRelated(): void {

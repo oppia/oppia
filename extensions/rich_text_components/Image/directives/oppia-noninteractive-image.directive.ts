@@ -29,7 +29,7 @@ require('services/html-escaper.service.ts');
 angular.module('oppia').directive('oppiaNoninteractiveImage', [
   'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImagePreloaderService',
-  'UrlInterpolationService', 'ENTITY_TYPE', 'LOADING_INDICATOR_URL'
+  'UrlInterpolationService', 'ENTITY_TYPE', 'LOADING_INDICATOR_URL',
   function(
       AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImagePreloaderService,

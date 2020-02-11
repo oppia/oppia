@@ -20,8 +20,8 @@ require('services/context.service.ts');
 require('services/rte-helper.service.ts');
 
 angular.module('oppia').directive('ckEditor4Rte', [
-  'ContextService', 'RteHelperService', 'PAGE_CONTEXT',
-  function(ContextService, RteHelperService, PAGE_CONTEXT) {
+  'ContextService', 'RteHelperService',
+  function(ContextService, RteHelperService) {
     return {
       restrict: 'E',
       scope: {

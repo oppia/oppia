@@ -731,7 +731,8 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
         topic_model.additional_story_references)
     for story_reference in all_story_references:
         story_services.delete_story(
-            committer_id, story_reference['story_id'], force_deletion)
+            committer_id, story_reference['story_id'],
+            force_deletion=force_deletion)
     topic_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)
