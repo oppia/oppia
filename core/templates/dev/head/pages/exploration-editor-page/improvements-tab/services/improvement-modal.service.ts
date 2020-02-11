@@ -298,6 +298,7 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'feedback-thread-modal.template.html'),
           resolve: {
+            messages: ThreadDataService.fetchMessages(thread.threadId),
             isUserLoggedIn: function() {
               return UserService.getUserInfoAsync().then(function(userInfo) {
                 return userInfo.isLoggedIn();
@@ -366,6 +367,7 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'suggestion-thread-modal.template.html'),
           resolve: {
+            messages: ThreadDataService.fetchMessages(thread.threadId),
             isUserLoggedIn: function() {
               return UserService.getUserInfoAsync().then(function(userInfo) {
                 return userInfo.isLoggedIn();

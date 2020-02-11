@@ -102,11 +102,7 @@ angular.module('oppia').factory('FeedbackImprovementTaskObjectFactory', [
       fetchTasks: function() {
         var createNew = this.createNew;
         return ThreadDataService.fetchThreads(true).then(threadData => {
-          return $q.all(
-            threadData.feedbackThreads.map(
-              thread => ThreadDataService.fetchMessages(thread.threadId))
-          ).then(() => threadData);
-        }).then(threadData => threadData.feedbackThreads.map(createNew));
+          .then(threadData => threadData.feedbackThreads.map(createNew));
       },
     };
   }
