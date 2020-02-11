@@ -37,7 +37,7 @@ describe('ExplorationFeatureService', () => {
     explorationData2 = {
       param_changes: [],
       states: {
-        'state_a': {
+        state_1: {
           param_changes: ['param_1', 'param_2']
         }
       }
