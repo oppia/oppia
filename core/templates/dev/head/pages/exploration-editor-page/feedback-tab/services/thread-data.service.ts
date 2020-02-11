@@ -27,11 +27,11 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ThreadDataService', [
-  '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
+  '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
   'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED',
   function(
-      $http, $log, $q, AlertsService, ExplorationDataService,
+      $http, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED) {
     let expId = ExplorationDataService.explorationId;
