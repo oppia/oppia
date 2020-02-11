@@ -22,29 +22,27 @@ import os
 import subprocess
 import sys
 
+# These libraries need to be installed before running or importing any script.
 TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
 
-# These libraries need to be installed before running or importing any script.
-pre_import_packages = [
+PRE_IMPORT = [
     ['pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')],
     ['future', '0.17.1', os.path.join('third_party', 'future-0.17.1')]
 ]
 
-for package, version, install_path in pre_import_packages:
-    if os.path.exists(install_path):
+for PACKAGE, VERSION, INSTALL_PATH in PRE_IMPORT:
+    if os.path.exists(INSTALL_PATH):
         continue
-    command = [
+    COMMAND = [
         sys.executable, '-m', 'pip', 'install', '%s==%s'
-        % (package, version), '--target', install_path]
-    process = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    if process.returncode == 0:
-        python_utils.PRINT(stdout)
-    elif 'can\'t combine user with prefix' in stderr:
+        % (PACKAGE, VERSION), '--target', INSTALL_PATH]
+    PROCESS = subprocess.Popen(
+        COMMAND, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    STDOUT, STDERR = PROCESS.communicate()
+    if 'can\'t combine user with prefix' in STDERR:
         subprocess.check_call([
             sys.executable, '-m', 'pip', 'install',
-            '%s==%s' % (package, version), '--target', install_path,
+            '%s==%s' % (PACKAGE, VERSION), '--target', INSTALL_PATH,
             '--user', '--prefix=', '--system'])
     else:
         raise Exception('Error installing package')
@@ -164,7 +162,6 @@ def ensure_pip_library_is_installed(package, version, path):
     if not os.path.exists(exact_lib_path):
         python_utils.PRINT('Installing %s' % package)
         pip_install(package, version, exact_lib_path)
-
 
 
 def main():
