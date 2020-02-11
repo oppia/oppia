@@ -113,9 +113,9 @@ describe('GraphInputValidationService', () => {
     expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
-    }).toThrow(new Error(
+    }).toThrowError(
       'Expected customization arguments to have properties: ' +
-      'graph, canEditEdgeWeight, canEditVertexLabel'));
+      'graph, canEditEdgeWeight, canEditVertexLabel');
   });
 
   it('The graph used in customization exceeds supported maximum number of ' +

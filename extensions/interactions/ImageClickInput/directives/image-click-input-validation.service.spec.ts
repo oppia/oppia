@@ -104,8 +104,8 @@ describe('ImageClickInputValidationService', () => {
       expect(() => {
         validatorService.getAllWarnings(
           currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-      }).toThrow(new Error(
-        'Expected customization arguments to have property: imageAndRegions'));
+      }).toThrowError(
+        'Expected customization arguments to have property: imageAndRegions');
     });
 
   it('should expect an image path customization argument', () => {

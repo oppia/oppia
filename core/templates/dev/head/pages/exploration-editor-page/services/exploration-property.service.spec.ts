@@ -61,7 +61,7 @@ describe('Exploration Property Service', function() {
   it('should create a new exploration properties object', function() {
     expect(function() {
       ExplorationPropertyService.init('initial value');
-    }).toThrow(new Error('Exploration property name cannot be null.'));
+    }).toThrowError('Exploration property name cannot be null.');
 
     ExplorationPropertyService.propertyName = 'property_1';
     ExplorationPropertyService.init('initial value');
@@ -95,7 +95,7 @@ describe('Exploration Property Service', function() {
   it('should save the displayed value when init is not called', function() {
     expect(function() {
       ExplorationPropertyService.saveDisplayedValue();
-    }).toThrow(new Error('Exploration property name cannot be null.'));
+    }).toThrowError('Exploration property name cannot be null.');
 
     ExplorationPropertyService.propertyName = 'property_1';
     ExplorationPropertyService.saveDisplayedValue();
@@ -117,7 +117,7 @@ describe('Exploration Property Service', function() {
     child.init();
     expect(function() {
       child.saveDisplayedValue();
-    }).toThrow(Error('this.displayed should have a valid value.'));
+    }).toThrowError('this.displayed should have a valid value.');
 
     // Then init with a value
     child.init('initial value');
