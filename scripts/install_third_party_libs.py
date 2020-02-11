@@ -22,6 +22,33 @@ import os
 import subprocess
 import sys
 
+TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
+
+# These libraries need to be installed before running or importing any script.
+pre_import_packages = [
+    ['pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2')],
+    ['future', '0.17.1', os.path.join('third_party', 'future-0.17.1')]
+]
+
+for package, version, install_path in pre_import_packages:
+    if os.path.exists(install_path):
+        continue
+    command = [
+        sys.executable, '-m', 'pip', 'install', '%s==%s'
+        % (package, version), '--target', install_path]
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0:
+        python_utils.PRINT(stdout)
+    elif 'can\'t combine user with prefix' in stderr:
+        subprocess.check_call([
+            sys.executable, '-m', 'pip', 'install',
+            '%s==%s' % (package, version), '--target', install_path,
+            '--user', '--prefix=', '--system'])
+    else:
+        raise Exception('Error installing package')
+
 
 # pylint: disable=wrong-import-position
 # pylint: disable=wrong-import-order
@@ -138,14 +165,6 @@ def ensure_pip_library_is_installed(package, version, path):
         python_utils.PRINT('Installing %s' % package)
         pip_install(package, version, exact_lib_path)
 
-
-# These libraries need to be installed before running or importing any script.
-TOOLS_DIR = os.path.join(os.pardir, 'oppia_tools')
-
-ensure_pip_library_is_installed(
-    'pyyaml', '5.1.2', os.path.join(TOOLS_DIR, 'pyyaml-5.1.2'))
-ensure_pip_library_is_installed(
-    'future', '0.17.1', os.path.join('third_party', 'future-0.17.1'))
 
 
 def main():
