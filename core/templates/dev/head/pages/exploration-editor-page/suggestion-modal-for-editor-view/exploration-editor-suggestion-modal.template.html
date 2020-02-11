@@ -21,7 +21,7 @@
     </div>
   </section>
   <div ng-show="canAccept" style="margin-top: 20px; margin-left: 10px;">
-    Review message (required if rejecting):
+    Review message:
     <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
   </div>
   <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
@@ -39,6 +39,6 @@
     <button class="btn btn-danger protractor-test-exploration-reject-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject || reviewMessage.length == 0">Reject</button>
   </span>
   <span uib-tooltip="Enter commit message before accepting" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
-    <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+    <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0 || reviewMessage.length == 0">Accept</button>
   </span>
 </div>
