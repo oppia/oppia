@@ -13,20 +13,27 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for WindowRef.
+ * @fileoverview Unit tests for DocumentAttributeCustomizationService.
  */
-
 import { TestBed } from '@angular/core/testing';
+
+import { DocumentAttributeCustomizationService } from
+  'services/contextual/document-attribute-customization.service';
 import { WindowRef } from 'services/contextual/window-ref.service';
 
-describe('Window Ref', () => {
-  let wrs;
+describe('Document Attribute Customization Service', () => {
+  let dacs, wrs;
 
   beforeEach(() => {
+    dacs = TestBed.get(DocumentAttributeCustomizationService);
     wrs = TestBed.get(WindowRef);
   });
 
-  it('should wrap the window object', () => {
-    expect(wrs.nativeWindow).toEqual(window);
+  it('should add a atribute', () => {
+    const setAttributeSpy = spyOn(
+      wrs.nativeWindow.document.documentElement, 'setAttribute').and.stub();
+    dacs.addAttribute('class', 'oppia-base-container');
+
+    expect(setAttributeSpy).toHaveBeenCalled();
   });
 });
