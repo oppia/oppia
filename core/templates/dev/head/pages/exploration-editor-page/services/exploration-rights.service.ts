@@ -136,7 +136,7 @@ angular.module('oppia').factory('ExplorationRightsService', [
           '/createhandler/moderatorrights/' +
           ExplorationDataService.explorationId);
 
-        return $http.put(explorationModeratorRightsUrl, {
+        $http.put(explorationModeratorRightsUrl, {
           email_body: emailBody,
           version: ExplorationDataService.data.version
         }).then(function(response) {

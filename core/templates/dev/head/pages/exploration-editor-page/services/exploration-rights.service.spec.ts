@@ -140,14 +140,14 @@ describe('Exploration rights service', function() {
     expect(ers.isPublic()).toBe(true);
   });
 
-  it('should reports correcty if exploration rights is viewable when' +
-    ' private', function() {
-    ers.init(['abc'], [], [], [], 'private', 'e1234', true, true);
-    expect(ers.viewableIfPrivate()).toBe(true);
+  it('should reports correcty if exploration rights is viewable when private',
+    function() {
+      ers.init(['abc'], [], [], [], 'private', 'e1234', true, true);
+      expect(ers.viewableIfPrivate()).toBe(true);
 
-    ers.init(['abc'], [], [], [], 'private', 'e1234', false, false);
-    expect(ers.viewableIfPrivate()).toBe(false);
-  });
+      ers.init(['abc'], [], [], [], 'private', 'e1234', false, false);
+      expect(ers.viewableIfPrivate()).toBe(false);
+    });
 
   it('should change community owned to true', function() {
     ers.init(['abc'], [], [], [], 'private', 'e1234', false, true);
@@ -248,7 +248,7 @@ describe('Exploration rights service', function() {
     $httpBackend.flush();
   });
 
-  it('should reject handler when making exploration rights public fails',
+  it('should call reject handler when making exploration rights public fails',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -266,36 +266,39 @@ describe('Exploration rights service', function() {
   it('should save moderator change to backend', function() {
     $httpBackend.expectPUT('/createhandler/moderatorrights/12345').respond(
       200, sampleDataResults);
-    ers.saveModeratorChangeToBackend().then(function(data) {
-      expect(clearWarningsSpy).toHaveBeenCalled();
-      expect(ers.ownerNames).toEqual(sampleDataResults.rights.owner_names);
-      expect(ers.editorNames).toEqual(sampleDataResults.rights.editor_names);
-      expect(ers.voiceArtistNames).toEqual(
-        sampleDataResults.rights.voice_artist_names);
-      expect(ers.viewerNames).toEqual(sampleDataResults.rights.viewer_names);
-      expect(ers.isPrivate()).toEqual(true);
-      expect(ers.clonedFrom()).toEqual(sampleDataResults.rights.cloned_from);
-      expect(ers.isCommunityOwned()).toBe(
-        sampleDataResults.rights.community_owned);
-      expect(ers.viewableIfPrivate()).toBe(
-        sampleDataResults.rights.viewable_if_private);
-    });
+    ers.saveModeratorChangeToBackend();
     $httpBackend.flush();
+
+    expect(clearWarningsSpy).toHaveBeenCalled();
+    expect(ers.ownerNames).toEqual(sampleDataResults.rights.owner_names);
+    expect(ers.editorNames).toEqual(sampleDataResults.rights.editor_names);
+    expect(ers.voiceArtistNames).toEqual(
+      sampleDataResults.rights.voice_artist_names);
+    expect(ers.viewerNames).toEqual(sampleDataResults.rights.viewer_names);
+    expect(ers.isPrivate()).toEqual(true);
+    expect(ers.clonedFrom()).toEqual(sampleDataResults.rights.cloned_from);
+    expect(ers.isCommunityOwned()).toBe(
+      sampleDataResults.rights.community_owned);
+    expect(ers.viewableIfPrivate()).toBe(
+      sampleDataResults.rights.viewable_if_private);
   });
 
   it('should reject handler when saving moderator change to backend fails',
     function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
       $httpBackend.expectPUT('/createhandler/moderatorrights/12345')
         .respond(500);
-      ers.saveModeratorChangeToBackend().then(
-        successHandler, failHandler);
+      ers.saveModeratorChangeToBackend();
       $httpBackend.flush();
 
       expect(clearWarningsSpy).not.toHaveBeenCalled();
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
+      expect(ers.ownerNames).toBeUndefined();
+      expect(ers.editorNames).toBeUndefined();
+      expect(ers.voiceArtistNames).toBeUndefined();
+      expect(ers.viewerNames).toBeUndefined();
+      expect(ers.isPrivate()).toBe(false);
+      expect(ers.isPublic()).toBe(false);
+      expect(ers.clonedFrom()).toBeUndefined();
+      expect(ers.isCommunityOwned()).toBeUndefined();
+      expect(ers.viewableIfPrivate()).toBeUndefined();
     });
 });
