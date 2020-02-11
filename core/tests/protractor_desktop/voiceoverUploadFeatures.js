@@ -92,7 +92,7 @@ describe('Voiceover upload features', function() {
     explorationEditorTranslationTab.deleteAudioRecord();
   });
 
-  it('should upload recorded file', function() {
+  it('should upload recorded audio', function() {
     explorationEditorTranslationTab.addAudioRecord();
     explorationEditorTranslationTab.stopAudioRecord();
     explorationEditorTranslationTab.confirmAudioRecord();
