@@ -115,7 +115,7 @@ def apply_change_list(story_id, change_list):
                 for node in story.story_contents.nodes:
                     if node.id == change.node_id:
                         exp_services.update_exploration_story_link(
-                            node.exploration_id, '', story.id)
+                            node.exploration_id, None, story.id)
                         break
                 story.delete_node(change.node_id)
             elif (change.cmd ==
