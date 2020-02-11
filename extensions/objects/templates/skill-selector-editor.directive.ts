@@ -28,8 +28,7 @@ angular.module('oppia').directive('skillSelectorEditor', [
       bindToController: {
         value: '='
       },
-      template: require(
-        './skill-selector-editor.directive.html'),
+      template: require('./skill-selector-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$scope', 'ContextService', 'ENTITY_TYPE',

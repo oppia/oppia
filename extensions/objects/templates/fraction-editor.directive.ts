@@ -17,17 +17,14 @@
  */
 
 angular.module('oppia').directive('fractionEditor', [
-  'FractionObjectFactory',
-  function(
-      FractionObjectFactory) {
+  'FractionObjectFactory', function(FractionObjectFactory) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      template: require(
-        './fraction-editor.directive.html'),
+      template: require('./fraction-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

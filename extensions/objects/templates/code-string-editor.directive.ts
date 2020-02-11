@@ -29,8 +29,7 @@ angular.module('oppia').directive('codeStringEditor', [
         getAlwaysEditable: '&',
         value: '='
       },
-      template: require(
-        './code-string-editor.directive.html'),
+      template: require('./code-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

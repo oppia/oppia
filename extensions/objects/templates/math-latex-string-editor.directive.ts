@@ -31,8 +31,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
         getAlwaysEditable: '&',
         value: '='
       },
-      template: require(
-        './math-latex-string-editor.directive.html'),
+      template: require('./math-latex-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

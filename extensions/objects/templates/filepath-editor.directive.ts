@@ -19,6 +19,7 @@
 // This directive can only be used in the context of an exploration.
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 
+require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
 require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
@@ -30,17 +31,16 @@ var gifshot = require('gifshot');
 
 angular.module('oppia').directive('filepathEditor', [
   '$sce', 'AlertsService', 'AssetsBackendApiService', 'ContextService',
-  'CsrfTokenService', 'ImageUploadHelperService',
+  'CsrfTokenService', 'ImageUploadHelperService', 'UrlInterpolationService',
   function($sce, AlertsService, AssetsBackendApiService, ContextService,
-      CsrfTokenService, ImageUploadHelperService) {
+      CsrfTokenService, ImageUploadHelperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      template: require(
-        './filepath-editor.directive.html'),
+      template: require('./filepath-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
@@ -740,12 +740,16 @@ angular.module('oppia').directive('filepathEditor', [
             filename: ImageUploadHelperService.generateImageFilename(
               dimensions.height, dimensions.width, imageType)
           }));
-          var imageUploadUrl = './createhandler/imageupload/';
+          var imageUploadUrlTemplate = '/createhandler/imageupload/' +
+            '<entity_type>/<entity_id>';
           CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
-              url: require(imageUploadUrl +
-                 ctrl.entityType + '/' + ctrl.entityId
+              url: UrlInterpolationService.interpolateUrl(
+                imageUploadUrlTemplate, {
+                  entity_type: ctrl.entityType,
+                  entity_id: ctrl.entityId
+                }
               ),
               data: form,
               processData: false,

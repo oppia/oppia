@@ -28,8 +28,7 @@ angular.module('oppia').directive('graphEditor', [
       bindToController: {
         value: '='
       },
-      template: require(
-        './graph-editor.directive.html'),
+      template: require('./graph-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

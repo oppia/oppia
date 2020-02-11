@@ -30,8 +30,7 @@ angular.module('oppia').directive('htmlEditor', [
       bindToController: {
         value: '='
       },
-      template: require(
-        './html-editor.directive.html'),
+      template: require('./html-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

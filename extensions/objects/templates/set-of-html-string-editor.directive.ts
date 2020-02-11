@@ -29,8 +29,7 @@ angular.module('oppia').directive('setOfHtmlStringEditor', [
         getInitArgs: '&',
         value: '='
       },
-      template: require(
-        './set-of-html-string-editor.directive.html'),
+      template: require('./set-of-html-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

@@ -22,18 +22,15 @@
 
 // TODO(czx): Uniquify the labels of image regions
 angular.module('oppia').directive('imageWithRegionsEditor', [
-  'AssetsBackendApiService',
-  'ContextService', 'ENTITY_TYPE',
-  function(AssetsBackendApiService,
-      ContextService, ENTITY_TYPE) {
+  'AssetsBackendApiService', 'ContextService', 'ENTITY_TYPE',
+  function(AssetsBackendApiService, ContextService, ENTITY_TYPE) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      template: require(
-        './image-with-regions-editor.directive.html'),
+      template: require('./image-with-regions-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$uibModal',

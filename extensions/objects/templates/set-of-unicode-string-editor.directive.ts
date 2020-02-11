@@ -28,8 +28,7 @@ angular.module('oppia').directive('setOfUnicodeStringEditor', [
       bindToController: {
         value: '='
       },
-      template: require(
-        './list-editor.directive.html'),
+      template: require('./list-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

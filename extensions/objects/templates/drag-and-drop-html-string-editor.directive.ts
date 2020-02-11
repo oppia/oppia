@@ -25,8 +25,7 @@ angular.module('oppia').directive('dragAndDropHtmlStringEditor', [
         getInitArgs: '&',
         value: '='
       },
-      template: require(
-        './drag-and-drop-html-string-editor.directive.html'),
+      template: require('./drag-and-drop-html-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

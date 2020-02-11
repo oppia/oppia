@@ -25,8 +25,7 @@ angular.module('oppia').directive('sanitizedUrlEditor', [
       bindToController: {
         value: '='
       },
-      template: require(
-        './sanitized-url-editor.directive.html'),
+      template: require('./sanitized-url-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

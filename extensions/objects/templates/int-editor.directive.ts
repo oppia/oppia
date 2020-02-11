@@ -28,8 +28,7 @@ angular.module('oppia').directive('intEditor', [
       bindToController: {
         value: '='
       },
-      template: require(
-        './int-editor.directive.html'),
+      template: require('./int-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
