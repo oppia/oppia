@@ -1062,12 +1062,12 @@ class SendDummyMailTest(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             generated_response = self.post_json(
-            '/sendDummyMailToAdminHandler', payload={},
-            csrf_token=csrf_token)
-            self.assertEqual(generated_response['msg'],
-                'Success! Mail sent to admin.')
+                '/sendDummyMailToAdminHandler', payload={},
+                csrf_token=csrf_token)
+            self.assertEqual(
+                generated_response['msg'], 'Success! Mail sent to admin.')
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             generated_response = self.post_json(
-            '/sendDummyMailToAdminHandler', payload={},
-            csrf_token=csrf_token,expected_status_int=400)
+                '/sendDummyMailToAdminHandler', payload={},
+                csrf_token=csrf_token, expected_status_int=400)

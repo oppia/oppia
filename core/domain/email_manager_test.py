@@ -134,7 +134,7 @@ class DummyMailTest(test_utils.GenericTestBase):
 
             # Send an email.
             email_manager.send_dummy_mail_to_admin(
-                dummy_system_name,dummy_system_address)
+                dummy_system_name, dummy_system_address)
 
             # Make sure emails are sent.
             messages = self.mail_stub.get_sent_messages(

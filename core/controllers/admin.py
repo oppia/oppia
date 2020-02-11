@@ -646,7 +646,7 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
             dummy_email_name = 'DUMMY_SYSTEM_NAME'
             dummy_email_address = 'dummy@system.com'
             email_manager.send_dummy_mail_to_admin(
-                dummy_email_name,dummy_email_address)
+                dummy_email_name, dummy_email_address)
             self.render_json(response)
         else:
-            raise self.InvalidInputException("This app cannot send Emails.")
+            raise self.InvalidInputException('This app cannot send Emails.')
