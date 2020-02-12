@@ -62,6 +62,7 @@ var _completeSignup = function(username) {
   usernameInput.sendKeys(username);
   agreeToTermsCheckbox.click();
   registerUser.click();
+  waitFor.pageToFullyLoad();
 };
 
 var createUser = function(email, username) {
