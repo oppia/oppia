@@ -39,6 +39,12 @@ var ExplorationEditorMainTab = function() {
     return element(
       by.cssContainingText('.protractor-test-html-select-option', optionNum));
   };
+  ////// BIG RANDOM CODE CHUNK
+  var itemSelectionAnswerOptions = function(optionNum) {
+    return element(
+      by.cssContainingText('.protractor-test-html-select-option', optionNum));
+  };
+  //////
   var neutralElement = element.all(by.css('.protractor-test-neutral-element'))
     .first();
   var defaultResponseTab = element(
@@ -890,6 +896,8 @@ var ExplorationEditorMainTab = function() {
         parameterElement.element(by.tagName('button')).click();
         multipleChoiceAnswerOptions(parameterValues[i])
           .click();
+      } else if (interactionId === 'ItemSelectionInput') {
+        itemSelectionAnswerOptions(parameterValues[i]).click();
       } else {
         parameterEditor.setValue(parameterValues[i]);
       }

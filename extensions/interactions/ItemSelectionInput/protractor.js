@@ -18,18 +18,24 @@
  */
 
 var forms = require('../../../core/tests/protractor_utils/forms.js');
+var objects = require('../../objects/protractor.js');
 
 // The members of richTextInstructionsArray are functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeInteraction = function(elem, richTextInstructionsArray) {
+var customizeInteraction = function(elem, richTextInstructionsArray, maxSelectionAllowed) {
+  // need to set # of max selections
   forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
   for (var i = 0; i < richTextInstructionsArray.length; i++) {
     var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
     richTextEditor.clear();
     richTextInstructionsArray[i](richTextEditor);
   }
+
+  objects.IntEditor(
+    elem.all(by.tagName('schema-based-int-editor')).last()
+  ).setValue(maxSelectionAllowed);
 };
 
 // These members of richTextInstructionsArray each describe how to check one of
@@ -69,8 +75,8 @@ var testSuite = [{
     editor.appendItalicText('answer2');
   }, function(editor) {
     editor.appendItalicText('answer3');
-  }]],
-  ruleArguments: ['Equals', new Set(['answer1', 'answer2'])],
+  }], 3],
+  ruleArguments: ['Equals', ['<p>answer1</p>', '<p>answer2</p>']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -78,8 +84,8 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('answer3');
   }]],
-  wrongAnswers: [new Set(['answer1'], ['answer2']), new Set(['answer1', 'answer3'])],
-  correctAnswers: [new Set(['answer1', 'answer2'])]
+  wrongAnswers: [['<p>answer1</p>'], ['<p>answer2</p>'], ['<p>answer1</p>', '<p>answer3</p>']],
+  correctAnswers: [['<p>answer1</p>', '<p>answer2</p>']]
 }, { 
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
@@ -87,8 +93,8 @@ var testSuite = [{
     editor.appendItalicText('answer2');
   }, function(editor) {
     editor.appendItalicText('answer3');
-  }]],
-  ruleArguments: ['ContainsAtLeastOneOf', new Set(['answer1', 'answer2'])],
+  }], 3],
+  ruleArguments: ['ContainsAtLeastOneOf', ['<p>answer1</p>', '<p>answer2</p>']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -96,8 +102,8 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('answer3');
   }]],
-  wrongAnswers: [new Set(['answer3'])],
-  correctAnswers: [new Set(['answer1']), new Set(['answer2']), new Set(['answer1', 'answer2'])]
+  wrongAnswers: [['<p>answer3</p>']],
+  correctAnswers: [['<p>answer1</p>'], ['<p>answer2</p>'], ['<p>answer1</p>', '<p>answer2</p>']]
 }, { 
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
@@ -105,8 +111,8 @@ var testSuite = [{
     editor.appendItalicText('answer2');
   }, function(editor) {
     editor.appendItalicText('answer3');
-  }]],
-  ruleArguments: ['IsProperSubsetOf', ['answer1', 'answer2']],
+  }], 3],
+  ruleArguments: ['IsProperSubsetOf', ['<p>answer1</p>', '<p>answer2</p>']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -114,8 +120,8 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('answer3');
   }]],
-  wrongAnswers: [new Set(['answer3']), new Set(['answer1', 'answer2'])],
-  correctAnswers: [new Set(['answer1']), new Set(['answer2'])]
+  wrongAnswers: [['<p>answer3</p>'], ['<p>answer1</p>', '<p>answer2</p>']],
+  correctAnswers: [['<p>answer1</p>'], ['<p>answer2</p>']]
 }, { 
   interactionArguments: [[function(editor) {
     editor.appendBoldText('answer1');
@@ -123,8 +129,8 @@ var testSuite = [{
     editor.appendItalicText('answer2');
   }, function(editor) {
     editor.appendItalicText('answer3');
-  }]],
-  ruleArguments: ['DoesNotContainAtLeastOneOf', ['answer1', 'answer2']],
+  }], 3],
+  ruleArguments: ['DoesNotContainAtLeastOneOf', ['<p>answer1</p>', '<p>answer2</p>']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('answer1');
   }, function(checker) {
@@ -132,6 +138,12 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('answer3');
   }]],
-  wrongAnswers: [new Set(['answer1', 'answer2'])],
-  correctAnswers: [new Set(['answer1']), new Set(['answer2']), new Set(['answer3'])]
+  wrongAnswers: [['<p>answer1</p>', '<p>answer2</p>']],
+  correctAnswers: [['<p>answer1</p>'], ['<p>answer2</p>'], ['<p>answer3</p>']]
 }];
+
+exports.customizeInteraction = customizeInteraction;
+exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
+exports.submitAnswer = submitAnswer;
+exports.answerObjectType = answerObjectType;
+exports.testSuite = testSuite;
