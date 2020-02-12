@@ -16,13 +16,13 @@
  * @fileoverview unit test for RuleObjectFactory.
  */
 import { TestBed } from '@angular/core/testing';
-import { RuleObjectFactory, Rule } from
+import { RuleObjectFactory, IBackendRuleDict, IRuleInput } from
   'domain/exploration/RuleObjectFactory';
 
-fdescribe('RuleObjectFactory', () => {
-  let ruleObjectFactory;
-  let ruleBackendDict: any;
-  let inputBackend
+describe('RuleObjectFactory', () => {
+  let ruleObjectFactory: RuleObjectFactory = null;
+  let ruleBackendDict: IBackendRuleDict = null;
+  let inputBackend: IRuleInput = null;
   beforeEach(() => {
     ruleObjectFactory = TestBed.get(RuleObjectFactory);
     inputBackend = {
