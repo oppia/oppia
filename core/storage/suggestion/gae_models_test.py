@@ -814,6 +814,4 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
         user_data = (
             suggestion_models.GeneralVoiceoverApplicationModel
             .export_data('author_1'))
-        print(expected_data)
-        print(user_data)
         self.assertEqual(expected_data, user_data)

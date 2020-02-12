@@ -1907,7 +1907,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_data = user_models.UserContributionScoringModel.export_data(
             'USER_WITHOUT_DATA')
         expected_data = {}
-        self.assertEquals(user_data, expected_data)
+        self.assertEqual(user_data, expected_data)
     
     def test_export_data_nontrivial(self):
         user_data = user_models.UserContributionScoringModel.export_data(
@@ -1922,7 +1922,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
                 'score': 2
             }
         }
-        self.assertEquals(user_data, expected_data)
+        self.assertEqual(user_data, expected_data)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
