@@ -524,7 +524,28 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
        TODO(#8523): Implement this function.
        """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+    
+    @classmethod
+    def export_data(cls, user_id):
+        user_data = dict()
+
+        models = (
+            cls.get_all()
+            .filter(cls.author_id == user_id).fetch())
+
+        for model in models:
+            user_data[model.id] = {
+                'target_type': model.target_type,
+                'target_id': model.target_id,
+                'language_code': model.language_code,
+                'status': model.status,
+                'content': model.content,
+                'filename': model.filename,
+                'rejection_message': model.rejection_message
+            }
+
+        return user_data
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for author_id and

@@ -1898,11 +1898,22 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
-        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+        """This model's export_data function has not been implemented yet.
+        However, it is pending implementation per #8523.
+        """
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+    
+    @classmethod
+    def export_data(cls, user_id):
+        """TODO fill this in with a better thing."""
+        user_data = dict()
+        scoring_models = cls.get_all().filter(cls.user_id == user_id).fetch()
+        for scoring_model in scoring_models:
+            user_data[scoring_model.score_category] = {
+                'score': scoring_model.score,
+                'has_email_been_sent': scoring_model.has_email_been_sent
+            }
+        return user_data
 
     @classmethod
     def apply_deletion_policy(cls, user_id):

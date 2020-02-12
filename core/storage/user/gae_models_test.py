@@ -1902,6 +1902,27 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             has_email_been_sent=False,
             deleted=True
         ).put()
+    
+    def test_export_data_trivial(self):
+        user_data = user_models.UserContributionScoringModel.export_data(
+            'USER_WITHOUT_DATA')
+        expected_data = {}
+        self.assertEquals(user_data, expected_data)
+    
+    def test_export_data_nontrivial(self):
+        user_data = user_models.UserContributionScoringModel.export_data(
+            self.USER_1_ID)
+        expected_data = {
+            self.SCORE_CATEGORY_1: {
+                'has_email_been_sent': False,
+                'score': 1.5
+            },
+            self.SCORE_CATEGORY_2: {
+                'has_email_been_sent': False,
+                'score': 2
+            }
+        }
+        self.assertEquals(user_data, expected_data)
 
     def test_get_deletion_policy(self):
         self.assertEqual(
