@@ -27,22 +27,16 @@ describe('Window Dimensions Service', () => {
     wds = TestBed.get(WindowDimensionsService);
     wr = TestBed.get(WindowRef);
 
-    // This condition will evaluates if innerWidth exists on window object.
-    // If innerWIdth is not set, then it should be define as property
-    // on window object using Object.defineProperty. This approach was choosen
-    // because spyOn() doesn't work on properties that doesn't have a get
-    // access type, it means that doesn't work on properties that is not setted
-    // in a object.
+    // This approach was choosen because spyOn() doesn't work on properties
+    // that doesn't have a get access type.
     // Without this approach the test will fail because it'll throw
     // 'Property innerWidth does not have access type get' error.
     // eslint-disable-next-line max-len
     // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
     // ref: https://github.com/jasmine/jasmine/issues/1415
-    if (!wr.nativeWindow.hasOwnProperty('innerWidth')) {
-      Object.defineProperty(wr.nativeWindow, 'innerWidth', {
-        get: () => undefined
-      });
-    }
+    Object.defineProperty(wr.nativeWindow, 'innerWidth', {
+      get: () => undefined
+    });
   });
 
   describe('getWidth', () => {
