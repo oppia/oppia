@@ -1902,13 +1902,13 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             has_email_been_sent=False,
             deleted=True
         ).put()
-    
+
     def test_export_data_trivial(self):
         user_data = user_models.UserContributionScoringModel.export_data(
             'USER_WITHOUT_DATA')
         expected_data = {}
         self.assertEqual(user_data, expected_data)
-    
+
     def test_export_data_nontrivial(self):
         user_data = user_models.UserContributionScoringModel.export_data(
             self.USER_1_ID)

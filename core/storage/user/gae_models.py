@@ -1900,7 +1900,7 @@ class UserContributionScoringModel(base_models.BaseModel):
     def get_export_policy():
         """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
-    
+
     @classmethod
     def export_data(cls, user_id):
         """(Takeout) Exports the data from UserContributionScoringModel

@@ -765,7 +765,7 @@ class GeneralVoiceoverApplicationModelUnitTests(test_utils.GenericTestBase):
             .export_data('non_existent_user'))
         test_data = {}
         self.assertEqual(user_data, test_data) 
-    
+
     def test_export_data_nontrivial(self):
         suggestion_models.GeneralVoiceoverApplicationModel(
             id='application_1_id',
