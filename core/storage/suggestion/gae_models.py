@@ -541,7 +541,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
             .filter(cls.author_id == user_id).fetch())
 
         for voiceover_model in voiceover_models:
-            user_data[model.id] = {
+            user_data[voiceover_model.id] = {
                 'target_type': voiceover_model.target_type,
                 'target_id': voiceover_model.target_id,
                 'language_code': voiceover_model.language_code,
