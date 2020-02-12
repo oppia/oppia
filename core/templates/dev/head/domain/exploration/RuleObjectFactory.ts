@@ -21,8 +21,8 @@ export interface IRuleInput {
   [propName: string ]: any;
 }
 export interface IBackendRuleDict {
-  rule_type: string,
-  inputs: IRuleInput
+  'rule_type': string,
+  'inputs': IRuleInput
 }
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
