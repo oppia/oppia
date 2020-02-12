@@ -24,9 +24,10 @@ require('interactions/SetInput/directives/set-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/window-dimensions.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveSetInput', [
-  function() {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
@@ -77,6 +78,8 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
             ctrl.submitAnswer(ctrl.answer);
           };
           ctrl.$onInit = function() {
+            ctrl.buttonText = HtmlEscaperService.escapedJsonToObj(
+              $attrs.buttonTextWithValue);
             ctrl.schema = {
               type: 'list',
               items: {
@@ -88,6 +91,10 @@ angular.module('oppia').directive('oppiaInteractiveSetInput', [
                   'I18N_INTERACTIONS_SET_INPUT_ADD_ITEM')
               }
             };
+            if (ctrl.buttonText) {
+              ctrl.schema.ui_config.add_element_text = $translate.instant(
+                ctrl.buttonText);
+            }
 
             // Adds an input field by default
             ctrl.answer = [''];
