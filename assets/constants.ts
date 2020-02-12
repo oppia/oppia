@@ -288,6 +288,10 @@ export = {
     "description": "Bangla",
     "relatedLanguages": ["bn"]
   }, {
+    "id": "ms",
+    "description": "Bahasa Melayu",
+    "relatedLanguages": ["ms"]
+  }, {
     "id": "ca",
     "description": "Catalan",
     "relatedLanguages": ["ca"]
