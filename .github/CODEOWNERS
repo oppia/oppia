@@ -13,7 +13,9 @@
 
 # Angular Migration team
 /core/templates/dev/head/services/contextual/logger.service.ts @bansalnitish
+/core/templates/dev/head/services/contextual/logger.service.spec.ts @bansalnitish
 /core/templates/dev/head/services/UpgradedServices.ts @bansalnitish
+/core/templates/dev/head/services/request-interceptor.service.ts @bansalnitish
 /typings/ @ankita240796
 /tsconfig.json @ankita240796
 
@@ -104,6 +106,7 @@
 /scripts/__init__.py @kevinlee12
 /scripts/build.py @kevinlee12
 /scripts/build_test.py @kevinlee12
+/scripts/check_e2e_tests_are_captured_in_ci*.py @Showtim3 @kevinlee12
 /scripts/check_frontend_coverage.py @marianazangrossi @kevinlee12
 /scripts/check_frontend_coverage_test.py @marianazangrossi @kevinlee12
 /scripts/clean.py @kevinlee12
@@ -116,6 +119,7 @@
 /scripts/docstrings_checker.py @kevinlee12
 /scripts/docstrings_checker_test.py @kevinlee12
 /scripts/install_chrome_on_travis.py @kevinlee12
+/scripts/install_chrome_on_travis_test.py @kevinlee12
 /scripts/install_prerequisites.sh @kevinlee12
 /scripts/install_third_party.py @kevinlee12
 /scripts/install_third_party_libs.py @kevinlee12
@@ -133,7 +137,8 @@
 /scripts/release_scripts/deploy.py @ankita240796 @kevinlee12
 /scripts/release_scripts/deploy_test.py @ankita24079 @kevinlee12
 /scripts/run_backend_tests.py @kevinlee12
-/scripts/run_e2e_tests.sh @kevinlee12
+/scripts/run_e2e_tests.py @kevinlee12
+/scripts/run_e2e_tests_test.py @kevinlee12
 /scripts/run_frontend_tests.py @kevinlee12
 /scripts/run_performance_tests.py @kevinlee12
 /scripts/run_presubmit_checks.py @kevinlee12
@@ -409,7 +414,7 @@
 /core/templates/dev/head/pages/interaction-specs.constants.ts @bansalnitish
 /core/templates/dev/head/I18nFooter.ts @nithusha21
 /core/templates/dev/head/i18n-footer.directive.html @nithusha21
-/core/templates/dev/head/services/contextual/document-attribute-customization.service.ts @bansalnitish
+/core/templates/dev/head/services/contextual/document-attribute-customization.service*.ts @bansalnitish
 /core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @bansalnitish
 /core/templates/dev/head/services/translation-file-hash-loader.service.ts @nithusha21
 /release_constants.py @ankita240796 @nithusha21 @seanlip
