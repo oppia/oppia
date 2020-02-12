@@ -238,7 +238,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
-import { from } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root'
