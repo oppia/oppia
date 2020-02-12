@@ -1898,14 +1898,20 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function has not been implemented yet.
-        However, it is pending implementation per #8523.
-        """
+        """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
     
     @classmethod
     def export_data(cls, user_id):
-        """TODO fill this in with a better thing."""
+        """(Takeout) Exports the data from UserContributionScoringModel
+        into dict format.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserContributionScoringModel.
+        """
         user_data = dict()
         scoring_models = cls.get_all().filter(cls.user_id == user_id).fetch()
         for scoring_model in scoring_models:

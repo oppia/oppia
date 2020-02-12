@@ -520,14 +520,20 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
 
     @staticmethod
     def get_export_policy():
-        """This model's export_data function implementation is still pending.
-
-       TODO(#8523): Implement this function.
-       """
+        """Model contains user data."""
         return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
     
     @classmethod
     def export_data(cls, user_id):
+        """(Takeout) Exports the data from GeneralVoiceoverApplicationModel
+        into dict format.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from GeneralVoiceoverApplicationModel.
+        """
         user_data = dict()
 
         models = (
