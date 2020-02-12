@@ -536,19 +536,19 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """
         user_data = dict()
 
-        models = (
+        voiceover_models = (
             cls.get_all()
             .filter(cls.author_id == user_id).fetch())
 
-        for model in models:
+        for voiceover_model in voiceover_models:
             user_data[model.id] = {
-                'target_type': model.target_type,
-                'target_id': model.target_id,
-                'language_code': model.language_code,
-                'status': model.status,
-                'content': model.content,
-                'filename': model.filename,
-                'rejection_message': model.rejection_message
+                'target_type': voiceover_model.target_type,
+                'target_id': voiceover_model.target_id,
+                'language_code': voiceover_model.language_code,
+                'status': voiceover_model.status,
+                'content': voiceover_model.content,
+                'filename': voiceover_model.filename,
+                'rejection_message': voiceover_model.rejection_message
             }
 
         return user_data
