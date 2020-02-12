@@ -53,6 +53,7 @@ var logout = function() {
 // The user needs to log in immediately before this method is called. Note
 // that this will fail if the user already has a username.
 var _completeSignup = function(username) {
+  browser.waitForAngularEnabled(false);
   browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
   waitFor.pageToFullyLoad();
   var usernameInput = element(by.css('.protractor-test-username-input'));
@@ -64,6 +65,7 @@ var _completeSignup = function(username) {
   agreeToTermsCheckbox.click();
   registerUser.click();
   waitFor.pageToFullyLoad();
+  browser.waitForAngularEnabled(true);
 };
 
 var createUser = function(email, username) {
