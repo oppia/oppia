@@ -17,7 +17,6 @@
  */
 
 import { TestBed } from '@angular/core/testing';
-
 import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
 
@@ -32,87 +31,199 @@ describe('Speech Synthesis Chunker Service', () => {
     speechSynthesisChunkerService = TestBed.get(SpeechSynthesisChunkerService);
   });
 
-  it('Should properly convert subtraction in LaTeX to speakable text',
-    () => {
-      var latex1 = '5-3';
-      var latex2 = 'i-j';
+  describe('formatLatexToSpeakableText', () => {
+    it('should properly convert subtraction in LaTeX to speakable text',
+      () => {
+        var latex1 = '5-3';
+        var latex2 = 'i-j';
+        var speakableLatex1 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
+        var speakableLatex2 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
+        expect(speakableLatex1).toEqual('5 minus 3');
+        expect(speakableLatex2).toEqual('i minus j');
+      }
+    );
+  
+    it('should properly convert fractions in LaTeX to speakable text',
+      () => {
+        var latex1 = '\\\\frac{2}{3}';
+        var latex2 = '\\\\frac{abc}{xyz}';
+        var latex3 = '\\\\frac{3n}{5}';
+        var latex4 = '\\\\frac{ijk}{5xy}';
+        var speakableLatex1 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
+        var speakableLatex2 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
+        var speakableLatex3 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
+        var speakableLatex4 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex4);
+        expect(speakableLatex1).toEqual('2/3');
+        expect(speakableLatex2).toEqual('a b c over x y z');
+        expect(speakableLatex3).toEqual('3n over 5');
+        expect(speakableLatex4).toEqual('i j k over 5x y');
+      }
+    );
+  
+    it('should properly convert square roots in LaTeX to speakable text',
+      () => {
+        var latex1 = '\\\\sqrt{3}';
+        var latex2 = '\\\\sqrt{xy}';
+        var speakableLatex1 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
+        var speakableLatex2 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
+        expect(speakableLatex1).toEqual('the square root of 3');
+        expect(speakableLatex2).toEqual('the square root of x y');
+      }
+    );
+  
+    it('should properly convert exponents in LaTeX to speakable text',
+      () => {
+        var latex1 = 'x^2';
+        var latex2 = '42^4';
+        var latex3 = 'x^62';
+        var latex4 = '3n^4x';
+        var speakableLatex1 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
+        var speakableLatex2 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
+        var speakableLatex3 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
+        var speakableLatex4 =
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex4);
+        expect(speakableLatex1).toEqual('x^2');
+        expect(speakableLatex2).toEqual('42 to the power of 4');
+        expect(speakableLatex3).toEqual('x to the power of 62');
+        expect(speakableLatex4).toEqual('3n to the power of 4x');
+      }
+    );
+  
+    it('should properly convert trigonometric functions in LaTeX to ' +
+        'speakable text', () => {
+      var latex1 = '\\\\sin{90}';
+      var latex2 = '\\\\cos{0}';
+      var latex3 = '\\\\tan{uv}';
       var speakableLatex1 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
       var speakableLatex2 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
-      expect(speakableLatex1).toEqual('5 minus 3');
-      expect(speakableLatex2).toEqual('i minus j');
-    }
-  );
-
-  it('Should properly convert fractions in LaTeX to speakable text',
-    () => {
-      var latex1 = '\\\\frac{2}{3}';
-      var latex2 = '\\\\frac{abc}{xyz}';
-      var latex3 = '\\\\frac{3n}{5}';
-      var latex4 = '\\\\frac{ijk}{5xy}';
-      var speakableLatex1 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
-      var speakableLatex2 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
       var speakableLatex3 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
-      var speakableLatex4 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex4);
-      expect(speakableLatex1).toEqual('2/3');
-      expect(speakableLatex2).toEqual('a b c over x y z');
-      expect(speakableLatex3).toEqual('3n over 5');
-      expect(speakableLatex4).toEqual('i j k over 5x y');
-    }
-  );
+          speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
+      expect(speakableLatex1).toEqual('the sine of 90');
+      expect(speakableLatex2).toEqual('the cosine of 0');
+      expect(speakableLatex3).toEqual('the tangent of u v');
+    });
+  });
 
-  it('Should properly convert square roots in LaTeX to speakable text',
-    () => {
-      var latex1 = '\\\\sqrt{3}';
-      var latex2 = '\\\\sqrt{xy}';
-      var speakableLatex1 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
-      var speakableLatex2 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
-      expect(speakableLatex1).toEqual('the square root of 3');
-      expect(speakableLatex2).toEqual('the square root of x y');
-    }
-  );
+  describe('convertToSpeakableText', () => {
+    it('should properly convert to speakable text when raw_latex-with-value' +
+      ' attribute is setted', () => {
+      const html = (
+        '<oppia-noninteractive-math raw_latex-with-value="5-1">' +
+        '</oppia-noninteractive-math>' +
+        '<li>Speech</li>' +
+        '<li>Text</li>'
+      );
 
-  it('Should properly convert exponents in LaTeX to speakable text',
-    () => {
-      var latex1 = 'x^2';
-      var latex2 = '42^4';
-      var latex3 = 'x^62';
-      var latex4 = '3n^4x';
-      var speakableLatex1 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
-      var speakableLatex2 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
-      var speakableLatex3 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
-      var speakableLatex4 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex4);
-      expect(speakableLatex1).toEqual('x^2');
-      expect(speakableLatex2).toEqual('42 to the power of 4');
-      expect(speakableLatex3).toEqual('x to the power of 62');
-      expect(speakableLatex4).toEqual('3n to the power of 4x');
-    }
-  );
+      expect(speechSynthesisChunkerService.convertToSpeakableText(html))
+        .toBe('5 minus 1Speech. Text. ');
+    });
 
-  it ('Should properly convert trigonometric functions in LaTeX to ' +
-      'speakable text', () => {
-    var latex1 = '\\\\sin{90}';
-    var latex2 = '\\\\cos{0}';
-    var latex3 = '\\\\tan{uv}';
-    var speakableLatex1 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
-    var speakableLatex2 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
-    var speakableLatex3 =
-        speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
-    expect(speakableLatex1).toEqual('the sine of 90');
-    expect(speakableLatex2).toEqual('the cosine of 0');
-    expect(speakableLatex3).toEqual('the tangent of u v');
+    it('should properly convert to speakable text when text-with-value' +
+      ' attribute is setted', () => {
+      const html = (
+        '<oppia-noninteractive-link text-with-value="&quot;">' +
+        '</oppia-noninteractive-link>' +
+        '<li>"Speech"</li>' +
+        '<li>Text</li>'
+      );
+
+      expect(speechSynthesisChunkerService.convertToSpeakableText(html))
+        .toBe('Speech. Text. ');
+    });
+  });
+
+  describe('speak', function() {
+    const MockSpeechSynthesisUtteranceConstructor = (
+      SpeechSynthesisUtterance);
+    const mockSpeechSynthesisUtteran = {
+      speak: () => {},
+      onend: () => {}
+    };
+
+    beforeEach(() => {
+      spyOn(window, 'SpeechSynthesisUtterance').and.returnValue(
+        // @ts-ignore
+        mockSpeechSynthesisUtteran);
+    });
+
+    it('should not speak when chunk is too short', () => {
+      const speechSynthesisUtterance = (
+        new MockSpeechSynthesisUtteranceConstructor('a'));
+      const callbackSpy = jasmine.createSpy('callback');
+      speechSynthesisChunkerService.speak(
+        speechSynthesisUtterance, callbackSpy);
+
+      expect(callbackSpy).toHaveBeenCalled();
+    });
+
+    it('should not speak when chunk is a falsy value', () => {
+      const speechSynthesisUtterance = (
+        new MockSpeechSynthesisUtteranceConstructor(''));
+      const callbackSpy = jasmine.createSpy('callback');
+      speechSynthesisChunkerService.speak(
+        speechSynthesisUtterance, callbackSpy);
+
+      expect(callbackSpy).toHaveBeenCalled();
+    });
+
+    it('should speak speech twice', () => {
+      jasmine.clock().uninstall();
+      jasmine.clock().install();
+
+      const speakSpy = spyOn(window.speechSynthesis, 'speak').and
+        .callFake(function() {
+          mockSpeechSynthesisUtteran.onend();
+        });
+      const speechSynthesisUtterance = (
+        new MockSpeechSynthesisUtteranceConstructor(
+          'Value inside utterance for testing purposes.' +
+          ' This is the next chunk'));
+      const callbackSpy = jasmine.createSpy('callback');
+      speechSynthesisChunkerService.speak(
+        speechSynthesisUtterance, callbackSpy);
+
+      jasmine.clock().tick(5000);
+
+      expect(callbackSpy).toHaveBeenCalled();
+      expect(speakSpy).toHaveBeenCalledTimes(2);
+
+      jasmine.clock().uninstall();
+    });
+
+    it('should speak once when cancel is requested', () => {
+      jasmine.clock().uninstall();
+      jasmine.clock().install();
+
+      const speakSpy = spyOn(window.speechSynthesis, 'speak').and
+        .callFake(() => mockSpeechSynthesisUtteran.onend());
+      const speechSynthesisUtterance = (
+        new MockSpeechSynthesisUtteranceConstructor(
+          'Value inside utterance for testing purposes.' +
+          ' This is the next chunk'));
+      const callbackSpy = jasmine.createSpy('callback');
+      speechSynthesisChunkerService.speak(
+        speechSynthesisUtterance, callbackSpy);
+      speechSynthesisChunkerService.cancel();
+
+      jasmine.clock().tick(5000);
+
+      expect(callbackSpy).not.toHaveBeenCalled();
+      expect(speakSpy).toHaveBeenCalledTimes(1);
+
+      jasmine.clock().uninstall();
+    });
   });
 });
