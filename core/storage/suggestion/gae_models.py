@@ -537,7 +537,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         user_data = dict()
 
         voiceover_models = (
-            cls.filter(cls.author_id == user_id).fetch())
+            cls.query(cls.author_id == user_id).fetch()
 
         for voiceover_model in voiceover_models:
             user_data[voiceover_model.id] = {
@@ -549,7 +549,6 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
                 'filename': voiceover_model.filename,
                 'rejection_message': voiceover_model.rejection_message
             }
-
         return user_data
 
     def verify_model_user_ids_exist(self):
