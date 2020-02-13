@@ -917,6 +917,19 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated CollectionModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_missing_rights_all_users_failure(self):
+        collection_models.CollectionRightsAllUsersModel.get_by_id(
+            '0').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_users_model_ids '
+                'field check of CollectionModel\', '
+                '[u"Entity id 0: based on field all_users_model_ids having '
+                'value 0, expect model CollectionRightsAllUsersModel '
+                'with id 0 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
 
 class CollectionSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
@@ -1716,12 +1729,16 @@ class CollectionRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+        editor_email = 'user@editor.com'
+        self.signup(editor_email, 'editor')
+        self.editor_id = self.get_user_id_from_email(editor_email)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i,
         ) for i in python_utils.RANGE(6)]
-
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
@@ -1731,11 +1748,13 @@ class CollectionRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
             category='category%d' % i,
             objective='objective%d' % i,
         ) for i in python_utils.RANGE(3)]
-
         for index, collection in enumerate(collections):
             collection.add_node('%s' % (index * 2))
             collection.add_node('%s' % (index * 2 + 1))
             collection_services.save_new_collection(self.owner_id, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
 
         user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(
             user_id_migration.AddAllUserIdsSnapshotsVerificationJob.create_new()
@@ -1802,6 +1821,19 @@ class CollectionRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
                 'having value 0, expect model CollectionRightsModel with '
                 'id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated CollectionRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_user_ids '
+                'field check of CollectionRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field all_user_ids '
+                'having value %s, expect model UserSettingsModel with '
+                'id %s but it doesn\'t exist"]]'
+            ) % (self.editor_id, self.editor_id),
+            u'[u\'fully-validated CollectionRightsAllUsersModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -3547,6 +3579,18 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated ExplorationModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_missing_rights_all_users_failure(self):
+        exp_models.ExplorationRightsAllUsersModel.get_by_id('0').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_users_model_ids '
+                'field check of ExplorationModel\', '
+                '[u"Entity id 0: based on field all_users_model_ids having '
+                'value 0, expect model ExplorationRightsAllUsersModel '
+                'with id 0 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated ExplorationModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
 
 class ExplorationSnapshotMetadataModelValidatorTests(
         test_utils.GenericTestBase):
@@ -4289,14 +4333,22 @@ class ExplorationRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        editor_email = 'user@editor.com'
+        self.signup(editor_email, 'editor')
+        self.editor_id = self.get_user_id_from_email(editor_email)
+
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
             category='category%d' % i,
         ) for i in python_utils.RANGE(3)]
-
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
+
+        rights_manager.assign_role_for_exploration(
+            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
 
         user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(
             user_id_migration.AddAllUserIdsSnapshotsVerificationJob.create_new()
@@ -4363,6 +4415,19 @@ class ExplorationRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
                 'having value 0, expect model ExplorationRightsModel with '
                 'id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_user_ids '
+                'field check of ExplorationRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field all_user_ids '
+                'having value %s, expect model UserSettingsModel with '
+                'id %s but it doesn\'t exist"]]'
+            ) % (self.editor_id, self.editor_id),
+            u'[u\'fully-validated ExplorationRightsAllUsersModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -9293,6 +9358,18 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_missing_rights_all_users_failure(self):
+        topic_models.TopicRightsAllUsersModel.get_by_id('0').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_users_model_ids '
+                'field check of TopicModel\', '
+                '[u"Entity id 0: based on field all_users_model_ids having '
+                'value 0, expect model TopicRightsAllUsersModel '
+                'with id 0 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated TopicModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
     def test_model_with_repeated_name(self):
         self.model_instance_0.name = 'Topic1'
         self.model_instance_0.canonical_name = 'topic1'
@@ -10266,6 +10343,13 @@ class TopicRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+        manager1_email = 'user@manager1.com'
+        self.signup(manager1_email, 'manager1')
+        self.set_topic_managers(['manager1'])
+        self.manager1_id = self.get_user_id_from_email(manager1_email)
+        self.manager1 = user_services.UserActionsInfo(self.manager1_id)
 
         topics = [topic_domain.Topic.create_default_topic(
             topic_id='%s' % i,
@@ -10276,6 +10360,9 @@ class TopicRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
         for index, topic in enumerate(topics):
             topic.language_code = language_codes[index]
             topic_services.save_new_topic(self.owner_id, topic)
+
+        topic_services.assign_role(
+            self.admin, self.manager1, topic_domain.ROLE_MANAGER, '0')
 
         user_id_migration.AddAllUserIdsSnapshotsVerificationJob.enqueue(
             user_id_migration.AddAllUserIdsSnapshotsVerificationJob.create_new()
@@ -10341,6 +10428,19 @@ class TopicRightsAllUsersModelValidatorTests(test_utils.GenericTestBase):
                 'having value 0, expect model TopicRightsModel with '
                 'id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated TopicRightsAllUsersModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_user_settings_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.manager1_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for all_user_ids '
+                'field check of TopicRightsAllUsersModel\', '
+                '[u"Entity id 0: based on field all_user_ids '
+                'having value %s, expect model UserSettingsModel with '
+                'id %s but it doesn\'t exist"]]'
+            ) % (self.manager1_id, self.manager1_id),
+            u'[u\'fully-validated TopicRightsAllUsersModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
