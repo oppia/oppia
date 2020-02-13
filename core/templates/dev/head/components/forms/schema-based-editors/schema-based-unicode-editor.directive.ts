@@ -22,11 +22,10 @@ require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 
 require('filters/convert-unicode-with-params-to-html.filter.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/device-info.service.ts');
 
 angular.module('oppia').directive('schemaBasedUnicodeEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -39,9 +38,7 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
         onInputBlur: '=',
         onInputFocus: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-unicode-editor.directive.html'),
+      template: require('./schema-based-unicode-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$sce', '$timeout', '$translate',
