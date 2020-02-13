@@ -19,16 +19,14 @@
 // This directive is always editable.
 
 angular.module('oppia').directive('musicPhraseEditor', [
-  'AlertsService', 'UrlInterpolationService',
-  function(AlertsService, UrlInterpolationService) {
+  'AlertsService', function(AlertsService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/music-phrase-editor.directive.html'),
+      template: require('./music-phrase-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

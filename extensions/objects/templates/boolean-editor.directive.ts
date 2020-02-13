@@ -19,8 +19,7 @@
 // The value for this editor is always editable.
 
 angular.module('oppia').directive('booleanEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
@@ -44,7 +43,6 @@ angular.module('oppia').directive('booleanEditor', [
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/boolean-editor.directive.html'),
+      template: require('./boolean-editor.directive.html'),
     };
   }]);

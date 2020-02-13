@@ -21,16 +21,14 @@
 // in via initArgs.
 
 angular.module('oppia').directive('setOfUnicodeStringEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/list-editor.directive.html'),
+      template: require('./list-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

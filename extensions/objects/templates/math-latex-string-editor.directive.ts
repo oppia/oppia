@@ -18,15 +18,12 @@
 
 require('directives/mathjax-bind.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
 angular.module('oppia').directive('mathLatexStringEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -34,8 +31,7 @@ angular.module('oppia').directive('mathLatexStringEditor', [
         getAlwaysEditable: '&',
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/math-latex-string-editor.directive.html'),
+      template: require('./math-latex-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

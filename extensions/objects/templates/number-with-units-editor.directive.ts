@@ -17,16 +17,14 @@
  */
 
 angular.module('oppia').directive('numberWithUnitsEditor', [
-  'NumberWithUnitsObjectFactory', 'UrlInterpolationService',
-  function(NumberWithUnitsObjectFactory, UrlInterpolationService) {
+  'NumberWithUnitsObjectFactory', function(NumberWithUnitsObjectFactory) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/number-with-units-editor.directive.html'),
+      template: require('./number-with-units-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

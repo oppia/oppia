@@ -21,16 +21,14 @@
 // in via initArgs.
 
 angular.module('oppia').directive('logicErrorCategoryEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/logic-error-category-editor.directive.html'),
+      template: require('./logic-error-category-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;

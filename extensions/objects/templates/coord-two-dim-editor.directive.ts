@@ -16,6 +16,8 @@
  * @fileoverview Directive for coord two dim editor.
  */
 
+require('domain/utilities/url-interpolation.service.ts');
+
 angular.module('oppia').directive('coordTwoDimEditor', [
   'UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -91,7 +93,6 @@ angular.module('oppia').directive('coordTwoDimEditor', [
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/coord-two-dim-editor.directive.html'),
+      template: require('./coord-two-dim-editor.directive.html'),
     };
   }]);

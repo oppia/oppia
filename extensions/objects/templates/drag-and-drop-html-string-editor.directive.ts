@@ -17,8 +17,7 @@
  */
 
 angular.module('oppia').directive('dragAndDropHtmlStringEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -26,8 +25,7 @@ angular.module('oppia').directive('dragAndDropHtmlStringEditor', [
         getInitArgs: '&',
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/drag-and-drop-html-string-editor.directive.html'),
+      template: require('./drag-and-drop-html-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
