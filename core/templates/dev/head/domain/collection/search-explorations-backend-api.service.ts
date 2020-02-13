@@ -20,8 +20,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { CollectionEditorPageConstants } from
-  'pages/collection-editor-page/collection-editor-page.constants';
+import { LibraryPageConstants } from
+  'pages/library-page/library-page.constants';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 
@@ -39,7 +39,7 @@ export class SearchExplorationsBackendApiService {
       value?: Object | PromiseLike<Object>) => void,
       errorCallback: (reason?: any) => void): void {
     var queryUrl = this.urlInterpolationService.interpolateUrl(
-      CollectionEditorPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE, {
+      LibraryPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE, {
         query: btoa(searchQuery)
       }
     );
