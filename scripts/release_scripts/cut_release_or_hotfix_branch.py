@@ -256,8 +256,7 @@ def execute_branch_cut():
     # The release coordinator should verify that tests are passing on the parent
     # branch before checking out the new branch.
     common.open_new_tab_in_browser_if_possible(
-        'https://travis-ci.org/oppia/oppia/branches?'
-        'utm_medium=notification&utm_source=github_status')
+        'https://travis-ci.org/oppia/oppia/branches')
     while True:
         if not hotfix_number:
             branch_to_check = 'develop'
