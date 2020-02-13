@@ -44,6 +44,7 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
         getLastAnswer: '&lastAnswer'
       },
       template: require('./interactive-map-interaction.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$attrs', '$scope', 'BrowserCheckerService',
         'CurrentInteractionService', function(
