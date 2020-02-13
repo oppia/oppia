@@ -2231,7 +2231,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
-            category='category%d' % i,
+            category='category',
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
@@ -7716,7 +7716,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
-            category='category%d' % i,
+            category='category',
         ) for i in python_utils.RANGE(6)]
 
         for exp in explorations:
