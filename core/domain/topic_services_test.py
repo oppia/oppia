@@ -1246,11 +1246,6 @@ class MockTopicObject(topic_domain.Topic):
     """Mocks Topic domain object."""
 
     @classmethod
-    def _convert_subtopic_v1_dict_to_v2_dict(cls, subtopic):
-        """Converts v1 subtopic dict to v2."""
-        return subtopic
-
-    @classmethod
     def _convert_story_reference_v1_dict_to_v2_dict(cls, story_reference):
         """Converts v1 story reference dict to v2."""
         return story_reference
@@ -1264,9 +1259,14 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_CREATE_NEW,
             'name': 'name'
         })
-        subtopic_dict = {
+        subtopic_v1_dict = {
             'id': 1,
-            'thumbnail_filename': 'image.png',
+            'title': 'subtopic_title',
+            'skill_ids': []
+        }
+        subtopic_v2_dict = {
+            'id': 1,
+            'thumbnail_filename': None,
             'title': 'subtopic_title',
             'skill_ids': []
         }
@@ -1277,7 +1277,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             canonical_name='Name',
             next_subtopic_id=1,
             language_code='en',
-            subtopics=[subtopic_dict],
+            subtopics=[subtopic_v1_dict],
             subtopic_schema_version=1,
             story_reference_schema_version=1
         )
@@ -1298,7 +1298,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(topic.next_subtopic_id, 1)
         self.assertEqual(topic.language_code, 'en')
         self.assertEqual(len(topic.subtopics), 1)
-        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_dict)
+        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_v2_dict)
 
 
 class StoryReferenceMigrationTests(test_utils.GenericTestBase):

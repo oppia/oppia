@@ -868,6 +868,21 @@ class Topic(python_utils.OBJECT):
             feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION)
 
     @classmethod
+    def _convert_subtopic_v1_dict_to_v2_dict(cls, subtopic_dict):
+        """Converts old Subtopic schema to the modern v2 schema. v2 schema
+        introduces the thumbnail_filename field.
+
+        Args:
+            subtopic_dict: dict. A dict used to initialize a Subtopic domain
+                object.
+
+        Returns:
+            dict. The converted subtopic_dict.
+        """
+        subtopic_dict['thumbnail_filename'] = None
+        return subtopic_dict
+
+    @classmethod
     def update_subtopics_from_model(cls, versioned_subtopics, current_version):
         """Converts the subtopics blob contained in the given
         versioned_subtopics dict from current_version to

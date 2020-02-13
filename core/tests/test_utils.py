@@ -381,8 +381,22 @@ class TestBase(unittest.TestCase):
             'acquired_skill_ids': [],
             'id': 'node_1',
             'title': 'Chapter 1',
+            'prerequisite_skill_ids': []}],
+        'initial_node_id': 'node_1',
+        'next_node_id': 'node_2'
+    }
+
+    VERSION_2_STORY_CONTENTS_DICT = {
+        'nodes': [{
+            'outline': u'',
+            'exploration_id': None,
+            'destination_node_ids': [],
+            'outline_is_finalized': False,
+            'acquired_skill_ids': [],
+            'id': 'node_1',
+            'title': 'Chapter 1',
             'prerequisite_skill_ids': [],
-            'thumbnail_filename': u'image.png'}],
+            'thumbnail_filename': None}],
         'initial_node_id': 'node_1',
         'next_node_id': 'node_2'
     }

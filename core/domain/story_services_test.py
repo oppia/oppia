@@ -1010,18 +1010,6 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
                 self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
 
 
-# TODO(aks681): Remove this mock class and the StoryContentsMigrationTests
-# class once the actual functions for story_contents migrations are
-# implemented.
-class MockStoryObject(story_domain.Story):
-    """Mocks Story domain object."""
-
-    @classmethod
-    def _convert_story_contents_v1_dict_to_v2_dict(cls, story_contents):
-        """Converts v1 story_contents dict to v2."""
-        return story_contents
-
-
 class StoryContentsMigrationTests(test_utils.GenericTestBase):
 
     def test_migrate_story_contents_to_latest_schema(self):
@@ -1034,18 +1022,23 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
             description='A new topic', canonical_story_ids=[],
             additional_story_ids=[], uncategorized_skill_ids=[],
             subtopics=[], next_subtopic_id=0)
-        self.save_new_story(
-            story_id, user_id, 'Title', 'Description', 'Notes',
-            topic_id)
+        story_model = story_models.StoryModel(
+            id=story_id,
+            description='Description',
+            title='Title',
+            language_code='1',
+            story_contents_schema_version=1,
+            notes='Notes',
+            corresponding_topic_id=topic_id,
+            story_contents=self.VERSION_1_STORY_CONTENTS_DICT
+        )
 
-        story_model = story_models.StoryModel.get(story_id)
-        self.assertEqual(story_model.story_contents_schema_version, 1)
-
-        swap_story_object = self.swap(story_domain, 'Story', MockStoryObject)
         current_schema_version_swap = self.swap(
             feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 2)
 
-        with swap_story_object, current_schema_version_swap:
+        with current_schema_version_swap:
             story = story_fetchers.get_story_from_model(story_model)
 
         self.assertEqual(story.story_contents_schema_version, 2)
+        self.assertEqual(
+            story.story_contents.to_dict(), self.VERSION_2_STORY_CONTENTS_DICT)
