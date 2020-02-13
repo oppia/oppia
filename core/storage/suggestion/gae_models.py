@@ -537,8 +537,7 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         user_data = dict()
 
         voiceover_models = (
-            cls.get_all()
-            .filter(cls.author_id == user_id).fetch())
+            cls.filter(cls.author_id == user_id).fetch())
 
         for voiceover_model in voiceover_models:
             user_data[voiceover_model.id] = {

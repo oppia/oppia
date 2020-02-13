@@ -1913,7 +1913,7 @@ class UserContributionScoringModel(base_models.BaseModel):
             dict. Dictionary of the data from UserContributionScoringModel.
         """
         user_data = dict()
-        scoring_models = cls.get_all().filter(cls.user_id == user_id).fetch()
+        scoring_models = cls.query(cls.user_id == user_id).fetch()
         for scoring_model in scoring_models:
             user_data[scoring_model.score_category] = {
                 'score': scoring_model.score,
