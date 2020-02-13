@@ -171,7 +171,7 @@ export class SpeechSynthesisChunkerService {
     // Convert links into speakable text by extracting the readable value.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Link)
       .replaceWith(function() {
-        var element = <HTMLElement><any>this;
+        var element = <HTMLElement><any> this;
         if (element.attributes['text-with-value'] !== undefined) {
           return element.attributes[
             'text-with-value'].textContent.replace(/&quot;/g, '');
@@ -182,7 +182,7 @@ export class SpeechSynthesisChunkerService {
     // Convert LaTeX to speakable text.
     elt.find('oppia-noninteractive-' + this.RTE_COMPONENT_NAMES.Math)
       .replaceWith(function() {
-        var element = <HTMLElement><any>this;
+        var element = <HTMLElement><any> this;
         if (element.attributes['raw_latex-with-value'] !== undefined) {
           return _this._formatLatexToSpeakableText(
             element.attributes['raw_latex-with-value'].textContent);

@@ -44,7 +44,7 @@ describe('Speech Synthesis Chunker Service', () => {
         expect(speakableLatex2).toEqual('i minus j');
       }
     );
-  
+
     it('should properly convert fractions in LaTeX to speakable text',
       () => {
         var latex1 = '\\\\frac{2}{3}';
@@ -65,7 +65,7 @@ describe('Speech Synthesis Chunker Service', () => {
         expect(speakableLatex4).toEqual('i j k over 5x y');
       }
     );
-  
+
     it('should properly convert square roots in LaTeX to speakable text',
       () => {
         var latex1 = '\\\\sqrt{3}';
@@ -78,7 +78,7 @@ describe('Speech Synthesis Chunker Service', () => {
         expect(speakableLatex2).toEqual('the square root of x y');
       }
     );
-  
+
     it('should properly convert exponents in LaTeX to speakable text',
       () => {
         var latex1 = 'x^2';
@@ -99,7 +99,7 @@ describe('Speech Synthesis Chunker Service', () => {
         expect(speakableLatex4).toEqual('3n to the power of 4x');
       }
     );
-  
+
     it('should properly convert trigonometric functions in LaTeX to ' +
         'speakable text', () => {
       var latex1 = '\\\\sin{90}';
