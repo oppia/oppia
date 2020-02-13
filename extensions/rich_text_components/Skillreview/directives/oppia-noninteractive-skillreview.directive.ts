@@ -43,7 +43,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             $uibModal.open({
               template: require(
-                '/components/concept-card/concept-card-modal.template.html'),
+                'components/concept-card/concept-card-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
