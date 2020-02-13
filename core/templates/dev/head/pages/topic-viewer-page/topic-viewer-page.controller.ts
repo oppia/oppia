@@ -75,7 +75,7 @@ angular.module('oppia').directive('topicViewerPage', [
                 ctrl.topicId = topicDataDict.id;
                 // TODO(#8521): Remove the use of $rootScope.$apply()
                 // once the controller is migrated to angular.
-                $rootScope.apply();
+                $rootScope.$apply();
               },
               function(errorResponse) {
                 if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
