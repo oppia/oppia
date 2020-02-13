@@ -157,6 +157,7 @@ angular.module('oppia').config([
                 rejection.config.url) : '';
               var additionalLoggingInfo = warningMessage +
                 '\n URL: ' + rejectionUrl +
+                '\n stacktrace: ' + rejection.data.stacktrace +
                 '\n data: ' + JSON.stringify(rejection.data);
               // $exceptionHandler is called directly instead of
               // throwing an error to invoke it because the return
