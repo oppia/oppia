@@ -311,10 +311,14 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             argparse.ArgumentTypeError,
             'The format of "release_version" should be: x.x.x'):
-            cut_release_or_hotfix_branch.release_version_type('invalid')
+            (
+                cut_release_or_hotfix_branch
+                .require_release_version_to_have_correct_format('invalid'))
 
     def test_no_exception_is_raised_for_valid_release_version(self):
-        cut_release_or_hotfix_branch.release_version_type('1.2.3')
+        (
+            cut_release_or_hotfix_branch
+            .require_release_version_to_have_correct_format('1.2.3'))
 
     def test_missing_release_version(self):
         args_swap = self.swap(

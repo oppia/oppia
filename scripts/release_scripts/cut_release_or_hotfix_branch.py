@@ -49,7 +49,8 @@ import release_constants
 from scripts import common
 
 
-def release_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
+def require_release_version_to_have_correct_format(
+        arg, pattern=re.compile(r'\d\.\d\.\d')):
     """Checks that the release version name matches the expected pattern.
 
     Args:
@@ -74,7 +75,7 @@ _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--release_version',
     help='version of the release for which the hotfix is being created',
-    type=release_version_type)
+    type=require_release_version_to_have_correct_format)
 _PARSER.add_argument('--hotfix_number', default=0)
 
 
