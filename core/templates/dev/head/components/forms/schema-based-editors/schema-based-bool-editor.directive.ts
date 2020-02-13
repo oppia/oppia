@@ -16,11 +16,8 @@
  * @fileoverview Directive for a schema-based editor for booleans.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').directive('schemaBasedBoolEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -29,9 +26,7 @@ angular.module('oppia').directive('schemaBasedBoolEditor', [
         isDisabled: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/' +
-        'schema-based-editors/schema-based-bool-editor.directive.html'),
+      template: require('./schema-based-bool-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {}]
     };

@@ -39,9 +39,7 @@ angular.module('oppia').directive('supplementalCard', [
         isLearnAgainButton: '&',
         getDisplayedCard: '&displayedCard',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/learner-experience/' +
-        'supplemental-card.directive.html'),
+      template: require('./supplemental-card.directive.html'),
       controller: [
         '$scope', '$window',
         'WindowDimensionsService', 'CONTENT_FOCUS_LABEL_PREFIX',

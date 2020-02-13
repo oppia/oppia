@@ -16,15 +16,11 @@
  * @fileoverview Directive for the correctness footer in the exploration player.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').directive('correctnessFooter', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/layout-directives/' +
-        'correctness-footer.directive.html')
+      template: require('./correctness-footer.directive.html')
     };
   }]);

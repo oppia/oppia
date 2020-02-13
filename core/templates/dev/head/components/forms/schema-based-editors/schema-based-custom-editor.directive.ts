@@ -18,15 +18,11 @@
 
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedCustomEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'UrlInterpolationService',
-  function(
-      NestedDirectivesRecursionTimeoutPreventionService,
-      UrlInterpolationService) {
+  function(NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -35,9 +31,7 @@ angular.module('oppia').directive('schemaBasedCustomEditor', [
         // The class of the object being edited.
         objType: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-custom-editor.directive.html'),
+      template: require('./schema-based-custom-editor.directive.html'),
       controllerAs: '$ctrl',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: [function() {}]

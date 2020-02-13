@@ -19,7 +19,6 @@
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/id-generation.service.ts');
 require('services/nested-directives-recursion-timeout-prevention.service.ts');
 require('services/schema-default-value.service.ts');
@@ -30,12 +29,10 @@ angular.module('oppia').directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
   'NestedDirectivesRecursionTimeoutPreventionService',
   'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
-  'UrlInterpolationService',
   function(
       FocusManagerService, IdGenerationService,
       NestedDirectivesRecursionTimeoutPreventionService,
-      SchemaDefaultValueService, SchemaUndefinedLastElementService,
-      UrlInterpolationService) {
+      SchemaDefaultValueService, SchemaUndefinedLastElementService) {
     return {
       scope: {
         localValue: '=',
@@ -50,9 +47,7 @@ angular.module('oppia').directive('schemaBasedListEditor', [
         validators: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-list-editor.directive.html'),
+      template: require('./schema-based-list-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {

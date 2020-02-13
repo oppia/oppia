@@ -17,10 +17,8 @@
  * editor.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').directive('continueButton', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {
@@ -28,9 +26,7 @@ angular.module('oppia').directive('continueButton', [
         isLearnAgainButton: '&',
         focusLabel: '@'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/learner-experience/' +
-        'continue-button.directive.html')
+      template: require('./continue-button.directive.html')
     };
   }
 ]);

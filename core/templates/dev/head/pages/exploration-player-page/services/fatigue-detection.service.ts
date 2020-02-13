@@ -16,11 +16,8 @@
  * @fileoverview Service for detecting spamming behavior from the learner.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').factory('FatigueDetectionService', [
-  '$uibModal', 'UrlInterpolationService',
-  function($uibModal, UrlInterpolationService) {
+  '$uibModal', function($uibModal) {
     // 4 submissions in under 10 seconds triggers modal.
     var SPAM_COUNT_THRESHOLD = 4;
     var SPAM_WINDOW_MSEC = 10000;
@@ -43,8 +40,8 @@ angular.module('oppia').factory('FatigueDetectionService', [
       },
       displayTakeBreakMessage: function() {
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-player-page/templates/' +
+          template: require(
+            'pages/exploration-player-page/templates/' +
             'take-break-modal.template.html'),
           backdrop: 'static',
           resolve: {},

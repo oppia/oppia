@@ -19,16 +19,12 @@
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/id-generation.service.ts');
 require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedDictEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'UrlInterpolationService',
-  function(
-      NestedDirectivesRecursionTimeoutPreventionService,
-      UrlInterpolationService) {
+  function(NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       scope: {
         localValue: '=',
@@ -38,9 +34,7 @@ angular.module('oppia').directive('schemaBasedDictEditor', [
         propertySchemas: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-dict-editor.directive.html'),
+      template: require('./schema-based-dict-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: [

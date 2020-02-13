@@ -29,9 +29,7 @@ angular.module('oppia').directive('explorationFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/layout-directives/' +
-        'exploration-footer.directive.html'),
+      template: require('./exploration-footer.directive.html'),
       controller: [
         '$scope', '$http', '$log', 'ContextService',
         'ExplorationSummaryBackendApiService', 'UrlService',

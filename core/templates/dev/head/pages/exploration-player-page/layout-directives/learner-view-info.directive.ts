@@ -26,20 +26,16 @@ require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 require('services/contextual/url.service.ts');
 require('services/date-time-format.service.ts');
 
 angular.module('oppia').directive('learnerViewInfo', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/layout-directives/' +
-        'learner-view-info.directive.html'),
+      template: require('./learner-view-info.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$uibModal', 'ContextService',
@@ -77,8 +73,8 @@ angular.module('oppia').directive('learnerViewInfo', [
           var openInformationCardModal = function() {
             $uibModal.open({
               animation: true,
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-player-page/templates/' +
+              template: require(
+                'pages/exploration-player-page/templates/' +
                 'information-card-modal.directive.html'),
               windowClass: 'oppia-modal-information-card',
               resolve: {
