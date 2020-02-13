@@ -234,6 +234,37 @@ class StoryNode(python_utils.OBJECT):
             raise utils.ValidationError(
                 'Invalid node_id: %s' % node_id)
 
+    @classmethod
+    def require_valid_thumbnail_filename(cls, thumbnail_filename):
+        """Checks whether the thumbnail filename of the node is a valid
+            one.
+
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+        """
+        if thumbnail_filename is not None:
+            if not isinstance(thumbnail_filename, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected thumbnail filename to be a string, received %s'
+                    % thumbnail_filename)
+            if thumbnail_filename.rfind('.') == 0:
+                raise utils.ValidationError(
+                    'Thumbnail filename should not start with a dot.')
+            if '/' in thumbnail_filename or '..' in thumbnail_filename:
+                raise utils.ValidationError(
+                    'Thumbnail filename should not include slashes or '
+                    'consecutive dot characters.')
+            if '.' not in thumbnail_filename:
+                raise utils.ValidationError(
+                    'Thumbnail filename with no extension.')
+
+            dot_index = thumbnail_filename.rfind('.')
+            extension = thumbnail_filename[dot_index + 1:].lower()
+            if (extension != 'png'):
+                raise utils.ValidationError(
+                    'Expected a filename ending in png, received %s' %
+                    thumbnail_filename)
+
     def to_dict(self):
         """Returns a dict representing this StoryNode domain object.
 
@@ -298,11 +329,7 @@ class StoryNode(python_utils.OBJECT):
                 raise utils.ValidationError(
                     'Expected exploration ID to be a string, received %s' %
                     self.exploration_id)
-        if self.thumbnail_filename is not None and not (
-                isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
-            raise utils.ValidationError(
-                'Expected thumbnail filename to be a string, received %s'
-                % self.thumbnail_filename)
+        self.require_valid_thumbnail_filename(self.thumbnail_filename)
 
         if not isinstance(self.outline, python_utils.BASESTRING):
             raise utils.ValidationError(
@@ -635,6 +662,37 @@ class Story(python_utils.OBJECT):
         self.last_updated = last_updated
         self.version = version
 
+    @classmethod
+    def require_valid_thumbnail_filename(cls, thumbnail_filename):
+        """Checks whether the thumbnail filename of the story is a valid
+            one.
+
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+        """
+        if thumbnail_filename is not None:
+            if not isinstance(thumbnail_filename, python_utils.BASESTRING):
+                raise utils.ValidationError(
+                    'Expected thumbnail filename to be a string, received %s'
+                    % thumbnail_filename)
+            if thumbnail_filename.rfind('.') == 0:
+                raise utils.ValidationError(
+                    'Thumbnail filename should not start with a dot.')
+            if '/' in thumbnail_filename or '..' in thumbnail_filename:
+                raise utils.ValidationError(
+                    'Thumbnail filename should not include slashes or '
+                    'consecutive dot characters.')
+            if '.' not in thumbnail_filename:
+                raise utils.ValidationError(
+                    'Thumbnail filename with no extension.')
+
+            dot_index = thumbnail_filename.rfind('.')
+            extension = thumbnail_filename[dot_index + 1:].lower()
+            if (extension != 'png'):
+                raise utils.ValidationError(
+                    'Expected a filename ending in png, received %s' %
+                    thumbnail_filename)
+
     def validate(self):
         """Validates various properties of the story object.
 
@@ -648,11 +706,7 @@ class Story(python_utils.OBJECT):
                 'Expected description to be a string, received %s'
                 % self.description)
 
-        if self.thumbnail_filename is not None and not (
-                isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
-            raise utils.ValidationError(
-                'Expected thumbnail filename to be a string, received %s'
-                % self.thumbnail_filename)
+        self.require_valid_thumbnail_filename(self.thumbnail_filename)
 
         if not isinstance(self.notes, python_utils.BASESTRING):
             raise utils.ValidationError(

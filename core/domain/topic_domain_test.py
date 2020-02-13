@@ -206,6 +206,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_abbreviated_name(name)
 
+    def _assert_valid_thumbnail_filename_for_topic(
+            self, expected_error_substring, thumbnail_filename):
+        """Checks that topic passes validation for thumbnail filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            topic_domain.Topic.require_valid_thumbnail_filename(
+                thumbnail_filename)
+    
+    def _assert_valid_thumbnail_filename_for_subtopic(
+            self, expected_error_substring, thumbnail_filename):
+        """Checks that subtopic passes validation for thumbnail filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            topic_domain.Subtopic.require_valid_thumbnail_filename(
+                thumbnail_filename)
+
     def test_valid_topic_id(self):
         self._assert_valid_topic_id('Topic id should be a string', 10)
         self._assert_valid_topic_id('Topic id abc is invalid', 'abc')
@@ -219,10 +235,21 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Abbreviated name field should not exceed 12 characters.',
             'this is a lengthy name.')
 
-    def test_thumbnail_filename_validation(self):
-        self.topic.thumbnail_filename = 1
-        self._assert_validation_error(
-            'Expected thumbnail filename to be a string, received 1')
+    def test_thumbnail_filename_validation_for_topic(self):
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Thumbnail filename with no extension.', 'name')
+        self._assert_valid_thumbnail_filename_for_topic(
+            'Expected a filename ending in png, received name.jpg', 'name.jpg')
 
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
@@ -245,10 +272,21 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics[0].id = 'invalid_id'
         self._assert_validation_error('Expected subtopic id to be an int')
 
-    def test_subtopic_thumbnail_filename_validation(self):
-        self.topic.subtopics[0].thumbnail_filename = 1
-        self._assert_validation_error(
-            'Expected thumbnail filename to be a string, received 1')
+    def test_thumbnail_filename_validation_for_subtopic(self):
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Thumbnail filename with no extension.', 'name')
+        self._assert_valid_thumbnail_filename_for_subtopic(
+            'Expected a filename ending in png, received name.jpg', 'name.jpg')
 
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'

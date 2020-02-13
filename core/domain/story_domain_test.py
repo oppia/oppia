@@ -259,6 +259,54 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_story_id('Story id should be a string', 10)
         self._assert_valid_story_id('Invalid story id', 'abc')
 
+    def _assert_valid_thumbnail_filename_for_story(
+            self, expected_error_substring, thumbnail_filename):
+        """Checks that story passes validation for thumbnail filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            story_domain.Story.require_valid_thumbnail_filename(
+                thumbnail_filename)
+
+    def _assert_valid_thumbnail_filename_for_story_node(
+            self, expected_error_substring, thumbnail_filename):
+        """Checks that story node passes validation for thumbnail filename."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            story_domain.StoryNode.require_valid_thumbnail_filename(
+                thumbnail_filename)
+
+    def test_thumbnail_filename_validation_for_story(self):
+        self._assert_valid_thumbnail_filename_for_story(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename_for_story(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename_for_story(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename_for_story(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename_for_story(
+            'Thumbnail filename with no extension.', 'name')
+        self._assert_valid_thumbnail_filename_for_story(
+            'Expected a filename ending in png, received name.jpg', 'name.jpg')
+
+    def test_thumbnail_filename_validation_for_story_node(self):
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Expected thumbnail filename to be a string, received 10', 10)
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Thumbnail filename should not start with a dot.', '.name')
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file/name')
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Thumbnail filename should not include slashes or '
+            'consecutive dot characters.', 'file..name')
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Thumbnail filename with no extension.', 'name')
+        self._assert_valid_thumbnail_filename_for_story_node(
+            'Expected a filename ending in png, received name.jpg', 'name.jpg')
+
     def test_to_human_readable_dict(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)
         expected_dict = {
