@@ -466,7 +466,7 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             'exploration_rights_data': exploration_rights_data,
             'general_feedback_email_reply_to_id_data': reply_to_data,
             'general_voiceover_application_data': expected_voiceover_data,
-            'user_contribution_scoring_data': expected_contrib_score_data 
+            'user_contribution_scoring_data': expected_contrib_score_data
         }
 
         # Perform export and compare.
