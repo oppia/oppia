@@ -874,7 +874,7 @@ class Story(python_utils.OBJECT):
         Returns:
             dict. The converted story_contents_dict.
         """
-        for index in range(len(story_contents_dict['nodes'])):
+        for index in python_utils.RANGE(len(story_contents_dict['nodes'])):
             story_contents_dict['nodes'][index]['thumbnail_filename'] = None
         return story_contents_dict
 
