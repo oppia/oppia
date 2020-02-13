@@ -25,10 +25,20 @@ import { ExplorationObjectFactory } from
 import { StateObjectFactory } from 'domain/state/StateObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
+import { LoggerService } from 'services/contextual/logger.service';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 
 describe('Exploration object factory', () => {
   let eof: ExplorationObjectFactory;
   let sof: StateObjectFactory, exploration, vof: VoiceoverObjectFactory;
+  let ssof: StatesObjectFactory;
+  let iof: InteractionObjectFactory;
+  let ls: LoggerService;
+  let loggerErrorSpy;
+  let firstState, secondState;
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [CamelCaseToHyphensPipe]
@@ -36,92 +46,93 @@ describe('Exploration object factory', () => {
     eof = TestBed.get(ExplorationObjectFactory);
     sof = TestBed.get(StateObjectFactory);
     vof = TestBed.get(VoiceoverObjectFactory);
+    ssof = TestBed.get(StatesObjectFactory);
+    iof = TestBed.get(InteractionObjectFactory);
+    ls = TestBed.get(LoggerService);
 
-    let statesDict = {
-      'first state': {
-        content: {
-          content_id: 'content',
-          html: 'content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              en: {
-                filename: 'myfile1.mp3',
-                file_size_bytes: 210000,
-                needs_update: false
-              },
-              'hi-en': {
-                filename: 'myfile3.mp3',
-                file_size_bytes: 430000,
-                needs_update: false
-              }
-            },
-            default_outcome: {}
-          }
-        },
-        interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
-          customization_args: {},
-          default_outcome: {
-            dest: 'new state',
-            feedback: [],
-            param_changes: []
-          },
-          hints: [],
-          id: 'TextInput'
-        },
-        param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
+    firstState = {
+      content: {
+        content_id: 'content',
+        html: 'content'
       },
-      'second state': {
-        content: {
-          content_id: 'content',
-          html: 'more content'
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {
-              'hi-en': {
-                filename: 'myfile2.mp3',
-                file_size_bytes: 120000,
-                needs_update: false
-              }
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'myfile1.mp3',
+              file_size_bytes: 210000,
+              needs_update: false
             },
-            default_outcome: {}
-          }
-        },
-        interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
-          customization_args: {},
-          default_outcome: {
-            dest: 'new state',
-            feedback: [],
-            param_changes: []
+            'hi-en': {
+              filename: 'myfile3.mp3',
+              file_size_bytes: 430000,
+              needs_update: false
+            }
           },
-          hints: [],
-          id: 'TextInput'
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {},
+        default_outcome: {
+          dest: 'new state',
+          feedback: [],
+          param_changes: []
         },
-        param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
+        hints: [],
+        id: 'TextInput'
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
+    };
+    secondState = {
+      content: {
+        content_id: 'content',
+        html: 'more content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            'hi-en': {
+              filename: 'myfile2.mp3',
+              file_size_bytes: 120000,
+              needs_update: false
+            }
+          },
+          default_outcome: {}
+        }
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {},
+        default_outcome: {
+          dest: 'new state',
+          feedback: [],
+          param_changes: []
         },
-      }
+        hints: [],
+        id: 'EndExploration'
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      },
     };
 
-    let explorationDict = {
+    const explorationDict = {
       id: 1,
       title: 'My Title',
       category: 'Art',
@@ -131,7 +142,10 @@ describe('Exploration object factory', () => {
       author_notes: '',
       states_schema_version: 15,
       init_state_name: 'Introduction',
-      states: statesDict,
+      language_code: 'en',
+      states: {
+        'first state': firstState,
+        'second state': secondState},
       param_specs: {},
       param_changes: [],
       version: 1
@@ -139,6 +153,8 @@ describe('Exploration object factory', () => {
 
     exploration = eof.createFromBackendDict(explorationDict);
     exploration.setInitialStateName('first state');
+
+    loggerErrorSpy = spyOn(ls, 'error').and.callThrough();
   });
 
   it('should get all language codes of an exploration', () => {
@@ -146,12 +162,16 @@ describe('Exploration object factory', () => {
       .toEqual(['en', 'hi-en']);
   });
 
+  it('should get the language code of an exploration', () => {
+    expect(exploration.getLanguageCode()).toBe('en');
+  });
+
   it('should correctly get the content html', () => {
     expect(exploration.getUninterpolatedContentHtml('first state'))
       .toEqual('content');
   });
 
-  it('should correctly get audio translations from an exploration',
+  it('should correctly get all audio translations by language code',
     () => {
       expect(exploration.getAllVoiceovers('hi-en')).toEqual({
         'first state': [vof.createFromBackendDict({
@@ -173,5 +193,157 @@ describe('Exploration object factory', () => {
         })],
         'second state': []
       });
+
+      expect(exploration.getAllVoiceovers('hi')).toEqual({
+        'first state': [],
+        'second state': []
+      });
     });
+
+  it('should correctly get the voiceovers from a language code in' +
+    ' an exploration', () => {
+    expect(exploration.getVoiceover('first state', 'en')).toEqual(
+      vof.createFromBackendDict({
+        filename: 'myfile1.mp3',
+        file_size_bytes: 210000,
+        needs_update: false
+      })
+    );
+
+    expect(exploration.getVoiceover('second state', 'en')).toBeNull();
+
+    expect(exploration.getVoiceover('third state', 'en')).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Invalid state name: third state');
+  });
+
+  it('should correctly get all voiceovers from an exploration', () => {
+    expect(exploration.getVoiceovers('first state')).toEqual({
+      en: vof.createFromBackendDict({
+        filename: 'myfile1.mp3',
+        file_size_bytes: 210000,
+        needs_update: false
+      }),
+      'hi-en': vof.createFromBackendDict({
+        filename: 'myfile3.mp3',
+        file_size_bytes: 430000,
+        needs_update: false
+      })
+    });
+
+    expect(exploration.getVoiceovers('second state')).toEqual({
+      'hi-en': vof.createFromBackendDict({
+        filename: 'myfile2.mp3',
+        file_size_bytes: 120000,
+        needs_update: false
+      })
+    });
+
+    expect(exploration.getVoiceovers('third state')).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Invalid state name: third state');
+  });
+
+  it('should correctly get all the states from an exploration', () => {
+    expect(exploration.getState('first state')).toEqual(
+      sof.createFromBackendDict('first state', firstState));
+    expect(exploration.getState('second state')).toEqual(
+      sof.createFromBackendDict('second state', secondState));
+    expect(exploration.getStates()).toEqual(
+      ssof.createFromBackendDict({
+        'first state': firstState,
+        'second state': secondState
+      }));
+  });
+
+  it('should correctly get the interaction from an exploration', () => {
+    expect(exploration.getInteraction('first state')).toEqual(
+      iof.createFromBackendDict(firstState.interaction)
+    );
+    expect(exploration.getInteraction('second state')).toEqual(
+      iof.createFromBackendDict(secondState.interaction)
+    );
+
+    expect(exploration.getInteraction('invalid state')).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Invalid state name: ' + 'invalid state');
+  });
+
+  it('should correctly get the interaction id from an exploration', () => {
+    expect(exploration.getInteractionId('first state'))
+      .toBe('TextInput');
+    expect(exploration.getInteractionId('second state'))
+      .toBe('EndExploration');
+
+    expect(exploration.getInteractionId('invalid state')).toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Invalid state name: ' + 'invalid state');
+  });
+
+  it('should correctly get the interaction customization args from an' +
+    ' exploration', () => {
+    expect(exploration.getInteractionCustomizationArgs('invalid state'))
+      .toBeNull();
+    expect(loggerErrorSpy).toHaveBeenCalledWith(
+      'Invalid state name: ' + 'invalid state');
+
+    expect(exploration.getInteractionCustomizationArgs('first state'))
+      .toEqual({});
+    expect(exploration.getInteractionCustomizationArgs('second state'))
+      .toEqual({});
+  });
+
+  it('should correctly get the interaction instructions from an exploration',
+    () => {
+      expect(exploration.getInteractionInstructions('first state')).toBeNull();
+      expect(exploration.getNarrowInstructions('first state')).toBeNull();
+
+      expect(exploration.getInteractionInstructions('invalid state')).toBe('');
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        'Invalid state name: ' + 'invalid state');
+
+      expect(exploration.getNarrowInstructions('invalid state')).toBe('');
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        'Invalid state name: ' + 'invalid state');
+    });
+
+  it('should correctly get interaction thumbnail src from an exploration',
+    () => {
+      expect(exploration.getInteractionThumbnailSrc('first state')).toBe(
+        '/extensions/interactions/TextInput/static/TextInput.png');
+      expect(exploration.getInteractionThumbnailSrc('invalid state')).toBe('');
+    });
+
+  it('should correctly check when an exploration has inline display mode',
+    () => {
+      expect(exploration.isInteractionInline('first state')).toBe(true);
+      expect(exploration.isInteractionInline('first state')).toBe(true);
+
+      expect(exploration.isInteractionInline('invalid state')).toBe(true);
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        'Invalid state name: invalid state');
+    });
+
+  it('should get and set initial state of an exploration', () => {
+    expect(exploration.getInitialState()).toEqual(
+      sof.createFromBackendDict('first state', firstState));
+
+    exploration.setInitialStateName('second state');
+    expect(exploration.getInitialState()).toEqual(
+      sof.createFromBackendDict('second state', secondState));
+  });
+
+  it('should get author recommended exploration ids according by if state' +
+    ' is terminal in an exploration', () => {
+    expect(exploration.isStateTerminal('first state')).toBe(false);
+    expect(() => {
+      exploration.getAuthorRecommendedExpIds('first state');
+    }).toThrow(Error(
+      'Tried to get recommendations for a non-terminal state: ' +
+      'first state'));
+
+    expect(exploration.isStateTerminal('second state')).toBe(true);
+    expect(exploration.getAuthorRecommendedExpIds('second state'))
+      .toBeNull();
+  });
 });
