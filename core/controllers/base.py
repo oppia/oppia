@@ -489,17 +489,19 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {
-                'error': python_utils.convert_to_bytes(exception),
-                'stacktrace': python_utils.convert_to_bytes(
-                    ''.join(traceback.format_exception(*sys.exc_info())))})
+            self._render_exception(
+                500, {
+                    'error': python_utils.convert_to_bytes(exception),
+                    'stacktrace': python_utils.convert_to_bytes(
+                        ''.join(traceback.format_exception(*sys.exc_info())))})
             return
 
         self.error(500)
-        self._render_exception(500, {
-            'error': python_utils.convert_to_bytes(exception),
-            'stacktrace': python_utils.convert_to_bytes(
-                ''.join(traceback.format_exception(*sys.exc_info())))})
+        self._render_exception(
+                500, {
+                    'error': python_utils.convert_to_bytes(exception),
+                    'stacktrace': python_utils.convert_to_bytes(
+                        ''.join(traceback.format_exception(*sys.exc_info())))})
 
     InternalErrorException = UserFacingExceptions.InternalErrorException
     InvalidInputException = UserFacingExceptions.InvalidInputException
