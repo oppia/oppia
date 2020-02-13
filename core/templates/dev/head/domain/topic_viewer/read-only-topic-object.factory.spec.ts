@@ -76,7 +76,7 @@ describe('Topic Data Object Factory', () => {
 
   it('should check value of uncategorized skill object', () => {
     expect(_sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0].getId())
-    .toEqual('skill_id_1');
+      .toEqual('skill_id_1');
     expect(_sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0].
       getDescription()).toEqual('Skill Description 1');
   });
@@ -99,12 +99,12 @@ describe('Topic Data Object Factory', () => {
   });
 
   it('should check the values of Canonical Stories', () => {
-    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getId())
-    .toEqual('0');
+    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getId()).
+      toEqual('0');
     expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getTitle()).
       toEqual('Story Title');
-    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getDescription()).
-      toEqual('Story Description');
+    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].
+      getDescription()).toEqual('Story Description');
     expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeCount()).
       toEqual(1);
   });
