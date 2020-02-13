@@ -269,6 +269,7 @@ FULLY_COVERED_FILENAMES = [
     'SkillSummaryObjectFactory.ts',
     'solution-validity.service.ts',
     'SolutionObjectFactory.ts',
+    'speech-synthesis-chunker.service.ts',
     'state-classifier-mapping.service.ts',
     'state-content.service.ts',
     'state-editor.constants.ajs.ts',
