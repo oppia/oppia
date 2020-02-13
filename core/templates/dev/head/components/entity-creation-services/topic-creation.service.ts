@@ -43,12 +43,15 @@ angular.module('oppia').factory('TopicCreationService', [
             function($scope, $uibModalInstance) {
               $scope.topicName = '';
               $scope.abbreviatedTopicName = '';
-              $scope.isTopicValid = function() {
+              $scope.isAbbreviateTopicNameValid = function() {
+                return (
+                  $scope.abbreviatedTopicName !== '' &&
+                  $scope.abbreviatedTopicName.length <= 12);
+              };
+              $scope.isTopicNameValid = function() {
                 return (
                   $scope.topicName !== '' &&
-                  $scope.abbreviatedTopicName !== '' &&
-                  $scope.topicName.length <= 20 &&
-                  $scope.abbreviatedTopicName.length <= 12);
+                  $scope.topicName.length <= 20);
               };
               $scope.save = function(topicName, abbreviatedTopicName) {
                 $uibModalInstance.close({
