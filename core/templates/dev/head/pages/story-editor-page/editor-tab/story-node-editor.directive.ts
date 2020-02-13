@@ -20,7 +20,7 @@ require(
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
-require('domain/summary/exploration-summary-backend-api.service.ts');
+require('domain/exploration/exploration-id-validation.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/alerts.service.ts');
 
@@ -43,13 +43,13 @@ angular.module('oppia').directive('storyNodeEditor', [
         '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StoryEditorStateService',
-        'ExplorationSummaryBackendApiService', 'StoryUpdateService',
+        'ExplorationIdValidationService', 'StoryUpdateService',
         'UndoRedoService', 'EVENT_STORY_INITIALIZED',
         'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
         'AlertsService',
         function(
             $scope, $rootScope, $uibModal, StoryEditorStateService,
-            ExplorationSummaryBackendApiService, StoryUpdateService,
+            ExplorationIdValidationService, StoryUpdateService,
             UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
             AlertsService) {
@@ -79,12 +79,7 @@ angular.module('oppia').directive('storyNodeEditor', [
               }
             }
           };
-          var _isExpIdValid = function(expId) {
-            return ExplorationSummaryBackendApiService.
-              loadPublicExplorationSummaries([expId]).then(function(summaries) {
-                return summaries.length === 1;
-              });
-          };
+
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyNodeIds = $scope.story.getStoryContents().getNodeIds();
@@ -105,12 +100,6 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.explorationId = $scope.getExplorationId();
             $scope.currentExplorationId = $scope.explorationId;
             $scope.expIdIsValid = true;
-            if ($scope.currentExplorationId) {
-              _isExpIdValid($scope.currentExplorationId).then(
-                function(response) {
-                  $scope.expIdIsValid = response;
-                });
-            }
             $scope.nodeTitleEditorIsShown = false;
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
@@ -147,8 +136,9 @@ angular.module('oppia').directive('storyNodeEditor', [
           };
 
           $scope.updateExplorationId = function(explorationId) {
-            _isExpIdValid(explorationId).then(function(response) {
-              $scope.expIdIsValid = response;
+            ExplorationIdValidationService.isExpIdValid(
+              explorationId).then(function(expIdIsValid) {
+              $scope.expIdIsValid = expIdIsValid;
               if ($scope.expIdIsValid) {
                 StoryUpdateService.setStoryNodeExplorationId(
                   $scope.story, $scope.getId(), explorationId);
