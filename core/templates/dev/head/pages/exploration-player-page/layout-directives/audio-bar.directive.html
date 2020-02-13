@@ -1,15 +1,22 @@
 <div class="audio-header" ng-if="isAudioBarAvailable()">
   <div ng-if="audioBarIsExpanded" class="audio-controls">
-    <div style="width: 560px;">
-      <span class="oppia-replay-white-circle" ng-click="onReplayButtonClicked()" ng-if="isAudioPlaying()">
+    <div class="audio-header-control-buttons">
+      <div>
+        <span class="oppia-replay-white-circle" ng-click="onBackwardButtonClicked()" ng-if="progressBarIsShown">
         <i class="fas fa-undo audio-undo-icon"></i>
+          <span class="oppia-five-back">5</span>
       </span>
-      <i class="fas audio-controls-button-icon"
-         ng-click="onPlayButtonClicked()"
-         ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
-         uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
-         tooltip-append-to-body="true" tooltip-placement="right">
-      </i>
+        <i class="fas audio-controls-button-icon"
+           ng-click="onPlayButtonClicked()"
+           ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
+           uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
+           tooltip-append-to-body="true" tooltip-placement="right">
+        </i>
+        <span class="oppia-replay-white-circle oppia-replay-white-circle-forward" ng-click="onForwardButtonClicked()"  ng-if="progressBarIsShown">
+        <i class="fas fa-undo audio-undo-icon audio-undo-icon-forward"></i>
+          <span class="oppia-five-back">5</span>
+      </span>
+      </div>
       <div class="slider-section" ng-if="progressBarIsShown">
         <div ng-if="audioLoadingIndicatorIsShown">
           <md-progress-linear md-mode="indeterminate"></md-progress-linear>
@@ -23,12 +30,13 @@
         <!--Filler space for message-->
         <span class="audio-controls-message">&zwnj;</span>
       </div>
+      <div class="audio-header-select">
       <select class="audio-language-select"
               ng-model="selectedLanguage.value"
               ng-options="o.value as o.displayed for o in languagesInExploration"
-              ng-style="progressBarIsShown ? {'width': '30%'} : {'width': '60%'}"
               ng-change="onNewLanguageSelected()">
       </select>
+      </div>
     </div>
     <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fas fa-sort-up"></i></div>
   </div>
@@ -131,10 +139,14 @@
     text-align: right;
     vertical-align: middle;
   }
-
+  .audio-header-control-buttons {
+    width: 560px;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    justify-content: center;
+  }
   .oppia-replay-white-circle {
-    background-color: #fff;
-    border-radius: 50%;
     display: inline-block;
     font-size: 1.4em;
     height: 36px;
@@ -145,14 +157,44 @@
   }
 
   .audio-undo-icon {
-    color: #0D48A1;
+    color: #fff;
     left: 50%;
     padding: 0;
     position: absolute;
     top: 7px;
     transform: translateX(-43%);
   }
+  .audio-undo-icon-forward {
+    transform: scaleX(-1) translateX(43%);
+  }
+  .audio-header-select {
+    transform: translateY(5px);
+  }
+  .oppia-five-back {
+    color: white;
+    font-size: 10px;
+    left: 3px;
+    font-weight: 800;
+    position: relative;
+    bottom: 7px;
+  }
+  @media screen and (max-width: 768px) {
+    .audio-header-control-buttons {
+      justify-content: space-evenly;
+    }
 
+    .oppia-replay-white-circle {
+      padding: 5px;
+      width: 26px;
+    }
+
+    .audio-header-select {
+      width: 20%;
+    }
+    .audio-header-select select {
+      width: 100%;
+    }
+    }
   .audio-controls-button-image {
     width: 21px;
     height: 21px;
@@ -229,11 +271,8 @@
   }
 
   audio-bar .slider-section {
-    display: inline-block;
-    margin: 0 auto;
-    padding: 0 4px;
-    transform: translateY(10px);
     width: 50%;
+    transform: translateY(10px);
   }
 
   .audio-bar-nav-up {

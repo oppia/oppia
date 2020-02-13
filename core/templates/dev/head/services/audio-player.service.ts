@@ -95,9 +95,12 @@ angular.module('oppia').factory('AudioPlayerService', [
       }
     };
 
-    var _replay = function() {
+    var _forward = function(seconds) {
       if (_currentTrack) {
-        _currentTrack.progress = 0;
+        var currentSeconds = _currentTrack.progress * _currentTrack.duration;
+        var forwardedProgress =
+            (currentSeconds + seconds) / _currentTrack.duration;
+        _currentTrack.progress = forwardedProgress;
       }
     };
 
@@ -110,9 +113,6 @@ angular.module('oppia').factory('AudioPlayerService', [
       play: function() {
         _play();
       },
-      replay: function() {
-        _replay();
-      },
       pause: function() {
         _pause();
       },
@@ -121,6 +121,9 @@ angular.module('oppia').factory('AudioPlayerService', [
       },
       rewind: function(seconds) {
         _rewind(seconds);
+      },
+      forward: function(seconds) {
+        _forward(seconds);
       },
       getCurrentTime: function() {
         if (_currentTrack) {
