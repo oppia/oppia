@@ -21,8 +21,7 @@
 // in via initArgs.
 
 angular.module('oppia').directive('setOfHtmlStringEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -30,8 +29,7 @@ angular.module('oppia').directive('setOfHtmlStringEditor', [
         getInitArgs: '&',
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/set-of-html-string-editor.directive.html'),
+      template: require('./set-of-html-string-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
