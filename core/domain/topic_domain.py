@@ -375,7 +375,7 @@ class Subtopic(python_utils.OBJECT):
 
             dot_index = thumbnail_filename.rfind('.')
             extension = thumbnail_filename[dot_index + 1:].lower()
-            if (extension != 'png'):
+            if extension != 'png':
                 raise utils.ValidationError(
                     'Expected a filename ending in png, received %s' %
                     thumbnail_filename)
@@ -574,7 +574,7 @@ class Topic(python_utils.OBJECT):
 
             dot_index = thumbnail_filename.rfind('.')
             extension = thumbnail_filename[dot_index + 1:].lower()
-            if (extension != 'png'):
+            if extension != 'png':
                 raise utils.ValidationError(
                     'Expected a filename ending in png, received %s' %
                     thumbnail_filename)

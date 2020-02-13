@@ -260,7 +260,7 @@ class StoryNode(python_utils.OBJECT):
 
             dot_index = thumbnail_filename.rfind('.')
             extension = thumbnail_filename[dot_index + 1:].lower()
-            if (extension != 'png'):
+            if extension != 'png':
                 raise utils.ValidationError(
                     'Expected a filename ending in png, received %s' %
                     thumbnail_filename)
@@ -688,7 +688,7 @@ class Story(python_utils.OBJECT):
 
             dot_index = thumbnail_filename.rfind('.')
             extension = thumbnail_filename[dot_index + 1:].lower()
-            if (extension != 'png'):
+            if extension != 'png':
                 raise utils.ValidationError(
                     'Expected a filename ending in png, received %s' %
                     thumbnail_filename)
@@ -868,13 +868,13 @@ class Story(python_utils.OBJECT):
         v2 schema introduces the thumbnail_filename field for Story Nodes.
 
         Args:
-            story_contents_dict: dict. A dict used to initialize a Story Contents
-                domain object.
+            story_contents_dict: dict. A dict used to initialize a Story
+                Contents domain object.
 
         Returns:
             dict. The converted story_contents_dict.
         """
-        for index, node in enumerate(story_contents_dict['nodes']):
+        for index in range(len(story_contents_dict['nodes'])):
             story_contents_dict['nodes'][index]['thumbnail_filename'] = None
         return story_contents_dict
 

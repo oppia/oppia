@@ -213,7 +213,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_thumbnail_filename(
                 thumbnail_filename)
-    
+
     def _assert_valid_thumbnail_filename_for_subtopic(
             self, expected_error_substring, thumbnail_filename):
         """Checks that subtopic passes validation for thumbnail filename."""
