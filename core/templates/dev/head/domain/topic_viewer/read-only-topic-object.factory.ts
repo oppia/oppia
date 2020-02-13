@@ -40,24 +40,25 @@ export interface IDegreesOfMastery {
 export class ReadOnlyTopic {
   _topicName: string;
   _topicId: string;
-  _canonicalStories: Array<StorySummary>;
-  _additionalStories: Array<StorySummary>;
-  _uncategorizedSkills: Array<SkillSummary>;
+  _canonicalStorySummaries: Array<StorySummary>;
+  _additionalStorySummaries: Array<StorySummary>;
+  _uncategorizedSkillSummaries: Array<SkillSummary>;
   _subtopics: Array<Subtopic>;
   _degreesOfMastery: IDegreesOfMastery;
   _skillDescriptions: ISkillDescriptions;
 
   constructor(topicName: string, topicId: string,
-      canonicalStories: Array<StorySummary>,
-      additionalStories: Array<StorySummary>,
-      uncategorizedSkills: Array<SkillSummary>, subtopics: Array<Subtopic>,
+      canonicalStorySummaries: Array<StorySummary>,
+      additionalStorySummaries: Array<StorySummary>,
+      uncategorizedSkillSummaries: Array<SkillSummary>,
+      subtopics: Array<Subtopic>,
       degreesOfMastery: IDegreesOfMastery,
       skillDescriptions: ISkillDescriptions) {
     this._topicName = topicName;
     this._topicId = topicId;
-    this._canonicalStories = canonicalStories;
-    this._additionalStories = additionalStories;
-    this._uncategorizedSkills = uncategorizedSkills;
+    this._canonicalStorySummaries = canonicalStorySummaries;
+    this._additionalStorySummaries = additionalStorySummaries;
+    this._uncategorizedSkillSummaries = uncategorizedSkillSummaries;
     this._subtopics = subtopics;
     this._degreesOfMastery = degreesOfMastery;
     this._skillDescriptions = skillDescriptions;
@@ -71,16 +72,16 @@ export class ReadOnlyTopic {
     return this._topicId;
   }
 
-  getCanonicalStories(): Array<StorySummary> {
-    return this._canonicalStories.slice();
+  getCanonicalStorySummaries(): Array<StorySummary> {
+    return this._canonicalStorySummaries.slice();
   }
 
-  getAdditionalStories(): Array<StorySummary> {
-    return this._additionalStories.slice();
+  getAdditionalStorySummaries(): Array<StorySummary> {
+    return this._additionalStorySummaries.slice();
   }
 
-  getUncategorizedSkills(): Array<SkillSummary> {
-    return this._uncategorizedSkills.slice();
+  getUncategorizedSkillsSummaries(): Array<SkillSummary> {
+    return this._uncategorizedSkillSummaries.slice();
   }
 
   getSubtopics(): Array<Subtopic> {
@@ -112,19 +113,15 @@ export class ReadOnlyTopicObjectFactory {
   }
 
   getStorySummaryArray(storyDicts: any): Array<StorySummary> {
-    var storyReferenceObjectFactory = new StoryReferenceObjectFactory();
     let storySummaryArray: Array<StorySummary> =
     storyDicts.map((storyDict: any) => {
-      return new StorySummary( storyDict.id, storyDict.title,
-        storyDict.node_count, storyDict.description,
-        storyReferenceObjectFactory.createFromStoryId(storyDict.id).
-          isStoryPublished());
+      return new StorySummary(storyDict.id, storyDict.title,
+        storyDict.node_count, storyDict.description, true);
     });
     return storySummaryArray;
   }
 
   createFromBackendDict(topicDataDict: any): ReadOnlyTopic {
-    let storyReferenceObjectFactory = new StoryReferenceObjectFactory();
     let subtopics: Array<Subtopic> =
     topicDataDict.subtopics.map((subtopic: Subtopic) => {
       return this._subtopicObjectFactory.create(

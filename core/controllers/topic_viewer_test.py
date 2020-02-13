@@ -121,7 +121,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'id': self.story.id,
                     'title': self.story.title,
                     'description': self.story.description,
-                    'node_count': self.story.node_count
+                    'node_count': self.story.node_count,
+                    'published': True
                 }],
                 'additional_story_dicts': [],
                 'uncategorized_skill_ids': [self.skill_id_1],
@@ -167,7 +168,8 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                         'id': self.story.id,
                         'title': self.story.title,
                         'description': self.story.description,
-                        'node_count': self.story.node_count
+                        'node_count': self.story.node_count,
+                        'published': True
                     }],
                     'additional_story_dicts': [],
                     'uncategorized_skill_ids': [self.skill_id_1],

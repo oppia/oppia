@@ -23,7 +23,6 @@ import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
 import { SubtopicObjectFactory } from
   'domain/topic/SubtopicObjectFactory';
-
 describe('Topic Data Object Factory', () => {
   let readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
   let _sampleReadOnlyTopic: ReadOnlyTopic = null;
@@ -40,13 +39,15 @@ describe('Topic Data Object Factory', () => {
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
-        node_count: 1
+        node_count: 1,
+        published: true
       }],
       additional_story_dicts: [{
         id: '1',
         title: 'Story Title',
         description: 'Story Description',
-        node_count: 1
+        node_count: 1,
+        published: true
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
@@ -74,20 +75,20 @@ describe('Topic Data Object Factory', () => {
   });
 
   it('should check value of uncategorized skill object', () => {
-    expect(_sampleReadOnlyTopic.getUncategorizedSkills()[0].getId()).toEqual(
-      'skill_id_1');
-    expect(_sampleReadOnlyTopic.getUncategorizedSkills()[0].getDescription()).
-      toEqual('Skill Description 1');
+    expect(_sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0].getId())
+    .toEqual('skill_id_1');
+    expect(_sampleReadOnlyTopic.getUncategorizedSkillsSummaries()[0].
+      getDescription()).toEqual('Skill Description 1');
   });
 
   it('should check values of Subtopic object', () => {
     expect(_sampleReadOnlyTopic.getSubtopics()[0].getId()).toEqual(1);
     expect(_sampleReadOnlyTopic.getSubtopics()[0].getTitle()).toEqual(
       'subtopic_name');
-    expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0]._id).
+    expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0].getId()).
       toEqual('skill_id_2');
     expect(_sampleReadOnlyTopic.getSubtopics()[0]._skillSummaries[0].
-      _description).toEqual('Skill Description 2');
+      getDescription()).toEqual('Skill Description 2');
   });
 
   it('should check type and values of Skill Description', () => {
@@ -98,23 +99,25 @@ describe('Topic Data Object Factory', () => {
   });
 
   it('should check the values of Canonical Stories', () => {
-    expect(_sampleReadOnlyTopic.getCanonicalStories()[0].getId()).toEqual('0');
-    expect(_sampleReadOnlyTopic.getCanonicalStories()[0].getTitle()).
+    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getId())
+    .toEqual('0');
+    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getTitle()).
       toEqual('Story Title');
-    expect(_sampleReadOnlyTopic.getCanonicalStories()[0].getDescription()).
+    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getDescription()).
       toEqual('Story Description');
-    expect(_sampleReadOnlyTopic.getCanonicalStories()[0].getNodeCount()).
+    expect(_sampleReadOnlyTopic.getCanonicalStorySummaries()[0].getNodeCount()).
       toEqual(1);
   });
 
   it('should check the values of Additional Stories', () => {
-    expect(_sampleReadOnlyTopic.getAdditionalStories()[0].getId()).toEqual('1');
-    expect(_sampleReadOnlyTopic.getAdditionalStories()[0].getTitle()).
+    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getId())
+      .toEqual('1');
+    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0].getTitle()).
       toEqual('Story Title');
-    expect(_sampleReadOnlyTopic.getAdditionalStories()[0].getDescription()).
-      toEqual('Story Description');
-    expect(_sampleReadOnlyTopic.getAdditionalStories()[0].getNodeCount()).
-      toEqual(1);
+    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0].
+      getDescription()).toEqual('Story Description');
+    expect(_sampleReadOnlyTopic.getAdditionalStorySummaries()[0].
+      getNodeCount()).toEqual(1);
   });
 
   it('should get the values as expected', () => {

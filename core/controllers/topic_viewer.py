@@ -69,13 +69,17 @@ class TopicPageDataHandler(base.BaseHandler):
                 additional_story_id) for additional_story_id
             in additional_story_ids]
 
-        canonical_story_dicts = [
-            summary.to_human_readable_dict() for summary
-            in canonical_story_summaries]
+        canonical_story_dicts = []
+        for summary in canonical_story_summaries:
+            summary = summary.to_human_readable_dict()
+            summary['published'] = True
+            canonical_story_dicts.append(summary)
 
-        additional_story_dicts = [
-            summary.to_human_readable_dict() for summary
-            in additional_story_summaries]
+        additional_story_dicts = []
+        for summary in additional_story_summaries:
+            summary = summary.to_human_readable_dict()
+            summary['published'] = True
+            additional_story_dicts.append(summary)
 
         uncategorized_skill_ids = topic.get_all_uncategorized_skill_ids()
         subtopics = topic.get_all_subtopics()

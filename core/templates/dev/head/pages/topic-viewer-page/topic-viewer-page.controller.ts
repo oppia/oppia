@@ -68,7 +68,7 @@ angular.module('oppia').directive('topicViewerPage', [
               function(readOnlyTopic) {
                 ctrl.topicId = readOnlyTopic.getTopicId();
                 ctrl.canonicalStoriesList =
-                  readOnlyTopic.getCanonicalStories();
+                  readOnlyTopic.getCanonicalStorySummaries();
                 ctrl.degreesOfMastery = readOnlyTopic.getDegreesOfMastery();
                 ctrl.subtopics = readOnlyTopic.getSubtopics();
                 ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();

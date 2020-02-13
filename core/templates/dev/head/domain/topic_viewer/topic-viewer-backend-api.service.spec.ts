@@ -73,11 +73,15 @@ describe('Topic viewer backend API service', function() {
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
+        node_count: 1,
+        published: true
       }],
       additional_story_dicts: [{
         id: '1',
         title: 'Story Title',
         description: 'Story Description',
+        node_count: 1,
+        published: true
       }],
       uncategorized_skill_ids: ['skill_id_1'],
       subtopics: [{
