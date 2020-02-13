@@ -346,15 +346,15 @@ class TakeoutServiceUnitTests(test_utils.GenericTestBase):
             rejection_message=None).put()
 
         user_models.UserContributionScoringModel(
-            id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_1_ID),
-            user_id=self.USER_1_ID,
+            id='%s.%s' % (self.SCORE_CATEGORY_1, self.USER_ID_1),
+            user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_1,
             score=1.5,
             has_email_been_sent=False
         ).put()
         user_models.UserContributionScoringModel(
-            id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_1_ID),
-            user_id=self.USER_1_ID,
+            id='%s.%s' % (self.SCORE_CATEGORY_2, self.USER_ID_1),
+            user_id=self.USER_ID_1,
             score_category=self.SCORE_CATEGORY_2,
             score=2,
             has_email_been_sent=False
