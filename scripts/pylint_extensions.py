@@ -37,8 +37,6 @@ ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
-DATA_TYPES = ['int.', 'str.', 'float.', 'bool.']
-
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 import astroid  # isort:skip
@@ -1196,8 +1194,9 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
+        allowed_comment_prefixes = ['int', 'str', 'float', 'bool', 'v']
         in_multi_line_comment = False
-        space_at_beginning = True
+        space_at_beginning_of_comment = True
         multi_line_indicator = b'"""'
         file_content = read_from_node(node)
         file_length = len(file_content)
@@ -1229,43 +1228,50 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             if line_num > 0:
                 previous_line = file_content[line_num - 1].strip()
 
+            # Comments may include a lowercase character at beginning
+            # or may not use a punctuation at end if it contains a
+            # excluded phrase e.g. "# coding: utf-8".
             if line.startswith(b'#'):
                 # Check if comment contains any excluded phrase.
                 word_is_present_in_excluded_phrases = any(
                     word in line for word in EXCLUDED_PHRASES)
 
-                # Check if variable name is used.
-                underscore_is_present = any('_' in word for word in line)
-
-                if word_is_present_in_excluded_phrases or underscore_is_present:
+                if word_is_present_in_excluded_phrases:
                     continue
 
             if line.startswith(b'#') and not next_line.startswith(b'#'):
-                # Check that the comment ends with the proper
-                # punctuation.
+                # Comments must end with the proper punctuation.
                 last_char_is_invalid = line[-1] not in (
                     ALLOWED_TERMINATING_PUNCTUATIONS)
                 if last_char_is_invalid:
                     self.add_message(
                         'invalid-punctuation-used', line=line_num + 1)
 
-            # Check that comment starts with a space and is not a
-            # shebang expression at the start of a bash script which
-            # loses function when a space is added.
+            # Comments must start with a space.
             if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
-                space_at_beginning = False
+                space_at_beginning_of_comment = False
                 self.add_message(
                     'no-space-at-beginning', line=line_num + 1)
 
-            # Check if comment contains version info or data type
-            # at the beginning.
-            if line.startswith(b'#') and len(line) > 1 and space_at_beginning:
-                word = line.split()[1]
-                data_type_is_present = word in DATA_TYPES
-                if data_type_is_present or re.search(br'^# v[0-9]+ .*$', line):
+            # Comments may include a lowercase character at the beginning
+            # only if they start with version info or a data type or.
+            # a variable name e.g. "# next_line is of string type."
+            # or "# v2 version does not have ExplorationStatsModel."
+            # or "# int. The file size, in bytes.".
+            if line.startswith(b'#') and len(line) > 1 and (
+                    space_at_beginning_of_comment):
+
+                # Check if variable name is used.
+                underscore_is_present = '_' in line.split()[1]
+
+                # Check if allowed prefix is used.
+                allowed_prefix_is_present = any(
+                    line[2:].startswith(word) for word in (
+                        allowed_comment_prefixes))
+                if allowed_prefix_is_present or underscore_is_present:
                     continue
 
-            # Check that comment starts with a capital letter.
+            # Comments must start with a capital letter.
             if not previous_line.startswith(b'#') and (
                     re.search(br'^# [a-z][A-Za-z]*.*$', line)):
                 self.add_message(
