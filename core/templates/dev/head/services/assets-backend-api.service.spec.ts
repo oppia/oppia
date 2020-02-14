@@ -211,9 +211,8 @@ describe('Assets Backend API Service', function() {
     $httpBackend.verifyNoOutstandingExpectation();
   });
 
-  it('should handler rejection on trying to process fetched file when' +
-    ' Blob throws a TypeError and BlobBuilder does not work correctly',
-    function() {
+  it('should handler rejection on trying to process fetched file when Blob' +
+    ' throws a TypeError and BlobBuilder does not work correctly', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
