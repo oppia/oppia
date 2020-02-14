@@ -201,6 +201,8 @@ FULLY_COVERED_FILENAMES = [
     'MultipleChoiceInput.ts',
     'music-notes-input-validation.service.ts',
     'MusicNotesInput.ts',
+    'navigation.service.ts',
+    'nested-directives-recursion-timeout-prevention.service.ts',
     'normalize-whitespace.filter.ts',
     'normalize-whitespace.pipe.ts',
     'number-attempts.service.ts',
