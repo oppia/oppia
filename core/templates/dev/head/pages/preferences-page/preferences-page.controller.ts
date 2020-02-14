@@ -174,7 +174,7 @@ angular.module('oppia').directive('preferencesPage', [
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/preferences-page/modal-templates/' +
                 'edit-profile-picture-modal.directive.html'),
-              backdrop: true,
+              backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', function(
                     $scope, $uibModalInstance) {

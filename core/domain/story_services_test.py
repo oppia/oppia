@@ -445,6 +445,53 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
+    def test_cannot_update_story_with_exps_with_different_categories(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        self.save_new_valid_exploration(
+            'exp_id_2', self.user_id_a, title='title', category='Category 2')
+        self.publish_exploration(self.user_id_a, 'exp_id_2')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2,
+                'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                'node_id': 'node_1',
+                'old_value': [],
+                'new_value': ['node_2']
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_id_2'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'All explorations in a story should be of the '
+            'same category'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
     def test_cannot_update_story_with_mismatch_of_story_versions(self):
         self.save_new_default_exploration(
             'exp_id', self.user_id_a, title='title')
