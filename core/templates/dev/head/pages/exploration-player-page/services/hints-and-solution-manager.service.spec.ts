@@ -32,7 +32,7 @@ require(
   'pages/exploration-player-page/services/' +
   'hints-and-solution-manager.service.ts');
 
-fdescribe('HintsAndSolutionManager service', function() {
+describe('HintsAndSolutionManager service', function() {
   var $timeout;
   var $rootScope;
   var hasms;
