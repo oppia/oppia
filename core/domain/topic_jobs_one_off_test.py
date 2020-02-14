@@ -125,7 +125,7 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.albert_id, 'A name', 'abbrev',
             'a name', '', [], [], [], 2)
         topic = (
-            topic_fetchers.get_topic_by_id(self.TOPIC_ID))
+            topic_models.TopicModel.get(self.TOPIC_ID))
         self.assertEqual(topic.subtopic_schema_version, 1)
 
         # Start migration job.

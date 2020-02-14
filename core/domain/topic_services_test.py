@@ -192,7 +192,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Sorry, we can only process v1-v%d story reference schemas at '
-            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            'present.' % feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION):
             topic_fetchers.get_topic_from_model(model)
 
     def test_get_topic_summary_from_model(self):

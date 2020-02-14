@@ -143,7 +143,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
         story = (
-            story_fetchers.get_story_by_id(self.STORY_ID))
+            story_models.StoryModel.get(self.STORY_ID))
         self.assertEqual(story.story_contents_schema_version, 1)
 
         # Start migration job.
