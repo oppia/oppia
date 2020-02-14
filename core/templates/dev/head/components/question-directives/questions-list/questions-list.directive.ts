@@ -631,30 +631,33 @@ angular.module('oppia').directive('questionsList', [
                       return;
                     }
 
-                    var modalInstance = $uibModal.open({
-                      templateUrl:
-                             UrlInterpolationService.getDirectiveTemplateUrl(
-                               '/components/question-directives' +
-                               '/modal-templates/' +
-                               'question-editor-save-modal.template.html'),
-                      backdrop: true,
-                      controller: [
-                        '$scope', '$uibModalInstance',
-                        function($scope, $uibModalInstance) {
-                          $scope.save = function(commitMessage) {
-                            $uibModalInstance.close(commitMessage);
-                          };
-                          $scope.cancel = function() {
-                            $uibModalInstance.dismiss('cancel');
-                          };
-                        }
-                      ]
-                    });
-
-                    modalInstance.result.then(function(commitMessage) {
-                      returnModalObject.commitMessage = commitMessage;
+                    if (QuestionUndoRedoService.hasChanges()) {
+                      var modalInstance = $uibModal.open({
+                        templateUrl:
+                               UrlInterpolationService.getDirectiveTemplateUrl(
+                                 '/components/question-directives' +
+                                 '/modal-templates/' +
+                                 'question-editor-save-modal.template.html'),
+                        backdrop: true,
+                        controller: [
+                          '$scope', '$uibModalInstance',
+                          function($scope, $uibModalInstance) {
+                            $scope.save = function(commitMessage) {
+                              $uibModalInstance.close(commitMessage);
+                            };
+                            $scope.cancel = function() {
+                              $uibModalInstance.dismiss('cancel');
+                            };
+                          }
+                        ]
+                      });
+                      modalInstance.result.then(function(commitMessage) {
+                        returnModalObject.commitMessage = commitMessage;
+                        $uibModalInstance.close(returnModalObject);
+                      });
+                    } else {
                       $uibModalInstance.close(returnModalObject);
-                    });
+                    }
                   };
                   $scope.isSaveAndCommitButtonDisabled = function() {
                     return !(QuestionUndoRedoService.hasChanges() ||
