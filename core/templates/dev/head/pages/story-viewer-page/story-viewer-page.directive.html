@@ -49,11 +49,9 @@
              ng-href="<[$ctrl.getExplorationUrl(node)]>"
              ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
             <div ng-style="{width: '160px',position: 'absolute',left: '<[$ctrl.getExplorationTitlePosition($index)]>',color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '18px',bottom: '65%'}">
-              <span ng-if="$ctrl.isSummaryTileVisible(node) && node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}">
+              <span ng-if="node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}">
               </span>
-              <span ng-if="!$ctrl.isSummaryTileVisible(node)" aria-live="assertive" translate="I18N_STORY_VIEWER_LOCKED_CHAPTER" translate-values="{title: node.getTitle()}">
-              </span>
-              <span ng-if="$ctrl.isSummaryTileVisible(node) && !node.isCompleted()" aria-live="assertive">
+              <span ng-if="!node.isCompleted()" aria-live="assertive">
                 <[node.getTitle()]>
               </span>
             </div>
@@ -76,7 +74,8 @@
                          height="100"
                          width="100"
                          ng-attr-xlink:href="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>"
-                         xlink:href="">
+                         xlink:href=""
+                         transform="rotate(-75 50 70)">
                   </image>
                   <image ng-if="!node.isCompleted()"
                          x="10"
@@ -125,11 +124,9 @@
             <a href=""
                class="oppia-story-node-small-screen">
               <[$index + 1]>
-              <span ng-if="$ctrl.isSummaryTileVisible(node) && node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}">
+              <span ng-if="node.isCompleted()" aria-live="assertive" translate="I18N_STORY_VIEWER_COMPLETED_CHAPTER" translate-values="{title: node.getTitle()}">
               </span>
-              <span ng-if="!$ctrl.isSummaryTileVisible(node)" aria-live="assertive" translate="I18N_STORY_VIEWER_LOCKED_CHAPTER" translate-values="{title: node.getTitle()}">
-              </span>
-              <span ng-if="$ctrl.isSummaryTileVisible(node) && !node.isCompleted()" aria-live="assertive">
+              <span ng-if="!node.isCompleted()" aria-live="assertive">
                 <[node.getTitle()]>
               </span>
               <svg width="100"
@@ -168,7 +165,8 @@
                            height="100"
                            width="100"
                            ng-attr-xlink:href="<[$ctrl.getStaticImageUrl('/general/collection_paw.svg')]>"
-                           xlink:href="">
+                           xlink:href=""
+                           transform="rotate(-75 50 70)">
                     </image>
                     <image ng-if="!node.isCompleted()"
                            x="10"
@@ -230,8 +228,8 @@
 
         <div class="oppia-card-preview-panel d-none d-md-block">
           <md-card class="oppia-activity-summary-tile md-default-theme">
-            <div class="title-section" style="background-color: grey; z-index: 1;">
-              <img ng-src="<[$ctrl.getStaticImageUrl('/subjects/Lightbulb.svg')]>" class="thumbnail-image">
+            <div class="title-section" style="background-color: <[$ctrl.thumbnailBgColor]>; z-index: 1;">
+              <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.thumbnailIconUrl)]>" class="thumbnail-image">
             </div>
             <div class="title-section-mask objective oppia-activity-summary-tile-pre-hover-preview">
               <span>Hover over an icon to preview an exploration.</span>
