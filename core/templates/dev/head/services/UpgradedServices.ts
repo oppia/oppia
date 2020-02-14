@@ -155,6 +155,9 @@ import { StateClassifierMappingService } from
 import { StateContentService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-content.service';
+import { StateCustomizationArgsService } from
+  // eslint-disable-next-line max-len
+  'components/state-editor/state-editor-properties-services/state-customization-args.service';
 import { StateEditorService } from
   // eslint-disable-next-line max-len
   'components/state-editor/state-editor-properties-services/state-editor.service';
@@ -445,6 +448,9 @@ export class UpgradedServices {
       upgradedServices['PlayerTranscriptService']);
     upgradedServices['StateContentService'] = new StateContentService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
+    upgradedServices['StateCustomizationArgsService'] =
+      new StateCustomizationArgsService(
+        upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateHintsService'] = new StateHintsService(
       upgradedServices['AlertsService'], upgradedServices['UtilsService']);
     upgradedServices['StateInteractionIdService'] =
