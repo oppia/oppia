@@ -19,10 +19,8 @@
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').directive('schemaBasedHtmlEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -32,9 +30,7 @@ angular.module('oppia').directive('schemaBasedHtmlEditor', [
         labelForFocusTarget: '&',
         uiConfig: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-html-editor.directive.html'),
+      template: require('./schema-based-html-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {}]
     };
