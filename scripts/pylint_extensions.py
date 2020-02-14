@@ -1228,18 +1228,21 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             if line_num > 0:
                 previous_line = file_content[line_num - 1].strip()
 
+            # Ignore lines which are not comments.
+            if not line.startswith(b'#'):
+                continue
+
+            # Check if comment contains any excluded phrase.
+            word_is_present_in_excluded_phrases = any(
+                word in line for word in EXCLUDED_PHRASES)
+
             # Comments may include a lowercase character at beginning
             # or may not use a punctuation at end if it contains a
             # excluded phrase e.g. "# coding: utf-8".
-            if line.startswith(b'#'):
-                # Check if comment contains any excluded phrase.
-                word_is_present_in_excluded_phrases = any(
-                    word in line for word in EXCLUDED_PHRASES)
+            if word_is_present_in_excluded_phrases:
+                continue
 
-                if word_is_present_in_excluded_phrases:
-                    continue
-
-            if line.startswith(b'#') and not next_line.startswith(b'#'):
+            if not next_line.startswith(b'#'):
                 # Comments must end with the proper punctuation.
                 last_char_is_invalid = line[-1] not in (
                     ALLOWED_TERMINATING_PUNCTUATIONS)
@@ -1258,8 +1261,7 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             # a variable name e.g. "# next_line is of string type."
             # or "# v2 version does not have ExplorationStatsModel."
             # or "# int. The file size, in bytes.".
-            if line.startswith(b'#') and len(line) > 1 and (
-                    space_at_beginning_of_comment):
+            if len(line) > 1 and space_at_beginning_of_comment:
 
                 # Check if variable name is used.
                 underscore_is_present = '_' in line.split()[1]
