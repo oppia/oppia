@@ -16,15 +16,11 @@
  * @fileoverview Directive for a schema-based editor for multiple choice.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/nested-directives-recursion-timeout-prevention.service.ts');
 
 angular.module('oppia').directive('schemaBasedChoicesEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
-  'UrlInterpolationService',
-  function(
-      NestedDirectivesRecursionTimeoutPreventionService,
-      UrlInterpolationService) {
+  function(NestedDirectivesRecursionTimeoutPreventionService) {
     return {
       restrict: 'E',
       scope: {},
@@ -37,12 +33,10 @@ angular.module('oppia').directive('schemaBasedChoicesEditor', [
         schema: '&',
         isDisabled: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-choices-editor.directive.html'),
+      template: require('./schema-based-choices-editor.directive.html'),
       controllerAs: '$ctrl',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
-      controller: ['$scope', function($scope) {
+      controller: [function() {
         var ctrl = this;
         ctrl.getReadonlySchema = function() {
           var readonlySchema = angular.copy(ctrl.schema());
