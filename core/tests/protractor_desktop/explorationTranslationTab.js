@@ -25,8 +25,10 @@ var workflow = require('../protractor_utils/workflow.js');
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage = require(
   '../protractor_utils/CreatorDashboardPage.js');
-var ExplorationEditorPage = require(
-  '../protractor_utils/ExplorationEditorPage.js');
+
+
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 
 describe('Exploration translation and voiceover tab', function() {
   var adminPage = null;
@@ -46,7 +48,6 @@ describe('Exploration translation and voiceover tab', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
-    explorationPreviewTab = explorationEditorPage.getPreviewTab();
 
     users.createUser('voiceArtist@translationTab.com', 'userVoiceArtist');
     users.createUser('user@editorTab.com', 'userEditor');
@@ -283,6 +284,7 @@ describe('Exploration translation and voiceover tab', function() {
     explorationEditorTranslationTab.moveToState('final card');
     explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
       'Yeh aakhri panna hain.'));
+
     explorationEditorTranslationTab.expectCorrectStatusColor(
       'first', YELLOW_STATE_PROGRESS_COLOR);
     explorationEditorTranslationTab.expectCorrectStatusColor(
