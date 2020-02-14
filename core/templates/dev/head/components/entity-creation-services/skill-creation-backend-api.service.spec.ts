@@ -29,6 +29,7 @@ fdescribe('Skill Creation backend service', function() {
   var SUCCESS_STATUS_CODE = 200;
   var ERROR_STATUS_CODE = 404;
   var rubricDict = null;
+  let postData = null
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -48,12 +49,17 @@ fdescribe('Skill Creation backend service', function() {
       difficulty: 'Easy',
       explanation: 'test explanation'
     };
-
+    postData = {
+      description: 'test_des_1',
+      linked_topic_ids: ['test_id_11'],
+      explanation_dict: 'explaination',
+      rubrics: rubricDict
+    };
   }));
 
   afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    // $httpBackend.verifyNoOutstandingExpectation();
+    // $httpBackend.verifyNoOutstandingRequest();
   });
 
   it('should successfully create a new skill and obtain the skill ID',
@@ -61,12 +67,12 @@ fdescribe('Skill Creation backend service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
-        SUCCESS_STATUS_CODE, {skillId: SAMPLE_SKILL_ID});
+      $httpBackend.expect('POST', '/skill_editor_handler/create_new',postData).respond(
+        SUCCESS_STATUS_CODE,SAMPLE_SKILL_ID);
       SkillCreationBackendService.createSkill('test_des_1',rubricDict,'explaination',['test_id_11']).then(
-        successHandler, failHandler);
+        successHandler, );
 
-      // $httpBackend.flush();
+      $httpBackend.flush();
       $rootScope.$apply();
 
       expect(successHandler).toHaveBeenCalled();
@@ -79,7 +85,7 @@ fdescribe('Skill Creation backend service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
+      $httpBackend.expect('POST','/skill_editor_handler/create_new',postData).respond(
         ERROR_STATUS_CODE);
       SkillCreationBackendService.createSkill('test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
         successHandler, failHandler);

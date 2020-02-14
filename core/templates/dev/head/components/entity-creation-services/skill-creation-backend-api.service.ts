@@ -35,7 +35,7 @@ angular.module('oppia').factory('SkillCreationBackendService', [
           }
         }, function(errorResponse) {
           if (errorCallback) {
-            errorCallback(errorResponse.data);
+            errorCallback(errorResponse);
           }
         });
     };
