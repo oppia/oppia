@@ -28,10 +28,10 @@ var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
-describe('Topic editor functionality', function() {
+fdescribe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
-  var topicId = null;
+  var topicName = 'Topic 1';
   var explorationEditorPage = null;
 
   beforeAll(function() {
@@ -45,20 +45,18 @@ describe('Topic editor functionality', function() {
     users.createAndLoginAdminUser(
       'creator@topicEditor.com', 'creatorTopicEditor');
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
-    browser.getCurrentUrl().then(function(url) {
-      topicId = url.split('/')[4];
-    });
+    topicsAndSkillsDashboardPage.createTopic(topicName, 'abbrev');
   });
 
   beforeEach(function() {
     users.login('creator@topicEditor.com');
-    topicEditorPage.get(topicId);
+    topicsAndSkillsDashboardPage.editTopic(topicName);
   });
 
-  it('should edit topic name, abbreviated topic name, ' +
+  fit('should edit topic name, abbreviated topic name, ' +
     'thumbnail and description correctly', function() {
-    topicEditorPage.changeTopicName('Topic 1 edited');
+    newTopicName = 'Topic 1 edited'
+    topicEditorPage.changeTopicName(newTopicName);
     expect(topicEditorPage.getTopicThumbnailSource())
       .not
       .toEqual(
@@ -72,9 +70,9 @@ describe('Topic editor functionality', function() {
     topicEditorPage.saveTopic('Changed topic name and description.');
 
     topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.expectTopicNameToBe('Topic 1 edited', 0);
+    topicsAndSkillsDashboardPage.expectTopicNameToBe(newTopicName, 0);
 
-    topicEditorPage.get(topicId);
+    topicsAndSkillsDashboardPage.editTopic(newTopicName);
     topicEditorPage.expectTopicNameToBe('Topic 1 edited');
     topicEditorPage.expectAbbreviatedTopicNameToBe('short name');
     topicEditorPage.expectTopicDescriptionToBe('Topic Description');
