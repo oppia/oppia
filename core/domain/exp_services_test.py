@@ -3483,6 +3483,38 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.assertIsNone(exploration_summary)
 
 
+class ExplorationStoryLinkTests(ExplorationServicesUnitTests):
+    """Test exploration story link functions."""
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+
+    def setUp(self):
+        super(ExplorationStoryLinkTests, self).setUp()
+        self.save_new_valid_exploration(self.EXP_ID_1, self.user_id_admin)
+        self.save_new_valid_exploration(self.EXP_ID_2, self.user_id_admin)
+
+    def test_update_and_get_exploration_story_link(self):
+        exp_services.update_exploration_story_link(
+            None, self.EXP_ID_1, 'story_id')
+
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration(self.EXP_ID_1),
+            'story_id')
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration(self.EXP_ID_2),
+            None)
+
+        exp_services.update_exploration_story_link(
+            self.EXP_ID_1, self.EXP_ID_2, 'story_id')
+
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration(self.EXP_ID_1),
+            None)
+        self.assertEqual(
+            exp_services.get_story_id_linked_to_exploration(self.EXP_ID_2),
+            'story_id')
+
+
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     """Test exploration summaries get_* functions."""
     ALBERT_EMAIL = 'albert@example.com'
