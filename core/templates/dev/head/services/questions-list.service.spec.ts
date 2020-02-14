@@ -84,7 +84,7 @@ describe('Questions List Service', function() {
     expect(qls.getCurrentPageNumber()).toBe(0);
   });
 
-  it('should not get question summaries when no skills id is provided',
+  it('should not get question summaries when no skill id is provided',
     function() {
       $httpBackend.expect(
         'GET', '/questions_list_handler/?cursor=').respond(
@@ -94,7 +94,7 @@ describe('Questions List Service', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-  it('should get question summaries twice with history reseted', function() {
+  it('should get question summaries twice with history reset', function() {
     var skillIds = ['1'];
     $httpBackend.expect(
       'GET', '/questions_list_handler/1?cursor=').respond(
