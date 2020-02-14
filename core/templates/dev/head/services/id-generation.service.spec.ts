@@ -35,21 +35,21 @@ describe('IdGenerationService', () => {
     expect(id1).not.toEqual(id2);
   });
 
-  it('should generate id with 10 digits when random string is greater than' +
-    ' or equal 10 of length', function() {
+  it('should generate id with 10 digits when random string has length' +
+    ' greater than or equal to 10', function() {
     // It returns a number that represents 10 digits string.
     spyOn(Math, 'random').and.returnValue(0.5023019837490587);
     var generatedId = idGenerationService.generateNewId();
     expect(generatedId.length).toBe(10);
   });
 
-  it('should generate id with 10 digits when random string is less than' +
-    ' 10 of length', function() {
+  it('should generate id with 10 digits when random string has length' +
+    ' less than 10', function() {
     // It returns a number that represents 9 digits string.
     spyOn(Math, 'random').and.returnValue(0.25275092369714336);
     var generatedId = idGenerationService.generateNewId();
     expect(generatedId.length).toBe(10);
-    // 0 should be inserted in order to length be 10
+    // 0 is inserted for generated id to be of length 10.
     expect(generatedId.slice(-1)).toBe('0');
   });
 });
