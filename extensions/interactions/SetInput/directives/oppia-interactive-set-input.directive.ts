@@ -24,7 +24,7 @@ require('interactions/SetInput/directives/set-input-rules.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/window-dimensions.service.ts');
-require('services/html-escaper.service.ts');  
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveSetInput', [
   'HtmlEscaperService', function(HtmlEscaperService) {

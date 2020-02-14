@@ -91,7 +91,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     @classmethod
     def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
         """Converts draft change list from state version 30 to 31. State
-        version 31 adds a customization arg for the "Add" button text 
+        version 31 adds a customization arg for the "Add" button text
         in SetInput interaction.
 
         Args:

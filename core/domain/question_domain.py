@@ -229,13 +229,13 @@ class Question(python_utils.OBJECT):
             dict. The converted question_state_dict.
         """
         if question_state_dict['interaction']['id'] == 'SetInput':
-                customization_args = question_state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'buttonText': {
-                        'value': 'Add item'
-                    }
-                })
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'buttonText': {
+                    'value': 'Add item'
+                }
+            })
 
         return question_state_dict
 
