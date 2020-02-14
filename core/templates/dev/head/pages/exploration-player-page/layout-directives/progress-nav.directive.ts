@@ -21,7 +21,6 @@ require(
   'continue-button.directive.ts');
 
 require('domain/utilities/browser-checker.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/exploration-player-state.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -34,7 +33,7 @@ require(
 require('pages/interaction-specs.constants.ajs.ts');
 
 angular.module('oppia').directive('progressNav', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {
@@ -45,9 +44,7 @@ angular.module('oppia').directive('progressNav', [
         isSubmitButtonShown: '&submitButtonIsShown',
         isSubmitButtonDisabled: '&submitButtonIsDisabled'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/layout-directives/' +
-        'progress-nav.directive.html'),
+      template: require('./progress-nav.directive.html'),
       controller: [
         '$rootScope', '$scope', 'BrowserCheckerService',
         'ExplorationPlayerStateService', 'PlayerPositionService',
