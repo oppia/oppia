@@ -316,7 +316,8 @@ export class UpgradedServices {
     upgradedServices['UserInfoObjectFactory'] = new UserInfoObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();
     upgradedServices['VoiceoverObjectFactory'] = new VoiceoverObjectFactory();
-    upgradedServices['WindowDimensionsService'] = new WindowDimensionsService();
+    upgradedServices['WindowDimensionsService'] = new WindowDimensionsService(
+      new WindowRef());
     upgradedServices['WindowRef'] = new WindowRef();
     upgradedServices['WinnowingPreprocessingService'] =
       new WinnowingPreprocessingService();
