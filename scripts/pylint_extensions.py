@@ -32,8 +32,11 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 sys.path.insert(0, _PYLINT_PATH)
 
+# List of punctuation allowed to used at the end of comments and docstrings.
 ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 
+# List of phrases if found inside a docstring or comment then skip
+# punctuation and capital letter checks for that comment or docstring.
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
 
