@@ -69,7 +69,6 @@ angular.module('oppia').directive('baseContent', [
           };
           ctrl.$onInit = function() {
             ctrl.iframed = UrlService.isIframed();
-            ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
             ctrl.DEV_MODE = $rootScope.DEV_MODE;
           };
         }
