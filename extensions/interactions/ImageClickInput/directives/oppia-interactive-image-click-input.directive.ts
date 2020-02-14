@@ -20,6 +20,7 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/ImageClickInput/directives/' +
   'image-click-input-rules.service.ts');
@@ -44,9 +45,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
       bindToController: {
         getLastAnswer: '&lastAnswer'
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/ImageClickInput/directives/' +
-        'image-click-input-interaction.directive.html'),
+      template: require('./image-click-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$element', '$attrs', '$scope', 'CurrentInteractionService',

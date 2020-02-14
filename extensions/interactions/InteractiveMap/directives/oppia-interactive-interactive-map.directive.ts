@@ -43,9 +43,7 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
       bindToController: {
         getLastAnswer: '&lastAnswer'
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/InteractiveMap/directives/' +
-        'interactive-map-interaction.directive.html'),
+      template: require('./interactive-map-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$scope', 'BrowserCheckerService',
