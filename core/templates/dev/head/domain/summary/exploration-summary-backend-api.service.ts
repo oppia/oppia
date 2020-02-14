@@ -47,8 +47,9 @@ angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
 
       $http.get(explorationSummaryDataUrl, {
         params: {
-          stringified_exp_ids: explorationIds,
-          include_private_explorations: includePrivateExplorations
+          stringified_exp_ids: JSON.stringify(explorationIds),
+          include_private_explorations: JSON.stringify(
+            includePrivateExplorations)
         }
       }).then(function(response) {
         var summaries = angular.copy(response.data.summaries);

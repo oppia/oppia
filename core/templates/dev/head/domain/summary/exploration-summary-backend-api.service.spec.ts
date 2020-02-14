@@ -84,10 +84,8 @@ describe('Exploration Summary Backend Api Service', function() {
       }];
 
       var requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=0&' +
-        'stringified_exp_ids=1&' +
-        'stringified_exp_ids=2&' +
-        'include_private_explorations=false';
+        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+        '&' + 'include_private_explorations=false';
 
       $httpBackend.expect('GET', requestUrl).respond({
         summaries: sampleResults
@@ -119,10 +117,8 @@ describe('Exploration Summary Backend Api Service', function() {
       }];
 
       var requestUrl = '/explorationsummarieshandler/data?' +
-        'stringified_exp_ids=0&' +
-        'stringified_exp_ids=1&' +
-        'stringified_exp_ids=2&' +
-        'include_private_explorations=true';
+        'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+        '&' + 'include_private_explorations=true';
 
       $httpBackend.expect('GET', requestUrl).respond({
         summaries: sampleResults
@@ -143,10 +139,8 @@ describe('Exploration Summary Backend Api Service', function() {
     var explorationIds = ['0', '1', '2'];
 
     var requestUrl = '/explorationsummarieshandler/data?' +
-      'stringified_exp_ids=0&' +
-      'stringified_exp_ids=1&' +
-      'stringified_exp_ids=2&' +
-      'include_private_explorations=false';
+      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+      '&' + 'include_private_explorations=false';
 
     $httpBackend.expect('GET', requestUrl).respond({
       summaries: null
@@ -170,10 +164,8 @@ describe('Exploration Summary Backend Api Service', function() {
     var errorMessage = 'Error on loading public exploration summaries.';
 
     var requestUrl = '/explorationsummarieshandler/data?' +
-      'stringified_exp_ids=0&' +
-      'stringified_exp_ids=1&' +
-      'stringified_exp_ids=2&' +
-      'include_private_explorations=false';
+      'stringified_exp_ids=' + encodeURI(JSON.stringify(explorationIds)) +
+      '&' + 'include_private_explorations=false';
 
     $httpBackend.expect('GET', requestUrl).respond(
       500, errorMessage);
