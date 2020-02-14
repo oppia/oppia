@@ -40,8 +40,7 @@ angular.module('oppia').directive('filepathEditor', [
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/filepath-editor.directive.html'),
+      template: require('./filepath-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
