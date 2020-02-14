@@ -32,12 +32,26 @@ from google.appengine.ext import ndb
 
 class ExplorationSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationModel(base_models.VersionedModel):
@@ -105,6 +119,11 @@ class ExplorationModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Exploration is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -218,13 +237,27 @@ class ExplorationModel(base_models.VersionedModel):
 class ExplorationRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for an exploration rights snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of an exploration rights snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class ExplorationRightsModel(base_models.VersionedModel):
@@ -275,6 +308,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @staticmethod
     def transform_dict_to_valid(model_dict):
@@ -495,6 +533,13 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         exploration is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def get_multi(cls, exp_id, exp_versions):
@@ -802,6 +847,14 @@ class ExpSummaryModel(base_models.BaseModel):
         ).order(
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
+
+    @staticmethod
+    def get_export_policy():
+        """Model data has already been exported as a part of the
+        ExplorationModel and thus does not need a separate export_data
+        function.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     def verify_model_user_ids_exist(self):
         """Check if UserSettingsModel exists for all the ids in owner_ids,
