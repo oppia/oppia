@@ -27,6 +27,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 import { TranslatorProviderForTests } from 'tests/test.extras';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 require('pages/library-page/library-page.directive.ts');
 
@@ -61,7 +62,9 @@ describe('Library controller', function() {
             }
           };
         }]);
-      $provide.value('WindowDimensionsService', new WindowDimensionsService());
+      $provide.value('WindowDimensionsService', new WindowDimensionsService(
+        new WindowRef()
+      ));
       $provide.value('UserInfoObjectFactory', new UserInfoObjectFactory());
       $provide.value('PageTitleService', {
         setPageTitle(title) {
