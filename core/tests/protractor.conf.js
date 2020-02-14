@@ -231,7 +231,14 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['--lang=en-EN', '--window-size=1285x1000']
+      args: [
+        '--lang=en-EN',
+        '--window-size=1285x1000',
+        // These arguments let us simulate recording from a microphone
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
+        '--use-file-for-fake-audio-capture=data/cafe.mp3',
+      ]
     },
     prefs: {
       intl: {

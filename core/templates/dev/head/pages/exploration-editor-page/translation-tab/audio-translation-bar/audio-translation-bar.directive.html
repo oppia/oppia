@@ -56,7 +56,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-upload-audio protractor-test-upload-audio-button"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio protractor-test-accessibility-translation-upload-audio"
             uib-tooltip="Upload"
             tooltip-placement="above"
             ng-click="openAddAudioTranslationModal()"
@@ -92,7 +92,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper" ng-if="voiceoverRecorder.status().isRecording">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-stop-record"
             uib-tooltip="Stop"
             tooltip-placement="above"
             ng-click="stopRecording()"
@@ -109,7 +109,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="!voiceoverRecorder.status().isRecording && audioBlob">
-    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition protractor-test-confirm-record"
             ng-click="saveRecordedAudio()"
             aria-label="Save the recorded audio">
       Confirm
@@ -157,7 +157,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio-button"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio"
             uib-tooltip="Upload audio"
             tooltip-placement="above"
             ng-hide="!canVoiceover"
@@ -166,7 +166,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-delete-record"
             uib-tooltip="Delete"
             tooltip-placement="above"
             ng-hide="!canVoiceover"
