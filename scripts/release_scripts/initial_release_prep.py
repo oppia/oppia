@@ -119,7 +119,7 @@ def cut_release_branch():
     subprocess.check_call([
         'python', '-m',
         'scripts.release_scripts.cut_release_or_hotfix_branch',
-        '--new_version=%s' % release_version])
+        '--release_version=%s' % release_version])
 
 
 def main():

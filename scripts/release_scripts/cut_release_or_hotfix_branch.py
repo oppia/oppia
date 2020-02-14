@@ -20,14 +20,14 @@ Usage: Run this script from your oppia root folder:
 
 For release branch:
 
-    python -m scripts.cut_release_or_hotfix_branch --version="x.y.z"
+    python -m scripts.cut_release_or_hotfix_branch --release_version="x.y.z"
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3. The generated branch
 name will be release-x.y.z, e.g. release-2.5.3.
 
 For hotfix branch:
 
-    python -m scripts.cut_release_or_hotfix_branch --version="x.y.z"
+    python -m scripts.cut_release_or_hotfix_branch --release_version="x.y.z"
     --hotfix_number=d
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3,
@@ -74,7 +74,9 @@ def require_release_version_to_have_correct_format(
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--release_version',
-    help='version of the release for which the hotfix is being created',
+    help=(
+        'version of the release for which the branch cut is being made or the '
+        'hotfix is being created'),
     type=require_release_version_to_have_correct_format)
 _PARSER.add_argument('--hotfix_number', default=0)
 
