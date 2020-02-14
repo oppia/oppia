@@ -17,23 +17,38 @@
  * backend.
  */
 
-require('domain/review_test/review-test-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-require('domain/utilities/url-interpolation.service.ts');
+import { ReviewTestDomainConstants } from
+  'domain/review_test/review-test-domain.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-angular.module('oppia').factory('ReviewTestBackendApiService', [
-  '$http', 'UrlInterpolationService', 'REVIEW_TEST_DATA_URL',
-  function($http, UrlInterpolationService, REVIEW_TEST_DATA_URL) {
-    var _fetchReviewTestData = function(storyId) {
-      var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
-        REVIEW_TEST_DATA_URL, {
-          story_id: storyId
-        });
-      return $http.get(reviewTestsDataUrl);
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class ReviewTestBackendApiService {
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient
+  ) {}
 
-    return {
-      fetchReviewTestData: _fetchReviewTestData,
-    };
+  _fetchReviewTestData(storyId: string): Promise<Object> {
+    return this.http.get(
+      this.urlInterpolationService.interpolateUrl(
+        ReviewTestDomainConstants.REVIEW_TEST_DATA_URL,
+        {story_id: storyId}
+      )
+    ).toPromise();
   }
-]);
+
+  fetchReviewTestData(storyId: string): Promise<Object> {
+    return this._fetchReviewTestData(storyId);
+  }
+}
+
+angular.module('oppia').factory(
+  'ReviewTestBackendApiService',
+  downgradeInjectable(ReviewTestBackendApiService));

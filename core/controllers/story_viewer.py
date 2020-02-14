@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the story viewer page"""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -98,18 +99,17 @@ class StoryProgressHandler(base.BaseHandler):
             raise self.PageNotFoundException(e)
 
         story = story_fetchers.get_story_by_id(story_id)
+        completed_nodes = story_fetchers.get_completed_nodes_in_story(
+            self.user_id, story_id)
         completed_node_ids = [
-            completed_node.id for completed_node in
-            story_fetchers.get_completed_nodes_in_story(
-                self.user_id, story_id)]
+            completed_node.id for completed_node in completed_nodes]
+
         ordered_nodes = [
             node for node in story.story_contents.get_ordered_nodes()
         ]
 
         next_exp_ids = []
-        completed_nodes = []
         next_node_id = None
-
         if not node_id in completed_node_ids:
             story_services.record_completed_node_in_story_context(
                 self.user_id, story_id, node_id)
@@ -123,11 +123,13 @@ class StoryProgressHandler(base.BaseHandler):
                 if node.id not in completed_node_ids:
                     next_exp_ids = [node.exploration_id]
                     next_node_id = node.id
+                    break
 
         ready_for_review_test = False
         exp_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 next_exp_ids))
+
         if (
                 (len(exp_summaries) != 0 and
                  len(completed_nodes) %

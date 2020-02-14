@@ -212,6 +212,10 @@ exports.config = {
   // (Note that the hint tooltip has a 60-second timeout.)
   allScriptsTimeout: 180000,
 
+
+  // How long to wait for a page to load.
+  getPageTimeout: 60000,
+
   // ----- What tests to run -----
   //
   // When run without a command line parameter, all suites will run. If run
@@ -227,7 +231,14 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['--lang=en-EN', '--window-size=1285x1000']
+      args: [
+        '--lang=en-EN',
+        '--window-size=1285x1000',
+        // These arguments let us simulate recording from a microphone
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
+        '--use-file-for-fake-audio-capture=data/cafe.mp3',
+      ]
     },
     prefs: {
       intl: {

@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,16 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for review test domain.
+ * @fileoverview Unit tests for WindowRef.
  */
 
-/* eslint-disable max-len */
-// TODO(#7092): Delete this file once migration is complete and these AngularJS
-// equivalents of the Angular constants are no longer needed.
-import { ReviewTestDomainConstants } from
-  'domain/review_test/review-test-domain.constants';
-/* eslint-enable max-len */
+import { TestBed } from '@angular/core/testing';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
-angular.module('oppia').constant(
-  'REVIEW_TEST_DATA_URL',
-  ReviewTestDomainConstants.REVIEW_TEST_DATA_URL);
+describe('Window Ref', () => {
+  let wrs;
+
+  beforeEach(() => {
+    wrs = TestBed.get(WindowRef);
+  });
+
+  it('should wrap the window object', () => {
+    expect(wrs.nativeWindow).toEqual(window);
+  });
+});

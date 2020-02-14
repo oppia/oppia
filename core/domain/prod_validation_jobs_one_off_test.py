@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.prod_validation_jobs_one_off."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -2230,7 +2231,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
-            category='category%d' % i,
+            category='category',
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
@@ -7715,7 +7716,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
-            category='category%d' % i,
+            category='category',
         ) for i in python_utils.RANGE(6)]
 
         for exp in explorations:
