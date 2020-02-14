@@ -26,6 +26,8 @@ import { ImageFileObjectFactory } from
   'domain/utilities/ImageFileObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+// Jquery is needed in this file because some tests will spyOn Jquery methods.
+// The spies won't work correctly without the import.
 import $ from 'jquery';
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -43,8 +45,8 @@ describe('Assets Backend API Service', function() {
   var $rootScope = null;
   var $q = null;
   var ENTITY_TYPE = null;
-  var audioRequestUrl;
-  var imageRequestUrl;
+  var audioRequestUrl = null;
+  var imageRequestUrl = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -104,7 +106,7 @@ describe('Assets Backend API Service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should correctly formulate the download URL for audios', function() {
+  it('should correctly formulate the download URL for audio', function() {
     expect(
       AssetsBackendApiService.getAudioDownloadUrl(
         ENTITY_TYPE.EXPLORATION, 'expid12345', 'a.mp3')
@@ -172,8 +174,25 @@ describe('Assets Backend API Service', function() {
     $httpBackend.verifyNoOutstandingExpectation();
   });
 
-  it('should handler rejection on fetching file when Blob throws a' +
-    ' TypeErrow and BlobBuilder does not exist', function() {
+  it('should handler rejection when fetching a file fails', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', audioRequestUrl).respond(
+      500, 'File not found.');
+    expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
+
+    AssetsBackendApiService.loadAudio('0', 'myfile.mp3').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('myfile.mp3');
+    expect(AssetsBackendApiService.isCached('myfile.mp3')).toBe(false);
+    $httpBackend.verifyNoOutstandingExpectation();
+  });
+
+  it('should handler rejection on trying to process fetched file when' +
+    ' Blob throws a TypeError and BlobBuilder does not exist', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
@@ -192,8 +211,9 @@ describe('Assets Backend API Service', function() {
     $httpBackend.verifyNoOutstandingExpectation();
   });
 
-  it('should handler rejection on fetching file when Blob throws a' +
-    ' TypeError and BlobBuilder does not work correctly', function() {
+  it('should handler rejection on trying to process fetched file when' +
+    ' Blob throws a TypeError and BlobBuilder does not work correctly',
+    function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
@@ -216,8 +236,8 @@ describe('Assets Backend API Service', function() {
     $httpBackend.verifyNoOutstandingExpectation();
   });
 
-  it('should fetch file when Blob throws a TypeError and BlobBuilder' +
-    ' is correctly implemented', function() {
+  it('should successfully process a fetch file when Blob throws a TypeError' +
+    ' and BlobBuilder is correctly implemented', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
@@ -250,7 +270,8 @@ describe('Assets Backend API Service', function() {
 
   it('should successfully save an audio', function(done) {
     var successMessage = 'Audio was successfully saved.';
-    // @ts-ignore
+    // @ts-ignore in order to ignore JQuery properties that should
+    // be declarated.
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.resolve(successMessage);
@@ -267,9 +288,10 @@ describe('Assets Backend API Service', function() {
     $rootScope.$apply();
   });
 
-  it('should not save an audio', function(done) {
+  it('should handle rejection when saving a file fails', function(done) {
     var errorMessage = 'Error on saving audio';
-    // @ts-ignore
+    // @ts-ignore in order to ignore JQuery properties that should
+    // be declarated.
     spyOn($, 'ajax').and.callFake(function() {
       var d = $.Deferred();
       d.reject({
@@ -434,7 +456,7 @@ describe('Assets Backend API Service', function() {
   });
 });
 
-describe('Assets Backend API Service', function() {
+describe('Assets Backend API Service without dev mode settings', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('AudioFileObjectFactory', new AudioFileObjectFactory());

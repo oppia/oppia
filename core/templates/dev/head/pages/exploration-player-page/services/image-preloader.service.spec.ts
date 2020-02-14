@@ -62,12 +62,19 @@ require('services/assets-backend-api.service.ts');
 require('services/context.service.ts');
 
 describe('Image preloader service', function() {
-  var abas, ips, eof, ecs, ifof;
+  var abas = null;
+  var ips = null;
+  var eof = null;
+  var ecs = null;
+  var ifof = null;
   var $httpBackend = null;
-  var UrlInterpolationService;
+  var UrlInterpolationService = null;
   var $rootScope = null;
-  var explorationDict;
-  var requestUrl1, requestUrl2, requestUrl3, requestUrl4;
+  var explorationDict = null;
+  var requestUrl1 = null;
+  var requestUrl2 = null;
+  var requestUrl3 = null;
+  var requestUrl4 = null;
 
   beforeEach(function() {
     angular.mock.module('oppia');
