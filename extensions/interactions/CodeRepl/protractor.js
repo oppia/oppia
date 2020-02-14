@@ -19,8 +19,8 @@
 
 var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 
-var customizeInteraction = function(interactionEditor,initialCode) {
-    // browser.executeScript("var editor = $('.CodeMirror')[0].CodeMirror;editor.setValue('"+initialCode+"');");
+var customizeInteraction = function(interactionEditor, initialCode) {
+  // There are no customizations.
 };
 
 var expectInteractionDetailsToMatch = function(elem) {
@@ -30,15 +30,15 @@ var expectInteractionDetailsToMatch = function(elem) {
 };
 
 var submitAnswer = function(conversationInput, answerCode) {
-    // var test = conversationInput.element(by.css(
-    //   '.CodeMirror'));
-    browser.executeScript("var editor = $('.CodeMirror')[0].CodeMirror;editor.setValue('"+answerCode+"');");
-    var submitAnswerButton = element(by.css(
-      '.protractor-test-submit-answer-button'));
-    waitFor.elementToBeClickable(
-      submitAnswerButton, 'Submit Answer button is not clickable');
-    submitAnswerButton.click();
-  };
+  browser.executeScript(
+    'var editor = $(".CodeMirror")[0].CodeMirror;editor.setValue("' +
+    answerCode + '");');
+  var submitAnswerButton = element(by.css(
+    '.protractor-test-submit-answer-button'));
+  waitFor.elementToBeClickable(
+    submitAnswerButton, 'Submit Answer button is not clickable');
+  submitAnswerButton.click();
+};
 
 var answerObjectType = 'CodeString';
 

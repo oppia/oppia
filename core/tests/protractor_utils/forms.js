@@ -709,8 +709,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
 
 var CodeStringEditor = function(elem) {
   return {
-    setValue: function(code){
-      // console.log(code)
+    setValue: function(code) {
       elem.element(by.tagName('textarea')).clear();
       elem.element(by.tagName('textarea')).sendKeys(code);
     }
