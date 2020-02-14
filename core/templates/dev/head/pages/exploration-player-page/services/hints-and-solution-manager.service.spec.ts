@@ -32,7 +32,7 @@ require(
   'pages/exploration-player-page/services/' +
   'hints-and-solution-manager.service.ts');
 
-describe('HintsAndSolutionManager service', function() {
+fdescribe('HintsAndSolutionManager service', function() {
   var $timeout;
   var $rootScope;
   var hasms;
@@ -243,30 +243,31 @@ describe('HintsAndSolutionManager service', function() {
     $timeout.verifyNoPendingTasks();
   });
 
-  it('shout not record the wrong answer', function() {
-    expect(hasms.isHintTooltipOpen()).toBe(false);
-    expect(hasms.isHintViewable(0)).toBe(false);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+  it('should not record the wrong answer when a hint is already released',
+    function() {
+      expect(hasms.isHintTooltipOpen()).toBe(false);
+      expect(hasms.isHintViewable(0)).toBe(false);
+      expect(hasms.isHintViewable(1)).toBe(false);
+      expect(hasms.isSolutionViewable()).toBe(false);
 
-    $timeout.flush();
-    $timeout.flush();
+      $timeout.flush();
+      $timeout.flush();
 
-    expect(hasms.isHintTooltipOpen()).toBe(true);
-    // It only changes hint visibility.
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isHintViewable(2)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
+      expect(hasms.isHintTooltipOpen()).toBe(true);
+      // It only changes hint visibility.
+      expect(hasms.isHintViewable(0)).toBe(true);
+      expect(hasms.isHintViewable(1)).toBe(false);
+      expect(hasms.isHintViewable(2)).toBe(false);
+      expect(hasms.isSolutionViewable()).toBe(false);
 
-    hasms.recordWrongAnswer();
-    $timeout.verifyNoPendingTasks();
+      hasms.recordWrongAnswer();
+      $timeout.verifyNoPendingTasks();
 
-    expect(hasms.isHintTooltipOpen()).toBe(true);
-    expect(hasms.isHintViewable(0)).toBe(true);
-    expect(hasms.isHintViewable(1)).toBe(false);
-    expect(hasms.isSolutionViewable()).toBe(false);
-  });
+      expect(hasms.isHintTooltipOpen()).toBe(true);
+      expect(hasms.isHintViewable(0)).toBe(true);
+      expect(hasms.isHintViewable(1)).toBe(false);
+      expect(hasms.isSolutionViewable()).toBe(false);
+    });
 
   it('should record the wrong answer', function() {
     expect(hasms.isHintTooltipOpen()).toBe(false);
@@ -285,5 +286,24 @@ describe('HintsAndSolutionManager service', function() {
     expect(hasms.isSolutionViewable()).toBe(false);
 
     $timeout.verifyNoPendingTasks();
+  });
+
+  it('should not record the wrong answer twice', function() {
+    expect(hasms.isHintTooltipOpen()).toBe(false);
+    expect(hasms.isHintViewable(0)).toBe(false);
+    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
+
+    hasms.recordWrongAnswer();
+    $timeout.flush();
+    $timeout.flush();
+
+    hasms.recordWrongAnswer();
+    $timeout.verifyNoPendingTasks();
+
+    expect(hasms.isHintTooltipOpen()).toBe(true);
+    expect(hasms.isHintViewable(0)).toBe(true);
+    expect(hasms.isHintViewable(1)).toBe(false);
+    expect(hasms.isSolutionViewable()).toBe(false);
   });
 });
