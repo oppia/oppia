@@ -215,6 +215,31 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
+        """Converts from version 30 to 31. Version 31 adds a new
+        customization arg to SetInput interaction which allows
+        creators to add custom text to the "Add" button.
+
+        Args:
+            question_state_dict: dict. A dict where each key-value pair
+                represents respectively, a state name and a dict used to
+                initalize a State domain object.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'SetInput':
+                customization_args = question_state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'buttonText': {
+                        'value': 'Add item'
+                    }
+                })
+
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given

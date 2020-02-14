@@ -38,7 +38,14 @@ class SetInput(base.BaseInteraction):
 
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.
-    _customization_arg_specs = []
+    _customization_arg_specs = [{
+        'name': 'buttonText',
+        'description': 'Customize the "Add" button text:',
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': 'Add item'
+    }]
 
     _answer_visualization_specs = [{
         # Table with answer counts for top N answers.
