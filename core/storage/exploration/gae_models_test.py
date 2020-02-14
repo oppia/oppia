@@ -86,6 +86,11 @@ class ExplorationContextModelUnitTests(test_utils.GenericTestBase):
             exp_models.ExplorationContextModel
             .has_reference_to_user_id('any_id'))
 
+    def test_get_export_policy(self):
+        self.assertEqual(
+            exp_models.ExplorationModel.get_export_policy(),
+            base_models.EXPORT_POLICY.NOT_APPLICABLE)
+
     def test_get_user_id_migration_policy(self):
         self.assertEqual(
             exp_models.ExplorationContextModel

@@ -251,6 +251,11 @@ class ExplorationContextModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, unused_user_id):
         """Check whether ExplorationContextModel references the given user.
