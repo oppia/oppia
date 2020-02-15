@@ -148,7 +148,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             });
           };
 
-          function isExpression(answerString) {
+          ctrl.isExpression = function(answerString) {
             var possibleSeparators = ['=', '<', '>'];
             for (var i = 0; i < possibleSeparators.length; i++) {
               if (answerString.includes(possibleSeparators[i])) {
@@ -156,10 +156,10 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               }
             }
             return true;
-          }
+          };
 
           ctrl.getLatexErrorText = function() {
-            if (!isExpression(guppyInstance.latex())) {
+            if (!ctrl.isExpression(guppyInstance.latex())) {
               return $translate.instant('I18N_MATH_EXPRESSION_ERROR');
             }
             return '';
@@ -167,7 +167,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
 
           ctrl.isCurrentAnswerValid = function() {
             var latexAnswer = guppyInstance.latex();
-            if (!isExpression(latexAnswer)) {
+            if (!ctrl.isExpression(latexAnswer)) {
               return false;
             }
             try {
