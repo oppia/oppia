@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,20 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Continue button in exploration player and
- * editor.
+ * @fileoverview Unit tests for WindowRef.
  */
 
-angular.module('oppia').directive('continueButton', [
-  function() {
-    return {
-      restrict: 'E',
-      scope: {
-        onClickContinueButton: '&',
-        isLearnAgainButton: '&',
-        focusLabel: '@'
-      },
-      template: require('./continue-button.directive.html')
-    };
-  }
-]);
+import { TestBed } from '@angular/core/testing';
+import { WindowRef } from 'services/contextual/window-ref.service';
+
+describe('Window Ref', () => {
+  let wrs;
+
+  beforeEach(() => {
+    wrs = TestBed.get(WindowRef);
+  });
+
+  it('should wrap the window object', () => {
+    expect(wrs.nativeWindow).toEqual(window);
+  });
+});
