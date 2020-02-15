@@ -25,43 +25,7 @@ require('directives/focus-on.directive.ts');
 
 require('pages/Base.ts');
 
-require('services/context.service.ts');
 require('services/csrf-token.service.ts');
-require('services/navigation.service.ts');
-require('services/debouncer.service.ts');
-require('services/date-time-format.service.ts');
-require('services/id-generation.service.ts');
-require('services/html-escaper.service.ts');
-require('services/translation-file-hash-loader.service.ts');
-require('services/rte-helper.service.ts');
-require('services/state-rules-stats.service.ts');
-require('services/construct-translation-ids.service.ts');
-require('services/user.service.ts');
-require('services/promo-bar.service.ts');
-require('services/contextual/device-info.service.ts');
-require('services/contextual/url.service.ts');
-require('services/stateful/focus-manager.service.ts');
-require('services/site-analytics.service.ts');
-
-require(
-  'components/common-layout-directives/common-elements/' +
-  'alert-message.directive.ts');
-require('components/button-directives/create-activity-button.directive.ts');
-
-require('components/forms/custom-forms-directives/object-editor.directive.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'promo-bar.directive.ts');
-require(
-  'components/common-layout-directives/navigation-bars/' +
-  'side-navigation-bar.directive.ts');
-require('components/button-directives/social-buttons.directive.ts');
-require(
-  'components/common-layout-directives/navigation-bars/' +
-  'top-navigation-bar.directive.ts');
-
-require('domain/user/UserInfoObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
 
 require('app.constants.ajs.ts');
 
