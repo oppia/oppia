@@ -384,7 +384,7 @@
     "I18N_PLAYER_IS_PRIVATE": "This exploration is private.",
     "I18N_PLAYER_LAST_UPDATED_TOOLTIP": "Last Updated",
     "I18N_PLAYER_LEARN_AGAIN_BUTTON": "Learn Again",
-    "I18N_PLAYER_LEAVE_FEEDBACK": "Leave feedback for the authors...",
+    "I18N_PLAYER_LEAVE_FEEDBACK": "Leave feedback for the authors. (When submitted, this will also include a reference to the card you're currently at in the exploration.)",
     "I18N_PLAYER_LOADING": "Loading...",
     "I18N_PLAYER_NEXT_LESSON": "Next Lesson",
     "I18N_PLAYER_NO_OBJECTIVE": "No objective specified.",
