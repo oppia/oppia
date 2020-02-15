@@ -148,8 +148,18 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             });
           };
 
+          function isExpression(answerString) {
+            var possibleSeparators = ['=', '<', '>'];
+            for (var i = 0; i < possibleSeparators.length; i++) {
+              if (answerString.includes(possibleSeparators[i])) {
+                return false;
+              }
+            }
+            return true;
+          }
+
           ctrl.getLatexErrorText = function() {
-            if (guppyInstance.latex().includes('=')) {
+            if (!isExpression(guppyInstance.latex())) {
               return $translate.instant('I18N_MATH_EXPRESSION_ERROR');
             }
             return '';
@@ -157,7 +167,7 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
 
           ctrl.isCurrentAnswerValid = function() {
             var latexAnswer = guppyInstance.latex();
-            if (latexAnswer.includes('=')) {
+            if (!isExpression(latexAnswer)) {
               return false;
             }
             try {

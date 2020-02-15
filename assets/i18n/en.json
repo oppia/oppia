@@ -342,7 +342,7 @@
     "I18N_LIBRARY_SUB_HEADER": "Begin your adventure by browsing our explorations.",
     "I18N_LIBRARY_VIEWS_TOOLTIP": "Views",
     "I18N_LIBRARY_VIEW_ALL": "View all",
-    "I18N_MATH_EXPRESSION_ERROR": "Please enter a math expression instead of an equation. (Without the '=')",
+    "I18N_MATH_EXPRESSION_ERROR": "Please enter a math expression instead of an equation/inequality.",
     "I18N_MODAL_CANCEL_BUTTON": "Cancel",
     "I18N_MODAL_CONTINUE_BUTTON": "Continue",
     "I18N_ONE_SUBSCRIBER_TEXT": "You have 1 subscriber.",
