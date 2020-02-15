@@ -18,38 +18,52 @@
 import { TestBed } from '@angular/core/testing';
 import { WindowDimensionsService } from
   'services/contextual/window-dimensions.service';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 describe('Window Dimensions Service', () => {
-  let wds;
+  let wds, wr;
 
   beforeEach(() => {
     wds = TestBed.get(WindowDimensionsService);
+    wr = TestBed.get(WindowRef);
+
+    // This approach was choosen because spyOn() doesn't work on properties
+    // that doesn't have a get access type.
+    // Without this approach the test will fail because it'll throw
+    // 'Property innerWidth does not have access type get' error.
+    // eslint-disable-next-line max-len
+    // ref: https://developer.mozilla.org/pt-BR/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty
+    // ref: https://github.com/jasmine/jasmine/issues/1415
+    Object.defineProperty(wr.nativeWindow, 'innerWidth', {
+      get: () => undefined
+    });
   });
 
   describe('getWidth', () => {
     it('should get window width by innerWidth', () => {
-      spyOnProperty(window, 'innerWidth').and.returnValue(1000);
+      spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(1000);
       expect(wds.getWidth()).toEqual(1000);
     });
 
     it('should get window width by clientWidth', () => {
-      spyOnProperty(window, 'innerWidth').and.returnValue(null);
-      spyOnProperty(window.document.documentElement, 'clientWidth').and
-        .returnValue(1000);
+      spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(null);
+      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth')
+        .and.returnValue(1000);
       expect(wds.getWidth()).toEqual(1000);
     });
 
     it('should get window width by document clientWidth', () => {
-      spyOnProperty(window, 'innerWidth').and.returnValue(null);
-      spyOnProperty(window.document.documentElement, 'clientWidth').and
-        .returnValue(null);
-      spyOnProperty(document.body, 'clientWidth').and.returnValue(1000);
+      spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(null);
+      spyOnProperty(wr.nativeWindow.document.documentElement, 'clientWidth')
+        .and.returnValue(null);
+      spyOnProperty(wr.nativeWindow.document.body, 'clientWidth')
+        .and.returnValue(1000);
       expect(wds.getWidth()).toEqual(1000);
     });
   });
 
   it('should check if window is narrow', () => {
-    spyOnProperty(window, 'innerWidth').and.returnValue(668);
+    spyOnProperty(wr.nativeWindow, 'innerWidth').and.returnValue(668);
 
     expect(wds.isWindowNarrow()).toBe(true);
   });

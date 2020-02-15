@@ -20,14 +20,14 @@ Usage: Run this script from your oppia root folder:
 
 For release branch:
 
-    python -m scripts.cut_release_or_hotfix_branch --version="x.y.z"
+    python -m scripts.cut_release_or_hotfix_branch --release_version="x.y.z"
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3. The generated branch
 name will be release-x.y.z, e.g. release-2.5.3.
 
 For hotfix branch:
 
-    python -m scripts.cut_release_or_hotfix_branch --version="x.y.z"
+    python -m scripts.cut_release_or_hotfix_branch --release_version="x.y.z"
     --hotfix_number=d
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3,
@@ -49,30 +49,35 @@ import release_constants
 from scripts import common
 
 
-def new_version_type(arg, pattern=re.compile(r'\d\.\d\.\d')):
-    """Checks that the new version name matches the expected pattern.
+def require_release_version_to_have_correct_format(
+        arg, pattern=re.compile(r'\d\.\d\.\d')):
+    """Checks that the release version name matches the expected pattern.
 
     Args:
-        arg: str. The new version name.
+        arg: str. The release version name.
         pattern: RegularExpression. The pattern that release version should
             match.
 
     Raises:
-        argparse.ArgumentTypeError: The new version name does not match
+        argparse.ArgumentTypeError: The release version name does not match
             the pattern.
 
     Returns:
-        str. The new version name with correct pattern.
+        str. The release version name with correct pattern.
     """
     if not pattern.match(arg):
         raise argparse.ArgumentTypeError(
-            'The format of "new_version" should be: x.x.x')
+            'The format of "release_version" should be: x.x.x')
     return arg
 
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
-    '--new_version', help='new version to be released', type=new_version_type)
+    '--release_version',
+    help=(
+        'version of the release for which the branch cut is being made or the '
+        'hotfix is being created'),
+    type=require_release_version_to_have_correct_format)
 _PARSER.add_argument('--hotfix_number', default=0)
 
 
@@ -177,11 +182,11 @@ def verify_hotfix_number_is_one_ahead_of_previous_hotfix_number(
 
     last_hotfix_number = 0
     release_branch_exists = False
-    hotfix_branch_name_regex = '^%s/release-%s-hotfix-\\d*$' % (
+    hotfix_branch_name_regex = '^remotes/%s/release-%s-hotfix-\\d*$' % (
         remote_alias, target_version)
     for branch_name in all_branches:
         branch_name = branch_name.lstrip().rstrip()
-        if branch_name == '%s/release-%s' % (
+        if branch_name == 'remotes/%s/release-%s' % (
                 remote_alias, target_version):
             release_branch_exists = True
         if re.match(hotfix_branch_name_regex, branch_name):
@@ -225,10 +230,10 @@ def execute_branch_cut():
     """Pushes the new release branch to Github."""
 
     parsed_args = _PARSER.parse_args()
-    if parsed_args.new_version:
-        target_version = parsed_args.new_version
+    if parsed_args.release_version:
+        target_version = parsed_args.release_version
     else:
-        raise Exception('ERROR: A "new_version" arg must be specified.')
+        raise Exception('ERROR: A "release_version" arg must be specified.')
 
     # Construct the new branch name.
     hotfix_number = int(parsed_args.hotfix_number)
@@ -250,10 +255,10 @@ def execute_branch_cut():
 
     verify_target_branch_does_not_already_exist(remote_alias, new_branch_name)
 
-    # The release coordinator should verify that tests are passing on develop
-    # before checking out the release branch.
+    # The release coordinator should verify that tests are passing on the parent
+    # branch before checking out the new branch.
     common.open_new_tab_in_browser_if_possible(
-        'https://github.com/oppia/oppia#oppia----')
+        'https://travis-ci.org/oppia/oppia/branches')
     while True:
         if not hotfix_number:
             branch_to_check = 'develop'
