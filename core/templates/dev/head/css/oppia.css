@@ -875,7 +875,8 @@ textarea {
 .dropdown-menu {
   padding: 5px 0;
   margin: 2px 0 0;
-  max-width: 220px;
+  margin-left: 10px;
+  max-width: 700px;
   min-width: 160px;
   font-size: 14px;
   -webkit-background-clip: padding-box;

@@ -24,7 +24,7 @@
       <[$ctrl.categoryButtonText|truncate:14]>
     </button>
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-    <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu" role="menu" style="max-height: 400px;overflow: auto;" ng-click="$event.stopPropagation()">
+    <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
       <li ng-repeat="item in $ctrl.selectionDetails.categories.masterList track by $index"
           ng-if="$ctrl.selectionDetails.categories.selections[item.id]">
         <a href="" ng-click="$ctrl.toggleSelection('categories', item.id)" ng-if="!$first && !$last" class="dropdown-item">
@@ -233,7 +233,7 @@
     }
     .oppia-search-bar-category-selector {
       margin-top: 27px;
-      left: -12px;
+      left: -13px;
       position: relative;
       display: block;
     }
@@ -245,6 +245,9 @@
       width: 271px;
       border-bottom-left-radius: 4px;
       border-top-left-radius: 4px;
+    }
+    .oppia-search-bar-dropdown-menu{
+      width: 270px;
     }
   }
 </style>
