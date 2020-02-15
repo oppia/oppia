@@ -208,6 +208,7 @@ class ProfilePictureHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    REDIRECT_DELETED_USERS = False
 
     @acl_decorators.can_manage_own_profile
     def get(self):
@@ -410,11 +411,28 @@ class UserInfoHandler(base.BaseHandler):
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    REDIRECT_DELETED_USERS = False
 
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        if self.username:
+        if self.user_is_scheduled_for_deletion:
+            user_settings = user_services.get_user_settings_by_gae_id(
+                self.gae_id, strict=False)
+            self.render_json({
+                'is_moderator': False,
+                'is_admin': False,
+                'is_super_admin': False,
+                'is_topic_manager': False,
+                'can_create_collections': False,
+                'preferred_site_language_code': (
+                    user_settings.preferred_site_language_code),
+                'username': user_settings.username,
+                'email': user_services.get_email_from_username(
+                    user_settings.username),
+                'user_is_logged_in': True
+            })
+        elif self.username:
             user_actions = user_services.UserActionsInfo(self.user_id).actions
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)

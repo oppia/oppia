@@ -84,7 +84,6 @@ class LogoutPage(webapp2.RequestHandler):
         url_to_redirect_to = (
             python_utils.convert_to_bytes(
                 self.request.get('redirect_url', '/')))
-        self.request.referrer = self.request.uri
         self.redirect(url_to_redirect_to)
 
 
@@ -216,7 +215,9 @@ class BaseHandler(webapp2.RequestHandler):
         if self.REDIRECT_DELETED_USERS and self.user_is_scheduled_for_deletion:
             return self.redirect(feconf.PENDING_ACCOUNT_DELETION_URL)
 
-        if (self.request.referrer and
+        if (self.REDIRECT_DELETED_USERS and
+                self.request.referrer and
+                self.user_id and
                 self.request.referrer.endswith(
                     feconf.PENDING_ACCOUNT_DELETION_URL)):
             return self.redirect('/logout?redirect_url=%s' % self.request.uri)
