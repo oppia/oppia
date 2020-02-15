@@ -658,7 +658,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Solution explanation'
                     }
                 },
-                'id': 'TextInput'
+                'id': 'SetInput'
             },
             'param_changes': [],
             'solicit_answer_details': False,
