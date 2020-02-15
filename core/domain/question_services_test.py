@@ -610,7 +610,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                 'rule_type': 'Contains'
             }],
             'training_data': [],
-            'tagged_misconception_id': None
+            'tagged_skill_misconception_id': None
         }
         question_state_dict = {
             'content': {
@@ -670,7 +670,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             language_code='en',
             version=0,
             linked_skill_ids=['skill_id'],
-            question_state_data_schema_version=29)
+            question_state_data_schema_version=30)
         commit_cmd = question_domain.QuestionChange({
             'cmd': question_domain.CMD_CREATE_NEW
         })
