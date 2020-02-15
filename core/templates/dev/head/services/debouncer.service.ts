@@ -33,7 +33,7 @@ export class DebouncerService {
     let timestamp;
     let result;
 
-    let later = () => {
+    const later = () => {
       let last = new Date().getTime() - timestamp;
       if (last < millisecsToWait) {
         timeout = setTimeout(later, millisecsToWait - last);
