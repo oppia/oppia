@@ -163,7 +163,7 @@ def generate_app_yaml(deploy_mode=False):
                 file_path,
                 prod_file_prefix + file_path)
     # The version: default line is required to run jobs on a local server (
-    # both in prod & non-prod mode). This line is not required when app.yaml
+    # both in prod & non-prod env). This line is not required when app.yaml
     # is generated during deployment. So, we remove this if the build process
     # is being run from the deploy script.
     if deploy_mode:
@@ -1259,7 +1259,7 @@ def main(args=None):
     # build process once third party libs are minified.
     if options.minify_third_party_libs_only and not options.prod_env:
         raise Exception(
-            'minify_third_party_libs_only should not be set in non-prod mode.')
+            'minify_third_party_libs_only should not be set in non-prod env.')
     if options.prod_env:
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         if not options.minify_third_party_libs_only:
