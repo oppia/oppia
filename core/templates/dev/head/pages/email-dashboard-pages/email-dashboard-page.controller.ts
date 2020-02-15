@@ -55,6 +55,9 @@ angular.module('oppia').directive('emailDashboardPage', [
             };
             EmailDashboardDataService.submitQuery(data).then(function(queries) {
               ctrl.currentPageOfQueries = queries;
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular
+              $rootScope.$apply();
             });
             ctrl.resetForm();
             ctrl.showSuccessMessage = true;
@@ -65,6 +68,9 @@ angular.module('oppia').directive('emailDashboardPage', [
               EmailDashboardDataService.getNextQueries().then(
                 function(queries) {
                   ctrl.currentPageOfQueries = queries;
+                  // TODO(#8521): Remove the use of $rootScope.$apply()
+                  // once the directive is migrated to angular
+                  $rootScope.$apply();
                 });
             }
           };
@@ -88,6 +94,9 @@ angular.module('oppia').directive('emailDashboardPage', [
             var queryId = ctrl.currentPageOfQueries[index].id;
             EmailDashboardDataService.fetchQuery(queryId).then(function(query) {
               ctrl.currentPageOfQueries[index] = query;
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular
+              $rootScope.$apply();
             });
           };
 
@@ -106,6 +115,9 @@ angular.module('oppia').directive('emailDashboardPage', [
             ctrl.currentPageOfQueries = [];
             EmailDashboardDataService.getNextQueries().then(function(queries) {
               ctrl.currentPageOfQueries = queries;
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular
+              $rootScope.$apply();
             });
           };
         }
