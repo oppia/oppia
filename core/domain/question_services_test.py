@@ -605,9 +605,9 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             },
             'rule_specs': [{
                 'inputs': {
-                    'x': 'Test'
+                    'x': ['A', 'B', 'C']
                 },
-                'rule_type': 'Contains'
+                'rule_type': 'HasElementsIn'
             }],
             'training_data': [],
             'tagged_skill_misconception_id': None
@@ -650,14 +650,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
                         'html': 'Hint 1'
                     }
                 }],
-                'solution': {
-                    'correct_answer': 'This is the correct answer',
-                    'answer_is_exclusive': False,
-                    'explanation': {
-                        'content_id': 'explanation_1',
-                        'html': 'Solution explanation'
-                    }
-                },
+                'solution': {},
                 'id': 'SetInput'
             },
             'param_changes': [],
