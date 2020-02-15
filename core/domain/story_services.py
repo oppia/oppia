@@ -201,30 +201,56 @@ def _save_story(committer_id, story, commit_message, change_list):
     story.validate()
     # Validate that all explorations referenced by the story exist.
     exp_ids = []
+
+    # Any exp ID in the story to compare categories later on.
+    exp_id = None
     for node in story.story_contents.nodes:
         if node.exploration_id is not None:
             exp_ids.append(node.exploration_id)
-    exp_summaries = (
-        exp_fetchers.get_exploration_summaries_matching_ids(exp_ids))
+            if exp_id is None:
+                exp_id = node.exploration_id
 
-    exp_summaries_dict = {
-        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
-    }
+    # Strict = False, since the existence of explorations is checked below.
+    exps_dict = (
+        exp_fetchers.get_multiple_explorations_by_id(exp_ids, strict=False))
+
     for node in story.story_contents.nodes:
         if (node.exploration_id is not None) and (
-                not exp_summaries_dict[node.exploration_id]):
+                node.exploration_id not in exps_dict):
             raise utils.ValidationError(
                 'Expected story to only reference valid explorations, '
                 'but found an exploration with ID: %s (was it deleted?)' %
                 node.exploration_id)
 
-    if exp_summaries:
-        common_exp_category = exp_summaries[0].category
-        for summary in exp_summaries:
-            if summary.category != common_exp_category:
+    valid_interaction_ids = [
+        'Continue', 'EndExploration', 'NumericInput', 'TextInput',
+        'FractionInput', 'NumberWithUnits', 'MultipleChoiceInput',
+        'ItemSelectionInput']
+    if exps_dict:
+        common_exp_category = exps_dict[exp_id].category
+        for exp_id in exps_dict:
+            exp = exps_dict[exp_id]
+            if exp.category != common_exp_category:
                 raise utils.ValidationError(
                     'All explorations in a story should be of the '
                     'same category.')
+            if exp.language_code != 'en':
+                raise utils.ValidationError(
+                    'All explorations in a story should be in English.')
+            if exp.param_specs or exp.param_changes:
+                raise utils.ValidationError(
+                    'Expected no exploration to have parameter values in'
+                    ' it. Invalid exploration: %s' % exp.id)
+            for state_name in exp.states:
+                state = exp.states[state_name]
+                if (
+                        state.interaction.id and
+                        state.interaction.id not in valid_interaction_ids):
+                    raise utils.ValidationError(
+                        'Expected explorations to only have the following '
+                        'interactions: %s. Invalid exploration: %s' %
+                        (valid_interaction_ids, exp.id))
+
 
     # Story model cannot be None as story is passed as parameter here and that
     # is only possible if a story model with that story id exists. Also this is

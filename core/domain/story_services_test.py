@@ -19,6 +19,9 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import logging
 
+from core.domain import exp_domain
+from core.domain import exp_services
+from core.domain import param_domain
 from core.domain import story_domain
 from core.domain import story_fetchers
 from core.domain import story_services
@@ -489,6 +492,89 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'All explorations in a story should be of the '
             'same category'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_cannot_update_story_with_exps_with_other_languages(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            language_code='es')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'All explorations in a story should be in English'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_cannot_update_story_with_exps_with_invalid_interactions(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            interaction_id='LogicProof')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        valid_interaction_ids = [
+            'Continue', 'EndExploration', 'NumericInput', 'TextInput',
+            'FractionInput', 'NumberWithUnits', 'MultipleChoiceInput',
+            'ItemSelectionInput']
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected explorations to only have the following '
+            'interactions'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+    def test_cannot_update_story_with_exps_with_parameter_values(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1',
+            interaction_id='LogicProof')
+        exp_services.update_exploration(
+            self.user_id_a, 'exp_id_1', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'theParameter':
+                        param_domain.ParamSpec('UnicodeString').to_dict()
+                }
+            })],
+            '')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected no exploration to have parameter values in'
+            ' it. Invalid exploration: exp_id_1'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
