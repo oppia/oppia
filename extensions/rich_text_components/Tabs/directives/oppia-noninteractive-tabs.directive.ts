@@ -22,18 +22,16 @@
 
 require('directives/angular-html-bind.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveTabs', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService',
+  function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Tabs/directives/tabs.directive.html'),
+      template: require('./tabs.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

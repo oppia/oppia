@@ -38,8 +38,7 @@ angular.module('oppia').directive('oppiaNoninteractiveImage', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Image/directives/image.directive.html'),
+      template: require('./image.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;

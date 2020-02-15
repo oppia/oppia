@@ -22,18 +22,16 @@
 
 require('directives/mathjax-bind.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveMath', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService',
+  function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Math/directives/math.directive.html'),
+      template: require('./math.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
