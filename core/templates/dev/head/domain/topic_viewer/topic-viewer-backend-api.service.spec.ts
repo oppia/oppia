@@ -16,35 +16,25 @@
  * @fileoverview Unit tests for TopicViewerBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
 
-describe('Topic viewer backend API service', function() {
-  var TopicViewerBackendApiService = null;
-  var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
-  var UndoRedoService = null;
+describe('Topic viewer backend API service', () => {
+  let topicViewerBackendApiService:
+    TopicViewerBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let sampleDataResults = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    TopicViewerBackendApiService = $injector.get(
-      'TopicViewerBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+    httpTestingController = TestBed.get(HttpTestingController);
+    topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
 
     // Sample topic object returnable from the backend
     sampleDataResults = {
@@ -74,26 +64,27 @@ describe('Topic viewer backend API service', function() {
         skill_id_2: 'Skill Description 2'
       }
     };
-  }));
+  });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing topic from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-
-      $httpBackend.expect('GET', '/topic_data_handler/0').respond(
-        sampleDataResults);
-      TopicViewerBackendApiService.fetchTopicData('0').then(
+      topicViewerBackendApiService.fetchTopicData('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(
+        '/topic_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 });
