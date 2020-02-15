@@ -26,7 +26,7 @@ oppia.directive('oppiaNoninteractiveLink', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Link/directives/link_directive.html'),
+        '/rich-text-components/Link/directives/link-directive.html'),
       controller: [
         '$scope', '$attrs', 'explorationContextService',
         function($scope, $attrs, explorationContextService) {
