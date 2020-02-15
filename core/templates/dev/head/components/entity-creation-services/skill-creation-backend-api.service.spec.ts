@@ -58,8 +58,8 @@ fdescribe('Skill Creation backend service', function() {
   }));
 
   afterEach(function() {
-    // $httpBackend.verifyNoOutstandingExpectation();
-    // $httpBackend.verifyNoOutstandingRequest();
+    $httpBackend.verifyNoOutstandingExpectation();
+    $httpBackend.verifyNoOutstandingRequest();
   });
 
   it('should successfully create a new skill and obtain the skill ID',
@@ -67,12 +67,12 @@ fdescribe('Skill Creation backend service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('POST', '/skill_editor_handler/create_new',postData).respond(
-        SUCCESS_STATUS_CODE,SAMPLE_SKILL_ID);
+      $httpBackend.expect('POST', '/skill_editor_handler/create_new', postData).respond(
+        200);
       SkillCreationBackendService.createSkill('test_des_1',rubricDict,'explaination',['test_id_11']).then(
-        successHandler, );
+        successHandler);
 
-      $httpBackend.flush();
+      //$httpBackend.flush();
       $rootScope.$apply();
 
       expect(successHandler).toHaveBeenCalled();
@@ -86,7 +86,7 @@ fdescribe('Skill Creation backend service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect('POST','/skill_editor_handler/create_new',postData).respond(
-        ERROR_STATUS_CODE);
+        404);
       SkillCreationBackendService.createSkill('test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
         successHandler, failHandler);
       // $httpBackend.flush();
