@@ -816,7 +816,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: <p>Math Expression Input. Provide a formula for calculating the area
+      html: <p>Math Expression Input. Provide the formula for calculating the area
         of a circle with radius = r.</p>
     content_ids_to_audio_translations:
       content: {}
@@ -846,7 +846,7 @@ states:
         dest: Math Expression Input
         feedback:
           content_id: default_outcome
-          html: <p>That is not how the area of a circle can be calculated. Try again.</p>
+          html: <p>That is not how the area of a circle is calculated. Try again.</p>
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
         param_changes: []
