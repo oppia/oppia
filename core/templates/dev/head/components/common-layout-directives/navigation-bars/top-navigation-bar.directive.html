@@ -15,14 +15,6 @@
            ng-class="$ctrl.windowIsNarrow ? 'oppia-logo-small' : 'oppia-logo-wide'" alt="Oppia Home">
     </picture>
   </a>
-  <!-- This is needed for the correct image to appear when an exploration is shared using G+. -->
-  <a style="display: none;">
-    <picture>
-      <source type="image/webp" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_mint.webp')]>">
-      <source type="image/png" ng-srcset="<[getStaticImageUrl('/logo/288x128_logo_mint.png')]>">
-      <img ng-src="<[$ctrl.getStaticImageUrl('/logo/288x128_logo_mint.png')]>" itemprop="image" alt="Oppia Home">
-    </picture>
-  </a>
 </div>
 
 <div ng-cloak class="float-right navbar-header" ng-if="$ctrl.userMenuIsShown">
