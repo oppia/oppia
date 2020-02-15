@@ -18,45 +18,6 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-import { Injectable } from "@angular/core";
-import { UrlInterpolationService } from "domain/utilities/url-interpolation.service";
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { throwError } from "rxjs";
-
-
-
-@Injectable({
-  providedIn: 'root'
-})
-export class SkillRightsBackendApiService {
-
-  headers = new HttpHeaders().set('Content-Type', 'application/json');
-
-  constructor(
-    private urlInterpolationService : UrlInterpolationService,
-    private http: HttpClient){
-  }
-  fetchSkillRights(skillId){
-    let skillRightsUrl = this.urlInterpolationService.interpolateUrl(
-      SKILL_RIGHTS_URL_TEMPLATE, {
-        skill_id: skillId
-      });
-    this.http.get()
-  }
-  error(error: HttpErrorResponse) {
-    let errorMessage = '';
-    if (error.error instanceof ErrorEvent) {
-      errorMessage = error.error.message;
-    } else {
-      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-    }
-    return throwError(errorMessage);
-  }
-}
-
-
-
-
 
 angular.module('oppia').factory('SkillRightsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'SKILL_RIGHTS_URL_TEMPLATE',

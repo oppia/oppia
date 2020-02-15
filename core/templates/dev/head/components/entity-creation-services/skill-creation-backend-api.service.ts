@@ -27,7 +27,7 @@ angular.module('oppia').factory('SkillCreationBackendService', [
         explanation_dict: explanation,
         rubrics: rubrics
       };
-      $http.post('/skill_editor_handler/create_new', JSON.stringify(postData))
+      $http.post('/skill_editor_handler/create_new', postData)
         .then(function(response) {
           let skillId = response.data.skill_id;
           if (successCallback) {
@@ -35,7 +35,7 @@ angular.module('oppia').factory('SkillCreationBackendService', [
           }
         }, function(errorResponse) {
           if (errorCallback) {
-            errorCallback(errorResponse);
+            errorCallback(errorResponse.data);
           }
         });
     };

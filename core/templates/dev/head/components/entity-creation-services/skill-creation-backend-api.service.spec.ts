@@ -20,16 +20,15 @@
 require('components/entity-creation-services/skill-creation-backend-api.service.ts');
 
 import { UpgradedServices } from 'services/UpgradedServices';
+require('services/csrf-token.service.ts');
 
 fdescribe('Skill Creation backend service', function() {
   var SkillCreationBackendService = null;
   var $httpBackend = null;
   var $rootScope = null;
-  var SAMPLE_SKILL_ID = 'hyuy4GUlvTqJ';
-  var SUCCESS_STATUS_CODE = 200;
-  var ERROR_STATUS_CODE = 404;
   var rubricDict = null;
-  let postData = null
+  var CsrfService = null;
+
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -39,21 +38,22 @@ fdescribe('Skill Creation backend service', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     SkillCreationBackendService = $injector.get(
       'SkillCreationBackendService');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
 
     rubricDict = {
       difficulty: 'Easy',
       explanation: 'test explanation'
-    };
-    postData = {
-      description: 'test_des_1',
-      linked_topic_ids: ['test_id_11'],
-      explanation_dict: 'explaination',
-      rubrics: rubricDict
     };
   }));
 
@@ -63,36 +63,31 @@ fdescribe('Skill Creation backend service', function() {
   });
 
   it('should successfully create a new skill and obtain the skill ID',
-    (done) => {
+    () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('POST', '/skill_editor_handler/create_new', postData).respond(
-        200);
+      $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
+        200, {skill_id: 'hyuy4GUlvTqJ'});
       SkillCreationBackendService.createSkill('test_des_1',rubricDict,'explaination',['test_id_11']).then(
-        successHandler);
-
-      //$httpBackend.flush();
-      $rootScope.$apply();
-
-      expect(successHandler).toHaveBeenCalled();
+        successHandler, failHandler);
+      $httpBackend.flush();
+      expect(successHandler).toHaveBeenCalledWith('hyuy4GUlvTqJ');
       expect(failHandler).not.toHaveBeenCalled();
-      done();
     });
 
   it('should fail to create a new skill and call the fail handler',
-    (done) => {
+    () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('POST','/skill_editor_handler/create_new',postData).respond(
-        404);
+      $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
+        500, 'Error creating a new skill.');
       SkillCreationBackendService.createSkill('test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
         successHandler, failHandler);
-      // $httpBackend.flush();
-        $rootScope.$apply();
+      $httpBackend.flush();
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-      done();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error creating a new skill.');
     });
 });
