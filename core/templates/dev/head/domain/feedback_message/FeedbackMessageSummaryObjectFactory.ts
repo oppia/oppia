@@ -46,7 +46,6 @@ export class FeedbackMessageSummary {
     this.createdOn = createdOn;
   }
 }
-
 @Injectable({
   providedIn: 'root'
 })
@@ -58,22 +57,20 @@ export class FeedbackMessageSummaryObjectFactory {
       newMessageId, newMessageText, null, null, null, null, authorUsername,
       authorPictureDataUrl, new Date());
   }
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'feedbackMessageSummaryBackendDict' is a dict with
-  // underscore_cased keys which give tslint errors against underscore_casing
-  // in favor of camelCasing.
+
   createFromBackendDict(
-      feedbackMessageSummaryBackendDict: any): FeedbackMessageSummary {
+      feedbackMessageSummaryBackendDict:
+      FeedbackMessageSummary): FeedbackMessageSummary {
     return new FeedbackMessageSummary(
-      feedbackMessageSummaryBackendDict.message_id,
+      feedbackMessageSummaryBackendDict.messageId,
       feedbackMessageSummaryBackendDict.text,
-      feedbackMessageSummaryBackendDict.updated_status,
-      feedbackMessageSummaryBackendDict.suggestion_html,
-      feedbackMessageSummaryBackendDict.current_content_html,
+      feedbackMessageSummaryBackendDict.updatedStatus,
+      feedbackMessageSummaryBackendDict.suggestionHtml,
+      feedbackMessageSummaryBackendDict.currentContentHtml,
       feedbackMessageSummaryBackendDict.description,
-      feedbackMessageSummaryBackendDict.author_username,
-      feedbackMessageSummaryBackendDict.author_picture_data_url,
-      feedbackMessageSummaryBackendDict.created_on);
+      feedbackMessageSummaryBackendDict.authorUsername,
+      feedbackMessageSummaryBackendDict.authorPictureDataUrl,
+      feedbackMessageSummaryBackendDict.createdOn);
   }
 }
 
