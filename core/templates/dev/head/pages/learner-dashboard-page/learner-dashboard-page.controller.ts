@@ -62,7 +62,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
         'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
         'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
         'FeedbackThreadSummaryObjectFactory',
-        'ObjectFactory',
+        'FeedbackMessageSummaryObjectFactory',
         'SuggestionModalForLearnerDashboardService', 'UserService',
         function(
             $scope, $rootScope, $q, $window, $http, $uibModal,
@@ -74,7 +74,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
             LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
             DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
             FeedbackThreadSummaryObjectFactory,
-            ObjectFactory,
+            FeedbackMessageSummaryObjectFactory,
             SuggestionModalForLearnerDashboardService, UserService) {
           var ctrl = this;
           var threadIndex = null;
@@ -305,7 +305,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               ctrl.messageSummaries = [];
               for (index = 0; index < messageSummaryDicts.length; index++) {
                 ctrl.messageSummaries.push(
-                  ObjectFactory.createFromBackendDict(
+                  FeedbackMessageSummaryObjectFactory.createFromBackendDict(
                     messageSummaryDicts[index]));
               }
               ctrl.loadingFeedbacks = false;
@@ -335,7 +335,7 @@ angular.module('oppia').directive('learnerDashboardPage', [
               ctrl.messageSendingInProgress = false;
               ctrl.newMessage.text = null;
               var newMessageSummary = (
-                ObjectFactory.createNewMessage(
+                FeedbackMessageSummaryObjectFactory.createNewMessage(
                   ctrl.threadSummary.totalMessageCount, newMessage,
                   ctrl.username, ctrl.profilePictureDataUrl));
               ctrl.messageSummaries.push(newMessageSummary);
