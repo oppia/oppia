@@ -71,35 +71,35 @@ angular.module('oppia').controller('Base', [
 
       CsrfTokenService.initializeToken();
       MetaTagCustomizationService.addMetaTags([
-        // {
-        //   propertyType: 'name',
-        //   propertyValue: 'application-name',
-        //   content: SITE_NAME
-        // },
-        // {
-        //   propertyType: 'name',
-        //   propertyValue: 'msapplication-square310x310logo',
-        //   content: $scope.getAssetUrl(
-        //     '/assets/images/logo/msapplication-large.png')
-        // },
-        // {
-        //   propertyType: 'name',
-        //   propertyValue: 'msapplication-wide310x150logo',
-        //   content: $scope.getAssetUrl(
-        //     '/assets/images/logo/msapplication-wide.png')
-        // },
-        // {
-        //   propertyType: 'name',
-        //   propertyValue: 'msapplication-square150x150logo',
-        //   content: $scope.getAssetUrl(
-        //     '/assets/images/logo/msapplication-square.png')
-        // },
-        // {
-        //   propertyType: 'name',
-        //   propertyValue: 'msapplication-square70x70logo',
-        //   content: $scope.getAssetUrl(
-        //     '/assets/images/logo/msapplication-tiny.png')
-        // },
+        {
+          propertyType: 'name',
+          propertyValue: 'application-name',
+          content: SITE_NAME
+        },
+        {
+          propertyType: 'name',
+          propertyValue: 'msapplication-square310x310logo',
+          content: $scope.getAssetUrl(
+            '/assets/images/logo/msapplication-large.png')
+        },
+        {
+          propertyType: 'name',
+          propertyValue: 'msapplication-wide310x150logo',
+          content: $scope.getAssetUrl(
+            '/assets/images/logo/msapplication-wide.png')
+        },
+        {
+          propertyType: 'name',
+          propertyValue: 'msapplication-square150x150logo',
+          content: $scope.getAssetUrl(
+            '/assets/images/logo/msapplication-square.png')
+        },
+        {
+          propertyType: 'name',
+          propertyValue: 'msapplication-square70x70logo',
+          content: $scope.getAssetUrl(
+            '/assets/images/logo/msapplication-tiny.png')
+        },
         {
           propertyType: 'property',
           propertyValue: 'og:url',
