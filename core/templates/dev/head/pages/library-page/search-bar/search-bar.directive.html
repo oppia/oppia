@@ -1,7 +1,7 @@
 <div class="oppia-same-row-container">
   <form class="navbar-form float-left oppia-search-bar-form" role="search">
     <div class="form-group">
-      <div class="input-group" style="max-width: 375px; width: 17em;">
+      <div class="input-group oppia-search-bar" style="max-width: 375px; width: 17em;">
         <div class="input-group-addon oppia-search-bar-icon">
           <i class="material-icons md-18" ng-if="!$ctrl.isSearchInProgress()">&#xE8B6;</i>
           <span ng-if="$ctrl.isSearchInProgress()">
@@ -16,6 +16,10 @@
   </form>
 </div>
 
+
+
+
+
 <div class="oppia-same-row-container">
   <div ng-class="{'open' : $ctrl.activeMenuName === 'category', 'dropup' : $ctrl.enableDropup()}" uib-dropdown class="float-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector">
     <button ng-click="$ctrl.openSubmenu($event, 'category')" ng-keydown="$ctrl.onMenuKeypress($event, 'category', {shiftTab: $ctrl.ACTION_CLOSE, enter: $ctrl.ACTION_OPEN})" uib-dropdown-toggle type="button" class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input ng-cloak dropdown-toggle"
@@ -24,7 +28,7 @@
       <[$ctrl.categoryButtonText|truncate:14]>
     </button>
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
-    <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
+    <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu oppia-search-bar-dropdown-menu" role="menu" style="max-height: 400px;overflow: auto;" ng-click="$event.stopPropagation()">
       <li ng-repeat="item in $ctrl.selectionDetails.categories.masterList track by $index"
           ng-if="$ctrl.selectionDetails.categories.selections[item.id]">
         <a href="" ng-click="$ctrl.toggleSelection('categories', item.id)" ng-if="!$first && !$last" class="dropdown-item">
@@ -138,6 +142,9 @@
     color: #fff;
   }
 
+
+
+
   .oppia-search-bar-input.btn:focus {
     outline: 1px dotted #fff;
     outline: auto 5px -webkit-focus-ring-color;
@@ -210,6 +217,8 @@
     }
   }
 
+
+
   .oppia-search-bar-input:focus {
     border-color: #66afe9;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
@@ -223,7 +232,7 @@
       border-top-right-radius: 4px;
     }
     .oppia-search-bar-category-selector {
-      display: none;
+      margin-top: 45px;
     }
   }
   /* This rule targets only Firefox browsers. */
@@ -234,4 +243,21 @@
     }
   }
 
+
+  @media (max-width: 740px) {
+    .oppia-search-bar {
+      right: 19px;
+      position: relative; 
+    }
+    .oppia-search-bar-category-selector{
+      margin-top: 27px;
+      left: 29px;
+      position: relative;
+      display: block;
+    }
+    .oppia-same-row-container{
+      clear: both;
+      width: 250px;
+    }
+  }
 </style>
