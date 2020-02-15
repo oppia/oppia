@@ -49,7 +49,10 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
     };
 
     var _postMessage = function(buffer) {
-      mp3Worker.postMessage({cmd: 'encode', buf: buffer});
+      // Ensure the mp3Worker is available when this is run.
+      if (mp3Worker) {
+        mp3Worker.postMessage({cmd: 'encode', buf: buffer});
+      }
     };
 
     var _stopWorker = function() {
@@ -91,7 +94,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
       processor.connect(definedAudioContext.destination);
     };
 
-    // Convert directly from mic to mp3.
+    // Convert directly from mic input to mp3.
     var _onAudioProcess = function(event) {
       var array = event.inputBuffer.getChannelData(0);
       _postMessage(array);
@@ -102,7 +105,7 @@ angular.module('oppia').factory('VoiceoverRecordingService', [
     };
 
     var _stopRecord = function() {
-      if (microphone && processor) {
+      if (microphone && processor && mp3Worker) {
         // Disconnect mic and processor and stop processing.
         microphone.disconnect();
         processor.disconnect();
