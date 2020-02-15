@@ -1480,22 +1480,6 @@ class RegenerateMissingV2StatsModelsOneOffJobTests(OneOffJobTestBase):
         output = self.run_one_off_job()
         self.assertEqual(output, [u'[u\'No change\', 1]'])
 
-    def test_job_yields_correct_message_when_missing_model_at_non_revert_commit(
-            self):
-        self.exp = exp_fetchers.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(self.exp.version, 5)
-
-        model_id = stats_models.ExplorationStatsModel.get_entity_id(
-            self.EXP_ID, 2)
-        model = stats_models.ExplorationStatsModel.get(model_id)
-        model.delete()
-
-        output = self.run_one_off_job()
-        self.assertEqual(
-            output,
-            [u'[u\'Missing model without revert commit\', [u\''
-             + self.EXP_ID + '\']]'])
-
     def test_job_cleans_up_stats_models_for_deleted_exps(self):
         exp_id_1 = 'EXP_ID_1'
         exp = self.save_new_valid_exploration(exp_id_1, 'owner_id')

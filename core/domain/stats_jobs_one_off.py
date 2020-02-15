@@ -1330,9 +1330,7 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                     inferred_change_list)
 
                 # If there are existing stats models for this version, which was
-                # incorrectly calculated before, we delete it. If it already
-                # doesn't exist, for the case when commit log entries are
-                # missing we don't raise an error.
+                # incorrectly calculated before, we delete it.
                 if all_models[version - 1] is not None:
                     all_models[version - 1].delete()
 
@@ -1348,16 +1346,11 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                     change_list)
 
                 # If there are existing stats models for this version, which was
-                # incorrectly calculated before, we delete it. If it already
-                # doesn't exist, we make sure that the commit_type is revert
-                # (this is the only case where we expect a missing model). If it
-                # is not a revert then we throw an error.
-                if all_models[version - 1] is None:
-                    if commit_log.commit_type != 'revert':
-                        yield ('Missing model without revert commit', exp.id)
-                        return
+                # incorrectly calculated before, we delete it.
+                if all_models[version - 1] is not None:
+                    all_models[version - 1].delete()
 
-                    # It is a revert commit, so we calculate stats accordingly.
+                if commit_log.commit_type == 'revert':
                     revert_to_version = (
                         commit_log.commit_cmds[0]['version_number'])
                     new_exp_stats_dicts.append(
@@ -1365,8 +1358,6 @@ class RegenerateMissingV2StatsModelsOneOffJob(
                             exp.id, version, exp_at_version.states, None,
                             revert_to_version).to_dict())
                 else:
-                    # The model already exists, so we delete it and recalculate.
-                    all_models[version - 1].delete()
                     new_exp_stats_dicts.append(
                         stats_services.get_stats_for_new_exp_version(
                             exp.id, version, exp_at_version.states,
