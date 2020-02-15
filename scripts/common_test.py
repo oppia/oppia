@@ -277,6 +277,20 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), False)
 
+    def test_is_current_branch_a_test_branch_with_test_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch test-common'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_test_branch(), True)
+
+    def test_is_current_branch_a_test_branch_with_non_test_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch invalid-test'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_test_branch(), False)
+
     def test_verify_current_branch_name_with_correct_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return 'On branch test'

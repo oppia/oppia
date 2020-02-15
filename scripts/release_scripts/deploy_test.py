@@ -160,6 +160,19 @@ class DeployTests(test_utils.GenericTestBase):
             Exception, 'Cannot use custom version with production app.'):
             deploy.execute_deployment()
 
+    def test_exception_is_raised_for_deploying_test_branch_to_prod(self):
+        args_swap = self.swap(
+            sys, 'argv', ['deploy.py', '--app_name=oppiaserver'])
+        def mock_get_branch():
+            return 'test-deploy'
+        get_branch_swap = self.swap(
+            common, 'get_current_branch_name', mock_get_branch)
+        with get_branch_swap, args_swap, self.install_swap:
+            with self.assertRaisesRegexp(
+                Exception,
+                'Test branch cannot be deployed to prod.'):
+                deploy.execute_deployment()
+
     def test_invalid_branch(self):
         def mock_get_branch():
             return 'invalid'
@@ -168,7 +181,8 @@ class DeployTests(test_utils.GenericTestBase):
         with get_branch_swap, self.args_swap, self.install_swap:
             with self.assertRaisesRegexp(
                 Exception,
-                'The deployment script must be run from a release branch.'):
+                'The deployment script must be run from a release '
+                'or test branch.'):
                 deploy.execute_deployment()
 
     def test_invalid_release_version(self):

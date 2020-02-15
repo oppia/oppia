@@ -58,6 +58,7 @@ PSUTIL_DIR = os.path.join(OPPIA_TOOLS_DIR, 'psutil-%s' % PSUTIL_VERSION)
 RELEASE_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)$'
 RELEASE_MAINTENANCE_BRANCH_REGEX = r'release-maintenance-(\d+\.\d+\.\d+)$'
 HOTFIX_BRANCH_REGEX = r'release-(\d+\.\d+\.\d+)-hotfix-[1-9]+$'
+TEST_BRANCH_REGEX = r'test-[A-Za-z0-9-]*$'
 
 
 def is_windows_os():
@@ -232,6 +233,16 @@ def is_current_branch_a_release_branch():
     hotfix_match = bool(
         re.match(HOTFIX_BRANCH_REGEX, current_branch_name))
     return release_match or release_maintenance_match or hotfix_match
+
+
+def is_current_branch_a_test_branch():
+    """Returns whether the current branch is a test branch for deployment.
+
+    Returns:
+        bool. Whether the current branch is a test branch for deployment.
+    """
+    current_branch_name = get_current_branch_name()
+    return bool(re.match(TEST_BRANCH_REGEX, current_branch_name))
 
 
 def verify_current_branch_name(expected_branch_name):
