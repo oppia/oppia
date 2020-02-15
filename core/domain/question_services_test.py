@@ -686,8 +686,8 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(question.question_state_data_schema_version, 31)
 
-        customization_args = question.question_state_data.interaction.customization_args
-        self.assertEqual(customization_args['buttonText']['value'], 'Add item')
+        cust_args = question.question_state_data.interaction.customization_args
+        self.assertEqual(cust_args['buttonText']['value'], 'Add item')
 
     def test_migrate_question_state_from_v29_to_v30(self):
         answer_group = {
