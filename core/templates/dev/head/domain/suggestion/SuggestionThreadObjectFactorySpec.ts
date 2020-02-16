@@ -146,7 +146,7 @@ describe('Suggestion thread object factory', () => {
       suggestionThread.setMessages(messages);
 
       expect(suggestionThread.messages).toEqual(messages);
-      expect(suggestionThread.messageCount).toEqual(2);
+      expect(suggestionThread.messageCount).toEqual(messages.length);
       expect(suggestionThread.lastNonemptyMessageSummary.authorUsername)
         .toEqual('author2');
       expect(suggestionThread.lastNonemptyMessageSummary.text)

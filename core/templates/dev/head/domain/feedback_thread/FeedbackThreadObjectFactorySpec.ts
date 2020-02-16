@@ -90,7 +90,7 @@ describe('Feedback thread object factory', () => {
       feedbackThread.setMessages(messages);
 
       expect(feedbackThread.messages).toEqual(messages);
-      expect(feedbackThread.messageCount).toEqual(2);
+      expect(feedbackThread.messageCount).toEqual(messages.length);
       expect(feedbackThread.lastNonemptyMessageSummary.authorUsername)
         .toEqual('author2');
       expect(feedbackThread.lastNonemptyMessageSummary.text)
