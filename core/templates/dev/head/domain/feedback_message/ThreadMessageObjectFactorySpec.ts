@@ -45,7 +45,7 @@ describe('Feedback thread object factory', () => {
       expect(threadMessage.entityType).toEqual('exploration');
       expect(threadMessage.entityId).toEqual('exploration.exp1.thread1');
       expect(threadMessage.messageId).toEqual(1);
-      expect(threadMessage.receivedViaEmail).toBe(false);
+      expect(threadMessage.receivedViaEmail).toEqual(false);
       expect(threadMessage.text).toEqual('message content');
       expect(threadMessage.updatedStatus).toBe(null);
       expect(threadMessage.updatedSubject).toBe(null);
@@ -88,7 +88,7 @@ describe('Feedback thread object factory', () => {
         updated_status: null
       });
 
-      expect(threadMessage.hasSubjectUpdate()).toBe(true);
+      expect(threadMessage.hasSubjectUpdate()).toEqual(true);
     });
 
     it('is true when text is empty string', () => {
@@ -105,7 +105,7 @@ describe('Feedback thread object factory', () => {
         updated_status: null
       });
 
-      expect(threadMessage.hasSubjectUpdate()).toBe(false);
+      expect(threadMessage.hasSubjectUpdate()).toEqual(false);
     });
   });
 
@@ -124,7 +124,7 @@ describe('Feedback thread object factory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.hasStatusUpdate()).toBe(true);
+      expect(threadMessage.hasStatusUpdate()).toEqual(true);
     });
 
     it('is true when text is empty string', () => {
@@ -141,7 +141,7 @@ describe('Feedback thread object factory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.hasStatusUpdate()).toBe(false);
+      expect(threadMessage.hasStatusUpdate()).toEqual(false);
     });
   });
 
@@ -160,7 +160,7 @@ describe('Feedback thread object factory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.isNonempty()).toBe(false);
+      expect(threadMessage.isNonempty()).toEqual(false);
     });
 
     it('is true when text is empty string', () => {
@@ -177,7 +177,7 @@ describe('Feedback thread object factory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.isNonempty()).toBe(true);
+      expect(threadMessage.isNonempty()).toEqual(true);
     });
   });
 });

@@ -41,14 +41,14 @@ describe('Feedback thread object factory', () => {
       var threadMessageSummary = factory.createFromBackendDict(
         { text: 'nonempty!', author_username: 'author' });
 
-      expect(threadMessageSummary.isNonempty()).toBe(false);
+      expect(threadMessageSummary.isNonempty()).toEqual(false);
     });
 
     it('is true when text is empty string', () => {
       var threadMessageSummary = factory.createFromBackendDict(
         { text: '', author_username: 'author' });
 
-      expect(threadMessageSummary.isNonempty()).toBe(true);
+      expect(threadMessageSummary.isNonempty()).toEqual(true);
     });
   });
 });
