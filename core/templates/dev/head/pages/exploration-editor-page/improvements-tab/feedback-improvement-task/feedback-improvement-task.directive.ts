@@ -39,7 +39,7 @@ angular.module('oppia').directive('feedbackImprovementTask', [
 
           $scope.getLastNonemptyMessageText = function() {
             return $scope.getData().lastNonemptyMessageSummary.text ||
-              $scope.getData().subject;
+              $scope.getData().summary || $scope.getData().subject;
           };
         }
       ]
