@@ -38,6 +38,15 @@ CUSTOMIZATION OPTIONS
 4.  To lint files in verbose mode
         python -m scripts.pre_commit_linter --verbose
 
+5. To lint all file extensions or to lint just a specific file extension
+        python -m scripts.pre_commit_linter --only-check-file-extensions
+        extension_type
+
+6. To lint a specific list of file extensions (*.js/*.py only). Seperate files
+    extensions by spaces
+        python -m scripts.pre_commit_linter --only-check-file-extensions
+        extension_1 extension_2 ... extension_n
+
 Note that the root folder MUST be named 'oppia'.
  """
 
@@ -84,6 +93,11 @@ _PARSER.add_argument(
     '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
+_EXCLUSIVE_GROUP.add_argument(
+    '--only-check-file-extensions',
+    nargs='+',
+    help='specific file extensions to be linted. Space separated list',
+    action='store')
 
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
@@ -667,7 +681,7 @@ class FileCache(python_utils.OBJECT):
 
 def _lint_all_files(
         js_filepaths, ts_filepaths, py_filepaths, html_filepaths,
-        css_filepaths, verbose_mode_enabled):
+        css_filepaths, verbose_mode_enabled, file_extension_type):
     """This function is used to check if node-eslint dependencies are
     installed and pass ESLint binary path and lint all the files(JS, Python,
     HTML, CSS) with their respective third party linters.
@@ -679,13 +693,15 @@ def _lint_all_files(
         html_filepaths: list(str). The list of HTML filepaths to be linted.
         css_filepaths: list(str). The list of CSS filepaths to be linted.
         verbose_mode_enabled: bool. True if verbose mode is enabled.
+        file_extension_type: list(str). The list of file extensions to be
+        linted.
 
     Returns:
         linting_processes: list(multiprocessing.Process). A list of linting
         processes.
         result_queues: list(multiprocessing.Queue). A list of queues to put
         results of tests.
-        stdout_queus: list(multiprocessing.Queue). A list of queues to store
+        stdout_queues: list(multiprocessing.Queue). A list of queues to store
         Stylelint outputs.
     """
 
@@ -717,68 +733,122 @@ def _lint_all_files(
             '         or node-stylelint and its dependencies.')
         sys.exit(1)
 
-    js_and_ts_files_to_lint = js_filepaths + ts_filepaths
-
     linting_processes = []
+    result_queues = []
+    stdout_queues = []
+    all_messages = []
 
-    js_and_ts_result = multiprocessing.Queue()
+    js_ts_linter = 'js' in file_extension_type or 'ts' in file_extension_type
+    py_linter = 'py' in file_extension_type
+    html_linter = 'html' in file_extension_type
+    css_linter = 'css' in file_extension_type
 
-    linting_processes.append(multiprocessing.Process(
-        target=_lint_js_and_ts_files, args=(
-            node_path, eslint_path, js_and_ts_files_to_lint,
-            js_and_ts_result, verbose_mode_enabled)))
+    if js_ts_linter:
+        js_and_ts_files_to_lint = js_filepaths + ts_filepaths
 
-    css_in_html_result = multiprocessing.Queue()
-    css_in_html_stdout = multiprocessing.Queue()
+        js_and_ts_result = multiprocessing.Queue()
 
-    linting_processes.append(multiprocessing.Process(
-        target=_lint_css_files, args=(
-            node_path,
-            stylelint_path,
-            config_path_for_css_in_html,
-            html_filepaths, css_in_html_stdout,
-            css_in_html_result, verbose_mode_enabled)))
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_js_and_ts_files, args=(
+                node_path, eslint_path, js_and_ts_files_to_lint,
+                js_and_ts_result, verbose_mode_enabled)))
 
-    css_result = multiprocessing.Queue()
-    css_stdout = multiprocessing.Queue()
+        # Pylint requires to provide paramter "this_bases" and "d", guess due to
+        # meta class.
+        js_ts_lint_checks_manager = JsTsLintChecksManager( # pylint: disable=no-value-for-parameter
+            verbose_mode_enabled)
+        js_message = js_ts_lint_checks_manager.perform_all_lint_checks()
+        all_messages += js_message
 
-    linting_processes.append(multiprocessing.Process(
-        target=_lint_css_files, args=(
-            node_path,
-            stylelint_path,
-            config_path_for_oppia_css,
-            css_filepaths, css_stdout,
-            css_result, verbose_mode_enabled)))
+    if html_linter:
+        css_in_html_result = multiprocessing.Queue()
+        css_in_html_stdout = multiprocessing.Queue()
 
-    py_result = multiprocessing.Queue()
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_css_files, args=(
+                node_path,
+                stylelint_path,
+                config_path_for_css_in_html,
+                html_filepaths, css_in_html_stdout,
+                css_in_html_result, verbose_mode_enabled)))
 
-    linting_processes.append(multiprocessing.Process(
-        target=_lint_py_files,
-        args=(
-            config_pylint, config_pycodestyle, py_filepaths,
-            py_result, verbose_mode_enabled)))
+        html_lint_checks_manager = HTMLLintChecksManager(   # pylint: disable=no-value-for-parameter
+            verbose_mode_enabled)
+        html_messages = html_lint_checks_manager.perform_all_lint_checks()
+        all_messages += html_messages
 
-    py_result_for_python3_compatibility = multiprocessing.Queue()
+    if css_linter:
+        css_result = multiprocessing.Queue()
+        css_stdout = multiprocessing.Queue()
 
-    linting_processes.append(multiprocessing.Process(
-        target=_lint_py_files_for_python3_compatibility,
-        args=(
-            py_filepaths, py_result_for_python3_compatibility,
-            verbose_mode_enabled)))
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_css_files, args=(
+                node_path,
+                stylelint_path,
+                config_path_for_oppia_css,
+                css_filepaths, css_stdout,
+                css_result, verbose_mode_enabled)))
+
+    if html_linter or css_linter:
+        css_lint_checks_manager = CSSLintChecksManager(   # pylint: disable=no-value-for-parameter
+            verbose_mode_enabled)
+        css_messages = css_lint_checks_manager.perform_all_lint_checks()
+        all_messages += css_messages
+
+    if py_linter:
+        py_result = multiprocessing.Queue()
+
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_py_files,
+            args=(
+                config_pylint, config_pycodestyle, py_filepaths,
+                py_result, verbose_mode_enabled)))
+
+        py_result_for_python3_compatibility = multiprocessing.Queue()
+
+        linting_processes.append(multiprocessing.Process(
+            target=_lint_py_files_for_python3_compatibility,
+            args=(
+                py_filepaths, py_result_for_python3_compatibility,
+                verbose_mode_enabled)))
+
+        py_lint_checks_manager = PythonLintChecksManager( # pylint: disable=no-value-for-parameter
+            verbose_mode_enabled)
+
+        py_messages = py_lint_checks_manager.perform_all_lint_checks()
+
+        all_messages += py_messages
+
+    code_owner_message = _check_codeowner_file(verbose_mode_enabled)
+    other_lint_checks_manager = OtherLintChecksManager(   # pylint: disable=no-value-for-parameter
+        verbose_mode_enabled)
+    all_messages += code_owner_message
+    other_messages = other_lint_checks_manager.perform_all_lint_checks()
+    all_messages += other_messages
 
     for process in linting_processes:
         process.daemon = False
         process.start()
 
-    result_queues = [
-        js_and_ts_result, css_in_html_result, css_result, py_result,
-        py_result_for_python3_compatibility
-    ]
+    if js_ts_linter:
+        result_queues.append(js_and_ts_result)
 
-    stdout_queus = [
-        css_in_html_stdout, css_stdout
-    ]
-    return linting_processes, result_queues, stdout_queus
+    if html_linter:
+        result_queues.append(css_in_html_result)
+        stdout_queues.append(css_in_html_stdout)
+
+    if css_linter:
+        result_queues.append(css_result)
+        stdout_queues.append(css_stdout)
+
+    if py_linter:
+        result_queues.append(py_result)
+        result_queues.append(py_result_for_python3_compatibility)
+
+    all_messages += _join_linting_process(
+        linting_processes, result_queues, stdout_queues)
+
+    return all_messages
 
 
 def _is_filepath_excluded_for_bad_patterns_check(pattern, filepath):
@@ -950,6 +1020,26 @@ def _redirect_stdout(new_target):
         yield new_target
     finally:
         sys.stdout = old_target
+
+
+def _get_file_extensions(file_extension_type):
+    """This function is used to return the file extensions which need to be
+    linted and checked.
+
+    Args:
+        file_extension_type: list(str). The list of file extensions to be
+        linted checked.
+
+    Returns:
+        all_file_extensions_type: list(str). The list of all file extensions
+        to be linted and checked.
+    """
+    all_file_extensions_type = ['js', 'ts', 'py', 'html', 'css']
+
+    if file_extension_type is not None:
+        return file_extension_type
+
+    return all_file_extensions_type
 
 
 def _get_all_filepaths(input_path, input_filenames):
@@ -2824,49 +2914,31 @@ class JsTsLintChecksManager(LintChecksManager):
         return summary_messages
 
 
-class OtherLintChecksManager(LintChecksManager):
-    """Manages all the linting functions except the ones against Js and Ts. It
-    checks Python, CSS, and HTML files.
+class PythonLintChecksManager(LintChecksManager):
+    """Manages all the Python linting functions.
 
     Attributes:
         verbose_mode_enabled: bool. True if verbose mode is enabled.
     """
     def __init__(
             self, verbose_mode_enabled=False):
-        """Constructs a OtherLintChecksManager object.
+        """Constructs a PythonLintChecksManager object.
 
         Args:
-            verbose_mode_enabled: bool. True if verbose mode is enabled.
+            verbose_mode_enabled: bool. True if mode is enabled.
         """
-        super(OtherLintChecksManager, self).__init__(
+        super(PythonLintChecksManager, self).__init__(
             verbose_mode_enabled=verbose_mode_enabled)
 
     @property
     def py_filepaths(self):
-        """Return all python filepaths."""
+        """Return all Python file paths."""
         return _FILES['.py']
-
-    @property
-    def html_filepaths(self):
-        """Return all html filepaths."""
-        return _FILES['.html']
-
-    @property
-    def other_filepaths(self):
-        """Return other filepaths."""
-        return _FILES['other']
-
-    @property
-    def css_filepaths(self):
-        """Return css filepaths."""
-        return _FILES['.css']
 
     @property
     def all_filepaths(self):
         """Return all filepaths."""
-        return (
-            self.css_filepaths + self.html_filepaths +
-            self.other_filepaths + self.py_filepaths)
+        return self.py_filepaths
 
     def _check_import_order(self):
         """This function is used to check that each file
@@ -2907,14 +2979,52 @@ class OtherLintChecksManager(LintChecksManager):
                     '%s   Import order checks passed' % _MESSAGE_TYPE_SUCCESS)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
-        self.process_manager['import'] = summary_messages
         _STDOUT_LIST.append(stdout)
+        return summary_messages
+
+    def perform_all_lint_checks(self):
+        """Perform all the lint checks and returns the messages returned by all
+        the checks.
+
+        Returns:
+            all_messages: str. All the messages returned by the lint checks.
+        """
+
+        common_messages = super(
+            PythonLintChecksManager, self).perform_all_lint_checks()
+
+        import_order_messages = self._check_import_order()
+
+        all_messages = common_messages + import_order_messages
+
+        return all_messages
 
 
-    def _check_import(self):
-        """Run checks relates to import order."""
-        methods = [self._check_import_order]
-        super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
+class HTMLLintChecksManager(LintChecksManager):
+    """Manages all the HTML linting functions.
+
+    Attributes:
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+    """
+    def __init__(
+            self, verbose_mode_enabled=False):
+        """Constructs a HTMLLintChecksManager object.
+
+        Args:
+            verbose_mode_enabled: bool. True if verbose mode is enabled.
+        """
+        super(HTMLLintChecksManager, self).__init__(
+            verbose_mode_enabled=verbose_mode_enabled)
+
+    @property
+    def html_filepaths(self):
+        """Return all html filepaths."""
+        return _FILES['.html']
+
+    @property
+    def all_filepaths(self):
+        """Return all filepaths."""
+        return self.html_filepaths
 
     def _check_html_tags_and_attributes(self, debug=False):
         """This function checks the indentation of lines in HTML files."""
@@ -3028,20 +3138,99 @@ class OtherLintChecksManager(LintChecksManager):
         """
 
         common_messages = super(
-            OtherLintChecksManager, self).perform_all_lint_checks()
-        # division_operator_messages = self._check_division_operator()
-        # import_order_messages = self._check_import_order()
-        self._check_import()
+            HTMLLintChecksManager, self).perform_all_lint_checks()
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
         html_tag_and_attribute_messages = (
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
-        import_order_messages = self.process_manager['import']
 
         all_messages = (
-            import_order_messages + common_messages +
-            html_tag_and_attribute_messages + html_linter_messages)
+            common_messages + html_tag_and_attribute_messages +
+            html_linter_messages)
+        return all_messages
+
+
+class CSSLintChecksManager(LintChecksManager):
+    """Manages all the CSS linting functions.
+
+    Attributes:
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+    """
+    def __init__(
+            self, verbose_mode_enabled=False):
+        """Constructs a CSSLintChecksManager object.
+
+        Args:
+            verbose_mode_enabled: bool. True if verbose mode is enabled.
+        """
+        super(CSSLintChecksManager, self).__init__(
+            verbose_mode_enabled=verbose_mode_enabled)
+
+    @property
+    def css_filepaths(self):
+        """Return css filepaths."""
+        return _FILES['.css']
+
+    @property
+    def all_filepaths(self):
+        """Return all filepaths."""
+        return self.css_filepaths
+
+    def perform_all_lint_checks(self):
+        """Perform all the lint checks and returns the messages returned by all
+        the checks.
+
+        Returns:
+            all_messages: str. All the messages returned by the lint checks.
+        """
+
+        common_messages = super(
+            CSSLintChecksManager, self).perform_all_lint_checks()
+
+        all_messages = common_messages
+        return all_messages
+
+
+class OtherLintChecksManager(LintChecksManager):
+    """Manages all the linting functions except the ones against Js and Ts. It
+    checks Python, CSS, and HTML files.
+
+    Attributes:
+        verbose_mode_enabled: bool. True if verbose mode is enabled.
+    """
+    def __init__(
+            self, verbose_mode_enabled=False):
+        """Constructs a OtherLintChecksManager object.
+
+        Args:
+            verbose_mode_enabled: bool. True if verbose mode is enabled.
+        """
+        super(OtherLintChecksManager, self).__init__(
+            verbose_mode_enabled=verbose_mode_enabled)
+
+    @property
+    def other_filepaths(self):
+        """Return other filepaths."""
+        return _FILES['other']
+
+    @property
+    def all_filepaths(self):
+        """Return all filepaths."""
+        return self.other_filepaths
+
+    def perform_all_lint_checks(self):
+        """Perform all the lint checks and returns the messages returned by all
+        the checks.
+
+        Returns:
+            all_messages: str. All the messages returned by the lint checks.
+        """
+
+        common_messages = super(
+            OtherLintChecksManager, self).perform_all_lint_checks()
+
+        all_messages = common_messages
         return all_messages
 
 
@@ -3112,6 +3301,9 @@ def main(args=None):
     HTML, and CSS files.
     """
     parsed_args = _PARSER.parse_args(args=args)
+    # File extension to be linted.
+    file_extension_type = _get_file_extensions(
+        parsed_args.only_check_file_extensions)
     # Default mode is non-verbose mode, if arguments contains --verbose flag it
     # will be made True, which will represent verbose mode.
     verbose_mode_enabled = bool(parsed_args.verbose)
@@ -3125,23 +3317,9 @@ def main(args=None):
 
     read_files(all_filepaths)
     categorize_files(all_filepaths)
-    linting_processes, result_queues, result_stdout = _lint_all_files(
+    all_messages = _lint_all_files(
         _FILES['.js'], _FILES['.ts'], _FILES['.py'], _FILES['.html'],
-        _FILES['.css'], verbose_mode_enabled)
-    code_owner_message = _check_codeowner_file(verbose_mode_enabled)
-    # Pylint requires to provide paramter "this_bases" and "d", guess due to
-    # meta class.
-    js_ts_lint_checks_manager = JsTsLintChecksManager( # pylint: disable=no-value-for-parameter
-        verbose_mode_enabled)
-    other_lint_checks_manager = OtherLintChecksManager(   # pylint: disable=no-value-for-parameter
-        verbose_mode_enabled)
-    all_messages = code_owner_message
-    js_message = js_ts_lint_checks_manager.perform_all_lint_checks()
-    other_messages = other_lint_checks_manager.perform_all_lint_checks()
-    all_messages += js_message + other_messages
-
-    all_messages += _join_linting_process(
-        linting_processes, result_queues, result_stdout)
+        _FILES['.css'], verbose_mode_enabled, file_extension_type)
 
     _print_complete_summary_of_errors()
 
