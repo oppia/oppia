@@ -192,11 +192,8 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
 
       spyOn(ThreadDataService, 'fetchThreads').and
         .returnValue($q.resolve(threads));
-      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages');
 
       FeedbackImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
-        expect(fetchMessagesSpy)
-          .toHaveBeenCalledTimes(threads.feedbackThreads.length);
         expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
         expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);
