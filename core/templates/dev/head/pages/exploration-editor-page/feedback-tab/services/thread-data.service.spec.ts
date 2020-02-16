@@ -27,7 +27,6 @@ require(
 describe('retrieving threads service', function() {
   let expId = 'exp1';
   let $httpBackend = null;
-  let ExplorationDataService = null;
   let ThreadDataService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -35,16 +34,13 @@ describe('retrieving threads service', function() {
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
+
+    $provide.value('ExplorationDataService', { explorationId: expId });
   }));
 
-  beforeEach(angular.mock.inject(function(
-      _$httpBackend_, _ExplorationDataService_, _ThreadDataService_) {
+  beforeEach(angular.mock.inject(function(_$httpBackend_, _ThreadDataService_) {
     $httpBackend = _$httpBackend_;
-    ExplorationDataService = _ExplorationDataService_;
     ThreadDataService = _ThreadDataService_;
-
-    spyOn(ExplorationDataService, 'getExplorationId')
-      .and.returnValue(expId);
   }));
 
   it('should retrieve feedback threads', function(done) {
