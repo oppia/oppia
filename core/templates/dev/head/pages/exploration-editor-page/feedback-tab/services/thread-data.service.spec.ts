@@ -26,11 +26,9 @@ require(
 
 describe('retrieving threads service', function() {
   var $httpBackend;
-  var FeedbackThreadObjectFactory;
-  var SuggestionObjectFactory;
   var ThreadDataService;
 
-  var expId = '12345';
+  var expId = 'exp1';
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -39,12 +37,8 @@ describe('retrieving threads service', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function(
-      _$httpBackend_, _FeedbackThreadObjectFactory_, _SuggestionObjectFactory_,
-      _ThreadDataService_) {
+  beforeEach(angular.mock.inject(function(_$httpBackend_, _ThreadDataService_) {
     $httpBackend = _$httpBackend_;
-    FeedbackThreadObjectFactory = _FeedbackThreadObjectFactory_;
-    SuggestionObjectFactory = _SuggestionObjectFactory_;
     ThreadDataService = _ThreadDataService_;
   }));
 
@@ -57,7 +51,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Feedback from a learner',
         summary: null,
-        thread_id: 'abc1'
+        thread_id: 'exploration.exp1.abc1'
       },
       {
         last_updated: 1441870501231.642,
@@ -66,7 +60,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Feedback from a learner',
         summary: null,
-        thread_id: 'abc2'
+        thread_id: 'exploration.exp1.def2'
       }
     ];
 
@@ -88,9 +82,9 @@ describe('retrieving threads service', function() {
         last_updated: 1528564605944.896,
         score_category: 'content.Algebra',
         status: 'received',
-        suggestion_id: 'exp_1.1234',
+        suggestion_id: 'exploration.exp1.ghi3',
         suggestion_type: 'edit_exploration_state_content',
-        target_id: 'exp_1',
+        target_id: 'exp1',
         target_type: 'exploration',
         target_version_at_submission: 1,
       }
@@ -104,7 +98,7 @@ describe('retrieving threads service', function() {
         status: 'open',
         subject: 'Suggestion from a learner',
         summary: null,
-        thread_id: 'exp_1.1234'
+        thread_id: 'exploration.exp1.ghi3'
       }
     ];
 
@@ -117,16 +111,13 @@ describe('retrieving threads service', function() {
     ).respond({ suggestions: mockSuggestions });
 
     ThreadDataService.fetchThreads().then(threadData => {
-      for (let feedbackThread of mockFeedbackThreads) {
-        expect(threadData.feedbackThreads).toContain(jasmine.objectContaining(
-          { threadId: feedbackThread.thread_id }));
-      }
-
-      for (let suggestionThread of mockSuggestionThreads) {
-        expect(threadData.suggestionThreads).toContain(jasmine.objectContaining(
-          { threadId: suggestionThread.thread_id }));
-      }
-    }).then(done, done.fail);
+      let [feedbackThreads, suggestionThreads] = threadData;
+      expect(feedbackThreads.map(t => t.threadId))
+        .toEqual(['exploration.exp1.abc1', 'exploration.exp1.def2']);
+      expect(suggestionThreads.map(t => t.threadId))
+        .toEqual(['exploration.exp1.ghi3']);
+      done();
+    }, done.fail);
     $httpBackend.flush();
   });
 });
