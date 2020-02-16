@@ -15,12 +15,12 @@
 /**
  * @fileoverview Service for posting the skills
  */
-// require('')
+
 angular.module('oppia').factory('SkillCreationBackendService', [
   '$http', '$q',
   function($http, $q) {
     var _createSkill = function(successCallback, errorCallback,
-      description, rubrics, explanation, linkedTopicIds) {
+        description, rubrics, explanation, linkedTopicIds) {
       let postData = {
         description: description,
         linked_topic_ids: linkedTopicIds,
@@ -50,55 +50,3 @@ angular.module('oppia').factory('SkillCreationBackendService', [
     };
   }
 ]);
-
-
-// import { downgradeInjectable } from '@angular/upgrade/static';
-// import { HttpClient } from '@angular/common/http';
-// import { Injectable } from '@angular/core';
-// import { Rubric } from 'domain/skill/RubricObjectFactory';
-// import { UrlInterpolationService } from
-//   'domain/utilities/url-interpolation.service';
-
-// export interface postSkillDataType { 
-//   description: string,
-//   linked_topic_ids: string,
-//   explanation_dict: string,
-//   rubrics: Rubric[]
-// }
-
-// @Injectable({
-//   providedIn: 'root'
-// })
-// export class SkillCreationBackendApiService {
-//   constructor(
-//     private urlInterpolationService: UrlInterpolationService,
-//     private http: HttpClient
-//   ) {}
-
-//   postSkillCreation(description, linkedTopicIds, explanation, rubric) {
-//     let data = { 
-//       description: description,
-//       linked_topic_ids: linkedTopicIds,
-//       explanation_dict: explanation,
-//       rubrics: rubric
-//     }
-//     let promise = new Promise((resolve, reject) => {
-//       this.http.post<postSkillDataType>(
-//         '/skill_editor_handler/create_new',data).toPromise()
-//         .then(
-//           res => { // Success
-//             resolve(res['data']);
-//           },
-//           msg => { // Error
-//             reject(msg);
-//           }
-//         );
-//     });
-//     return promise;
-//   }
-
-// }
-
-// angular.module('oppia').factory(
-//   'SkillCreationBackendApiService',
-//   downgradeInjectable(SkillCreationBackendApiService));

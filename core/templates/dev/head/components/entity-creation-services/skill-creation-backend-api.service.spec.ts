@@ -17,12 +17,13 @@
  */
 
 // eslint-disable-next-line max-len
-require('components/entity-creation-services/skill-creation-backend-api.service.ts');
 
-import { UpgradedServices } from 'services/UpgradedServices';
+require(
+  'components/entity-creation-services/skill-creation-backend-api.service.ts');
 require('services/csrf-token.service.ts');
+import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('Skill Creation backend service', function() {
+describe('Skill Creation backend service', function() {
   var SkillCreationBackendService = null;
   var $httpBackend = null;
   var $rootScope = null;
@@ -69,7 +70,8 @@ fdescribe('Skill Creation backend service', function() {
 
       $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
         200, {skill_id: 'hyuy4GUlvTqJ'});
-      SkillCreationBackendService.createSkill('test_des_1',rubricDict,'explaination',['test_id_11']).then(
+      SkillCreationBackendService.createSkill(
+        'test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
         successHandler, failHandler);
       $httpBackend.flush();
       expect(successHandler).toHaveBeenCalledWith('hyuy4GUlvTqJ');
@@ -83,7 +85,8 @@ fdescribe('Skill Creation backend service', function() {
 
       $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
         500, 'Error creating a new skill.');
-      SkillCreationBackendService.createSkill('test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
+      SkillCreationBackendService.createSkill(
+        'test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
         successHandler, failHandler);
       $httpBackend.flush();
       expect(successHandler).not.toHaveBeenCalled();
