@@ -74,7 +74,7 @@ describe('Feedback thread object factory', () => {
   });
 
   describe('.hasSubjectUpdate()', () => {
-    it('is true when updatedStatus is non-null', () => {
+    it('is true when updatedSubject is non-null', () => {
       var threadMessage = factory.createFromBackendDict({
         updated_subject: 'a new descriptive subject!',
 
@@ -91,7 +91,7 @@ describe('Feedback thread object factory', () => {
       expect(threadMessage.hasSubjectUpdate()).toBe(true);
     });
 
-    it('is true when text is empty string', () => {
+    it('is false when updatedStatus is null', () => {
       var threadMessage = factory.createFromBackendDict({
         updated_subject: null,
 
@@ -127,7 +127,7 @@ describe('Feedback thread object factory', () => {
       expect(threadMessage.hasStatusUpdate()).toBe(true);
     });
 
-    it('is true when text is empty string', () => {
+    it('is false when updatedStatus is null', () => {
       var threadMessage = factory.createFromBackendDict({
         updated_status: null,
 
@@ -145,7 +145,7 @@ describe('Feedback thread object factory', () => {
     });
   });
 
-  describe('.isNotempty()', () => {
+  describe('.isNonempty()', () => {
     it('is true when text is nonempty string', () => {
       var threadMessage = factory.createFromBackendDict({
         text: 'nonempty!',

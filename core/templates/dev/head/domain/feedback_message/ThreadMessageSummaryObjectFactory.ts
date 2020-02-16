@@ -42,8 +42,8 @@ export class ThreadMessageSummaryObjectFactory {
   // because 'threadMessageSummaryBackendDict' is a dict with underscore_cased
   // keys which give tslint errors against underscore_casing in favor of
   // camelCasing.
-  createFromBackendDict(threadMessageSummaryBackendDict: any):
-    ThreadMessageSummary {
+  createFromBackendDict(
+      threadMessageSummaryBackendDict: any): ThreadMessageSummary {
     return new ThreadMessageSummary(
       threadMessageSummaryBackendDict.author_username,
       threadMessageSummaryBackendDict.text);

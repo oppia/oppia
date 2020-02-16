@@ -36,7 +36,7 @@ describe('Feedback thread object factory', () => {
     });
   });
 
-  describe('.isNotempty()', () => {
+  describe('.isNonempty()', () => {
     it('is true when text is nonempty string', () => {
       var threadMessageSummary = factory.createFromBackendDict(
         { text: 'nonempty!', author_username: 'author' });
