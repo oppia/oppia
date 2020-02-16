@@ -37,18 +37,18 @@ describe('Feedback thread object factory', () => {
   });
 
   describe('.isNotempty()', () => {
-    it('is true when text is empty string', () => {
+    it('is true when text is nonempty string', () => {
       var threadMessageSummary = factory.createFromBackendDict(
         { text: 'nonempty!', author_username: 'author' });
 
-      expect(threadMessageSummary.isNonempty()).toEqual(false);
+      expect(threadMessageSummary.isNonempty()).toBe(true);
     });
 
-    it('is true when text is empty string', () => {
+    it('is false when text is empty string', () => {
       var threadMessageSummary = factory.createFromBackendDict(
         { text: '', author_username: 'author' });
 
-      expect(threadMessageSummary.isNonempty()).toEqual(true);
+      expect(threadMessageSummary.isNonempty()).toBe(false);
     });
   });
 });

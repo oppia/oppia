@@ -45,7 +45,7 @@ describe('Feedback thread object factory', () => {
       expect(threadMessage.entityType).toEqual('exploration');
       expect(threadMessage.entityId).toEqual('exploration.exp1.thread1');
       expect(threadMessage.messageId).toEqual(1);
-      expect(threadMessage.receivedViaEmail).toEqual(false);
+      expect(threadMessage.receivedViaEmail).toBe(false);
       expect(threadMessage.text).toEqual('message content');
       expect(threadMessage.updatedStatus).toBe(null);
       expect(threadMessage.updatedSubject).toBe(null);
@@ -88,7 +88,7 @@ describe('Feedback thread object factory', () => {
         updated_status: null
       });
 
-      expect(threadMessage.hasSubjectUpdate()).toEqual(true);
+      expect(threadMessage.hasSubjectUpdate()).toBe(true);
     });
 
     it('is true when text is empty string', () => {
@@ -105,7 +105,7 @@ describe('Feedback thread object factory', () => {
         updated_status: null
       });
 
-      expect(threadMessage.hasSubjectUpdate()).toEqual(false);
+      expect(threadMessage.hasSubjectUpdate()).toBe(false);
     });
   });
 
@@ -124,7 +124,7 @@ describe('Feedback thread object factory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.hasStatusUpdate()).toEqual(true);
+      expect(threadMessage.hasStatusUpdate()).toBe(true);
     });
 
     it('is true when text is empty string', () => {
@@ -141,12 +141,12 @@ describe('Feedback thread object factory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.hasStatusUpdate()).toEqual(false);
+      expect(threadMessage.hasStatusUpdate()).toBe(false);
     });
   });
 
   describe('.isNotempty()', () => {
-    it('is true when text is empty string', () => {
+    it('is true when text is nonempty string', () => {
       var threadMessage = factory.createFromBackendDict({
         text: 'nonempty!',
 
@@ -160,10 +160,10 @@ describe('Feedback thread object factory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.isNonempty()).toEqual(false);
+      expect(threadMessage.isNonempty()).toBe(true);
     });
 
-    it('is true when text is empty string', () => {
+    it('is false when text is empty string', () => {
       var threadMessage = factory.createFromBackendDict({
         text: '',
 
@@ -177,7 +177,7 @@ describe('Feedback thread object factory', () => {
         updated_subject: null
       });
 
-      expect(threadMessage.isNonempty()).toEqual(true);
+      expect(threadMessage.isNonempty()).toBe(false);
     });
   });
 });
