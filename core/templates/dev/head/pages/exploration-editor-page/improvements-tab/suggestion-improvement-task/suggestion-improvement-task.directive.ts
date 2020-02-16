@@ -33,11 +33,13 @@ angular.module('oppia').directive('suggestionImprovementTask', [
         '$scope', 'DateTimeFormatService', 'ThreadStatusDisplayService',
         function($scope, DateTimeFormatService, ThreadStatusDisplayService) {
           $scope.getLastNonemptyMessageAuthorUsername = function() {
-            return $scope.getData().lastNonemptyMessageSummary.authorUsername;
+            return $scope.getData().lastNonemptyMessageSummary.authorUsername ||
+              $scope.getData().originalAuthorName;
           };
 
           $scope.getLastNonemptyMessageText = function() {
-            return $scope.getData().lastNonemptyMessageSummary.text;
+            return $scope.getData().lastNonemptyMessageSummary.text ||
+              $scope.getData().subject;
           };
         }
       ]

@@ -64,15 +64,11 @@ angular.module('oppia').factory('ThreadDataService', [
     };
 
     let setSuggestionThreadFromBackendDicts = function(
-        threadBackendDict, suggestionBackendDictsByThreadId) {
+        threadBackendDict, suggestionBackendDict) {
       let threadId = threadBackendDict.thread_id;
-      if (!suggestionBackendDictsByThreadId.hasOwnProperty(threadId)) {
-        throw Error(
-          'Suggestion thread (id: "' + threadId + '") has no suggestion');
-      }
       return threadsById[threadId] =
         SuggestionThreadObjectFactory.createFromBackendDicts(
-          threadBackendDict, suggestionBackendDictsByThreadId[threadId]);
+          threadBackendDict, suggestionBackendDict);
     };
 
     let getThreadIdFromSuggestionBackendDict = function(suggestionBackendDict) {
@@ -85,26 +81,27 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       fetchThreads: function() {
-        let suggestionPromise = $http.get(
-          SUGGESTION_LIST_HANDLER_URL +
-          '?target_type=exploration&target_id=' + expId);
+        let suggestionPromise = $http.get(SUGGESTION_LIST_HANDLER_URL, {
+          params: {target_type: 'exploration', target_id: expId}
+        });
         let threadPromise = $http.get(THREAD_LIST_HANDLER_URL);
 
         return $q.all([suggestionPromise, threadPromise]).then(response => {
           let [suggestionResponse, threadResponse] = response.map(r => r.data);
-          let suggestionBackendDictsByThreadId = suggestionResponse.suggestions
-            .reduce((backendDictsByThreadId, backendDict) => {
-              let threadId = getThreadIdFromSuggestionBackendDict(backendDict);
-              backendDictsByThreadId[threadId] = backendDict;
-              return backendDictsByThreadId;
-            }, {});
+
+          let suggestionBackendDictsByThreadId = {};
+          suggestionResponse.suggestions.forEach(backendDict => {
+            let threadId = getThreadIdFromSuggestionBackendDict(backendDict);
+            suggestionBackendDictsByThreadId[threadId] = backendDict;
+          });
 
           return {
             feedbackThreads: threadResponse.feedback_thread_dicts.map(
               setFeedbackThreadFromBackendDict),
             suggestionThreads: threadResponse.suggestion_thread_dicts.map(
               threadBackendDict => setSuggestionThreadFromBackendDicts(
-                threadBackendDict, suggestionBackendDictsByThreadId))
+                threadBackendDict,
+                suggestionBackendDictsByThreadId[threadBackendDict.thread_id]))
           };
         });
       },

@@ -35,8 +35,8 @@ class SuggestionThread {
   lastUpdated: number;
   messageCount: number;
   threadId: string;
-  suggestion: Suggestion;
   lastNonemptyMessageSummary: ThreadMessageSummary;
+  suggestion: Suggestion;
   messages: ThreadMessage[];
 
   constructor(
@@ -51,9 +51,9 @@ class SuggestionThread {
     this.lastUpdated = lastUpdated;
     this.messageCount = messageCount;
     this.threadId = threadId;
-    this.suggestion = suggestion;
     this.lastNonemptyMessageSummary = new ThreadMessageSummary(
       lastNonemptyMessageAuthor, lastNonemptyMessageText);
+    this.suggestion = suggestion;
     this.messages = [];
   }
 
