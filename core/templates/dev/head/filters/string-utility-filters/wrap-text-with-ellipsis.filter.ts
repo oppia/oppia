@@ -17,7 +17,7 @@
  */
 
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('services/UtilsService.ts');
+require('services/utils.service.ts');
 
 angular.module('oppia').filter('wrapTextWithEllipsis', [
   '$filter', 'UtilsService', function($filter, UtilsService) {

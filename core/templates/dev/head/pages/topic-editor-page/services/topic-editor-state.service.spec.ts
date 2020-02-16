@@ -43,6 +43,8 @@ import { VoiceoverObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-update.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
@@ -178,13 +180,13 @@ describe('Topic editor state service', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
 
   beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     fakeEditableTopicBackendApiService = (
       FakeEditableTopicBackendApiService());
@@ -231,6 +233,7 @@ describe('Topic editor state service', function() {
         subtopic_schema_version: '1',
         version: '1'
       },
+      groupedSkillSummaries: {},
       skillIdToDescriptionDict: {
         skill_1: 'Description 1'
       },
@@ -278,6 +281,7 @@ describe('Topic editor state service', function() {
         subtopic_schema_version: '1',
         version: '1'
       },
+      groupedSkillSummaries: {},
       skillIdToDescriptionDict: {
         skill_2: 'Description 2',
         skill_3: 'Description 3',

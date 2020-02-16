@@ -18,7 +18,7 @@
  */
 
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('ExplorationRightsService', [
   '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
@@ -43,14 +43,14 @@ angular.module('oppia').factory('ExplorationRightsService', [
       clonedFrom: function() {
         return this._clonedFrom;
       },
+      isCloned: function() {
+        return Boolean(this._clonedFrom);
+      },
       isPrivate: function() {
         return this._status === ACTIVITY_STATUS_PRIVATE;
       },
       isPublic: function() {
         return this._status === ACTIVITY_STATUS_PUBLIC;
-      },
-      isCloned: function() {
-        return Boolean(this._clonedFrom);
       },
       isCommunityOwned: function() {
         return this._isCommunityOwned;

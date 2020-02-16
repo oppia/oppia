@@ -22,11 +22,11 @@ require('domain/state_card/StateCardObjectFactory.ts');
 require('expressions/expression-interpolation.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/contextual/UrlService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/contextual/url.service.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/stateful/focus-manager.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

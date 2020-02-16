@@ -21,17 +21,15 @@ require('components/button-directives/hint-and-solution-buttons.directive.ts');
 
 require('domain/summary/exploration-summary-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/ContextService.ts');
-require('services/contextual/UrlService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('services/context.service.ts');
+require('services/contextual/url.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('explorationFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/layout-directives/' +
-        'exploration-footer.directive.html'),
+      template: require('./exploration-footer.directive.html'),
       controller: [
         '$scope', '$http', '$log', 'ContextService',
         'ExplorationSummaryBackendApiService', 'UrlService',
@@ -40,38 +38,42 @@ angular.module('oppia').directive('explorationFooter', [
             $scope, $http, $log, ContextService,
             ExplorationSummaryBackendApiService, UrlService,
             WindowDimensionsService) {
-          $scope.explorationId = ContextService.getExplorationId();
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-          $scope.iframed = UrlService.isIframed();
-
-          $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-          WindowDimensionsService.registerOnResizeHook(function() {
+          var ctrl = this;
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
+          };
+          ctrl.$onInit = function() {
+            $scope.explorationId = ContextService.getExplorationId();
+            $scope.iframed = UrlService.isIframed();
             $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-            $scope.$apply();
-          });
-
-          $scope.contributorNames = [];
-          if (!ContextService.isInQuestionPlayerMode()) {
-            ExplorationSummaryBackendApiService
-              .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
-              .then(function(summaries) {
-                var summaryBackendObject = null;
-                if (summaries.length > 0) {
-                  var contributorSummary = (
-                    summaries[0].human_readable_contributors_summary);
-                  $scope.contributorNames = (
-                    Object.keys(contributorSummary).sort(
-                      function(contributorUsername1, contributorUsername2) {
-                        var commitsOfContributor1 = contributorSummary[
-                          contributorUsername1].num_commits;
-                        var commitsOfContributor2 = contributorSummary[
-                          contributorUsername2].num_commits;
-                        return commitsOfContributor2 - commitsOfContributor1;
-                      })
-                  );
-                }
-              });
-          }
+            WindowDimensionsService.registerOnResizeHook(function() {
+              $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+              $scope.$apply();
+            });
+            $scope.contributorNames = [];
+            if (!ContextService.isInQuestionPlayerMode()) {
+              ExplorationSummaryBackendApiService
+                .loadPublicAndPrivateExplorationSummaries([
+                  $scope.explorationId])
+                .then(function(summaries) {
+                  var summaryBackendObject = null;
+                  if (summaries.length > 0) {
+                    var contributorSummary = (
+                      summaries[0].human_readable_contributors_summary);
+                    $scope.contributorNames = (
+                      Object.keys(contributorSummary).sort(
+                        function(contributorUsername1, contributorUsername2) {
+                          var commitsOfContributor1 = contributorSummary[
+                            contributorUsername1].num_commits;
+                          var commitsOfContributor2 = contributorSummary[
+                            contributorUsername2].num_commits;
+                          return commitsOfContributor2 - commitsOfContributor1;
+                        })
+                    );
+                  }
+                });
+            }
+          };
         }
       ]
     };

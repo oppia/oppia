@@ -20,17 +20,19 @@
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/RubricObjectFactory.ts');
-require('services/ValidatorsService.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').factory('SkillObjectFactory', [
   'ConceptCardObjectFactory', 'MisconceptionObjectFactory',
-  'RubricObjectFactory', 'ValidatorsService', 'SKILL_DIFFICULTIES',
-  function(
+  'RubricObjectFactory', 'ValidatorsService', 'INVALID_NAME_CHARS',
+  'SKILL_DIFFICULTIES', function(
       ConceptCardObjectFactory, MisconceptionObjectFactory,
-      RubricObjectFactory, ValidatorsService, SKILL_DIFFICULTIES) {
+      RubricObjectFactory, ValidatorsService, INVALID_NAME_CHARS,
+      SKILL_DIFFICULTIES) {
     var Skill = function(
         id, description, misconceptions, rubrics, conceptCard, languageCode,
-        version, nextMisconceptionId, supersedingSkillId, allQuestionsMerged) {
+        version, nextMisconceptionId, supersedingSkillId, allQuestionsMerged,
+        prerequisiteSkillIds) {
       this._id = id;
       this._description = description;
       this._misconceptions = misconceptions;
@@ -41,6 +43,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
       this._nextMisconceptionId = nextMisconceptionId;
       this._supersedingSkillId = supersedingSkillId;
       this._allQuestionsMerged = allQuestionsMerged;
+      this._prerequisiteSkillIds = prerequisiteSkillIds;
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
@@ -64,6 +67,15 @@ angular.module('oppia').factory('SkillObjectFactory', [
           'All 3 difficulties (Easy, Medium and Hard) should be addressed ' +
           'in rubrics.');
       }
+      this.getMisconceptions().forEach(misconception => {
+        INVALID_NAME_CHARS.forEach(character => {
+          if (misconception.getName().indexOf(character) !== -1) {
+            issues.push(
+              'Misconception ' + misconception.getName() +
+              ' has invalid character.');
+          }
+        });
+      });
       return issues;
     };
 
@@ -82,7 +94,8 @@ angular.module('oppia').factory('SkillObjectFactory', [
         version: this._version,
         next_misconception_id: this._nextMisconceptionId,
         superseding_skill_id: this._supersedingSkillId,
-        all_questions_merged: this._allQuestionsMerged
+        all_questions_merged: this._allQuestionsMerged,
+        prerequisite_skill_ids: this._prerequisiteSkillIds
       };
     };
 
@@ -97,6 +110,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
       this._nextMisconceptionId = skill.getNextMisconceptionId();
       this._supersedingSkillId = skill.getSupersedingSkillId();
       this._allQuestionsMerged = skill.getAllQuestionsMerged();
+      this._prerequisiteSkillIds = skill.getPrerequisiteSkillIds();
     };
 
     // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
@@ -114,7 +128,8 @@ angular.module('oppia').factory('SkillObjectFactory', [
         skillBackendDict.version,
         skillBackendDict.next_misconception_id,
         skillBackendDict.superseding_skill_id,
-        skillBackendDict.all_questions_merged);
+        skillBackendDict.all_questions_merged,
+        skillBackendDict.prerequisite_skill_ids);
     };
 
 
@@ -126,7 +141,7 @@ angular.module('oppia').factory('SkillObjectFactory', [
     /* eslint-enable dot-notation */
       return new Skill(null, 'Skill description loading',
         [], [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en',
-        1, 0, null, false);
+        1, 0, null, false, []);
     };
 
     var generateMisconceptionsFromBackendDict = function(
@@ -150,6 +165,22 @@ angular.module('oppia').factory('SkillObjectFactory', [
 
     Skill.prototype.getDescription = function() {
       return this._description;
+    };
+
+    Skill.prototype.getPrerequisiteSkillIds = function() {
+      return this._prerequisiteSkillIds.slice();
+    };
+
+    Skill.prototype.addPrerequisiteSkill = function(skillId) {
+      this._prerequisiteSkillIds.push(skillId);
+    };
+
+    Skill.prototype.deletePrerequisiteSkill = function(skillId) {
+      for (var idx in this._prerequisiteSkillIds) {
+        if (this._prerequisiteSkillIds[idx] === skillId) {
+          this._prerequisiteSkillIds.splice(idx, 1);
+        }
+      }
     };
 
     Skill.prototype.getId = function() {

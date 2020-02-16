@@ -206,7 +206,7 @@ export class StoryContents {
         nodeIsVisited[currentNodeIndex] = true;
         var currentNode = nodes[currentNodeIndex];
 
-        startingNode.getAcquiredSkillIds().forEach((skillId) => {
+        currentNode.getAcquiredSkillIds().forEach((skillId) => {
           simulatedSkillIds.add(skillId);
         });
         for (var i = 0; i < currentNode.getDestinationNodeIds().length; i++) {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('header.template.html')
+    @load('base-components/header.template.html')
   </head>
 
   <body>
@@ -11,7 +11,7 @@
       <page-footer></page-footer>
     </base-content>
 
-    @require('pages/footer_js_libs.html')
+    @load('pages/footer_js_libs.html')
     <script src="/templates/dev/head/pages/Base.js"></script>
   </body>
 </html>

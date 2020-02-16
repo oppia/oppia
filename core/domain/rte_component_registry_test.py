@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.rte_component_registry."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -25,6 +26,7 @@ import re
 import string
 import struct
 
+from constants import constants
 from core.domain import obj_services
 from core.domain import rte_component_registry
 from core.tests import test_utils
@@ -317,6 +319,16 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             set(actual_inline_component_tag_names),
             set(obtained_inline_component_tag_names))
+
+    def test_inline_rte_components_list(self):
+        inline_component_tag_names = (
+            rte_component_registry.Registry.get_inline_component_tag_names())
+        inline_component_tag_names_from_constant = [
+            'oppia-noninteractive-%s' % element_id
+            for element_id in constants.INLINE_RTE_COMPONENTS]
+        self.assertEqual(
+            set(inline_component_tag_names),
+            set(inline_component_tag_names_from_constant))
 
     def test_get_block_component_tag_names(self):
         """Test get_block_component_tag_names method."""

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for core.domain.question_services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -60,11 +61,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.save_new_skill(
-            'skill_1', self.admin_id, 'Skill Description 1')
+            'skill_1', self.admin_id, description='Skill Description 1')
         self.save_new_skill(
-            'skill_2', self.admin_id, 'Skill Description 2')
+            'skill_2', self.admin_id, description='Skill Description 2')
         self.save_new_skill(
-            'skill_3', self.admin_id, 'Skill Description 3')
+            'skill_3', self.admin_id, description='Skill Description 3')
 
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
@@ -374,10 +375,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertIsNone(question_summaries[1])
 
     def test_delete_question(self):
-        question_rights_model = question_models.QuestionRightsModel.get(
-            self.question_id)
-        self.assertFalse(question_rights_model is None)
-
         question_summary_model = question_models.QuestionSummaryModel.get(
             self.question_id)
         self.assertFalse(question_summary_model is None)
@@ -388,11 +385,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'Entity for class QuestionModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionModel.get(self.question_id)
-
-        with self.assertRaisesRegexp(Exception, (
-            'Entity for class QuestionRightsModel with id %s not found' % (
-                self.question_id))):
-            question_models.QuestionRightsModel.get(self.question_id)
 
         with self.assertRaisesRegexp(Exception, (
             'Entity for class QuestionSummaryModel with id %s not found' % (
@@ -546,38 +538,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_compute_summary_of_question(self):
         question_summary = question_services.compute_summary_of_question(
-            self.question, self.editor_id)
+            self.question)
 
         self.assertEqual(question_summary.id, self.question_id)
         self.assertEqual(
             question_summary.question_content,
             feconf.DEFAULT_INIT_STATE_CONTENT_STR)
-
-    def test_get_question_summaries_by_creator_id(self):
-        question_summaries = (
-            question_services.get_question_summaries_by_creator_id(
-                self.editor_id))
-
-        self.assertEqual(len(question_summaries), 3)
-        question_summaries.sort(key=lambda summary: summary.last_updated)
-        question_ids = [summary.id for summary in question_summaries]
-        self.assertEqual(question_ids[0], self.question_id)
-        self.assertEqual(question_ids[1], self.question_id_1)
-        self.assertEqual(question_ids[2], self.question_id_2)
-
-    def test_created_question_rights(self):
-        question_rights = question_services.get_question_rights(
-            self.question_id)
-
-        self.assertTrue(question_rights.is_creator(self.editor_id))
-        self.assertEqual(question_rights.creator_id, self.editor_id)
-
-        self.assertIsNone(
-            question_services.get_question_rights('question_id', strict=False))
-        with self.assertRaisesRegexp(
-            Exception, 'Entity for class QuestionRightsModel with id '
-            'question_id not found'):
-            question_services.get_question_rights('question_id')
 
     def test_get_skills_of_question(self):
         # If the question id doesnt exist at all, it returns an empty list.

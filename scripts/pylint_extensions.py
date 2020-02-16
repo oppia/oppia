@@ -17,6 +17,7 @@
 """Implements additional custom Pylint checkers to be used as part of
 presubmit checks.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -30,6 +31,13 @@ from . import docstrings_checker
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 sys.path.insert(0, _PYLINT_PATH)
+
+ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
+
+EXCLUDED_PHRASES = [
+    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+
+DATA_TYPES = ['int', 'str', 'float', 'bool']
 
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
@@ -51,7 +59,7 @@ def read_from_node(node):
     Returns:
         list(str). The data read from the ast node.
     """
-    return list(node.stream().readlines())
+    return list([line.decode('utf-8') for line in node.stream().readlines()])
 
 
 class ExplicitKeywordArgsChecker(checkers.BaseChecker):
@@ -639,7 +647,6 @@ class DocstringParameterChecker(checkers.BaseChecker):
         """Checks whether a class and corresponding  init() method are
         documented. If both of them are documented, it adds an error message.
 
-
         Args:
             class_doc: Docstring. Pylint docstring class instance representing
                 a class's docstring.
@@ -658,6 +665,7 @@ class DocstringParameterChecker(checkers.BaseChecker):
     def _handle_no_raise_doc(self, excs, node):
         """Checks whether the raised exception in a function has been
         documented, add a message otherwise.
+
         Args:
             excs: list(str). A list of exception types.
             node: astroid.scoped_nodes.Function. Node to access module content.
@@ -961,6 +969,484 @@ class SingleSpaceAfterYieldChecker(checkers.BaseChecker):
                 self.add_message('single-space-after-yield', line=line_num + 1)
 
 
+class ExcessiveEmptyLinesChecker(checkers.BaseChecker):
+    """Checks if there are excessive newlines between method definitions."""
+    __implements__ = interfaces.IRawChecker
+
+    name = 'excessive-new-lines'
+    priority = -1
+    msgs = {
+        'C0011': (
+            'Excessive new lines between function definations.',
+            'excessive-new-lines',
+            'Remove extra newlines.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that method definitions are not seperated
+        by more than two blank lines.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        blank_line_counter = 0
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            if file_content[line_num] == b'\n':
+                blank_line_counter += 1
+            else:
+                blank_line_counter = 0
+
+            if line_num + 1 < file_length and blank_line_counter > 2:
+                line = file_content[line_num + 1].strip()
+                if line.startswith(b'def') or line.startswith(b'@'):
+                    self.add_message('excessive-new-lines', line=line_num + 1)
+
+
+class SingleNewlineAboveArgsChecker(checkers.BaseChecker):
+    """Checker for single space above args in python doc string."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'single-space-above-args-raises-returns'
+    priority = -1
+    msgs = {
+        'C0012': (
+            'Files must have a single newline above args in doc string.',
+            'single-space-above-args',
+            'Please enter a single newline above args in doc string.'
+        ),
+        'C0013': (
+            'Files must have a single newline above returns in doc string.',
+            'single-space-above-returns',
+            'Please enter a single newline above returns in doc string.'
+        ),
+        'C0014': (
+            'Files must have a single newline above raises in doc string.',
+            'single-space-above-raises',
+            'Please enter a single newline above raises in doc string.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that there is a single newline above args,
+        raises, returns in python doc string.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        blank_line_counter = 0
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            if file_content[line_num] == b'\n':
+                blank_line_counter += 1
+            else:
+                blank_line_counter = 0
+
+            if (line_num + 1 < file_length and (
+                    blank_line_counter == 0 or blank_line_counter > 1)):
+                line = file_content[line_num + 1].strip()
+                if line == b'Args:':
+                    self.add_message(
+                        'single-space-above-args', line=line_num + 1)
+                elif line == b'Returns:':
+                    self.add_message(
+                        'single-space-above-returns', line=line_num + 1)
+                elif line == b'Raises:':
+                    self.add_message(
+                        'single-space-above-raises', line=line_num + 1)
+
+
+class DivisionOperatorChecker(checkers.BaseChecker):
+    """Checks if division operator is used."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'division-operator-used'
+    priority = -1
+    msgs = {
+        'C0015': (
+            'Division Operator is used.',
+            'division-operator-used',
+            'Please use python_utils.divide() instead of the "/" operator'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that the division operator('/') is not
+        used and python_utils.divide() is used instead.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        string_indicator = b'\''
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single line comment, ignore it.
+            if line.startswith(b'#'):
+                continue
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multi-line comment.
+            if in_multi_line_comment:
+                continue
+
+            # Ignore anything inside a string.
+            if line.count(string_indicator) >= 2:
+                continue
+
+            if re.search(br'[^/]/[^/]', line):
+                self.add_message(
+                    'division-operator-used', line=line_num + 1)
+
+
+class SingleLineCommentChecker(checkers.BaseChecker):
+    """Checks if comments follow correct style."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'incorrectly_styled_comment'
+    priority = -1
+    msgs = {
+        'C0016': (
+            'Invalid punctuation is used.',
+            'invalid-punctuation-used',
+            'Please use valid punctuation.'
+        ),
+        'C0017': (
+            'No space is used at beginning of comment.',
+            'no-space-at-beginning',
+            'Please use single space at the beginning of comment.'
+        ),
+        'C0018': (
+            'No capital letter is used at the beginning of comment.',
+            'no-capital-letter-at-beginning',
+            'Please use capital letter to begin the content of comment.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that comments follow correct style.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        in_multi_line_comment = False
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+
+            # Single multi-line comment, ignore it.
+            if line.count(multi_line_indicator) == 2:
+                continue
+
+            # Flip multi-line boolean depending on whether or not we see
+            # the multi-line indicator. Possible for multiline comment to
+            # be somewhere other than the start of a line (e.g. func arg),
+            # so we can't look at start of or end of a line, which is why
+            # the case where two indicators in a single line is handled
+            # separately (i.e. one line comment with multi-line strings).
+            if multi_line_indicator in line:
+                in_multi_line_comment = not in_multi_line_comment
+
+            # Ignore anything inside a multiline comment.
+            if in_multi_line_comment:
+                continue
+
+            next_line = ''
+            previous_line = ''
+            if line_num + 1 < file_length:
+                next_line = file_content[line_num + 1].strip()
+            if line_num > 0:
+                previous_line = file_content[line_num - 1].strip()
+
+            if line.startswith(b'#'):
+                # Check if comment contains any excluded phrase.
+                word_is_present_in_excluded_phrases = any(
+                    word in line for word in EXCLUDED_PHRASES)
+
+                # Check if variable name is used.
+                underscore_is_present = any('_' in word for word in line)
+
+                if word_is_present_in_excluded_phrases or underscore_is_present:
+                    continue
+
+            if line.startswith(b'#') and not next_line.startswith(b'#'):
+                # Check that the comment ends with the proper
+                # punctuation.
+                last_char_is_invalid = line[-1] not in (
+                    ALLOWED_TERMINATING_PUNCTUATIONS)
+                if last_char_is_invalid:
+                    self.add_message(
+                        'invalid-punctuation-used', line=line_num + 1)
+
+            # Check that comment starts with a space and is not a
+            # shebang expression at the start of a bash script which
+            # loses function when a space is added.
+            if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
+                self.add_message(
+                    'no-space-at-beginning', line=line_num + 1)
+
+            # Check if comment contains version info or data type.
+            if not previous_line.startswith(b'#'):
+                data_type_is_present = any(word in line for word in DATA_TYPES)
+                if data_type_is_present or re.search(br'^# v[0-9]+ .*$', line):
+                    continue
+
+            # Check that comment starts with a capital letter.
+            if not previous_line.startswith(b'#') and (
+                    re.search(br'^# [a-z][A-Za-z]*.*$', line)):
+                self.add_message(
+                    'no-capital-letter-at-beginning', line=line_num + 1)
+
+
+class DocstringChecker(checkers.BaseChecker):
+    """Checks if docstring follow correct style."""
+
+    __implements__ = interfaces.IRawChecker
+    name = 'invalid-docstring-format'
+    priority = -1
+    msgs = {
+        'C0019': (
+            'Period is not used at the end of the docstring.',
+            'no-period-used',
+            'Please use a period at the end of the docstring,'
+        ),
+        'C0020': (
+            'Multiline docstring should end with a new line.',
+            'no-newline-used-at-end',
+            'Please end multiline docstring with a new line.'
+        ),
+        'C0021': (
+            'Single line docstring should not span two lines.',
+            'single-line-docstring-span-two-lines',
+            'Please do not use two lines for a single line docstring. '
+            'If line length exceeds 80 characters, '
+            'convert the single line docstring to a multiline docstring.'
+        ),
+        'C0022': (
+            'Empty line before the end of multi-line docstring.',
+            'empty-line-before-end',
+            'Please do not use empty line before '
+            'the end of the multi-line docstring.'
+        ),
+        'C0023': (
+            'Space after """ in docstring.',
+            'space-after-triple-quote',
+            'Please do not use space after """ in docstring.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that docstring end in a period and the
+        arguments order in the function definition matches the order in the
+        docstring.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        is_docstring = False
+        is_class_or_function = False
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+            prev_line = ''
+
+            if line_num > 0:
+                prev_line = file_content[line_num - 1].strip()
+
+            # Check if it is a docstring and not some multi-line string.
+            if (prev_line.startswith(b'class ') or
+                    prev_line.startswith(b'def ')) or (is_class_or_function):
+                is_class_or_function = True
+                if prev_line.endswith(b'):') and line.startswith(b'"""'):
+                    is_docstring = True
+                    is_class_or_function = False
+
+            # Check for space after """ in docstring.
+            if re.search(br'^""".+$', line) and is_docstring and (
+                    line[3] == b' '):
+                is_docstring = False
+                self.add_message(
+                    'space-after-triple-quote', line=line_num + 1)
+
+            # Check if single line docstring span two lines.
+            if line == b'"""' and prev_line.startswith(b'"""') and is_docstring:
+                is_docstring = False
+                self.add_message(
+                    'single-line-docstring-span-two-lines', line=line_num + 1)
+
+            # Check for single line docstring.
+            elif re.search(br'^""".+"""$', line) and is_docstring:
+                # Check for punctuation at line[-4] since last three
+                # characters are double quotes.
+                if (len(line) > 6) and (
+                        line[-4] not in ALLOWED_TERMINATING_PUNCTUATIONS):
+                    self.add_message(
+                        'no-period-used', line=line_num + 1)
+                is_docstring = False
+
+            # Check for mutliline docstring.
+            elif line.endswith(b'"""') and is_docstring:
+                # Case 1: line is """. This is correct for multiline docstring.
+                if line == b'"""':
+                    # Check for empty line before the end of docstring.
+                    if prev_line == b'':
+                        self.add_message(
+                            'empty-line-before-end', line=line_num + 1)
+                    # Check for punctuation at the end of docstring.
+                    else:
+                        last_char_is_invalid = prev_line[-1] not in (
+                            ALLOWED_TERMINATING_PUNCTUATIONS)
+                        no_word_is_present_in_excluded_phrases = (not any(
+                            word in prev_line for word in EXCLUDED_PHRASES))
+                        if last_char_is_invalid and (
+                                no_word_is_present_in_excluded_phrases):
+                            self.add_message(
+                                'no-period-used', line=line_num + 1)
+
+                # Case 2: line contains some words before """. """
+                # should shift to next line.
+                elif not any(word in line for word in EXCLUDED_PHRASES):
+                    self.add_message(
+                        'no-newline-used-at-end', line=line_num + 1)
+                is_docstring = False
+
+
+class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
+    """Checks if there is a single empty line below the fileoverview docstring.
+    Note: The check assumes that all files have a file overview. This
+    assumption is justified because Pylint has an inbuilt check
+    (missing-docstring) for missing file overviews.
+    """
+
+    __implements__ = interfaces.IRawChecker
+    name = 'space_between_imports_and_file-overview'
+    priority = -1
+    msgs = {
+        'C0024': (
+            'No empty line used below the fileoverview docstring.',
+            'no-empty-line-provided-below-fileoverview',
+            'please provide an empty line below the fileoverview.'
+        ),
+        'C0025': (
+            'Single empty line should be provided below the fileoverview.',
+            'only-a-single-empty-line-should-be-provided',
+            'please provide an empty line below the fileoverview.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that there is a blank line below
+        file overview docstring.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        triple_quote_counter = 0
+        empty_line_counter = 0
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+            # Single line comment, ignore it.
+            if line.startswith(b'#'):
+                continue
+            triple_quote_counter += line.count(multi_line_indicator)
+
+            if line.endswith(b'"""') and triple_quote_counter == 2:
+                closing_line_index_of_fileoverview = line_num
+                break
+
+        empty_line_check_index = closing_line_index_of_fileoverview
+        if empty_line_check_index < file_length - 1:
+            while file_content[empty_line_check_index + 1] == b'\n':
+                empty_line_counter += 1
+                empty_line_check_index += 1
+
+        if empty_line_counter > 1:
+            self.add_message(
+                'only-a-single-empty-line-should-be-provided',
+                line=closing_line_index_of_fileoverview + 1)
+        elif empty_line_counter == 0:
+            self.add_message(
+                'no-empty-line-provided-below-fileoverview',
+                line=closing_line_index_of_fileoverview + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -976,3 +1462,9 @@ def register(linter):
     linter.register_checker(RestrictedImportChecker(linter))
     linter.register_checker(SingleCharAndNewlineAtEOFChecker(linter))
     linter.register_checker(SingleSpaceAfterYieldChecker(linter))
+    linter.register_checker(ExcessiveEmptyLinesChecker(linter))
+    linter.register_checker(SingleNewlineAboveArgsChecker(linter))
+    linter.register_checker(DivisionOperatorChecker(linter))
+    linter.register_checker(SingleLineCommentChecker(linter))
+    linter.register_checker(DocstringChecker(linter))
+    linter.register_checker(BlankLineBelowFileOverviewChecker(linter))

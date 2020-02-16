@@ -1,5 +1,6 @@
 <style>
-  admin-navbar .nav > li > a:focus {
+  admin-navbar .nav > li > a:focus,
+  admin-navbar .oppia-admin-page-dropdown-icon {
     background-color: #00376d;
     color: #fff;
   }
@@ -9,27 +10,69 @@
   admin-navbar .oppia-navbar-profile-admin .open > a:hover,
   admin-navbar .oppia-navbar-profile-admin .open > a:focus,
   admin-navbar .oppia-navbar-tabs-admin > li > a:hover,
-  admin-navbar .oppia-navbar-tabs-admin > li > a.active {
+  admin-navbar .oppia-navbar-tabs-admin > li > a.active,
+  admin-navbar .oppia-admin-page-dropdown-icon {
     background-color: #fff;
     color: #00376d;
   }
+  admin-navbar .oppia-navbar-admin {
+    top: 0;
+  }
+  @media screen and (max-width: 710px) {
+    admin-navbar .oppia-admin-page-dropdown {
+      display: block;
+    }
+    admin-navbar .oppia-hide-in-small-width-screens {
+      display: none;
+    }
+  }
+  @media screen and (min-width: 711px) {
+    admin-navbar .oppia-admin-page-dropdown,
+    admin-navbar .oppia-admin-page-dropdown-icon,
+    admin-navbar .oppia-admin-page-dropdown-menu {
+      display: none;
+    }
+  }
 </style>
-<nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection" role="navigation">
+<nav class="navbar navbar-default navbar-light oppia-navbar oppia-prevent-selection oppia-navbar-admin" role="navigation">
   <div class="navbar-container" style="background-color: #00376d">
     <div class="navbar-header protractor-test-navbar-header float-left">
-      <a class="oppia-navbar-brand-name oppia-transition-200" href="/library">
+      <a class="oppia-navbar-brand-name oppia-transition-200 float-left" href="/library">
         <img ng-src="<[$ctrl.logoWhiteImgUrl]>" class="oppia-logo" ng-class="'oppia-logo-wide'">
       </a>
       <ul class="nav navbar-nav oppia-navbar-breadcrumb">
         <li>
-          <span class="oppia-navbar-breadcrumb-separator"></span>
-          Admin
+          <span class="oppia-navbar-breadcrumb-separator"></span>Admin
         </li>
       </ul>
     </div>
     <div ng-cloak class="navbar-header float-right">
       <ul class="nav oppia-navbar-nav oppia-navbar-profile-admin">
-        <ul class="nav oppia-navbar-tabs-admin">
+        <ul class="nav oppia-navbar-tabs-admin oppia-admin-page-dropdown" uib-dropdown>
+          <li uib-dropdown-toggle class="nav-item oppia-clickable-navbar-element"
+              ng-mouseover="$ctrl.onMouseoverDropdownIconOrMenu($event)"
+              ng-mouseleave="$ctrl.onMouseoutDropdownIconOrMenu($event)">
+            <a class="nav-link oppia-navbar-tab"
+               uib-tooltip="Menu"
+               tooltip-placement="bottom">
+              <i class="fa fa-bars oppia-admin-page-dropdown-icon"></i>
+            </a>
+          </li>
+          <ul class="uib-dropdown-menu dropdown-menu oppia-admin-page-dropdown-menu"
+              ng-mouseover="$ctrl.onMouseoverDropdownIconOrMenu($event)"
+              ng-mouseleave="$ctrl.onMouseoutDropdownIconOrMenu($event)"
+              ng-show="$ctrl.dropdownMenuisActive"
+              role="menu">
+            <li ng-repeat="(tabName, url) in $ctrl.ADMIN_TAB_URLS">
+              <a class="dropdown-item nav-link oppia-navbar-tab"
+                 style = "color: #00376d"
+                 ng-href="<[url]>">
+                 {{tabName}}
+              </a>
+            </li>
+          </ul>
+        </ul>
+        <ul class="nav oppia-navbar-tabs-admin oppia-hide-in-small-width-screens">
           <li class="nav-item oppia-clickable-navbar-element float-right">
             <a class="nav-link oppia-navbar-tab"
                ng-href="<[::$ctrl.ADMIN_TAB_URLS.ACTIVITIES]>"
@@ -75,6 +118,8 @@
               Misc
             </a>
           </li>
+        </ul>
+        <ul class="nav oppia-navbar-tabs-admin">
           <li uib-dropdown class="nav-item uib-dropdown float-right">
             <a uib-dropdown-toggle class="nav-link uib-dropdown-toggle oppia-navbar-dropdown-toggle"
                data-toggle="dropdown"
@@ -88,7 +133,6 @@
                 <div ng-if="!$ctrl.profilePictureDataUrl" class="dropdown-toggle">
                   <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
                 </div>
-
                 <div style="display: none;" class="oppia-user-email">
                   <[$ctrl.getUserEmail()]>
                 </div>

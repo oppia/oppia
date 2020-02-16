@@ -21,35 +21,52 @@
  * function on Oppia-ml.
  */
 
-require('classifiers/svm-prediction.service.ts');
-require('classifiers/text-input.tokenizer.ts');
-require('classifiers/count-vectorizer.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require('interactions/interactions-extension.constants.ajs.ts');
+import { CountVectorizerService } from 'classifiers/count-vectorizer.service';
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants';
+import { SVMPredictionService } from 'classifiers/svm-prediction.service';
+import { TextInputTokenizer } from 'classifiers/text-input.tokenizer';
 
-angular.module('oppia').factory('TextInputPredictionService', [
-  'CountVectorizerService', 'SVMPredictionService',
-  'TextInputTokenizer', 'TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD', function(
-      CountVectorizerService, SVMPredictionService,
-      TextInputTokenizer, TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
-    return {
-      predict: function(classifierData, textInput) {
-        var cvVocabulary = classifierData.cv_vocabulary;
-        var svmData = classifierData.SVM;
+export interface IClassifierData {
+  /* eslint-disable camelcase */
+  cv_vocabulary: object;
+  SVM: object;
+}
+@Injectable({
+  providedIn: 'root'
+})
+export class TextInputPredictionService {
+  private TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD = (
+    InteractionsExtensionsConstants.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD);
+  constructor(private countVectorizerService: CountVectorizerService,
+      private svmPredictionService: SVMPredictionService,
+      private textInputTokenizer: TextInputTokenizer) {
+  }
 
-        // Tokenize the text input.
-        textInput = textInput.toLowerCase();
-        var textInputTokens = TextInputTokenizer.generateTokens(textInput);
+  predict(classifierData: IClassifierData, textInput: string): number {
+    /* eslint-disable camelcase */
+    const cvVocabulary = classifierData.cv_vocabulary;
+    const svmData = classifierData.SVM;
 
-        var textVector = CountVectorizerService.vectorize(
-          textInputTokens, cvVocabulary);
-        var predictionResult = SVMPredictionService.predict(
-          svmData, textVector);
-        if (predictionResult.predictionConfidence >
-            TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
-          return predictionResult.predictionLabel;
-        }
-        return -1;
-      }
-    };
-  }]);
+    // Tokenize the text input.
+    textInput = textInput.toLowerCase();
+    const textInputTokens = this.textInputTokenizer.generateTokens(textInput);
+
+    const textVector = this.countVectorizerService.vectorize(
+      textInputTokens, cvVocabulary);
+    const predictionResult = this.svmPredictionService.predict(
+      svmData, textVector);
+    if (predictionResult.predictionConfidence >
+        this.TEXT_INPUT_PREDICTION_SERVICE_THRESHOLD) {
+      return predictionResult.predictionLabel;
+    }
+    return -1;
+  }
+}
+
+angular.module('oppia').factory(
+  'TextInputPredictionService', downgradeInjectable(
+    TextInputPredictionService));

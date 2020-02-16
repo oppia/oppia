@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/typescript_checks.py."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -30,6 +31,7 @@ MOCK_COMPILED_JS_DIR = os.path.join(TEST_SOURCE_DIR, 'compiled_js_dir', '')
 
 class TypescriptChecksTests(test_utils.GenericTestBase):
     """Test the typescript checks."""
+
     def setUp(self):
         super(TypescriptChecksTests, self).setUp()
         process = subprocess.Popen(['test'], stdout=subprocess.PIPE)

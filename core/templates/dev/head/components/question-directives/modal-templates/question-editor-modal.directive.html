@@ -1,9 +1,26 @@
 <div class="modal-header">
   <h3>
-    Question Editor
+    Question <span ng-if="!newQuestionIsBeingCreated"> and Linked Skills </span> Editor
   </h3>
 </div>
 <div class="modal-body" style="width: 96%; margin-left: 2%;">
+  <div ng-if="!newQuestionIsBeingCreated">
+    <h4> <strong> Linked Skills </strong> </h4>
+    <md-card class="question-skill-id" ng-repeat="skill in associatedSkillSummaries">
+      <div class="skill-description-card">
+        <span style="float: right;" ng-click="removeSkill(skill.getId())" aria-hidden="true">
+          <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
+        </span>
+        <a ng-href="<[getSkillEditorUrl(skill.getId())]>" target="_blank" rel="noopener">
+          <[skill.getDescription()]>
+        </a>
+      </div>
+    </md-card>
+    <button class="btn btn-success btn-sm" ng-click="addSkill()">Link Another Skill</button>
+    <button class="btn btn-primary btn-sm" ng-click="undo()">Undo Skill Changes</button>
+  </div>
+
+  <h4 ng-if="!newQuestionIsBeingCreated" style="margin-top: 4vh;"> <strong> Question Editor </strong> </h4>
   <question-editor question-id="questionId"
                    misconceptions-by-skill="misconceptionsBySkill"
                    question-state-data="questionStateData"
@@ -22,5 +39,24 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
-  <button class="btn btn-success protractor-test-save-question-button" ng-click="done()"> Save and Publish Question </button>
+  <button title="To Save please add: interaction, hint, solution and address all misconceptions"
+          class="btn btn-success protractor-test-save-question-button"
+          ng-click="done()"
+          ng-disabled="isSaveButtonDisabled()">
+    Done
+  </button>
 </div>
+<style>
+  .question-skill-id {
+    background-color: #efefef;
+    margin-left: 0;
+  }
+  .question-skill-id:hover {
+    background-color: #e0e0e0;
+  }
+  .skill-description-card {
+    height: 2.5em;
+    padding-left: 10px;
+    padding-top: 10px;
+  }
+</style>

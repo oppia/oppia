@@ -19,7 +19,7 @@
  */
 
 require('pages/exploration-editor-page/services/change-list.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('ExplorationPropertyService', [
   '$log', '$rootScope', 'AlertsService', 'ChangeListService',
@@ -86,10 +86,6 @@ angular.module('oppia').factory('ExplorationPropertyService', [
 
         if (!this._isValid(this.displayed) || !this.hasChanged()) {
           this.restoreFromMemento();
-          return;
-        }
-
-        if (angular.equals(this.displayed, this.savedMemento)) {
           return;
         }
 

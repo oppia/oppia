@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for Oppia suggestions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -23,7 +24,8 @@ import feconf
 
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 # Constants defining types of entities to which suggestions can be created.
 TARGET_TYPE_EXPLORATION = 'exploration'
@@ -143,6 +145,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """General suggestion needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralSuggestionModel exists for the user.
@@ -155,7 +162,33 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         return cls.query(
             ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
-        ).get() is not None
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralSuggestionModel has two fields that contain user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the author_id and
+        final_reviewer_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.author_id == old_user_id,
+                cls.final_reviewer_id == old_user_id)).fetch():
+            if model.author_id == old_user_id:
+                model.author_id = new_user_id
+            if model.final_reviewer_id == old_user_id:
+                model.final_reviewer_id = new_user_id
+            migrated_models.append(model)
+        GeneralSuggestionModel.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def create(
@@ -335,54 +368,174 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         return user_data
 
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for author_id and
+        final_reviewer_id.
+        """
+        user_ids = [self.author_id]
+        # We don't need to check final_reviewer_id if it is None.
+        if self.final_reviewer_id is not None:
+            user_ids.append(self.final_reviewer_id)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
 
-class ReviewerRotationTrackingModel(base_models.BaseModel):
-    """Model to keep track of the position in the reviewer rotation. This model
-    is keyed by the score category.
+
+class GeneralVoiceoverApplicationModel(base_models.BaseModel):
+    """A general model for voiceover application of an entity.
+
+    The ID of the voiceover application will be a random hashed value.
     """
-
-    # The ID of the user whose turn is just completed in the rotation.
-    current_position_in_rotation = ndb.StringProperty(
-        required=True, indexed=False)
+    # The type of entity to which the user will be assigned as a voice artist
+    # once the application will get approved.
+    target_type = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the entity to which the application belongs.
+    target_id = ndb.StringProperty(required=True, indexed=True)
+    # The language code for the voiceover audio.
+    language_code = ndb.StringProperty(required=True, indexed=True)
+    # The status of the application. One of: accepted, rejected, in-review.
+    status = ndb.StringProperty(
+        required=True, indexed=True, choices=STATUS_CHOICES)
+    # The HTML content written in the given language_code.
+    # This will typically be a snapshot of the content of the initial card of
+    # the target.
+    content = ndb.TextProperty(required=True)
+    # The filename of the voiceover audio. The filename will have
+    # datetime-randomId(length 6)-language_code.mp3 pattern.
+    filename = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the author of the voiceover application.
+    author_id = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the reviewer who accepted/rejected the voiceover application.
+    final_reviewer_id = ndb.StringProperty(indexed=True)
+    # The plain text message submitted by the reviewer while rejecting the
+    # application.
+    rejection_message = ndb.TextProperty()
 
     @staticmethod
     def get_deletion_policy():
-        """Reviewer rotation tracking is going to be reworked. Thus, using
-        not applicable for now.
+        """General voiceover application needs to be pseudonymized for the
+        user.
         """
-        return base_models.DELETION_POLICY.NOT_APPLICABLE
+        return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
     @classmethod
-    def create(cls, score_category, user_id):
-        """Creates a new ReviewerRotationTrackingModel instance.
-
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether GeneralVoiceoverApplicationModel exists for the user.
         Args:
-            score_category: str. The score category.
-            user_id: str. The ID of the user who completed their turn in the
-                rotation for the given category.
-
-        Raises:
-            Exception: There is already an instance with the given id.
+            user_id: str. The ID of the user whose data should be checked.
+        Returns:
+            bool. Whether any models refer to the given user ID.
         """
-        if cls.get_by_id(score_category):
-            raise Exception(
-                'There already exists an instance with the given id: %s' % (
-                    score_category))
-        cls(id=score_category, current_position_in_rotation=user_id).put()
+        return cls.query(
+            ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralVoiceoverApplicationModel has two fields that contain user
+        ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
 
     @classmethod
-    def update_position_in_rotation(cls, score_category, user_id):
-        """Updates current position in rotation for the given score_category.
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the author_id and
+        final_reviewer_id.
 
         Args:
-            score_category: str. The score category.
-            user_id: str. The ID of the user who completed their turn in the
-                rotation for the given category.
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
         """
-        instance = cls.get_by_id(score_category)
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.author_id == old_user_id,
+                cls.final_reviewer_id == old_user_id)).fetch():
+            if model.author_id == old_user_id:
+                model.author_id = new_user_id
+            if model.final_reviewer_id == old_user_id:
+                model.final_reviewer_id = new_user_id
+            migrated_models.append(model)
+        GeneralVoiceoverApplicationModel.put_multi(
+            migrated_models, update_last_updated_time=False)
 
-        if instance is None:
-            cls.create(score_category, user_id)
+    @classmethod
+    def get_user_voiceover_applications(cls, author_id, status=None):
+        """Returns a list of voiceover application submitted by the given user.
+
+        Args:
+            author_id: str. The id of the user created the voiceover
+                application.
+            status: str|None. The status of the voiceover application.
+                If the status is None, the query will fetch all the
+                voiceover applications.
+
+        Returns:
+            list(GeneralVoiceoverApplicationModel). The list of voiceover
+                application submitted by the given user.
+        """
+        if status in STATUS_CHOICES:
+            return cls.query(ndb.AND(
+                cls.author_id == author_id, cls.status == status)).fetch()
         else:
-            instance.current_position_in_rotation = user_id
-            instance.put()
+            return cls.query(cls.author_id == author_id).fetch()
+
+    @classmethod
+    def get_reviewable_voiceover_applications(cls, user_id):
+        """Returns a list of voiceover application which a given user can
+        review.
+
+        Args:
+            user_id: str. The id of the user trying to make this query.
+                As a user cannot review their own voiceover application, so the
+                voiceover application created by the user will be excluded.
+
+        Returns:
+            list(GeneralVoiceoverApplicationModel). The list of voiceover
+                application which the given user can review.
+        """
+        return cls.query(ndb.AND(
+            cls.author_id != user_id,
+            cls.status == STATUS_IN_REVIEW)).fetch()
+
+    @classmethod
+    def get_voiceover_applications(cls, target_type, target_id, language_code):
+        """Returns a list of voiceover applications submitted for a give entity
+        in a given language.
+
+        Args:
+            target_type: str. The type of entity.
+            target_id: str. The ID of the targeted entity.
+            language_code: str. The code of the language in which the voiceover
+                application is submitted.
+
+        Returns:
+            list(GeneralVoiceoverApplicationModel). The list of voiceover
+            application which is submitted to a give entity in a given language.
+        """
+        return cls.query(ndb.AND(
+            cls.target_type == target_type, cls.target_id == target_id,
+            cls.language_code == language_code)).fetch()
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for author_id and
+        final_reviewer_id.
+        """
+        user_ids = [self.author_id]
+        # We don't need to check final_reviewer_id if it is None.
+        if self.final_reviewer_id is not None:
+            user_ids.append(self.final_reviewer_id)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)

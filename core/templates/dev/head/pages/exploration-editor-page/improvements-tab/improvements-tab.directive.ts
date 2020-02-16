@@ -35,7 +35,7 @@ require(
 );
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/ImprovementTaskService.ts');
+require('services/improvement-task.service.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'improvements-display.service.ts');
@@ -51,18 +51,16 @@ angular.module('oppia').directive('improvementsTab', [
       controller: [
         '$scope', 'ImprovementTaskService', 'ImprovementsDisplayService',
         function($scope, ImprovementTaskService, ImprovementsDisplayService) {
+          var ctrl = this;
           var fetchedTasks = [];
-          ImprovementTaskService.fetchTasks().then(function(tasks) {
-            fetchedTasks = tasks;
-          });
 
-          $scope.onlyShowOpenTasks = true;
+          $scope.getStatusCssClass = function(status) {
+            return ImprovementsDisplayService.getStatusCssClass(status);
+          };
 
-          $scope.getStatusCssClass =
-            ImprovementsDisplayService.getStatusCssClass;
-
-          $scope.getHumanReadableStatus =
-            ImprovementsDisplayService.getHumanReadableStatus;
+          $scope.getHumanReadableStatus = function(status) {
+            return ImprovementsDisplayService.getHumanReadableStatus(status);
+          };
 
           $scope.getTasks = function() {
             return fetchedTasks;
@@ -86,6 +84,13 @@ angular.module('oppia').directive('improvementsTab', [
 
           $scope.getOpenTaskCount = function() {
             return fetchedTasks.filter($scope.isTaskOpen).length;
+          };
+
+          ctrl.$onInit = function() {
+            ImprovementTaskService.fetchTasks().then(function(tasks) {
+              fetchedTasks = tasks;
+            });
+            $scope.onlyShowOpenTasks = true;
           };
         }
       ],

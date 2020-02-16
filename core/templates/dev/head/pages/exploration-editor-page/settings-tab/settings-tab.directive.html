@@ -36,39 +36,51 @@
             <div class="form-group">
               <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2 float-left">Language</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="$ctrl.explorationLanguageCodeService.displayed" ng-change="$ctrl.saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.explorationLanguageCodeService.getAllLanguageCodes()" width="85%">
-                </select>
-                <span class="form-text" style="font-size: smaller">
-                  <em>
-                    Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank" rel="noopener">Tell us.</a>
-                  </em>
-                </span>
+                <div class="row">
+                  <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select float-right" ng-model="$ctrl.explorationLanguageCodeService.displayed" ng-change="$ctrl.saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.explorationLanguageCodeService.getSupportedContentLanguages()" width="85%" style="margin-right: 0;">
+                  </select>
+                </div>
+                <div class="row">
+                  <span class="form-text" style="font-size: smaller">
+                    <em>
+                      Don't see the language you want? <a href="https://github.com/oppia/oppia/issues/new?title=Please%20add%20a%20new%20language%20choice%20to%20the%20exploration%20settings%20tab&body=Please%20add%20the%20language%20choice%20%7B%7BYOUR_LANGUAGE_HERE%7D%7D%20to%20the%20exploration%20settings%20tab.%0A%0AHere%20is%20a%20link%20to%20an%20exploration%20that%20uses%20it:%20%7B%7BINSERT_LINK_HERE%7D%7D" target="_blank" rel="noopener">Tell us.</a>
+                    </em>
+                  </span>
+                </div>
               </div>
             </div>
             <div class="form-group">
               <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2 float-left">Name of first card</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="$ctrl.explorationInitStateNameService.displayed" ng-change="$ctrl.saveExplorationInitStateName()" ng-options="name as name for name in $ctrl.stateNames track by name" width="85%">
-                </select>
-                <span class="form-text" style="font-size: smaller">
-                  <em>This is the first card the learner sees when playing your exploration.</em>
-                </span>
+                <div class="row">
+                  <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="$ctrl.explorationInitStateNameService.displayed" ng-change="$ctrl.saveExplorationInitStateName()" ng-options="name as name for name in $ctrl.stateNames track by name" width="85%">
+                  </select>
+                </div>
+                <div class="row">
+                  <span class="form-text" style="font-size: smaller">
+                    <em>This is the first card the learner sees when playing your exploration.</em>
+                  </span>
+                </div>
               </div>
             </div>
             <div class="form-group">
               <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2 float-left">Tags</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
-                <div ng-if="$ctrl.hasPageLoaded">
-                  <select2-dropdown item="$ctrl.explorationTagsService.displayed"
-                                    choices="$ctrl.explorationTagsService.displayed"
-                                    allow-multiple-choices="true"
-                                    invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
-                                    new-choice-regex="<[::$ctrl.TAG_REGEX]>"
-                                    width="85%"
-                                    placeholder="Skills, concepts, topics..."
-                                    on-selection-change="$ctrl.saveExplorationTags()">
-                  </select2-dropdown>
+                <div class="row">
+                  <div ng-if="$ctrl.hasPageLoaded" style="width:100%;">
+                    <select2-dropdown item="$ctrl.explorationTagsService.displayed"
+                                      choices="$ctrl.explorationTagsService.displayed"
+                                      allow-multiple-choices="true"
+                                      invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
+                                      new-choice-regex="<[::$ctrl.TAG_REGEX]>"
+                                      width="100%"
+                                      placeholder="Skills, concepts, topics..."
+                                      on-selection-change="$ctrl.saveExplorationTags()">
+                    </select2-dropdown>
+                  </div>
                 </div>
+              </div>
+              <div class="col-lg-10 col-md-10 col-sm-10 offset-2" style="padding-left:0;">
                 <span class="form-text" style="font-size: smaller">
                   <em>Tags help learners discover your exploration when searching.</em>
                 </span>
@@ -205,7 +217,7 @@
               <div class="oppia-on-off-switch">
                 <input type="checkbox" ng-if="!$ctrl.isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()">
                 <input type="checkbox" ng-if="$ctrl.isCorrectnessFeedbackEnabled()" class="oppia-on-off-switch-checkbox" id="correctness-switch" ng-click="$ctrl.toggleCorrectnessFeedback()" checked>
-                <label class="oppia-on-off-switch-label" for="correctness-switch">
+                <label class="oppia-on-off-switch-label protractor-test-enable-mark-correctness-feedback" for="correctness-switch">
                   <span class="oppia-on-off-switch-inner"></span>
                   <span class="oppia-on-off-switch-main"></span>
                 </label>

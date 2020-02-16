@@ -26,6 +26,9 @@ require(
   'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
   'skill-misconceptions-editor.directive.ts');
 require(
+  'pages/skill-editor-page/editor-tab/skill-prerequisite-skills-editor/' +
+  'skill-prerequisite-skills-editor.directive.ts');
+require(
   'pages/skill-editor-page/editor-tab/skill-rubrics-editor/' +
   'skill-rubrics-editor.directive.ts');
 
@@ -45,7 +48,9 @@ angular.module('oppia').directive('skillEditorMainTab', [
       controller: [
         '$scope', 'SkillEditorStateService',
         function($scope, SkillEditorStateService) {
-          $scope.hasLoadedSkill = SkillEditorStateService.hasLoadedSkill;
+          $scope.hasLoadedSkill = function() {
+            return SkillEditorStateService.hasLoadedSkill();
+          };
         }
       ]
     };

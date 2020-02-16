@@ -5,7 +5,7 @@
       (Drag and drop skills to assign them to subtopics)
     </h4>
     <div class="subtopics-container">
-      <md-card class="subtopic"
+      <md-card class="subtopic protractor-test-subtopic-column"
                ng-repeat="(subtopicIndex, subtopic) in subtopics"
                dnd-list="subtopic.getSkillSummaries()"
                dnd-drop="endMoveSkill(subtopic.getId())">
@@ -28,7 +28,8 @@
                    dnd-dragstart="startMoveSkill(subtopic.getId(), skillSummary)"
                    dnd-effect-allowed="move"
                    dnd-disable-if="isSkillDeleted(skillSummary)">
-            <a ng-if="!isSkillDeleted(skillSummary)"
+            <a class="protractor-test-assigned-skill-card-text"
+               ng-if="!isSkillDeleted(skillSummary)"
                ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
               <[skillSummary.getDescription()]>
             </a>
@@ -46,7 +47,7 @@
     </div>
   </md-card>
 
-  <md-card class="uncategorized-skill-ids"
+  <md-card class="uncategorized-skill-ids protractor-test-uncategorized-skills-container"
            dnd-list="uncategorizedSkillSummaries"
            dnd-drop="endMoveSkill(null)">
     <h3> Uncategorized Skills </h3>
@@ -57,8 +58,9 @@
                dnd-effect-allowed="move"
                dnd-dragstart="startMoveSkill(null, skillSummary)"
                dnd-disable-if="isSkillDeleted(skillSummary)">
-        <div class="skill-card">
-          <a ng-if="!isSkillDeleted(skillSummary)"
+        <div class="skill-card protractor-test-skill-card">
+          <a class="protractor-test-skill-card-text"
+             ng-if="!isSkillDeleted(skillSummary)"
              ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
             <[skillSummary.getDescription()]>
           </a>

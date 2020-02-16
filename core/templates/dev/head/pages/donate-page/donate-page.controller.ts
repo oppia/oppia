@@ -19,8 +19,8 @@
 require('base-components/base-content.directive.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/contextual/WindowDimensionsService.ts');
+require('services/site-analytics.service.ts');
+require('services/contextual/window-dimensions.service.ts');
 
 angular.module('oppia').directive('donatePage', [
   'UrlInterpolationService', function(
@@ -39,10 +39,6 @@ angular.module('oppia').directive('donatePage', [
             $http, $timeout, $window, SiteAnalyticsService,
             UrlInterpolationService, WindowDimensionsService) {
           var ctrl = this;
-          ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
-          ctrl.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/opp_donate_text.svg');
-
           ctrl.onDonateThroughAmazon = function() {
             SiteAnalyticsService.registerGoToDonationSiteEvent('Amazon');
             $timeout(function() {
@@ -61,6 +57,11 @@ angular.module('oppia').directive('donatePage', [
             // _CORS
             // for more information.
             SiteAnalyticsService.registerGoToDonationSiteEvent('PayPal');
+          };
+          ctrl.$onInit = function() {
+            ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+            ctrl.donateImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/opp_donate_text.svg');
           };
         }
       ]

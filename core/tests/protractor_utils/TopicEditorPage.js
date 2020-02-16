@@ -17,8 +17,10 @@
  * in Protractor tests.
  */
 
+var dragAndDropScript = require('html-dnd').code;
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var path = require('path');
 
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
@@ -33,6 +35,8 @@ var TopicEditorPage = function() {
 
   var topicNameField = element(
     by.css('.protractor-test-topic-name-field'));
+  var abbreviatedTopicNameField = element(
+    by.css('.protractor-test-abbreviated-topic-name-field'));
   var topicDescriptionField = element(
     by.css('.protractor-test-topic-description-field'));
   var saveTopicButton = element(
@@ -51,10 +55,16 @@ var TopicEditorPage = function() {
   var confirmSubtopicCreationButton = element(
     by.css('.protractor-test-confirm-subtopic-creation-button'));
   var subtopics = element.all(by.css('.protractor-test-subtopic'));
+  var subtopicColumns = element.all(
+    by.css('.protractor-test-subtopic-column'));
   var deleteSubtopicButtons = element.all(
     by.css('.protractor-test-delete-subtopic-button'));
+  var skillCards = element.all(
+    by.css('.protractor-test-skill-card'));
   var uncategorizedSkillItems = element.all(
     by.css('.protractor-test-uncategorized-skill-item'));
+  var uncategorizedSkillsContainer = element(
+    by.css('.protractor-test-uncategorized-skills-container'));
   var editSubtopicButtons = element.all(
     by.css('.protractor-test-edit-subtopic-button'));
   var subtopicTitleField = element(
@@ -78,13 +88,61 @@ var TopicEditorPage = function() {
   var questionItems = element.all(
     by.css('.protractor-test-question-list-item'));
   var questionItem = element(by.css('.protractor-test-question-list-item'));
+  var selectSkillDropdown = element(
+    by.css('.protractor-test-select-skill-dropdown'));
+  var customTopicThumbnail = element(
+    by.css('.protractor-test-custom-photo'));
+  var topicThumbnailClickable = element(
+    by.css('.protractor-test-photo-clickable'));
+  var topicThumbnailUploadInput = element(
+    by.css('.protractor-test-photo-upload-input'));
+  var topicThumbnailCropper = element(
+    by.css('.cropper-container'));
+  var topicThumbnailSubmitButton = element(
+    by.css('.protractor-test-photo-upload-submit'));
+
+  var dragAndDrop = function(fromElement, toElement) {
+    browser.executeScript(dragAndDropScript, fromElement, toElement);
+  };
 
   this.get = function(topicId) {
     browser.get(EDITOR_URL_PREFIX + topicId);
     return waitFor.pageToFullyLoad();
   };
 
-  this.expectNumberOfQuestionsToBe = function(count) {
+  this.getTopicThumbnailSource = function() {
+    return customTopicThumbnail.getAttribute('src');
+  };
+
+  this.uploadThumbnail = function(imgPath) {
+    topicThumbnailClickable.click();
+    absPath = path.resolve(__dirname, imgPath);
+    return topicThumbnailUploadInput.sendKeys(absPath);
+  };
+
+  this.publishTopic = function() {
+    publishTopicButton.click();
+    return waitFor.invisibilityOf(
+      publishTopicButton, 'Topic is taking too long to publish.');
+  };
+
+  this.submitTopicThumbnail = function(imgPath) {
+    return this.uploadThumbnail(imgPath).then(function() {
+      waitFor.visibilityOf(
+        topicThumbnailCropper, 'Photo cropper is taking too long to appear');
+    }).then(function() {
+      topicThumbnailSubmitButton.click();
+    }).then(function() {
+      return waitFor.invisibilityOf(
+        topicThumbnailUploadInput,
+        'Photo uploader is taking too long to disappear');
+    });
+  };
+
+  this.expectNumberOfQuestionsForSkillWithDescriptionToBe = function(
+      count, skillDescription) {
+    selectSkillDropdown.click();
+    element(by.css('option[label="' + skillDescription + '"]')).click();
     waitFor.visibilityOf(
       questionItem, 'Question takes too long to appear');
     questionItems.then(function(items) {
@@ -171,6 +229,44 @@ var TopicEditorPage = function() {
     confirmSubtopicCreationButton.click();
   };
 
+  this.dragSkillToSubtopic = function(skillIndex, subtopicIndex) {
+    var target = subtopicTitles.get(subtopicIndex);
+    var toMove = skillCards.get(skillIndex);
+    dragAndDrop(toMove.getWebElement(), target.getWebElement());
+  };
+
+  this.dragSkillBetweenSubtopics = function(
+      fromSubtopicIndex, skillCardIndex, toSubtopicIndex) {
+    var subtopicCol = subtopicColumns.get(fromSubtopicIndex);
+    skillNamesElems = subtopicCol.all(
+      by.css('.protractor-test-assigned-skill-card-text'));
+    var toMove = skillNamesElems.get(skillCardIndex);
+    var target = subtopicColumns.get(toSubtopicIndex);
+    dragAndDrop(toMove.getWebElement(), target.getWebElement());
+  };
+
+  this.dragSkillFromSubtopicToUncategorized = function(
+      subtopicIndex, skillCardIndex) {
+    var subtopicCol = subtopicColumns.get(subtopicIndex);
+    skillNamesElems = subtopicCol.all(
+      by.css('.protractor-test-assigned-skill-card-text'));
+    var toMove = skillNamesElems.get(skillCardIndex);
+    dragAndDrop(
+      toMove.getWebElement(),
+      uncategorizedSkillsContainer.getWebElement());
+  };
+
+  this.expectSubtopicToHaveSkills = function(subtopicIndex, skillNames) {
+    var subtopicCol = subtopicColumns.get(subtopicIndex);
+    skillNamesElems = subtopicCol.all(
+      by.css('.protractor-test-assigned-skill-card-text'));
+    skillNamesElems.each(function(skillCardTextElem, index) {
+      var text = skillCardTextElem.getText();
+      expect(skillNames[index]).toEqual(text);
+    });
+    expect(skillNamesElems.count()).toEqual(skillNames.length);
+  };
+
   this.moveToSubtopicsTab = function() {
     subtopicsTabButton.click();
   };
@@ -227,6 +323,15 @@ var TopicEditorPage = function() {
 
   this.expectTopicNameToBe = function(name) {
     expect(topicNameField.getAttribute('value')).toEqual(name);
+  };
+
+  this.changeAbbreviatedTopicName = function(newName) {
+    abbreviatedTopicNameField.clear();
+    abbreviatedTopicNameField.sendKeys(newName);
+  };
+
+  this.expectAbbreviatedTopicNameToBe = function(name) {
+    expect(abbreviatedTopicNameField.getAttribute('value')).toEqual(name);
   };
 
   this.changeTopicDescription = function(newDescription) {

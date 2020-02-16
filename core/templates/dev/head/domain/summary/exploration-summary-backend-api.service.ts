@@ -17,8 +17,8 @@
  * from the backend.
  */
 
-require('services/AlertsService.ts');
-require('services/ValidatorsService.ts');
+require('services/alerts.service.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
   '$http', '$q', 'AlertsService',

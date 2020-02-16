@@ -41,8 +41,8 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
@@ -177,6 +177,10 @@ angular.module('oppia').factory('TrainingModalService', [
 
               $scope.init();
             }]
+        }).result.then(function() {}, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
         // Save the modified training data externally in state content.
         $rootScope.$broadcast('externalSave');

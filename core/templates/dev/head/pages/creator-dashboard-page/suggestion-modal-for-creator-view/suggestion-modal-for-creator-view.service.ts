@@ -19,7 +19,7 @@ require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/SuggestionModalService.ts');
+require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
   '$http', '$log',
@@ -216,6 +216,10 @@ angular.module('oppia').factory('SuggestionModalForCreatorDashboardService', [
         }, function() {
           $log.error('Error resolving suggestion');
         });
+      }, function() {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       });
     };
 

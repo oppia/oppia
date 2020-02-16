@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Services for questions data model."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -40,7 +41,6 @@ def create_new_question(committer_id, question, commit_message):
         commit_message: str. A description of changes made to the question.
     """
     question.validate()
-    create_new_question_rights(question.id, committer_id)
     model = question_models.QuestionModel(
         id=question.id,
         question_state_data=question.question_state_data.to_dict(),
@@ -53,7 +53,7 @@ def create_new_question(committer_id, question, commit_message):
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
     question.version += 1
-    create_question_summary(question.id, committer_id)
+    create_question_summary(question.id)
     opportunity_services.increment_question_counts(question.linked_skill_ids, 1)
 
 
@@ -279,11 +279,6 @@ def delete_question(
     """
     question_model = question_models.QuestionModel.get(question_id)
     question_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
-        force_deletion=force_deletion)
-    question_rights_model = question_models.QuestionRightsModel.get(
-        question_id)
-    question_rights_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
         force_deletion=force_deletion)
 
@@ -587,36 +582,34 @@ def update_question(
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)
-    create_question_summary(question_id, committer_id)
+    create_question_summary(question_id)
 
 
-def create_question_summary(question_id, creator_id):
+def create_question_summary(question_id):
     """Creates and stores a summary of the given question.
 
     Args:
         question_id: str. ID of the question.
-        creator_id: str. The user ID of the creator of the question.
     """
     question = get_question_by_id(question_id)
-    question_summary = compute_summary_of_question(question, creator_id)
+    question_summary = compute_summary_of_question(question)
     save_question_summary(question_summary)
 
 
-def compute_summary_of_question(question, creator_id):
+def compute_summary_of_question(question):
     """Create a QuestionSummary domain object for a given Question domain
     object and return it.
 
     Args:
         question: Question. The question object for which the summary
             is to be computed.
-        creator_id: str. The user ID of the creator of the question.
 
     Returns:
         QuestionSummary. The computed summary for the given question.
     """
     question_content = question.question_state_data.content.html
     question_summary = question_domain.QuestionSummary(
-        creator_id, question.id, question_content,
+        question.id, question_content,
         question.created_on, question.last_updated)
     return question_summary
 
@@ -631,7 +624,6 @@ def save_question_summary(question_summary):
     """
     question_summary_model = question_models.QuestionSummaryModel(
         id=question_summary.id,
-        creator_id=question_summary.creator_id,
         question_model_last_updated=question_summary.last_updated,
         question_model_created_on=question_summary.created_on,
         question_content=question_summary.question_content
@@ -651,91 +643,11 @@ def get_question_summary_from_model(question_summary_model):
         QuestionSummary.
     """
     return question_domain.QuestionSummary(
-        question_summary_model.creator_id,
         question_summary_model.id,
         question_summary_model.question_content,
         question_summary_model.question_model_created_on,
         question_summary_model.question_model_last_updated
     )
-
-
-def get_question_summaries_by_creator_id(creator_id):
-    """Gets question summaries of questions created by the user.
-
-    Args:
-        creator_id: str. The user ID of the creator.
-
-    Returns:
-        QuestionSummaryModel. The QuestionSummaryModel for the given question.
-    """
-    question_summary_models = (
-        question_models.QuestionSummaryModel.get_by_creator_id(creator_id))
-
-    question_summaries = [
-        get_question_summary_from_model(question_summary_model)
-        for question_summary_model in question_summary_models
-    ]
-
-    return question_summaries
-
-
-def get_question_rights_from_model(question_rights_model):
-    """Constructs a QuestionRights object from the given question rights model.
-
-    Args:
-        question_rights_model: QuestionRightsModel. Question rights from the
-            datastore.
-
-    Returns:
-        QuestionRights. The rights object created from the model.
-    """
-
-    return question_domain.QuestionRights(
-        question_rights_model.id,
-        question_rights_model.creator_id
-    )
-
-
-def create_new_question_rights(question_id, committer_id):
-    """Creates a new question rights object and saves it to the datastore.
-
-    Args:
-        question_id: str. ID of the question.
-        committer_id: str. ID of the committer.
-    """
-    question_rights = question_domain.QuestionRights(
-        question_id, committer_id)
-    commit_cmds = [{'cmd': question_domain.CMD_CREATE_NEW}]
-
-    question_models.QuestionRightsModel(
-        id=question_rights.id,
-        creator_id=question_rights.creator_id
-    ).commit(committer_id, 'Created new question rights', commit_cmds)
-
-
-def get_question_rights(question_id, strict=True):
-    """Retrieves the rights object for the given question.
-
-    Args:
-        question_id: str. ID of the question.
-        strict: bool. Whether to fail noisily if no question rights with a
-            given id exists in the datastore.
-
-    Returns:
-        QuestionRights. The rights object associated with the given question.
-
-    Raises:
-        EntityNotFoundError.The question rights for question with ID
-            question_id was not found in the datastore.
-    """
-
-    model = question_models.QuestionRightsModel.get(
-        question_id, strict=strict)
-
-    if model is None:
-        return None
-
-    return get_question_rights_from_model(model)
 
 
 def get_interaction_id_for_question(question_id):

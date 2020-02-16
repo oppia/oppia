@@ -15,6 +15,7 @@
 """This script should only be run by Travis to install and provide a constant
 version of Chrome.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -56,8 +57,8 @@ def main(args=None):
         os.chdir(oppia_dir)
 
     python_utils.PRINT('Installing %s' % travis_chrome_path)
-    subprocess.call(['sudo', 'dpkg', '-i', travis_chrome_path])
+    subprocess.check_call(['sudo', 'dpkg', '-i', travis_chrome_path])
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     main()

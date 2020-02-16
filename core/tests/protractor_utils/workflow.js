@@ -18,10 +18,12 @@
  */
 
 var forms = require('./forms.js');
+var users = require('./users.js');
 var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
+var TopicsAndSkillsDashboardPage = require('./TopicsAndSkillsDashboardPage.js');
 
 // check if the save roles button is clickable
 var canAddRolesToUsers = function() {
@@ -58,7 +60,22 @@ var createExplorationAndStartTutorial = function() {
   var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
   creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  creatorDashboardPage.clickCreateActivityButton();
+  users.isAdmin().then(function(isAdmin) {
+    creatorDashboardPage.clickCreateActivityButton();
+    if (isAdmin) {
+      var activityCreationModal = element(
+        by.css('.protractor-test-creation-modal'));
+      waitFor.visibilityOf(
+        activityCreationModal,
+        'ActivityCreationModal takes too long to be visible.');
+      var createExplorationButton = element(
+        by.css('.protractor-test-create-exploration'));
+      waitFor.elementToBeClickable(
+        createExplorationButton,
+        'createExplorationButton takes too long to be clickable.');
+      createExplorationButton.click();
+    }
+  });
 };
 
 /**
@@ -151,6 +168,33 @@ var createAddExpDetailsAndPublishExp = function(
     title, objective, category, language, tags);
 };
 
+// Creates and publishes a exploration with two cards
+var createAndPublishTwoCardExploration = function(
+    title, category, objective, language) {
+  createExploration();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.setContent(forms.toRichText('card 1'));
+  explorationEditorMainTab.setInteraction('Continue');
+  explorationEditorMainTab.getResponseEditor('default').setDestination(
+    'second card', true, null
+  );
+  explorationEditorMainTab.moveToState('second card');
+  explorationEditorMainTab.setContent(forms.toRichText('card 2'));
+  explorationEditorMainTab.setInteraction('EndExploration');
+
+  var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  explorationEditorPage.navigateToSettingsTab();
+  explorationEditorSettingsTab.setTitle(title);
+  explorationEditorSettingsTab.setCategory(category);
+  explorationEditorSettingsTab.setObjective(objective);
+  if (language) {
+    explorationEditorSettingsTab.setLanguage(language);
+  }
+  explorationEditorPage.saveChanges();
+  publishExploration();
+};
+
 // Role management (state editor settings tab)
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
@@ -206,12 +250,27 @@ var getExplorationPlaytesters = function() {
   return _getExplorationRoles('viewer');
 };
 
+var createSkillAndAssignTopic = function(
+    skillDescription, material, topicName) {
+  var topicsAndSkillsDashboardPage =
+      new TopicsAndSkillsDashboardPage.TopicsAndSkillsDashboardPage();
+  topicsAndSkillsDashboardPage.get();
+  topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+    skillDescription, material);
+  topicsAndSkillsDashboardPage.get();
+  topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
+  topicsAndSkillsDashboardPage.searchSkillByName(skillDescription);
+  topicsAndSkillsDashboardPage.assignSkillWithIndexToTopicByTopicName(
+    0, topicName);
+};
+
 exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
+exports.createAndPublishTwoCardExploration = createAndPublishTwoCardExploration;
 
 exports.canAddRolesToUsers = canAddRolesToUsers;
 exports.checkForAddTitleWarning = checkForAddTitleWarning;
@@ -226,3 +285,4 @@ exports.getExplorationCollaborators = getExplorationCollaborators;
 exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;
 exports.createAddExpDetailsAndPublishExp = createAddExpDetailsAndPublishExp;
+exports.createSkillAndAssignTopic = createSkillAndAssignTopic;

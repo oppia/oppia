@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/SuggestionModalService.ts');
+require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForLearnerDashboardService', [
   '$uibModal', 'UrlInterpolationService',

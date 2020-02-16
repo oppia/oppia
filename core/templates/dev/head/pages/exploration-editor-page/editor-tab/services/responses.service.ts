@@ -33,8 +33,8 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

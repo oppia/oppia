@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """One-off jobs for explorations."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -35,8 +36,8 @@ import feconf
 import python_utils
 import utils
 
-(file_models, base_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
+(exp_models,) = models.Registry.import_models([
+    models.NAMES.exploration])
 gae_image_services = models.Registry.import_gae_image_services()
 
 

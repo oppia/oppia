@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for methods defined in question fetchers.."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -47,9 +48,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.save_new_skill(
-            'skill_1', self.admin_id, 'Skill Description 1')
+            'skill_1', self.admin_id, description='Skill Description 1')
         self.save_new_skill(
-            'skill_2', self.admin_id, 'Skill Description 2')
+            'skill_2', self.admin_id, description='Skill Description 2')
 
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
@@ -101,7 +102,9 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
     def test_cannot_get_question_from_model_with_invalid_schema_version(self):
         # Delete all question models.
         all_question_models = question_models.QuestionModel.get_all()
-        question_models.QuestionModel.delete_multi(all_question_models)
+        question_models.QuestionModel.delete_multi(
+            [question_model.id for question_model in all_question_models],
+            feconf.SYSTEM_COMMITTER_ID, '', force_deletion=True)
 
         all_question_models = question_models.QuestionModel.get_all()
         self.assertEqual(all_question_models.count(), 0)

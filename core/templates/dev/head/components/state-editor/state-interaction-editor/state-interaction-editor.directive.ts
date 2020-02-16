@@ -44,10 +44,10 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
-require('services/AlertsService.ts');
-require('services/EditabilityService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -87,6 +87,7 @@ angular.module('oppia').directive('stateInteractionEditor', [
             ExplorationHtmlFormatterService, SubtitledHtmlObjectFactory,
             StateSolutionService, StateHintsService,
             StateContentService) {
+          var ctrl = this;
           var DEFAULT_TERMINAL_STATE_CONTENT =
             'Congratulations, you have finished!';
 
@@ -94,16 +95,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
           // interaction preview.
           $scope.submitAnswer = function() {};
           $scope.adjustPageHeight = function() {};
-          $scope.EditabilityService = EditabilityService;
-
-          $scope.StateInteractionIdService = StateInteractionIdService;
-          $scope.hasLoaded = false;
-          $scope.customizationModalReopened = false;
-
-          $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/avatar/user_blue_72px.png');
-          $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/avatar/user_black_72px.png');
 
           $scope.getCurrentInteractionName = function() {
             return (
@@ -142,23 +133,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
               StateEditorService.getAnswerChoices(
                 $scope.interactionId, currentCustomizationArgs));
           };
-
-          $scope.$on('stateEditorInitialized', function(evt, stateData) {
-            $scope.hasLoaded = false;
-            InteractionDetailsCacheService.reset();
-            $rootScope.$broadcast('initializeAnswerGroups', {
-              interactionId: stateData.interaction.id,
-              answerGroups: stateData.interaction.answerGroups,
-              defaultOutcome: stateData.interaction.defaultOutcome,
-              confirmedUnclassifiedAnswers: (
-                stateData.interaction.confirmedUnclassifiedAnswers)
-            });
-
-            _updateInteractionPreviewAndAnswerChoices();
-            $scope.hasLoaded = true;
-          });
-
-          $rootScope.$broadcast('interactionEditorInitialized');
 
           // If a terminal interaction is selected for a state with no content,
           // this function sets the content to DEFAULT_TERMINAL_STATE_CONTENT.
@@ -249,8 +223,12 @@ angular.module('oppia').directive('stateInteractionEditor', [
                     $scope.StateCustomizationArgsService = (
                       StateCustomizationArgsService);
 
-                    $scope.getInteractionThumbnailImageUrl = (
-                      UrlInterpolationService.getInteractionThumbnailImageUrl);
+                    $scope.getInteractionThumbnailImageUrl = function(
+                        interactionId) {
+                      return (
+                        UrlInterpolationService.getInteractionThumbnailImageUrl(
+                          interactionId));
+                    };
 
                     $scope.INTERACTION_SPECS = INTERACTION_SPECS;
 
@@ -452,10 +430,45 @@ angular.module('oppia').directive('stateInteractionEditor', [
                 StateInteractionIdService.savedMemento);
               $scope.recomputeGraph();
               _updateInteractionPreviewAndAnswerChoices();
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
+          ctrl.$onInit = function() {
+            $scope.EditabilityService = EditabilityService;
 
-          StateEditorService.updateStateInteractionEditorInitialised();
+            $scope.StateInteractionIdService = StateInteractionIdService;
+            $scope.hasLoaded = false;
+            $scope.customizationModalReopened = false;
+
+            $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/avatar/user_blue_72px.png');
+            $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/avatar/user_black_72px.png');
+            $scope.$on('stateEditorInitialized', function(evt, stateData) {
+              if (stateData === undefined || $.isEmptyObject(stateData)) {
+                throw new Error('Expected stateData to be defined but ' +
+                  'received ' + stateData);
+              }
+              $scope.hasLoaded = false;
+              InteractionDetailsCacheService.reset();
+              $rootScope.$broadcast('initializeAnswerGroups', {
+                interactionId: stateData.interaction.id,
+                answerGroups: stateData.interaction.answerGroups,
+                defaultOutcome: stateData.interaction.defaultOutcome,
+                confirmedUnclassifiedAnswers: (
+                  stateData.interaction.confirmedUnclassifiedAnswers)
+              });
+
+              _updateInteractionPreviewAndAnswerChoices();
+              $scope.hasLoaded = true;
+            });
+
+            $rootScope.$broadcast('interactionEditorInitialized');
+            StateEditorService.updateStateInteractionEditorInitialised();
+          };
         }
       ]
     };

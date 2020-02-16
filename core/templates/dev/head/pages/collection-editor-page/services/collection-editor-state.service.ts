@@ -23,7 +23,7 @@ require('domain/collection/collection-rights-backend-api.service.ts');
 require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/editable-collection-backend-api.service.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 

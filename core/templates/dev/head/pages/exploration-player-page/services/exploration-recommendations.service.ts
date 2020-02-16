@@ -17,8 +17,8 @@
  * exploration.
  */
 
-require('services/ContextService.ts');
-require('services/contextual/UrlService.ts');
+require('services/context.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').factory('ExplorationRecommendationsService', [
   '$http', 'ContextService', 'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT',
@@ -42,6 +42,8 @@ angular.module('oppia').factory('ExplorationRecommendationsService', [
           stringified_author_recommended_ids: JSON.stringify(
             authorRecommendedExpIds),
           collection_id: UrlService.getCollectionIdFromExplorationUrl(),
+          story_id: UrlService.getUrlParams().story_id,
+          current_node_id: UrlService.getUrlParams().node_id,
           include_system_recommendations: null
         };
 

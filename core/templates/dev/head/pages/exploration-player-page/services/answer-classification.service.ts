@@ -22,7 +22,7 @@ require(
   'prediction-algorithm-registry.service.ts');
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');

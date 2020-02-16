@@ -20,13 +20,11 @@ require('base-components/warning-loader.directive.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/sidebar/sidebar-status.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/UrlService.ts');
-require('services/stateful/BackgroundMaskService.ts');
+require('services/contextual/url.service.ts');
+require('services/stateful/background-mask.service.ts');
 
 angular.module('oppia').directive('baseContent', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -37,20 +35,27 @@ angular.module('oppia').directive('baseContent', [
         footer: '?pageFooter',
         navOptions: '?navOptions',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/base-components/base-content.directive.html'),
+      template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$rootScope', 'BackgroundMaskService',
+      controller: ['$rootScope', '$window', 'BackgroundMaskService',
         'SidebarStatusService', 'UrlService', 'SITE_FEEDBACK_FORM_URL',
-        function($rootScope, BackgroundMaskService,
+        function($rootScope, $window, BackgroundMaskService,
             SidebarStatusService, UrlService, SITE_FEEDBACK_FORM_URL) {
+          // Mimic redirection behaviour in the backend (see issue #7867 for
+          // details).
+          if ($window.location.hostname === 'oppiaserver.appspot.com') {
+            $window.location.href = (
+              'https://oppiatestserver.appspot.com' +
+              $window.location.pathname +
+              $window.location.search +
+              $window.location.hash);
+          }
+
           var ctrl = this;
-          ctrl.iframed = UrlService.isIframed();
-          ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
-          ctrl.isSidebarShown = SidebarStatusService.isSidebarShown;
-          ctrl.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
-          ctrl.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
-          ctrl.DEV_MODE = $rootScope.DEV_MODE;
+          ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
+          ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
+          ctrl.isBackgroundMaskActive = () => (
+            BackgroundMaskService.isMaskActive());
           ctrl.skipToMainContent = function() {
             var mainContentElement = document.getElementById(
               'oppia-main-content');
@@ -61,6 +66,11 @@ angular.module('oppia').directive('baseContent', [
             mainContentElement.tabIndex = -1;
             mainContentElement.scrollIntoView();
             mainContentElement.focus();
+          };
+          ctrl.$onInit = function() {
+            ctrl.iframed = UrlService.isIframed();
+            ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
+            ctrl.DEV_MODE = $rootScope.DEV_MODE;
           };
         }
       ]

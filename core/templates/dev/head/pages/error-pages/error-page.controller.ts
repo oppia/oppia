@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/PageTitleService.ts');
+require('services/page-title.service.ts');
 
 angular.module('oppia').directive('errorPage', [
   'UrlInterpolationService', function(
@@ -36,15 +36,15 @@ angular.module('oppia').directive('errorPage', [
         function(
             PageTitleService, UrlInterpolationService) {
           var ctrl = this;
-          ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/oops_mint.png');
-
           ctrl.getStatusCode = function() {
             return Number(ctrl.statusCode);
           };
-
-          PageTitleService.setPageTitle(
-            'Error ' + ctrl.statusCode + ' - Oppia');
+          ctrl.$onInit = function() {
+            ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/oops_mint.png');
+            PageTitleService.setPageTitle(
+              'Error ' + ctrl.statusCode + ' - Oppia');
+          };
         }
       ]};
   }]);

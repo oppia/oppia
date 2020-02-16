@@ -15,6 +15,7 @@
 # limitations under the License.]
 
 """Domain objects for topics, and related models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -41,6 +42,8 @@ ROLE_NONE = 'none'
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
 TOPIC_PROPERTY_NAME = 'name'
+TOPIC_PROPERTY_ABBREVIATED_NAME = 'abbreviated_name'
+TOPIC_PROPERTY_THUMBNAIL_FILENAME = 'thumbnail_filename'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES = 'canonical_story_references'
 TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES = 'additional_story_references'
@@ -93,10 +96,12 @@ class TopicChange(change_domain.BaseChange):
     # The allowed list of topic properties which can be used in
     # update_topic_property command.
     TOPIC_PROPERTIES = (
-        TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_DESCRIPTION,
+        TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_ABBREVIATED_NAME,
+        TOPIC_PROPERTY_DESCRIPTION,
         TOPIC_PROPERTY_CANONICAL_STORY_REFERENCES,
         TOPIC_PROPERTY_ADDITIONAL_STORY_REFERENCES,
-        TOPIC_PROPERTY_LANGUAGE_CODE)
+        TOPIC_PROPERTY_LANGUAGE_CODE,
+        TOPIC_PROPERTY_THUMBNAIL_FILENAME)
 
     # The allowed list of subtopic properties which can be used in
     # update_subtopic_property command.
@@ -371,9 +376,11 @@ class Topic(python_utils.OBJECT):
     """Domain object for an Oppia Topic."""
 
     def __init__(
-            self, topic_id, name, description, canonical_story_references,
-            additional_story_references, uncategorized_skill_ids, subtopics,
-            subtopic_schema_version, next_subtopic_id, language_code, version,
+            self, topic_id, name, abbreviated_name, thumbnail_filename,
+            description, canonical_story_references,
+            additional_story_references, uncategorized_skill_ids,
+            subtopics, subtopic_schema_version,
+            next_subtopic_id, language_code, version,
             story_reference_schema_version, created_on=None,
             last_updated=None):
         """Constructs a Topic domain object.
@@ -381,6 +388,8 @@ class Topic(python_utils.OBJECT):
         Args:
             topic_id: str. The unique ID of the topic.
             name: str. The name of the topic.
+            abbreviated_name: str. The abbreviated topic name.
+            thumbnail_filename: str|None. The thumbnail filename of the topic.
             description: str. The description of the topic.
             canonical_story_references: list(StoryReference). A set of story
                 reference objects representing the canonical stories that are
@@ -407,6 +416,8 @@ class Topic(python_utils.OBJECT):
         """
         self.id = topic_id
         self.name = name
+        self.abbreviated_name = abbreviated_name
+        self.thumbnail_filename = thumbnail_filename
         self.canonical_name = name.lower()
         self.description = description
         self.canonical_story_references = canonical_story_references
@@ -430,6 +441,8 @@ class Topic(python_utils.OBJECT):
         return {
             'id': self.id,
             'name': self.name,
+            'abbreviated_name': self.abbreviated_name,
+            'thumbnail_filename': self.thumbnail_filename,
             'description': self.description,
             'canonical_story_references': [
                 reference.to_dict()
@@ -477,6 +490,24 @@ class Topic(python_utils.OBJECT):
 
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
+
+    @classmethod
+    def require_valid_abbreviated_name(cls, name):
+        """Checks whether the abbreviated name of the topic is a valid one.
+
+        Args:
+            name: str. The abbreviated name to validate.
+        """
+        if not isinstance(name, python_utils.BASESTRING):
+            raise utils.ValidationError('Abbreviated name should be a string.')
+
+        if name == '':
+            raise utils.ValidationError(
+                'Abbreviated name field should not be empty.')
+
+        if len(name) > 12:
+            raise utils.ValidationError(
+                'Abbreviated name field should not exceed 12 characters.')
 
     def get_all_skill_ids(self):
         """Returns all the ids of all the skills present in the topic.
@@ -655,6 +686,12 @@ class Topic(python_utils.OBJECT):
                 valid.
         """
         self.require_valid_name(self.name)
+        self.require_valid_abbreviated_name(self.abbreviated_name)
+        if self.thumbnail_filename is not None and not (
+                isinstance(self.thumbnail_filename, python_utils.BASESTRING)):
+            raise utils.ValidationError(
+                'Expected thumbnail filename to be a string, received %s'
+                % self.thumbnail_filename)
         if not isinstance(self.description, python_utils.BASESTRING):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
@@ -744,7 +781,7 @@ class Topic(python_utils.OBJECT):
                 % self.uncategorized_skill_ids)
 
     @classmethod
-    def create_default_topic(cls, topic_id, name):
+    def create_default_topic(cls, topic_id, name, abbreviated_name):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
@@ -752,12 +789,13 @@ class Topic(python_utils.OBJECT):
         Args:
             topic_id: str. The unique id of the topic.
             name: str. The initial name for the topic.
+            abbreviated_name: str. The abbreviated name for the topic.
 
         Returns:
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, name,
+            topic_id, name, abbreviated_name, None,
             feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, 1,
             constants.DEFAULT_LANGUAGE_CODE, 0,
@@ -824,8 +862,32 @@ class Topic(python_utils.OBJECT):
 
         Args:
             new_name: str. The updated name for the topic.
+
+        Raises:
+            ValidationError: Name should be a string.
         """
+        if not isinstance(new_name, python_utils.BASESTRING):
+            raise utils.ValidationError('Name should be a string.')
         self.name = new_name
+        self.canonical_name = new_name.lower()
+
+    def update_abbreviated_name(self, new_abbreviated_name):
+        """Updates the abbreviated_name of a topic object.
+
+        Args:
+            new_abbreviated_name: str. The updated abbreviated_name
+            for the topic.
+        """
+        self.abbreviated_name = new_abbreviated_name
+
+    def update_thumbnail_filename(self, new_thumbnail_filename):
+        """Updates the thumbnail filename of a topic object.
+
+        Args:
+            new_thumbnail_filename: str|None. The updated thumbnail filename
+            for the topic.
+        """
+        self.thumbnail_filename = new_thumbnail_filename
 
     def update_description(self, new_description):
         """Updates the description of a topic object.

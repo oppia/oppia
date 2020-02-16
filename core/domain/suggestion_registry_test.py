@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for suggestion registry classes."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -1051,10 +1052,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
         self.suggestion_dict = {
-            'suggestion_id': 'exploration.exp1.thread1',
+            'suggestion_id': 'skill1.thread1',
             'suggestion_type': suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            'target_type': suggestion_models.TARGET_TYPE_TOPIC,
-            'target_id': 'exp1',
+            'target_type': suggestion_models.TARGET_TYPE_SKILL,
+            'target_id': 'skill1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
             'author_name': 'author',
@@ -1069,7 +1070,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                         feconf.CURRENT_STATE_SCHEMA_VERSION),
                     'linked_skill_ids': ['skill_1']
                 },
-                'skill_id': 'skill_1'
+                'skill_id': 'skill_1',
+                'topic_name': 'topic_1'
             },
             'score_category': 'question.topic_1',
             'last_updated': utils.get_time_in_millisecs(self.fake_date)
@@ -1253,7 +1255,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1277,7 +1279,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1306,7 +1308,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['score_category'], self.fake_date)
 
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.author_id, 'description')
+        self.save_new_skill(skill_id, self.author_id, description='description')
         suggestion.change.skill_id = skill_id
 
         suggestion.pre_accept_validate()
@@ -1437,3 +1439,225 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             'old question_dict'):
             suggestion.pre_update_validate(
                 question_domain.QuestionChange(change))
+
+
+class MockInvalidVoiceoverApplication(
+        suggestion_registry.BaseVoiceoverApplication):
+
+    def __init__(self):  # pylint: disable=super-init-not-called
+        pass
+
+
+class BaseVoiceoverApplicationUnitTests(test_utils.GenericTestBase):
+    """Tests for the BaseVoiceoverApplication class."""
+
+    def setUp(self):
+        super(BaseVoiceoverApplicationUnitTests, self).setUp()
+        self.base_voiceover_application = MockInvalidVoiceoverApplication()
+
+    def test_base_class_init_raises_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseVoiceoverApplication should implement '
+            '__init__.'):
+            suggestion_registry.BaseVoiceoverApplication()
+
+    def test_base_class_accept_raises_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseVoiceoverApplication should implement accept.'):
+            self.base_voiceover_application.accept()
+
+    def test_base_class_reject_raises_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseVoiceoverApplication should implement reject.'):
+            self.base_voiceover_application.reject()
+
+
+class ExplorationVoiceoverApplicationUnitTest(test_utils.GenericTestBase):
+    """Tests for the ExplorationVoiceoverApplication class."""
+
+    def setUp(self):
+        super(ExplorationVoiceoverApplicationUnitTest, self).setUp()
+        self.signup('author@example.com', 'author')
+        self.author_id = self.get_user_id_from_email('author@example.com')
+
+        self.signup('reviewer@example.com', 'reviewer')
+        self.reviewer_id = self.get_user_id_from_email('reviewer@example.com')
+
+        self.voiceover_application = (
+            suggestion_registry.ExplorationVoiceoverApplication(
+                'application_id', 'exp_id', suggestion_models.STATUS_IN_REVIEW,
+                self.author_id, None, 'en', 'audio_file.mp3', '<p>Content</p>',
+                None))
+
+    def test_validation_with_invalid_target_type_rasie_exception(self):
+        self.voiceover_application.validate()
+
+        self.voiceover_application.target_type = 'invalid_target'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected target_type to be among allowed choices, '
+            'received invalid_target'):
+            self.voiceover_application.validate()
+
+    def test_validation_with_invalid_target_id_rasie_exception(self):
+        self.voiceover_application.validate()
+
+        self.voiceover_application.target_id = 123
+        with self.assertRaisesRegexp(
+            Exception, 'Expected target_id to be a string'):
+            self.voiceover_application.validate()
+
+    def test_validation_with_invalid_status_rasie_exception(self):
+        self.voiceover_application.validate()
+
+        self.voiceover_application.status = 'invalid_status'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected status to be among allowed choices, '
+            'received invalid_status'):
+            self.voiceover_application.validate()
+
+    def test_validation_with_invalid_author_id_rasie_exception(self):
+        self.voiceover_application.validate()
+
+        self.voiceover_application.author_id = 123
+        with self.assertRaisesRegexp(
+            Exception, 'Expected author_id to be a string'):
+            self.voiceover_application.validate()
+
+    def test_validation_with_invalid_final_reviewer_id_rasie_exception(self):
+        self.assertEqual(
+            self.voiceover_application.status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
+        self.voiceover_application.validate()
+
+        self.voiceover_application.final_reviewer_id = 123
+        with self.assertRaisesRegexp(
+            Exception, 'Expected final_reviewer_id to be None as the '
+            'voiceover application is not yet handled.'):
+            self.voiceover_application.validate()
+
+    def test_validation_for_handled_application_with_invalid_final_review(self):
+        self.assertEqual(
+            self.voiceover_application.status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
+        self.voiceover_application.validate()
+
+        self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
+        with self.assertRaisesRegexp(
+            Exception, 'Expected final_reviewer_id to be a string'):
+            self.voiceover_application.validate()
+
+    def test_validation_for_rejected_application_with_no_message(self):
+        self.assertEqual(
+            self.voiceover_application.status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(self.voiceover_application.rejection_message, None)
+        self.voiceover_application.validate()
+
+        self.voiceover_application.final_reviewer_id = 'reviewer_id'
+        self.voiceover_application.status = suggestion_models.STATUS_REJECTED
+        with self.assertRaisesRegexp(
+            Exception, 'Expected rejection_message to be a string for a '
+            'rejected application'):
+            self.voiceover_application.validate()
+
+    def test_validation_for_accepted_application_with_message(self):
+        self.assertEqual(
+            self.voiceover_application.status,
+            suggestion_models.STATUS_IN_REVIEW)
+        self.assertEqual(self.voiceover_application.rejection_message, None)
+        self.voiceover_application.validate()
+
+        self.voiceover_application.final_reviewer_id = 'reviewer_id'
+        self.voiceover_application.status = suggestion_models.STATUS_ACCEPTED
+        self.voiceover_application.rejection_message = 'Invalid message'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected rejection_message to be None for the accepted '
+            'voiceover application, received Invalid message'):
+            self.voiceover_application.validate()
+
+    def test_validation_with_invalid_language_code_type_raise_exception(self):
+        self.assertEqual(self.voiceover_application.language_code, 'en')
+        self.voiceover_application.validate()
+
+        self.voiceover_application.language_code = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected language_code to be a string'):
+            self.voiceover_application.validate()
+
+    def test_validation_with_invalid_language_code_raise_exception(self):
+        self.assertEqual(self.voiceover_application.language_code, 'en')
+        self.voiceover_application.validate()
+
+        self.voiceover_application.language_code = 'invalid language'
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid language_code: invalid language'):
+            self.voiceover_application.validate()
+
+    def test_validation_with_invalid_filename_type_raise_exception(self):
+        self.assertEqual(self.voiceover_application.filename, 'audio_file.mp3')
+        self.voiceover_application.validate()
+
+        self.voiceover_application.filename = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected filename to be a string'):
+            self.voiceover_application.validate()
+
+    def test_validation_with_invalid_content_type_raise_exception(self):
+        self.assertEqual(self.voiceover_application.content, '<p>Content</p>')
+        self.voiceover_application.validate()
+
+        self.voiceover_application.content = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected content to be a string'):
+            self.voiceover_application.validate()
+
+    def test_to_dict_returns_correct_dict(self):
+        self.voiceover_application.accept(self.reviewer_id)
+        expected_dict = {
+            'voiceover_application_id': 'application_id',
+            'target_type': 'exploration',
+            'target_id': 'exp_id',
+            'status': 'accepted',
+            'author_name': 'author',
+            'final_reviewer_name': 'reviewer',
+            'language_code': 'en',
+            'content': '<p>Content</p>',
+            'filename': 'audio_file.mp3',
+            'rejection_message': None
+        }
+        self.assertEqual(
+            self.voiceover_application.to_dict(), expected_dict)
+
+    def test_is_handled_property_returns_correct_value(self):
+        self.assertFalse(self.voiceover_application.is_handled)
+
+        self.voiceover_application.accept(self.reviewer_id)
+
+        self.assertTrue(self.voiceover_application.is_handled)
+
+    def test_accept_voiceover_application(self):
+        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
+        self.assertEqual(self.voiceover_application.status, 'review')
+
+        self.voiceover_application.accept(self.reviewer_id)
+
+        self.assertEqual(
+            self.voiceover_application.final_reviewer_id, self.reviewer_id)
+        self.assertEqual(self.voiceover_application.status, 'accepted')
+
+    def test_reject_voiceover_application(self):
+        self.assertEqual(self.voiceover_application.final_reviewer_id, None)
+        self.assertEqual(self.voiceover_application.status, 'review')
+
+        self.voiceover_application.reject(self.reviewer_id, 'rejection message')
+
+        self.assertEqual(
+            self.voiceover_application.final_reviewer_id, self.reviewer_id)
+        self.assertEqual(self.voiceover_application.status, 'rejected')
+        self.assertEqual(
+            self.voiceover_application.rejection_message, 'rejection message')

@@ -24,6 +24,10 @@ import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
 import { MisconceptionObjectFactory } from
   'domain/skill/MisconceptionObjectFactory';
+import { QuestionSummaryObjectFactory } from
+  'domain/question/QuestionSummaryObjectFactory';
+import { QuestionSummaryForOneSkillObjectFactory } from
+  'domain/question/QuestionSummaryForOneSkillObjectFactory';
 import { RubricObjectFactory } from
   'domain/skill/RubricObjectFactory';
 import { RecordedVoiceoversObjectFactory } from
@@ -58,7 +62,28 @@ describe('Skill editor state service', function() {
       updateSkill: null
     };
 
-    var _fetchOrUpdateSkill = function() {
+    var _fetchSkill = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve({
+            skill: self.newBackendSkillObject,
+            groupedSkillSummaries: {
+              Name: [{
+                id: 'skill_id_1',
+                description: 'Description 1'
+              }, {
+                id: 'skill_id_2',
+                description: 'Description 2'
+              }]
+            }
+          });
+        } else {
+          reject();
+        }
+      });
+    };
+
+    var _updateSkill = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
           resolve(self.newBackendSkillObject);
@@ -70,8 +95,8 @@ describe('Skill editor state service', function() {
 
     self.newBackendSkillObject = {};
     self.failure = null;
-    self.fetchSkill = _fetchOrUpdateSkill;
-    self.updateSkill = _fetchOrUpdateSkill;
+    self.fetchSkill = _fetchSkill;
+    self.updateSkill = _updateSkill;
 
     return self;
   };
@@ -112,6 +137,12 @@ describe('Skill editor state service', function() {
       'MisconceptionObjectFactory', new MisconceptionObjectFactory());
     $provide.value('RubricObjectFactory', new RubricObjectFactory());
     $provide.value(
+      'QuestionSummaryObjectFactory', new QuestionSummaryObjectFactory());
+    $provide.value(
+      'QuestionSummaryForOneSkillObjectFactory',
+      new QuestionSummaryForOneSkillObjectFactory(
+        new QuestionSummaryObjectFactory));
+    $provide.value(
       'RecordedVoiceoversObjectFactory',
       new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
     $provide.value('SkillRightsObjectFactory', new SkillRightsObjectFactory());
@@ -130,7 +161,7 @@ describe('Skill editor state service', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -156,14 +187,16 @@ describe('Skill editor state service', function() {
       id: '2',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: true
     };
 
     var misconceptionDict2 = {
       id: '4',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: false
     };
 
     var rubricDict = {
@@ -196,19 +229,18 @@ describe('Skill editor state service', function() {
     };
 
     var skillDict = {
-      id: '1',
+      id: 'skill_id_1',
       description: 'test description',
       misconceptions: [misconceptionDict1, misconceptionDict2],
       rubrics: [rubricDict],
       skill_contents: skillContentsDict,
       language_code: 'en',
-      version: 3
+      version: 3,
+      prerequisite_skill_ids: []
     };
 
     skillRightsObject = {
-      skill_id: '1',
-      creator_id: '0',
-      skill_is_private: true,
+      skill_id: 'skill_id_1',
       can_edit_skill_description: true
     };
     fakeSkillRightsBackendApiService.backendSkillRightsObject = (
@@ -219,14 +251,14 @@ describe('Skill editor state service', function() {
 
   it('should request to load the skill from the backend', function() {
     spyOn(fakeEditableSkillBackendApiService, 'fetchSkill').and.callThrough();
-    SkillEditorStateService.loadSkill('1');
+    SkillEditorStateService.loadSkill('skill_id_1');
     expect(fakeEditableSkillBackendApiService.fetchSkill)
       .toHaveBeenCalled();
   });
 
   it('should track whether it is currently loading the skill', function() {
     expect(SkillEditorStateService.isLoadingSkill()).toBe(false);
-    SkillEditorStateService.loadSkill('1');
+    SkillEditorStateService.loadSkill('skill_id_1');
     expect(SkillEditorStateService.isLoadingSkill()).toBe(true);
     $rootScope.$apply();
     expect(SkillEditorStateService.isLoadingSkill()).toBe(false);
@@ -236,7 +268,7 @@ describe('Skill editor state service', function() {
     function() {
       expect(SkillEditorStateService.isLoadingSkill()).toBe(false);
       fakeEditableSkillBackendApiService.failure = 'Internal 500 error';
-      SkillEditorStateService.loadSkill('1');
+      SkillEditorStateService.loadSkill('skill_id_1');
       expect(SkillEditorStateService.isLoadingSkill()).toBe(true);
       $rootScope.$apply();
       expect(SkillEditorStateService.isLoadingSkill()).toBe(false);
@@ -244,10 +276,17 @@ describe('Skill editor state service', function() {
 
   it('should report that a skill has loaded through loadSkill()', function() {
     expect(SkillEditorStateService.hasLoadedSkill()).toBe(false);
-    var newSkill = SkillEditorStateService.loadSkill('1');
+    var newSkill = SkillEditorStateService.loadSkill('skill_id_1');
     expect(SkillEditorStateService.hasLoadedSkill()).toBe(false);
     $rootScope.$apply();
     expect(SkillEditorStateService.hasLoadedSkill()).toBe(true);
+    var groupedSkillSummaries =
+      SkillEditorStateService.getGroupedSkillSummaries();
+    expect(groupedSkillSummaries.current.length).toEqual(2);
+    expect(groupedSkillSummaries.others.length).toEqual(0);
+
+    expect(groupedSkillSummaries.current[0].id).toEqual('skill_id_1');
+    expect(groupedSkillSummaries.current[1].id).toEqual('skill_id_2');
   });
 
   it('should return the last skill loaded as the same object', function() {
@@ -255,7 +294,7 @@ describe('Skill editor state service', function() {
     var expectedSkill = SkillObjectFactory.createFromBackendDict(
       fakeEditableSkillBackendApiService.newBackendSkillObject);
     expect(previousSkill).not.toEqual(expectedSkill);
-    SkillEditorStateService.loadSkill('1');
+    SkillEditorStateService.loadSkill('skill_id_1');
     $rootScope.$apply();
     var actualSkill = SkillEditorStateService.getSkill();
     expect(actualSkill).toEqual(expectedSkill);
@@ -272,7 +311,7 @@ describe('Skill editor state service', function() {
 
   it('should not save the skill if there are no pending changes',
     function() {
-      SkillEditorStateService.loadSkill('1');
+      SkillEditorStateService.loadSkill('skill_id_1');
       $rootScope.$apply();
       expect(SkillEditorStateService.saveSkill(
         'commit message')).toBe(false);
@@ -283,7 +322,7 @@ describe('Skill editor state service', function() {
       spyOn(fakeEditableSkillBackendApiService,
         'updateSkill').and.callThrough();
 
-      SkillEditorStateService.loadSkill('1');
+      SkillEditorStateService.loadSkill('skill_id_1');
       SkillUpdateService.setSkillDescription(
         SkillEditorStateService.getSkill(), 'new description');
       $rootScope.$apply();
@@ -292,7 +331,7 @@ describe('Skill editor state service', function() {
         'commit message')).toBe(true);
       $rootScope.$apply();
 
-      var expectedId = '1';
+      var expectedId = 'skill_id_1';
       var expectedVersion = 3;
       var expectedCommitMessage = 'commit message';
       var updateSkillSpy = (
@@ -304,7 +343,7 @@ describe('Skill editor state service', function() {
 
   it('should track whether it is currently saving the skill',
     function() {
-      SkillEditorStateService.loadSkill('1');
+      SkillEditorStateService.loadSkill('skill_id_1');
       SkillUpdateService.setSkillDescription(
         SkillEditorStateService.getSkill(), 'new description');
       $rootScope.$apply();
@@ -319,7 +358,7 @@ describe('Skill editor state service', function() {
 
   it('should indicate a skill is no longer saving after an error',
     function() {
-      SkillEditorStateService.loadSkill('1');
+      SkillEditorStateService.loadSkill('skill_id_1');
       SkillUpdateService.setSkillDescription(
         SkillEditorStateService.getSkill(), 'new description');
       $rootScope.$apply();
@@ -339,7 +378,7 @@ describe('Skill editor state service', function() {
       spyOn(fakeSkillRightsBackendApiService, 'fetchSkillRights')
         .and.callThrough();
 
-      SkillEditorStateService.loadSkill('1');
+      SkillEditorStateService.loadSkill('skill_id_1');
       expect(fakeSkillRightsBackendApiService.fetchSkillRights)
         .toHaveBeenCalled();
     });
@@ -347,8 +386,6 @@ describe('Skill editor state service', function() {
   it('should initially return an interstitial skill rights object', function() {
     var skillRights = SkillEditorStateService.getSkillRights();
     expect(skillRights.getSkillId()).toEqual(null);
-    expect(skillRights.getCreatorId()).toEqual(null);
-    expect(skillRights.isPrivate()).toEqual(true);
     expect(skillRights.canEditSkillDescription()).toEqual(false);
   });
 

@@ -30,8 +30,8 @@ require(
 
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
-require('services/PageTitleService.ts');
-require('services/contextual/UrlService.ts');
+require('services/page-title.service.ts');
+require('services/contextual/url.service.ts');
 
 require('pages/collection-editor-page/collection-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
@@ -54,10 +54,6 @@ angular.module('oppia').directive('collectionEditorPage', [
             RouterService, UrlService, EVENT_COLLECTION_INITIALIZED,
             EVENT_COLLECTION_REINITIALIZED) {
           var ctrl = this;
-          ctrl.getActiveTabName = RouterService.getActiveTabName;
-          // Load the collection to be edited.
-          CollectionEditorStateService.loadCollection(
-            UrlService.getCollectionIdFromEditorUrl());
           var setTitle = function() {
             var title = (
               CollectionEditorStateService.getCollection().getTitle());
@@ -69,9 +65,18 @@ angular.module('oppia').directive('collectionEditorPage', [
             }
           };
 
-          $scope.$on(EVENT_COLLECTION_INITIALIZED, setTitle);
-          $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
-        }]
+          ctrl.getActiveTabName = function() {
+            return RouterService.getActiveTabName();
+          };
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_COLLECTION_INITIALIZED, setTitle);
+            $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
+            // Load the collection to be edited.
+            CollectionEditorStateService.loadCollection(
+              UrlService.getCollectionIdFromEditorUrl());
+          };
+        }
+      ]
     };
   }
 ]);

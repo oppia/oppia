@@ -27,15 +27,15 @@ require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/topic-rights-backend-api.service.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
-require('services/AlertsService.ts');
-require('services/QuestionsListService.ts');
+require('services/alerts.service.ts');
+require('services/questions-list.service.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'QuestionsListService', 'RubricObjectFactory', 'StorySummaryObjectFactory',
+  'RubricObjectFactory', 'StorySummaryObjectFactory',
   'SubtopicPageObjectFactory', 'TopicObjectFactory',
   'TopicRightsBackendApiService', 'TopicRightsObjectFactory', 'UndoRedoService',
   'EVENT_STORY_SUMMARIES_INITIALIZED',
@@ -43,7 +43,7 @@ angular.module('oppia').factory('TopicEditorStateService', [
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
-      QuestionsListService, RubricObjectFactory, StorySummaryObjectFactory,
+      RubricObjectFactory, StorySummaryObjectFactory,
       SubtopicPageObjectFactory, TopicObjectFactory,
       TopicRightsBackendApiService, TopicRightsObjectFactory, UndoRedoService,
       EVENT_STORY_SUMMARIES_INITIALIZED,
@@ -64,9 +64,33 @@ angular.module('oppia').factory('TopicEditorStateService', [
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
     var _skillIdToRubricsObject = {};
+    var _groupedSkillSummaries = {
+      current: [],
+      others: []
+    };
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
+    };
+
+    var _updateGroupedSkillSummaries = function(groupedSkillSummaries) {
+      var sortedSkillSummaries = [];
+      _groupedSkillSummaries.current = [];
+      _groupedSkillSummaries.others = [];
+
+      for (var idx in groupedSkillSummaries[_topic.getName()]) {
+        _groupedSkillSummaries.current.push(
+          groupedSkillSummaries[_topic.getName()][idx]);
+      }
+      for (var name in groupedSkillSummaries) {
+        if (name === _topic.getName()) {
+          continue;
+        }
+        var skillSummaries = groupedSkillSummaries[name];
+        for (var idx in skillSummaries) {
+          _groupedSkillSummaries.others.push(skillSummaries[idx]);
+        }
+      }
     };
     var _getSubtopicIdFromSubtopicPageId = function(subtopicPageId) {
       // The subtopic page id consists of the topic id of length 12, a hyphen
@@ -140,19 +164,20 @@ angular.module('oppia').factory('TopicEditorStateService', [
         EditableTopicBackendApiService.fetchTopic(
           topicId).then(
           function(newBackendTopicObject) {
+            _updateGroupedSkillSummaries(
+              newBackendTopicObject.groupedSkillSummaries);
             _updateTopic(
               newBackendTopicObject.topicDict,
               newBackendTopicObject.skillIdToDescriptionDict
             );
+            _updateGroupedSkillSummaries(
+              newBackendTopicObject.groupedSkillSummaries);
             _updateSkillIdToRubricsObject(
               newBackendTopicObject.skillIdToRubricsDict);
             EditableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
               });
-            QuestionsListService.getQuestionSummariesAsync(
-              0, _topic.getSkillIds(), true, false
-            );
           },
           function(error) {
             AlertsService.addWarning(
@@ -169,6 +194,10 @@ angular.module('oppia').factory('TopicEditorStateService', [
             'There was an error when loading the topic rights.');
           _topicIsLoading = false;
         });
+      },
+
+      getGroupedSkillSummaries: function() {
+        return angular.copy(_groupedSkillSummaries);
       },
 
       /**

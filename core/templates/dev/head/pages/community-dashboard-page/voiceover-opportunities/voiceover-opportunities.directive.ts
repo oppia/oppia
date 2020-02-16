@@ -44,16 +44,11 @@ angular.module('oppia').directive('voiceoverOpportunities', [
             $scope, ContributionOpportunitiesService,
             TranslationLanguageService) {
           var ctrl = this;
-          ctrl.opportunities = [];
-          ctrl.opportunitiesAreLoading = true;
-          ctrl.moreOpportunitiesAvailable = true;
-          ctrl.progressBarRequired = false;
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
-              var subheading = (
-                opportunity.topic_name + ' - ' + opportunity.story_title);
-              var heading = opportunity.chapter_title;
+              var subheading = opportunity.getOpportunitySubheading();
+              var heading = opportunity.getOpportunityHeading();
 
               ctrl.opportunities.push({
                 heading: heading,
@@ -65,14 +60,6 @@ angular.module('oppia').directive('voiceoverOpportunities', [
             ctrl.opportunitiesAreLoading = false;
           };
 
-          $scope.$on('activeLanguageChanged', function() {
-            ctrl.opportunities = [];
-            ctrl.opportunitiesAreLoading = true;
-            ContributionOpportunitiesService.getVoiceoverOpportunities(
-              TranslationLanguageService.getActiveLanguageCode(),
-              updateWithNewOpportunities);
-          });
-
           ctrl.onLoadMoreOpportunities = function() {
             if (
               !ctrl.opportunitiesAreLoading &&
@@ -83,10 +70,22 @@ angular.module('oppia').directive('voiceoverOpportunities', [
                 updateWithNewOpportunities);
             }
           };
-
-          ContributionOpportunitiesService.getVoiceoverOpportunities(
-            TranslationLanguageService.getActiveLanguageCode(),
-            updateWithNewOpportunities);
+          ctrl.$onInit = function() {
+            $scope.$on('activeLanguageChanged', function() {
+              ctrl.opportunities = [];
+              ctrl.opportunitiesAreLoading = true;
+              ContributionOpportunitiesService.getVoiceoverOpportunities(
+                TranslationLanguageService.getActiveLanguageCode(),
+                updateWithNewOpportunities);
+            });
+            ctrl.opportunities = [];
+            ctrl.opportunitiesAreLoading = true;
+            ctrl.moreOpportunitiesAvailable = true;
+            ctrl.progressBarRequired = false;
+            ContributionOpportunitiesService.getVoiceoverOpportunities(
+              TranslationLanguageService.getActiveLanguageCode(),
+              updateWithNewOpportunities);
+          };
         }
       ]
     };

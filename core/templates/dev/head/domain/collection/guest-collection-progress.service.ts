@@ -32,7 +32,7 @@ import { Collection } from
   'domain/collection/CollectionObjectFactory';
 import { GuestCollectionProgress, GuestCollectionProgressObjectFactory } from
   'domain/collection/GuestCollectionProgressObjectFactory';
-import { WindowRef } from 'services/contextual/WindowRefService';
+import { WindowRef } from 'services/contextual/window-ref.service';
 
 @Injectable({
   providedIn: 'root'

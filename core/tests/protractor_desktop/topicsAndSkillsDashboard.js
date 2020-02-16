@@ -57,28 +57,15 @@ describe('Topics and skills dashboard functionality', function() {
 
   it('should add a new topic to list', function() {
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(0);
-    topicsAndSkillsDashboardPage.createTopicWithTitle('Topic 1');
+    topicsAndSkillsDashboardPage.createTopic('Topic 1', 'abbrev');
 
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.expectNumberOfTopicsToBe(1);
   });
 
-  it('should add a new unpublished skill to list', function() {
-    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
-
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(0);
-    topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 1');
-
-    topicsAndSkillsDashboardPage.get();
-    topicsAndSkillsDashboardPage.navigateToUnpublishedSkillsTab();
-    topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
-  });
-
   it('should move published skill to unused skills section', function() {
-    topicsAndSkillsDashboardPage.createSkillWithDescription('Skill 2');
-    skillEditorPage.editConceptCard('Concept card explanation');
-    skillEditorPage.saveOrPublishSkill('Added review material.');
-    skillEditorPage.firstTimePublishSkill();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill 2', 'Concept card explanation');
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
@@ -94,10 +81,8 @@ describe('Topics and skills dashboard functionality', function() {
   });
 
   it('should merge an outside skill with one in a topic', function() {
-    topicsAndSkillsDashboardPage.createSkillWithDescription(
-      'Skill to be merged');
-    skillEditorPage.editConceptCard('Concept card explanation');
-    skillEditorPage.saveOrPublishSkill('Added review material.');
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill to be merged', 'Concept card explanation');
     skillEditorPage.moveToQuestionsTab();
     skillEditorPage.clickCreateQuestionButton();
     skillEditorPage.confirmSkillDifficulty();
@@ -113,17 +98,20 @@ describe('Topics and skills dashboard functionality', function() {
       explanation: 'It is correct'
     });
     skillEditorPage.saveQuestion();
-    skillEditorPage.firstTimePublishSkill();
     topicsAndSkillsDashboardPage.get();
     topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.mergeSkillWithIndexToSkillWithIndex(0, 0);
     topicsAndSkillsDashboardPage.navigateToTopicWithIndex(0);
     topicEditorPage.moveToQuestionsTab();
-    topicEditorPage.expectNumberOfQuestionsToBe(1);
+    topicEditorPage.expectNumberOfQuestionsForSkillWithDescriptionToBe(
+      1, 'Skill 2');
   });
 
   it('should remove a skill from list once deleted', function() {
-    topicsAndSkillsDashboardPage.navigateToUnpublishedSkillsTab();
+    topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
+      'Skill to be deleted', 'Concept card explanation');
+    topicsAndSkillsDashboardPage.get();
+    topicsAndSkillsDashboardPage.navigateToUnusedSkillsTab();
     topicsAndSkillsDashboardPage.expectNumberOfSkillsToBe(1);
     topicsAndSkillsDashboardPage.deleteSkillWithIndex(0);
 

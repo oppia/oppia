@@ -21,7 +21,7 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
-require('services/ValidatorsService.ts');
+require('services/validators.service.ts');
 
 angular.module('oppia').factory('ExplorationObjectiveService', [
   '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',

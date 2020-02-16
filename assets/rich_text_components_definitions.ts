@@ -22,6 +22,7 @@ export = {
     "icon_data_url": "/rich_text_components/Collapsible/Collapsible.png",
     "is_complex": true,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "heading",
@@ -51,6 +52,7 @@ export = {
     "icon_data_url": "/rich_text_components/Image/Image.png",
     "is_complex": false,
     "requires_fs": true,
+    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "filepath",
@@ -91,6 +93,7 @@ export = {
     "icon_data_url": "/rich_text_components/Link/Link.png",
     "is_complex": false,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": false,
     "customization_arg_specs": [{
       "name": "url",
@@ -118,6 +121,7 @@ export = {
     "icon_data_url": "/rich_text_components/Math/Math.png",
     "is_complex": false,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": false,
     "customization_arg_specs": [{
       "name": "raw_latex",
@@ -125,6 +129,27 @@ export = {
       "schema": {
         "type": "custom",
         "obj_type": "MathLatexString"
+      },
+      "default_value": ""
+    }]
+  },
+  "Skillreview": {
+    "backend_id": "skillreview",
+    "category": "Basic Input",
+    "description": "A link to the concept card of the linked skill.",
+    "frontend_id": "skillreview",
+    "tooltip": "Insert Concept Card Link",
+    "icon_data_url": "/rich_text_components/Skillreview/Skillreview.png",
+    "is_complex": false,
+    "requires_fs": false,
+    "is_lesson_related": true,
+    "is_block_element": false,
+    "customization_arg_specs": [{
+      "name": "skill_summary",
+      "description": "Click on skill to view concept card.",
+      "schema": {
+        "type": "custom",
+        "obj_type": "SkillSelector"
       },
       "default_value": ""
     }]
@@ -138,6 +163,7 @@ export = {
     "icon_data_url": "/rich_text_components/Tabs/Tabs.png",
     "is_complex": true,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "tab_contents",
@@ -164,6 +190,7 @@ export = {
     "icon_data_url": "/rich_text_components/Video/Video.png",
     "is_complex": false,
     "requires_fs": false,
+    "is_lesson_related": false,
     "is_block_element": true,
     "customization_arg_specs": [{
       "name": "video_id",

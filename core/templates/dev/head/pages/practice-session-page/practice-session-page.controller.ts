@@ -27,9 +27,9 @@ require(
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
-require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
-require('services/PageTitleService.ts');
+require('services/alerts.service.ts');
+require('services/contextual/url.service.ts');
+require('services/page-title.service.ts');
 require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -57,7 +57,6 @@ angular.module('oppia').directive('practiceSessionPage', [
             TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS
         ) {
           var ctrl = this;
-          ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
           var _fetchSkillDetails = function() {
             var practiceSessionsDataUrl = UrlInterpolationService
               .interpolateUrl(
@@ -105,9 +104,12 @@ angular.module('oppia').directive('practiceSessionPage', [
               ctrl.questionPlayerConfig = questionPlayerConfig;
             });
           };
-          _fetchSkillDetails();
-          PageTitleService.setPageTitle(
-            'Practice Session: ' + ctrl.topicName + ' - Oppia');
+          ctrl.$onInit = function() {
+            ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+            _fetchSkillDetails();
+            PageTitleService.setPageTitle(
+              'Practice Session: ' + ctrl.topicName + ' - Oppia');
+          };
         }
       ]
     };

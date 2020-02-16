@@ -31,9 +31,9 @@ require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/QuestionsListService.ts');
-require('services/contextual/UrlService.ts');
+require('services/alerts.service.ts');
+require('services/questions-list.service.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -48,7 +48,7 @@ angular.module('oppia').directive('questionsTab', [
         'SkillEditorStateService', 'QuestionCreationService', 'UrlService',
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'QuestionsListService', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'QuestionsListService',
         'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'NUM_QUESTIONS_PER_PAGE', function(
@@ -56,23 +56,28 @@ angular.module('oppia').directive('questionsTab', [
             SkillEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
-            QuestionsListService, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            QuestionsListService,
             StateEditorService, QuestionUndoRedoService, UndoRedoService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
             NUM_QUESTIONS_PER_PAGE) {
+          var ctrl = this;
           var _init = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.getQuestionSummariesAsync =
               QuestionsListService.getQuestionSummariesAsync;
+            $scope.getGroupedSkillSummaries =
+              SkillEditorStateService.getGroupedSkillSummaries;
             $scope.isLastQuestionBatch =
              QuestionsListService.isLastQuestionBatch;
             $scope.skillIdToRubricsObject = {};
             $scope.skillIdToRubricsObject[$scope.skill.getId()] =
               $scope.skill.getRubrics();
           };
-          _init();
-          $scope.$on(EVENT_SKILL_INITIALIZED, _init);
-          $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
+          ctrl.$onInit = function() {
+            _init();
+            $scope.$on(EVENT_SKILL_INITIALIZED, _init);
+            $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
+          };
         }
       ]
     };

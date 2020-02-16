@@ -16,122 +16,142 @@
  * @fileoverview Factory for creating new frontend instances of Interaction
  * domain objects.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/exploration/HintObjectFactory.ts');
-require('domain/exploration/OutcomeObjectFactory.ts');
-require('domain/exploration/SolutionObjectFactory.ts');
+import cloneDeep from 'lodash/cloneDeep';
 
-angular.module('oppia').factory('InteractionObjectFactory', [
-  'AnswerGroupObjectFactory', 'HintObjectFactory', 'OutcomeObjectFactory',
-  'SolutionObjectFactory',
-  function(
-      AnswerGroupObjectFactory, HintObjectFactory, OutcomeObjectFactory,
-      SolutionObjectFactory) {
-    var Interaction = function(
-        answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
-        defaultOutcome, hints, id, solution) {
-      this.answerGroups = answerGroups;
-      this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
-      this.customizationArgs = customizationArgs;
-      this.defaultOutcome = defaultOutcome;
-      this.hints = hints;
-      this.id = id;
-      this.solution = solution;
-    };
+import { AnswerGroupObjectFactory } from
+  'domain/exploration/AnswerGroupObjectFactory';
+import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { OutcomeObjectFactory } from 'domain/exploration/OutcomeObjectFactory';
+import { SolutionObjectFactory } from
+  'domain/exploration/SolutionObjectFactory';
 
-    Interaction.prototype.setId = function(newValue) {
-      this.id = newValue;
-    };
-
-    Interaction.prototype.setAnswerGroups = function(newValue) {
-      this.answerGroups = newValue;
-    };
-
-    Interaction.prototype.setDefaultOutcome = function(newValue) {
-      this.defaultOutcome = newValue;
-    };
-
-    Interaction.prototype.setCustomizationArgs = function(newValue) {
-      this.customizationArgs = newValue;
-    };
-
-    Interaction.prototype.setSolution = function(newValue) {
-      this.solution = newValue;
-    };
-
-    Interaction.prototype.setHints = function(newValue) {
-      this.hints = newValue;
-    };
-
-    Interaction.prototype.copy = function(otherInteraction) {
-      this.answerGroups = angular.copy(otherInteraction.answerGroups);
-      this.confirmedUnclassifiedAnswers =
-        angular.copy(otherInteraction.confirmedUnclassifiedAnswers);
-      this.customizationArgs = angular.copy(otherInteraction.customizationArgs);
-      this.defaultOutcome = angular.copy(otherInteraction.defaultOutcome);
-      this.hints = angular.copy(otherInteraction.hints);
-      this.id = angular.copy(otherInteraction.id);
-      this.solution = angular.copy(otherInteraction.solution);
-    };
-
-    Interaction.prototype.toBackendDict = function() {
-      return {
-        answer_groups: this.answerGroups.map(function(answerGroup) {
-          return answerGroup.toBackendDict();
-        }),
-        confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
-        customization_args: this.customizationArgs,
-        default_outcome:
-          this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
-        hints: this.hints.map(function(hint) {
-          return hint.toBackendDict();
-        }),
-        id: this.id,
-        solution: this.solution ? this.solution.toBackendDict() : null
-      };
-    };
-
-    // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
-    /* eslint-disable dot-notation */
-    Interaction['createFromBackendDict'] = function(interactionDict) {
-    /* eslint-enable dot-notation */
-      var defaultOutcome;
-      if (interactionDict.default_outcome) {
-        defaultOutcome = OutcomeObjectFactory.createFromBackendDict(
-          interactionDict.default_outcome);
-      } else {
-        defaultOutcome = null;
-      }
-      return new Interaction(
-        generateAnswerGroupsFromBackend(interactionDict.answer_groups),
-        interactionDict.confirmed_unclassified_answers,
-        interactionDict.customization_args,
-        defaultOutcome,
-        generateHintsFromBackend(interactionDict.hints),
-        interactionDict.id,
-        interactionDict.solution ? (
-          generateSolutionFromBackend(interactionDict.solution)) : null);
-    };
-
-    var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
-      return answerGroupBackendDicts.map(function(
-          answerGroupBackendDict) {
-        return AnswerGroupObjectFactory.createFromBackendDict(
-          answerGroupBackendDict);
-      });
-    };
-
-    var generateHintsFromBackend = function(hintBackendDicts) {
-      return hintBackendDicts.map(function(hintBackendDict) {
-        return HintObjectFactory.createFromBackendDict(hintBackendDict);
-      });
-    };
-
-    var generateSolutionFromBackend = function(solutionBackendDict) {
-      return SolutionObjectFactory.createFromBackendDict(solutionBackendDict);
-    };
-
-    return Interaction;
+export class Interaction {
+  answerGroups;
+  confirmedUnclassifiedAnswers;
+  customizationArgs;
+  defaultOutcome;
+  hints;
+  id;
+  solution;
+  constructor(
+      answerGroups, confirmedUnclassifiedAnswers, customizationArgs,
+      defaultOutcome, hints, id, solution) {
+    this.answerGroups = answerGroups;
+    this.confirmedUnclassifiedAnswers = confirmedUnclassifiedAnswers;
+    this.customizationArgs = customizationArgs;
+    this.defaultOutcome = defaultOutcome;
+    this.hints = hints;
+    this.id = id;
+    this.solution = solution;
   }
-]);
+
+  setId(newValue: string): void {
+    this.id = newValue;
+  }
+  // TODO(#7165): Replace any with exact type.
+  setAnswerGroups(newValue: any): void {
+    this.answerGroups = newValue;
+  }
+  // TODO(#7165): Replace any with exact type.
+  setDefaultOutcome(newValue: any): void {
+    this.defaultOutcome = newValue;
+  }
+  // TODO(#7165): Replace any with exact type.
+  setCustomizationArgs(newValue: any): void {
+    this.customizationArgs = newValue;
+  }
+  // TODO(#7165): Replace any with exact type.
+  setSolution(newValue: any): void {
+    this.solution = newValue;
+  }
+  // TODO(#7165): Replace any with exact type.
+  setHints(newValue: any): void {
+    this.hints = newValue;
+  }
+  // TODO(#7165): Replace any with exact type.
+  copy(otherInteraction: any): void {
+    this.answerGroups = cloneDeep(otherInteraction.answerGroups);
+    this.confirmedUnclassifiedAnswers =
+      cloneDeep(otherInteraction.confirmedUnclassifiedAnswers);
+    this.customizationArgs = cloneDeep(otherInteraction.customizationArgs);
+    this.defaultOutcome = cloneDeep(otherInteraction.defaultOutcome);
+    this.hints = cloneDeep(otherInteraction.hints);
+    this.id = cloneDeep(otherInteraction.id);
+    this.solution = cloneDeep(otherInteraction.solution);
+  }
+  // TODO(#7165): Replace any with exact type.
+  toBackendDict(): any {
+    return {
+      answer_groups: this.answerGroups.map(function(answerGroup) {
+        return answerGroup.toBackendDict();
+      }),
+      confirmed_unclassified_answers: this.confirmedUnclassifiedAnswers,
+      customization_args: this.customizationArgs,
+      default_outcome:
+        this.defaultOutcome ? this.defaultOutcome.toBackendDict() : null,
+      hints: this.hints.map(function(hint) {
+        return hint.toBackendDict();
+      }),
+      id: this.id,
+      solution: this.solution ? this.solution.toBackendDict() : null
+    };
+  }
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class InteractionObjectFactory {
+  constructor(
+    private answerGroupFactory: AnswerGroupObjectFactory,
+    private hintFactory: HintObjectFactory,
+    private solutionFactory: SolutionObjectFactory,
+    private outcomeFactory: OutcomeObjectFactory) {}
+  // TODO(ankita240796): Remove the bracket notation once Angular2 gets in.
+  /* eslint-disable dot-notation */
+  // TODO(#7165): Replace any with exact type.
+  createFromBackendDict(interactionDict: any): Interaction {
+  /* eslint-enable dot-notation */
+    var defaultOutcome;
+    if (interactionDict.default_outcome) {
+      defaultOutcome = this.outcomeFactory.createFromBackendDict(
+        interactionDict.default_outcome);
+    } else {
+      defaultOutcome = null;
+    }
+    return new Interaction(
+      this.generateAnswerGroupsFromBackend(interactionDict.answer_groups),
+      interactionDict.confirmed_unclassified_answers,
+      interactionDict.customization_args,
+      defaultOutcome,
+      this.generateHintsFromBackend(interactionDict.hints),
+      interactionDict.id,
+      interactionDict.solution ? (
+        this.generateSolutionFromBackend(interactionDict.solution)) : null);
+  }
+  // TODO(#7165): Replace any with exact type.
+  generateAnswerGroupsFromBackend(answerGroupBackendDicts: any) {
+    return answerGroupBackendDicts.map((
+        answerGroupBackendDict) => {
+      return this.answerGroupFactory.createFromBackendDict(
+        answerGroupBackendDict);
+    });
+  }
+  // TODO(#7165): Replace any with exact type.
+  generateHintsFromBackend(hintBackendDicts: any) {
+    return hintBackendDicts.map((hintBackendDict) => {
+      return this.hintFactory.createFromBackendDict(hintBackendDict);
+    });
+  }
+  // TODO(#7165): Replace any with exact type.
+  generateSolutionFromBackend(solutionBackendDict: any) {
+    return this.solutionFactory.createFromBackendDict(solutionBackendDict);
+  }
+}
+
+angular.module('oppia').factory(
+  'InteractionObjectFactory', downgradeInjectable(
+    InteractionObjectFactory));

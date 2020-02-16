@@ -16,9 +16,11 @@
  * @fileoverview Page object for the exploration editor's translation tab, for
  * use in Protractor tests.
  */
+
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
+var path = require('path');
 
 var ExplorationEditorTranslationTab = function() {
   var dismissWelcomeModalButton = element(
@@ -65,6 +67,7 @@ var ExplorationEditorTranslationTab = function() {
       }
     });
   };
+
   this.playTutorial = function() {
     var tutorialTabHeadings = [
       'Translations In Oppia',
@@ -107,6 +110,24 @@ var ExplorationEditorTranslationTab = function() {
       'Translation tutorial modal takes too long to appear');
   };
 
+  var startRecordButton = element(
+    by.css('.protractor-test-accessibility-translation-start-record'));
+  var stopRecordButton = element(
+    by.css('.protractor-test-stop-record'));
+  var confirmRecordButton = element(
+    by.css('.protractor-test-confirm-record'));
+  var playRecordButton = element(
+    by.css('.protractor-test-play-pause-audio-button'));
+  var uploadAudioButton = element(
+    by.css('.protractor-test-upload-audio'));
+  var audioUploadInput = element(
+    by.css('.protractor-test-upload-audio'));
+  var saveUploadedAudioButton = element(
+    by.css('.protractor-test-save-uploaded-audio'));
+  var deleteRecordButton = element(
+    by.css('.protractor-test-delete-record'));
+  var confirmDeleteRecordButton = element(
+    by.css('.protractor-test-confirm-discard-changes'));
   var contentTabButton = element(
     by.css('.protractor-test-translation-content-tab'));
   var feedbackTabButton = element(
@@ -115,62 +136,27 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-translation-hints-tab'));
   var solutionTabButton = element(
     by.css('.protractor-test-translation-solution-tab'));
-
   var contentTabText = element(by.css('.protractor-test-content-text'));
-
-  var feedbackList = element.all(
-    by.css('li.protractor-test-translation-feedback'));
-  var translationFeedback = function(index) {
-    return element(by.css('.protractor-test-feedback-' + index));
-  };
-  var translationFeedbackText = function(index) {
-    return element(by.css('.protractor-test-feedback-' + index + '-text'));
-  };
-
-  var hintsList = element.all(
-    by.css('li.protractor-test-translation-hint'));
-  var translationHint = function(index) {
-    return element(by.css('.protractor-test-hint-' + index));
-  };
-  var translationHintText = function(index) {
-    return element(by.css('.protractor-test-hint-' + index + '-text'));
-  };
-
   var solutionTabText = element(by.css('.protractor-test-solution-text'));
-
   var numericalStatus = element(
     by.css('.protractor-test-translation-numerical-status'));
-
   var translationTabContentAccessibility = element(
     by.css('.protractor-test-accessibility-translation-content'));
-
   var translationTabFeedbackAccessibility = element(
     by.css('.protractor-test-accessibility-translation-feedback'));
-
   var translationTabHintAccessibility = element(
     by.css('.protractor-test-accessibility-translation-hint'));
-
   var translationTabSolutionAccessibility = element(
     by.css('.protractor-test-accessibility-translation-solution'));
-
   var translationTabStartRecordingAccessibility = element(
     by.css('.protractor-test-accessibility-translation-start-record'));
-
   var translationTabUploadRecordingAccessibility = element(
     by.css('.protractor-test-accessibility-translation-upload-audio'));
-
   var translationTabPlayRecordingAccessibility = element(
     by.css('.protractor-test-accessibility-translation-play-recorded-audio'));
-
-  var _selectLanguage = function(language) {
-    element(by.css('.protractor-test-translation-language-selector')).
-      element(by.cssContainingText('option', language)).click();
-  };
-
   var selectedLanguageElement = element(
     by.css('.protractor-test-translation-language-selector')).element(
     by.css('option:checked'));
-
   var languageSelectorLabelElement = element(
     by.css('.protractor-test-language-selector-label'));
   var progressBarLabelElement = element(
@@ -178,20 +164,117 @@ var ExplorationEditorTranslationTab = function() {
   var translationModeButton = element(
     by.css('.protractor-test-translation-mode'));
   var voiceoverModeButton = element(by.css('.protractor-test-voiceover-mode'));
-
   var saveTranslationButton = element(
     by.css('.protractor-test-save-translation'));
   var editTranslationButtton = element(
     by.css('.protractor-test-edit-translation'));
   var translationDisplay = element(
     by.css('.protractor-test-translation-display'));
-
-  var stateGraph = element(by.css('.protractor-test-translation-graph'));
-  var stateBackgroundNodes = stateGraph.all(by.css(
-    '.protractor-test-node-background'));
-  var stateNodes = stateGraph.all(by.css('.protractor-test-node'));
+  var stateGraph = element(
+    by.css('.protractor-test-translation-graph'));
+  var feedbackList = element.all(
+    by.css('li.protractor-test-translation-feedback'));
+  var hintsList = element.all(
+    by.css('li.protractor-test-translation-hint'));
+  var stateBackgroundNodes = stateGraph.all(
+    by.css('.protractor-test-node-background'));
+  var stateNodes = stateGraph.all(
+    by.css('.protractor-test-node'));
+  var audioUploadInputElement = element(
+    by.css('.protractor-test-upload-audio'));
+  var audioOverFiveMinutesErrorMessageElement = element(
+    by.css('.protractor-test-audio-file-upload-field-error-message'));
+  var uploadAudioButton = element.all(
+    by.css('.protractor-test-upload-audio')).last();
+  var saveUploadedAudioButton = element(
+    by.css('.protractor-test-save-uploaded-audio'));
+  var playPauseAudioButton = element(
+    by.css('.protractor-test-play-pause-audio-button'));
+  var audioMaterialSliderDiv = element(by.css('.md-slider-wrapper'));
+  var closeAudioUploaderModalButton = element(
+    by.css('.protractor-test-close-audio-upload-modal'));
+  var translationFeedback = function(index) {
+    return element(by.css('.protractor-test-feedback-' + index));
+  };
+  var translationFeedbackText = function(index) {
+    return element(by.css('.protractor-test-feedback-' + index + '-text'));
+  };
+  var translationHint = function(index) {
+    return element(by.css('.protractor-test-hint-' + index));
+  };
+  var translationHintText = function(index) {
+    return element(by.css('.protractor-test-hint-' + index + '-text'));
+  };
+  var _selectLanguage = function(language) {
+    element(
+      by.css('.protractor-test-translation-language-selector')
+    ).element(
+      by.cssContainingText('option', language)
+    ).click();
+  };
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-label'));
+  };
+
+  this.deleteAudioRecord = function() {
+    waitFor.elementToBeClickable(
+      deleteRecordButton,
+      'Delete Record button is not clickable');
+    deleteRecordButton.click();
+    waitFor.elementToBeClickable(
+      confirmDeleteRecordButton,
+      'The confirm record deletion button is not clickable');
+    confirmDeleteRecordButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.uploadAudioRecord = function(audioPath) {
+    waitFor.elementToBeClickable(
+      uploadAudioButton,
+      'Audio Record button is not clickable');
+    uploadAudioButton.click();
+    absPath = path.resolve(__dirname, audioPath);
+    return audioUploadInput.sendKeys(absPath);
+  };
+
+  this.saveAudioRecord = function() {
+    waitFor.elementToBeClickable(
+      saveUploadedAudioButton,
+      'Save uploaded audio button is not clickable');
+    saveUploadedAudioButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.addAudioRecord = function() {
+    waitFor.elementToBeClickable(
+      startRecordButton,
+      'Add Record button is not clickable');
+    startRecordButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.stopAudioRecord = function() {
+    waitFor.elementToBeClickable(
+      stopRecordButton,
+      'Stop Record button is not clickable');
+    stopRecordButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.confirmAudioRecord = function() {
+    waitFor.elementToBeClickable(
+      confirmRecordButton,
+      'Confirm record addition is not clickable');
+    confirmRecordButton.click();
+    waitFor.pageToFullyLoad();
+  };
+
+  this.playAudioRecord = function() {
+    waitFor.elementToBeClickable(
+      playRecordButton,
+      'Play Record button is not clickable');
+    playRecordButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.setTranslation = function(richTextInstructions) {
@@ -214,6 +297,84 @@ var ExplorationEditorTranslationTab = function() {
     waitFor.invisibilityOf(
       saveTranslationButton,
       'State translation editor takes too long to disappear');
+  };
+
+  this.expectSaveUploadedAudioButtonToBeDisabled = function() {
+    expect(saveUploadedAudioButton.getAttribute('disabled')).toBe('true');
+  };
+
+  this.uploadAudio = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    waitFor.elementToBeClickable(
+      saveUploadedAudioButton, 'Save button is not clickable');
+    saveUploadedAudioButton.click();
+    waitFor.invisibilityOf(saveUploadedAudioButton,
+      'Upload Audio modal takes too long to disappear');
+  };
+
+  this.expectWrongFileType = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    expect(element(by.css('div.error-message')).getText())
+      .toContain('This file is not recognized as an audio file.');
+  };
+
+  this.expectAudioOverFiveMinutes = function(relativePathOfAudioToUpload) {
+    var audioAbsolutePath = path.resolve(
+      __dirname, relativePathOfAudioToUpload);
+    audioUploadInputElement.sendKeys(audioAbsolutePath);
+    waitFor.elementToBeClickable(
+      saveUploadedAudioButton, 'Save button is not clickable');
+    saveUploadedAudioButton.click();
+    waitFor.visibilityOf(audioOverFiveMinutesErrorMessageElement,
+      'Error element is not visible');
+    expect(audioOverFiveMinutesErrorMessageElement.getText()).toContain(
+      'Audio files must be under 300 seconds in length.');
+  };
+
+  this.openUploadAudioModal = function() {
+    waitFor.elementToBeClickable(
+      uploadAudioButton, 'Upload Audio button is not clickable');
+    uploadAudioButton.click();
+  };
+
+  this.closeUploadAudioModal = function() {
+    waitFor.elementToBeClickable(
+      closeAudioUploaderModalButton,
+      'Close audio uploader modal button is not clickable');
+    closeAudioUploaderModalButton.click();
+  };
+
+  this.playOrPauseAudioFile = function() {
+    waitFor.visibilityOf(
+      playPauseAudioButton,
+      'Play or pause audio button is taking too long to appear');
+    playPauseAudioButton.click();
+    return this._isAudioPlaying();
+  };
+
+  this._isAudioPlaying = function() {
+    return audioMaterialSliderDiv.getAttribute('aria-valuenow')
+      .then(function(firstValue) {
+        return new Promise(function(resolve, reject) {
+          setTimeout(function() {
+            resolve(firstValue);
+          }, 2000);
+        });
+      }).then(function(firstValue) {
+        return audioMaterialSliderDiv.getAttribute('aria-valuenow')
+          .then(function(secondValue) {
+            if (firstValue && secondValue) {
+              return +firstValue < +secondValue;
+            }
+            return false;
+          });
+      }).then(function(isPlaying) {
+        return isPlaying;
+      });
   };
 
   this.expectTranslationToMatch = function(richTextInstructions) {

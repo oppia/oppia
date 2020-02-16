@@ -16,56 +16,74 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
-require('pages/exploration-player-page/services/player-transcript.service.ts');
-require('services/ContextService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('PlayerPositionService', [
-  'ContextService', 'PlayerTranscriptService', function(
-      ContextService, PlayerTranscriptService) {
-    var displayedCardIndex = null;
-    var onChangeCallback = null;
-    var learnerJustSubmittedAnAnswer = false;
+import { ContextService } from 'services/context.service';
+import { PlayerTranscriptService } from
+  'pages/exploration-player-page/services/player-transcript.service';
 
-    return {
-      init: function(callback) {
-        displayedCardIndex = null;
-        onChangeCallback = callback;
-      },
-      getCurrentStateName: function() {
-        try {
-          return (
-            PlayerTranscriptService.getCard(displayedCardIndex).getStateName());
-        } catch (e) {
-          var additionalInfo = ('\nUndefined card error debug logs:' +
-            '\nRequested card index: ' + displayedCardIndex +
-            '\nExploration ID: ' + ContextService.getExplorationId() +
-            '\nTotal cards: ' + PlayerTranscriptService.getNumCards() +
-            '\nLast state name: ' + PlayerTranscriptService.getLastStateName()
-          );
-          e.message += additionalInfo;
-          throw e;
-        }
-      },
-      setDisplayedCardIndex: function(index) {
-        var oldIndex = displayedCardIndex;
-        displayedCardIndex = index;
 
-        if (oldIndex !== displayedCardIndex) {
-          onChangeCallback();
-        }
-      },
-      getDisplayedCardIndex: function() {
-        return displayedCardIndex;
-      },
-      recordAnswerSubmission: function() {
-        learnerJustSubmittedAnAnswer = true;
-      },
-      recordNavigationButtonClick: function() {
-        learnerJustSubmittedAnAnswer = false;
-      },
-      hasLearnerJustSubmittedAnAnswer: function() {
-        return learnerJustSubmittedAnAnswer;
-      }
-    };
+@Injectable({
+  providedIn: 'root'
+})
+export class PlayerPositionService {
+  constructor(private contextService: ContextService,
+              private playerTranscriptService: PlayerTranscriptService) {}
+
+  displayedCardIndex = null;
+  onChangeCallback = null;
+  learnerJustSubmittedAnAnswer = false;
+
+  init(callback: Function): void {
+    this.displayedCardIndex = null;
+    this.onChangeCallback = callback;
   }
-]);
+
+  getCurrentStateName(): string {
+    try {
+      return (
+        this.playerTranscriptService.getCard(
+          this.displayedCardIndex).getStateName());
+    } catch (e) {
+      let additionalInfo = ('\nUndefined card error debug logs:' +
+          '\nRequested card index: ' + this.displayedCardIndex +
+          '\nExploration ID: ' + this.contextService.getExplorationId() +
+          '\nTotal cards: ' + this.playerTranscriptService.getNumCards() +
+          '\nLast state name: ' +
+          this.playerTranscriptService.getLastStateName()
+      );
+      e.message += additionalInfo;
+      throw e;
+    }
+  }
+
+  setDisplayedCardIndex(index: number): void {
+    let oldIndex = this.displayedCardIndex;
+    this.displayedCardIndex = index;
+
+    if (oldIndex !== this.displayedCardIndex) {
+      this.onChangeCallback();
+    }
+  }
+
+  getDisplayedCardIndex(): number {
+    return this.displayedCardIndex;
+  }
+
+  recordAnswerSubmission(): void {
+    this.learnerJustSubmittedAnAnswer = true;
+  }
+
+  recordNavigationButtonClick(): void {
+    this.learnerJustSubmittedAnAnswer = false;
+  }
+
+  hasLearnerJustSubmittedAnAnswer(): boolean {
+    return this.learnerJustSubmittedAnAnswer;
+  }
+}
+
+angular.module('oppia').factory(
+  'PlayerPositionService',
+  downgradeInjectable(PlayerPositionService));

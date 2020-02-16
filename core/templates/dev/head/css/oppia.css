@@ -929,7 +929,6 @@ textarea {
 .navbar-light .navbar-nav .nav-link {
   color: white;
   text-align: center;
-  width: 46px;
 }
 .navbar-light .navbar-nav .show > .nav-link,
 .navbar-light .navbar-nav .active > .nav-link,
@@ -937,7 +936,6 @@ textarea {
 .navbar-light .navbar-nav .nav-link.active {
   color: white;
   text-align: center;
-  width: 46px;
 }
 .navbar-light .navbar-nav .nav-link:hover,
 .navbar-light .navbar-nav .nav-link:focus {
@@ -1556,16 +1554,10 @@ md-card.oppia-dashboard-tile {
 }
 
 @media(max-width: 1099px) {
-  .oppia-editor-publish-button {
-    padding-bottom: 3px;
-  }
-  .oppia-save-draft-button {
-    padding-bottom: 3px;
-    width: 40px;
-  }
+  .oppia-editor-publish-button,
+  .oppia-save-draft-button,
   .oppia-save-changes-button {
     padding-bottom: 3px;
-    width: 55px;
   }
 }
 
@@ -1575,16 +1567,10 @@ md-card.oppia-dashboard-tile {
     display: none;
   }
 
-  .oppia-editor-publish-button {
-    padding-bottom: 6px;
-  }
-  .oppia-save-draft-button {
-    padding-bottom: 6px;
-    width: 125px;
-  }
+  .oppia-editor-publish-button,
+  .oppia-save-draft-button,
   .oppia-save-changes-button {
     padding-bottom: 6px;
-    width: 136px;
   }
 }
 
@@ -2427,8 +2413,10 @@ oppia-parameter {
   opacity: .5;
 }
 
-.modal-content, .modal-dialog {
-  min-width: 590px;
+@media(min-width: 768px) {
+  .modal-content, .modal-dialog {
+    min-width: 590px;
+  }
 }
 .modal-content {
   background-clip: padding-box;
@@ -2606,7 +2594,7 @@ div#ng-curtain {
 }
 
 .oppia-navbar-brand-name {
-  float: left;
+  float: right;
   height: 56px;
   line-height: 20px;
   margin-left: -10px;
@@ -3084,6 +3072,9 @@ md-card.preview-conversation-skin-supplemental-card {
   font-size: 0.75em;
   list-style-type: none;
   text-align: center;
+}
+.oppia-navbar-nav.oppia-navbar-profile > li:hover {
+  background-color: #009688
 }
 .oppia-activity-summary-tile.small-width .metrics li {
   display: block;
@@ -3837,7 +3828,7 @@ md-card.preview-conversation-skin-supplemental-card {
   https://www.nczonline.net/blog/2013/04/01/making-accessible-icon-buttons/
   Use for all links and buttons that only use an icon */
 .oppia-icon-accessibility-label {
-  display: block;
+  display: inline-block;
   font-size: 0;
   height: 1px;
   overflow: hidden;
@@ -4524,12 +4515,17 @@ div.oppia-issues-learner-action {
 }
 
 .oppia-issues-learner-action-table {
-  width: 100%;
   border: 1px solid black;
+  margin-bottom: 2em;
+  width: 100%;
 }
 
 /* To fix the shifting of tooltip when text is too long. */
 .nav .tooltip-inner {
   max-width: none;
   white-space: nowrap;
+}
+
+.oppia-rule-preview {
+  word-wrap: break-word;
 }

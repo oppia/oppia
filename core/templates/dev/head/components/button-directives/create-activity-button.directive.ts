@@ -19,9 +19,9 @@
 require('components/entity-creation-services/collection-creation.service.ts');
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('domain/utilities/browser-checker.service.ts');
-require('services/contextual/UrlService.ts');
-require('services/SiteAnalyticsService.ts');
-require('services/UserService.ts');
+require('services/contextual/url.service.ts');
+require('services/site-analytics.service.ts');
+require('services/user.service.ts');
 
 angular.module('oppia').directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -29,8 +29,7 @@ angular.module('oppia').directive('createActivityButton', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/button-directives/create-activity-button.directive.html'),
+      template: require('./create-activity-button.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$timeout', '$window', '$uibModal',
@@ -43,19 +42,6 @@ angular.module('oppia').directive('createActivityButton', [
             SiteAnalyticsService, UrlService, UserService,
             ALLOW_YAML_FILE_UPLOAD) {
           var ctrl = this;
-          ctrl.creationInProgress = false;
-          ctrl.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
-
-          ctrl.canCreateCollections = null;
-          ctrl.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            ctrl.canCreateCollections = userInfo.canCreateCollections();
-            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-          });
-
-          ctrl.showUploadExplorationModal = (
-            ExplorationCreationService.showUploadExplorationModal);
-
           ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent(
               'createActivityButton');
@@ -120,17 +106,30 @@ angular.module('oppia').directive('createActivityButton', [
               });
             }
           };
+          ctrl.showUploadExplorationModal = function() {
+            ExplorationCreationService.showUploadExplorationModal();
+          };
+          ctrl.$onInit = function() {
+            ctrl.creationInProgress = false;
+            ctrl.allowYamlFileUpload = ALLOW_YAML_FILE_UPLOAD;
 
-          // If the user clicked on a 'create' button to get to the dashboard,
-          // open the create modal immediately (or redirect to the exploration
-          // editor if the create modal does not need to be shown).
-          if (UrlService.getUrlParams().mode === 'create') {
-            if (!ctrl.canCreateCollections) {
-              ExplorationCreationService.createNewExploration();
-            } else {
-              ctrl.initCreationProcess();
+            ctrl.canCreateCollections = null;
+            ctrl.userIsLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              ctrl.canCreateCollections = userInfo.canCreateCollections();
+              ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            });
+            // If the user clicked on a 'create' button to get to the dashboard,
+            // open the create modal immediately (or redirect to the exploration
+            // editor if the create modal does not need to be shown).
+            if (UrlService.getUrlParams().mode === 'create') {
+              if (!ctrl.canCreateCollections) {
+                ExplorationCreationService.createNewExploration();
+              } else {
+                ctrl.initCreationProcess();
+              }
             }
-          }
+          };
         }
       ]
     };

@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/statistics/learner-answer-details-backend-api.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Learner answer info backend Api service', function() {
   var LearnerAnswerDetailsBackendApiService = null;
@@ -34,7 +34,7 @@ describe('Learner answer info backend Api service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Domain objects relating to stories."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -198,6 +199,9 @@ class StoryNode(python_utils.OBJECT):
     @classmethod
     def get_incremented_node_id(cls, node_id):
         """Increments the next node id of the story.
+
+        Args:
+            node_id: str. The id of the node.
 
         Returns:
             str. The new next node id.

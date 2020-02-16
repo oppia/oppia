@@ -2,7 +2,7 @@
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
 
   <head>
-    @require('../../base-components/header.template.html', {"title": "Moderator Tools - Oppia"})
+    @load('base-components/header.template.html', {"title": "Moderator Tools - Oppia"})
   </head>
 
   <body>
@@ -25,7 +25,7 @@
       </base-content>
     </div>
 
-    @require('../footer_js_libs.html')
+    @load('pages/footer_js_libs.html')
     <script src="/third_party/static/ckeditor-4.12.1/ckeditor.js"></script>
   </body>
 </html>

@@ -24,6 +24,7 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var ExplorationPlayerPage = function() {
   var conversationInput = element(
     by.css('.protractor-test-conversation-input'));
+  var nextCardButton = element(by.css('.protractor-test-next-card-button'));
   var suggestionDescriptionInput = element(
     by.css('.protractor-test-suggestion-description-input'));
   var closeSuggestionModalButton = element(
@@ -71,6 +72,8 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-return-to-parent-button'));
   var answerDetailsSubmitButton = element(
     by.css('.protractor-test-answer-details-submit-button'));
+  var correctFeedbackElement = element(
+    by.css('.protractor-test-correct-feedback'));
 
   var feedbackPopupLink =
     element(by.css('.protractor-test-exploration-feedback-popup-link'));
@@ -87,6 +90,11 @@ var ExplorationPlayerPage = function() {
     waitFor.elementToBeClickable(suggestionPopupLink,
       'Suggest changes button taking too long to appear');
     suggestionPopupLink.click();
+  };
+
+  this.expectNextCardButtonTextToBe = function(text) {
+    var buttonText = nextCardButton.getText();
+    expect(buttonText).toMatch(text);
   };
 
   this.fillAndSubmitSuggestion = function(
@@ -303,6 +311,12 @@ var ExplorationPlayerPage = function() {
     suggestionSubmitButton.click();
     waitFor.invisibilityOf(
       suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
+  };
+
+  this.expectCorrectFeedback = function() {
+    waitFor.visibilityOf(
+      correctFeedbackElement,
+      'Correct feedback footer takes too long to appear');
   };
 };
 

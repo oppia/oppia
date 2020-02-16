@@ -32,9 +32,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').directive('solutionEditor', [
   'ExplorationHtmlFormatterService',
@@ -64,18 +64,19 @@ angular.module('oppia').directive('solutionEditor', [
         'StateSolutionService',
         function(StateSolutionService) {
           var ctrl = this;
-          ctrl.StateSolutionService = StateSolutionService;
-
-          ctrl.EXPLANATION_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
           ctrl.getAnswerHtml = function() {
             return ExplorationHtmlFormatterService.getAnswerHtml(
               StateSolutionService.savedMemento.correctAnswer,
               StateInteractionIdService.savedMemento,
               StateCustomizationArgsService.savedMemento);
+          };
+          ctrl.$onInit = function() {
+            ctrl.StateSolutionService = StateSolutionService;
+
+            ctrl.EXPLANATION_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
           };
         }
       ]

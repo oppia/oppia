@@ -20,6 +20,8 @@ require(
   'components/state-directives/answer-group-editor/' +
   'summary-list-header.directive.ts');
 require(
+  'components/review-material-editor/review-material-editor.directive.ts');
+require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/angular-html-bind.directive.ts');
 require(
@@ -32,18 +34,18 @@ require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
 require('filters/format-rte-preview.filter.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
-require('services/GenerateContentIdService.ts');
+require('services/generate-content-id.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
-  'COMPONENT_NAME_EXPLANATION', 'COMPONENT_NAME_WORKED_EXAMPLE',
+  'COMPONENT_NAME_WORKED_EXAMPLE',
   function(
       GenerateContentIdService, SkillEditorStateService, SkillUpdateService,
       SubtitledHtmlObjectFactory, UrlInterpolationService,
-      COMPONENT_NAME_EXPLANATION, COMPONENT_NAME_WORKED_EXAMPLE) {
+      COMPONENT_NAME_WORKED_EXAMPLE) {
     return {
       restrict: 'E',
       scope: {},
@@ -53,13 +55,7 @@ angular.module('oppia').directive('skillConceptCardEditor', [
       controller: [
         '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
         function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/drag_dots.png');
-          $scope.HTML_SCHEMA = {
-            type: 'html'
-          };
-
+          var ctrl = this;
           var initBindableFieldsDict = function() {
             $scope.bindableFieldsDict = {
               displayedConceptCardExplanation:
@@ -69,39 +65,16 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             };
           };
 
-          var explanationMemento = null;
           var workedExamplesMemento = null;
 
           $scope.isEditable = function() {
             return true;
           };
 
-          initBindableFieldsDict();
-          $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+          $scope.onSaveExplanation = function(explanationObject) {
+            SkillUpdateService.setConceptCardExplanation(
+              $scope.skill, explanationObject);
             initBindableFieldsDict();
-          });
-
-          // When the page is scrolled so that the top of the page is above the
-          // browser viewport, there are some bugs in the positioning of the
-          // helper. This is a bug in jQueryUI that has not been fixed yet.
-          // For more details, see http://stackoverflow.com/q/5791886
-          $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
-            axis: 'y',
-            cursor: 'move',
-            handle: '.oppia-worked-example-sort-handle',
-            items: '.oppia-sortable-worked-example',
-            revert: 100,
-            tolerance: 'pointer',
-            start: function(e, ui) {
-              $scope.activeWorkedExampleIndex = null;
-              ui.placeholder.height(ui.item.height());
-            },
-            stop: function() {
-              var newWorkedExamples =
-                $scope.bindableFieldsDict.displayedWorkedExamples;
-              SkillUpdateService.updateWorkedExamples(
-                $scope.skill, newWorkedExamples);
-            }
           };
 
           $scope.changeActiveWorkedExampleIndex = function(idx) {
@@ -110,32 +83,6 @@ angular.module('oppia').directive('skillConceptCardEditor', [
             } else {
               $scope.activeWorkedExampleIndex = idx;
             }
-          };
-
-          $scope.conceptCardExplanationEditorIsShown = false;
-
-          $scope.openConceptCardExplanationEditor = function() {
-            $scope.conceptCardExplanationEditorIsShown = true;
-            explanationMemento =
-              $scope.bindableFieldsDict.displayedConceptCardExplanation;
-          };
-
-          $scope.closeConceptCardExplanationEditor = function() {
-            $scope.conceptCardExplanationEditorIsShown = false;
-            $scope.bindableFieldsDict.displayedConceptCardExplanation =
-              explanationMemento;
-          };
-
-          $scope.saveConceptCardExplanation = function() {
-            $scope.conceptCardExplanationEditorIsShown = false;
-            SkillUpdateService.setConceptCardExplanation(
-              $scope.skill,
-              SubtitledHtmlObjectFactory.createDefault(
-                $scope.bindableFieldsDict.displayedConceptCardExplanation,
-                COMPONENT_NAME_EXPLANATION));
-            explanationMemento = null;
-            $scope.displayedConceptCardExplanation =
-              $scope.skill.getConceptCard().getExplanation().getHtml();
           };
 
           $scope.deleteWorkedExample = function(index, evt) {
@@ -160,6 +107,10 @@ angular.module('oppia').directive('skillConceptCardEditor', [
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
               $scope.activeWorkedExampleIndex = null;
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -203,12 +154,48 @@ angular.module('oppia').directive('skillConceptCardEditor', [
                     COMPONENT_NAME_WORKED_EXAMPLE)));
               $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
           $scope.onWorkedExampleSaved = function() {
             $scope.bindableFieldsDict.displayedWorkedExamples =
               $scope.skill.getConceptCard().getWorkedExamples();
+          };
+          ctrl.$onInit = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/drag_dots.png');
+            initBindableFieldsDict();
+            $scope.$on(EVENT_SKILL_REINITIALIZED, function() {
+              initBindableFieldsDict();
+            });
+
+            // When the page is scrolled so that the top of the page is above
+            // the browser viewport, there are some bugs in the positioning of
+            // the helper. This is a bug in jQueryUI that has not been fixed
+            // yet. For more details, see http://stackoverflow.com/q/5791886
+            $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
+              axis: 'y',
+              cursor: 'move',
+              handle: '.oppia-worked-example-sort-handle',
+              items: '.oppia-sortable-worked-example',
+              revert: 100,
+              tolerance: 'pointer',
+              start: function(e, ui) {
+                $scope.activeWorkedExampleIndex = null;
+                ui.placeholder.height(ui.item.height());
+              },
+              stop: function() {
+                var newWorkedExamples =
+                  $scope.bindableFieldsDict.displayedWorkedExamples;
+                SkillUpdateService.updateWorkedExamples(
+                  $scope.skill, newWorkedExamples);
+              }
+            };
           };
         }
       ]

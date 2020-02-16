@@ -20,7 +20,7 @@
 // history-tab.directive.ts is upgraded to Angular 8.
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
+import { EditabilityService } from 'services/editability.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
@@ -91,7 +91,7 @@ describe('HistoryTab controller', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -102,6 +102,11 @@ describe('HistoryTab controller', function() {
     beforeEach(angular.mock.inject(function(_$componentController_) {
       $componentController = _$componentController_;
       historyTabCtrl = $componentController('historyTab', null, {});
+      // Refer: https://www.codelord.net/2017/01/09/
+      // unit-testing-angular-components-with-%24componentcontroller/
+      // Angular and $componentController does not take care of
+      // $onInit lifecycle hook, so we need to call it explicitly.
+      historyTabCtrl.$onInit();
     }));
 
     it('should get version numbers of revisions to be displayed',

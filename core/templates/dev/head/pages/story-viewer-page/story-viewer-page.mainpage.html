@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base-components/header.template.html', {"title": "Oppia"})
+    @load('base-components/header.template.html', {"title": "Oppia"})
 
     <style>
       html, body {
@@ -17,7 +17,7 @@
         font-size: 3em;
         margin-top: 0;
         margin-bottom: 25px;
-        padding-top: 66.5px;
+        padding-top: 30px;
         text-align: center;
       }
       .oppia-story-viewer-container .oppia-story-description {
@@ -38,7 +38,6 @@
       .oppia-story-table {
         margin: 0 auto;
         max-width: 90%;
-        padding: 50px 20px 420px 20px;
         position: relative;
         text-align: left;
         top: 35px;
@@ -78,6 +77,12 @@
         width: 100px;
       }
 
+      @media (min-width: 768px) {
+        .oppia-story-description {
+          padding-bottom: 4vh;
+        }
+      }
+
       @media only screen and (max-width: 998px) {
         .oppia-activity-summary-tile-mobile-background-mask {
           align-items: center;
@@ -110,6 +115,6 @@
       </base-content>
     </div>
 
-    @require('../footer_js_libs.html')
+    @load('pages/footer_js_libs.html')
   </body>
 </html>

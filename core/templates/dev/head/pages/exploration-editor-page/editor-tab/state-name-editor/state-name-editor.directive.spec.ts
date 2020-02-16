@@ -30,7 +30,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/stateful/FocusManagerService.ts');
+require('services/stateful/focus-manager.service.ts');
 
 describe('Sidebar state name controller', function() {
   describe('SidebarStateName', function() {
@@ -49,7 +49,7 @@ describe('Sidebar state name controller', function() {
     });
     beforeEach(angular.mock.module('oppia', function($provide) {
       var ugs = new UpgradedServices();
-      for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+      for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
         $provide.value(key, value);
       }
     }));

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Provides app identity services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -39,16 +40,20 @@ def get_application_id():
 
 def get_gcs_resource_bucket_name():
     """Returns the application's bucket name for GCS resources, which depends
-    on the application ID.
+    on the application ID in production mode, or default bucket name in
+    development mode.
 
     This needs to be in sync with deploy.py which adds the bucket name to
     constants.js
 
+    Also, note that app_identity.get_default_gcs_bucket_name() returns None
+    if we try to use it in production mode but the default bucket hasn't been
+    enabled through the project console.
+
     Returns:
-        str or None. The bucket name for the application's GCS resources, in
-        production mode.
+        str. The bucket name for the application's GCS resources.
     """
     if constants.DEV_MODE:
-        return None
+        return app_identity.get_default_gcs_bucket_name()
     else:
         return get_application_id() + _GCS_RESOURCE_BUCKET_NAME_SUFFIX

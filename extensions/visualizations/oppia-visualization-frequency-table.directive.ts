@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/HtmlEscaperService.ts');
+require('services/html-escaper.service.ts');
 
 // Each visualization receives three variables: 'data', 'options', and
 // 'isAddressed'. The exact format for each of these is specific to the
@@ -35,10 +35,12 @@ angular.module('oppia').directive('oppiaVisualizationFrequencyTable', [
         '$attrs', 'HtmlEscaperService',
         function($attrs, HtmlEscaperService) {
           var ctrl = this;
-          ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-          ctrl.options =
-            HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-          ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+          ctrl.$onInit = function() {
+            ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+            ctrl.options =
+              HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
+            ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+          };
         }
       ]
     };

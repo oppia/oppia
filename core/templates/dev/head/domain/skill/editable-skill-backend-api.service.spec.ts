@@ -18,7 +18,7 @@
 
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/skill/editable-skill-backend-api.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
@@ -36,7 +36,7 @@ describe('Editable skill backend API service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -58,14 +58,16 @@ describe('Editable skill backend API service', function() {
       id: '2',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: true
     };
 
     var misconceptionDict2 = {
       id: '4',
       name: 'test name',
       notes: 'test notes',
-      feedback: 'test feedback'
+      feedback: 'test feedback',
+      must_be_addressed: true
     };
 
     var skillContentsDict = {
@@ -79,7 +81,8 @@ describe('Editable skill backend API service', function() {
       misconceptions: [misconceptionDict1, misconceptionDict2],
       skill_contents: skillContentsDict,
       language_code: 'en',
-      version: 3
+      version: 3,
+      prerequisite_skill_ids: []
     };
 
     var skillDict2 = {
@@ -88,11 +91,13 @@ describe('Editable skill backend API service', function() {
       misconceptions: [misconceptionDict1],
       skill_contents: skillContentsDict,
       language_code: 'en',
-      version: 2
+      version: 2,
+      prerequisite_skill_ids: []
     };
 
     sampleResponse = {
-      skill: skillDict
+      skill: skillDict,
+      grouped_skill_summaries: {}
     };
 
     sampleResponse2 = {
@@ -117,7 +122,10 @@ describe('Editable skill backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleResponse.skill);
+      expect(successHandler).toHaveBeenCalledWith({
+        skill: sampleResponse.skill,
+        groupedSkillSummaries: sampleResponse.grouped_skill_summaries
+      });
       expect(failHandler).not.toHaveBeenCalled();
     });
 
@@ -147,7 +155,7 @@ describe('Editable skill backend API service', function() {
       var skillDict = null;
       EditableSkillBackendApiService.fetchSkill('1').then(
         function(data) {
-          skillDict = data;
+          skillDict = data.skill;
         });
       $httpBackend.flush();
 
@@ -164,6 +172,31 @@ describe('Editable skill backend API service', function() {
       expect(failHandler).not.toHaveBeenCalled();
     });
 
+  it('should use the rejection handler if the skill update in the backend' +
+    'failed', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
+      sampleResponse);
+    var skillDict = null;
+    EditableSkillBackendApiService.fetchSkill('1').then(
+      function(data) {
+        skillDict = data.skill;
+      });
+    $httpBackend.flush();
+
+    $httpBackend.expect('PUT', '/skill_editor_handler/data/1').respond(
+      500, 'Error on update skill 1.');
+    EditableSkillBackendApiService.updateSkill(
+      skillDict.id, skillDict.version, 'commit message', []
+    ).then(successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error on update skill 1.');
+  });
+
   it('should succesfully fetch multiple existing skills from the backend',
     function() {
       var successHandler = jasmine.createSpy('success');
@@ -178,4 +211,51 @@ describe('Editable skill backend API service', function() {
       expect(successHandler).toHaveBeenCalledWith(sampleResponse2.skills);
       expect(failHandler).not.toHaveBeenCalled();
     });
+
+  it('should use the rejection handler if fetch multiple skills from the ' +
+    'backend failed', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    var skillDataUrl = '/skill_data_handler/' + encodeURIComponent('1,2');
+    $httpBackend.expect('GET', skillDataUrl).respond(
+      500, 'Error on fetching skills 1 and 2.');
+    EditableSkillBackendApiService.fetchMultiSkills(['1', '2']).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error on fetching skills 1 and 2.');
+  });
+
+  it('should successfully delete a skill', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('DELETE', '/skill_editor_handler/data/1').respond(200);
+    EditableSkillBackendApiService.deleteSkill('1').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith(200);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should use the rejection handler if delete a existing skill fails',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect('DELETE', '/skill_editor_handler/data/1').respond(
+        500, 'It is not possible to delete skill 1.');
+      EditableSkillBackendApiService.deleteSkill('1').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'It is not possible to delete skill 1.');
+    }
+  );
 });

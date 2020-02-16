@@ -40,6 +40,7 @@ CUSTOMIZATION OPTIONS
 
 Note that the root folder MUST be named 'oppia'.
  """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -47,7 +48,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 # pylint: disable=wrong-import-order
 import abc
 import argparse
-import ast
 import collections
 import contextlib
 import fnmatch
@@ -64,7 +64,7 @@ import time
 
 # Install third party dependencies before proceeding.
 from . import install_third_party_libs
-install_third_party_libs.main(args=[])
+install_third_party_libs.main()
 
 # pylint: disable=wrong-import-position
 import python_utils  # isort:skip
@@ -94,12 +94,14 @@ EXCLUDED_PATHS = (
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js', 'backend_prod_files/*',
     'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
     '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*',
-    'webpack_bundles/*', 'core/tests/services_sources/*')
+    'webpack_bundles/*', 'core/tests/services_sources/*',
+    'core/tests/release_sources/tmp_unzip.zip',
+    'core/tests/release_sources/tmp_unzip.tar.gz')
 
 GENERATED_FILE_PATHS = (
     'extensions/interactions/LogicProof/static/js/generatedDefaultData.ts',
     'extensions/interactions/LogicProof/static/js/generatedParser.ts',
-    'core/templates/dev/head/expressions/expression-parser.service.js')
+    'core/templates/dev/head/expressions/parser.js')
 
 CONFIG_FILE_PATHS = (
     'core/tests/.browserstack.env.example',
@@ -534,6 +536,10 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party_libs.py',
     '/.github/']
 
+# NOTE TO DEVELOPERS: This should match the version of Node used in common.py.
+NODE_DIR = os.path.abspath(
+    os.path.join(os.getcwd(), os.pardir, 'oppia_tools', 'node-10.18.0'))
+
 if not os.getcwd().endswith('oppia'):
     python_utils.PRINT('')
     python_utils.PRINT(
@@ -571,6 +577,7 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-3.13.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'psutil-5.6.7'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
     os.path.join('third_party', 'bleach-3.1.0'),
@@ -594,7 +601,6 @@ import pycodestyle  # isort:skip
 import esprima  # isort:skip
 from pylint import lint  # isort:skip
 from . import build  # isort:skip
-from . import docstrings_checker  # isort:skip
 import html.parser  # isort:skip
 # pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
@@ -693,8 +699,7 @@ def _lint_all_files(
 
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
-    node_path = os.path.join(
-        parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
+    node_path = os.path.join(NODE_DIR, 'bin', 'node')
     eslint_path = os.path.join(
         'node_modules', 'eslint', 'bin', 'eslint.js')
     stylelint_path = os.path.join(
@@ -1394,7 +1399,8 @@ def _check_codeowner_file(verbose_mode_enabled):
                         break
                 if not match:
                     python_utils.PRINT(
-                        '%s is not covered under CODEOWNERS' % file_path)
+                        '%s is not listed in the .github/CODEOWNERS file.' % (
+                            file_path))
                     failed = True
 
         failed = failed or (
@@ -1402,10 +1408,12 @@ def _check_codeowner_file(verbose_mode_enabled):
                 important_rules_in_critical_section))
 
         if failed:
-            summary_message = '%s   CODEOWNERS file check failed' % (
-                _MESSAGE_TYPE_FAILED)
+            summary_message = (
+                '%s   CODEOWNERS file coverage check failed, see messages '
+                'above for files that need to be added or patterns that need '
+                'to be fixed.' % _MESSAGE_TYPE_FAILED)
         else:
-            summary_message = '%s  CODEOWNERS file check passed' % (
+            summary_message = '%s  CODEOWNERS file coverage check passed' % (
                 _MESSAGE_TYPE_SUCCESS)
 
         summary_messages.append(summary_message)
@@ -1766,7 +1774,8 @@ def _check_codeowner_file(verbose_mode_enabled):
                         break
                 if not match:
                     python_utils.PRINT(
-                        '%s is not covered under CODEOWNERS' % file_path)
+                        '%s is not listed in the .github/CODEOWNERS file.' % (
+                            file_path))
                     failed = True
 
         failed = failed or (
@@ -1774,8 +1783,10 @@ def _check_codeowner_file(verbose_mode_enabled):
                 important_rules_in_critical_section))
 
         if failed:
-            summary_message = '%s   CODEOWNERS file check failed' % (
-                _MESSAGE_TYPE_FAILED)
+            summary_message = (
+                '%s   CODEOWNERS file coverage check failed, see messages '
+                'above for files that need to be added or patterns that need '
+                'to be fixed.' % _MESSAGE_TYPE_FAILED)
         else:
             summary_message = '%s  CODEOWNERS file check passed' % (
                 _MESSAGE_TYPE_SUCCESS)
@@ -1809,8 +1820,7 @@ class LintChecksManager( # pylint: disable=inherit-non-class
         # The path for node is set explicitly, since otherwise the lint
         # tests fail on CircleCI due to the TypeScript files not being
         # compilable.
-        node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
-        os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
+        os.environ['PATH'] = '%s/bin:' % NODE_DIR + os.environ['PATH']
 
         self.verbose_mode_enabled = verbose_mode_enabled
         self.process_manager = multiprocessing.Manager().dict()
@@ -1895,8 +1905,8 @@ class LintChecksManager( # pylint: disable=inherit-non-class
 
             if failed:
                 summary_message = (
-                    '%s  Mandatory pattern check failed' % (
-                        _MESSAGE_TYPE_FAILED))
+                    '%s  Mandatory pattern check failed, see errors above for'
+                    'patterns that should be added.' % _MESSAGE_TYPE_FAILED)
             else:
                 summary_message = (
                     '%s  Mandatory pattern check passed' % (
@@ -1961,8 +1971,10 @@ class LintChecksManager( # pylint: disable=inherit-non-class
                             python_utils.PRINT('')
                             total_error_count += 1
             if failed:
-                summary_message = '%s Pattern checks failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s Pattern check failed, see errors above '
+                    'for patterns that should be removed.' % (
+                        _MESSAGE_TYPE_FAILED))
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s Pattern checks passed' % (
@@ -2016,8 +2028,7 @@ class JsTsLintChecksManager(LintChecksManager):
         Args:
             verbose_mode_enabled: bool. True if verbose mode is enabled.
         """
-        node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
-        os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
+        os.environ['PATH'] = '%s/bin:' % NODE_DIR + os.environ['PATH']
 
         super(JsTsLintChecksManager, self).__init__(
             verbose_mode_enabled=verbose_mode_enabled)
@@ -2167,8 +2178,10 @@ class JsTsLintChecksManager(LintChecksManager):
                 python_utils.PRINT(err_msg)
 
             if failed:
-                summary_message = '%s  Extra JS files check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s  Extra JS files check failed, see '
+                    'message above on resolution steps.' % (
+                        _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = '%s  Extra JS files check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
@@ -2219,8 +2232,9 @@ class JsTsLintChecksManager(LintChecksManager):
         with _redirect_stdout(stdout):
             if failed:
                 summary_message = (
-                    '%s  JS and TS Component name and count check failed' %
-                    (_MESSAGE_TYPE_FAILED))
+                    '%s  JS and TS Component name and count check failed, '
+                    'see messages above for duplicate names.' % (
+                        _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -2353,8 +2367,10 @@ class JsTsLintChecksManager(LintChecksManager):
 
         with _redirect_stdout(stdout):
             if failed:
-                summary_message = '%s   Directive scope check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s   Directive scope check failed, '
+                    'see messages above for suggested fixes.' % (
+                        _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -2447,7 +2463,8 @@ class JsTsLintChecksManager(LintChecksManager):
         with _redirect_stdout(stdout):
             if failed:
                 summary_message = (
-                    '%s  Sorted dependencies check failed' % (
+                    '%s  Sorted dependencies check failed, fix files that '
+                    'that don\'t have sorted dependencies mentioned above.' % (
                         _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = (
@@ -2510,7 +2527,8 @@ class JsTsLintChecksManager(LintChecksManager):
 
             if failed:
                 summary_message = (
-                    '%s   Controller dependency line break check failed' % (
+                    '%s   Controller dependency line break check failed, '
+                    'see messages above for the affected files.' % (
                         _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
@@ -2690,8 +2708,10 @@ class JsTsLintChecksManager(LintChecksManager):
                                 'constants file.' % (filepath, constant))
 
             if failed:
-                summary_message = '%s  Constants declaration check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s  Constants declaration check failed, '
+                    'see messages above for constants with errors.' % (
+                        _MESSAGE_TYPE_FAILED))
             else:
                 summary_message = '%s  Constants declaration check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
@@ -2782,8 +2802,10 @@ class JsTsLintChecksManager(LintChecksManager):
                         python_utils.PRINT('')
 
             if failed:
-                summary_message = '%s   HTML directive name check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s   HTML directive name check failed, see files above '
+                    'that did not end with _directive.html but '
+                    'should have.' % _MESSAGE_TYPE_FAILED)
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s   HTML directive name check passed' % (
@@ -2846,52 +2868,6 @@ class OtherLintChecksManager(LintChecksManager):
             self.css_filepaths + self.html_filepaths +
             self.other_filepaths + self.py_filepaths)
 
-    def _check_division_operator(self):
-        """This function ensures that the division operator('/') is not used and
-        python_utils.divide() is used instead.
-        """
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting division checks')
-            python_utils.PRINT('----------------------------------------')
-
-        summary_messages = []
-        files_to_check = [
-            filepath for filepath in self.py_filepaths if not
-            any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)]
-        failed = False
-
-        stdout = python_utils.string_io()
-        with _redirect_stdout(stdout):
-            for filepath in files_to_check:
-                ast_file = ast.walk(
-                    ast.parse(
-                        python_utils.convert_to_bytes(
-                            FILE_CACHE.read(filepath))))
-                ast_divisions = [n for n in ast_file if isinstance(n, ast.Div)]
-                if ast_divisions:
-                    python_utils.PRINT(
-                        'Please use python_utils.divide() instead of the '
-                        '"/" operator in --> %s' % filepath)
-                    failed = True
-
-            python_utils.PRINT('')
-            if failed:
-                summary_message = (
-                    '%s Division operator check failed' % _MESSAGE_TYPE_FAILED)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s Division operator check passed' % _MESSAGE_TYPE_SUCCESS)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-
-            python_utils.PRINT('')
-            self.process_manager['division'] = summary_messages
-            _STDOUT_LIST.append(stdout)
-
-
     def _check_import_order(self):
         """This function is used to check that each file
         has imports placed in alphabetical order.
@@ -2921,7 +2897,9 @@ class OtherLintChecksManager(LintChecksManager):
             python_utils.PRINT('')
             if failed:
                 summary_message = (
-                    '%s   Import order checks failed' % _MESSAGE_TYPE_FAILED)
+                    '%s   Import order checks failed, file imports should be '
+                    'alphabetized, see affect files above.' % (
+                        _MESSAGE_TYPE_FAILED))
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -2933,252 +2911,10 @@ class OtherLintChecksManager(LintChecksManager):
         _STDOUT_LIST.append(stdout)
 
 
-    def _check_divide_and_import(self):
-        """Run checks relates to division and import order."""
-        methods = [self._check_division_operator, self._check_import_order]
+    def _check_import(self):
+        """Run checks relates to import order."""
+        methods = [self._check_import_order]
         super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
-
-    def _check_docstrings_and_comments(self):
-        """Run checks relates to docstring and comments."""
-        methods = [self._check_docstrings, self._check_comments]
-        super(OtherLintChecksManager, self)._run_multiple_checks(*methods)
-
-    def _check_docstrings(self):
-        """This function ensures that docstrings end in a period and the arg
-        order in the function definition matches the order in the doc string.
-
-        Returns:
-            summary_messages: list(str). Summary of messages generated by the
-            check.
-        """
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting docstring checks')
-            python_utils.PRINT('----------------------------------------')
-        summary_messages = []
-        files_to_check = [
-            filepath for filepath in self.py_filepaths if not
-            any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)]
-        missing_period_message = (
-            'There should be a period at the end of the docstring.')
-        multiline_docstring_message = (
-            'Multiline docstring should end with a new line.')
-        single_line_docstring_message = (
-            'Single line docstring should not span two lines. '
-            'If line length exceeds 80 characters, '
-            'convert the single line docstring to a multiline docstring.')
-        previous_line_message = (
-            'There should not be any empty lines before the end of '
-            'the multi-line docstring.')
-        space_after_triple_quotes_in_docstring_message = (
-            'There should be no space after """ in docstring.')
-        failed = False
-        is_docstring = False
-        is_class_or_function = False
-        stdout = python_utils.string_io()
-        with _redirect_stdout(stdout):
-            for filepath in files_to_check:
-                file_content = FILE_CACHE.readlines(filepath)
-                file_length = len(file_content)
-                for line_num in python_utils.RANGE(file_length):
-                    line = file_content[line_num].strip()
-                    prev_line = ''
-
-                    if line_num > 0:
-                        prev_line = file_content[line_num - 1].strip()
-
-                    # Check if it is a docstring and not some multi-line string.
-                    if (prev_line.startswith('class ') or
-                            prev_line.startswith('def ')) or (
-                                is_class_or_function):
-                        is_class_or_function = True
-                        if prev_line.endswith('):') and (
-                                line.startswith('"""')):
-                            is_docstring = True
-                            is_class_or_function = False
-
-                    # Check for space after """ in docstring.
-                    if re.match(r'^""".+$', line) and is_docstring and (
-                            line[3] == ' '):
-                        failed = True
-                        python_utils.PRINT('%s --> Line %s: %s' % (
-                            filepath, line_num + 1,
-                            space_after_triple_quotes_in_docstring_message))
-                        python_utils.PRINT('')
-                        is_docstring = False
-
-                    # Check if single line docstring span two lines.
-                    if line == '"""' and prev_line.startswith('"""') and (
-                            is_docstring):
-                        failed = True
-                        python_utils.PRINT('%s --> Line %s: %s' % (
-                            filepath, line_num, single_line_docstring_message))
-                        python_utils.PRINT('')
-                        is_docstring = False
-
-                    # Check for single line docstring.
-                    elif re.match(r'^""".+"""$', line) and is_docstring:
-                        # Check for punctuation at line[-4] since last three
-                        # characters are double quotes.
-                        if (len(line) > 6) and (
-                                line[-4] not in
-                                ALLOWED_TERMINATING_PUNCTUATIONS):
-                            failed = True
-                            python_utils.PRINT('%s --> Line %s: %s' % (
-                                filepath, line_num + 1, missing_period_message))
-                            python_utils.PRINT('')
-                        is_docstring = False
-
-                    # Check for multiline docstring.
-                    elif line.endswith('"""') and is_docstring:
-                        # Case 1: line is """. This is correct for multiline
-                        # docstring.
-                        if line == '"""':
-                            # Check for empty line before the end of docstring.
-                            if prev_line == '':
-                                failed = True
-                                python_utils.PRINT('%s --> Line %s: %s' % (
-                                    filepath, line_num, previous_line_message))
-                                python_utils.PRINT('')
-                            # Check for punctuation at end of docstring.
-                            else:
-                                last_char_is_invalid = prev_line[-1] not in (
-                                    ALLOWED_TERMINATING_PUNCTUATIONS)
-                                no_word_is_present_in_excluded_phrases = (
-                                    not any(
-                                        word in prev_line for word in(
-                                            EXCLUDED_PHRASES)))
-                                if last_char_is_invalid and (
-                                        no_word_is_present_in_excluded_phrases):
-                                    failed = True
-                                    python_utils.PRINT('%s --> Line %s: %s' % (
-                                        filepath, line_num,
-                                        missing_period_message))
-                                    python_utils.PRINT('')
-
-                        # Case 2: line contains some words before """. """
-                        # should shift to next line.
-                        elif not any(word in line for word in EXCLUDED_PHRASES):
-                            failed = True
-                            python_utils.PRINT('%s --> Line %s: %s' % (
-                                filepath, line_num + 1,
-                                multiline_docstring_message))
-                            python_utils.PRINT('')
-
-                        is_docstring = False
-
-            docstring_checker = docstrings_checker.ASTDocStringChecker()
-            for filepath in files_to_check:
-                ast_file = ast.walk(
-                    ast.parse(
-                        python_utils.convert_to_bytes(
-                            FILE_CACHE.read(filepath))))
-                func_defs = [n for n in ast_file if isinstance(
-                    n, ast.FunctionDef)]
-                for func in func_defs:
-                    # Check that the args in the docstring are listed in the
-                    # same order as they appear in the function definition.
-                    func_result = docstring_checker.check_docstrings_arg_order(
-                        func)
-                    for error_line in func_result:
-                        python_utils.PRINT('%s --> Func %s: %s' % (
-                            filepath, func.name, error_line))
-                        python_utils.PRINT('')
-                        failed = True
-
-            python_utils.PRINT('')
-            if failed:
-                summary_message = (
-                    '%s   Docstring check failed' % _MESSAGE_TYPE_FAILED)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s   Docstring check passed' % _MESSAGE_TYPE_SUCCESS)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-        self.process_manager['docstrings'] = summary_messages
-        _STDOUT_LIST.append(stdout)
-
-    def _check_comments(self):
-        """This function ensures that comments follow correct style."""
-        if self.verbose_mode_enabled:
-            python_utils.PRINT('Starting comment checks')
-            python_utils.PRINT('----------------------------------------')
-        summary_messages = []
-        files_to_check = [
-            filepath for filepath in self.py_filepaths if not
-            any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)]
-        message = 'There should be a period at the end of the comment.'
-        failed = False
-        space_regex = re.compile(r'^#[^\s].*$')
-        capital_regex = re.compile('^# [a-z][A-Za-z]* .*$')
-        stdout = python_utils.string_io()
-        with _redirect_stdout(stdout):
-            for filepath in files_to_check:
-                file_content = FILE_CACHE.readlines(filepath)
-                file_length = len(file_content)
-                for line_num in python_utils.RANGE(file_length):
-                    line = file_content[line_num].strip()
-                    next_line = ''
-                    previous_line = ''
-                    if line_num + 1 < file_length:
-                        next_line = file_content[line_num + 1].strip()
-                    if line_num > 0:
-                        previous_line = file_content[line_num - 1].strip()
-
-                    if line.startswith('#') and not next_line.startswith('#'):
-                        # Check that the comment ends with the proper
-                        # punctuation.
-                        last_char_is_invalid = line[-1] not in (
-                            ALLOWED_TERMINATING_PUNCTUATIONS)
-                        no_word_is_present_in_excluded_phrases = not any(
-                            word in line for word in EXCLUDED_PHRASES)
-                        if last_char_is_invalid and (
-                                no_word_is_present_in_excluded_phrases):
-                            failed = True
-                            python_utils.PRINT('%s --> Line %s: %s' % (
-                                filepath, line_num + 1, message))
-                            python_utils.PRINT('')
-
-                    # Check that comment starts with a space and is not a
-                    # shebang expression at the start of a bash script which
-                    # loses funtion when a space is added.
-                    if space_regex.match(line) and not line.startswith('#!'):
-                        message = (
-                            'There should be a space at the beginning '
-                            'of the comment.')
-                        failed = True
-                        python_utils.PRINT('%s --> Line %s: %s' % (
-                            filepath, line_num + 1, message))
-                        python_utils.PRINT('')
-
-                    # Check that comment starts with a capital letter.
-                    if not previous_line.startswith('#') and (
-                            capital_regex.match(line)):
-                        message = (
-                            'There should be a capital letter'
-                            ' to begin the content of the comment.')
-                        failed = True
-                        python_utils.PRINT('%s --> Line %s: %s' % (
-                            filepath, line_num + 1, message))
-                        python_utils.PRINT('')
-
-            python_utils.PRINT('')
-            if failed:
-                summary_message = (
-                    '%s   Comments check failed' % _MESSAGE_TYPE_FAILED)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s   Comments check passed' % _MESSAGE_TYPE_SUCCESS)
-                python_utils.PRINT(summary_message)
-                summary_messages.append(summary_message)
-        self.process_manager['comments'] = summary_messages
-        _STDOUT_LIST.append(stdout)
-
 
     def _check_html_tags_and_attributes(self, debug=False):
         """This function checks the indentation of lines in HTML files."""
@@ -3206,8 +2942,9 @@ class OtherLintChecksManager(LintChecksManager):
                     failed = True
 
             if failed:
-                summary_message = '%s   HTML tag and attribute check failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s   HTML tag and attribute check failed, fix the HTML '
+                    'files listed above.' % _MESSAGE_TYPE_FAILED)
                 python_utils.PRINT(summary_message)
                 summary_messages.append(summary_message)
             else:
@@ -3223,10 +2960,7 @@ class OtherLintChecksManager(LintChecksManager):
 
     def _lint_html_files(self):
         """This function is used to check HTML files for linting errors."""
-        parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-
-        node_path = os.path.join(
-            parent_dir, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
+        node_path = os.path.join(NODE_DIR, 'bin', 'node')
         htmllint_path = os.path.join(
             'node_modules', 'htmllint-cli', 'bin', 'cli.js')
 
@@ -3269,8 +3003,9 @@ class OtherLintChecksManager(LintChecksManager):
             if total_error_count:
                 python_utils.PRINT('(%s files checked, %s errors found)' % (
                     total_files_checked, total_error_count))
-                summary_message = '%s   HTML linting failed' % (
-                    _MESSAGE_TYPE_FAILED)
+                summary_message = (
+                    '%s   HTML linting failed, '
+                    'fix the HTML files listed above.' % _MESSAGE_TYPE_FAILED)
                 summary_messages.append(summary_message)
             else:
                 summary_message = '%s   HTML linting passed' % (
@@ -3296,23 +3031,17 @@ class OtherLintChecksManager(LintChecksManager):
             OtherLintChecksManager, self).perform_all_lint_checks()
         # division_operator_messages = self._check_division_operator()
         # import_order_messages = self._check_import_order()
-        self._check_divide_and_import()
-        self._check_docstrings_and_comments()
-        docstring_messages = self.process_manager['docstrings']
-        comment_messages = self.process_manager['comments']
+        self._check_import()
         # The html tags and attributes check has an additional
         # debug mode which when enabled prints the tag_stack for each file.
         html_tag_and_attribute_messages = (
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
         import_order_messages = self.process_manager['import']
-        division_operator_messages = self.process_manager['division']
 
         all_messages = (
             import_order_messages + common_messages +
-            docstring_messages + comment_messages +
-            html_tag_and_attribute_messages + html_linter_messages +
-            division_operator_messages)
+            html_tag_and_attribute_messages + html_linter_messages)
         return all_messages
 
 

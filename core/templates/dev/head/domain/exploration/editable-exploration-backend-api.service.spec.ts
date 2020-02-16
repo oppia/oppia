@@ -18,12 +18,14 @@
 
 require('domain/exploration/editable-exploration-backend-api.service.ts');
 require('domain/exploration/read-only-exploration-backend-api.service.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
+
+import { TranslatorProviderForTests } from 'tests/test.extras';
 
 describe('Editable exploration backend API service', function() {
   var EditableExplorationBackendApiService = null;
@@ -36,10 +38,10 @@ describe('Editable exploration backend API service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
-    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    'oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

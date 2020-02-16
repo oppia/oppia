@@ -15,63 +15,70 @@
 /**
  * @fileoverview Rules service for the interaction.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
 
-angular.module('oppia').factory('TextInputRulesService', [
-  '$filter', function($filter) {
-    return {
-      Equals: function(answer, inputs) {
-        var normalizedAnswer = $filter('normalizeWhitespace')(answer);
-        var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
-        return normalizedAnswer.toLowerCase() === normalizedInput.toLowerCase();
-      },
-      FuzzyEquals: function(answer, inputs) {
-        var normalizedAnswer = $filter('normalizeWhitespace')(answer);
-        var answerString = normalizedAnswer.toLowerCase();
+@Injectable({
+  providedIn: 'root'
+})
+export class TextInputRulesService {
+  constructor(private nws: NormalizeWhitespacePipe) {}
+  Equals(answer: string, inputs: {x: string}): boolean {
+    var normalizedAnswer = this.nws.transform(answer);
+    var normalizedInput = this.nws.transform(inputs.x);
+    return normalizedAnswer.toLowerCase() === normalizedInput.toLowerCase();
+  }
+  FuzzyEquals(answer: string, inputs: {x: string}): boolean {
+    var normalizedAnswer = this.nws.transform(answer);
+    var answerString = normalizedAnswer.toLowerCase();
 
-        var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
-        var inputString = normalizedInput.toLowerCase();
+    var normalizedInput = this.nws.transform(inputs.x);
+    var inputString = normalizedInput.toLowerCase();
 
-        if (inputString === answerString) {
-          return true;
+    if (inputString === answerString) {
+      return true;
+    }
+    var editDistance = [];
+    for (var i = 0; i <= inputString.length; i++) {
+      editDistance.push([i]);
+    }
+    for (var j = 1; j <= answerString.length; j++) {
+      editDistance[0].push(j);
+    }
+    for (var i = 1; i <= inputString.length; i++) {
+      for (var j = 1; j <= answerString.length; j++) {
+        if (inputString.charAt(i - 1) === answerString.charAt(j - 1)) {
+          editDistance[i][j] = editDistance[i - 1][j - 1];
+        } else {
+          editDistance[i][j] = Math.min(editDistance[i - 1][j - 1],
+            editDistance[i][j - 1],
+            editDistance[i - 1][j]) + 1;
         }
-        var editDistance = [];
-        for (var i = 0; i <= inputString.length; i++) {
-          editDistance.push([i]);
-        }
-        for (var j = 1; j <= answerString.length; j++) {
-          editDistance[0].push(j);
-        }
-        for (var i = 1; i <= inputString.length; i++) {
-          for (var j = 1; j <= answerString.length; j++) {
-            if (inputString.charAt(i - 1) === answerString.charAt(j - 1)) {
-              editDistance[i][j] = editDistance[i - 1][j - 1];
-            } else {
-              editDistance[i][j] = Math.min(editDistance[i - 1][j - 1],
-                editDistance[i][j - 1],
-                editDistance[i - 1][j]) + 1;
-            }
-          }
-        }
-        return editDistance[inputString.length][answerString.length] === 1;
-      },
-      CaseSensitiveEquals: function(answer, inputs) {
-        var normalizedAnswer = $filter('normalizeWhitespace')(answer);
-        var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
-        return normalizedAnswer === normalizedInput;
-      },
-      StartsWith: function(answer, inputs) {
-        var normalizedAnswer = $filter('normalizeWhitespace')(answer);
-        var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
-        return normalizedAnswer.toLowerCase().indexOf(
-          normalizedInput.toLowerCase()) === 0;
-      },
-      Contains: function(answer, inputs) {
-        var normalizedAnswer = $filter('normalizeWhitespace')(answer);
-        var normalizedInput = $filter('normalizeWhitespace')(inputs.x);
-        return normalizedAnswer.toLowerCase().indexOf(
-          normalizedInput.toLowerCase()) !== -1;
       }
-    };
-  }]);
+    }
+    return editDistance[inputString.length][answerString.length] === 1;
+  }
+  CaseSensitiveEquals(answer: string, inputs: {x: string}): boolean {
+    var normalizedAnswer = this.nws.transform(answer);
+    var normalizedInput = this.nws.transform(inputs.x);
+    return normalizedAnswer === normalizedInput;
+  }
+  StartsWith(answer: string, inputs: {x: string}): boolean {
+    var normalizedAnswer = this.nws.transform(answer);
+    var normalizedInput = this.nws.transform(inputs.x);
+    return normalizedAnswer.toLowerCase().indexOf(
+      normalizedInput.toLowerCase()) === 0;
+  }
+  Contains(answer: string, inputs: {x: string}): boolean {
+    var normalizedAnswer = this.nws.transform(answer);
+    var normalizedInput = this.nws.transform(inputs.x);
+    return normalizedAnswer.toLowerCase().indexOf(
+      normalizedInput.toLowerCase()) !== -1;
+  }
+}
+
+angular.module('oppia').factory(
+  'TextInputRulesService', downgradeInjectable(TextInputRulesService));

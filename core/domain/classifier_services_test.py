@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for classifier services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -26,6 +27,7 @@ from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
+from core.domain import fs_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -63,6 +65,20 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.exp_id = exploration_id
         self.exp_state = (
             exp_fetchers.get_exploration_by_id(exploration_id).states['Home'])
+
+    def _create_classifier_training_job(
+            self, algorithm_id, interaction_id, exp_id, exp_version,
+            next_scheduled_check_time, training_data, state_name, status,
+            classifier_data, data_schema_version):
+        """Creates a new classifier training job model and stores
+        classfier data in a file.
+        """
+        job_id = classifier_models.ClassifierTrainingJobModel.create(
+            algorithm_id, interaction_id, exp_id, exp_version,
+            next_scheduled_check_time, training_data, state_name, status,
+            data_schema_version)
+        fs_services.save_classifier_data(exp_id, job_id, classifier_data)
+        return job_id
 
     def test_creation_of_jobs_and_mappings(self):
         """Test the handle_trainable_states method and
@@ -287,11 +303,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(all_mappings.count(), 1)
 
         # Create job and mapping for previous version.
-        job_id = classifier_models.ClassifierTrainingJobModel.create(
+        job_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             'TextInput', self.exp_id, exploration.version - 1,
             next_scheduled_check_time, [], 'Old home',
-            feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
+            feconf.TRAINING_JOB_STATUS_COMPLETE, {}, 1)
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.exp_id, exploration.version - 1, 'Old home', job_id)
         classifier_services.handle_non_retrainable_states(
@@ -324,7 +340,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         interaction_id = 'TextInput'
         next_scheduled_check_time = datetime.datetime.utcnow()
-        job_id = classifier_models.ClassifierTrainingJobModel.create(
+        job_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             interaction_id, exp_id, 1, next_scheduled_check_time, [],
             state_name, feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
@@ -341,11 +357,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_training_job.next_scheduled_check_time,
             next_scheduled_check_time)
         self.assertEqual(classifier_training_job.training_data, [])
+        self.assertEqual(classifier_training_job.classifier_data, {})
         self.assertEqual(classifier_training_job.state_name, state_name)
         self.assertEqual(
             classifier_training_job.status,
             feconf.TRAINING_JOB_STATUS_NEW)
-        self.assertEqual(classifier_training_job.classifier_data, {})
         self.assertEqual(classifier_training_job.data_schema_version, 1)
 
     def test_deletion_of_classifier_training_jobs(self):
@@ -356,7 +372,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         interaction_id = 'TextInput'
         next_scheduled_check_time = datetime.datetime.utcnow()
 
-        job_id = classifier_models.ClassifierTrainingJobModel.create(
+        job_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             interaction_id, exp_id, 1, next_scheduled_check_time, [],
             state_name, feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
@@ -375,7 +391,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         interaction_id = 'TextInput'
 
-        job_id = classifier_models.ClassifierTrainingJobModel.create(
+        job_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             interaction_id, exp_id, 1, next_scheduled_check_time, [],
             state_name, feconf.TRAINING_JOB_STATUS_PENDING, {}, 1)
@@ -407,12 +423,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         interaction_id = 'TextInput'
 
-        job_id = classifier_models.ClassifierTrainingJobModel.create(
+        job_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
                 'algorithm_id'], interaction_id, exp_id, 1,
             datetime.datetime.utcnow(), [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW, None, 1
-        )
+            feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -441,12 +456,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         interaction_id = 'TextInput'
 
-        job_id = classifier_models.ClassifierTrainingJobModel.create(
+        job_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
                 'algorithm_id'], interaction_id, exp_id, 1,
             datetime.datetime.utcnow(), [], state_name,
-            feconf.TRAINING_JOB_STATUS_PENDING, None, 1
-        )
+            feconf.TRAINING_JOB_STATUS_PENDING, {}, 1)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
@@ -476,18 +490,16 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         interaction_id = 'TextInput'
         exp2_id = u'2'
 
-        job1_id = classifier_models.ClassifierTrainingJobModel.create(
+        job1_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
                 'algorithm_id'], interaction_id, exp1_id, 1,
             datetime.datetime.utcnow(), [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW, None, 1
-        )
-        classifier_models.ClassifierTrainingJobModel.create(
+            feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
+        self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING[interaction_id][
                 'algorithm_id'], interaction_id, exp2_id, 1,
             datetime.datetime.utcnow(), [], state_name,
-            feconf.TRAINING_JOB_STATUS_PENDING, None, 1
-        )
+            feconf.TRAINING_JOB_STATUS_PENDING, {}, 1)
         # This will get the job_id of the exploration created in setup.
         classifier_services.fetch_next_job()
         next_job = classifier_services.fetch_next_job()
@@ -500,20 +512,23 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         state_name = 'Home'
         interaction_id = 'TextInput'
 
-        job_id = classifier_models.ClassifierTrainingJobModel.create(
+        job_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             interaction_id, exp_id, 1, next_scheduled_check_time, [],
-            state_name, feconf.TRAINING_JOB_STATUS_PENDING, None, 1)
-
-        classifier_training_job = (
-            classifier_services.get_classifier_training_job_by_id(job_id))
-        self.assertEqual(classifier_training_job.classifier_data, None)
-
-        classifier_services.store_classifier_data(job_id, {})
+            state_name, feconf.TRAINING_JOB_STATUS_PENDING, {}, 1)
 
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         self.assertEqual(classifier_training_job.classifier_data, {})
+
+        classifier_data = {'classifier_data': 'data'}
+        classifier_services.store_classifier_data(
+            job_id, classifier_data)
+
+        classifier_training_job = (
+            classifier_services.get_classifier_training_job_by_id(job_id))
+        self.assertEqual(
+            classifier_training_job.classifier_data, classifier_data)
 
     def test_retrieval_of_classifier_training_jobs_from_exploration_attributes(
             self):
@@ -522,10 +537,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exp_id = u'1'
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_name = u'टेक्स्ट'
-        job_id = classifier_models.ClassifierTrainingJobModel.create(
+        job_id = self._create_classifier_training_job(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
             'TextInput', exp_id, 1, next_scheduled_check_time, [], state_name,
-            feconf.TRAINING_JOB_STATUS_NEW, None, 1)
+            feconf.TRAINING_JOB_STATUS_NEW, {}, 1)
         classifier_models.TrainingJobExplorationMappingModel.create(
             exp_id, 1, state_name, job_id)
         classifier_training_jobs = (

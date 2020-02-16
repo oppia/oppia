@@ -16,74 +16,109 @@
  * @fileoverview Standalone services for the general state editor page.
  */
 
-require('services/AlertsService.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('StatePropertyService', [
-  'AlertsService',
-  function(AlertsService) {
-    // Public base API for data services corresponding to state properties
-    // (interaction id, content, etc.)
-    // WARNING: This should be initialized only in the context of the state
-    // editor, and every time the state is loaded, so that proper behavior is
-    // maintained if e.g. the state is renamed.
-    return {
-      init: function(stateName, value) {
-        if (this.setterMethodKey === null) {
-          throw 'State property setter method key cannot be null.';
-        }
+import cloneDeep from 'lodash/cloneDeep';
 
-        // The name of the state.
-        this.stateName = stateName;
-        // The current value of the property (which may not have been saved to
-        // the frontend yet). In general, this will be bound directly to the UI.
-        this.displayed = angular.copy(value);
-        // The previous (saved-in-the-frontend) value of the property. Here,
-        // 'saved' means that this is the latest value of the property as
-        // determined by the frontend change list.
-        this.savedMemento = angular.copy(value);
-      },
-      // Returns whether the current value has changed from the memento.
-      hasChanged: function() {
-        return !angular.equals(this.savedMemento, this.displayed);
-      },
-      // The name of the setter method in ExplorationStatesService for this
-      // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
-      setterMethodKey: null,
-      // Transforms the given value into a normalized form. THIS CAN BE
-      // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
-      _normalize: function(value) {
-        return value;
-      },
-      // Validates the given value and returns a boolean stating whether it
-      // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
-      // behavior is to always return true.
-      _isValid: function(value) {
-        return true;
-      },
-      // Updates the memento to the displayed value.
-      saveDisplayedValue: function() {
-        if (this.setterMethodKey === null) {
-          throw 'State property setter method key cannot be null.';
-        }
+import { AlertsService } from 'services/alerts.service';
+import { UtilsService } from 'services/utils.service';
 
-        this.displayed = this._normalize(this.displayed);
-        if (!this._isValid(this.displayed) || !this.hasChanged()) {
-          this.restoreFromMemento();
-          return;
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class StatePropertyService {
+  // The name of the setter method in ExplorationStatesService for this
+  // property. THIS MUST BE SPECIFIED BY SUBCLASSES.
+  setterMethodKey: string;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of displayed depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of displayed according to that.
+  displayed: any;
+  stateName: string;
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of savedMemento depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of savedMemento according to that.
+  savedMemento: any;
 
-        if (angular.equals(this.displayed, this.savedMemento)) {
-          return;
-        }
-
-        AlertsService.clearWarnings();
-
-        this.savedMemento = angular.copy(this.displayed);
-      },
-      // Reverts the displayed value to the saved memento.
-      restoreFromMemento: function() {
-        this.displayed = angular.copy(this.savedMemento);
-      }
-    };
+  constructor(private alertsService: AlertsService,
+    private utilsService: UtilsService) {
+    this.setterMethodKey = null;
   }
-]);
+
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of value depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of value according to that.
+  init(stateName: string, value: any): void {
+    if (this.setterMethodKey === null) {
+      throw 'State property setter method key cannot be null.';
+    }
+    // The name of the state.
+    this.stateName = stateName;
+    // The current value of the property (which may not have been saved to
+    // the frontend yet). In general, this will be bound directly to the UI.
+    this.displayed = cloneDeep(value);
+    // The previous (saved-in-the-frontend) value of the property. Here,
+    // 'saved' means that this is the latest value of the property as
+    // determined by the frontend change list.
+    this.savedMemento = cloneDeep(value);
+  }
+
+  // Returns whether the current value has changed from the memento.
+  hasChanged(): boolean {
+    return !this.utilsService.isEquivalent(this.savedMemento, this.displayed);
+  }
+
+  // Transforms the given value into a normalized form. THIS CAN BE
+  // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of value depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of value according to that.
+  _normalize(value: any): any {
+    return value;
+  }
+
+  // Validates the given value and returns a boolean stating whether it
+  // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
+  // behavior is to always return true.
+  // TODO(#7165): Replace 'any' with the exact type. This has been kept
+  // as any since type of value depends on the property for which the
+  // value is provided. We need to create different domain objects for
+  // various properties and decide type of value according to that.
+  _isValid(value: any): boolean {
+    return true;
+  }
+
+  saveDisplayedValue(): void {
+    if (this.setterMethodKey === null) {
+      throw 'State property setter method key cannot be null.';
+    }
+
+    this.displayed = this._normalize(this.displayed);
+    if (!this._isValid(this.displayed) || !this.hasChanged()) {
+      this.restoreFromMemento();
+      return;
+    }
+
+    if (this.utilsService.isEquivalent(this.displayed, this.savedMemento)) {
+      return;
+    }
+
+    this.alertsService.clearWarnings();
+
+    this.savedMemento = cloneDeep(this.displayed);
+  }
+
+  // Reverts the displayed value to the saved memento.
+  restoreFromMemento(): void {
+    this.displayed = cloneDeep(this.savedMemento);
+  }
+}
+
+angular.module('oppia').factory(
+  'StatePropertyService', downgradeInjectable(
+    StatePropertyService));

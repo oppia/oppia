@@ -35,8 +35,8 @@ require(
   'state-editor.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/AlertsService.ts');
-require('services/EditabilityService.ts');
+require('services/alerts.service.ts');
+require('services/editability.service.ts');
 
 require('pages/interaction-specs.constants.ajs.ts');
 
@@ -61,32 +61,17 @@ angular.module('oppia').directive('questionEditor', [
         '$scope', '$rootScope', '$uibModal',
         'AlertsService', 'QuestionCreationService',
         'EditabilityService', 'EditableQuestionBackendApiService',
-        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'QuestionObjectFactory',
         'INTERACTION_SPECS', 'StateEditorService', 'ResponsesService',
         'SolutionValidityService', 'QuestionUpdateService',
         function(
             $scope, $rootScope, $uibModal,
             AlertsService, QuestionCreationService,
             EditabilityService, EditableQuestionBackendApiService,
-            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            QuestionObjectFactory,
             INTERACTION_SPECS, StateEditorService, ResponsesService,
             SolutionValidityService, QuestionUpdateService) {
           var ctrl = this;
-          if (ctrl.canEditQuestion()) {
-            EditabilityService.markEditable();
-          } else {
-            EditabilityService.markNotEditable();
-          }
-          StateEditorService.setActiveStateName('question');
-          StateEditorService.setMisconceptionsBySkill(
-            ctrl.getMisconceptionsBySkill());
-          ctrl.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/avatar/oppia_avatar_100px.svg');
-
-          ctrl.interactionIsShown = false;
-
-          ctrl.stateEditorInitialized = false;
-
           ctrl.getStateContentPlaceholder = function() {
             return (
               'You can speak to the learner here, then ask them a question.');
@@ -207,23 +192,43 @@ angular.module('oppia').directive('questionEditor', [
                   writtenTranslations.markAllTranslationsAsNeedingUpdate(
                     contentId);
                 });
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             }
           };
 
-          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
-            _init();
-          });
+          ctrl.$onInit = function() {
+            $scope.$on('stateEditorDirectiveInitialized', function(evt) {
+              _init();
+            });
 
-          $scope.$on('interactionEditorInitialized', function(evt) {
-            _init();
-          });
+            $scope.$on('interactionEditorInitialized', function(evt) {
+              _init();
+            });
 
-          $scope.$on('onInteractionIdChanged', function(evt) {
-            _init();
-          });
+            $scope.$on('onInteractionIdChanged', function(evt) {
+              _init();
+            });
+            if (ctrl.canEditQuestion()) {
+              EditabilityService.markEditable();
+            } else {
+              EditabilityService.markNotEditable();
+            }
+            StateEditorService.setActiveStateName('question');
+            StateEditorService.setMisconceptionsBySkill(
+              ctrl.getMisconceptionsBySkill());
+            ctrl.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/avatar/oppia_avatar_100px.svg');
 
-          _init();
+            ctrl.interactionIsShown = false;
+
+            ctrl.stateEditorInitialized = false;
+            // The _init function is written separately since it is also called
+            // in $scope.$on when some external events are triggered.
+            _init();
+          };
         }
       ]
     };

@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('profilePageNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -30,7 +30,9 @@ angular.module('oppia').directive('profilePageNavbar', [
       controllerAs: '$ctrl',
       controller: ['UrlService', function(UrlService) {
         var ctrl = this;
-        ctrl.username = UrlService.getUsernameFromProfileUrl();
+        ctrl.$onInit = function() {
+          ctrl.username = UrlService.getUsernameFromProfileUrl();
+        };
       }]
     };
   }

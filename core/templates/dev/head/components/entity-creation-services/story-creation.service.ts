@@ -18,7 +18,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('StoryCreationService', [
   '$http', '$rootScope', '$uibModal', '$window', 'AlertsService',
@@ -80,6 +80,10 @@ angular.module('oppia').factory('StoryCreationService', [
             }, function() {
               $rootScope.loadingMessage = '';
             });
+        }, function() {
+          // Note to developers:
+          // This callback is triggered when the Cancel button is clicked.
+          // No further action is needed.
         });
       }
     };

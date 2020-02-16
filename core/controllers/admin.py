@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the admin view."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -387,9 +388,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1')
+                topic_id_1, 'Dummy Topic 1', 'abbrev')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic')
+                topic_id_2, 'Empty Topic', 'abbrev')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -436,9 +437,6 @@ class AdminHandler(base.BaseHandler):
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
             topic_services.publish_topic(topic_id_1, self.user_id)
-            skill_services.publish_skill(skill_id_1, self.user_id)
-            skill_services.publish_skill(skill_id_2, self.user_id)
-            skill_services.publish_skill(skill_id_3, self.user_id)
         else:
             raise Exception('Cannot load new structures data in production.')
 

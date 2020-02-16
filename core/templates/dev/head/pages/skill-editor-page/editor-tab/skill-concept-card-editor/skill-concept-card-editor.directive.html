@@ -5,40 +5,9 @@
       <div class="concept-card-subtitle">
         This gives the learner a brief overview of how to perform the skill.
       </div>
-      <div ng-if="!conceptCardExplanationEditorIsShown" class="review-material" style="padding-top: 0.5em;">
-        <div ng-class="oppia-editable-section"
-             ng-click="openConceptCardExplanationEditor()">
-          <i class="material-icons oppia-editor-edit-icon float-right protractor-test-edit-concept-card"
-             title="Edit Concept Card Explanation">&#xE254;
-          </i>
-          <div class="oppia-state-content-display oppia-transition-200 protractor-test-concept-card-explanation"
-               ng-class="oppia-prevent-selection"
-               title="Concept Card Explanation">
-            <span class="oppia-placeholder" ng-show="skill.getConceptCard().getExplanation().getHtml() === ''">
-                Give a review or explanation of the skill.
-            </span>
-            <angular-html-bind html-data="bindableFieldsDict.displayedConceptCardExplanation">
-            </angular-html-bind>
-          </div>
-          <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
-          <div class="oppia-editable-section-mask">
-          </div>
-        </div>
-      </div>
-
-      <div ng-if="conceptCardExplanationEditorIsShown">
-        <schema-based-editor schema="HTML_SCHEMA" class="protractor-test-concept-card-text" local-value="bindableFieldsDict.displayedConceptCardExplanation">
-        </schema-based-editor>
-        <div class="editor-buttons">
-          <button type="button"
-                  class="btn btn-success oppia-save-state-item-button float-right protractor-test-save-concept-card"
-                  ng-click="saveConceptCardExplanation()">
-            Save
-          </button>
-          <button type="button" class="btn btn-secondary float-right" ng-click="closeConceptCardExplanationEditor()">Cancel</button>
-          <div style="clear: both;"></div>
-        </div>
-      </div>
+      <review-material-editor bindable-dict="bindableFieldsDict"
+                              on-save-explanation="onSaveExplanation">
+      </review-material-editor>
     </div>
   </div>
 </md-card>
@@ -109,19 +78,7 @@
     font-style: italic;
   }
 
-  skill-concept-card-editor .review-material {
-    padding-bottom: 36px;
-  }
-
   skill-concept-card-editor .last-element {
     border-bottom: 1px solid #ccc;
-  }
-
-  skill-concept-card-editor .editor-buttons {
-    margin-top: 2px;
-  }
-
-  skill-concept-card-editor .oppia-editor-edit-icon {
-    position: relative;
   }
 </style>

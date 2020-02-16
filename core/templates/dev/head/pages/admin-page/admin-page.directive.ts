@@ -35,8 +35,8 @@ require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-router.service.ts');
-require('services/CsrfTokenService.ts');
-require('services/UtilsService.ts');
+require('services/csrf-token.service.ts');
+require('services/utils.service.ts');
 
 angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {
@@ -53,13 +53,6 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
         function($http, $location, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
-          ctrl.userEmail = '';
-          AdminDataService.getDataAsync().then(function(response) {
-            ctrl.userEmail = response.user_email;
-          });
-          ctrl.inDevMode = DEV_MODE;
-
-          ctrl.statusMessage = '';
           ctrl.isActivitiesTabOpen = function() {
             return AdminRouterService.isActivitiesTabOpen();
           };
@@ -75,16 +68,22 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           ctrl.isMiscTabOpen = function() {
             return AdminRouterService.isMiscTabOpen();
           };
-
-          CsrfTokenService.initializeToken();
-
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;
           };
 
-          $scope.$on('$locationChangeSuccess', function() {
-            AdminRouterService.showTab($location.path().replace('/', '#'));
-          });
+          ctrl.$onInit = function() {
+            $scope.$on('$locationChangeSuccess', function() {
+              AdminRouterService.showTab($location.path().replace('/', '#'));
+            });
+            ctrl.userEmail = '';
+            AdminDataService.getDataAsync().then(function(response) {
+              ctrl.userEmail = response.user_email;
+            });
+            ctrl.inDevMode = DEV_MODE;
+            ctrl.statusMessage = '';
+            CsrfTokenService.initializeToken();
+          };
         }
       ]
     };

@@ -20,6 +20,8 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
+const macros = require('./webpack.common.macros.ts');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -68,6 +70,9 @@ module.exports = {
     community_dashboard:
       commonPrefix + '/pages/community-dashboard-page/' +
       'community-dashboard-page.scripts.ts',
+    delete_account:
+      commonPrefix + '/pages/delete-account-page/' +
+        'delete-account-page.scripts.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.scripts.ts',
     email_dashboard:
       commonPrefix +
@@ -98,6 +103,9 @@ module.exports = {
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.scripts.ts',
+    pending_account_deletion:
+      commonPrefix + '/pages/pending-account-deletion-page/' +
+      'pending-account-deletion-page.scripts.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.scripts.ts',
@@ -136,19 +144,6 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      chunks: ['admin'],
-      filename: 'admin-page.mainpage.html',
-      meta: {
-        name: defaultMeta.name,
-        description: 'Oppia is a free site for sharing knowledge via ' +
-          'interactive lessons called \'explorations\'. Learn from ' +
-          'user-created explorations, or teach and create your own.'
-      },
-      template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['about'],
       filename: 'about-page.mainpage.html',
       meta: {
@@ -158,6 +153,19 @@ module.exports = {
         'site to create 1-1 learning scenarios for others.'
       },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['admin'],
+      filename: 'admin-page.mainpage.html',
+      meta: {
+        name: defaultMeta.name,
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
+      template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -235,6 +243,16 @@ module.exports = {
       template:
         commonPrefix + '/pages/community-dashboard-page/' +
         'community-dashboard-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['delete_account'],
+      filename: 'delete-account-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+        commonPrefix + '/pages/delete-account-page/' +
+          'delete-account-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -407,14 +425,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['privacy'],
-      filename: 'privacy-page.mainpage.html',
-      meta: defaultMeta,
-      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
-      minify: htmlMinifyConfig,
-      inject: false
-    }),
-    new HtmlWebpackPlugin({
       chunks: ['notifications_dashboard'],
       filename: 'notifications-dashboard-page.mainpage.html',
       meta: {
@@ -427,6 +437,16 @@ module.exports = {
         '/pages/notifications-dashboard-page/' +
         'notifications-dashboard-page.mainpage.html'
       ),
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['pending_account_deletion'],
+      filename: 'pending-account-deletion-page.mainpage.html',
+      meta: defaultMeta,
+      template:
+          commonPrefix + '/pages/pending-account-deletion-page/' +
+          'pending-account-deletion-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -448,6 +468,14 @@ module.exports = {
       },
       template:
         commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['privacy'],
+      filename: 'privacy-page.mainpage.html',
+      meta: defaultMeta,
+      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -617,7 +645,15 @@ module.exports = {
     }),
     new ForkTsCheckerWebpackPlugin({
       checkSyntacticErrors: true
-    })
+    }),
+    new webpack.LoaderOptionsPlugin({
+      options: {
+        macros: {
+          load: macros.load,
+          loadExtensions: macros.loadExtensions
+        },
+      },
+    }),
   ],
   module: {
     rules: [{
@@ -641,13 +677,21 @@ module.exports = {
       ]
     },
     {
-      test: /\.html$/,
+      test: {
+        include: /.html$/,
+        exclude: /directive\.html$/
+      },
       loader: 'underscore-template-loader'
+    },
+    {
+      test: /directive\.html$/,
+      loader: 'html-loader'
     },
     {
       test: /\.css$/,
       include: [
         path.resolve(__dirname, 'extensions'),
+        path.resolve(__dirname, 'node_modules'),
       ],
       use: ['style-loader', 'css-loader']
     }]

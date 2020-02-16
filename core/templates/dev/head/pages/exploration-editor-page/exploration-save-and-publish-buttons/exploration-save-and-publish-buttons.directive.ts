@@ -29,7 +29,7 @@ require(
 require(
   'pages/exploration-editor-page/services/' +
   'user-exploration-permissions.service.ts');
-require('services/EditabilityService.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').directive('explorationSaveAndPublishButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -46,18 +46,7 @@ angular.module('oppia').directive('explorationSaveAndPublishButtons', [
             $scope, ChangeListService, EditabilityService,
             ExplorationRightsService, ExplorationWarningsService,
             ExplorationSaveService, UserExplorationPermissionsService) {
-          $scope.saveIsInProcess = false;
-          $scope.publishIsInProcess = false;
-          $scope.loadingDotsAreShown = false;
-
-          UserExplorationPermissionsService.getPermissionsAsync()
-            .then(function(permissions) {
-              $scope.showPublishButton = function() {
-                return permissions.can_publish && (
-                  ExplorationRightsService.isPrivate());
-              };
-            });
-
+          var ctrl = this;
           $scope.isPrivate = function() {
             return ExplorationRightsService.isPrivate();
           };
@@ -135,6 +124,19 @@ angular.module('oppia').directive('explorationSaveAndPublishButtons', [
               .then(function() {
                 $scope.saveIsInProcess = false;
                 $scope.loadingDotsAreShown = false;
+              });
+          };
+          ctrl.$onInit = function() {
+            $scope.saveIsInProcess = false;
+            $scope.publishIsInProcess = false;
+            $scope.loadingDotsAreShown = false;
+
+            UserExplorationPermissionsService.getPermissionsAsync()
+              .then(function(permissions) {
+                $scope.showPublishButton = function() {
+                  return permissions.can_publish && (
+                    ExplorationRightsService.isPrivate());
+                };
               });
           };
         }

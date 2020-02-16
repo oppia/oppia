@@ -21,6 +21,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
@@ -31,7 +33,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
-require('services/EditabilityService.ts');
+require('services/editability.service.ts');
 
 describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess, rvo, srvos;
@@ -46,7 +48,7 @@ describe('State content editor directive', function() {
 
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(function() {
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS);
+    angular.mock.module('oppia', TranslatorProviderForTests);
 
     mockExplorationData = {
       explorationId: 0,
@@ -58,7 +60,7 @@ describe('State content editor directive', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

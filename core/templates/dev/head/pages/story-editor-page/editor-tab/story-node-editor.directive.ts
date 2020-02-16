@@ -21,7 +21,7 @@ require(
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/story/story-update.service.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
@@ -50,6 +50,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
             EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR,
             AlertsService) {
+          var ctrl = this;
           var _recalculateAvailableNodes = function() {
             $scope.newNodeId = null;
             $scope.availableNodes = [];
@@ -106,11 +107,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;
           };
-          // Regex pattern for exploration id, EXPLORATION_AND_SKILL_ID_PATTERN
-          // is not being used here, as the chapter of the story can be saved
-          // with empty exploration id.
-          $scope.explorationIdPattern = /^[a-zA-Z0-9_-]*$/;
-          $scope.canSaveExpId = true;
+
           $scope.checkCanSaveExpId = function() {
             $scope.canSaveExpId = $scope.explorationIdPattern.test(
               $scope.explorationId);
@@ -149,14 +146,14 @@ angular.module('oppia').directive('storyNodeEditor', [
               StoryEditorStateService.getSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/modal-templates/' +
-                'select-skill-modal.template.html'),
+                '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
+                  $scope.countOfSkillsToPrioritize = 0;
                   $scope.save = function() {
                     $uibModalInstance.close($scope.selectedSkillId);
                   };
@@ -183,14 +180,14 @@ angular.module('oppia').directive('storyNodeEditor', [
               StoryEditorStateService.getSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/modal-templates/' +
-                'select-skill-modal.template.html'),
+                '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = null;
+                  $scope.countOfSkillsToPrioritize = 0;
                   $scope.save = function() {
                     $uibModalInstance.close($scope.selectedSkillId);
                   };
@@ -332,11 +329,19 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.oldOutline = newOutline;
           };
 
-          $scope.$on(EVENT_STORY_INITIALIZED, _init);
-          $scope.$on(EVENT_STORY_REINITIALIZED, _init);
-          $scope.$on('recalculateAvailableNodes', _recalculateAvailableNodes);
+          ctrl.$onInit = function() {
+            // Regex pattern for exploration id,
+            // EXPLORATION_AND_SKILL_ID_PATTERN
+            // is not being used here, as the chapter of the story can be saved
+            // with empty exploration id.
+            $scope.explorationIdPattern = /^[a-zA-Z0-9_-]*$/;
+            $scope.canSaveExpId = true;
+            $scope.$on(EVENT_STORY_INITIALIZED, _init);
+            $scope.$on(EVENT_STORY_REINITIALIZED, _init);
+            $scope.$on('recalculateAvailableNodes', _recalculateAvailableNodes);
 
-          _init();
+            _init();
+          };
         }
       ]
     };

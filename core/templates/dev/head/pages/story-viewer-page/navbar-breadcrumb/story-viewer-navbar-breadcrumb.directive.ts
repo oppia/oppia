@@ -18,7 +18,7 @@
 
 require('domain/story_viewer/story-viewer-backend-api.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -30,14 +30,19 @@ angular.module('oppia').directive('storyViewerNavbarBreadcrumb', [
         '/pages/story-viewer-page/navbar-breadcrumb/' +
         'story-viewer-navbar-breadcrumb.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['StoryViewerBackendApiService', 'UrlService',
-        function(StoryViewerBackendApiService, UrlService) {
+      controller: ['$rootScope', 'StoryViewerBackendApiService', 'UrlService',
+        function($rootScope, StoryViewerBackendApiService, UrlService) {
           var ctrl = this;
-          StoryViewerBackendApiService.fetchStoryData(
-            UrlService.getStoryIdFromViewerUrl()).then(
-            function(storyDataDict) {
-              ctrl.storyTitle = storyDataDict.story_title;
-            });
+          ctrl.$onInit = function() {
+            StoryViewerBackendApiService.fetchStoryData(
+              UrlService.getStoryIdFromViewerUrl()).then(
+              function(storyDataDict) {
+                ctrl.storyTitle = storyDataDict.story_title;
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the directive is migrated to angular
+                $rootScope.$apply();
+              });
+          };
         }
       ]
     };

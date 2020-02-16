@@ -26,7 +26,7 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
+import { EditabilityService } from 'services/editability.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -58,7 +58,7 @@ import { StateEditorService } from
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 /* eslint-enable max-len */
-import { SuggestionModalService } from 'services/SuggestionModalService';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -87,6 +87,8 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   var AnswerDetailsImprovementTaskObjectFactory = null;
   var ImprovementModalService = null;
   var LearnerAnswerDetailsDataService = null;
+  var TestLearnerAnswerDetailsObjectFactory = null;
+  var TestLearnerAnswerInfoObjectFactory = null;
   var ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE = null;
   var STATUS_NOT_ACTIONABLE = null;
   var STATUS_OPEN = null;
@@ -157,7 +159,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -165,6 +167,8 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
       _$q_, _$rootScope_, _$uibModal_,
       _AnswerDetailsImprovementTaskObjectFactory_, _ImprovementModalService_,
       _LearnerAnswerDetailsDataService_,
+      _LearnerAnswerDetailsObjectFactory_,
+      _LearnerAnswerInfoObjectFactory_,
       _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_,
       _STATUS_NOT_ACTIONABLE_, _STATUS_OPEN_) {
     $q = _$q_;
@@ -174,6 +178,8 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
       _AnswerDetailsImprovementTaskObjectFactory_;
     ImprovementModalService = _ImprovementModalService_;
     LearnerAnswerDetailsDataService = _LearnerAnswerDetailsDataService_;
+    TestLearnerAnswerDetailsObjectFactory = _LearnerAnswerDetailsObjectFactory_;
+    TestLearnerAnswerInfoObjectFactory = _LearnerAnswerInfoObjectFactory_;
     ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE =
       _ANSWER_DETAILS_IMPROVEMENT_TASK_TYPE_;
     STATUS_NOT_ACTIONABLE = _STATUS_NOT_ACTIONABLE_;
@@ -216,19 +222,23 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
 
   describe('AnswerDetailsImprovementTask', function() {
     beforeEach(function() {
-      this.mockLearnerAnswerDetails = {
-        expId: 12,
-        stateName: 'fakeStateName',
-        learnerAnswerInfoData: [{
-          id: 1,
-          answer: 'fakeAnswer',
-          answer_details: 'fakeAnswerDetails',
-          created_on: 1441870501230.642,
-        }]
-      };
-      this.task =
-        AnswerDetailsImprovementTaskObjectFactory.createNew(
-          this.mockLearnerAnswerDetails);
+      this.testLastUpdatedTime = 1441870501230.642;
+
+      this.testLearnerAnswerDetails =
+        TestLearnerAnswerDetailsObjectFactory.createDefaultLearnerAnswerDetails(
+          'fakeExpId', 'fakeStateName', 'fakeInteractionId',
+          'fakeCustomizationArgs', [
+            TestLearnerAnswerInfoObjectFactory.createFromBackendDict({
+              id: 'test_1',
+              answer: 'Answer 1',
+              answer_details: 'Answer details one.',
+              created_on: this.testLastUpdatedTime
+            })
+          ]
+        );
+
+      this.task = AnswerDetailsImprovementTaskObjectFactory
+        .createNew(this.testLearnerAnswerDetails);
     });
 
     describe('.getStatus', function() {
@@ -237,7 +247,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
       });
 
       it('returns not actionable as status', function() {
-        this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
+        this.testLearnerAnswerDetails.learnerAnswerInfoData = [];
         expect(this.task.getStatus()).toEqual(STATUS_NOT_ACTIONABLE);
       });
     });
@@ -255,7 +265,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
       });
 
       it('returns is obsolete as true', function() {
-        this.mockLearnerAnswerDetails.learnerAnswerInfoData = [];
+        this.testLearnerAnswerDetails.learnerAnswerInfoData = [];
         expect(this.task.isObsolete()).toEqual(true);
       });
     });
@@ -270,13 +280,19 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
     describe('.getDirectiveData', function() {
       it('returns the learner answer details', function() {
         expect(this.task.getDirectiveData()).toBe(
-          this.mockLearnerAnswerDetails);
+          this.testLearnerAnswerDetails);
       });
     });
 
     describe('.getActionButtons', function() {
       it('contains one button', function() {
         expect(this.task.getActionButtons().length).toEqual(1);
+      });
+    });
+
+    describe('.getLastUpdatedTime', function() {
+      it('returns the time when this task was last updated', function() {
+        expect(this.task.getLastUpdatedTime()).toBe(this.testLastUpdatedTime);
       });
     });
 
@@ -290,7 +306,7 @@ describe('AnswerDetailsImprovementTaskObjectFactory', function() {
 
         this.button.execute();
 
-        expect(spy).toHaveBeenCalledWith(this.mockLearnerAnswerDetails);
+        expect(spy).toHaveBeenCalledWith(this.testLearnerAnswerDetails);
       });
     });
   });

@@ -1,3 +1,5 @@
+@load('base-components/no-script.template.html')
+
 <% if (webpackConfig.mode == 'production') { %>
   <script src="/third_party/generated/js/third_party.min.js"></script>
 <% } else { %>

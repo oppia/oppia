@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Domain objects for configuration properties."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -285,6 +286,15 @@ class Registry(python_utils.OBJECT):
             }
 
         return schemas_dict
+
+    @classmethod
+    def get_all_config_property_names(cls):
+        """Return a list of all the config property names.
+
+        Returns:
+            list. The list of all config property names.
+        """
+        return list(cls._config_registry)
 
 
 PROMO_BAR_ENABLED = ConfigProperty(

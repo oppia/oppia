@@ -16,23 +16,22 @@
  * @fileoverview Directive for warning_loader.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').directive('warningLoader', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/base-components/warning-loader.directive.html'),
+      template: require('./warning-loader.directive.html'),
       controllerAs: '$ctrl',
       controller: ['AlertsService',
         function(AlertsService) {
           var ctrl = this;
-          ctrl.AlertsService = AlertsService;
+          ctrl.$onInit = function() {
+            ctrl.AlertsService = AlertsService;
+          };
         }
       ]
     };

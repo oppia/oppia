@@ -17,8 +17,8 @@
  * of a user for a particular exploration.
  */
 require('domain/utilities/url-interpolation.service.ts');
-require('services/ContextService.ts');
-require('services/contextual/UrlService.ts');
+require('services/context.service.ts');
+require('services/contextual/url.service.ts');
 
 require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');

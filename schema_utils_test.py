@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for object schema definitions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -58,7 +59,7 @@ ALLOWED_SCHEMA_TYPES = [
 ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
     'ParameterName', 'SanitizedUrl', 'Graph', 'ImageWithRegions',
-    'ListOfTabs']
+    'ListOfTabs', 'SkillSelector']
 
 # Schemas for the UI config for the various types. All of these configuration
 # options are optional additions to the schema, and, if omitted, should not

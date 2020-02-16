@@ -38,34 +38,10 @@ angular.module('oppia').directive('misconceptionEditor', [
         function(
             $scope, SkillUpdateService, SkillEditorStateService,
             MISCONCEPTION_NAME_CHAR_LIMIT) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.MISCONCEPTION_NAME_CHAR_LIMIT = MISCONCEPTION_NAME_CHAR_LIMIT;
-
+          var ctrl = this;
           var nameMemento = null;
           var notesMemento = null;
           var feedbackMemento = null;
-
-          $scope.nameEditorIsOpen = false;
-          $scope.notesEditorIsOpen = false;
-          $scope.feedbackEditorIsOpen = false;
-
-          $scope.container = {
-            misconceptionName: $scope.misconception.getName(),
-            misconceptionNotes: $scope.misconception.getNotes(),
-            misconceptionFeedback: $scope.misconception.getFeedback()
-          };
-
-          $scope.NOTES_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
-          $scope.FEEDBACK_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {
-              hide_complex_extensions: 'true'
-            }
-          };
 
           $scope.openNameEditor = function() {
             if ($scope.isEditable()) {
@@ -123,6 +99,14 @@ angular.module('oppia').directive('misconceptionEditor', [
             }
           };
 
+          $scope.updateMustBeAddressed = function() {
+            SkillUpdateService.updateMisconceptionMustBeAddressed(
+              $scope.skill,
+              $scope.misconception.getId(),
+              !$scope.container.misconceptionMustBeAddressed,
+              $scope.container.misconceptionMustBeAddressed);
+          };
+
           $scope.saveFeedback = function() {
             $scope.feedbackEditorIsOpen = false;
             var feedbackHasChanged = (
@@ -155,6 +139,34 @@ angular.module('oppia').directive('misconceptionEditor', [
             $scope.container.misconceptionFeedback = feedbackMemento;
             feedbackMemento = null;
             $scope.feedbackEditorIsOpen = false;
+          };
+
+          ctrl.$onInit = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.MISCONCEPTION_NAME_CHAR_LIMIT = (
+              MISCONCEPTION_NAME_CHAR_LIMIT);
+            $scope.nameEditorIsOpen = false;
+            $scope.notesEditorIsOpen = false;
+            $scope.feedbackEditorIsOpen = false;
+
+            $scope.container = {
+              misconceptionName: $scope.misconception.getName(),
+              misconceptionNotes: $scope.misconception.getNotes(),
+              misconceptionFeedback: $scope.misconception.getFeedback(),
+              misconceptionMustBeAddressed: $scope.misconception.isMandatory()
+            };
+
+            $scope.NOTES_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
+
+            $scope.FEEDBACK_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {
+                hide_complex_extensions: 'true'
+              }
+            };
           };
         }]
     };

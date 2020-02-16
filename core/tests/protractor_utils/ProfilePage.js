@@ -43,8 +43,8 @@ var ProfilePage = function() {
     expect(currUserProfilePhoto.isPresent()).toBe(true);
   };
 
-  this.expectOtherUserToNotHaveProfilePhoto = function() {
-    expect(otherUserProfilePhoto.isPresent()).toBe(false);
+  this.expectOtherUserToHaveProfilePhoto = function() {
+    expect(otherUserProfilePhoto.isPresent()).toBe(true);
   };
 
   this.expectUserToHaveBio = function(expectedText) {

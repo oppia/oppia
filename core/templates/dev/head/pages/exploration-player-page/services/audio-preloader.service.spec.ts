@@ -65,7 +65,7 @@ require('pages/exploration-player-page/services/audio-preloader.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'audio-translation-language.service.ts');
-require('services/ContextService.ts');
+require('services/context.service.ts');
 
 describe('Audio preloader service', function() {
   beforeEach(function() {
@@ -139,7 +139,7 @@ describe('Audio preloader service', function() {
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

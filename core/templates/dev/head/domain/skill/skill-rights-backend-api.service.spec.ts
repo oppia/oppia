@@ -23,7 +23,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require('App.ts');
 require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.controller.ts');
-require('services/CsrfTokenService.ts');
+require('services/csrf-token.service.ts');
 
 describe('Skill rights backend API service', function() {
   var SkillRightsBackendApiService = null;
@@ -35,7 +35,7 @@ describe('Skill rights backend API service', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -60,37 +60,6 @@ describe('Skill rights backend API service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully set a skill to be public', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/skill_editor_handler/publish_skill/0').respond(200);
-    SkillRightsBackendApiService.setSkillPublic('0', 1).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
-  });
-
-  it('should call the provided fail handler on HTTP failure', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-
-    $httpBackend.expect(
-      'PUT', '/skill_editor_handler/publish_skill/0').respond(
-      500, 'Error loading skill 0.');
-    SkillRightsBackendApiService.setSkillPublic('0', 1).then(
-      successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
-
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  });
-
   it('should report a cached skill rights after caching it', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
@@ -100,9 +69,7 @@ describe('Skill rights backend API service', function() {
     // Cache a skill.
     SkillRightsBackendApiService.cacheSkillRights('0', {
       skill_id: '0',
-      can_edit_skill: true,
-      skill_is_private: true,
-      creator_id: 'a'
+      can_edit_skill: true
     });
 
     // It should now be cached.
@@ -116,9 +83,7 @@ describe('Skill rights backend API service', function() {
 
     expect(successHandler).toHaveBeenCalledWith({
       skill_id: '0',
-      can_edit_skill: true,
-      skill_is_private: true,
-      creator_id: 'a'
+      can_edit_skill: true
     });
     expect(failHandler).not.toHaveBeenCalled();
   });

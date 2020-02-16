@@ -16,6 +16,7 @@
  * @fileoverview Component for a topic tile.
  */
 
+require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('topicSummaryTile', [
@@ -39,8 +40,8 @@ angular.module('oppia').directive('topicSummaryTile', [
               });
           };
 
-          ctrl.getStaticImageUrl = function(url) {
-            return UrlInterpolationService.getStaticImageUrl(url);
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
         }
       ]

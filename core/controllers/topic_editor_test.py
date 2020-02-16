@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the topic editor page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -49,14 +50,19 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.save_new_skill(
+            self.skill_id, self.admin_id, description='Skill Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id_2, self.admin_id, 'Skill Description 2')
+            self.skill_id_2, self.admin_id, description='Skill Description 2')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
-            [self.skill_id, self.skill_id_2], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id, self.skill_id_2],
+            subtopics=[], next_subtopic_id=1)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -84,9 +90,13 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(response['additional_story_summary_dicts'], [])
 
         self.save_new_topic(
-            topic_id, self.admin_id, 'New name', 'New description',
-            [canonical_story_id], [additional_story_id], [self.skill_id],
-            [], 1)
+            topic_id, self.admin_id, name='New name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='New description',
+            canonical_story_ids=[canonical_story_id],
+            additional_story_ids=[additional_story_id],
+            uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
 
         self.save_new_story(
             canonical_story_id, self.admin_id, 'title', 'description',
@@ -519,8 +529,12 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
         topic_id_1 = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id_1, self.admin_id, 'Name 1', 'Description 1', [], [],
-            [self.skill_id], [], 1)
+            topic_id_1, self.admin_id, name='Name 1',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description 1', canonical_story_ids=[],
+            additional_story_ids=[],
+            uncategorized_skill_ids=[self.skill_id],
+            subtopics=[], next_subtopic_id=1)
 
         json_response = self.put_json(
             '%s/%s' % (

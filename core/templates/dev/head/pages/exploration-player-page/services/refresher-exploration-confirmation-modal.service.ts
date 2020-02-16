@@ -19,26 +19,26 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').factory(
   'RefresherExplorationConfirmationModalService', [
-    '$uibModal', 'ExplorationEngineService', 'UrlInterpolationService',
-    'UrlService',
+    '$timeout', '$uibModal', 'ExplorationEngineService',
+    'UrlInterpolationService', 'UrlService',
     function(
-        $uibModal, ExplorationEngineService, UrlInterpolationService,
-        UrlService) {
+        $timeout, $uibModal, ExplorationEngineService,
+        UrlInterpolationService, UrlService) {
       return {
         displayRedirectConfirmationModal: function(
             refresherExplorationId, redirectConfirmationCallback) {
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-player-page/templates/' +
+            template: require(
+              'pages/exploration-player-page/templates/' +
               'refresher-exploration-confirmation-modal.template.html'),
             backdrop: 'static',
             controller: [
-              '$scope', '$uibModalInstance', '$window', '$timeout',
-              function($scope, $uibModalInstance, $window, $timeout) {
+              '$scope', '$uibModalInstance', '$window',
+              function($scope, $uibModalInstance, $window) {
                 $scope.confirmRedirect = function() {
                   redirectConfirmationCallback();
 
@@ -78,6 +78,10 @@ angular.module('oppia').factory(
                 };
               }
             ]
+          }).result.then(function() {}, function() {
+            // Note to developers:
+            // This callback is triggered when the Cancel button is clicked.
+            // No further action is needed.
           });
         }
       };

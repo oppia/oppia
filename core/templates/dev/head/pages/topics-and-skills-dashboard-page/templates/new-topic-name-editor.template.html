@@ -3,18 +3,29 @@
     Enter Topic Name
   </h3>
 </div>
-<form ng-submit="save(topicName)">
-  <div class="modal-body new-topic-name-editor" ng-class="{'has-error': isTopicNameEmpty(topicName)}">
-    <p>
-      Enter the name for the topic: &nbsp;
-      <input class="form-group protractor-test-new-topic-name-field" ng-model="topicName" maxlength="20" autofocus>
-      <p style="color: red;" ng-if="topicName.length === 20">
-        Topic name should be less than 20 characters.
-      </p>
-    </p>
+<form ng-submit="save(topicName, abbreviatedTopicName)">
+  <div class="modal-body new-topic-name-editor">
+    <div class="form-group row" ng-class="{'has-error': !isTopicNameValid()}">
+      <label class="col-sm-6 col-form-label">Enter a name for the topic: &nbsp;</label>
+      <div class="col-sm-6">
+        <input class="form-control protractor-test-new-topic-name-field" ng-model="topicName" maxlength="20" autofocus>
+        <p style="color: red;" ng-if="topicName.length === 20">
+          Topic name should be less than 20 characters. Please add a short topic name.
+        </p>
+      </div>
+    </div>
+    <div class="form-group row"  ng-class="{'has-error': !isAbbreviateTopicNameValid()}">
+      <label class="col-sm-6 col-form-label">Enter an abbreviated topic name: &nbsp;</label>
+      <div class="col-sm-6">
+        <input class="form-control protractor-test-new-abbreviated-topic-name-field" ng-model="abbreviatedTopicName" maxlength="12" autofocus>
+        <p style="color: red;" ng-if="abbreviatedTopicName.length === 12">
+          Abbreviated topic name should be less than 12 characters.
+        </p>
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="isTopicNameEmpty(topicName) || topicName.length >= 20">
+    <button class="btn btn-success protractor-test-confirm-topic-creation-button" type="submit" ng-disabled="!isTopicNameValid() || !isAbbreviateTopicNameValid()">
       <span>Create Topic</span>
     </button>
     <button class="btn btn-secondary" ng-click="cancel()">Cancel</button>

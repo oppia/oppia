@@ -17,8 +17,8 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('answerSubmitAction', [
   'ExplorationHtmlFormatterService', 'HtmlEscaperService',
@@ -36,17 +36,18 @@ angular.module('oppia').directive('answerSubmitAction', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.currentStateName = $attrs.currentStateName;
-        ctrl.destStateName = $attrs.destStateName;
-        ctrl.actionIndex = $attrs.actionIndex;
-        ctrl.timeSpentInStateSecs = $attrs.timeSpentInStateSecs;
-
         var _customizationArgs = HtmlEscaperService.escapedJsonToObj(
           $attrs.interactionCustomizationArgs);
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         ctrl.getShortAnswerHtml = function() {
           return ExplorationHtmlFormatterService.getShortAnswerHtml(
             _answer, $attrs.interactionId, _customizationArgs);
+        };
+        ctrl.$onInit = function() {
+          ctrl.currentStateName = $attrs.currentStateName;
+          ctrl.destStateName = $attrs.destStateName;
+          ctrl.actionIndex = $attrs.actionIndex;
+          ctrl.timeSpentInStateSecs = $attrs.timeSpentInStateSecs;
         };
       }]
     };

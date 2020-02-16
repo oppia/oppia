@@ -16,25 +16,21 @@
  * @fileoverview Unit tests for Interaction object factory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// InteractionObjectFactory.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
 import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
+import { InteractionObjectFactory } from
+  'domain/exploration/InteractionObjectFactory';
 import { OutcomeObjectFactory } from
   'domain/exploration/OutcomeObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { SolutionObjectFactory } from
+  'domain/exploration/SolutionObjectFactory';
 
-require('domain/exploration/InteractionObjectFactory.ts');
-require('domain/exploration/SolutionObjectFactory.ts');
-
-describe('Interaction object factory', function() {
+describe('Interaction object factory', () => {
   var iof = null;
   var oof = null;
   var agof = null;
@@ -47,37 +43,15 @@ describe('Interaction object factory', function() {
   var hintsDict = null;
   var interactionDict = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    iof = $injector.get('InteractionObjectFactory');
-    oof = $injector.get('OutcomeObjectFactory');
-    agof = $injector.get('AnswerGroupObjectFactory');
-    hof = $injector.get('HintObjectFactory');
-    sof = $injector.get('SolutionObjectFactory');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [CamelCaseToHyphensPipe]
+    });
+    iof = TestBed.get(InteractionObjectFactory);
+    oof = TestBed.get(OutcomeObjectFactory);
+    agof = TestBed.get(AnswerGroupObjectFactory);
+    hof = TestBed.get(HintObjectFactory);
+    sof = TestBed.get(SolutionObjectFactory);
     defaultOutcomeDict = {
       dest: 'dest_default',
       feedback: {
@@ -144,15 +118,15 @@ describe('Interaction object factory', function() {
     };
 
     testInteraction = iof.createFromBackendDict(interactionDict);
-  }));
+  });
 
-  it('should correctly set the new ID', function() {
+  it('should correctly set the new ID', () => {
     expect(testInteraction.id).toEqual('interaction_id');
     testInteraction.setId('new_interaction_id');
     expect(testInteraction.id).toEqual('new_interaction_id');
   });
 
-  it('should correctly set the new answer group', function() {
+  it('should correctly set the new answer group', () => {
     var newAnswerGroup = {
       rule_specs: [],
       outcome: {
@@ -190,7 +164,7 @@ describe('Interaction object factory', function() {
     expect(testInteraction.answerGroups).toEqual([newAnswerGroup]);
   });
 
-  it('should correctly set the new default outcome', function() {
+  it('should correctly set the new default outcome', () => {
     var newDefaultOutcomeDict = {
       dest: 'dest_default_new',
       feedback: {
@@ -219,7 +193,7 @@ describe('Interaction object factory', function() {
     expect(testInteraction.defaultOutcome).toEqual(newDefaultOutcome);
   });
 
-  it('should correctly set the new customization args', function() {
+  it('should correctly set the new customization args', () => {
     var newCustomizationArgs = {
       customArgNew: {
         value: 'custom_value_new'
@@ -234,7 +208,7 @@ describe('Interaction object factory', function() {
     expect(testInteraction.customizationArgs).toEqual(newCustomizationArgs);
   });
 
-  it('should correctly set the new solution', function() {
+  it('should correctly set the new solution', () => {
     var newSolutionDict = {
       answer_is_exclusive: false,
       correct_answer: 'This is a new correct answer!',
@@ -257,7 +231,7 @@ describe('Interaction object factory', function() {
     expect(testInteraction.solution).toEqual(newSolution);
   });
 
-  it('should correctly set the new hint', function() {
+  it('should correctly set the new hint', () => {
     var newHintDict = {
       hint_content: {
         html: '<p>New Hint</p>',
@@ -272,7 +246,7 @@ describe('Interaction object factory', function() {
     expect(testInteraction.hints).toEqual([newHint]);
   });
 
-  it('should correctly copy from other interaction', function() {
+  it('should correctly copy from other interaction', () => {
     var newAnswerGroups = [{
       rule_specs: [],
       outcome: {

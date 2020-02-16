@@ -35,12 +35,7 @@ angular.module('oppia').directive('stateTranslationEditor', [
             TranslationLanguageService, TranslationStatusService,
             TranslationTabActiveContentIdService,
             WrittenTranslationObjectFactory) {
-          $scope.HTML_SCHEMA = {
-            type: 'html',
-            ui_config: {
-              hide_complex_extensions: 'true'
-            }
-          };
+          var ctrl = this;
           var showMarkAudioAsNeedingUpdateModalIfRequired = function(
               contentId, langaugeCode) {
             var stateName = StateEditorService.getActiveStateName();
@@ -74,6 +69,10 @@ angular.module('oppia').directive('stateTranslationEditor', [
                   contentId, langaugeCode);
                 ExplorationStatesService.saveRecordedVoiceovers(
                   stateName, recordedVoiceovers);
+              }, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             }
           };
@@ -81,13 +80,9 @@ angular.module('oppia').directive('stateTranslationEditor', [
           var langaugeCode = null;
           $scope.activeWrittenTranslation = null;
           $scope.translationEditorIsOpen = false;
-          $scope.isEditable = EditabilityService.isEditable;
-          $scope.$on('activeContentIdChanged', function() {
-            initEditor();
-          });
-          $scope.$on('activeLanguageChanged', function() {
-            initEditor();
-          });
+          $scope.isEditable = function() {
+            return EditabilityService.isEditable();
+          };
 
           var initEditor = function() {
             $scope.activeWrittenTranslation = null;
@@ -102,7 +97,6 @@ angular.module('oppia').directive('stateTranslationEditor', [
                   .getWrittenTranslation(contentId, langaugeCode));
             }
           };
-          initEditor();
           var saveTranslation = function() {
             var oldWrittenTranslation = null;
             var newWrittenTranslation = null;
@@ -134,12 +128,6 @@ angular.module('oppia').directive('stateTranslationEditor', [
             $scope.translationEditorIsOpen = false;
           };
 
-          $scope.$on('externalSave', function() {
-            if ($scope.translationEditorIsOpen) {
-              saveTranslation();
-            }
-          });
-
           $scope.openTranslationEditor = function() {
             if ($scope.isEditable()) {
               $scope.translationEditorIsOpen = true;
@@ -170,6 +158,26 @@ angular.module('oppia').directive('stateTranslationEditor', [
           $scope.cancelEdit = function() {
             StateWrittenTranslationsService.restoreFromMemento();
             initEditor();
+          };
+          ctrl.$onInit = function() {
+            $scope.HTML_SCHEMA = {
+              type: 'html',
+              ui_config: {
+                hide_complex_extensions: 'true'
+              }
+            };
+            $scope.$on('activeContentIdChanged', function() {
+              initEditor();
+            });
+            $scope.$on('activeLanguageChanged', function() {
+              initEditor();
+            });
+            initEditor();
+            $scope.$on('externalSave', function() {
+              if ($scope.translationEditorIsOpen) {
+                saveTranslation();
+              }
+            });
           };
         }
       ]

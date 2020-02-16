@@ -26,7 +26,7 @@ import { AnswerGroupObjectFactory } from
   'domain/exploration/AnswerGroupObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
+import { EditabilityService } from 'services/editability.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { FeedbackThreadObjectFactory } from
@@ -58,7 +58,7 @@ import { StateEditorService } from
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
 /* eslint-enable max-len */
-import { SuggestionModalService } from 'services/SuggestionModalService';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -155,7 +155,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
@@ -178,6 +178,7 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
       var mockThread = {threadId: 1};
       var task = FeedbackImprovementTaskObjectFactory.createNew(mockThread);
 
+      expect(task.isObsolete()).toBe(false);
       expect(task.getDirectiveData()).toBe(mockThread);
       expect(task.getDirectiveType()).toEqual(FEEDBACK_IMPROVEMENT_TASK_TYPE);
     });
@@ -185,13 +186,17 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
 
   describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
-      spyOn(ThreadDataService, 'fetchThreads').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'fetchMessages').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'getData').and.returnValue({
-        feedbackThreads: [{threadId: 'abc1'}, {threadId: 'def2'}]
-      });
+      var threads = {
+        feedbackThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
+      };
+
+      spyOn(ThreadDataService, 'fetchThreads').and
+        .returnValue($q.resolve(threads));
+      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages');
 
       FeedbackImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
+        expect(fetchMessagesSpy)
+          .toHaveBeenCalledTimes(threads.feedbackThreads.length);
         expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
         expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);
@@ -241,6 +246,13 @@ describe('FeedbackImprovementTaskObjectFactory', function() {
     describe('.getDirectiveData', function() {
       it('returns the thread', function() {
         expect(this.task.getDirectiveData()).toBe(this.mockThread);
+      });
+    });
+
+    describe('.getLastUpdatedTime', function() {
+      it('returns the time when this task was last updated', function() {
+        expect(this.task.getLastUpdatedTime())
+          .toBe(this.mockThread.last_updated);
       });
     });
 

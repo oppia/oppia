@@ -41,8 +41,8 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
         if (_currentlyInEditorFirstVisit) {
           $rootScope.$broadcast('enterEditorForTheFirstTime');
           EditorFirstTimeEventsService.initRegisterEvents(expId);
-          $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).error(
-            function() {
+          $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).then(
+            null, function() {
               console.error('Warning: could not record editor tutorial ' +
               'start event.');
             });
@@ -70,7 +70,7 @@ angular.module('oppia').factory('StateTutorialFirstTimeService', [
           $rootScope.$broadcast('enterTranslationForTheFirstTime');
           EditorFirstTimeEventsService.initRegisterEvents(expId);
           $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
-            .error(function() {
+            .then(null, function() {
               console.error(
                 'Warning: could not record translation tutorial start event.'
               );

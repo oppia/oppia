@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for the base interaction specification."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -101,32 +102,32 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         """Validates the customization arg specs for the interaction.
 
         Args:
-            customization_args: list(dict(str, *)). The customization args for
-                the interaction.
+            customization_args: list(CustomizationArgSpec). The customization
+                args for the interaction.
         """
         for ca_spec in customization_args:
-            self.assertEqual(set(ca_spec.keys()), set([
+            self.assertTrue(all(hasattr(ca_spec, attr) for attr in [
                 'name', 'description', 'schema', 'default_value']))
 
             self.assertTrue(
-                isinstance(ca_spec['name'], python_utils.BASESTRING))
-            self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
+                isinstance(ca_spec.name, python_utils.BASESTRING))
+            self.assertTrue(self._is_alphanumeric_string(ca_spec.name))
             self.assertTrue(
-                isinstance(ca_spec['description'], python_utils.BASESTRING))
-            self.assertGreater(len(ca_spec['description']), 0)
+                isinstance(ca_spec.description, python_utils.BASESTRING))
+            self.assertGreater(len(ca_spec.description), 0)
 
-            schema_utils_test.validate_schema(ca_spec['schema'])
+            schema_utils_test.validate_schema(ca_spec.schema)
             self.assertEqual(
-                ca_spec['default_value'],
+                ca_spec.default_value,
                 schema_utils.normalize_against_schema(
-                    ca_spec['default_value'], ca_spec['schema']))
+                    ca_spec.default_value, ca_spec.schema))
 
-            if ca_spec['schema']['type'] == 'custom':
+            if ca_spec.schema['type'] == 'custom':
                 obj_class = obj_services.Registry.get_object_class_by_type(
-                    ca_spec['schema']['obj_type'])
+                    ca_spec.schema['obj_type'])
                 self.assertEqual(
-                    ca_spec['default_value'],
-                    obj_class.normalize(ca_spec['default_value']))
+                    ca_spec.default_value,
+                    obj_class.normalize(ca_spec.default_value))
 
     def _validate_answer_visualization_specs(self, answer_visualization_specs):
         """Validates all the answer_visualization_specs for the interaction.
@@ -472,7 +473,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                     interaction.answer_type)
 
             self._validate_customization_arg_specs(
-                interaction._customization_arg_specs)  # pylint: disable=protected-access
+                interaction.customization_arg_specs)
 
             answer_visualization_specs = (
                 interaction.answer_visualization_specs)

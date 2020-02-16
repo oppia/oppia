@@ -38,6 +38,9 @@ angular.module('oppia').factory('TranslationLanguageService', [
         $rootScope.$broadcast('activeLanguageChanged');
       },
       getActiveLanguageDescription: function() {
+        if (!activeLanguageCode) {
+          return null;
+        }
         return LanguageUtilService.getAudioLanguageDescription(
           activeLanguageCode);
       }

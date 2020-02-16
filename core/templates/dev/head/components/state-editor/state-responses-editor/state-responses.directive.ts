@@ -68,12 +68,12 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/EditabilityService.ts');
-require('services/ExplorationHtmlFormatterService.ts');
-require('services/GenerateContentIdService.ts');
-require('services/HtmlEscaperService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/editability.service.ts');
+require('services/exploration-html-formatter.service.ts');
+require('services/generate-content-id.service.ts');
+require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -112,17 +112,7 @@ angular.module('oppia').directive('stateResponses', [
             INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT,
             SHOW_TRAINABLE_UNRESOLVED_ANSWERS) {
-          $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
-            SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
-          $scope.EditabilityService = EditabilityService;
-          $scope.stateName = StateEditorService.getActiveStateName();
-          $scope.enableSolicitAnswerDetailsFeature = (
-            ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
-          $scope.stateSolicitAnswerDetailsService = (
-            StateSolicitAnswerDetailsService);
-          $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/drag_dots.png');
-
+          var ctrl = this;
           var _initializeTrainingData = function() {
             if (StateEditorService.isInQuestionMode()) {
               return;
@@ -226,10 +216,11 @@ angular.module('oppia').directive('stateResponses', [
           };
 
           $scope.isSelfLoopWithNoFeedback = function(outcome) {
-            if (!outcome) {
-              return false;
+            if (outcome && typeof outcome === 'object' &&
+              outcome.constructor.name === 'Outcome') {
+              return outcome.isConfusing($scope.stateName);
             }
-            return outcome.isConfusing($scope.stateName);
+            return false;
           };
 
           $scope.isSelfLoopThatIsMarkedCorrect = function(outcome) {
@@ -273,11 +264,12 @@ angular.module('oppia').directive('stateResponses', [
           $scope.isLinearWithNoFeedback = function(outcome) {
             // Returns false if current interaction is linear and has no
             // feedback
-            if (!outcome) {
-              return false;
+            if (outcome && typeof outcome === 'object' &&
+              outcome.constructor.name === 'Outcome') {
+              return $scope.isCurrentInteractionLinear() &&
+                !outcome.hasNonemptyFeedback();
             }
-            return $scope.isCurrentInteractionLinear() &&
-              !outcome.hasNonemptyFeedback();
+            return false;
           };
 
           $scope.getOutcomeTooltip = function(outcome) {
@@ -293,69 +285,6 @@ angular.module('oppia').directive('stateResponses', [
                      ' or direct the learner to a different card.';
             }
           };
-
-          $scope.$on('initializeAnswerGroups', function(evt, data) {
-            ResponsesService.init(data);
-            $scope.answerGroups = ResponsesService.getAnswerGroups();
-            $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
-
-            // If the creator selects an interaction which has only one possible
-            // answer, automatically expand the default response. Otherwise,
-            // default to having no responses initially selected.
-            if ($scope.isCurrentInteractionLinear()) {
-              ResponsesService.changeActiveAnswerGroupIndex(0);
-            }
-
-            // Initialize training data for these answer groups.
-            _initializeTrainingData();
-
-            $scope.activeAnswerGroupIndex = (
-              ResponsesService.getActiveAnswerGroupIndex());
-            $rootScope.$broadcast('externalSave');
-          });
-
-          $scope.$on('onInteractionIdChanged', function(
-              evt, newInteractionId) {
-            $rootScope.$broadcast('externalSave');
-            ResponsesService.onInteractionIdChanged(
-              newInteractionId, function(newAnswerGroups, newDefaultOutcome) {
-                $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-                $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-                $scope.refreshWarnings()();
-                $scope.answerGroups = ResponsesService.getAnswerGroups();
-                $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
-
-                // Reinitialize training data if the interaction ID is changed.
-                _initializeTrainingData();
-
-                $scope.activeAnswerGroupIndex = (
-                  ResponsesService.getActiveAnswerGroupIndex());
-              });
-
-            // Prompt the user to create a new response if it is not a linear or
-            // non-terminal interaction and if an actual interaction is
-            // specified (versus one being deleted).
-            if (newInteractionId &&
-                !INTERACTION_SPECS[newInteractionId].is_linear &&
-                !INTERACTION_SPECS[newInteractionId].is_terminal) {
-              $scope.openAddAnswerGroupModal();
-            }
-          });
-
-          $scope.$on('answerGroupChanged', function() {
-            $scope.answerGroups = ResponsesService.getAnswerGroups();
-            $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
-            $scope.activeAnswerGroupIndex = (
-              ResponsesService.getActiveAnswerGroupIndex());
-          });
-
-          $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
-            ResponsesService.updateAnswerChoices(
-              newAnswerChoices, function(newAnswerGroups) {
-                $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-                $scope.refreshWarnings()();
-              });
-          });
 
           $scope.openAddAnswerGroupModal = function() {
             AlertsService.clearWarnings();
@@ -449,34 +378,11 @@ angular.module('oppia').directive('stateResponses', [
               if (result.reopen) {
                 $scope.openAddAnswerGroupModal();
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
-          };
-
-          // When the page is scrolled so that the top of the page is above the
-          // browser viewport, there are some bugs in the positioning of the
-          // helper. This is a bug in jQueryUI that has not been fixed yet. For
-          // more details, see http://stackoverflow.com/q/5791886
-          $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
-            axis: 'y',
-            cursor: 'move',
-            handle: '.oppia-rule-sort-handle',
-            items: '.oppia-sortable-rule-block',
-            revert: 100,
-            tolerance: 'pointer',
-            start: function(e, ui) {
-              $rootScope.$broadcast('externalSave');
-              $scope.changeActiveAnswerGroupIndex(-1);
-              ui.placeholder.height(ui.item.height());
-            },
-            stop: function() {
-              ResponsesService.save(
-                $scope.answerGroups, $scope.defaultOutcome,
-                function(newAnswerGroups, newDefaultOutcome) {
-                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
-                  $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
-                  $scope.refreshWarnings()();
-                });
-            }
           };
 
           $scope.deleteAnswerGroup = function(index, evt) {
@@ -509,6 +415,10 @@ angular.module('oppia').directive('stateResponses', [
                   $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
                   $scope.refreshWarnings()();
                 });
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -563,7 +473,8 @@ angular.module('oppia').directive('stateResponses', [
 
           $scope.saveDefaultOutcomeFeedback = function(updatedOutcome) {
             ResponsesService.updateDefaultOutcome({
-              feedback: updatedOutcome.feedback
+              feedback: updatedOutcome.feedback,
+              dest: updatedOutcome.dest
             }, function(newDefaultOutcome) {
               $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
             });
@@ -657,11 +568,111 @@ angular.module('oppia').directive('stateResponses', [
             var activeStateName = $scope.stateName;
             return outcome && (outcome.dest === activeStateName);
           };
+          ctrl.$onInit = function() {
+            $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
+              SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+            $scope.EditabilityService = EditabilityService;
+            $scope.stateName = StateEditorService.getActiveStateName();
+            $scope.enableSolicitAnswerDetailsFeature = (
+              ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
+            $scope.stateSolicitAnswerDetailsService = (
+              StateSolicitAnswerDetailsService);
+            $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+              '/general/drag_dots.png');
+            $scope.$on('initializeAnswerGroups', function(evt, data) {
+              ResponsesService.init(data);
+              $scope.answerGroups = ResponsesService.getAnswerGroups();
+              $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
-          if (StateEditorService.isInQuestionMode()) {
-            $scope.onResponsesInitialized();
-          }
-          StateEditorService.updateStateResponsesInitialised();
+              // If the creator selects an interaction which has only one
+              // possible answer, automatically expand the default response.
+              // Otherwise, default to having no responses initially selected.
+              if ($scope.isCurrentInteractionLinear()) {
+                ResponsesService.changeActiveAnswerGroupIndex(0);
+              }
+
+              // Initialize training data for these answer groups.
+              _initializeTrainingData();
+
+              $scope.activeAnswerGroupIndex = (
+                ResponsesService.getActiveAnswerGroupIndex());
+              $rootScope.$broadcast('externalSave');
+            });
+
+            $scope.$on('onInteractionIdChanged', function(
+                evt, newInteractionId) {
+              $rootScope.$broadcast('externalSave');
+              ResponsesService.onInteractionIdChanged(
+                newInteractionId, function(newAnswerGroups, newDefaultOutcome) {
+                  $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  $scope.refreshWarnings()();
+                  $scope.answerGroups = ResponsesService.getAnswerGroups();
+                  $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+
+                  // Reinitialize training data if the interaction ID is
+                  // changed.
+                  _initializeTrainingData();
+
+                  $scope.activeAnswerGroupIndex = (
+                    ResponsesService.getActiveAnswerGroupIndex());
+                });
+
+              // Prompt the user to create a new response if it is not a linear
+              // or non-terminal interaction and if an actual interaction is
+              // specified (versus one being deleted).
+              if (newInteractionId &&
+                  !INTERACTION_SPECS[newInteractionId].is_linear &&
+                  !INTERACTION_SPECS[newInteractionId].is_terminal) {
+                $scope.openAddAnswerGroupModal();
+              }
+            });
+
+            $scope.$on('answerGroupChanged', function() {
+              $scope.answerGroups = ResponsesService.getAnswerGroups();
+              $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+              $scope.activeAnswerGroupIndex = (
+                ResponsesService.getActiveAnswerGroupIndex());
+            });
+
+            $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
+              ResponsesService.updateAnswerChoices(
+                newAnswerChoices, function(newAnswerGroups) {
+                  $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                  $scope.refreshWarnings()();
+                });
+            });
+            // When the page is scrolled so that the top of the page is above
+            // the browser viewport, there are some bugs in the positioning of
+            // the helper. This is a bug in jQueryUI that has not been fixed
+            // yet. For more details, see http://stackoverflow.com/q/5791886
+            $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
+              axis: 'y',
+              cursor: 'move',
+              handle: '.oppia-rule-sort-handle',
+              items: '.oppia-sortable-rule-block',
+              revert: 100,
+              tolerance: 'pointer',
+              start: function(e, ui) {
+                $rootScope.$broadcast('externalSave');
+                $scope.changeActiveAnswerGroupIndex(-1);
+                ui.placeholder.height(ui.item.height());
+              },
+              stop: function() {
+                ResponsesService.save(
+                  $scope.answerGroups, $scope.defaultOutcome,
+                  function(newAnswerGroups, newDefaultOutcome) {
+                    $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
+                    $scope.onSaveInteractionDefaultOutcome(newDefaultOutcome);
+                    $scope.refreshWarnings()();
+                  });
+              }
+            };
+            if (StateEditorService.isInQuestionMode()) {
+              $scope.onResponsesInitialized();
+            }
+            StateEditorService.updateStateResponsesInitialised();
+          };
         }
       ]
     };

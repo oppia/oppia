@@ -49,9 +49,9 @@ require('components/state-editor/state-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('services/AlertsService.ts');
-require('services/ContextService.ts');
-require('services/ExplorationFeaturesService.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/exploration-features.service.ts');
 
 angular.module('oppia').directive('explorationEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -76,32 +76,6 @@ angular.module('oppia').directive('explorationEditorTab', [
             ExplorationWarningsService, GraphDataService, RouterService,
             StateEditorService, UrlInterpolationService) {
           var ctrl = this;
-          ctrl.areParametersEnabled =
-            ExplorationFeaturesService.areParametersEnabled;
-
-          ctrl.interactionIsShown = false;
-
-          $scope.$on('refreshStateEditor', function() {
-            ctrl.initStateEditor();
-          });
-
-          $scope.$watch(ExplorationStatesService.getStates, function() {
-            if (ExplorationStatesService.getStates()) {
-              StateEditorService.setStateNames(
-                ExplorationStatesService.getStateNames());
-            }
-          }, true);
-
-          $scope.$watch(function() {
-            return StateEditorService.isStateEditorInitialised();
-          }, function() {
-            if (StateEditorService.isStateEditorInitialised() &&
-            ExplorationStatesService.isInitialized()) {
-              var stateData = ExplorationStatesService.getState(ctrl.stateName);
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
-            }
-          });
-
           ctrl.getStateContentPlaceholder = function() {
             if (
               StateEditorService.getActiveStateName() ===
@@ -133,7 +107,26 @@ angular.module('oppia').directive('explorationEditorTab', [
             StateEditorService.setInQuestionMode(false);
             var stateData = ExplorationStatesService.getState(ctrl.stateName);
             if (ctrl.stateName && stateData) {
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
+              // StateEditorService.checkEventListenerRegistrationStatus()
+              // returns true if the event listeners of the state editor child
+              // components have been registered.
+              // In this case 'stateEditorInitialized' is broadcasted so that:
+              // 1. state-editor directive can initialise the child
+              //    components of the state editor.
+              // 2. state-interaction-editor directive can initialise the
+              //    child components of the interaction editor.
+              $scope.$watch(function() {
+                return (
+                  StateEditorService.checkEventListenerRegistrationStatus());
+              }, function() {
+                if (
+                  StateEditorService.checkEventListenerRegistrationStatus() &&
+                ExplorationStatesService.isInitialized()) {
+                  var stateData = (
+                    ExplorationStatesService.getState(ctrl.stateName));
+                  $rootScope.$broadcast('stateEditorInitialized', stateData);
+                }
+              });
 
               var content = ExplorationStatesService.getStateContentMemento(
                 ctrl.stateName);
@@ -145,21 +138,14 @@ angular.module('oppia').directive('explorationEditorTab', [
             }
           };
 
-          $scope.$on('stateEditorDirectiveInitialized', function(evt) {
-            if (ExplorationStatesService.isInitialized()) {
-              var stateData = (
-                ExplorationStatesService.getState(ctrl.stateName));
-              $rootScope.$broadcast('stateEditorInitialized', stateData);
-            }
-          });
-
           ctrl.recomputeGraph = function() {
             GraphDataService.recompute();
           };
 
           ctrl.saveStateContent = function(displayedValue) {
             ExplorationStatesService.saveStateContent(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
             // Show the interaction when the text content is saved, even if no
             // content is entered.
             ctrl.interactionIsShown = true;
@@ -167,13 +153,15 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveInteractionId = function(displayedValue) {
             ExplorationStatesService.saveInteractionId(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
             StateEditorService.setInteractionId(angular.copy(displayedValue));
           };
 
           ctrl.saveInteractionAnswerGroups = function(newAnswerGroups) {
             ExplorationStatesService.saveInteractionAnswerGroups(
-              ctrl.stateName, angular.copy(newAnswerGroups));
+              StateEditorService.getActiveStateName(),
+              angular.copy(newAnswerGroups));
 
             StateEditorService.setInteractionAnswerGroups(
               angular.copy(newAnswerGroups));
@@ -182,7 +170,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveInteractionDefaultOutcome = function(newOutcome) {
             ExplorationStatesService.saveInteractionDefaultOutcome(
-              ctrl.stateName, angular.copy(newOutcome));
+              StateEditorService.getActiveStateName(),
+              angular.copy(newOutcome));
 
             StateEditorService.setInteractionDefaultOutcome(
               angular.copy(newOutcome));
@@ -191,7 +180,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveInteractionCustomizationArgs = function(displayedValue) {
             ExplorationStatesService.saveInteractionCustomizationArgs(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
 
             StateEditorService.setInteractionCustomizationArgs(
               angular.copy(displayedValue));
@@ -199,7 +189,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveSolution = function(displayedValue) {
             ExplorationStatesService.saveSolution(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
 
             StateEditorService.setInteractionSolution(
               angular.copy(displayedValue));
@@ -207,7 +198,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveHints = function(displayedValue) {
             ExplorationStatesService.saveHints(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
 
             StateEditorService.setInteractionHints(
               angular.copy(displayedValue));
@@ -215,7 +207,8 @@ angular.module('oppia').directive('explorationEditorTab', [
 
           ctrl.saveSolicitAnswerDetails = function(displayedValue) {
             ExplorationStatesService.saveSolicitAnswerDetails(
-              ctrl.stateName, angular.copy(displayedValue));
+              StateEditorService.getActiveStateName(),
+              angular.copy(displayedValue));
 
             StateEditorService.setSolicitAnswerDetails(
               angular.copy(displayedValue));
@@ -251,12 +244,31 @@ angular.module('oppia').directive('explorationEditorTab', [
                   ExplorationStatesService.saveWrittenTranslations(
                     stateName, writtenTranslations);
                 }
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             }
           };
 
           ctrl.navigateToState = function(stateName) {
             RouterService.navigateToMainTab(stateName);
+          };
+          ctrl.areParametersEnabled = function() {
+            return ExplorationFeaturesService.areParametersEnabled();
+          };
+          ctrl.$onInit = function() {
+            $scope.$on('refreshStateEditor', function() {
+              ctrl.initStateEditor();
+            });
+
+            $scope.$watch(ExplorationStatesService.getStates, function() {
+              if (ExplorationStatesService.getStates()) {
+                StateEditorService.setStateNames(
+                  ExplorationStatesService.getStateNames());
+              }
+            }, true);
+            ctrl.interactionIsShown = false;
           };
         }
       ]

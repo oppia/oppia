@@ -106,6 +106,9 @@ angular.module('oppia').factory('QuestionObjectFactory', [
       var pendingMisconceptionNamesToTag = [];
       Object.keys(misconceptionsBySkill).forEach(function(skillId) {
         for (var i = 0; i < misconceptionsBySkill[skillId].length; i++) {
+          if (!misconceptionsBySkill[skillId][i].isMandatory()) {
+            continue;
+          }
           var skillMisconceptionId =
             skillId + '-' + misconceptionsBySkill[skillId][i].getId();
           if (
@@ -116,16 +119,14 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         }
       });
       if (pendingMisconceptionNamesToTag.length > 0) {
-        var returnString =
-          'The following misconceptions should also be caught:';
+        var returnString = 'Click on (or create) an answer ' +
+          'that is neither marked correct nor is a default answer (marked ' +
+          'above as [All other answers]) and tag the following misconceptions' +
+          ' to that answer group:';
         pendingMisconceptionNamesToTag.forEach(function(misconceptionName) {
           returnString = returnString + ' ' + misconceptionName + ',';
         });
         returnString = returnString.slice(0, -1);
-        returnString = returnString + '. Click on (or create) an answer ' +
-          'that is neither marked correct nor is a default answer (marked ' +
-          'above as [All other answers]) to tag a misconception to that ' +
-          'answer group.';
         return returnString;
       }
       return false;
@@ -149,7 +150,8 @@ angular.module('oppia').factory('QuestionObjectFactory', [
         id: null,
         question_state_data: this._stateData.toBackendDict(),
         language_code: this._languageCode,
-        version: 1
+        linked_skill_ids: this._linkedSkillIds,
+        version: 1,
       };
       if (!isNewQuestion) {
         questionBackendDict.id = this._id;

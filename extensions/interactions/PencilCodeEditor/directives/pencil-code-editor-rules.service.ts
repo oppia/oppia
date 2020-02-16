@@ -15,58 +15,68 @@
 /**
  * @fileoverview Rules service for the interaction.
  */
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require(
-  'filters/string-utility-filters/' +
-  'normalize-whitespace-punctuation-and-case.filter.ts');
-require('services/CodeNormalizerService.ts');
+import { CodeNormalizerService } from 'services/code-normalizer.service';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
+/* eslint-disable max-len */
+import { NormalizeWhitespacePunctuationAndCasePipe } from
+  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.pipe';
+/* eslint-enable max-len */
 
-angular.module('oppia').factory('PencilCodeEditorRulesService', [
-  '$filter', 'CodeNormalizerService',
-  function($filter, CodeNormalizerService) {
-    return {
-      CodeEquals: function(answer, inputs) {
-        var normalizedCode =
-          CodeNormalizerService.getNormalizedCode(answer.code);
-        var normalizedExpectedCode =
-          CodeNormalizerService.getNormalizedCode(inputs.x);
-        return normalizedCode === normalizedExpectedCode;
-      },
-      CodeContains: function(answer, inputs) {
-        var normalizedCode =
-          CodeNormalizerService.getNormalizedCode(answer.code);
-        var normalizedSnippet =
-          CodeNormalizerService.getNormalizedCode(inputs.x);
-        return normalizedCode.indexOf(normalizedSnippet) !== -1;
-      },
-      CodeDoesNotContain: function(answer, inputs) {
-        var normalizedCode =
-          CodeNormalizerService.getNormalizedCode(answer.code);
-        var normalizedSnippet =
-          CodeNormalizerService.getNormalizedCode(inputs.x);
-        return normalizedCode.indexOf(normalizedSnippet) === -1;
-      },
-      OutputEquals: function(answer, inputs) {
-        var normalizedOutput = $filter('normalizeWhitespace')(answer.output);
-        var normalizedExpectedOutput =
-          $filter('normalizeWhitespace')(inputs.x);
-        return normalizedOutput === normalizedExpectedOutput;
-      },
-      OutputRoughlyEquals: function(answer, inputs) {
-        var normalizedOutput = $filter(
-          'normalizeWhitespacePunctuationAndCase')(answer.output);
-        var normalizedExpectedOutput =
-          $filter('normalizeWhitespacePunctuationAndCase')(inputs.x);
-        return normalizedOutput === normalizedExpectedOutput;
-      },
-      ResultsInError: function(answer) {
-        return !!(answer.error.trim());
-      },
-      ErrorContains: function(answer, inputs) {
-        var normalizedError = $filter('normalizeWhitespace')(answer.error);
-        var normalizedSnippet = $filter('normalizeWhitespace')(inputs.x);
-        return normalizedError.indexOf(normalizedSnippet) !== -1;
-      }
-    };
-  }]);
+@Injectable({
+  providedIn: 'root'
+})
+export class PencilCodeEditorRulesService {
+  constructor(
+    private nwp: NormalizeWhitespacePipe,
+    private nwpac: NormalizeWhitespacePunctuationAndCasePipe,
+    private cn: CodeNormalizerService) {}
+
+  CodeEquals(answer: {code: string}, inputs: {x: string}): boolean {
+    var normalizedCode =
+      this.cn.getNormalizedCode(answer.code);
+    var normalizedExpectedCode =
+      this.cn.getNormalizedCode(inputs.x);
+    return normalizedCode === normalizedExpectedCode;
+  }
+  CodeContains(answer: {code: string}, inputs: {x: string}): boolean {
+    var normalizedCode =
+      this.cn.getNormalizedCode(answer.code);
+    var normalizedSnippet =
+      this.cn.getNormalizedCode(inputs.x);
+    return normalizedCode.indexOf(normalizedSnippet) !== -1;
+  }
+  CodeDoesNotContain(answer: {code: string}, inputs: {x: string}): boolean {
+    var normalizedCode =
+      this.cn.getNormalizedCode(answer.code);
+    var normalizedSnippet =
+      this.cn.getNormalizedCode(inputs.x);
+    return normalizedCode.indexOf(normalizedSnippet) === -1;
+  }
+  OutputEquals(answer: {output: string}, inputs: {x: string}): boolean {
+    var normalizedOutput = this.nwp.transform(answer.output);
+    var normalizedExpectedOutput =
+      this.nwp.transform(inputs.x);
+    return normalizedOutput === normalizedExpectedOutput;
+  }
+  OutputRoughlyEquals(answer: {output: string}, inputs: {x: string}): boolean {
+    var normalizedOutput = this.nwpac.transform(answer.output);
+    var normalizedExpectedOutput = this.nwpac.transform(inputs.x);
+    return normalizedOutput === normalizedExpectedOutput;
+  }
+  ResultsInError(answer: {error: string}): boolean {
+    return !!(answer.error.trim());
+  }
+  ErrorContains(answer: {error: string}, inputs: {x: string}): boolean {
+    var normalizedError = this.nwp.transform(answer.error);
+    var normalizedSnippet = this.nwp.transform(inputs.x);
+    return normalizedError.indexOf(normalizedSnippet) !== -1;
+  }
+}
+
+angular.module('oppia').factory(
+  'PencilCodeEditorRulesService', downgradeInjectable(
+    PencilCodeEditorRulesService));

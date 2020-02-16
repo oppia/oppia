@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the cron jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -131,6 +132,42 @@ class CronJobTests(test_utils.GenericTestBase):
         all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
         self.assertEqual(len(all_jobs), 1)
         self.assertEqual(all_jobs[0].job_type, 'DashboardStatsOneOffJob')
+        self.logout()
+
+    def test_cron_user_deletion_handler(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+
+        with self.testapp_swap:
+            self.get_html_response('/cron/users/user_deletion')
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+
+        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
+        self.assertEqual(len(all_jobs), 1)
+        self.assertEqual(all_jobs[0].job_type, 'UserDeletionOneOffJob')
+        self.logout()
+
+    def test_cron_verify_user_deletion_handler(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+
+        with self.testapp_swap:
+            self.get_html_response('/cron/users/verify_user_deletion')
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+
+        all_jobs = job_models.JobModel.get_all_unfinished_jobs(3)
+        self.assertEqual(len(all_jobs), 1)
+        self.assertEqual(all_jobs[0].job_type, 'VerifyUserDeletionOneOffJob')
         self.logout()
 
     def test_cron_exploration_recommendations_handler(self):
@@ -291,72 +328,3 @@ class CronJobTests(test_utils.GenericTestBase):
                 'html': '<p>new suggestion content</p>'
             }
         )
-
-    def test_cron_mail_reviewers_in_rotation_handler(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-
-        reviewer_ids = []
-        score_categories = []
-
-        def _mock_send_mail_to_notify_users_to_review(
-                reviewer_id, score_category):
-            """Mocks email_manager.send_mail_to_notify_users_to_review() as its
-            not possible to send mail with self.testapp_swap, i.e with the URLs
-            defined in main_cron.
-            """
-            reviewer_ids.append(reviewer_id)
-            score_categories.append(score_category)
-
-        send_mail_to_notify_users_to_review_swap = self.swap(
-            email_manager, 'send_mail_to_notify_users_to_review',
-            _mock_send_mail_to_notify_users_to_review)
-
-        self.save_new_valid_exploration(
-            'exp_id', self.admin_id, title='A title', category='Algebra')
-
-        new_content = state_domain.SubtitledHtml(
-            'content', '<p>new suggestion content</p>').to_dict()
-        change = {
-            'cmd': 'edit_state_property',
-            'property_name': 'content',
-            'state_name': 'Introduction',
-            'new_value': new_content
-        }
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            'exp_id', 1,
-            feconf.SYSTEM_COMMITTER_ID, change, 'change title', self.admin_id)
-
-        exploration = exp_fetchers.get_exploration_by_id('exp_id')
-        self.assertEqual(
-            exploration.states['Introduction'].content.to_dict(), {
-                'content_id': 'content',
-                'html': ''
-            }
-        )
-
-        suggestion = suggestion_services.query_suggestions(
-            [('author_id', feconf.SYSTEM_COMMITTER_ID),
-             ('target_id', 'exp_id')])[0]
-        suggestion_services.accept_suggestion(
-            suggestion, self.admin_id,
-            suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)
-
-        exploration = exp_fetchers.get_exploration_by_id('exp_id')
-        self.assertEqual(
-            exploration.states['Introduction'].content.to_dict(), {
-                'content_id': 'content',
-                'html': '<p>new suggestion content</p>'
-            }
-        )
-
-        send_suggestion_review_related_emails_swap = self.swap(
-            feconf, 'SEND_SUGGESTION_REVIEW_RELATED_EMAILS', True)
-
-        with self.testapp_swap, send_suggestion_review_related_emails_swap, (
-            send_mail_to_notify_users_to_review_swap):
-            self.get_html_response('/cron/suggestions/notify_reviewers')
-
-        self.assertEqual(reviewer_ids, [None])
-        self.assertEqual(score_categories, ['content.Algebra'])

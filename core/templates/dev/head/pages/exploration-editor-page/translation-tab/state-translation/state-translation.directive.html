@@ -39,7 +39,7 @@
   <div class="translation-state-contents">
     <div ng-if="isActive(TAB_ID_CONTENT)" class="translation-state-content protractor-test-content-text">
       <span>
-        <span ng-show="!getRequiredHtml(stateContent)" class="oppia-placeholder">
+        <span ng-if="!getRequiredHtml(stateContent)" class="oppia-placeholder">
           <[getEmptyContentMessage()]>
         </span>
         <span>
@@ -74,7 +74,7 @@
             <div ng-if="activeAnswerGroupIndex === $index">
               <div class="oppia-editor-card-section protractor-test-feedback-<[$index]>-text">
                 <div class="oppia-rule-body-container">
-                  <span ng-show="!getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-placeholder">
+                  <span ng-if="!getRequiredHtml(answerGroup.outcome.feedback)" class="oppia-placeholder">
                     <[getEmptyContentMessage()]>
                   </span>
                   <span>
@@ -140,8 +140,13 @@
           </a>
           <div ng-if="activeHintIndex === $index">
             <div class="oppia-editor-card-section protractor-test-hint-<[$index]>-text">
-              <angular-html-bind html-data="getRequiredHtml(hint.hintContent)" class="oppia-rte-editor">
-              </angular-html-bind>
+              <span ng-if="!getRequiredHtml(hint.hintContent)" class="oppia-placeholder">
+                <[getEmptyContentMessage()]>
+              </span>
+              <span>
+                <angular-html-bind html-data="getRequiredHtml(hint.hintContent)" class="oppia-rte-editor">
+                </angular-html-bind>
+              </span>
             </div>
           </div>
         </li>
@@ -149,6 +154,9 @@
     </div>
 
     <div ng-if="isActive(TAB_ID_SOLUTION)" class="translation-state-content protractor-test-solution-text">
+      <span ng-if="!getRequiredHtml(stateSolution.explanation)" class="oppia-placeholder">
+        <[getEmptyContentMessage()]>
+      </span>
       <span>
         <angular-html-bind html-data="getRequiredHtml(stateSolution.explanation)" class="oppia-rte-editor">
         </angular-html-bind>

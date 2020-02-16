@@ -33,6 +33,10 @@ angular.module('oppia').constant(
   SkillDomainConstants.SKILL_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant(
+  'FETCH_SKILLS_URL_TEMPLATE',
+  SkillDomainConstants.FETCH_SKILLS_URL_TEMPLATE);
+
+angular.module('oppia').constant(
   'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
   SkillDomainConstants.SKILL_EDITOR_QUESTION_URL_TEMPLATE);
 
@@ -61,6 +65,9 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK',
   SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK);
+angular.module('oppia').constant(
+  'SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED',
+  SkillDomainConstants.SKILL_MISCONCEPTIONS_PROPERTY_MUST_BE_ADDRESSED);
 
 angular.module('oppia').constant(
   'CMD_UPDATE_SKILL_PROPERTY',
@@ -78,6 +85,13 @@ angular.module('oppia').constant(
 angular.module('oppia').constant(
   'CMD_DELETE_SKILL_MISCONCEPTION',
   SkillDomainConstants.CMD_DELETE_SKILL_MISCONCEPTION);
+
+angular.module('oppia').constant(
+  'CMD_ADD_PREREQUISITE_SKILL',
+  SkillDomainConstants.CMD_ADD_PREREQUISITE_SKILL);
+angular.module('oppia').constant(
+  'CMD_DELETE_PREREQUISITE_SKILL',
+  SkillDomainConstants.CMD_DELETE_PREREQUISITE_SKILL);
 
 angular.module('oppia').constant(
   'CMD_UPDATE_RUBRICS', SkillDomainConstants.CMD_UPDATE_RUBRICS);

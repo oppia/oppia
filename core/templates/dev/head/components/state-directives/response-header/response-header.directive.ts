@@ -23,7 +23,7 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
-require('services/EditabilityService.ts');
+require('services/editability.service.ts');
 
 angular.module('oppia').directive('responseHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -55,8 +55,9 @@ angular.module('oppia').directive('responseHeader', [
             PLACEHOLDER_OUTCOME_DEST,
             StateInteractionIdService, INTERACTION_SPECS) {
           var ctrl = this;
-          ctrl.EditabilityService = EditabilityService;
-          ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
+          ctrl.isInQuestionMode = function() {
+            return StateEditorService.isInQuestionMode();
+          };
 
           ctrl.getCurrentInteractionId = function() {
             return StateInteractionIdService.savedMemento;
@@ -88,6 +89,9 @@ angular.module('oppia').directive('responseHeader', [
 
           ctrl.deleteResponse = function(evt) {
             ctrl.getOnDeleteFn()(ctrl.getIndex(), evt);
+          };
+          ctrl.$onInit = function() {
+            ctrl.EditabilityService = EditabilityService;
           };
         }
       ]

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """File for compiling and checking typescript."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -25,7 +26,7 @@ import sys
 import python_utils
 
 COMPILED_JS_DIR = os.path.join('local_compiled_js_for_test', '')
-TSCONFIG_FILEPATH = 'tsconfig-for-compile-check.json'
+TSCONFIG_FILEPATH = 'tsconfig.json'
 
 
 def validate_compiled_js_dir():
@@ -41,7 +42,7 @@ def validate_compiled_js_dir():
 
 def compile_and_check_typescript():
     """Compiles typescript files and checks the compilation errors."""
-    node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
+    node_path = os.path.join(os.pardir, 'oppia_tools/node-10.18.0')
     os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
     validate_compiled_js_dir()
@@ -54,11 +55,11 @@ def compile_and_check_typescript():
         './node_modules/typescript/bin/tsc', '--project',
         TSCONFIG_FILEPATH]
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-    if os.path.exists(COMPILED_JS_DIR):
-        shutil.rmtree(COMPILED_JS_DIR)
     error_messages = []
     for line in iter(process.stdout.readline, ''):
         error_messages.append(line)
+    if os.path.exists(COMPILED_JS_DIR):
+        shutil.rmtree(COMPILED_JS_DIR)
     if error_messages:
         python_utils.PRINT('Errors found during compilation\n')
         for message in error_messages:

@@ -85,6 +85,11 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
       return this._actionButtons;
     };
 
+    /** @returns {number} - The time that the task was last updated. */
+    SuggestionImprovementTask.prototype.getLastUpdatedTime = function() {
+      return this._suggestionThread.last_updated;
+    };
+
     return {
       /**
        * @returns {SuggestionImprovementTask}
@@ -100,14 +105,12 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
        */
       fetchTasks: function() {
         var createNew = this.createNew;
-        return ThreadDataService.fetchThreads().then(function() {
+        return ThreadDataService.fetchThreads().then(threadData => {
           return $q.all(
-            ThreadDataService.data.suggestionThreads.map(function(suggestion) {
-              return ThreadDataService.fetchMessages(suggestion.threadId);
-            }));
-        }).then(function() {
-          return ThreadDataService.getData().suggestionThreads.map(createNew);
-        });
+            threadData.suggestionThreads.map(
+              thread => ThreadDataService.fetchMessages(thread.threadId))
+          ).then(() => threadData);
+        }).then(threadData => threadData.suggestionThreads.map(createNew));
       },
     };
   }

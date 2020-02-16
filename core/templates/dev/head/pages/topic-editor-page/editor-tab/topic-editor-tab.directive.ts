@@ -20,10 +20,16 @@ require(
   'pages/topic-editor-page/editor-tab/topic-editor-stories-list.directive.ts');
 
 require('components/entity-creation-services/story-creation.service.ts');
+require(
+  'components/forms/custom-forms-directives/thumbnail-uploader.directive.ts');
 require('domain/editor/undo_redo/undo-redo.service.ts');
 require('domain/topic/topic-update.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
+require('services/alerts.service.ts');
+require('services/context.service.ts');
+require('services/csrf-token.service.ts');
+require('services/image-upload-helper.service.ts');
 
 angular.module('oppia').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -33,21 +39,41 @@ angular.module('oppia').directive('topicEditorTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/editor-tab/topic-editor-tab.directive.html'),
       controller: [
-        '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService', 'UrlInterpolationService', 'StoryCreationService',
+        '$scope', '$uibModal', 'AlertsService',
+        'ContextService', 'CsrfTokenService', 'ImageUploadHelperService',
+        'TopicEditorStateService', 'TopicUpdateService', 'UndoRedoService',
+        'UrlInterpolationService', 'StoryCreationService',
         'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService, UrlInterpolationService, StoryCreationService,
+            $scope, $uibModal, AlertsService,
+            ContextService, CsrfTokenService, ImageUploadHelperService,
+            TopicEditorStateService, TopicUpdateService, UndoRedoService,
+            UrlInterpolationService, StoryCreationService,
             EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
+          var ctrl = this;
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
+            $scope.editableAbbreviatedName = $scope.topic.getAbbreviatedName();
             $scope.editableDescription = $scope.topic.getDescription();
+            var placeholderImageUrl = '/icons/story-image-icon.png';
+            if (!$scope.topic.getThumbnailFilename()) {
+              $scope.editableThumbnailDataUrl = (
+                UrlInterpolationService.getStaticImageUrl(
+                  placeholderImageUrl));
+            } else {
+              $scope.editableThumbnailDataUrl = (
+                ImageUploadHelperService
+                  .getTrustedResourceUrlForThumbnailFilename(
+                    $scope.topic.getThumbnailFilename(),
+                    ContextService.getEntityType(),
+                    ContextService.getEntityId()));
+            }
+
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
@@ -56,6 +82,10 @@ angular.module('oppia').directive('topicEditorTab', [
           var _initStorySummaries = function() {
             $scope.canonicalStorySummaries =
               TopicEditorStateService.getCanonicalStorySummaries();
+          };
+
+          $scope.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
 
           $scope.createCanonicalStory = function() {
@@ -73,6 +103,10 @@ angular.module('oppia').directive('topicEditorTab', [
                     };
                   }
                 ]
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               StoryCreationService.createNewCanonicalStory(
@@ -93,6 +127,22 @@ angular.module('oppia').directive('topicEditorTab', [
             $scope.topicNameEditorIsShown = false;
           };
 
+          $scope.updateAbbreviatedName = function(newAbbreviatedName) {
+            if (newAbbreviatedName === $scope.topic.getAbbreviatedName()) {
+              return;
+            }
+            TopicUpdateService.setAbbreviatedTopicName(
+              $scope.topic, newAbbreviatedName);
+          };
+
+          $scope.updateTopicThumbnailFilename = function(newThumbnailFilename) {
+            if (newThumbnailFilename === $scope.topic.getThumbnailFilename()) {
+              return;
+            }
+            TopicUpdateService.setThumbnailFilename(
+              $scope.topic, newThumbnailFilename);
+          };
+
           $scope.updateTopicDescription = function(newDescription) {
             if (newDescription !== $scope.topic.getDescription()) {
               TopicUpdateService.setTopicDescription(
@@ -100,12 +150,14 @@ angular.module('oppia').directive('topicEditorTab', [
             }
           };
 
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
-          $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
+            $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+            $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
 
-          _initEditor();
-          _initStorySummaries();
+            _initEditor();
+            _initStorySummaries();
+          };
         }
       ]
     };

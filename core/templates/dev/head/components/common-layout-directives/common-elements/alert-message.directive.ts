@@ -16,7 +16,7 @@
  * @fileoverview Directive for Alert Messages
  */
 
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').directive('alertMessage', [function() {
   return {

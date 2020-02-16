@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/contextual/UrlService.ts');
+require('services/contextual/url.service.ts');
 
 angular.module('oppia').directive('topicViewerNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -27,13 +27,23 @@ angular.module('oppia').directive('topicViewerNavbarBreadcrumb', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-viewer-page/navbar-breadcrumb/' +
         'topic-viewer-navbar-breadcrumb.directive.html'),
-      controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
-        function($scope, TopicViewerBackendApiService, UrlService) {
-          TopicViewerBackendApiService.fetchTopicData(
-            UrlService.getTopicNameFromLearnerUrl()).then(
-            function(topicDataDict) {
-              $scope.topicName = topicDataDict.topic_name;
-            });
+      controller: [
+        '$scope', '$rootScope', 'TopicViewerBackendApiService',
+        'UrlService',
+        function(
+            $scope, $rootScope, TopicViewerBackendApiService,
+            UrlService) {
+          var ctrl = this;
+          ctrl.$onInit = function() {
+            TopicViewerBackendApiService.fetchTopicData(
+              UrlService.getTopicNameFromLearnerUrl()).then(
+              function(topicDataDict) {
+                $scope.topicName = topicDataDict.topic_name;
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$apply();
+              });
+          };
         }
       ]
     };

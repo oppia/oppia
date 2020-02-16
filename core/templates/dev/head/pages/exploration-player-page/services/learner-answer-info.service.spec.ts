@@ -28,18 +28,18 @@ import { AnswerGroupObjectFactory } from
 /* eslint-disable max-len */
 import { ChangeObjectFactory } from
   'domain/editor/undo_redo/ChangeObjectFactory';
-import { EditabilityService } from 'services/EditabilityService';
+import { EditabilityService } from 'services/editability.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
 import { CodeNormalizerService } from
-  'services/CodeNormalizerService';
+  'services/code-normalizer.service';
 import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService';
+  'services/exploration-features.service';
 import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
 import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { ImprovementsService } from 'services/ImprovementsService';
+import { ImprovementsService } from 'services/improvements.service';
 import { LearnerActionObjectFactory } from
   'domain/statistics/LearnerActionObjectFactory';
 import { LearnerParamsService } from
@@ -77,7 +77,7 @@ import { SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 import { SubtitledHtmlObjectFactory } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { SuggestionModalService } from 'services/SuggestionModalService';
+import { SuggestionModalService } from 'services/suggestion-modal.service';
 /* eslint-disable max-len */
 import { ThreadStatusDisplayService } from
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
@@ -182,7 +182,7 @@ describe('Learner answer info service', function() {
   }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.upgradedServices)) {
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));

@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/AlertsService.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('LearnerPlaylistService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
@@ -106,6 +106,10 @@ angular.module('oppia').factory('LearnerPlaylistService', [
           learnerDashboardActivityIds.removeFromCollectionLearnerPlaylist(
             activityId);
         }
+      }, function() {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       });
     };
 

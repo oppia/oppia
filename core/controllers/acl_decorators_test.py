@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.domain.acl_decorators."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -1859,8 +1860,11 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.save_new_topic(
-            self.topic_id, self.viewer_id, 'Name', 'Description', [], [],
-            [], [], 1)
+            self.topic_id, self.viewer_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         topic_services.assign_role(
             self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
@@ -1926,8 +1930,11 @@ class EditStoryDecoratorTests(test_utils.GenericTestBase):
             self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description',
-            [self.story_id], [], [], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[self.story_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
 
     def test_can_not_edit_story_with_invalid_story_id(self):
@@ -2015,8 +2022,11 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.save_new_topic(
-            self.topic_id, self.viewer_id, 'Name', 'Description', [], [],
-            [], [], 1)
+            self.topic_id, self.viewer_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         topic_services.assign_role(
             self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
@@ -2099,8 +2109,11 @@ class StoryViewerTests(test_utils.GenericTestBase):
             self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
             self.topic_id)
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description',
-            [self.story_id], [], [], [], 1)
+            self.topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[self.story_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
     def test_cannot_access_non_existent_story(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2174,91 +2187,6 @@ class CreateSkillTests(test_utils.GenericTestBase):
             response = self.get_json(
                 '/mock_create_skill', expected_status_int=401)
 
-        self.assertEqual(
-            response['error'],
-            'You must be logged in to access this resource.')
-
-
-class PublishSkillTests(test_utils.GenericTestBase):
-    """Tests for decorator can_publish_skill."""
-    viewer_username = 'viewer'
-    viewer_email = 'viewer@example.com'
-    skill_id_1 = '1'
-    skill_id_2 = '2'
-
-    class MockHandler(base.BaseHandler):
-        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-        @acl_decorators.can_publish_skill
-        def get(self, skill_id):
-            self.render_json({'skill_id': skill_id})
-
-    def setUp(self):
-        super(PublishSkillTests, self).setUp()
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
-        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-
-        self.set_admins([self.ADMIN_USERNAME, self.EDITOR_USERNAME])
-
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.admin = user_services.UserActionsInfo(self.admin_id)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-
-        self.signup(self.viewer_email, self.viewer_username)
-
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock_publish_skill/<skill_id>', self.MockHandler)],
-            debug=feconf.DEBUG,
-        ))
-        skill_services.create_new_skill_rights(self.skill_id_1, self.admin_id)
-        skill_services.create_new_skill_rights(self.skill_id_2, self.editor_id)
-
-    def test_can_not_publish_skill_with_invalid_skill_id(self):
-        self.login(self.ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock_publish_skill/invalid_skill_id', expected_status_int=404)
-        self.logout()
-
-    def test_admin_can_publish_skill(self):
-        self.login(self.ADMIN_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_publish_skill/%s' % self.skill_id_1)
-        self.logout()
-
-    def test_editor_can_publish_skill(self):
-        self.login(self.EDITOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_publish_skill/%s' % self.skill_id_2)
-        self.logout()
-
-    def test_editor_cannot_publish_skill_created_by_admin(self):
-        self.login(self.EDITOR_EMAIL)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock_publish_skill/%s' % self.skill_id_1,
-                expected_status_int=401)
-            self.assertEqual(
-                response['error'],
-                'You do not have credentials to edit this skill.')
-        self.logout()
-
-    def test_viewer_cannot_publish_skill(self):
-        self.login(self.viewer_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock_publish_skill/%s' % self.skill_id_1,
-                expected_status_int=401)
-            self.assertEqual(
-                response['error'],
-                'You do not have credentials to edit this skill.')
-        self.logout()
-
-    def test_guest_cannot_publish_skill(self):
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock_publish_skill/%s' % self.skill_id_1,
-                expected_status_int=401)
         self.assertEqual(
             response['error'],
             'You must be logged in to access this resource.')
@@ -2571,7 +2499,6 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock_edit_skill/<skill_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        skill_services.create_new_skill_rights(self.skill_id, self.admin_id)
 
     def test_cannot_edit_skill_with_invalid_skill_id(self):
         self.login(self.ADMIN_EMAIL)
@@ -2588,29 +2515,13 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_admin_can_edit_other_public_skill(self):
-        skill_services.publish_skill(self.skill_id, self.admin_id)
         self.login(self.second_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
         self.assertEqual(response['skill_id'], self.skill_id)
         self.logout()
 
-    def test_admin_can_not_edit_other_private_skill(self):
-        self.login(self.second_admin_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401)
-        self.logout()
-
-    def test_topic_manager_can_not_edit_private_skill(self):
-        self.login(self.manager_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock_edit_skill/%s' % self.skill_id, expected_status_int=401)
-        self.logout()
-
     def test_topic_manager_can_edit_public_skill(self):
-        skill_services.publish_skill(self.skill_id, self.admin_id)
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_skill/%s' % self.skill_id)
@@ -2618,7 +2529,6 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_normal_user_can_not_edit_public_skill(self):
-        skill_services.publish_skill(self.skill_id, self.admin_id)
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
@@ -2654,14 +2564,16 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email('a@example.com')
+        self.question_id = 'question_id'
+        self.save_new_question(
+            self.question_id, self.owner_id,
+            self._create_valid_question_data('ABC'), ['skill_1'])
 
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
                 '/mock_edit_question/<question_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        question_services.create_new_question_rights(
-            self.question_id, self.ADMIN_EMAIL)
 
     def test_guest_cannot_edit_question(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -2896,7 +2808,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_can_edit_question_with_valid_question_id(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_QUESTION, self.question_id))
@@ -2908,8 +2820,11 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL)
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, self.admin_id, 'Name', 'Description',
-            [], [], [], [], 1)
+            topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_TOPIC, topic_id))
@@ -2920,7 +2835,7 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
     def test_can_edit_skill(self):
         self.login(self.ADMIN_EMAIL)
         skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(skill_id, self.admin_id, 'Description')
+        self.save_new_skill(skill_id, self.admin_id, description='Description')
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_SKILL, skill_id))
@@ -2936,8 +2851,11 @@ class EditEntityDecoratorTests(test_utils.GenericTestBase):
             story_id, self.admin_id, 'Title', 'Description', 'Notes',
             topic_id)
         self.save_new_topic(
-            topic_id, self.admin_id, 'Name', 'Description',
-            [story_id], [], [], [], 1)
+            topic_id, self.admin_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[story_id],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock_edit_entity/%s/%s' % (
                 feconf.ENTITY_TYPE_STORY, story_id))

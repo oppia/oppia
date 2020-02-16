@@ -31,8 +31,8 @@ require(
 
 require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
-require('services/PageTitleService.ts');
-require('services/contextual/UrlService.ts');
+require('services/page-title.service.ts');
+require('services/contextual/url.service.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
@@ -55,15 +55,19 @@ angular.module('oppia').directive('topicEditorPage', [
             TopicEditorStateService, UrlService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           var ctrl = this;
-          ctrl.getActiveTabName = TopicEditorRoutingService.getActiveTabName;
-          TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+          ctrl.getActiveTabName = function() {
+            return TopicEditorRoutingService.getActiveTabName();
+          };
 
           var setPageTitle = function() {
             PageTitleService.setPageTitle(
               TopicEditorStateService.getTopic().getName() + ' - Oppia');
           };
-          $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
+          ctrl.$onInit = function() {
+            TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+            $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
+            $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
+          };
         }
       ]
     };
