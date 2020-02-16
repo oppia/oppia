@@ -55,10 +55,6 @@ export class FeedbackThread {
     this.messages = [];
   }
 
-  getMessages(): ThreadMessage[] {
-    return this.messages;
-  }
-
   setMessages(messages: ThreadMessage[]): void {
     this.messages = messages;
     // Since messages have been updated, we need to update all of our other
@@ -69,6 +65,10 @@ export class FeedbackThread {
       let i = nonemptyMessages.length - 1;
       this.lastNonemptyMessageSummary = nonemptyMessages[i].getSummary();
     }
+  }
+
+  getMessages(): ThreadMessage[] {
+    return this.messages;
   }
 
   isSuggestionThread(): boolean {

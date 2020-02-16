@@ -214,6 +214,10 @@ import { TextInputValidationService } from
 import { ThreadStatusDisplayService } from
   // eslint-disable-next-line max-len
   'pages/exploration-editor-page/feedback-tab/services/thread-status-display.service';
+import { ThreadMessageObjectFactory } from
+  'domain/feedback_message/ThreadMessageObjectFactory';
+import { ThreadMessageSummaryObjectFactory } from
+  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 import { TopicObjectFactory } from
   'domain/topic/TopicObjectFactory';
 import { TopicSummaryObjectFactory } from
@@ -312,6 +316,10 @@ export class UpgradedServices {
     upgradedServices['SuggestionObjectFactory'] = new SuggestionObjectFactory();
     upgradedServices['ThreadStatusDisplayService'] =
       new ThreadStatusDisplayService();
+    upgradedServices['ThreadMessageSummaryObjectFactory'] =
+      new ThreadMessageSummaryObjectFactory();
+    upgradedServices['ThreadMessageObjectFactory'] =
+      new ThreadMessageObjectFactory();
     upgradedServices['UnitsObjectFactory'] = new UnitsObjectFactory();
     upgradedServices['UserInfoObjectFactory'] = new UserInfoObjectFactory();
     upgradedServices['UtilsService'] = new UtilsService();

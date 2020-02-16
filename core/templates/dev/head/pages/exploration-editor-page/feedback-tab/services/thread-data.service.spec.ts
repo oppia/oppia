@@ -19,32 +19,19 @@
 
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // thread-data.service.ts is upgraded to Angular 8.
-import { FeedbackThreadObjectFactory } from
-  'domain/feedback_thread/FeedbackThreadObjectFactory';
-import { SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-
-import { TranslatorProviderForTests } from 'tests/test.extras';
 
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
 describe('retrieving threads service', function() {
+  var $httpBackend;
+  var FeedbackThreadObjectFactory;
+  var SuggestionObjectFactory;
+  var ThreadDataService;
+
   var expId = '12345';
-  beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
-  beforeEach(function() {
-    angular.mock.module('oppia');
-    angular.mock.module(function($provide) {
-      $provide.value('ExplorationDataService', {
-        explorationId: expId
-      });
-      $provide.value(
-        'FeedbackThreadObjectFactory', new FeedbackThreadObjectFactory());
-      $provide.value('SuggestionObjectFactory', new SuggestionObjectFactory());
-    });
-  });
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -52,10 +39,13 @@ describe('retrieving threads service', function() {
     }
   }));
 
-  var ThreadDataService, $httpBackend;
-  beforeEach(angular.mock.inject(function(_$httpBackend_, _ThreadDataService_) {
-    ThreadDataService = _ThreadDataService_;
+  beforeEach(angular.mock.inject(function(
+      _$httpBackend_, _FeedbackThreadObjectFactory_, _SuggestionObjectFactory_,
+      _ThreadDataService_) {
     $httpBackend = _$httpBackend_;
+    FeedbackThreadObjectFactory = _FeedbackThreadObjectFactory_;
+    SuggestionObjectFactory = _SuggestionObjectFactory_;
+    ThreadDataService = _ThreadDataService_;
   }));
 
   it('should retrieve feedback threads', function(done) {
@@ -125,7 +115,6 @@ describe('retrieving threads service', function() {
     $httpBackend.whenGET(
       '/suggestionlisthandler?target_type=exploration&target_id=' + expId
     ).respond({ suggestions: mockSuggestions });
-
 
     ThreadDataService.fetchThreads().then(threadData => {
       for (let feedbackThread of mockFeedbackThreads) {
