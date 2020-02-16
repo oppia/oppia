@@ -17,18 +17,18 @@
  */
 
 import { ThreadMessageObjectFactory } from
-  'domain/feedback_thread/ThreadMessageObjectFactory';
+  'domain/feedback_message/ThreadMessageObjectFactory';
 
 describe('Feedback thread object factory', () => {
-  let ThreadMessageObjectFactory: ThreadMessageObjectFactory;
+  let factory: ThreadMessageObjectFactory;
 
   beforeEach(() => {
-    ThreadMessageObjectFactory = new ThreadMessageObjectFactory();
+    factory = new ThreadMessageObjectFactory();
   });
 
   describe('createFromBackendDict', () => {
     it('should create a new feedback thread from a backend dict.', () => {
-      var threadMessageBackendDict = {
+      var threadMessage = factory.createFromBackendDict({
         author_username: 'author',
         created_on: 1000,
         entity_type: 'exploration',
@@ -38,10 +38,8 @@ describe('Feedback thread object factory', () => {
         text: 'message content',
         updated_status: null,
         updated_subject: null
-      };
+      });
 
-      var threadMessage = ThreadMessageObjectFactory.createFromBackendDict(
-        threadMessageBackendDict);
       expect(threadMessage.authorUsername).toEqual('author');
       expect(threadMessage.createdOn).toEqual(1000);
       expect(threadMessage.entityType).toEqual('exploration');
@@ -56,7 +54,7 @@ describe('Feedback thread object factory', () => {
 
   describe('.hasSubjectUpdate()', () => {
     it('is true when updatedStatus is non-null', () => {
-      var threadMessage = ThreadMessageObjectFactory.createFromBackendDict({
+      var threadMessage = factory.createFromBackendDict({
         updated_subject: 'a new descriptive subject!',
 
         author_username: 'author',
@@ -73,7 +71,7 @@ describe('Feedback thread object factory', () => {
     });
 
     it('is true when text is empty string', () => {
-      var threadMessage = ThreadMessageObjectFactory.createFromBackendDict({
+      var threadMessage = factory.createFromBackendDict({
         updated_subject: null,
 
         author_username: 'author',
@@ -92,7 +90,7 @@ describe('Feedback thread object factory', () => {
 
   describe('.hasStatusUpdate()', () => {
     it('is true when updatedStatus is non-null', () => {
-      var threadMessage = ThreadMessageObjectFactory.createFromBackendDict({
+      var threadMessage = factory.createFromBackendDict({
         updated_status: 'open',
 
         author_username: 'author',
@@ -109,7 +107,7 @@ describe('Feedback thread object factory', () => {
     });
 
     it('is true when text is empty string', () => {
-      var threadMessage = ThreadMessageObjectFactory.createFromBackendDict({
+      var threadMessage = factory.createFromBackendDict({
         updated_status: null,
 
         author_username: 'author',
@@ -128,7 +126,7 @@ describe('Feedback thread object factory', () => {
 
   describe('.isNotempty()', () => {
     it('is true when text is empty string', () => {
-      var threadMessage = ThreadMessageObjectFactory.createFromBackendDict({
+      var threadMessage = factory.createFromBackendDict({
         text: 'nonempty!',
 
         author_username: 'author',
@@ -145,7 +143,7 @@ describe('Feedback thread object factory', () => {
     });
 
     it('is true when text is empty string', () => {
-      var threadMessage = ThreadMessageObjectFactory.createFromBackendDict({
+      var threadMessage = factory.createFromBackendDict({
         text: '',
 
         author_username: 'author',
