@@ -20,6 +20,8 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { ThreadMessage } from
+  'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummary } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
@@ -33,10 +35,7 @@ export class FeedbackThread {
   stateName: string;
   threadId: string;
   lastNonemptyMessageSummary: ThreadMessageSummary;
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'messages' is an array of dicts with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  messages: any[];
+  messages: ThreadMessage[];
 
   constructor(
       status: string, subject: string, summary: string,
@@ -56,11 +55,15 @@ export class FeedbackThread {
     this.messages = [];
   }
 
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'messages' is an array of dicts with underscore_cased keys
-  // which give tslint errors against underscore_casing in favor of camelCasing.
-  setMessages(messages: any[]): void {
+  setMessages(messages: ThreadMessage[]): void {
     this.messages = messages;
+    // Since messages have been updated, we need to update our last nonempty
+    // message as well to maintain consistency between them.
+    let nonemptyMessages = messages.filter(m => m.isNonempty());
+    if (nonemptyMessages.length > 0) {
+      let i = nonemptyMessages.length - 1;
+      this.lastNonemptyMessageSummary = nonemptyMessages[i].getSummary();
+    }
   }
 
   isSuggestionThread(): boolean {

@@ -20,11 +20,12 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
 
-import { Suggestion, SuggestionObjectFactory } from
-  'domain/suggestion/SuggestionObjectFactory';
-
+import { ThreadMessage } from
+  'domain/feedback_message/ThreadMessageObjectFactory';
 import { ThreadMessageSummary } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+import { Suggestion, SuggestionObjectFactory } from
+  'domain/suggestion/SuggestionObjectFactory';
 
 class SuggestionThread {
   status: string;
@@ -36,8 +37,7 @@ class SuggestionThread {
   threadId: string;
   suggestion: Suggestion;
   lastNonemptyMessageSummary: ThreadMessageSummary;
-  // TODO(#7165): Replace any with exact type.
-  messages: Array<any>;
+  messages: ThreadMessage[];
 
   constructor(
       status: string, subject: string, summary: string,
@@ -57,13 +57,18 @@ class SuggestionThread {
     this.messages = [];
   }
 
-  // TODO(#7165): Replace any with exact type.
-  setMessages(messages: Array<any>): void {
+  setMessages(messages: ThreadMessage[]): void {
     this.messages = messages;
+    // Since messages have been updated, we need to update our last nonempty
+    // message as well to maintain consistency between them.
+    let nonemptyMessages = messages.filter(m => m.isNonempty());
+    if (nonemptyMessages.length > 0) {
+      let i = nonemptyMessages.length - 1;
+      this.lastNonemptyMessageSummary = nonemptyMessages[i].getSummary();
+    }
   }
 
-  // TODO(#7165): Replace any with exact type.
-  getMessages(): Array<any> {
+  getMessages(): ThreadMessage[] {
     return this.messages;
   }
 

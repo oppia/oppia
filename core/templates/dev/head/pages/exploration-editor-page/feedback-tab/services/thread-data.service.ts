@@ -29,11 +29,13 @@ require(
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
-  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
+  'ThreadMessageObjectFactory', 'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED',
+  'STATUS_IGNORED', 'STATUS_OPEN',
   function(
       $http, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
-      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
+      ThreadMessageObjectFactory, ACTION_ACCEPT_SUGGESTION, STATUS_FIXED,
+      STATUS_IGNORED, STATUS_OPEN) {
     let expId = ExplorationDataService.explorationId;
     let FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + expId;
     let FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
@@ -68,7 +70,6 @@ angular.module('oppia').factory('ThreadDataService', [
         throw Error(
           'Suggestion thread (id: "' + threadId + '") has no suggestion');
       }
-
       return threadsById[threadId] =
         SuggestionThreadObjectFactory.createFromBackendDicts(
           threadBackendDict, suggestionBackendDictsByThreadId[threadId]);
@@ -82,6 +83,7 @@ angular.module('oppia').factory('ThreadDataService', [
       getThread: function(threadId) {
         return getThreadById(threadId);
       },
+
       fetchThreads: function() {
         let suggestionPromise = $http.get(SUGGESTION_LIST_HANDLER_URL, {
           params: { target_type: 'exploration', target_id: expId }
@@ -103,20 +105,25 @@ angular.module('oppia').factory('ThreadDataService', [
           };
         });
       },
+
       fetchMessages: function(thread) {
         let threadId = thread.threadId;
         return $http.get(THREAD_HANDLER_URL + '/' + threadId).then(response => {
-          thread.setMessages(response.data.messages);
+          thread.setMessages(response.data.messages.map(
+            ThreadMessageObjectFactory.createFromBackendDict));
         });
       },
+
       fetchFeedbackStats: function() {
         return $http.get(FEEDBACK_STATS_HANDLER_URL).then(response => {
           openThreadsCount = response.data.num_open_threads;
         });
       },
+
       getOpenThreadsCount: function() {
         return openThreadsCount;
       },
+
       createNewThread: function(newSubject, newText) {
         return $http.post(THREAD_LIST_HANDLER_URL, {
           state_name: null,
@@ -129,12 +136,14 @@ angular.module('oppia').factory('ThreadDataService', [
           AlertsService.addWarning('Error creating new thread: ' + err + '.');
         });
       },
+
       markThreadAsSeen: function(thread) {
         let threadId = thread.threadId;
         return $http.post(FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
           thread_id: threadId
         });
       },
+
       addNewMessage: function(thread, newMessage, newStatus) {
         let threadId = thread.threadId;
         let oldStatus = thread.status;
@@ -153,6 +162,7 @@ angular.module('oppia').factory('ThreadDataService', [
           return this.fetchMessages(thread);
         });
       },
+
       resolveSuggestion: function(
           thread, action, commitMsg, reviewMsg, audioUpdateRequired) {
         let threadId = thread.threadId;
