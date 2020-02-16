@@ -145,7 +145,14 @@ export = {
     "is_lesson_related": true,
     "is_block_element": false,
     "customization_arg_specs": [{
-      "name": "skill_summary",
+      "name": "text",
+      "description": "Enter the link text to be displayed",
+      "schema": {
+        "type": "unicode"
+      },
+      "default_value": ""
+    }, {
+      "name": "skill_id",
       "description": "Click on skill to view concept card.",
       "schema": {
         "type": "custom",

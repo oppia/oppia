@@ -134,13 +134,12 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
     def test_skillreview_validation(self):
         """Tests skillreview component validation."""
         valid_items = [{
-            'skill_summary-with-value':
-                '{\'id\': \'skill_id\', \'description\': '
-                '\'skill_description\'}',
+            'skill_id-with-value': 'skill_id',
+            'text-with-value': 'Skill Link Text'
         }]
         invalid_items = [{
-            'skill_summary-with-value': 'javascript:alert(5);',
-            'text-with-value': 'Hello'
+            'skill_id-with-value': 20,
+            'url-with-value': 'Hello'
         }]
 
         self.check_validation(

@@ -33,11 +33,11 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
         '$attrs', '$uibModal', 'ContextService', 'ENTITY_TYPE',
         function($attrs, $uibModal, ContextService, ENTITY_TYPE) {
           var ctrl = this;
-          var skillSummary = HtmlEscaperService.escapedJsonToObj(
-            $attrs.skillSummaryWithValue);
+          var skillId = HtmlEscaperService.escapedJsonToObj(
+            $attrs.skillIdWithValue);
+          ctrl.linkText = HtmlEscaperService.escapedJsonToObj(
+            $attrs.textWithValue);
           ctrl.openConceptCard = function() {
-            var skillId = skillSummary.id;
-            var skillDescription = ctrl.skillDescription;
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             // The catch at the end was needed according to this thread:
             // https://github.com/angular-ui/bootstrap/issues/6501, where in
@@ -54,7 +54,7 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
                     $scope, $uibModalInstance) {
                   $scope.skillIds = [skillId];
                   $scope.index = 0;
-                  $scope.currentSkill = skillDescription;
+                  $scope.modalHeader = 'Concept Card';
                   $scope.isInTestMode = false;
 
                   $scope.closeModal = function() {
@@ -68,9 +68,6 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
                 throw res;
               }
             });
-          };
-          ctrl.$onInit = function() {
-            ctrl.skillDescription = skillSummary.description;
           };
         }
       ]

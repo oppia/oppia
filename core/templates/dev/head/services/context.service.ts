@@ -35,7 +35,7 @@ export class ContextService {
     private entityContextObjectFactory: EntityContextObjectFactory) {}
 
   pageContext = null;
-  contextIsLessonRelated = false;
+  explorationIsLinkedToStory = false;
   explorationId = null;
   questionId = null;
   editorContext = null;
@@ -114,14 +114,16 @@ export class ContextService {
     return (
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR ||
-      this.getPageContext() ===
-        ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR &&
-        this.contextIsLessonRelated
+      (
+        this.getPageContext() === (
+          ServicesConstants.PAGE_CONTEXT.EXPLORATION_EDITOR) &&
+        this.explorationIsLinkedToStory
+      )
     );
   }
 
-  setContextIsLessonRelated(): void {
-    this.contextIsLessonRelated = true;
+  setExplorationIsLinkedToStory(): void {
+    this.explorationIsLinkedToStory = true;
   }
 
   isInExplorationContext(): boolean {

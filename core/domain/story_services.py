@@ -26,7 +26,6 @@ from __future__ import unicode_literals  # pylint: disable=import-only-modules
 import logging
 
 from core.domain import exp_fetchers
-from core.domain import exp_services
 from core.domain import opportunity_services
 from core.domain import story_domain
 from core.domain import story_fetchers
@@ -35,8 +34,8 @@ from core.platform import models
 import feconf
 import utils
 
-(story_models, user_models,) = models.Registry.import_models(
-    [models.NAMES.story, models.NAMES.user])
+(exp_models, story_models, user_models,) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.story, models.NAMES.user])
 memcache_services = models.Registry.import_memcache_services()
 
 
@@ -102,9 +101,13 @@ def apply_change_list(story_id, change_list):
             story.
 
     Returns:
-        Story. The resulting story domain object.
+        Story, list(str), list(str). The resulting story domain object, the
+            exploration IDs removed from story and the exploration IDs added to
+            the story.
     """
     story = story_fetchers.get_story_by_id(story_id)
+    exp_ids_removed_from_story = []
+    exp_ids_added_to_story = []
     try:
         for change in change_list:
             if not isinstance(change, story_domain.StoryChange):
@@ -114,8 +117,11 @@ def apply_change_list(story_id, change_list):
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
                 for node in story.story_contents.nodes:
                     if node.id == change.node_id:
-                        exp_services.update_exploration_story_link(
-                            node.exploration_id, None, story.id)
+                        if node.exploration_id in exp_ids_added_to_story:
+                            exp_ids_added_to_story = [
+                                exp_id for exp_id in exp_ids_added_to_story
+                                if exp_id != node.exploration_id]
+                        exp_ids_removed_from_story.append(node.exploration_id)
                         break
                 story.delete_node(change.node_id)
             elif (change.cmd ==
@@ -147,8 +153,12 @@ def apply_change_list(story_id, change_list):
                       story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
                     story.update_node_exploration_id(
                         change.node_id, change.new_value)
-                    exp_services.update_exploration_story_link(
-                        change.old_value, change.new_value, story.id)
+                    if change.old_value in exp_ids_added_to_story:
+                        exp_ids_added_to_story = [
+                            exp_id for exp_id in exp_ids_added_to_story
+                            if exp_id != change.old_value]
+                    exp_ids_removed_from_story.append(change.old_value)
+                    exp_ids_added_to_story.append(change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
@@ -174,7 +184,7 @@ def apply_change_list(story_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # story is sufficient to apply the schema migration.
                 continue
-        return story
+        return story, exp_ids_removed_from_story, exp_ids_added_to_story
 
     except Exception as e:
         logging.error(
@@ -297,8 +307,24 @@ def update_story(
         raise ValueError('Expected a commit message but received none.')
 
     old_story = story_fetchers.get_story_by_id(story_id)
-    new_story = apply_change_list(story_id, change_list)
+    new_story, exp_ids_removed_from_story, exp_ids_added_to_story = (
+        apply_change_list(story_id, change_list))
     _save_story(committer_id, new_story, commit_message, change_list)
+
+    exploration_context_models_to_be_deleted = (
+        exp_models.ExplorationContextModel.get_multi(
+            exp_ids_removed_from_story))
+    exploration_context_models_to_be_deleted = [
+        model for model in exploration_context_models_to_be_deleted
+        if model is not None]
+    exp_models.ExplorationContextModel.delete_multi(
+        exploration_context_models_to_be_deleted)
+
+    new_exploration_context_models = [exp_models.ExplorationContextModel(
+        id=exp_id,
+        story_id=story_id
+    ) for exp_id in exp_ids_added_to_story]
+    exp_models.ExplorationContextModel.put_multi(new_exploration_context_models)
     create_story_summary(new_story.id)
     opportunity_services.update_exploration_opportunities(old_story, new_story)
 
@@ -321,9 +347,18 @@ def delete_story(committer_id, story_id, force_deletion=False):
     story_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_STORY_DELETED,
         force_deletion=force_deletion)
+    exp_ids_to_be_removed = []
     for node in story.story_contents.nodes:
-        exp_services.update_exploration_story_link(
-            node.exploration_id, None, story.id)
+        exp_ids_to_be_removed.append(node.exploration_id)
+
+    exploration_context_models_to_be_deleted = (
+        exp_models.ExplorationContextModel.get_multi(
+            exp_ids_to_be_removed))
+    exploration_context_models_to_be_deleted = [
+        model for model in exploration_context_models_to_be_deleted
+        if model is not None]
+    exp_models.ExplorationContextModel.delete_multi(
+        exploration_context_models_to_be_deleted)
 
     # This must come after the story is retrieved. Otherwise the memcache
     # key will be reinstated.
