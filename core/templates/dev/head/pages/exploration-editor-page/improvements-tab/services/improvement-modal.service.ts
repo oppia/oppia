@@ -298,7 +298,7 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'feedback-thread-modal.template.html'),
           resolve: {
-            messages: ThreadDataService.fetchMessages(thread.threadId),
+            messages: ThreadDataService.fetchMessages(thread),
             isUserLoggedIn: function() {
               return UserService.getUserInfoAsync().then(function(userInfo) {
                 return userInfo.isLoggedIn();
@@ -342,8 +342,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                   return;
                 }
                 $scope.messageSendingInProgress = true;
-                ThreadDataService.addNewMessage(
-                  threadId, tmpText, tmpStatus, function() {
+                ThreadDataService.addNewMessage(thread, tmpText, tmpStatus)
+                  .then(() => {
                     $scope.tmpMessage.status = $scope.activeThread.status;
                     $scope.messageSendingInProgress = false;
                   }, function() {
@@ -367,7 +367,7 @@ angular.module('oppia').factory('ImprovementModalService', [
             '/pages/exploration-editor-page/improvements-tab/templates/' +
             'suggestion-thread-modal.template.html'),
           resolve: {
-            messages: ThreadDataService.fetchMessages(thread.threadId),
+            messages: ThreadDataService.fetchMessages(thread),
             isUserLoggedIn: function() {
               return UserService.getUserInfoAsync().then(function(userInfo) {
                 return userInfo.isLoggedIn();
@@ -413,8 +413,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                   return;
                 }
                 $scope.messageSendingInProgress = true;
-                ThreadDataService.addNewMessage(
-                  threadId, tmpText, tmpStatus, function() {
+                ThreadDataService.addNewMessage(thread, tmpText, tmpStatus)
+                  .then(() => {
                     $scope.tmpMessage.status = $scope.activeThread.status;
                     $scope.messageSendingInProgress = false;
                   }, function() {

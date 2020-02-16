@@ -105,7 +105,7 @@ angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
        */
       fetchTasks: function() {
         var createNew = this.createNew;
-        return ThreadDataService.fetchThreads(true)
+        return ThreadDataService.fetchThreads()
           .then(threadData => threadData.suggestionThreads.map(createNew));
       },
     };

@@ -72,10 +72,8 @@ angular.module('oppia').directive('feedbackTab', [
           };
           // Fetches the threads again if any thread is updated.
           ctrl.fetchUpdatedThreads = function() {
-            var threadPromise = ThreadDataService.fetchThreads().then(data => {
-              ctrl.threadData = data;
-              return data;
-            });
+            var threadPromise = ThreadDataService.fetchThreads()
+              .then(data => ctrl.threadData = data);
             ctrl.threadIsStale = false;
             return threadPromise;
           };
@@ -121,7 +119,7 @@ angular.module('oppia').directive('feedbackTab', [
               }]
             }).result.then(function(result) {
               ThreadDataService.createNewThread(
-                result.newThreadSubject, result.newThreadText, function() {
+                result.newThreadSubject, result.newThreadText).then(() => {
                   ctrl.clearActiveThread();
                   AlertsService.addSuccessMessage('Feedback thread created.');
                 });
@@ -179,8 +177,9 @@ angular.module('oppia').directive('feedbackTab', [
             }
             ctrl.threadIsStale = true;
             ctrl.messageSendingInProgress = true;
-            ThreadDataService.addNewMessage(
-              threadId, tmpText, tmpStatus, function() {
+            let thread = ThreadDataService.getThread(threadId);
+            ThreadDataService.addNewMessage(thread, tmpText, tmpStatus)
+              .then(() => {
                 _resetTmpMessageFields();
                 ctrl.messageSendingInProgress = false;
               }, function() {
@@ -189,17 +188,9 @@ angular.module('oppia').directive('feedbackTab', [
           };
 
           ctrl.setActiveThread = function(threadId) {
-            ThreadDataService.fetchMessages(threadId);
-            ThreadDataService.markThreadAsSeen(threadId);
-            var allThreads = [].concat(
-              ctrl.threadData.feedbackThreads,
-              ctrl.threadData.suggestionThreads);
-            for (var i = 0; i < allThreads.length; i++) {
-              if (allThreads[i].threadId === threadId) {
-                ctrl.activeThread = allThreads[i];
-                break;
-              }
-            }
+            ctrl.activeThread = ThreadDataService.getThread(threadId);
+            ThreadDataService.fetchMessages(ctrl.activeThread);
+            ThreadDataService.markThreadAsSeen(ctrl.activeThread);
             ctrl.tmpMessage.status = ctrl.activeThread.status;
           };
           ctrl.getLabelClass = function(status) {
