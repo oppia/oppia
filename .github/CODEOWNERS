@@ -196,7 +196,7 @@
 /core/templates/dev/head/components/forms/ @bansalnitish
 /core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @bansalnitish
 /core/templates/dev/head/components/ck-editor-helpers/customize-rte-component-modal.template.html @bansalnitish
-/core/templates/dev/head/services/schema-default-value.service.ts @bansalnitish
+/core/templates/dev/head/services/schema-default-value.service*.ts @bansalnitish
 /core/templates/dev/head/services/schema-undefined-last-element.service*.ts @bansalnitish
 
 
@@ -332,7 +332,7 @@
 /core/templates/dev/head/domain/review_test/ @nishantwrp @sophiewu6 @vinitamurthi
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi
-/core/templates/dev/head/services/questions-list.service.ts @sophiewu6 @vinitamurthi
+/core/templates/dev/head/services/questions-list.service*.ts @sophiewu6 @vinitamurthi
 /core/templates/dev/head/components/question-directives/question-editor/ @aks681 @vinitamurthi
 /core/templates/dev/head/components/question-directives/questions-list/ @aks681 @vinitamurthi
 /core/templates/dev/head/components/question-directives/modal-templates/ @aks681 @vinitamurthi
