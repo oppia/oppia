@@ -55,6 +55,10 @@ export class FeedbackThread {
     this.messages = [];
   }
 
+  getMessages(): ThreadMessage[] {
+    return this.messages;
+  }
+
   setMessages(messages: ThreadMessage[]): void {
     this.messages = messages;
     // Since messages have been updated, we need to update our last nonempty

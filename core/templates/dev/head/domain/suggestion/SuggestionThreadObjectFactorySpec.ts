@@ -20,9 +20,12 @@ import { TestBed } from '@angular/core/testing';
 
 import { SuggestionThreadObjectFactory } from
   'domain/suggestion/SuggestionThreadObjectFactory';
+import { ThreadMessageObjectFactory } from
+  'domain/feedback_message/ThreadMessageObjectFactory';
 
 describe('Suggestion thread object factory', () => {
   let suggestionThreadObjectFactory: SuggestionThreadObjectFactory = null;
+  let threadMessageObjectFactory: ThreadMessageObjectFactory = null;
   let suggestionThreadBackendDict;
   let suggestionBackendDict;
 
@@ -58,6 +61,7 @@ describe('Suggestion thread object factory', () => {
     };
 
     suggestionThreadObjectFactory = TestBed.get(SuggestionThreadObjectFactory);
+    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
   });
 
   it('should create a new suggestion thread from a backend dict.', () => {
@@ -124,15 +128,29 @@ describe('Suggestion thread object factory', () => {
       null);
   });
 
-  it('should handle message getter and setter.', () => {
-    let suggestionThread = suggestionThreadObjectFactory.createFromBackendDicts(
-      suggestionThreadBackendDict, suggestionBackendDict);
+  describe('.setMessages', () => {
+    it('should handle message getter and setter.', () => {
+      let suggestionThread =
+        suggestionThreadObjectFactory.createFromBackendDicts(
+          suggestionThreadBackendDict, suggestionBackendDict);
 
-    expect(suggestionThread.getMessages().length).toBe(0);
+      expect(suggestionThread.getMessages()).toEqual([]);
 
-    let messages = [{ text: 'message1' }, { text: 'message2' }];
-    suggestionThread.setMessages(messages);
+      let messages = [
+        threadMessageObjectFactory.createFromBackendDict(
+          { author_username: 'author1', text: 'message1' }),
+        threadMessageObjectFactory.createFromBackendDict(
+          { author_username: 'author2', text: 'message2' })
+      ];
 
-    expect(suggestionThread.getMessages()).toEqual(messages);
+      suggestionThread.setMessages(messages);
+
+      expect(suggestionThread.messages).toEqual(messages);
+      expect(suggestionThread.messageCount).toEqual(2);
+      expect(suggestionThread.lastNonemptyMessageSummary.authorUsername)
+        .toEqual('author2');
+      expect(suggestionThread.lastNonemptyMessageSummary.text)
+        .toEqual('author2');
+    });
   });
 });

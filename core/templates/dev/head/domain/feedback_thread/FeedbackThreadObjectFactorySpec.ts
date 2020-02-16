@@ -16,14 +16,20 @@
  * @fileoverview Unit tests for FeedbackThreadObjectFactory.
  */
 
+import { TestBed } from '@angular/core/testing';
+
 import { FeedbackThreadObjectFactory } from
   'domain/feedback_thread/FeedbackThreadObjectFactory';
+import { ThreadMessageObjectFactory } from
+  'domain/feedback_message/ThreadMessageObjectFactory';
 
 describe('Feedback thread object factory', () => {
   let feedbackThreadObjectFactory: FeedbackThreadObjectFactory;
+  let threadMessageObjectFactory: ThreadMessageObjectFactory;
 
   beforeEach(() => {
-    feedbackThreadObjectFactory = new FeedbackThreadObjectFactory();
+    feedbackThreadObjectFactory = TestBed.get(FeedbackThreadObjectFactory);
+    threadMessageObjectFactory = TestBed.get(ThreadMessageObjectFactory);
   });
 
   it('should create a new feedback thread from a backend dict.', () => {
@@ -55,9 +61,40 @@ describe('Feedback thread object factory', () => {
       .toEqual('author');
     expect(feedbackThread.lastNonemptyMessageSummary.text)
       .toEqual('tenth message');
+  });
 
-    var messages = [{ text: 'message1' }, { text: 'message2' }];
-    feedbackThread.setMessages(messages);
-    expect(feedbackThread.messages).toEqual(messages);
+  describe('.setMessages', () => {
+    it('updates message-related fields', () => {
+      let feedbackThread = feedbackThreadObjectFactory.createFromBackendDict({
+        last_updated: 1000,
+        original_author_username: 'author',
+        status: 'accepted',
+        subject: 'sample subject',
+        summary: 'sample summary',
+        message_count: 10,
+        state_name: 'state 1',
+        thread_id: 'exp1.thread1',
+        last_nonempty_message_author: 'author',
+        last_nonempty_message_text: 'tenth message'
+      });
+
+      expect(feedbackThread.getMessages()).toEqual([]);
+
+      let messages = [
+        threadMessageObjectFactory.createFromBackendDict(
+          { author_username: 'author1', text: 'message1' }),
+        threadMessageObjectFactory.createFromBackendDict(
+          { author_username: 'author2', text: 'message2' })
+      ];
+
+      feedbackThread.setMessages(messages);
+
+      expect(feedbackThread.messages).toEqual(messages);
+      expect(feedbackThread.messageCount).toEqual(2);
+      expect(feedbackThread.lastNonemptyMessageSummary.authorUsername)
+        .toEqual('author2');
+      expect(feedbackThread.lastNonemptyMessageSummary.text)
+        .toEqual('author2');
+    });
   });
 });
