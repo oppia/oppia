@@ -36,7 +36,7 @@ angular.module('oppia').factory('ThreadDataService', [
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       ThreadMessageObjectFactory, ACTION_ACCEPT_SUGGESTION, STATUS_FIXED,
       STATUS_IGNORED, STATUS_OPEN) {
-    let expId = ExplorationDataService.explorationId;
+    let expId = ExplorationDataService.getExplorationId();
     let FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + expId;
     let FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
     let SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' + expId;

@@ -25,12 +25,6 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
 describe('retrieving threads service', function() {
-  var $httpBackend;
-  var ExplorationDataService;
-  var ThreadDataService;
-
-  var expId = 'exp1';
-
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -40,13 +34,15 @@ describe('retrieving threads service', function() {
 
   beforeEach(angular.mock.inject(function(
       _$httpBackend_, _ExplorationDataService_, _ThreadDataService_) {
-    $httpBackend = _$httpBackend_;
-    ExplorationDataService = _ExplorationDataService_;
-    ThreadDataService = _ThreadDataService_;
+    this.$httpBackend = _$httpBackend_;
+    this.ExplorationDataService = _ExplorationDataService_;
+    this.ThreadDataService = _ThreadDataService_;
   }));
 
   beforeEach(() => {
-    ExplorationDataService.explorationId = expId;
+    this.expId = 'exp1';
+    spyOn(this.ExplorationDataService, 'getExplorationId')
+      .and.returnValue(this.expId);
   });
 
   it('should retrieve feedback threads', function(done) {
@@ -70,16 +66,24 @@ describe('retrieving threads service', function() {
         thread_id: 'exploration.exp1.def2'
       }
     ];
-
+    var mockSuggestionThreads = [
+      {
+        description: 'Suggestion',
+        last_updated: 1441870501231.642,
+        original_author_username: 'test_learner',
+        state_name: null,
+        status: 'open',
+        subject: 'Suggestion from a learner',
+        summary: null,
+        thread_id: 'exploration.exp1.ghi3'
+      }
+    ];
     var mockSuggestions = [
       {
         assigned_reviewer_id: null,
         author_name: 'author_1',
         change: {
-          new_value: {
-            html: 'new content html',
-            audio_translation: {}
-          },
+          new_value: { html: 'new content html', audio_translation: {} },
           old_value: null,
           cmd: 'edit_state_property',
           state_name: 'state_1',
@@ -93,38 +97,24 @@ describe('retrieving threads service', function() {
         suggestion_type: 'edit_exploration_state_content',
         target_id: 'exp1',
         target_type: 'exploration',
-        target_version_at_submission: 1,
-      }
-    ];
-    var mockSuggestionThreads = [
-      {
-        description: 'Suggestion',
-        last_updated: 1441870501231.642,
-        original_author_username: 'test_learner',
-        state_name: null,
-        status: 'open',
-        subject: 'Suggestion from a learner',
-        summary: null,
-        thread_id: 'exploration.exp1.ghi3'
+        target_version_at_submission: 1
       }
     ];
 
-    $httpBackend.whenGET('/threadlisthandler/' + expId).respond({
+    this.$httpBackend.whenGET('/threadlisthandler/' + this.expId).respond({
       feedback_thread_dicts: mockFeedbackThreads,
       suggestion_thread_dicts: mockSuggestionThreads
     });
-    $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId)
+    this.$httpBackend.whenGET(
+      '/suggestionlisthandler?target_type=exploration&target_id=' + this.expId)
       .respond({ suggestions: mockSuggestions });
 
-    ThreadDataService.fetchThreads().then(threadData => {
-      let [feedbackThreads, suggestionThreads] = threadData;
-      expect(feedbackThreads.map(t => t.threadId))
+    this.ThreadDataService.fetchThreads().then(threadData => {
+      expect(threadData.feedbackThreads.map(t => t.threadId))
         .toEqual(['exploration.exp1.abc1', 'exploration.exp1.def2']);
-      expect(suggestionThreads.map(t => t.threadId))
+      expect(threadData.suggestionThreads.map(t => t.threadId))
         .toEqual(['exploration.exp1.ghi3']);
-      done();
-    }, done.fail);
-    $httpBackend.flush();
+    }).then(done, done.fail);
+    this.$httpBackend.flush();
   });
 });

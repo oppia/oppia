@@ -27,21 +27,19 @@ require('services/contextual/url.service.ts');
 require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationDataService', [
-  '$http', '$q', 'AlertsService',
-  'EditableExplorationBackendApiService', 'LocalStorageService',
-  'LoggerService', 'ReadOnlyExplorationBackendApiService',
-  'UrlService', 'WindowRef',
+  '$http', '$q', 'AlertsService', 'EditableExplorationBackendApiService',
+  'LocalStorageService', 'LoggerService',
+  'ReadOnlyExplorationBackendApiService', 'UrlService', 'WindowRef',
   function(
-      $http, $q, AlertsService,
-      EditableExplorationBackendApiService, LocalStorageService,
-      LoggerService, ReadOnlyExplorationBackendApiService,
-      UrlService, WindowRef) {
+      $http, $q, AlertsService, EditableExplorationBackendApiService,
+      LocalStorageService, LoggerService,
+      ReadOnlyExplorationBackendApiService, UrlService, WindowRef) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
-    var explorationId = '';
-    var draftChangeListId = null;
-    var pathname = UrlService.getPathname();
-    var pathnameArray = pathname.split('/');
-    for (var i = 0; i < pathnameArray.length; i++) {
+    let explorationId = '';
+    let draftChangeListId = null;
+    let pathname = UrlService.getPathname();
+    let pathnameArray = pathname.split('/');
+    for (let i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create') {
         explorationId = pathnameArray[i + 1];
         break;
@@ -50,120 +48,107 @@ angular.module('oppia').factory('ExplorationDataService', [
 
     if (!explorationId) {
       LoggerService.error(
-        'Unexpected call to ExplorationDataService for pathname ',
-        pathname);
-      // Note: if we do not return anything, Karma unit tests fail.
+        'Unexpected call to ExplorationDataService for pathname ', pathname);
+      // NOTE: if we don't return something, Karma unit tests fail.
       return {};
     }
 
-    var resolvedAnswersUrlPrefix = (
+    let resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
-    var explorationDraftAutosaveUrl = (
+    let explorationDraftAutosaveUrl = (
       '/createhandler/autosave_draft/' + explorationId);
 
     // Put exploration variables here.
-    var explorationData = {
+    return {
       explorationId: explorationId,
+
+      getExplorationId: function() {
+        return explorationId;
+      },
+
       data: null,
+
       // Note that the changeList is the full changeList since the last
       // committed version (as opposed to the most recent autosave).
       autosaveChangeList: function(
-          changeList,
-          successCallback,
-          errorCallback = function() {}) {
+          changeList, successCallback, errorCallback = () => {}) {
         // First save locally to be retrieved later if save is unsuccessful.
         LocalStorageService.saveExplorationDraft(
           explorationId, changeList, draftChangeListId);
-        $http.put(explorationDraftAutosaveUrl, {
+        return $http.put(explorationDraftAutosaveUrl, {
           change_list: changeList,
-          version: explorationData.data.version
-        }).then(function(response) {
+          version: this.data.version
+        }).then(response => {
           draftChangeListId = response.data.draft_change_list_id;
           // We can safely remove the locally saved draft copy if it was saved
           // to the backend.
           LocalStorageService.removeExplorationDraft(explorationId);
-          if (successCallback) {
-            successCallback(response);
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+          return response;
+        }).then(successCallback, errorCallback);
       },
+
       discardDraft: function(successCallback, errorCallback) {
-        $http.post(explorationDraftAutosaveUrl, {}).then(function() {
+        return $http.post(explorationDraftAutosaveUrl, {}).then(() => {
           LocalStorageService.removeExplorationDraft(explorationId);
-          if (successCallback) {
-            successCallback();
-          }
-        }, function() {
-          if (errorCallback) {
-            errorCallback();
-          }
-        });
+        }).then(successCallback, errorCallback);
       },
+
       // Returns a promise that supplies the data for the current exploration.
       getData: function(errorCallback) {
-        if (explorationData.data) {
+        if (this.data) {
           LoggerService.info('Found exploration data in cache.');
-          return $q.resolve(explorationData.data);
-        } else {
-          // Retrieve data from the server.
-          // WARNING: Note that this is a version of the exploration with draft
-          // changes applied. This makes a force-refresh necessary when changes
-          // are discarded, otherwise the exploration-with-draft-changes
-          // (which is cached here) will be reused.
-          return (
-            EditableExplorationBackendApiService.fetchApplyDraftExploration(
-              explorationId).then(function(response) {
-              LoggerService.info('Retrieved exploration data.');
-              LoggerService.info(response);
-              draftChangeListId = response.draft_change_list_id;
-              explorationData.data = response;
-              var draft = LocalStorageService.getExplorationDraft(
-                explorationId);
-              if (draft) {
-                if (draft.isValid(draftChangeListId)) {
-                  var changeList = draft.getChanges();
-                  explorationData.autosaveChangeList(changeList, function() {
-                    // A reload is needed so that the changelist just saved is
-                    // loaded as opposed to the exploration returned by this
-                    // response.
-                    WindowRef.nativeWindow.location.reload();
-                  });
-                } else {
-                  if (errorCallback) {
-                    errorCallback(explorationId, draft.getChanges());
-                  }
-                }
-              }
-              return response;
-            })['catch'](function(error) {
-              errorCallback(error);
-            })
-          );
+          return $q.resolve(this.data);
         }
+        // Retrieve data from the server.
+        // WARNING: Note that this is a version of the exploration with draft
+        // changes applied. This makes a force-refresh necessary when changes
+        // are discarded, otherwise the exploration-with-draft-changes (which is
+        // cached here) will be reused.
+        return EditableExplorationBackendApiService.fetchApplyDraftExploration(
+          explorationId
+        ).then(response => {
+          LoggerService.info('Retrieved exploration data.');
+          LoggerService.info(response);
+          draftChangeListId = response.draft_change_list_id;
+          this.data = response;
+          let draft = LocalStorageService.getExplorationDraft(explorationId);
+          if (draft) {
+            if (draft.isValid(draftChangeListId)) {
+              let changeList = draft.getChanges();
+              this.autosaveChangeList(changeList).then(() => {
+                // A reload is needed so that the changelist just saved is
+                // loaded as opposed to the exploration returned by this
+                // response.
+                WindowRef.nativeWindow.location.reload();
+              });
+            } else if (errorCallback) {
+              errorCallback(explorationId, draft.getChanges());
+              return $q.reject();
+            }
+          }
+          return response;
+        });
       },
+
       // Returns a promise supplying the last saved version for the current
       // exploration.
       getLastSavedData: function() {
         return ReadOnlyExplorationBackendApiService.loadLatestExploration(
-          explorationId).then(function(response) {
+          explorationId
+        ).then(response => {
           LoggerService.info('Retrieved saved exploration data.');
           LoggerService.info(response);
-
           return response.exploration;
         });
       },
+
       resolveAnswers: function(stateName, resolvedAnswersList) {
         AlertsService.clearWarnings();
-        $http.put(
-          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
-            resolved_answers: resolvedAnswersList
-          }
-        );
+        return $http.put(
+          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName),
+          { resolved_answers: resolvedAnswersList });
       },
+
       /**
        * Saves the exploration to the backend, and, on a success callback,
        * updates the local copy of the exploration data.
@@ -176,26 +161,18 @@ angular.module('oppia').factory('ExplorationDataService', [
        */
       save: function(
           changeList, commitMessage, successCallback, errorCallback) {
-        EditableExplorationBackendApiService.updateExploration(explorationId,
-          explorationData.data ? explorationData.data.version : null,
-          commitMessage, changeList).then(
-          function(response) {
-            AlertsService.clearWarnings();
-            explorationData.data = response;
-            if (successCallback) {
-              successCallback(
-                response.is_version_of_draft_valid,
-                response.draft_changes);
-            }
-          }, function() {
-            if (errorCallback) {
-              errorCallback();
-            }
+        let explorationVersion = this.data ? this.data.version : null;
+        return EditableExplorationBackendApiService.updateExploration(
+          explorationId, explorationVersion, commitMessage, changeList
+        ).then(response => {
+          AlertsService.clearWarnings();
+          this.data = response;
+          if (successCallback) {
+            successCallback(
+              response.is_version_of_draft_valid, response.draft_changes);
           }
-        );
+        }, errorCallback);
       }
     };
-
-    return explorationData;
   }
 ]);
