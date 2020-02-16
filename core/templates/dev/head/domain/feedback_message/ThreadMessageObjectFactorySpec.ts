@@ -52,6 +52,27 @@ describe('Feedback thread object factory', () => {
     });
   });
 
+  describe('.getSummary', () => {
+    it('should return the same author and text as message.', () => {
+      var threadMessage = factory.createFromBackendDict({
+        author_username: 'author',
+        text: 'message content',
+
+        created_on: 1000,
+        entity_type: 'exploration',
+        entity_id: 'exploration.exp1.thread1',
+        message_id: 1,
+        received_via_email: false,
+        updated_status: null,
+        updated_subject: null
+      });
+
+      let summary = threadMessage.getSummary();
+      expect(summary.authorUsername).toEqual('author');
+      expect(summary.text).toEqual('message content');
+    });
+  });
+
   describe('.hasSubjectUpdate()', () => {
     it('is true when updatedStatus is non-null', () => {
       var threadMessage = factory.createFromBackendDict({

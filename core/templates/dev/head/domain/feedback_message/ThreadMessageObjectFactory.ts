@@ -20,6 +20,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { ThreadMessageSummary } from
+  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+
 export class ThreadMessage {
   authorUsername: string;
   createdOn: number;
@@ -44,6 +47,10 @@ export class ThreadMessage {
     this.text = text;
     this.updatedStatus = updatedStatus;
     this.updatedSubject = updatedSubject;
+  }
+
+  getSummary(): ThreadMessageSummary {
+    return new ThreadMessageSummary(this.authorUsername, this.text);
   }
 
   isNonempty(): boolean {
