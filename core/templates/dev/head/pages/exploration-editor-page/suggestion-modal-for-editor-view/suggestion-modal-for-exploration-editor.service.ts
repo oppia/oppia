@@ -88,10 +88,14 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             if (!$scope.canEdit) {
               $scope.errorMessage = '';
             } else if (!$scope.isNotHandled) {
-              $scope.errorMessage = (
-                suggestionStatus === 'accepted' || suggestionStatus === 'fixed')
-                  ? SuggestionModalService.SUGGESTION_ACCEPTED_MSG
-                  : SuggestionModalService.SUGGESTION_REJECTED_MSG;
+              if (suggestionStatus === 'accepted' ||
+                  suggestionStatus === 'fixed') {
+                $scope.errorMessage =
+                  SuggestionModalService.SUGGESTION_ACCEPTED_MSG;
+              } else {
+                $scope.errorMessage =
+                  SuggestionModalService.SUGGESTION_REJECTED_MSG;
+              }
             } else if (!suggestionIsValid) {
               $scope.errorMessage =
                 SuggestionModalService.SUGGESTION_INVALID_MSG;

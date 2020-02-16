@@ -260,18 +260,16 @@ angular.module('oppia').factory('ImprovementModalService', [
                 }
               };
               $scope.deleteSelectedLearnerAnswerInfo = function() {
-                for (var i = 0;
-                     i < $scope.selectedLearnerAnswerInfo.length; i++) {
-                  var index = (
+                $scope.selectedLearnerAnswerInfo.forEach(info => {
+                  var index =
                     $scope.learnerAnswerDetails.learnerAnswerInfoData.indexOf(
-                      $scope.selectedLearnerAnswerInfo[i]));
+                      info);
                   $scope.learnerAnswerDetails.learnerAnswerInfoData.splice(
                     index, 1);
                   LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
                     $scope.learnerAnswerDetails.expId,
-                    $scope.learnerAnswerDetails.stateName,
-                    $scope.selectedLearnerAnswerInfo[i].getId());
-                }
+                    $scope.learnerAnswerDetails.stateName, info.getId());
+                });
                 $scope.selectedLearnerAnswerInfo = [];
                 $scope.currentLearnerAnswerInfo = null;
                 if ($scope.getLearnerAnswerInfos().length === 0) {
