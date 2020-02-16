@@ -18,11 +18,12 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
-require('components/entity-creation-services/skill-creation-backend-api.service.ts')
+require(
+  'components/entity-creation-services/skill-creation-backend-api.service.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
-  'SkillCreationBackendService','UrlInterpolationService',
+  'SkillCreationBackendService', 'UrlInterpolationService',
   function(
       $rootScope, $timeout, $window, AlertsService,
       SkillCreationBackendService, UrlInterpolationService) {
@@ -42,17 +43,18 @@ angular.module('oppia').factory('SkillCreationService', [
         skillCreationInProgress = true;
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating skill';
-        SkillCreationBackendService.createSkill(description, rubrics, explanation, linkedTopicIds)
-        .then(function(response) {
-          $timeout(function() {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_SKILL_URL_TEMPLATE, {
-                skill_id: response.skillId
-              });
-          }, 150);
-        }, function() {
-          $rootScope.loadingMessage = '';
-        });
+        SkillCreationBackendService.createSkill(
+          description, rubrics, explanation, linkedTopicIds)
+          .then(function(response) {
+            $timeout(function() {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_SKILL_URL_TEMPLATE, {
+                  skill_id: response.skillId
+                });
+            }, 150);
+          }, function() {
+            $rootScope.loadingMessage = '';
+          });
       }
     };
   }
