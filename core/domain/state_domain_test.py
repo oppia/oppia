@@ -651,17 +651,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected duration_secs to be a float'
+            utils.ValidationError, 'Expected duration_secs to be a float or int'
             ):
-            with self.swap(audio_voiceover, 'duration_secs', 0):
+            with self.swap(audio_voiceover, 'duration_secs', 'test'):
                 audio_voiceover.validate()
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid duration in seconds'
-            ):
-            with self.swap(audio_voiceover, 'duration_secs', 0.0):
-                audio_voiceover.validate()
-        with self.assertRaisesRegexp(
-            utils.ValidationError, 'Invalid duration in seconds'
+            utils.ValidationError, 'Expected duration_secs to be positive number'
             ):
             with self.swap(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
