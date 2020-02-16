@@ -29,19 +29,18 @@ require(
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
-  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED',
+  'ACTION_ACCEPT_SUGGESTION', 'STATUS_OPEN', 'STATUS_FIXED', 'STATUS_IGNORED',
   function(
       $http, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
-      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED) {
+      ACTION_ACCEPT_SUGGESTION, STATUS_OPEN, STATUS_FIXED, STATUS_IGNORED) {
     let expId = ExplorationDataService.explorationId;
     let FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + expId;
-    let THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
-    let SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
-    let SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' + expId;
-    let THREAD_HANDLER_URL = '/threadhandler';
     let FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
-    let THREAD_STATUS_OPEN = 'open';
+    let SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' + expId;
+    let SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
+    let THREAD_HANDLER_URL = '/threadhandler';
+    let THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
 
     // Holds all the threads for this exploration. This is an object whose
     // values are objects, each representing threads, keyed by their IDs.
@@ -49,13 +48,15 @@ angular.module('oppia').factory('ThreadDataService', [
     // The messages of the thread objects are updated lazily.
     let threadsById = {};
 
+    // Cached number of open threads requiring action.
+    let openThreadsCount = 0;
+
     let getThreadById = function(threadId) {
       return threadsById[threadId] || null;
     };
 
     let setFeedbackThreadFromBackendDict = function(threadBackendDict) {
       let threadId = threadBackendDict.thread_id;
-
       return threadsById[threadId] =
         FeedbackThreadObjectFactory.createFromBackendDict(threadBackendDict);
     };
@@ -63,7 +64,6 @@ angular.module('oppia').factory('ThreadDataService', [
     let setSuggestionThreadFromBackendDicts = function(
         threadBackendDict, suggestionBackendDictsByThreadId) {
       let threadId = threadBackendDict.thread_id;
-
       if (!suggestionBackendDictsByThreadId.hasOwnProperty(threadId)) {
         throw Error(
           'Suggestion thread (id: "' + threadId + '") has no suggestion');
@@ -78,9 +78,6 @@ angular.module('oppia').factory('ThreadDataService', [
       return suggestionBackendDict.suggestion_id;
     };
 
-    // Cached number of open threads requiring action.
-    let openThreadsCount = 0;
-
     return {
       fetchThreads: function() {
         let suggestionPromise = $http.get(SUGGESTION_LIST_HANDLER_URL, {
@@ -88,8 +85,8 @@ angular.module('oppia').factory('ThreadDataService', [
         });
         let threadPromise = $http.get(THREAD_LIST_HANDLER_URL);
 
-        return $q.all([suggestionPromise, threadPromise]).then(res => {
-          let [suggestionResponse, threadResponse] = res.map(r => r.data);
+        return $q.all([suggestionPromise, threadPromise]).then(response => {
+          let [suggestionResponse, threadResponse] = response.map(r => r.data);
           let suggestionBackendDictsByThreadId = {};
 
           suggestionResponse.suggestions.forEach(backendDict => {
@@ -126,7 +123,6 @@ angular.module('oppia').factory('ThreadDataService', [
           text: newText
         }).then(() => {
           openThreadsCount += 1;
-
           return this.fetchThreads();
         }, err => {
           AlertsService.addWarning('Error creating new thread: ' + err + '.');
@@ -140,14 +136,12 @@ angular.module('oppia').factory('ThreadDataService', [
       addNewMessage: function(
           threadId, newMessage, newStatus, onSuccess, onFailure) {
         let thread = getThreadById(threadId);
-
         if (thread === null) {
           throw Error('Can not add message to a nonexistent thread');
         }
 
         let oldStatus = thread.status;
         let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
-
         return $http.post(THREAD_HANDLER_URL + '/' + threadId, {
           updated_status: updatedStatus,
           updated_subject: null,
@@ -155,13 +149,12 @@ angular.module('oppia').factory('ThreadDataService', [
         }).then(() => {
           thread.status = newStatus;
           if (updatedStatus) {
-            if (oldStatus === THREAD_STATUS_OPEN) {
+            if (oldStatus === STATUS_OPEN) {
               openThreadsCount -= 1;
-            } else if (newStatus === THREAD_STATUS_OPEN) {
+            } else if (newStatus === STATUS_OPEN) {
               openThreadsCount += 1;
             }
           }
-
           return this.fetchMessages(threadId);
         }).then(onSuccess, onFailure);
       },
@@ -169,11 +162,9 @@ angular.module('oppia').factory('ThreadDataService', [
           threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
           onSuccess, onFailure) {
         let thread = getThreadById(threadId);
-
         if (thread === null) {
           throw Error('Can not resolve the suggestion of a nonexistent thread');
         }
-
         return $http.put(SUGGESTION_ACTION_HANDLER_URL + '/' + threadId, {
           action: action,
           review_message: reviewMsg,
