@@ -50,10 +50,12 @@ var CreatorDashboardPage = function() {
       by.css('.protractor-test-exploration-dashboard-card'));
     return allExplorationDashboardCard.filter(function(tile) {
       return tile.element(
-        by.css('.protractor-test-exp-summary-tile-title')).
-        getText().then(function(tileTitle) {
+        by.css('.protractor-test-exp-summary-tile-title')
+      ).element(by.tagName('span')).getText().then(
+        function(tileTitle) {
           return (tileTitle === explorationTitle);
-        });
+        }
+      );
     });
   };
 
