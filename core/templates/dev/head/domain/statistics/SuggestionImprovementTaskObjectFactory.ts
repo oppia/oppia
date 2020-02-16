@@ -28,10 +28,10 @@ require(
   'suggestion-modal-for-exploration-editor.service.ts');
 
 angular.module('oppia').factory('SuggestionImprovementTaskObjectFactory', [
-  '$q', 'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
+  'ImprovementActionButtonObjectFactory', 'ImprovementModalService',
   'ThreadDataService', 'SUGGESTION_IMPROVEMENT_TASK_TYPE',
   function(
-      $q, ImprovementActionButtonObjectFactory, ImprovementModalService,
+      ImprovementActionButtonObjectFactory, ImprovementModalService,
       ThreadDataService, SUGGESTION_IMPROVEMENT_TASK_TYPE) {
     var SuggestionImprovementTask = function(suggestionThread) {
       this._actionButtons = [
