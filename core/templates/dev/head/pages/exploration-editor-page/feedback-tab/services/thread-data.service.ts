@@ -29,11 +29,11 @@ require(
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
-  'ACTION_ACCEPT_SUGGESTION', 'STATUS_OPEN', 'STATUS_FIXED', 'STATUS_IGNORED',
+  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
   function(
       $http, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
-      ACTION_ACCEPT_SUGGESTION, STATUS_OPEN, STATUS_FIXED, STATUS_IGNORED) {
+      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     let expId = ExplorationDataService.explorationId;
     let FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + expId;
     let FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
