@@ -743,7 +743,8 @@ class Voiceover(python_utils.OBJECT):
                 self.duration_secs)
         if self.duration_secs <= 0:
             raise utils.ValidationError(
-                'Invalid duration in seconds: %s' % self.duration_secs)
+                'Expected duration_secs to be greater than 0: %s' %
+                self.duration_secs)
 
 
 class WrittenTranslation(python_utils.OBJECT):
