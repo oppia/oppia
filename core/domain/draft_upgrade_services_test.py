@@ -153,7 +153,7 @@ class DraftUpgradeUtilUnitTests(test_utils.GenericTestBase):
                                 'file_size_name': 100,
                                 'filename': 'atest.mp3',
                                 'needs_update': False,
-                                'duration_secs': 0.1
+                                'duration_secs': 0.0
                             }
                         }
                     }
