@@ -230,8 +230,8 @@ class Question(python_utils.OBJECT):
         # Get the voiceovers_mapping metadata.
         voiceovers = (question_state_dict['recorded_voiceovers']
                       ['voiceovers_mapping'])
-        for content_id in voiceovers.keys():
-            for language_code in voiceovers[content_id].keys():
+        for voiceover_state in voiceovers.values():
+            for language_code in voiceover_state.values():
                 # Initialize duration_secs with 0.1 for every voiceover
                 # recording under Content, Feedback, Hints, and Solutions.
                 # This is necessary to keep the state functional
@@ -240,7 +240,7 @@ class Question(python_utils.OBJECT):
                 # The reason is probably 0 == 0.0 and doesn't need to be
                 # represented as 0.0. Fun fact some processor(s) represent
                 # 0 using the same reasoning for both floats and ints.
-                voiceovers[content_id][language_code]['duration_secs'] = 0.1
+                language_code['duration_secs'] = 0.1
         return question_state_dict
 
 

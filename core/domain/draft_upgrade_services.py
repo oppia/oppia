@@ -106,23 +106,23 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                 # Get the language code to access the language code correctly.
-                new_changes = change.new_value['voiceovers_mapping']
+                voiceover_changes = change.new_value['voiceovers_mapping']
                 # Initialize the value to migrate draft state to v31.
                 # Use the dynamic language code like 'en' to access the data.
                 # Using 0.1 as a temporary value because js uses 0.0 as 0. The
                 # reason is probably 0 == 0.0 and doesn't need to be
                 # represented as 0.0. Fun fact some processor(s) represent
                 # 0 using the same reasoning for both floats and ints.
-                for state in new_changes.keys():
-                    for language_code in new_changes[state].keys():
-                        new_changes[state][language_code]['duration_secs'] = 0.1
+                for voiceover_state in voiceover_changes.values():
+                    for language_code in voiceover_state.values():
+                        language_code['duration_secs'] = 0.1
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
                     'state_name': change.state_name,
                     'new_value': {
-                        'voiceovers_mapping': new_changes
+                        'voiceovers_mapping': voiceover_changes
                     }
                 })
         return draft_change_list
