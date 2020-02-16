@@ -86,8 +86,8 @@ angular.module('oppia').factory('ThreadDataService', [
 
       fetchThreads: function() {
         let suggestionPromise = $http.get(
-          SUGGESTION_LIST_HANDLER_URL + '?target_type=exploration&target_id=' +
-          expId);
+          SUGGESTION_LIST_HANDLER_URL +
+          '?target_type=exploration&target_id=' + expId);
         let threadPromise = $http.get(THREAD_LIST_HANDLER_URL);
 
         return $q.all([suggestionPromise, threadPromise]).then(response => {
