@@ -42,15 +42,15 @@ describe('Feedback thread object factory', () => {
 
       var threadMessage = ThreadMessageObjectFactory.createFromBackendDict(
         threadMessageBackendDict);
-        expect(threadMessage.authorUsername).toEqual('author');
-        expect(threadMessage.createdOn).toEqual(1000);
-        expect(threadMessage.entityType).toEqual('exploration');
-        expect(threadMessage.entityId).toEqual('exploration.exp1.thread1');
-        expect(threadMessage.messageId).toEqual(1);
-        expect(threadMessage.receivedViaEmail).toBe(false);
-        expect(threadMessage.text).toEqual('message content');
-        expect(threadMessage.updatedStatus).toBe(null);
-        expect(threadMessage.updatedSubject).toBe(null);
+      expect(threadMessage.authorUsername).toEqual('author');
+      expect(threadMessage.createdOn).toEqual(1000);
+      expect(threadMessage.entityType).toEqual('exploration');
+      expect(threadMessage.entityId).toEqual('exploration.exp1.thread1');
+      expect(threadMessage.messageId).toEqual(1);
+      expect(threadMessage.receivedViaEmail).toBe(false);
+      expect(threadMessage.text).toEqual('message content');
+      expect(threadMessage.updatedStatus).toBe(null);
+      expect(threadMessage.updatedSubject).toBe(null);
     });
   });
 
