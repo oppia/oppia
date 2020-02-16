@@ -95,7 +95,7 @@
       </md-card>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-4" ng-if="$ctrl.graphDataLoaded">
       <md-card class="oppia-page-card oppia-long-text" style="">
         <legend class="text-center">Role Hierarchy</legend>
         <role-graph graph-data="$ctrl.graphData"
