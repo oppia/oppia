@@ -25,6 +25,10 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
 describe('retrieving threads service', function() {
+  beforeEach(() => {
+    this.expId = 'exp1';
+  });
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -37,13 +41,10 @@ describe('retrieving threads service', function() {
     this.$httpBackend = _$httpBackend_;
     this.ExplorationDataService = _ExplorationDataService_;
     this.ThreadDataService = _ThreadDataService_;
-  }));
 
-  beforeEach(() => {
-    this.expId = 'exp1';
     spyOn(this.ExplorationDataService, 'getExplorationId')
       .and.returnValue(this.expId);
-  });
+  }));
 
   it('should retrieve feedback threads', function(done) {
     var mockFeedbackThreads = [
