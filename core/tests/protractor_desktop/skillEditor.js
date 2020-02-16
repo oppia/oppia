@@ -46,7 +46,9 @@ describe('Skill Editor functionality', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     users.createAndLoginAdminUser(
       'creator@skillEditor.com', 'creatorSkillEditor');
-    topicsAndSkillsDashboardPage.get();
+    waitFor.pageToFullyLoad();
+    browser.get('/topics_and_skills_dashboard/');
+    waitFor.pageToFullyLoad();
     topicsAndSkillsDashboardPage.createSkillWithDescriptionAndExplanation(
       'Skill 1', 'Concept card explanation');
     browser.getCurrentUrl().then(function(url) {

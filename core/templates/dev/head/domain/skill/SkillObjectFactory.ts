@@ -38,7 +38,7 @@ export interface SkillBackendInterface {
   'skill_contents': ConceptCardBackendInterface
   'language_code': string,
   'version': number,
-  'next_misconception_id': string,
+  'next_misconception_id': number,
   'superseding_skill_id': string;
   'all_questions_merged': boolean;
   'prerequisite_skill_ids': string[];
@@ -51,15 +51,15 @@ export class Skill {
   _conceptCard: ConceptCard;
   _languageCode: string;
   _version: number;
-  _nextMisconceptionId: string;
-  _supersedingSkillId: string;
+  _nextMisconceptionId: number;
+  _supersedingSkillId: string | null;
   _allQuestionsMerged: boolean;
   _prerequisiteSkillIds: string[];
   SKILL_DIFFICULTIES : string[] = constants.SKILL_DIFFICULTIES;
 
   constructor(id: string, description: string, misconceptions: Misconception[],
       rubrics: Rubric[], conceptCard: ConceptCard, languageCode: string,
-      version: number, nextMisconceptionId: string, supersedingSkillId: string,
+      version: number, nextMisconceptionId: number, supersedingSkillId: string,
       allQuestionsMerged: boolean, prerequisiteSkillIds: string[]) {
     this._id = id;
     this._allQuestionsMerged = allQuestionsMerged;
@@ -140,12 +140,12 @@ export class Skill {
     return this._version;
   }
 
-  getNextMisconceptionId(): string {
+  getNextMisconceptionId(): number {
     return this._nextMisconceptionId;
   }
 
   getIncrementedMisconceptionId(id: string) {
-    return (parseInt(id) + 1).toString();
+    return (parseInt(id) + 1);
   }
 
   getSupersedingSkillId(): string {
@@ -257,7 +257,7 @@ export class SkillObjectFactory {
   createInterstitialSkill(): Skill {
     return new Skill(null, 'Skill description loading',
       [], [], this.conceptCardObjectFactory.createInterstitialConceptCard(),
-      'en', 1, '0', null, false, []);
+      'en', 1, 0, null, false, []);
   }
 
   hasValidDescription(description: string) {
