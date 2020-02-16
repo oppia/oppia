@@ -94,7 +94,7 @@ describe('Feedback thread object factory', () => {
       expect(feedbackThread.lastNonemptyMessageSummary.authorUsername)
         .toEqual('author2');
       expect(feedbackThread.lastNonemptyMessageSummary.text)
-        .toEqual('author2');
+        .toEqual('message2');
     });
   });
 });

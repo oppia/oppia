@@ -150,7 +150,7 @@ describe('Suggestion thread object factory', () => {
       expect(suggestionThread.lastNonemptyMessageSummary.authorUsername)
         .toEqual('author2');
       expect(suggestionThread.lastNonemptyMessageSummary.text)
-        .toEqual('author2');
+        .toEqual('message2');
     });
   });
 });
