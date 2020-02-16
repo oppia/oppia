@@ -107,8 +107,8 @@ describe('retrieving threads service', function() {
       suggestion_thread_dicts: mockSuggestionThreads
     });
     $httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
-    ).respond({ suggestions: mockSuggestions });
+      '/suggestionlisthandler?target_type=exploration&target_id=' + expId)
+      .respond({ suggestions: mockSuggestions });
 
     ThreadDataService.fetchThreads().then(threadData => {
       let [feedbackThreads, suggestionThreads] = threadData;
