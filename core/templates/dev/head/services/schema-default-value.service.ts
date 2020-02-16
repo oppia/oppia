@@ -19,11 +19,13 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { LoggerService } from 'services/contextual/logger.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SchemaDefaultValueService {
+  constructor(private logger: LoggerService) {}
   // TODO(sll): Rewrite this to take validators into account, so that
   // we always start with a valid value.
   // TODO(#7165): Replace 'any' with the exact type. This has been kept as
@@ -37,7 +39,10 @@ export class SchemaDefaultValueService {
     } else if (schema.type === 'unicode' || schema.type === 'html') {
       return '';
     } else if (schema.type === 'list') {
-      return [this.getDefaultValue(schema.items)];
+      var that = this;
+      return schema.items.map(function(item) {
+        return that.getDefaultValue(item);
+      });
     } else if (schema.type === 'dict') {
       var result = {};
       for (var i = 0; i < schema.properties.length; i++) {
@@ -48,7 +53,7 @@ export class SchemaDefaultValueService {
     } else if (schema.type === 'int' || schema.type === 'float') {
       return 0;
     } else {
-      console.error('Invalid schema type: ' + schema.type);
+      this.logger.error('Invalid schema type: ' + schema.type);
     }
   }
 }

@@ -27,28 +27,6 @@ import release_constants
 from scripts import common
 
 
-def get_mail_message_template():
-    """Returns a mail template with the details for running jobs for release
-    on backup server.
-
-    Returns:
-        string. The mail message template.
-    """
-    return (
-        'Hi Sean,\n\n'
-        'You will need to run these jobs on the backup server:\n\n'
-        '[List of jobs formatted as: {{Job Name}} '
-        '(instructions: {{Instruction doc url}}) (Author: {{Author Name}})]\n'
-        'The specific instructions for jobs are linked with them. '
-        'The general instructions are as follows:\n\n'
-        '1. Login as admin\n'
-        '2. Navigate to the admin panel and then the jobs tab\n'
-        '3. Run the above jobs\n'
-        '4. In case of failure/success, please send the output logs for '
-        'the job to me and the job authors: {{Author names}}\n\n'
-        'Thanks!\n')
-
-
 def get_extra_jobs_due_to_schema_changes(
         remote_alias, previous_release_version):
     """Finds additional jobs which should be run based on
@@ -141,7 +119,7 @@ def cut_release_branch():
     subprocess.check_call([
         'python', '-m',
         'scripts.release_scripts.cut_release_or_hotfix_branch',
-        '--new_version=%s' % release_version])
+        '--release_version=%s' % release_version])
 
 
 def main():
@@ -192,24 +170,13 @@ def main():
         release_constants.ONE_TIME_JOBS_SPREADSHEET_URL)
     common.ask_user_to_confirm(
         'Please copy the names of the jobs to be run for this release along '
-        'with author names, author mail ids & instruction docs.')
+        'with author names, author mail ids & instruction docs.\n'
+        'Note: Copy only those jobs that have been successfully run '
+        'on backup server.')
     common.open_new_tab_in_browser_if_possible(
         release_constants.RELEASE_DRIVE_URL)
     common.ask_user_to_confirm(
         'Please enter the above job names to release journal.')
-    python_utils.PRINT(get_mail_message_template())
-    common.ask_user_to_confirm(
-        'Update the mail message template by adding job names, '
-        'instruction doc url and author names '
-        'Note: Send the mail only after deploying to backup server.\n\n'
-        'Note: Add author email ids to the cc list when you send '
-        'the mail.\n\n'
-        'Note: Please check manually if the details in the above mail '
-        'are correct and add anything extra if required.\n\n'
-        'Copy and save the above template for sending a mail to Sean '
-        'to run these jobs on backup server.\n\n'
-        'If the jobs are successful on backup server, run them on test '
-        'and prod server.')
 
     cut_release_branch()
 
