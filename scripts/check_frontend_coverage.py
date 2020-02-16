@@ -98,7 +98,6 @@ FULLY_COVERED_FILENAMES = [
     'creator-dashboard-page.constants.ajs.ts',
     'creator-dashboard-page.constants.ts',
     'data.ts',
-    'debouncer.service.ts',
     'debug-info-tracker.service.ts',
     'device-info.service.ts',
     'document-attribute-customization.service.ts',
