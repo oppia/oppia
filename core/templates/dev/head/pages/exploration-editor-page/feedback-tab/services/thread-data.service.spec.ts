@@ -26,6 +26,7 @@ require(
 
 describe('retrieving threads service', function() {
   var $httpBackend;
+  var ExplorationDataService;
   var ThreadDataService;
 
   var expId = 'exp1';
@@ -37,10 +38,16 @@ describe('retrieving threads service', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function(_$httpBackend_, _ThreadDataService_) {
+  beforeEach(angular.mock.inject(function(
+      _$httpBackend_, _ExplorationDataService_, _ThreadDataService_) {
     $httpBackend = _$httpBackend_;
+    ExplorationDataService = _ExplorationDataService_;
     ThreadDataService = _ThreadDataService_;
   }));
+
+  beforeEach(() => {
+    ExplorationDataService.explorationId = expId;
+  });
 
   it('should retrieve feedback threads', function(done) {
     var mockFeedbackThreads = [
