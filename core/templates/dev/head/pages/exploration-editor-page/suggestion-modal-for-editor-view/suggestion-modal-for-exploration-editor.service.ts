@@ -26,24 +26,20 @@ require('services/editability.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
-  '$log', '$rootScope', '$uibModal',
-  'ExplorationDataService', 'ExplorationStatesService',
-  'StateObjectFactory', 'SuggestionModalService',
+  '$log', '$rootScope', '$uibModal', 'ExplorationDataService',
+  'ExplorationStatesService', 'StateObjectFactory', 'SuggestionModalService',
   'ThreadDataService', 'UrlInterpolationService',
-  function($log, $rootScope, $uibModal,
-      ExplorationDataService, ExplorationStatesService,
-      StateObjectFactory, SuggestionModalService,
+  function(
+      $log, $rootScope, $uibModal, ExplorationDataService,
+      ExplorationStatesService, StateObjectFactory, SuggestionModalService,
       ThreadDataService, UrlInterpolationService) {
-    var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
-      'exploration-editor-suggestion-modal.template.html'
-    );
-
     var _showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
         setActiveThread = (threadId) => {}, threadUibModalInstance) {
-      $uibModal.open({
-        templateUrl: _templateUrl,
+      return $uibModal.open({
+        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+          '/pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
+          'exploration-editor-suggestion-modal.template.html'),
         backdrop: true,
         size: 'lg',
         resolve: {
@@ -92,13 +88,13 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             if (!$scope.canEdit) {
               $scope.errorMessage = '';
             } else if (!$scope.isNotHandled) {
-              $scope.errorMessage = ((suggestionStatus === 'accepted' ||
-                suggestionStatus === 'fixed') ?
-              SuggestionModalService.SUGGESTION_ACCEPTED_MSG :
-              SuggestionModalService.SUGGESTION_REJECTED_MSG);
+              $scope.errorMessage = (
+                suggestionStatus === 'accepted' || suggestionStatus === 'fixed')
+                  ? SuggestionModalService.SUGGESTION_ACCEPTED_MSG
+                  : SuggestionModalService.SUGGESTION_REJECTED_MSG;
             } else if (!suggestionIsValid) {
-              $scope.errorMessage = SuggestionModalService
-                .SUGGESTION_INVALID_MSG;
+              $scope.errorMessage =
+                SuggestionModalService.SUGGESTION_INVALID_MSG;
             } else if (unsavedChangesExist) {
               $scope.errorMessage = SuggestionModalService.UNSAVED_CHANGES_MSG;
             } else {
@@ -112,32 +108,28 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               if (threadUibModalInstance !== null) {
                 threadUibModalInstance.close();
               }
-              SuggestionModalService.acceptSuggestion(
-                $uibModalInstance,
-                {
-                  action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
-                  commitMessage: $scope.commitMessage,
-                  reviewMessage: $scope.reviewMessage,
-                  // TODO(sll): If audio files exist for the content being
-                  // replaced, implement functionality in the modal for the
-                  // exploration creator to indicate whether this change
-                  // requires the corresponding audio subtitles to be updated.
-                  // For now, we default to assuming that the changes are
-                  // sufficiently small as to warrant no updates.
-                  audioUpdateRequired: false
-                });
+              SuggestionModalService.acceptSuggestion($uibModalInstance, {
+                action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+                commitMessage: $scope.commitMessage,
+                reviewMessage: $scope.reviewMessage,
+                // TODO(sll): If audio files exist for the content being
+                // replaced, implement functionality in the modal for the
+                // exploration creator to indicate whether this change
+                // requires the corresponding audio subtitles to be updated.
+                // For now, we default to assuming that the changes are
+                // sufficiently small as to warrant no updates.
+                audioUpdateRequired: false
+              });
             };
 
             $scope.rejectSuggestion = function() {
               if (threadUibModalInstance !== null) {
                 threadUibModalInstance.close();
               }
-              SuggestionModalService.rejectSuggestion(
-                $uibModalInstance,
-                {
-                  action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
-                  reviewMessage: $scope.reviewMessage
-                });
+              SuggestionModalService.rejectSuggestion($uibModalInstance, {
+                action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+                reviewMessage: $scope.reviewMessage
+              });
             };
 
             $scope.cancelReview = function() {
@@ -145,17 +137,15 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             };
           }
         ]
-      }).result.then(function(result) {
+      }).result.then(result => {
         return ThreadDataService.resolveSuggestion(
           activeThread, result.action, result.commitMessage,
-          result.reviewMessage, result.audioUpdateRequired)
-          .then(() => {
+          result.reviewMessage, result.audioUpdateRequired).then(() => {
             setActiveThread(activeThread.threadId);
             // Immediately update editor to reflect accepted suggestion.
             if (result.action ===
                 SuggestionModalService.ACTION_ACCEPT_SUGGESTION) {
               var suggestion = activeThread.getSuggestion();
-
               var stateName = suggestion.stateName;
               var stateDict = ExplorationDataService.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
@@ -173,10 +163,8 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
               });
               $rootScope.$broadcast('refreshStateEditor');
             }
-          }, () => {
-            $log.error('Error resolving suggestion');
-          });
-      }, function() {
+          }, () => $log.error('Error resolving suggestion'));
+      }, () => {
         // Note to developers:
         // This callback is triggered when the Cancel button is clicked.
         // No further action is needed.
@@ -188,13 +176,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
           suggestionType, extraParams, threadUibModalInstance = null) {
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
-            extraParams.activeThread,
-            extraParams.isSuggestionHandled,
-            extraParams.hasUnsavedChanges,
-            extraParams.isSuggestionValid,
-            extraParams.setActiveThread,
-            threadUibModalInstance
-          );
+            extraParams.activeThread, extraParams.isSuggestionHandled,
+            extraParams.hasUnsavedChanges, extraParams.isSuggestionValid,
+            extraParams.setActiveThread, threadUibModalInstance);
         }
       }
     };

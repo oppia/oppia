@@ -88,8 +88,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                 actionIndexAtStartOfFinalBlock = indexOfFirstDisplayedAction;
 
                 $scope.issueIsMultipleIncorrectSubmissions = false;
-                if (playthrough.issueType === (
-                  ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)) {
+                if (playthrough.issueType ===
+                    ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
                   $scope.issueIsMultipleIncorrectSubmissions = true;
                 }
               };
@@ -121,7 +121,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                 for (i = indexOfFirstDisplayedAction - 1; i >= 0; i--) {
                   let action = playthrough.actions[i];
                   let currentStateName =
-                      action.actionCustomizationArgs.state_name.value;
+                    action.actionCustomizationArgs.state_name.value;
 
                   if (currentStateName !== previousStateName) {
                     // When the latest state name and the state name of the
@@ -130,8 +130,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                     // of the block has crossed the threshold number of actions
                     // per block. If it has, we don't add more learner actions
                     // to the block.
-                    if (indexOfFirstDisplayedAction - i >= (
-                      MAX_UNRELATED_ACTIONS_PER_BLOCK)) {
+                    if (indexOfFirstDisplayedAction - i >=
+                        MAX_UNRELATED_ACTIONS_PER_BLOCK) {
                       indexOfFirstDisplayedAction = i + 1;
                       break;
                     }
@@ -154,11 +154,10 @@ angular.module('oppia').factory('ImprovementModalService', [
                */
               $scope.renderIssueTable = function() {
                 var lars = LearnerActionRenderService;
-                var tableHtml =
-                  lars.renderFinalDisplayBlockForMISIssueHTML(
-                    playthrough.actions.slice(
-                      actionIndexAtStartOfFinalBlock),
-                    actionIndexAtStartOfFinalBlock + 1);
+                var tableHtml = lars.renderFinalDisplayBlockForMISIssueHTML(
+                  playthrough.actions.slice(
+                    actionIndexAtStartOfFinalBlock),
+                  actionIndexAtStartOfFinalBlock + 1);
                 return tableHtml;
               };
 
@@ -194,8 +193,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                * @returns {boolean}
                */
               $scope.isActionHighlighted = function(actionIndex) {
-                return $scope.getLearnerActionIndex(actionIndex) > (
-                  actionIndexAtStartOfFinalBlock);
+                return ($scope.getLearnerActionIndex(actionIndex) >
+                        actionIndexAtStartOfFinalBlock);
               };
 
               /**
@@ -261,8 +260,8 @@ angular.module('oppia').factory('ImprovementModalService', [
                 }
               };
               $scope.deleteSelectedLearnerAnswerInfo = function() {
-                for (
-                  var i = 0; i < $scope.selectedLearnerAnswerInfo.length; i++) {
+                for (var i = 0;
+                     i < $scope.selectedLearnerAnswerInfo.length; i++) {
                   var index = (
                     $scope.learnerAnswerDetails.learnerAnswerInfoData.indexOf(
                       $scope.selectedLearnerAnswerInfo[i]));
@@ -299,11 +298,8 @@ angular.module('oppia').factory('ImprovementModalService', [
             'feedback-thread-modal.template.html'),
           resolve: {
             messages: ThreadDataService.fetchMessages(thread),
-            isUserLoggedIn: function() {
-              return UserService.getUserInfoAsync().then(function(userInfo) {
-                return userInfo.isLoggedIn();
-              });
-            },
+            isUserLoggedIn:
+              UserService.getUserInfoAsync().then(u => u.isLoggedIn())
           },
           controller: [
             '$scope', '$uibModalInstance', 'isUserLoggedIn',
@@ -321,7 +317,7 @@ angular.module('oppia').factory('ImprovementModalService', [
               // Initial load of the thread list on page load.
               $scope.tmpMessage = {
                 status: $scope.activeThread.status,
-                text: '',
+                text: ''
               };
 
               $scope.getTitle = function() {
@@ -346,7 +342,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   .then(() => {
                     $scope.tmpMessage.status = $scope.activeThread.status;
                     $scope.messageSendingInProgress = false;
-                  }, function() {
+                  }, () => {
                     $scope.messageSendingInProgress = false;
                   }).then($uibModalInstance.close);
               };
@@ -368,11 +364,8 @@ angular.module('oppia').factory('ImprovementModalService', [
             'suggestion-thread-modal.template.html'),
           resolve: {
             messages: ThreadDataService.fetchMessages(thread),
-            isUserLoggedIn: function() {
-              return UserService.getUserInfoAsync().then(function(userInfo) {
-                return userInfo.isLoggedIn();
-              });
-            },
+            isUserLoggedIn:
+              UserService.getUserInfoAsync().then(u => u.isLoggedIn())
           },
           controller: [
             '$scope', '$uibModalInstance', 'isUserLoggedIn',
@@ -390,13 +383,12 @@ angular.module('oppia').factory('ImprovementModalService', [
               // Initial load of the thread list on page load.
               $scope.tmpMessage = {
                 status: $scope.activeThread.status,
-                text: '',
+                text: ''
               };
 
               $scope.getTitle = function() {
-                return (
-                  'Suggestion for the card "' +
-                  $scope.activeThread.suggestion.stateName + '"');
+                return 'Suggestion for the card "' +
+                  $scope.activeThread.suggestion.stateName + '"';
               };
 
               // TODO(Allan): Implement ability to edit suggestions before
@@ -417,7 +409,7 @@ angular.module('oppia').factory('ImprovementModalService', [
                   .then(() => {
                     $scope.tmpMessage.status = $scope.activeThread.status;
                     $scope.messageSendingInProgress = false;
-                  }, function() {
+                  }, () => {
                     $scope.messageSendingInProgress = false;
                   }).then($uibModalInstance.close);
               };

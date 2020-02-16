@@ -36,8 +36,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').directive('feedbackTab', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -50,16 +49,14 @@ angular.module('oppia').directive('feedbackTab', [
         '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
         'DateTimeFormatService', 'EditabilityService',
         'ExplorationStatesService',
-        'SuggestionModalForExplorationEditorService',
-        'ThreadDataService', 'ThreadStatusDisplayService',
-        'UrlInterpolationService', 'UserService',
+        'SuggestionModalForExplorationEditorService', 'ThreadDataService',
+        'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
         function(
             $q, $rootScope, $uibModal, AlertsService, ChangeListService,
             DateTimeFormatService, EditabilityService,
             ExplorationStatesService,
-            SuggestionModalForExplorationEditorService,
-            ThreadDataService, ThreadStatusDisplayService,
-            UrlInterpolationService, UserService) {
+            SuggestionModalForExplorationEditorService, ThreadDataService,
+            ThreadStatusDisplayService, UrlInterpolationService, UserService) {
           var ctrl = this;
           var _resetTmpMessageFields = function() {
             ctrl.tmpMessage.status = ctrl.activeThread ?
@@ -117,14 +114,14 @@ angular.module('oppia').directive('feedbackTab', [
                   $uibModalInstance.dismiss('cancel');
                 };
               }]
-            }).result.then(function(result) {
+            }).result.then(result => {
               ThreadDataService.createNewThread(
                 result.newThreadSubject, result.newThreadText)
                 .then(() => {
                   ctrl.clearActiveThread();
                   AlertsService.addSuccessMessage('Feedback thread created.');
                 });
-            }, function() {
+            }, () => {
               // Note to developers:
               // This callback is triggered when the Cancel button is clicked.
               // No further action is needed.
@@ -183,7 +180,7 @@ angular.module('oppia').directive('feedbackTab', [
               .then(() => {
                 _resetTmpMessageFields();
                 ctrl.messageSendingInProgress = false;
-              }, function() {
+              }, () => {
                 ctrl.messageSendingInProgress = false;
               });
           };
@@ -216,7 +213,7 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.threadIsStale = false;
             $rootScope.loadingMessage = 'Loading';
             var userInfoPromise = UserService.getUserInfoAsync();
-            userInfoPromise.then(function(userInfo) {
+            userInfoPromise.then(userInfo => {
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
             });
 
@@ -228,7 +225,7 @@ angular.module('oppia').directive('feedbackTab', [
             ctrl.clearActiveThread();
             ThreadDataService.fetchFeedbackStats();
             var threadPromise = ctrl.fetchUpdatedThreads();
-            $q.all([userInfoPromise, threadPromise]).then(function() {
+            $q.all([userInfoPromise, threadPromise]).then(() => {
               $rootScope.loadingMessage = '';
             });
           };
