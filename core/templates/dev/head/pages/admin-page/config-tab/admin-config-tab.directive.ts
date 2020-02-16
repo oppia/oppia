@@ -22,11 +22,11 @@ require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
 angular.module('oppia').directive('adminConfigTab', [
-  '$rootScope', '$window', 'AdminConfigTabBackendApiService', 'AdminDataService',
-  'AdminTaskManagerService', 'UrlInterpolationService',
+  '$rootScope', '$window', 'AdminConfigTabBackendApiService',
+  'AdminDataService', 'AdminTaskManagerService', 'UrlInterpolationService',
   function(
-      $rootScope, $window, AdminConfigTabBackendApiService, AdminDataService,
-      AdminTaskManagerService, UrlInterpolationService) {
+      $rootScope, $window, AdminConfigTabBackendApiService,
+      AdminDataService, AdminTaskManagerService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
