@@ -25,9 +25,10 @@ require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
 describe('retrieving threads service', function() {
-  beforeEach(() => {
-    this.expId = 'exp1';
-  });
+  let expId = 'exp1';
+  let $httpBackend = null;
+  let ExplorationDataService = null;
+  let ThreadDataService = null;
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -38,12 +39,12 @@ describe('retrieving threads service', function() {
 
   beforeEach(angular.mock.inject(function(
       _$httpBackend_, _ExplorationDataService_, _ThreadDataService_) {
-    this.$httpBackend = _$httpBackend_;
-    this.ExplorationDataService = _ExplorationDataService_;
-    this.ThreadDataService = _ThreadDataService_;
+    $httpBackend = _$httpBackend_;
+    ExplorationDataService = _ExplorationDataService_;
+    ThreadDataService = _ThreadDataService_;
 
-    spyOn(this.ExplorationDataService, 'getExplorationId')
-      .and.returnValue(this.expId);
+    spyOn(ExplorationDataService, 'getExplorationId')
+      .and.returnValue(expId);
   }));
 
   it('should retrieve feedback threads', function(done) {
@@ -102,20 +103,20 @@ describe('retrieving threads service', function() {
       }
     ];
 
-    this.$httpBackend.whenGET('/threadlisthandler/' + this.expId).respond({
+    $httpBackend.whenGET('/threadlisthandler/' + expId).respond({
       feedback_thread_dicts: mockFeedbackThreads,
       suggestion_thread_dicts: mockSuggestionThreads
     });
-    this.$httpBackend.whenGET(
-      '/suggestionlisthandler?target_type=exploration&target_id=' + this.expId)
+    $httpBackend.whenGET(
+      '/suggestionlisthandler?target_type=exploration&target_id=' + expId)
       .respond({ suggestions: mockSuggestions });
 
-    this.ThreadDataService.fetchThreads().then(threadData => {
+    ThreadDataService.fetchThreads().then(threadData => {
       expect(threadData.feedbackThreads.map(t => t.threadId))
         .toEqual(['exploration.exp1.abc1', 'exploration.exp1.def2']);
       expect(threadData.suggestionThreads.map(t => t.threadId))
         .toEqual(['exploration.exp1.ghi3']);
     }).then(done, done.fail);
-    this.$httpBackend.flush();
+    $httpBackend.flush();
   });
 });
