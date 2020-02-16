@@ -19,7 +19,7 @@
 import { ThreadMessageSummaryObjectFactory } from
   'domain/feedback_message/ThreadMessageSummaryObjectFactory';
 
-describe('Feedback thread object factory', () => {
+describe('Thread message summary object factory', () => {
   let factory: ThreadMessageSummaryObjectFactory;
 
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('Feedback thread object factory', () => {
   });
 
   describe('createFromBackendDict', () => {
-    it('should create a new feedback thread from a backend dict.', () => {
+    it('should create new thread message summary from a backend dict.', () => {
       var threadMessageSummary = factory.createFromBackendDict(
         { author_username: 'author', text: 'message content' });
 

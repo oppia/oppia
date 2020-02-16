@@ -19,7 +19,7 @@
 import { ThreadMessageObjectFactory } from
   'domain/feedback_message/ThreadMessageObjectFactory';
 
-describe('Feedback thread object factory', () => {
+describe('Thread message object factory', () => {
   let factory: ThreadMessageObjectFactory;
 
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('Feedback thread object factory', () => {
   });
 
   describe('createFromBackendDict', () => {
-    it('should create a new feedback thread from a backend dict.', () => {
+    it('should create a new thread message from a backend dict.', () => {
       var threadMessage = factory.createFromBackendDict({
         author_username: 'author',
         created_on: 1000,
@@ -91,7 +91,7 @@ describe('Feedback thread object factory', () => {
       expect(threadMessage.hasSubjectUpdate()).toBe(true);
     });
 
-    it('is false when updatedStatus is null', () => {
+    it('is false when updatedSubject is null', () => {
       var threadMessage = factory.createFromBackendDict({
         updated_subject: null,
 

@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Factory for creating new frontend instances of thread message
- * domain objects.
+ * summary domain objects.
  */
 
 import { Injectable } from '@angular/core';
