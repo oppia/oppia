@@ -33,4 +33,7 @@ export class LibraryPageConstants {
     '/library/recently_published': 'group',
     '/search/find': 'search'
   };
+
+  public static SEARCH_EXPLORATION_URL_TEMPLATE =
+    '/exploration/metadata_search?q=<query>';
 }
