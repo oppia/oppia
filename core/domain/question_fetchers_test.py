@@ -63,7 +63,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
 
         questions, _, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
-                2, [], ''))
+                1, [], ''))
         self.assertEqual(len(questions), 0)
 
         questions, _, _ = (
