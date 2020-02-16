@@ -61,8 +61,9 @@ export class FeedbackThread {
 
   setMessages(messages: ThreadMessage[]): void {
     this.messages = messages;
-    // Since messages have been updated, we need to update our last nonempty
-    // message as well to maintain consistency between them.
+    // Since messages have been updated, we need to update all of our other
+    // message-related fields to maintain consistency between them.
+    this.messageCount = messages.length;
     let nonemptyMessages = messages.filter(m => m.isNonempty());
     if (nonemptyMessages.length > 0) {
       let i = nonemptyMessages.length - 1;
