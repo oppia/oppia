@@ -35,7 +35,7 @@ angular.module('oppia').directive('baseContent', [
         footer: '?pageFooter',
         navOptions: '?navOptions',
       },
-      template: require('!html-loader!./base-content.directive.html'),
+      template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
         'SidebarStatusService', 'UrlService', 'SITE_FEEDBACK_FORM_URL',
