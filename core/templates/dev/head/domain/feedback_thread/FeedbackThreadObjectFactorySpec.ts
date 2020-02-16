@@ -35,7 +35,9 @@ describe('Feedback thread object factory', () => {
       summary: 'sample summary',
       message_count: 10,
       state_name: 'state 1',
-      thread_id: 'exp1.thread1'
+      thread_id: 'exp1.thread1',
+      last_nonempty_message_author: 'author',
+      last_nonempty_message_text: 'tenth message'
     };
 
     var feedbackThread = feedbackThreadObjectFactory.createFromBackendDict(
@@ -49,12 +51,12 @@ describe('Feedback thread object factory', () => {
     expect(feedbackThread.stateName).toEqual('state 1');
     expect(feedbackThread.threadId).toEqual('exp1.thread1');
     expect(feedbackThread.isSuggestionThread()).toEqual(false);
+    expect(feedbackThread.lastNonemptyMessageSummary.authorUsername)
+      .toEqual('author');
+    expect(feedbackThread.lastNonemptyMessageSummary.text)
+      .toEqual('tenth message');
 
-    var messages = [{
-      text: 'message1'
-    }, {
-      text: 'message2'
-    }];
+    var messages = [{ text: 'message1' }, { text: 'message2' }];
     feedbackThread.setMessages(messages);
     expect(feedbackThread.messages).toEqual(messages);
   });

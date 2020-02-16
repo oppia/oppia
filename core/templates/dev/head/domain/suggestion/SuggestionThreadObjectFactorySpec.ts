@@ -35,7 +35,9 @@ describe('Suggestion thread object factory', () => {
       summary: 'sample summary',
       message_count: 10,
       state_name: 'state 1',
-      thread_id: 'exploration.exp1.thread1'
+      thread_id: 'exploration.exp1.thread1',
+      last_nonempty_message_author: 'author',
+      last_nonempty_message_text: 'tenth message',
     };
     suggestionBackendDict = {
       suggestion_id: 'exploration.exp1.thread1',
@@ -49,12 +51,8 @@ describe('Suggestion thread object factory', () => {
         cmd: 'edit_state_property',
         property_name: 'content',
         state_name: 'state_1',
-        new_value: {
-          html: 'new suggestion content'
-        },
-        old_value: {
-          html: 'old suggestion content'
-        }
+        new_value: { html: 'new suggestion content' },
+        old_value: { html: 'old suggestion content' }
       },
       last_updated: 1000
     };
@@ -76,6 +74,10 @@ describe('Suggestion thread object factory', () => {
     expect(suggestionThread.summary).toEqual('sample summary');
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.threadId).toEqual('exploration.exp1.thread1');
+    expect(suggestionThread.lastNonemptyMessageSummary.authorUsername)
+      .toEqual('author');
+    expect(suggestionThread.lastNonemptyMessageSummary.text)
+      .toEqual('tenth message');
 
     let suggestion = suggestionThread.getSuggestion();
     expect(suggestion.suggestionId).toEqual('exploration.exp1.thread1');
@@ -127,12 +129,10 @@ describe('Suggestion thread object factory', () => {
       suggestionThreadBackendDict, suggestionBackendDict);
 
     expect(suggestionThread.getMessages().length).toBe(0);
-    let messages = [{
-      text: 'message1'
-    }, {
-      text: 'message2'
-    }];
+
+    let messages = [{ text: 'message1' }, { text: 'message2' }];
     suggestionThread.setMessages(messages);
+
     expect(suggestionThread.getMessages()).toEqual(messages);
   });
 });

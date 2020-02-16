@@ -23,6 +23,9 @@ import { Injectable } from '@angular/core';
 import { Suggestion, SuggestionObjectFactory } from
   'domain/suggestion/SuggestionObjectFactory';
 
+import { ThreadMessageSummary } from
+  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+
 class SuggestionThread {
   status: string;
   subject: string;
@@ -32,12 +35,15 @@ class SuggestionThread {
   messageCount: number;
   threadId: string;
   suggestion: Suggestion;
+  lastNonemptyMessageSummary: ThreadMessageSummary;
   // TODO(#7165): Replace any with exact type.
   messages: Array<any>;
+
   constructor(
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdated: number, messageCount: number,
-      threadId: string, suggestion: Suggestion) {
+      threadId: string, lastNonemptyMessageAuthor: string,
+      lastNonemptyMessageText: string, suggestion: Suggestion) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -46,12 +52,16 @@ class SuggestionThread {
     this.messageCount = messageCount;
     this.threadId = threadId;
     this.suggestion = suggestion;
+    this.lastNonemptyMessageSummary = new ThreadMessageSummary(
+      lastNonemptyMessageAuthor, lastNonemptyMessageText);
     this.messages = [];
   }
+
   // TODO(#7165): Replace any with exact type.
   setMessages(messages: Array<any>): void {
     this.messages = messages;
   }
+
   // TODO(#7165): Replace any with exact type.
   getMessages(): Array<any> {
     return this.messages;
@@ -109,7 +119,9 @@ export class SuggestionThreadObjectFactory {
       suggestionThreadBackendDict.original_author_username,
       suggestionThreadBackendDict.last_updated,
       suggestionThreadBackendDict.message_count,
-      suggestionThreadBackendDict.thread_id, suggestion);
+      suggestionThreadBackendDict.thread_id,
+      suggestionThreadBackendDict.last_nonempty_message_author,
+      suggestionThreadBackendDict.last_nonempty_message_text, suggestion);
   }
 }
 

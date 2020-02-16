@@ -20,6 +20,9 @@
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
 
+import { ThreadMessageSummary } from
+  'domain/feedback_message/ThreadMessageSummaryObjectFactory';
+
 export class FeedbackThread {
   status: string;
   subject: string;
@@ -29,6 +32,7 @@ export class FeedbackThread {
   messageCount: number;
   stateName: string;
   threadId: string;
+  lastNonemptyMessageSummary: ThreadMessageSummary;
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'messages' is an array of dicts with underscore_cased keys
   // which give tslint errors against underscore_casing in favor of camelCasing.
@@ -37,7 +41,8 @@ export class FeedbackThread {
   constructor(
       status: string, subject: string, summary: string,
       originalAuthorName: string, lastUpdated: number, messageCount: number,
-      stateName: string, threadId: string) {
+      stateName: string, threadId: string, lastNonemptyMessageAuthor: string,
+      lastNonemptyMessageText: string) {
     this.status = status;
     this.subject = subject;
     this.summary = summary;
@@ -46,6 +51,8 @@ export class FeedbackThread {
     this.messageCount = messageCount;
     this.stateName = stateName;
     this.threadId = threadId;
+    this.lastNonemptyMessageSummary = new ThreadMessageSummary(
+      lastNonemptyMessageAuthor, lastNonemptyMessageText);
     this.messages = [];
   }
 
@@ -77,7 +84,9 @@ export class FeedbackThreadObjectFactory {
       feedbackThreadBackendDict.last_updated,
       feedbackThreadBackendDict.message_count,
       feedbackThreadBackendDict.state_name,
-      feedbackThreadBackendDict.thread_id);
+      feedbackThreadBackendDict.thread_id,
+      feedbackThreadBackendDict.last_nonempty_message_author,
+      feedbackThreadBackendDict.last_nonempty_message_text);
   }
 }
 angular.module('oppia').factory(
