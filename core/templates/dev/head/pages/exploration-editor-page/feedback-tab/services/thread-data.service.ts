@@ -163,7 +163,7 @@ angular.module('oppia').factory('ThreadDataService', [
           onSuccess, onFailure) {
         let thread = getThreadById(threadId);
         if (thread === null) {
-          throw Error('Can not resolve the suggestion of a nonexistent thread');
+          throw Error('Can not resolve suggestion of a nonexistent thread');
         }
         return $http.put(SUGGESTION_ACTION_HANDLER_URL + '/' + threadId, {
           action: action,
