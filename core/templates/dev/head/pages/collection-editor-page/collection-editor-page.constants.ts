@@ -27,9 +27,6 @@ export class CollectionEditorPageConstants {
   public static COLLECTION_TITLE_INPUT_FOCUS_LABEL =
     'collectionTitleInputFocusLabel';
 
-  public static SEARCH_EXPLORATION_URL_TEMPLATE =
-    '/exploration/metadata_search?q=<query>';
-
   public static EVENT_COLLECTION_INITIALIZED = 'collectionInitialized';
   public static EVENT_COLLECTION_REINITIALIZED = 'collectionReinitialized';
 }
