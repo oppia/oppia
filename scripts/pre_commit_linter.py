@@ -203,10 +203,10 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\btoThrow'),
-        'message': 'In tests, please use \'.toThrowError\' instead of \'.toThrow(new Error(\'',
+        'regexp': re.compile(r'\btoThrow\s*\(\n*\s*\bnew Error\b'),
+        'message': 'In tests, please use \'.toThrowError\' instead of',
         'excluded_files': (),
-        'excluded_dirs': () 
+        'excluded_dirs': ()
     },
     {
         'regexp': re.compile(r'\b(beforeEach\(inject\(function)\('),
