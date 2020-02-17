@@ -188,15 +188,9 @@ angular.module('oppia').directive('thumbnailUploader', [
                     var mirrorCanvas = new C2S(
                       croppedCanvas.width, croppedCanvas.height);
                     mirrorCanvas.canvas.drawImage(croppedCanvas, 0, 0);
-                    // var croppedImageDataUrl = (cropper
-                    //   .getCroppedCanvas()
-                    //   .toDataURL());
                     var croppedImageDataUrl = (
-                      "data:image/svg+xml;base64," +
-                      btoa(
-                        unescape(
-                          encodeURIComponent(
-                            mirrorCanvas.getSerializedSvg()))));
+                      'data:image/svg+xml;base64,' +
+                      btoa(mirrorCanvas.getSerializedSvg()));
                     $uibModalInstance.close(croppedImageDataUrl);
                   };
 

@@ -543,6 +543,11 @@ def require_valid_name(name, name_type, allow_empty=False):
 
 
 def require_valid_thumbnail_filename(thumbnail_filename):
+    """Generic thumbnail filename validation.
+
+        Args:
+            thumbnail_filename: str. The thumbnail filename to validate.
+        """
     if thumbnail_filename is not None:
         if not isinstance(thumbnail_filename, python_utils.BASESTRING):
             raise ValidationError(

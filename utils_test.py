@@ -331,12 +331,14 @@ class UtilsTests(test_utils.GenericTestBase):
 
     def _assert_valid_thumbnail_filename(
             self, expected_error_substring, thumbnail_filename):
+        """Helper method for test_require_valid_thumbnail_filename."""
         with self.assertRaisesRegexp(
             utils.ValidationError, expected_error_substring):
             utils.require_valid_thumbnail_filename(
                 thumbnail_filename)
-    
+
     def test_require_valid_thumbnail_filename(self):
+        """Test thumbnail filename validation."""
         self._assert_valid_thumbnail_filename(
             'Expected thumbnail filename to be a string, received 10', 10)
         self._assert_valid_thumbnail_filename(
