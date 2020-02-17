@@ -743,7 +743,7 @@ class Voiceover(python_utils.OBJECT):
                 self.duration_secs)
         if self.duration_secs < 0:
             raise utils.ValidationError(
-                'Expected duration_secs to be positive number: %s' %
+                'Expected duration_secs to be positive number %s' %
                 self.duration_secs)
 
 
