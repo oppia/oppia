@@ -507,27 +507,20 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         default_outcome = init_state.interaction.default_outcome
         default_outcome.dest = exploration.init_state_name
         old_answer_groups = copy.deepcopy(init_state.interaction.answer_groups)
-        old_answer_groups.append({
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        })
+        old_answer_groups.append(
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    exploration.init_state_name,
+                    state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Feedback</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec('Contains', {'x': 'Test'}),
+                ],
+                [], None
+            )
+        )
 
         init_state.update_interaction_answer_groups(old_answer_groups)
 
@@ -711,9 +704,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         interaction.id = 'TextInput'
-        answer_groups_list = [
-            answer_group.to_dict() for answer_group in answer_groups]
-        init_state.update_interaction_answer_groups(answer_groups_list)
+        init_state.update_interaction_answer_groups(answer_groups)
         init_state.update_interaction_default_outcome(default_outcome.to_dict())
         exploration.validate()
 
@@ -736,56 +727,42 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.hints = []
 
         # Validate AnswerGroup.
-        answer_groups_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Feedback'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': 1
-        }
-        init_state.update_interaction_answer_groups([answer_groups_dict])
+        answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    exploration.init_state_name,
+                    state_domain.SubtitledHtml(
+                        'feedback_1', 'Feedback'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec('Contains', {'x': 'Test'}),
+                ],
+                [], 1  # tagged_skill_misconception_id
+            )
+        ]
+        init_state.update_interaction_answer_groups(answer_groups)
 
         self._assert_validation_error(
             exploration,
             'Expected tagged skill misconception id to be a str, received 1')
 
-        answer_groups_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Feedback'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id':
-                'invalid_tagged_skill_misconception_id'
-        }
-        init_state.update_interaction_answer_groups([answer_groups_dict])
+        answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    exploration.init_state_name,
+                    state_domain.SubtitledHtml(
+                        'feedback_1', 'Feedback'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec('Contains', {'x': 'Test'}),
+                ],
+                [], 'invalid_tagged_skill_misconception_id'
+            )
+        ]
+
+        init_state.update_interaction_answer_groups(answer_groups)
 
         self._assert_validation_error(
             exploration,
@@ -1180,28 +1157,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = exploration.states[exploration.init_state_name]
         init_state.update_interaction_id('TextInput')
 
-        answer_group_dict = {
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Feedback</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }
-        init_state.update_interaction_answer_groups([answer_group_dict])
+        answer_group = state_domain.AnswerGroup(
+            state_domain.Outcome(
+                exploration.init_state_name,
+                state_domain.SubtitledHtml(
+                    'feedback_1', '<p>Feedback</p>'
+                ), False, [], None, None,
+            ),
+            [
+                state_domain.RuleSpec('Contains', {'x': 'Test'}),
+            ],
+            [], None
+        )
+        init_state.update_interaction_answer_groups([answer_group])
 
         hints_list = []
         hints_list.append({
@@ -1555,35 +1523,28 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             objective='', end_state_name='End')
         exploration.validate()
 
-        param_changes = [{
-            'customization_args': {
-                'list_of_values': ['1', '2'], 'parse_with_jinja': False
-            },
-            'name': 'ParamChange',
-            'generator_id': 'RandomSelector'
-        }]
+        param_changes = [
+            param_domain.ParamChange(
+                'ParamChange', 'RandomSelector',
+                {
+                    'list_of_values': ['1', '2'],
+                    'parse_with_jinja': False
+                }
+            )
+        ]
 
-        answer_groups = [{
-            'outcome': {
-                'dest': exploration.init_state_name,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Feedback'
-                },
-                'labelled_as_correct': False,
-                'param_changes': param_changes,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'rule_specs': [{
-                'inputs': {
-                    'x': 'Test'
-                },
-                'rule_type': 'Contains'
-            }],
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    exploration.init_state_name,
+                    state_domain.SubtitledHtml(
+                        'feedback_1', 'Feedback'
+                    ), False, param_changes, None, None,
+                ),
+                [state_domain.RuleSpec('Contains', {'x': 'Test'})],
+                [], None
+            )
+        ]
 
         exploration.init_state.update_interaction_answer_groups(answer_groups)
         with self.assertRaisesRegexp(
@@ -7601,72 +7562,55 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         state1.update_interaction_solution(solution_dict1)
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome1 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
-            'outcome': {
-                'dest': 'state3',
-                'feedback': {
-                    'content_id': 'feedback_2',
-                    'html': '<p>Outcome2 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
-        answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelectionInput</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value3 for ItemSelectionInput</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome for state3</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        answer_group_list2 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state1',
+                    state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Outcome1 for state2</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec('Equals', {'x': 0}),
+                    state_domain.RuleSpec('Equals', {'x': 1})
+                ],
+                [], None
+            ),
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state3',
+                    state_domain.SubtitledHtml(
+                        'feedback_2', '<p>Outcome2 for state2</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec('Equals', {'x': 0}),
+                ],
+                [], None
+            ),
+        ]
+
+        answer_group_list3 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'state1',
+                    state_domain.SubtitledHtml(
+                        'feedback_1', '<p>Outcome for state3</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {'x': ['<p>This is value1 for ItemSelectionInput</p>']}
+                    ),
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {'x': ['<p>This is value3 for ItemSelectionInput</p>']}
+                    ),
+                ],
+                [], None
+            ),
+        ]
         state2.update_interaction_answer_groups(answer_group_list2)
         state3.update_interaction_answer_groups(answer_group_list3)
 

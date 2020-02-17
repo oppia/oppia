@@ -1242,35 +1242,30 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             ]}
         }
 
-        answer_group_list1 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value2 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'Introduction',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state1</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        answer_groups = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'Introduction',
+                    state_domain.SubtitledHtml(
+                        'feedback', '<p>Outcome for state1</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {'x': ['<p>This is value1 for ItemSelection</p>']}
+                    ),
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {'x': ['<p>This is value2 for ItemSelection</p>']}
+                    )
+                ],
+                [], None
+            )
+        ]
 
         state1.update_interaction_customization_args(customization_args_dict1)
-        state1.update_interaction_answer_groups(answer_group_list1)
+        state1.update_interaction_answer_groups(answer_groups)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
@@ -1290,35 +1285,30 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             ]}
         }
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        answer_groups2 = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'State1',
+                    state_domain.SubtitledHtml(
+                        'feedback', '<p>Outcome for state2</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {'x': ['<p>This is value1 for ItemSelection</p>']}
+                    ),
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {'x': ['<p>This is value3 for ItemSelection</p>']}
+                    )
+                ],
+                [], None
+            )
+        ]
 
         state2.update_interaction_customization_args(customization_args_dict2)
-        state2.update_interaction_answer_groups(answer_group_list2)
+        state2.update_interaction_answer_groups(answer_groups2)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1355,32 +1345,27 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             ]}
         }
 
-        answer_group_list = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value1 for ItemSelection</p>'
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    '<p>This is value3 for ItemSelection</p>'
-                ]}
-            }],
-            'outcome': {
-                'dest': 'State1',
-                'feedback': {
-                    'content_id': 'feedback',
-                    'html': '<p>Outcome for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_skill_misconception_id': None
-        }]
+        answer_group_list = [
+            state_domain.AnswerGroup(
+                state_domain.Outcome(
+                    'State1',
+                    state_domain.SubtitledHtml(
+                        'feedback', '<p>Outcome for state2</p>'
+                    ), False, [], None, None,
+                ),
+                [
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {'x': ['<p>This is value1 for ItemSelection</p>']}
+                    ),
+                    state_domain.RuleSpec(
+                        'Equals',
+                        {'x': ['<p>This is value3 for ItemSelection</p>']}
+                    )
+                ],
+                [], None
+            )
+        ]
 
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_interaction_answer_groups(answer_group_list)

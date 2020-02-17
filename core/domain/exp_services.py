@@ -356,7 +356,11 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS):
-                    state.update_interaction_answer_groups(change.new_value)
+                    answer_groups = [
+                        state_domain.AnswerGroup.from_dict(answer_dict)
+                        for answer_dict in change.new_value
+                    ]
+                    state.update_interaction_answer_groups(answer_groups)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
