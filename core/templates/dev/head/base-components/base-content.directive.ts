@@ -17,6 +17,15 @@
  */
 
 require('base-components/warning-loader.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'promo-bar.directive.ts');
+require(
+  'components/common-layout-directives/navigation-bars/' +
+  'side-navigation-bar.directive.ts');
+require(
+  'components/common-layout-directives/navigation-bars/' +
+  'top-navigation-bar.directive.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/sidebar/sidebar-status.service.ts');

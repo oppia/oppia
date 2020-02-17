@@ -701,5 +701,8 @@ module.exports = {
     splitChunks: {
       chunks: 'all'
     },
+  },
+  performance: {
+    hints: 'warning'
   }
 };

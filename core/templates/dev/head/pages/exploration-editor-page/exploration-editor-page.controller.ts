@@ -16,13 +16,18 @@
  * @fileoverview Controllers for the exploration editor page and the editor
  *               help tab in the navbar.
  */
-
+require(
+  'components/common-layout-directives/common-elements/' +
+  'promo-bar.directive.ts');
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'alert-message.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require(

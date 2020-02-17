@@ -16,6 +16,9 @@
  * @fileoverview Directive for warning_loader.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'alert-message.directive.ts');
 require('services/alerts.service.ts');
 
 angular.module('oppia').directive('warningLoader', [

@@ -16,6 +16,7 @@
  * @fileoverview Directive for the footer.
  */
 
+require('components/button-directives/social-buttons.directive.ts');
 
 angular.module('oppia').directive('oppiaFooter', [
   function() {

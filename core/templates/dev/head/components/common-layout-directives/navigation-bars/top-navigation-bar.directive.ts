@@ -17,6 +17,7 @@
  * of the navbar that is used for local navigation (such as the various tabs in
  * the editor pages).
  */
+require('components/button-directives/social-buttons.directive.ts');
 
 require('domain/sidebar/sidebar-status.service.ts');
 require('domain/utilities/url-interpolation.service.ts');
