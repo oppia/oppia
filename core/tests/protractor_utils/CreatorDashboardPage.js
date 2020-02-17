@@ -53,8 +53,11 @@ var CreatorDashboardPage = function() {
     return allExplorationDashboardCard.then(function(tiles) {
       return tiles.filter(function(tile) {
         return tile.getText().then(function(text) {
-          // Tile text contains title, possibly followed by newline and more text
-          return (text.startsWith(explorationTitle + '\n') || text === explorationTitle);
+          // Tile text contains title, possibly followed by newline and text
+          return (
+            text.startsWith(explorationTitle + '\n') ||
+            text === explorationTitle
+          );
         });
       });
     });
