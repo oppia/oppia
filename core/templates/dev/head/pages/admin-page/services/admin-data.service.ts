@@ -33,7 +33,7 @@ export class AdminDataService {
     this.dataPromise = null;
   }
 
-  _getDataAsync() {
+  _getDataAsync(): Promise<Object> {
     if (this.dataPromise) {
       return this.dataPromise;
     }
@@ -44,7 +44,7 @@ export class AdminDataService {
     return this.dataPromise;
   }
 
-  getDataAsync() {
+  getDataAsync(): Promise<Object> {
     return this._getDataAsync();
   }
 }
