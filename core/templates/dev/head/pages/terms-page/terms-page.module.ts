@@ -16,7 +16,6 @@
  * @fileoverview Module for the terms page.
  */
 
-
 import 'core-js/es7/reflect';
 import 'zone.js';
 

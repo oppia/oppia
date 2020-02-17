@@ -16,7 +16,6 @@
  * @fileoverview Module for the skill editor page.
  */
 
-
 import 'core-js/es7/reflect';
 import 'zone.js';
 

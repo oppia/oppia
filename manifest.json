@@ -250,6 +250,7 @@
         "rootDir": "bootstrap-4.3.1-dist",
         "targetDirPrefix": "bootstrap-",
         "bundle": {
+          "css": ["css/bootstrap.css"],
           "js": ["js/bootstrap.js"]
         }
       },
