@@ -312,6 +312,7 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'jpeg': ['jpg', 'jpeg'],
     'png': ['png'],
     'gif': ['gif'],
+    'svg': ['svg']
 }
 
 # An array containing the accepted audio extensions for uploaded files and

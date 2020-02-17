@@ -633,10 +633,13 @@ class ImageUploadHandler(EditorHandler):
         allowed_formats = ', '.join(
             list(feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.keys()))
 
-        # Verify that the data is recognized as an image.
-        file_format = imghdr.what(None, h=raw)
-        if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
-            raise self.InvalidInputException('Image not recognized')
+        if filename_prefix != 'thumbnail':
+            # Verify that the data is recognized as an image.
+            file_format = imghdr.what(None, h=raw)
+            if file_format not in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS:
+                raise self.InvalidInputException('Image not recognized')
+        else:
+            file_format = 'svg'
 
         # Verify that the file type matches the supplied extension.
         if not filename:

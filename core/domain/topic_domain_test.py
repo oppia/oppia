@@ -247,9 +247,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Thumbnail filename should not include slashes or '
             'consecutive dot characters.', 'file..name')
         self._assert_valid_thumbnail_filename_for_topic(
-            'Thumbnail filename with no extension.', 'name')
+            'Thumbnail filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_topic(
-            'Expected a filename ending in png, received name.jpg', 'name.jpg')
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
@@ -284,9 +284,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Thumbnail filename should not include slashes or '
             'consecutive dot characters.', 'file..name')
         self._assert_valid_thumbnail_filename_for_subtopic(
-            'Thumbnail filename with no extension.', 'name')
+            'Thumbnail filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_subtopic(
-            'Expected a filename ending in png, received name.jpg', 'name.jpg')
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'

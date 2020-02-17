@@ -287,9 +287,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Thumbnail filename should not include slashes or '
             'consecutive dot characters.', 'file..name')
         self._assert_valid_thumbnail_filename_for_story(
-            'Thumbnail filename with no extension.', 'name')
+            'Thumbnail filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_story(
-            'Expected a filename ending in png, received name.jpg', 'name.jpg')
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
     def test_thumbnail_filename_validation_for_story_node(self):
         self._assert_valid_thumbnail_filename_for_story_node(
@@ -303,9 +303,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Thumbnail filename should not include slashes or '
             'consecutive dot characters.', 'file..name')
         self._assert_valid_thumbnail_filename_for_story_node(
-            'Thumbnail filename with no extension.', 'name')
+            'Thumbnail filename should include an extension.', 'name')
         self._assert_valid_thumbnail_filename_for_story_node(
-            'Expected a filename ending in png, received name.jpg', 'name.jpg')
+            'Expected a filename ending in svg, received name.jpg', 'name.jpg')
 
     def test_to_human_readable_dict(self):
         story_summary = story_fetchers.get_story_summary_by_id(self.STORY_ID)

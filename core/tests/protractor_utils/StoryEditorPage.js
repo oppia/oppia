@@ -105,11 +105,11 @@ var StoryEditorPage = function() {
   var storyThumbnailImageElement = element(
     by.css('.story-thumbnail .protractor-test-custom-photo'));
   var storyThumbnailButton = element(
-    by.css('.story-thumbnail .protractor-test-photo-clickable'));
+    by.css('.story-thumbnail .protractor-test-photo-button'));
   var chapterThumbnailImageElement = element(
     by.css('.story-node-thumbnail .protractor-test-custom-photo'));
   var chapterThumbnailButton = element(
-    by.css('.story-node-thumbnail .protractor-test-photo-clickable'));
+    by.css('.story-node-thumbnail .protractor-test-photo-button'));
   this.get = function(storyId) {
     browser.get(EDITOR_URL_PREFIX + storyId);
     return waitFor.pageToFullyLoad();

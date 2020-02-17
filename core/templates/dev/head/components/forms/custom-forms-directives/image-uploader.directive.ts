@@ -48,13 +48,15 @@ angular.module('oppia').directive('imageUploader', [
           if (!file.type.match('image.jpeg') &&
             !file.type.match('image.gif') &&
             !file.type.match('image.jpg') &&
-            !file.type.match('image.png')) {
+            !file.type.match('image.png') &&
+            !file.type.match('image.svg')) {
             return 'This image format is not supported.';
           }
 
           if ((file.type.match(/jp(e?)g$/) && !file.name.match(/\.jp(e?)g$/)) ||
             (file.type.match(/gif$/) && !file.name.match(/\.gif$/)) ||
-            (file.type.match(/png$/) && !file.name.match(/\.png$/))) {
+            (file.type.match(/png$/) && !file.name.match(/\.png$/)) ||
+            (file.type.match(/svg$/) && !file.name.match(/\.svg$/))) {
             return 'This image format does not match the filename extension.';
           }
 

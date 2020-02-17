@@ -138,7 +138,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         """
         # Generate story with old(v1) story contents data.
         self.save_new_story_with_story_contents_schema_v1(
-            self.STORY_ID, 'image.png', self.albert_id, 'A title',
+            self.STORY_ID, 'image.svg', self.albert_id, 'A title',
             'A description', 'A note', self.TOPIC_ID)
         topic_services.add_canonical_story(
             self.albert_id, self.TOPIC_ID, self.STORY_ID)
@@ -154,7 +154,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Verify the story migrates correctly.
         updated_story = (
-            story_fetchers.get_story_by_id(self.STORY_ID))
+            story_models.StoryModel.get(self.STORY_ID))
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)

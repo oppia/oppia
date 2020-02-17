@@ -94,11 +94,11 @@ var TopicEditorPage = function() {
   var subtopicThumbnailImageElement = element(
     by.css('.subtopic-thumbnail .protractor-test-custom-photo'));
   var subtopicThumbnailButton = element(
-    by.css('.subtopic-thumbnail .protractor-test-photo-clickable'));
+    by.css('.subtopic-thumbnail .protractor-test-photo-button'));
   var topicThumbnailImageElement = element(
     by.css('.thumbnail-editor .protractor-test-custom-photo'));
   var topicThumbnailButton = element(
-    by.css('.thumbnail-editor .protractor-test-photo-clickable'));
+    by.css('.thumbnail-editor .protractor-test-photo-button'));
   var dragAndDrop = function(fromElement, toElement) {
     browser.executeScript(dragAndDropScript, fromElement, toElement);
   };

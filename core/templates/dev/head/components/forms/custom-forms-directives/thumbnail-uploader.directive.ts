@@ -28,6 +28,8 @@ require('services/context.service.ts');
 require('services/csrf-token.service.ts');
 require('services/image-upload-helper.service.ts');
 
+var C2S = require('canvas2svg');
+
 angular.module('oppia').directive('thumbnailUploader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -154,7 +156,7 @@ angular.module('oppia').directive('thumbnailUploader', [
                   $scope.onFileChanged = function(file) {
                     tempImageName = (
                       ImageUploadHelperService.generateImageFilename(
-                        150, 150, 'png'));
+                        150, 150, 'svg'));
                     $('.oppia-thumbnail-uploader').fadeOut(function() {
                       $scope.invalidImageWarningIsShown = false;
 
@@ -182,9 +184,19 @@ angular.module('oppia').directive('thumbnailUploader', [
                   };
 
                   $scope.confirm = function() {
-                    var croppedImageDataUrl = (cropper
-                      .getCroppedCanvas()
-                      .toDataURL());
+                    var croppedCanvas = cropper.getCroppedCanvas();
+                    var mirrorCanvas = new C2S(
+                      croppedCanvas.width, croppedCanvas.height);
+                    mirrorCanvas.canvas.drawImage(croppedCanvas, 0, 0);
+                    // var croppedImageDataUrl = (cropper
+                    //   .getCroppedCanvas()
+                    //   .toDataURL());
+                    var croppedImageDataUrl = (
+                      "data:image/svg+xml;base64," +
+                      btoa(
+                        unescape(
+                          encodeURIComponent(
+                            mirrorCanvas.getSerializedSvg()))));
                     $uibModalInstance.close(croppedImageDataUrl);
                   };
 
