@@ -100,6 +100,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             $scope.explorationId = $scope.getExplorationId();
             $scope.currentExplorationId = $scope.explorationId;
             $scope.expIdIsValid = true;
+            $scope.showInvalidExpError = false;
             $scope.nodeTitleEditorIsShown = false;
             $scope.OUTLINE_SCHEMA = {
               type: 'html',
@@ -143,6 +144,8 @@ angular.module('oppia').directive('storyNodeEditor', [
                 StoryUpdateService.setStoryNodeExplorationId(
                   $scope.story, $scope.getId(), explorationId);
                 $scope.currentExplorationId = explorationId;
+              } else {
+                $scope.showInvalidExpError = true;
               }
             });
           };
@@ -345,7 +348,7 @@ angular.module('oppia').directive('storyNodeEditor', [
             // EXPLORATION_AND_SKILL_ID_PATTERN
             // is not being used here, as the chapter of the story can be saved
             // with empty exploration id.
-            $scope.explorationIdPattern = /^[a-zA-Z0-9_-]*$/;
+            $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
             $scope.canSaveExpId = true;
             $scope.$on(EVENT_STORY_INITIALIZED, _init);
             $scope.$on(EVENT_STORY_REINITIALIZED, _init);
