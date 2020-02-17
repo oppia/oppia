@@ -329,6 +329,14 @@ class UtilsTests(test_utils.GenericTestBase):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
 
+    def test_snake_case_to_camel_case(self):
+        camel_case_str1 = utils.snake_case_to_camel_case('user_id_number')
+        camel_case_str2 = utils.snake_case_to_camel_case('hello_world')
+        camel_case_str3 = utils.snake_case_to_camel_case('test1')
+        self.assertEqual(camel_case_str1, 'userIdNumber')
+        self.assertEqual(camel_case_str2, 'helloWorld')
+        self.assertEqual(camel_case_str3, 'test1')
+
     def _assert_valid_thumbnail_filename(
             self, expected_error_substring, thumbnail_filename):
         """Helper method for test_require_valid_thumbnail_filename."""

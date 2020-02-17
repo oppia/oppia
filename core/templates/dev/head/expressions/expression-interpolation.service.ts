@@ -18,7 +18,7 @@
 
 require('filters/convert-html-to-unicode.filter.ts');
 require('expressions/expression-evaluator.service.ts');
-require('expressions/expression-parser.service.js');
+require('expressions/expression-parser.service.ts');
 require('expressions/expression-syntax-tree.service.ts');
 require('services/html-escaper.service.ts');
 
