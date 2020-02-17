@@ -27,27 +27,31 @@ require('services/contextual/url.service.ts');
 require('services/services.constants.ajs.ts');
 
 angular.module('oppia').factory('ExplorationDataService', [
-  '$http', '$log', '$q', '$window', 'AlertsService',
+  '$http', '$q', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
-  'ReadOnlyExplorationBackendApiService', 'UrlService',
+  'LoggerService', 'ReadOnlyExplorationBackendApiService',
+  'UrlService', 'WindowRef',
   function(
-      $http, $log, $q, $window, AlertsService,
+      $http, $q, AlertsService,
       EditableExplorationBackendApiService, LocalStorageService,
-      ReadOnlyExplorationBackendApiService, UrlService,) {
+      LoggerService, ReadOnlyExplorationBackendApiService,
+      UrlService, WindowRef) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
-    var pathnameArray = UrlService.getPathname().split('/');
+    var pathname = UrlService.getPathname();
+    var pathnameArray = pathname.split('/');
     for (var i = 0; i < pathnameArray.length; i++) {
       if (pathnameArray[i] === 'create') {
         explorationId = pathnameArray[i + 1];
         break;
       }
     }
+
     if (!explorationId) {
-      $log.error(
+      LoggerService.error(
         'Unexpected call to ExplorationDataService for pathname ',
-        pathnameArray[i]);
+        pathname);
       // Note: if we do not return anything, Karma unit tests fail.
       return {};
     }
@@ -65,7 +69,7 @@ angular.module('oppia').factory('ExplorationDataService', [
       // committed version (as opposed to the most recent autosave).
       autosaveChangeList: function(
           changeList,
-          successCallback = function(response) {},
+          successCallback,
           errorCallback = function() {}) {
         // First save locally to be retrieved later if save is unsuccessful.
         LocalStorageService.saveExplorationDraft(
@@ -102,7 +106,7 @@ angular.module('oppia').factory('ExplorationDataService', [
       // Returns a promise that supplies the data for the current exploration.
       getData: function(errorCallback) {
         if (explorationData.data) {
-          $log.info('Found exploration data in cache.');
+          LoggerService.info('Found exploration data in cache.');
           return $q.resolve(explorationData.data);
         } else {
           // Retrieve data from the server.
@@ -113,8 +117,8 @@ angular.module('oppia').factory('ExplorationDataService', [
           return (
             EditableExplorationBackendApiService.fetchApplyDraftExploration(
               explorationId).then(function(response) {
-              $log.info('Retrieved exploration data.');
-              $log.info(response);
+              LoggerService.info('Retrieved exploration data.');
+              LoggerService.info(response);
               draftChangeListId = response.draft_change_list_id;
               explorationData.data = response;
               var draft = LocalStorageService.getExplorationDraft(
@@ -126,7 +130,7 @@ angular.module('oppia').factory('ExplorationDataService', [
                     // A reload is needed so that the changelist just saved is
                     // loaded as opposed to the exploration returned by this
                     // response.
-                    $window.location.reload();
+                    WindowRef.nativeWindow.location.reload();
                   });
                 } else {
                   if (errorCallback) {
@@ -135,6 +139,8 @@ angular.module('oppia').factory('ExplorationDataService', [
                 }
               }
               return response;
+            })['catch'](function(error) {
+              errorCallback(error);
             })
           );
         }
@@ -144,8 +150,8 @@ angular.module('oppia').factory('ExplorationDataService', [
       getLastSavedData: function() {
         return ReadOnlyExplorationBackendApiService.loadLatestExploration(
           explorationId).then(function(response) {
-          $log.info('Retrieved saved exploration data.');
-          $log.info(response);
+          LoggerService.info('Retrieved saved exploration data.');
+          LoggerService.info(response);
 
           return response.exploration;
         });
@@ -171,7 +177,8 @@ angular.module('oppia').factory('ExplorationDataService', [
       save: function(
           changeList, commitMessage, successCallback, errorCallback) {
         EditableExplorationBackendApiService.updateExploration(explorationId,
-          explorationData.data.version, commitMessage, changeList).then(
+          explorationData.data ? explorationData.data.version : null,
+          commitMessage, changeList).then(
           function(response) {
             AlertsService.clearWarnings();
             explorationData.data = response;

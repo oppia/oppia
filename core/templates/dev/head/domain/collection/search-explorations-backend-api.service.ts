@@ -16,38 +16,52 @@
  * @fileoverview Service to search explorations metadata.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('SearchExplorationsBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'SEARCH_EXPLORATION_URL_TEMPLATE',
-  function(
-      $http, $q, UrlInterpolationService,
-      SEARCH_EXPLORATION_URL_TEMPLATE) {
-    var _fetchExplorations = function(
-        searchQuery, successCallback, errorCallback) {
-      var queryUrl = UrlInterpolationService.interpolateUrl(
-        SEARCH_EXPLORATION_URL_TEMPLATE, {
-          query: btoa(searchQuery)
-        }
-      );
-      $http.get(queryUrl).then(function(response) {
-        successCallback(response.data);
-      }, function(errorResponse) {
-        errorCallback(errorResponse.data);
-      });
-    };
-    return {
-      /**
-       * Returns exploration's metadata dict, given a search query. Search
-       * queries are tokens that will be matched against exploration's title
-       * and objective.
-       */
-      fetchExplorations: function(searchQuery) {
-        return $q(function(resolve, reject) {
-          _fetchExplorations(searchQuery, resolve, reject);
-        });
+import { LibraryPageConstants } from
+  'pages/library-page/library-page.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SearchExplorationsBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolationService: UrlInterpolationService
+  ) {}
+
+  private _fetchExplorations(
+      searchQuery: string, successCallback: (
+      value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    var queryUrl = this.urlInterpolationService.interpolateUrl(
+      LibraryPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE, {
+        query: btoa(searchQuery)
       }
-    };
-  }]);
+    );
+    this.http.get(queryUrl).toPromise().then((response) => {
+      successCallback(response);
+    }, (errorResponse) => {
+      errorCallback(errorResponse);
+    });
+  }
+
+  /**
+   * Returns exploration's metadata dict, given a search query. Search
+   * queries are tokens that will be matched against exploration's title
+   * and objective.
+   */
+  fetchExplorations(searchQuery: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchExplorations(searchQuery, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'SearchExplorationsBackendApiService',
+  downgradeInjectable(SearchExplorationsBackendApiService));
