@@ -16,47 +16,64 @@
  * @fileoverview Service to get classroom data.
  */
 
-require('domain/topic/TopicSummaryObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/classroom/classroom-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('ClassroomBackendApiService', [
-  '$http', '$q', 'TopicSummaryObjectFactory', 'UrlInterpolationService',
-  'CLASSROOOM_DATA_URL_TEMPLATE',
-  function($http, $q, TopicSummaryObjectFactory, UrlInterpolationService,
-      CLASSROOOM_DATA_URL_TEMPLATE) {
-    var topicSummaryDicts = null;
-    var topicSummaryObjects = null;
-    var _fetchClassroomData = function(
-        classroomName, successCallback, errorCallback) {
-      var classroomDataUrl = UrlInterpolationService.interpolateUrl(
-        CLASSROOOM_DATA_URL_TEMPLATE, {
-          classroom_name: classroomName
-        });
+import { ClassroomDomainConstants } from
+  'domain/classroom/classroom-domain.constants';
+import { TopicSummaryObjectFactory } from
+  'domain/topic/TopicSummaryObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-      $http.get(classroomDataUrl).then(function(response) {
-        topicSummaryDicts = angular.copy(response.data.topic_summary_dicts);
-        topicSummaryObjects = topicSummaryDicts.map(
-          function(summaryDict) {
-            return TopicSummaryObjectFactory.createFromBackendDict(summaryDict);
-          }
-        );
-        if (successCallback) {
-          successCallback(topicSummaryObjects);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
+@Injectable({
+  providedIn: 'root'
+})
+export class ClassroomBackendApiService {
+  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
+  // 'any' because 'subtopicDataBackendDict' is a dict with underscore_cased
+  // keys which give tslint errors against underscore_casing in favor of
+  // camelCasing.
+  topicSummaryObjects: any = null;
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient,
+    private topicSummaryObjectFactory: TopicSummaryObjectFactory
+  ) {}
+
+  _fetchClassroomData(classroomName: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    let classroomDataUrl = this.urlInterpolationService.interpolateUrl(
+      ClassroomDomainConstants.CLASSROOOM_DATA_URL_TEMPLATE, {
+        classroom_name: classroomName
       });
-    };
 
-    return {
-      fetchClassroomData: function(classroomName) {
-        return $q(function(resolve, reject) {
-          _fetchClassroomData(classroomName, resolve, reject);
-        });
+    this.http.get(classroomDataUrl).toPromise().then((data: any) => {
+      this.topicSummaryObjects = data.topic_summary_dicts.map(
+        (summaryDict) => {
+          return this.topicSummaryObjectFactory.createFromBackendDict(
+            summaryDict);
+        }
+      );
+      if (successCallback) {
+        successCallback(this.topicSummaryObjects);
       }
-    };
+    }, (error: any) => {
+      if (errorCallback) {
+        errorCallback(error);
+      }
+    });
   }
-]);
+
+  fetchClassroomData(classroomName: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchClassroomData(classroomName, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'ClassroomBackendApiService',
+  downgradeInjectable(ClassroomBackendApiService));

@@ -27,6 +27,7 @@ describe('Concept card backend API service', function() {
   var $httpBackend = null;
   var sampleResponse1 = null;
   var sampleResponse2 = null;
+  var sampleResponse3 = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -94,6 +95,10 @@ describe('Concept card backend API service', function() {
     };
 
     sampleResponse2 = {
+      concept_card_dicts: [conceptCardDict2]
+    };
+
+    sampleResponse3 = {
       concept_card_dicts: [conceptCardDict1, conceptCardDict2]
     };
   }));
@@ -128,14 +133,32 @@ describe('Concept card backend API service', function() {
       var conceptCardDataUrl =
         '/concept_card_handler/' + encodeURIComponent('1,2');
       $httpBackend.expect('GET', conceptCardDataUrl).respond(
-        sampleResponse2);
+        sampleResponse3);
       ConceptCardBackendApiService.loadConceptCards(['1', '2']).then(
         successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
-        sampleResponse2.concept_card_dicts);
+        sampleResponse3.concept_card_dicts);
       expect(failHandler).not.toHaveBeenCalled();
+    });
+
+  it('should get all concept cards even the one which was fetched before',
+    function() {
+      $httpBackend.expect('GET', '/concept_card_handler/' + '1').respond(
+        sampleResponse1);
+
+      ConceptCardBackendApiService.loadConceptCards(['1']).then(
+        function(conceptCards) {
+          $httpBackend.expect('GET', '/concept_card_handler/' + '2').respond(
+            sampleResponse2);
+          ConceptCardBackendApiService.loadConceptCards(['1', '2']).then(
+            function(conceptCards2) {
+              expect(conceptCards).toEqual(sampleResponse1.concept_card_dicts);
+              expect(conceptCards2).toEqual(sampleResponse3.concept_card_dicts);
+            });
+        });
+      $httpBackend.flush();
     });
 
   it('should use the rejection handler if backend request failed',
@@ -152,4 +175,18 @@ describe('Concept card backend API service', function() {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading skill 1.');
     });
+
+  it('should not fetch the same concept card', function() {
+    $httpBackend.expect('GET', '/concept_card_handler/1').respond(
+      sampleResponse1);
+    ConceptCardBackendApiService.loadConceptCards(['1'])
+      .then(function(conceptCards) {
+        ConceptCardBackendApiService.loadConceptCards(['1'])
+          .then(function(conceptCards2) {
+            expect(conceptCards).toEqual(conceptCards2);
+            expect(conceptCards2).toEqual(sampleResponse1.concept_card_dicts);
+          });
+      });
+    $httpBackend.flush();
+  });
 });

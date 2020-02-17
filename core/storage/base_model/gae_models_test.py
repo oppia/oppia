@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.base_model.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -71,6 +72,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_export_data(self):
         with self.assertRaises(NotImplementedError):
             base_models.BaseModel.export_data('user_id')
+
+    def test_get_export_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_export_policy()
 
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()

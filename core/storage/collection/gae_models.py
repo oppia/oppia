@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Model for an Oppia collection."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -31,12 +32,26 @@ from google.appengine.ext import ndb
 
 class CollectionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionModel(base_models.VersionedModel):
@@ -76,6 +91,11 @@ class CollectionModel(base_models.VersionedModel):
     def get_deletion_policy():
         """Collection is deleted only if it is not public."""
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -186,13 +206,27 @@ class CollectionModel(base_models.VersionedModel):
 class CollectionRightsSnapshotMetadataModel(
         base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a collection rights snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionRightsSnapshotContentModel(
         base_models.BaseSnapshotContentModel):
     """Storage model for the content of a collection rights snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class CollectionRightsModel(base_models.VersionedModel):
@@ -241,6 +275,11 @@ class CollectionRightsModel(base_models.VersionedModel):
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
     @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
+    @staticmethod
     def transform_dict_to_valid(model_dict):
         """Replace invalid fields and values in the CollectionRightsModel dict.
 
@@ -272,8 +311,7 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
-        """Check whether CollectionRightsModel or its snapshots references the
-        given user.
+        """Check whether CollectionRightsModel references the given user.
 
         Args:
             user_id: str. The ID of the user whose data should be checked.
@@ -281,21 +319,6 @@ class CollectionRightsModel(base_models.VersionedModel):
         Returns:
             bool. Whether any models refer to the given user ID.
         """
-        more_results = True
-        cursor = None
-        while more_results:
-            snapshot_content_models, cursor, more_results = (
-                cls.SNAPSHOT_CONTENT_CLASS.query().fetch_page(
-                    base_models.FETCH_BATCH_SIZE, start_cursor=cursor))
-            for snapshot_content_model in snapshot_content_models:
-                reconstituted_model = cls(
-                    **CollectionRightsModel.transform_dict_to_valid(
-                        snapshot_content_model.content))
-                if any((user_id in reconstituted_model.owner_ids,
-                        user_id in reconstituted_model.editor_ids,
-                        user_id in reconstituted_model.voice_artist_ids,
-                        user_id in reconstituted_model.viewer_ids)):
-                    return True
         return (
             cls.query(ndb.OR(
                 cls.owner_ids == user_id,
@@ -347,7 +370,7 @@ class CollectionRightsModel(base_models.VersionedModel):
         user_ids = (self.owner_ids + self.editor_ids + self.voice_artist_ids +
                     self.viewer_ids)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
@@ -467,6 +490,14 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         is not public.
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+        TODO(#8523): Implement this function.
+        """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
     @classmethod
     def _get_instance_id(cls, collection_id, version):
@@ -602,6 +633,14 @@ class CollectionSummaryModel(base_models.BaseModel):
         """
         return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
 
+    @staticmethod
+    def get_export_policy():
+        """Model data has already been exported as a part of the
+        CollectionRightsModel, and thus does not need an export_data
+        function.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether CollectionSummaryModel references user.
@@ -713,7 +752,7 @@ class CollectionSummaryModel(base_models.BaseModel):
         user_ids = (self.owner_ids + self.editor_ids + self.viewer_ids +
                     self.contributor_ids)
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
