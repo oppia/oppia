@@ -3179,10 +3179,10 @@ escodegen@1.8.x:
   optionalDependencies:
     source-map "~0.2.0"
 
-eslint-plugin-angular@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-angular/-/eslint-plugin-angular-4.0.1.tgz#f6c01d2a1e549d603e29eceb8615b5a989863a5e"
-  integrity sha512-OaW5G461C2lIkOG+/bhnBoXB9UQm/r0Dj2Qf9uiIN0/ncvf2Llp30L0q1tqWkN8/CxyBwQKh1v0hpCLLDjaIKQ==
+eslint-plugin-angular@^1.6.4:
+  version "1.6.4"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-angular/-/eslint-plugin-angular-1.6.4.tgz#f495b351e2a49907a020f1c4fbdfbf81011a32a2"
+  integrity sha1-9JWzUeKkmQegIPHE+9+/gQEaMqI=
 
 eslint-plugin-html@^6.0.0:
   version "6.0.0"

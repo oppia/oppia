@@ -16,7 +16,7 @@
  * @fileoverview Unit test for CollectionCreationBackendApiService.
  */
 
-// eslint-disable-next-line max-len
+
 
 require(
   'components/entity-creation-services/skill-creation-backend-api.service.ts');
