@@ -370,10 +370,15 @@ def send_job_failure_email(job_id):
             mail_body.replace('\n', '<br/>'))
 
 
-def send_dummy_mail_to_admin(email_name, email_address):
-    """Send an email to the specified email address."""
+def send_dummy_mail_to_admin(email_name, email_address, email_body):
+    """Send an email from the specified email address to admin.
+
+    Args:
+        email_name: str. The name of the sender.
+        email_address: str. The email address of the sender.
+        email_body: str. Body of the email.
+    """
     email_subject = 'Test Mail'
-    email_body = 'This is a test mail from Oppia.'
     system_name_email = '%s <%s>' % (
         email_name, email_address)
 

@@ -121,6 +121,7 @@ class DummyMailTest(test_utils.GenericTestBase):
         dummy_system_name = 'DUMMY_SYSTEM_NAME'
         dummy_system_address = 'dummy@system.com'
         dummy_receiver_address = 'admin@system.com'
+        dummy_email_body = 'This is a test mail from Oppia'
 
         send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         admin_email_ctx = self.swap(
@@ -134,7 +135,7 @@ class DummyMailTest(test_utils.GenericTestBase):
 
             # Send an email.
             email_manager.send_dummy_mail_to_admin(
-                dummy_system_name, dummy_system_address)
+                dummy_system_name, dummy_system_address, dummy_email_body)
 
             # Make sure emails are sent.
             messages = self.mail_stub.get_sent_messages(
@@ -145,8 +146,7 @@ class DummyMailTest(test_utils.GenericTestBase):
             self.assertEqual(messages[0].to, dummy_receiver_address)
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
-            self.assertIn(
-                'This is a test mail from Oppia.', messages[0].html.decode())
+            self.assertIn(dummy_email_body, messages[0].html.decode())
 
 
 class EmailRightsTest(test_utils.GenericTestBase):

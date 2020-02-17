@@ -1060,14 +1060,20 @@ class SendDummyMailTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         csrf_token = self.get_new_csrf_token()
 
+        payload = {
+            'username': feconf.SYSTEM_EMAIL_NAME
+        }
+
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             generated_response = self.post_json(
-                '/sendDummyMailToAdminHandler', payload={},
+                '/sendDummyMailToAdminHandler', payload,
                 csrf_token=csrf_token)
             self.assertEqual(
                 generated_response['msg'], 'Success! Mail sent to admin.')
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             generated_response = self.post_json(
-                '/sendDummyMailToAdminHandler', payload={},
+                '/sendDummyMailToAdminHandler', payload,
                 csrf_token=csrf_token, expected_status_int=400)
+            self.assertEqual(
+                generated_response['error'], 'This app cannot send emails.')
