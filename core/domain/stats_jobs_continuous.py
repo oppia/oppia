@@ -122,7 +122,10 @@ class InteractionAnswerSummariesMRJobManager(
                     Occurs when version mismatches and the new
                     version has a different interaction ID.
         """
-        exploration_id, exploration_version, state_name = key.split(':')
+        try:
+            exploration_id, exploration_version, state_name = key.split(':')
+        except Exception as e:
+            raise Exception(u'Failed to split "%s" with ":".' % key)
 
         value_dicts = [
             ast.literal_eval(stringified_value)
