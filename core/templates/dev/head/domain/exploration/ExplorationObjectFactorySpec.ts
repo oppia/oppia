@@ -68,7 +68,7 @@ describe('Exploration object factory', () => {
               filename: 'myfile3.mp3',
               file_size_bytes: 430000,
               needs_update: false,
-              duration_secs: 4.3
+              duration_secs: 2.1
             }
           },
           default_outcome: {}
@@ -107,7 +107,7 @@ describe('Exploration object factory', () => {
               filename: 'myfile2.mp3',
               file_size_bytes: 120000,
               needs_update: false,
-              duration_secs: 4.3
+              duration_secs: 1.2
             }
           },
           default_outcome: {}
@@ -181,7 +181,7 @@ describe('Exploration object factory', () => {
           filename: 'myfile3.mp3',
           file_size_bytes: 430000,
           needs_update: false,
-          duration_secs: 4.3
+          duration_secs: 2.1
         })],
         'second state': [vof.createFromBackendDict({
           filename: 'myfile2.mp3',
@@ -195,7 +195,7 @@ describe('Exploration object factory', () => {
           filename: 'myfile1.mp3',
           file_size_bytes: 210000,
           needs_update: false,
-          duration_secs: 2.1
+          duration_secs: 4.3
         })],
         'second state': []
       });
@@ -212,7 +212,8 @@ describe('Exploration object factory', () => {
       vof.createFromBackendDict({
         filename: 'myfile1.mp3',
         file_size_bytes: 210000,
-        needs_update: false
+        needs_update: false,
+        duration_secs: 4.3
       })
     );
 
@@ -228,12 +229,14 @@ describe('Exploration object factory', () => {
       en: vof.createFromBackendDict({
         filename: 'myfile1.mp3',
         file_size_bytes: 210000,
-        needs_update: false
+        needs_update: false,
+        duration_secs: 4.3
       }),
       'hi-en': vof.createFromBackendDict({
         filename: 'myfile3.mp3',
         file_size_bytes: 430000,
-        needs_update: false
+        needs_update: false,
+        duration_secs: 2.1
       })
     });
 
@@ -241,7 +244,8 @@ describe('Exploration object factory', () => {
       'hi-en': vof.createFromBackendDict({
         filename: 'myfile2.mp3',
         file_size_bytes: 120000,
-        needs_update: false
+        needs_update: false,
+        duration_secs: 1.2
       })
     });
 
