@@ -23,7 +23,7 @@ IMPORTANT NOTES:
 1.  Before running this script, you must install third-party dependencies by
     running
 
-        python -m scripts.release_scripts.install_third_party_libs
+        python -m scripts.install_third_party_libs
 
     at least once.
 
