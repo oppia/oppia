@@ -80,8 +80,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             MockInteractionAnswerSummariesAggregator)
 
     def _invalid_state_names_permitted(self):
-        """Context manager to stop validating the names of exploration states.
-        """
+        """Context manager to stop validating names of exploration states."""
         return self.swap(
             exp_domain.Exploration, '_require_valid_state_name',
             lambda unused_cls, unused_name: None)
