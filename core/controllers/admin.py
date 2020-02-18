@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the admin view."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -307,7 +308,8 @@ class AdminHandler(base.BaseHandler):
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
-                True, [], None, None).to_dict()
+                True, [], None, None
+            )
         )
         question = question_domain.Question(
             question_id, state,

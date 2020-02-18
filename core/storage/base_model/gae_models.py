@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Base model class."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -43,6 +44,12 @@ DELETION_POLICY = utils.create_enum(  # pylint: disable=invalid-name
     'LOCALLY_PSEUDONYMIZE',
     'KEEP_IF_PUBLIC',
     'NOT_APPLICABLE'
+)
+
+EXPORT_POLICY = utils.create_enum( # pylint: disable=invalid-name
+    'CONTAINS_USER_DATA',
+    'NOT_APPLICABLE',
+    'TO_BE_IMPLEMENTED'
 )
 
 # Types of user id migration policies. The pragma comment is needed because
@@ -152,6 +159,16 @@ class BaseModel(ndb.Model):
 
         Args:
             user_id: str. The ID of the user whose data should be exported.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in a derived
+                class.
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def get_export_policy():
+        """This method should be implemented by subclasses.
 
         Raises:
             NotImplementedError: The method is not overwritten in a derived

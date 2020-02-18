@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Jobs for statistics views."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -1257,51 +1258,110 @@ class RegenerateMissingV2StatsModelsOneOffJob(
             stats_models.ExplorationStatsModel.get_multi_stats_models(
                 [exp_domain.ExpVersionReference(exp.id, version)
                  for version in python_utils.RANGE(1, exp.version + 1)]))
+
+        if exp.deleted:
+            all_existent_models = [m for m in all_models if m is not None]
+            stats_models.ExplorationStatsModel.delete_multi(all_existent_models)
+            yield (
+                'Deleted all stats', {
+                    'exp_id': exp.id,
+                    'number_of_models': len(all_existent_models)
+                })
+            return
+
         first_missing_version = None
         for version, model in enumerate(all_models):
             if model is None:
                 first_missing_version = version + 1
                 break
 
+        # If no stats models are missing, we are good.
         if first_missing_version is None:
             yield ('No change', exp.id)
             return
 
+        # The first model cannot be missing. It should only be missing for
+        # revert commits and the first change cannot be a revert commit.
         if first_missing_version == 1:
             yield ('Missing model at version 1', exp.id)
             return
 
         new_exp_stats_dicts = []
 
+        # From the version just before the first missing version to the latest
+        # version of the exploration stats were incorrectly calculated. So we
+        # recalculate stats for all these versions.
         for version in python_utils.RANGE(
                 first_missing_version - 1, exp.version + 1):
             commit_log = exp_models.ExplorationCommitLogEntryModel.get_commit(
                 exp.id, version)
             exp_at_version = exp_models.ExplorationModel.get_version(
                 exp.id, version)
-            # Delete all old models.
-            if all_models[version - 1] is None:
-                if commit_log.commit_type != 'revert':
-                    yield ('Missing model without revert commit', exp.id)
-                    return
 
-                # Is a revert commit.
-                revert_to_version = commit_log.commit_cmds[0]['version_number']
+            # If commit log models are missing (we noticed this on prod), we
+            # manually calculate a diff between adjacent versions.
+            if commit_log is None:
+                prev_exp = exp_models.ExplorationModel.get_version(
+                    exp.id, version - 1)
+                old_states = prev_exp.states
+                new_states = exp_at_version.states
+                inferred_change_list = []
+
+                # If a state isn't present in the new version, we consider it as
+                # a deletion.
+                for old_state in old_states:
+                    if old_state not in new_states:
+                        inferred_change_list.append(
+                            exp_domain.ExplorationChange({
+                                'cmd': exp_domain.CMD_DELETE_STATE,
+                                'state_name': old_state
+                            }))
+
+                # If a new state is present in the new version, we consider it
+                # as an addition.
+                for new_state in new_states:
+                    if new_state not in old_states:
+                        inferred_change_list.append(
+                            exp_domain.ExplorationChange({
+                                'cmd': exp_domain.CMD_ADD_STATE,
+                                'state_name': new_state
+                            }))
+                exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                    inferred_change_list)
+
+                # If there are existing stats models for this version, which was
+                # incorrectly calculated before, we delete it.
+                if all_models[version - 1] is not None:
+                    all_models[version - 1].delete()
+
                 new_exp_stats_dicts.append(
                     stats_services.get_stats_for_new_exp_version(
-                        exp.id, version, exp_at_version.states, None,
-                        revert_to_version).to_dict())
+                        exp.id, version, exp_at_version.states,
+                        exp_versions_diff, None).to_dict())
             else:
-                all_models[version - 1].delete()
                 change_list = (
                     [exp_domain.ExplorationChange(commit_cmd)
                      for commit_cmd in commit_log.commit_cmds])
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
-                new_exp_stats_dicts.append(
-                    stats_services.get_stats_for_new_exp_version(
-                        exp.id, version, exp_at_version.states,
-                        exp_versions_diff, None).to_dict())
+
+                # If there are existing stats models for this version, which was
+                # incorrectly calculated before, we delete it.
+                if all_models[version - 1] is not None:
+                    all_models[version - 1].delete()
+
+                if commit_log.commit_type == 'revert':
+                    revert_to_version = (
+                        commit_log.commit_cmds[0]['version_number'])
+                    new_exp_stats_dicts.append(
+                        stats_services.get_stats_for_new_exp_version(
+                            exp.id, version, exp_at_version.states, None,
+                            revert_to_version).to_dict())
+                else:
+                    new_exp_stats_dicts.append(
+                        stats_services.get_stats_for_new_exp_version(
+                            exp.id, version, exp_at_version.states,
+                            exp_versions_diff, None).to_dict())
 
         stats_models.ExplorationStatsModel.save_multi(new_exp_stats_dicts)
 

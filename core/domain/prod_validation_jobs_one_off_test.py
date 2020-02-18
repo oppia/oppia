@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Unit tests for core.domain.prod_validation_jobs_one_off."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -2230,7 +2231,7 @@ class ExplorationOpportunitySummaryModelValidatorTests(
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
-            category='category%d' % i,
+            category='category',
         ) for i in python_utils.RANGE(5)]
 
         for exp in explorations:
@@ -7715,7 +7716,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         explorations = [exp_domain.Exploration.create_default_exploration(
             '%s' % i,
             title='title %d' % i,
-            category='category%d' % i,
+            category='category',
         ) for i in python_utils.RANGE(6)]
 
         for exp in explorations:
@@ -11603,18 +11604,12 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -11795,18 +11790,12 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             intro_state.update_interaction_id('TextInput')
             end_state.update_interaction_id('EndExploration')
 
-            default_outcome_dict = {
-                'dest': 'End',
-                'feedback': {
-                    'content_id': 'default_outcome',
-                    'html': '<p>Introduction</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            }
-            intro_state.update_interaction_default_outcome(default_outcome_dict)
+            default_outcome = state_domain.Outcome(
+                'End', state_domain.SubtitledHtml(
+                    'default_outcome', '<p>Introduction</p>'),
+                False, [], None, None
+            )
+            intro_state.update_interaction_default_outcome(default_outcome)
             end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -11988,18 +11977,12 @@ class ExpUserLastPlaythroughModelValidatorTests(
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -12151,18 +12134,12 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:

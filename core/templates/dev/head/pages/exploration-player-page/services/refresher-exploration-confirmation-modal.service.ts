@@ -32,8 +32,8 @@ angular.module('oppia').factory(
         displayRedirectConfirmationModal: function(
             refresherExplorationId, redirectConfirmationCallback) {
           $uibModal.open({
-            templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-player-page/templates/' +
+            template: require(
+              'pages/exploration-player-page/templates/' +
               'refresher-exploration-confirmation-modal.template.html'),
             backdrop: 'static',
             controller: [

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for test_utils, mainly for the FunctionWrapper."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -304,3 +305,149 @@ class TestUtilsTests(test_utils.GenericTestBase):
             gravatar_data_url = utils.convert_png_to_data_url(
                 expected_gravatar_filepath)
             self.assertEqual(profile_picture, gravatar_data_url)
+
+    def test_swap_with_check_on_method_called(self):
+        def mock_getcwd():
+            return
+
+        getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
+        with getcwd_swap:
+            SwapWithCheckTestClass.getcwd_function_without_args()
+
+    def test_swap_with_check_on_called_failed(self):
+        def mock_getcwd():
+            return
+
+        getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
+        with self.assertRaisesRegexp(AssertionError, r'os\.getcwd'):
+            with getcwd_swap:
+                SwapWithCheckTestClass.empty_function_without_args()
+
+    def test_swap_with_check_on_not_called(self):
+        def mock_getcwd():
+            return
+
+        getcwd_swap = self.swap_with_checks(
+            os, 'getcwd', mock_getcwd, called=False)
+        with getcwd_swap:
+            SwapWithCheckTestClass.empty_function_without_args()
+
+    def test_swap_with_check_on_not_called_failed(self):
+        def mock_getcwd():
+            return
+
+        getcwd_swap = self.swap_with_checks(
+            os, 'getcwd', mock_getcwd)
+        with self.assertRaisesRegexp(AssertionError, r'os\.getcwd'):
+            with getcwd_swap:
+                SwapWithCheckTestClass.empty_function_without_args()
+
+    def test_swap_with_check_on_expected_args(self):
+        def mock_getenv(unused_env):
+            return
+        def mock_join(*unused_args):
+            return
+        getenv_swap = self.swap_with_checks(
+            os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)])
+        join_swap = self.swap_with_checks(
+            os.path, 'join', mock_join, expected_args=[('first', 'second')])
+        with getenv_swap, join_swap:
+            SwapWithCheckTestClass.functions_with_args()
+
+    def test_swap_with_check_on_expected_args_failed_on_run_sequence(self):
+        def mock_getenv(unused_env):
+            return
+        def mock_join(*unused_args):
+            return
+        getenv_swap = self.swap_with_checks(
+            os, 'getenv', mock_getenv, expected_args=[('456',), ('123',)])
+        join_swap = self.swap_with_checks(
+            os.path, 'join', mock_join, expected_args=[('first', 'second')])
+        with self.assertRaisesRegexp(AssertionError, r'os\.getenv'):
+            with getenv_swap, join_swap:
+                SwapWithCheckTestClass.functions_with_args()
+
+    def test_swap_with_check_on_expected_args_failed_on_wrong_args_number(self):
+        def mock_getenv(unused_env):
+            return
+        def mock_join(*unused_args):
+            return
+        getenv_swap = self.swap_with_checks(
+            os, 'getenv', mock_getenv, expected_args=[('123',), ('456',)])
+        join_swap = self.swap_with_checks(
+            os.path, 'join', mock_join, expected_args=[
+                ('first', 'second'), ('third', 'forth')])
+        with self.assertRaisesRegexp(AssertionError, r'join'):
+            with getenv_swap, join_swap:
+                SwapWithCheckTestClass.functions_with_args()
+
+    def test_swap_with_check_on_expected_kwargs(self):
+        # pylint: disable=unused-argument
+        def mock_getenv(key, default):
+            return
+        # pylint: enable=unused-argument
+        getenv_swap = self.swap_with_checks(
+            os, 'getenv', mock_getenv, expected_kwargs=[
+                {'key': '123', 'default': '456'},
+                {'key': '678', 'default': '900'},
+            ])
+
+        with getenv_swap:
+            SwapWithCheckTestClass.functions_with_kwargs()
+
+    def test_swap_with_check_on_expected_kwargs_failed_on_wrong_numbers(self):
+        # pylint: disable=unused-argument
+        def mock_getenv(key, default):
+            return
+        # pylint: enable=unused-argument
+        getenv_swap = self.swap_with_checks(
+            os, 'getenv', mock_getenv, expected_kwargs=[
+                {'key': '123', 'default': '456'},
+                {'key': '678', 'default': '900'},
+                {'key': '678', 'default': '900'},
+            ])
+
+        with self.assertRaisesRegexp(AssertionError, r'os\.getenv'):
+            with getenv_swap:
+                SwapWithCheckTestClass.functions_with_kwargs()
+
+    def test_swap_with_check_on_capature_exception_raised_by_tested_function(
+            self):
+        def mock_getcwd():
+            raise ValueError()
+
+
+        getcwd_swap = self.swap_with_checks(os, 'getcwd', mock_getcwd)
+
+        with self.assertRaises(ValueError):
+            with getcwd_swap:
+                SwapWithCheckTestClass.getcwd_function_without_args()
+
+
+class SwapWithCheckTestClass(python_utils.OBJECT):
+    """Dummy class for testing check_with_swap. This class stores a few dummy
+    functions.
+    """
+
+    @classmethod
+    def getcwd_function_without_args(cls):
+        """Run getcwd function."""
+        os.getcwd()
+
+    @classmethod
+    def empty_function_without_args(cls):
+        """Empty function."""
+        pass
+
+    @classmethod
+    def functions_with_args(cls):
+        """Run a few functions with args."""
+        os.getenv('123')
+        os.getenv('456')
+        os.path.join('first', 'second')
+
+    @classmethod
+    def functions_with_kwargs(cls):
+        """Run a few functions with kwargs."""
+        os.getenv(key='123', default='456')
+        os.getenv(key='678', default='900')

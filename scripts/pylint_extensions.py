@@ -17,6 +17,7 @@
 """Implements additional custom Pylint checkers to be used as part of
 presubmit checks.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -31,12 +32,15 @@ _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 _PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.9.4')
 sys.path.insert(0, _PYLINT_PATH)
 
+# List of punctuation symbols that can be used at the end of
+# comments and docstrings.
 ALLOWED_TERMINATING_PUNCTUATIONS = ['.', '?', '}', ']', ')']
 
+# If any of these phrases are found inside a docstring or comment,
+# the punctuation and capital letter checks will be skipped for that
+# comment or docstring.
 EXCLUDED_PHRASES = [
     'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
-
-DATA_TYPES = ['int', 'str', 'float', 'bool']
 
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
@@ -1195,7 +1199,9 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
 
+        allowed_comment_prefixes = ['int', 'str', 'float', 'bool', 'v']
         in_multi_line_comment = False
+        space_at_beginning_of_comment = True
         multi_line_indicator = b'"""'
         file_content = read_from_node(node)
         file_length = len(file_content)
@@ -1227,40 +1233,52 @@ class SingleLineCommentChecker(checkers.BaseChecker):
             if line_num > 0:
                 previous_line = file_content[line_num - 1].strip()
 
-            if line.startswith(b'#'):
-                # Check if comment contains any excluded phrase.
-                word_is_present_in_excluded_phrases = any(
-                    word in line for word in EXCLUDED_PHRASES)
+            # Ignore lines which are not comments.
+            if not line.startswith(b'#'):
+                continue
 
-                # Check if variable name is used.
-                underscore_is_present = any('_' in word for word in line)
+            # Check if comment contains any excluded phrase.
+            word_is_present_in_excluded_phrases = any(
+                word in line for word in EXCLUDED_PHRASES)
 
-                if word_is_present_in_excluded_phrases or underscore_is_present:
-                    continue
+            # Comments may include a lowercase character at beginning
+            # or may not use a punctuation at end if it contains a
+            # excluded phrase e.g. "# coding: utf-8".
+            if word_is_present_in_excluded_phrases:
+                continue
 
-            if line.startswith(b'#') and not next_line.startswith(b'#'):
-                # Check that the comment ends with the proper
-                # punctuation.
+            if not next_line.startswith(b'#'):
+                # Comments must end with the proper punctuation.
                 last_char_is_invalid = line[-1] not in (
                     ALLOWED_TERMINATING_PUNCTUATIONS)
                 if last_char_is_invalid:
                     self.add_message(
                         'invalid-punctuation-used', line=line_num + 1)
 
-            # Check that comment starts with a space and is not a
-            # shebang expression at the start of a bash script which
-            # loses function when a space is added.
+            # Comments must start with a space.
             if re.search(br'^#[^\s].*$', line) and not line.startswith(b'#!'):
+                space_at_beginning_of_comment = False
                 self.add_message(
                     'no-space-at-beginning', line=line_num + 1)
 
-            # Check if comment contains version info or data type.
-            if not previous_line.startswith(b'#'):
-                data_type_is_present = any(word in line for word in DATA_TYPES)
-                if data_type_is_present or re.search(br'^# v[0-9]+ .*$', line):
+            # Comments may include a lowercase character at the beginning
+            # only if they start with version info or a data type or.
+            # a variable name e.g. "# next_line is of string type."
+            # or "# v2 version does not have ExplorationStatsModel."
+            # or "# int. The file size, in bytes.".
+            if len(line) > 1 and space_at_beginning_of_comment:
+
+                # Check if variable name is used.
+                underscore_is_present = '_' in line.split()[1]
+
+                # Check if allowed prefix is used.
+                allowed_prefix_is_present = any(
+                    line[2:].startswith(word) for word in (
+                        allowed_comment_prefixes))
+                if allowed_prefix_is_present or underscore_is_present:
                     continue
 
-            # Check that comment starts with a capital letter.
+            # Comments must start with a capital letter.
             if not previous_line.startswith(b'#') and (
                     re.search(br'^# [a-z][A-Za-z]*.*$', line)):
                 self.add_message(
@@ -1383,6 +1401,69 @@ class DocstringChecker(checkers.BaseChecker):
                 is_docstring = False
 
 
+class BlankLineBelowFileOverviewChecker(checkers.BaseChecker):
+    """Checks if there is a single empty line below the fileoverview docstring.
+    Note: The check assumes that all files have a file overview. This
+    assumption is justified because Pylint has an inbuilt check
+    (missing-docstring) for missing file overviews.
+    """
+
+    __implements__ = interfaces.IRawChecker
+    name = 'space_between_imports_and_file-overview'
+    priority = -1
+    msgs = {
+        'C0024': (
+            'No empty line used below the fileoverview docstring.',
+            'no-empty-line-provided-below-fileoverview',
+            'please provide an empty line below the fileoverview.'
+        ),
+        'C0025': (
+            'Single empty line should be provided below the fileoverview.',
+            'only-a-single-empty-line-should-be-provided',
+            'please provide an empty line below the fileoverview.'
+        )
+    }
+
+    def process_module(self, node):
+        """Process a module to ensure that there is a blank line below
+        file overview docstring.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
+
+        multi_line_indicator = b'"""'
+        file_content = read_from_node(node)
+        file_length = len(file_content)
+        triple_quote_counter = 0
+        empty_line_counter = 0
+        for line_num in python_utils.RANGE(file_length):
+            line = file_content[line_num].strip()
+            # Single line comment, ignore it.
+            if line.startswith(b'#'):
+                continue
+            triple_quote_counter += line.count(multi_line_indicator)
+
+            if line.endswith(b'"""') and triple_quote_counter == 2:
+                closing_line_index_of_fileoverview = line_num
+                break
+
+        empty_line_check_index = closing_line_index_of_fileoverview
+        if empty_line_check_index < file_length - 1:
+            while file_content[empty_line_check_index + 1] == b'\n':
+                empty_line_counter += 1
+                empty_line_check_index += 1
+
+        if empty_line_counter > 1:
+            self.add_message(
+                'only-a-single-empty-line-should-be-provided',
+                line=closing_line_index_of_fileoverview + 1)
+        elif empty_line_counter == 0:
+            self.add_message(
+                'no-empty-line-provided-below-fileoverview',
+                line=closing_line_index_of_fileoverview + 1)
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -1403,3 +1484,4 @@ def register(linter):
     linter.register_checker(DivisionOperatorChecker(linter))
     linter.register_checker(SingleLineCommentChecker(linter))
     linter.register_checker(DocstringChecker(linter))
+    linter.register_checker(BlankLineBelowFileOverviewChecker(linter))

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for TopicViewerBackendApiService.
  */
 
+<<<<<<< HEAD
 // TODO(#7222): Remove the following block of unnnecessary imports once
 // the code corresponding to the spec is upgraded to Angular 8.
 import { ReadOnlyTopicObjectFactory } from
@@ -64,6 +65,27 @@ describe('Topic viewer backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+=======
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
+
+describe('Topic viewer backend API service', () => {
+  let topicViewerBackendApiService:
+    TopicViewerBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let sampleDataResults = null;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+    });
+    httpTestingController = TestBed.get(HttpTestingController);
+    topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
+>>>>>>> upstream/develop
 
     // Sample topic object returnable from the backend
     sampleDataResults = {
@@ -97,29 +119,38 @@ describe('Topic viewer backend API service', function() {
         skill_id_2: 'Skill Description 2'
       }
     };
+<<<<<<< HEAD
 
     sampleDataResultsObjects = readOnlyTopicObjectFactory.createFromBackendDict(
       sampleDataResults);
   }));
+=======
+  });
+>>>>>>> upstream/develop
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing topic from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-
-      $httpBackend.expect('GET', '/topic_data_handler/0').respond(
-        sampleDataResults);
-      TopicViewerBackendApiService.fetchTopicData('0').then(
+      topicViewerBackendApiService.fetchTopicData('0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      var req = httpTestingController.expectOne(
+        '/topic_data_handler/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
 
+      flushMicrotasks();
+
+<<<<<<< HEAD
       expect(successHandler).toHaveBeenCalledWith(sampleDataResultsObjects);
+=======
+      expect(successHandler).toHaveBeenCalled();
+>>>>>>> upstream/develop
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 });

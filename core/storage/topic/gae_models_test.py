@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Topic model."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -288,12 +289,35 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
     TOPIC_1_ID = 'topic_1_id'
     TOPIC_2_ID = 'topic_2_id'
     TOPIC_3_ID = 'topic_3_id'
+    TOPIC_4_ID = 'topic_4_id'
+    TOPIC_5_ID = 'topic_5_id'
     MANAGER_1_ID_OLD = 'manager_1_id_old'
     MANAGER_1_ID_NEW = 'manager_1_id_new'
     MANAGER_2_ID_OLD = 'manager_2_id_old'
     MANAGER_2_ID_NEW = 'manager_2_id_new'
     MANAGER_3_ID_OLD = 'manager_3_id_old'
     MANAGER_3_ID_NEW = 'manager_3_id_old'
+    USER_ID_1 = 'user_id_1'
+    USER_ID_2 = 'user_id_2'
+
+    def setUp(self):
+        super(TopicRightsModelUnitTests, self).setUp()
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_4_ID,
+            manager_ids=[self.USER_ID_2],
+            topic_is_published=True
+        ).commit(
+            'commiter_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
+        topic_models.TopicRightsModel(
+            id=self.TOPIC_5_ID,
+            manager_ids=[self.USER_ID_2],
+            topic_is_published=True
+        ).commit(
+            'commiter_id',
+            'New topic rights',
+            [{'cmd': topic_domain.CMD_CREATE_NEW}])
 
     def test_get_deletion_policy(self):
         self.assertEqual(
@@ -400,7 +424,11 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
             manager_ids=[self.MANAGER_1_ID_NEW, self.MANAGER_2_ID_NEW])
         self.assertTrue(model.verify_model_user_ids_exist())
 
-        model.author_id = [feconf.SYSTEM_COMMITTER_ID]
+        model.manager_ids = [feconf.SYSTEM_COMMITTER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.manager_ids = [feconf.MIGRATION_BOT_USER_ID]
+        self.assertTrue(model.verify_model_user_ids_exist())
+        model.manager_ids = [feconf.SUGGESTION_BOT_USER_ID]
         self.assertTrue(model.verify_model_user_ids_exist())
 
         model.manager_ids = [self.MANAGER_1_ID_NEW, 'user_non_id']
@@ -408,3 +436,19 @@ class TopicRightsModelUnitTests(test_utils.GenericTestBase):
 
         model.manager_ids = ['user_non_id']
         self.assertFalse(model.verify_model_user_ids_exist())
+
+    def test_export_data_nontrivial(self):
+        """Tests nontrivial export data on user with some managed topics."""
+        user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_2)
+        expected_data = {
+            'managed_topic_ids': [self.TOPIC_4_ID, self.TOPIC_5_ID]
+        }
+        self.assertEqual(user_data, expected_data)
+
+    def test_export_data_trivial(self):
+        """Tests trivial export data on user with no managed topics."""
+        user_data = topic_models.TopicRightsModel.export_data(self.USER_ID_1)
+        expected_data = {
+            'managed_topic_ids': []
+        }
+        self.assertEqual(user_data, expected_data)

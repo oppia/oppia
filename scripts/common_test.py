@@ -1,4 +1,3 @@
-# coding: utf-8
 #
 # Copyright 2019 The Oppia Authors. All Rights Reserved.
 #
@@ -15,6 +14,7 @@
 # limitations under the License.
 
 """Unit tests for scripts/common.py."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -22,6 +22,7 @@ import contextlib
 import getpass
 import http.server
 import os
+import re
 import shutil
 import socketserver
 import stat
@@ -30,8 +31,11 @@ import sys
 import tempfile
 
 from core.tests import test_utils
+
+import psutil
 import python_utils
 import release_constants
+
 
 from . import common
 
@@ -44,8 +48,45 @@ import github # isort:skip
 # pylint: enable=wrong-import-position
 
 
+class MockPsutilProcess(python_utils.OBJECT):
+    """A mock class for Process class in Psutil."""
+    cmdlines = [
+        ['dev_appserver.py', '--host', '0.0.0.0', '--port', '9001'],
+        ['downloads']
+    ]
+
+    def __init__(self, index):
+        """Constructor for this mock object.
+        Args:
+            index: int. The index of process to be checked.
+        """
+        self.index = index
+
+    def cmdline(self):
+        """Return the command line of this process."""
+        pass
+
+    def kill(self):
+        """Kill the process."""
+        pass
+
+    def is_running(self):
+        """Check whether the function is running."""
+        return True
+
+
 class CommonTests(test_utils.GenericTestBase):
     """Test the methods which handle common functionalities."""
+
+    def test_is_x64_architecture_in_x86(self):
+        maxsize_swap = self.swap(sys, 'maxsize', 1)
+        with maxsize_swap:
+            self.assertFalse(common.is_x64_architecture())
+
+    def test_is_x64_architecture_in_x64(self):
+        maxsize_swap = self.swap(sys, 'maxsize', 2**32 + 1)
+        with maxsize_swap:
+            self.assertTrue(common.is_x64_architecture())
 
     def test_run_cmd(self):
         self.assertEqual(
@@ -198,6 +239,11 @@ class CommonTests(test_utils.GenericTestBase):
             common.get_current_release_version_number('release-1.2.3-hotfix-1'),
             '1.2.3')
 
+    def test_get_current_release_version_number_with_maintenance_branch(self):
+        self.assertEqual(
+            common.get_current_release_version_number(
+                'release-maintenance-1.2.3'), '1.2.3')
+
     def test_get_current_release_version_number_with_invalid_branch(self):
         with self.assertRaisesRegexp(
             Exception, 'Invalid branch name: invalid-branch.'):
@@ -217,12 +263,33 @@ class CommonTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), True)
 
+    def test_is_current_branch_a_release_branch_with_maintenance_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch release-maintenance-1.2.3'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_release_branch(), True)
+
     def test_is_current_branch_a_release_branch_with_non_release_branch(self):
         def mock_check_output(unused_cmd_tokens):
             return 'On branch test'
         with self.swap(
             subprocess, 'check_output', mock_check_output):
             self.assertEqual(common.is_current_branch_a_release_branch(), False)
+
+    def test_is_current_branch_a_test_branch_with_test_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch test-common'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_test_branch(), True)
+
+    def test_is_current_branch_a_test_branch_with_non_test_branch(self):
+        def mock_check_output(unused_cmd_tokens):
+            return 'On branch invalid-test'
+        with self.swap(
+            subprocess, 'check_output', mock_check_output):
+            self.assertEqual(common.is_current_branch_a_test_branch(), False)
 
     def test_verify_current_branch_name_with_correct_branch(self):
         def mock_check_output(unused_cmd_tokens):
@@ -557,6 +624,105 @@ class CommonTests(test_utils.GenericTestBase):
                         release_constants.LABEL_FOR_RELEASED_PRS)):
                 common.check_prs_for_current_release_are_released(mock_repo)
 
+    def test_kill_processes_based_on_regex(self):
+        killed = []
+
+        def mock_kill(p):
+            killed.append(MockPsutilProcess.cmdlines[p.index])
+
+        def mock_cmdlines(p):
+            return MockPsutilProcess.cmdlines[p.index]
+
+        def mock_process_iter():
+            return [MockPsutilProcess(0), MockPsutilProcess(1)]
+
+        process_iter_swap = self.swap_with_checks(
+            psutil, 'process_iter', mock_process_iter)
+        kill_swap = self.swap(MockPsutilProcess, 'kill', mock_kill)
+        cmdlines_swap = self.swap(MockPsutilProcess, 'cmdline', mock_cmdlines)
+        with process_iter_swap, kill_swap, cmdlines_swap:
+            common.kill_processes_based_on_regex(r'.*dev_appserver\.py')
+        self.assertEqual(killed, [MockPsutilProcess.cmdlines[0]])
+
+    def test_kill_processes_based_on_regex_when_access_denied(self):
+        killed = []
+
+        def mock_kill(p):
+            killed.append(MockPsutilProcess.cmdlines[p.index])
+
+        def mock_cmdlines(p):
+            if p.index == 0:
+                raise psutil.AccessDenied()
+            return MockPsutilProcess.cmdlines[p.index]
+
+        def mock_process_iter():
+            return [MockPsutilProcess(0), MockPsutilProcess(1)]
+
+        process_iter_swap = self.swap_with_checks(
+            psutil, 'process_iter', mock_process_iter)
+        kill_swap = self.swap(MockPsutilProcess, 'kill', mock_kill)
+        cmdlines_swap = self.swap(MockPsutilProcess, 'cmdline', mock_cmdlines)
+        with process_iter_swap, kill_swap, cmdlines_swap:
+            common.kill_processes_based_on_regex(r'.*dev_appserver\.py')
+        self.assertEqual(killed, [])
+
+    def test_kill_process_when_psutil_not_in_path(self):
+        path_swap = self.swap(sys, 'path', [])
+        def mock_process_iter():
+            return []
+        process_iter_swap = self.swap(psutil, 'process_iter', mock_process_iter)
+        with path_swap, process_iter_swap:
+            common.kill_processes_based_on_regex('')
+
+    def test_inplace_replace_file(self):
+        origin_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json')
+        backup_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        expected_lines = [
+            '{\n',
+            '    "RANDMON1" : "randomValue1",\n',
+            '    "312RANDOM" : "ValueRanDom2",\n',
+            '    "DEV_MODE": true,\n',
+            '    "RAN213DOM" : "raNdoVaLue3"\n',
+            '}\n'
+        ]
+
+        def mock_remove(unused_file):
+            return
+
+        remove_swap = self.swap_with_checks(
+            os, 'remove', mock_remove, expected_args=[(backup_file,)]
+        )
+        with remove_swap:
+            common.inplace_replace_file(
+                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
+        with python_utils.open_file(origin_file, 'r') as f:
+            self.assertEqual(expected_lines, f.readlines())
+        # Revert the file.
+        os.remove(origin_file)
+        shutil.move(backup_file, origin_file)
+
+    def test_inplace_replace_file_with_exception_raised(self):
+        origin_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json')
+        backup_file = os.path.join(
+            'core', 'tests', 'data', 'inplace_replace_test.json.bak')
+        with python_utils.open_file(origin_file, 'r') as f:
+            origin_content = f.readlines()
+
+        def mock_compile(unused_arg):
+            raise ValueError
+
+        compile_swap = self.swap_with_checks(re, 'compile', mock_compile)
+        with self.assertRaises(ValueError), compile_swap:
+            common.inplace_replace_file(
+                origin_file, '"DEV_MODE": .*', '"DEV_MODE": true,')
+        self.assertFalse(os.path.isfile(backup_file))
+        with python_utils.open_file(origin_file, 'r') as f:
+            new_content = f.readlines()
+        self.assertEqual(origin_content, new_content)
+
     def test_convert_to_posixpath_on_windows(self):
         def mock_is_windows():
             return True
@@ -576,3 +742,13 @@ class CommonTests(test_utils.GenericTestBase):
         with is_windows_swap:
             actual_file_path = common.convert_to_posixpath(original_filepath)
         self.assertEqual(actual_file_path, original_filepath)
+
+    def test_create_readme(self):
+        try:
+            os.makedirs('readme_test_dir')
+            common.create_readme('readme_test_dir', 'Testing readme.')
+            with python_utils.open_file('readme_test_dir/README.md', 'r') as f:
+                self.assertEqual(f.read(), 'Testing readme.')
+        finally:
+            if os.path.exists('readme_test_dir'):
+                shutil.rmtree('readme_test_dir')

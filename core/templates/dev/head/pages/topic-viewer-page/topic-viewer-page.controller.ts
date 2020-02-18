@@ -73,6 +73,13 @@ angular.module('oppia').directive('topicViewerPage', [
                 ctrl.subtopics = readOnlyTopic.getSubtopics();
                 ctrl.skillDescriptions = readOnlyTopic.getSkillDescriptions();
                 $rootScope.loadingMessage = '';
+<<<<<<< HEAD
+=======
+                ctrl.topicId = topicDataDict.id;
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$apply();
+>>>>>>> upstream/develop
               },
               function(errorResponse) {
                 if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {

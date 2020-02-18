@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for storing the audit logs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -51,6 +52,11 @@ class RoleQueryAuditModel(base_models.BaseModel):
     def get_deletion_policy():
         """Audit logs are kept for investigation purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):

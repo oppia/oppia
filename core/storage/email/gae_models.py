@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Models for the content of sent emails."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -82,6 +83,13 @@ class SentEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Users already have access to this data since emails were sent
+        to them.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -287,10 +295,11 @@ class SentEmailModel(base_models.BaseModel):
         """Check if UserSettingsModel exists for recipient_id and sender_id."""
         user_ids = [self.recipient_id, self.sender_id]
         user_ids = [user_id for user_id in user_ids
-                    if user_id != feconf.SYSTEM_COMMITTER_ID]
+                    if user_id not in feconf.SYSTEM_USERS]
         user_settings_models = user_models.UserSettingsModel.get_multi(
             user_ids, include_deleted=True)
         return all(model is not None for model in user_settings_models)
+
 
 
 class BulkEmailModel(base_models.BaseModel):
@@ -327,6 +336,13 @@ class BulkEmailModel(base_models.BaseModel):
     def get_deletion_policy():
         """Sent email should be kept for audit purposes."""
         return base_models.DELETION_POLICY.KEEP
+
+    @staticmethod
+    def get_export_policy():
+        """Users already have access to this data since the emails were sent
+        to them.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
@@ -399,6 +415,11 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
     def get_deletion_policy():
         """Feedback email reply to id should be deleted."""
         return base_models.DELETION_POLICY.DELETE
+
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
 
     @classmethod
     def has_reference_to_user_id(cls, user_id):
