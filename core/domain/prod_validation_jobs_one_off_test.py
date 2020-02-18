@@ -11604,18 +11604,12 @@ class CompletedActivitiesModelValidatorTests(test_utils.GenericTestBase):
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -11796,18 +11790,12 @@ class IncompleteActivitiesModelValidatorTests(test_utils.GenericTestBase):
             intro_state.update_interaction_id('TextInput')
             end_state.update_interaction_id('EndExploration')
 
-            default_outcome_dict = {
-                'dest': 'End',
-                'feedback': {
-                    'content_id': 'default_outcome',
-                    'html': '<p>Introduction</p>'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            }
-            intro_state.update_interaction_default_outcome(default_outcome_dict)
+            default_outcome = state_domain.Outcome(
+                'End', state_domain.SubtitledHtml(
+                    'default_outcome', '<p>Introduction</p>'),
+                False, [], None, None
+            )
+            intro_state.update_interaction_default_outcome(default_outcome)
             end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -11989,18 +11977,12 @@ class ExpUserLastPlaythroughModelValidatorTests(
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
@@ -12152,18 +12134,12 @@ class LearnerPlaylistModelValidatorTests(test_utils.GenericTestBase):
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'),
+            False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         for exp in explorations:
