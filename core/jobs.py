@@ -1479,7 +1479,7 @@ class BaseContinuousComputationManager(python_utils.OBJECT):
 
         Returns:
             str. The unique id of the new batch job beginning/continuing the
-                computation..
+                computation.
 
         Raises:
             Exception: The computation wasn't idle before trying to start.
