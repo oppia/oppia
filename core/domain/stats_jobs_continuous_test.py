@@ -85,7 +85,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
     def test_debug_message_for_faulty_keys(self):
         # Prepare an exploration with a malformed state name.
-        exp_id = u'eid'
+        exp_id = 'eid'
         exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
         with self._invalid_state_names_permitted():
             exp.rename_state(feconf.DEFAULT_INIT_STATE_NAME, '\u0000�')
