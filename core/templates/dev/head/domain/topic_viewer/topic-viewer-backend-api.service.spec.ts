@@ -28,7 +28,7 @@ import { TopicViewerBackendApiService } from
   'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('Topic viewer backend API service', () => {
+describe('Topic viewer backend API service', () => {
   let topicViewerBackendApiService:
     TopicViewerBackendApiService = null;
   let httpTestingController: HttpTestingController;
@@ -103,7 +103,7 @@ fdescribe('Topic viewer backend API service', () => {
     httpTestingController.verify();
   });
 
-  fit('should successfully fetch an existing topic from the backend',
+  it('should successfully fetch an existing topic from the backend',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
