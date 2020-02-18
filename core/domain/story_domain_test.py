@@ -604,7 +604,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -615,7 +615,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 2',
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
@@ -626,7 +626,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -653,7 +653,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -677,7 +677,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.next_node_id = 'node_4'
         node_1 = {
             'id': 'node_1',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 1',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
@@ -701,7 +701,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 1: Prerequisite skills not acquired.
         node_1 = {
             'id': 'node_1',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 1',
             'destination_node_ids': ['node_2', 'node_3'],
             'acquired_skill_ids': ['skill_2'],
@@ -712,7 +712,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
@@ -723,7 +723,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
@@ -745,7 +745,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 2: Story with loops.
         node_1 = {
             'id': 'node_1',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
@@ -756,7 +756,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 2',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': ['skill_3'],
@@ -767,7 +767,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 3',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_4'],
@@ -786,7 +786,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 3: Disconnected graph.
         node_1 = {
             'id': 'node_1',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
@@ -797,7 +797,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
@@ -808,7 +808,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
@@ -828,7 +828,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 4: Graph with duplicate nodes.
         node_1 = {
             'id': 'node_1',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
@@ -839,7 +839,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_3'],
@@ -850,7 +850,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_2',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 2',
             'destination_node_ids': [],
             'acquired_skill_ids': ['skill_4'],
@@ -870,7 +870,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # Case 5: A valid graph.
         node_1 = {
             'id': 'node_1',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 1',
             'destination_node_ids': ['node_2'],
             'acquired_skill_ids': ['skill_2'],
@@ -881,7 +881,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_2 = {
             'id': 'node_2',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 2',
             'destination_node_ids': ['node_4', 'node_3'],
             'acquired_skill_ids': ['skill_3', 'skill_4'],
@@ -892,7 +892,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_3 = {
             'id': 'node_3',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 3',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
@@ -903,7 +903,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         }
         node_4 = {
             'id': 'node_4',
-            'thumbnail_filename': 'image.png',
+            'thumbnail_filename': 'image.svg',
             'title': 'Title 4',
             'destination_node_ids': [],
             'acquired_skill_ids': [],

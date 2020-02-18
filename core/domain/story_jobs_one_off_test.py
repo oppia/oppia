@@ -145,6 +145,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         story = (
             story_models.StoryModel.get(self.STORY_ID))
         self.assertEqual(story.story_contents_schema_version, 1)
+        story = story_fetchers.get_story_by_id(self.STORY_ID)
+        self.assertEqual(story.story_contents_schema_version, 2)
 
         # Start migration job.
         job_id = (
@@ -155,6 +157,11 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Verify the story migrates correctly.
         updated_story = (
             story_models.StoryModel.get(self.STORY_ID))
+        self.assertEqual(
+            updated_story.story_contents_schema_version,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
+        updated_story = (
+            story_fetchers.get_story_by_id(self.STORY_ID))
         self.assertEqual(
             updated_story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)

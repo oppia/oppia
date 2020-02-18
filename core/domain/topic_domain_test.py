@@ -40,7 +40,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'Name', 'abbrev')
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title', ['skill_id_1'], 'image.png')]
+            topic_domain.Subtopic(1, 'Title', ['skill_id_1'], 'image.svg')]
         self.topic.next_subtopic_id = 2
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
@@ -86,13 +86,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_subtopics(self):
         self.topic.subtopics = [topic_domain.Subtopic(
-            1, 'Title', ['skill_id_1'], 'image.png')]
+            1, 'Title', ['skill_id_1'], 'image.svg')]
         subtopics = self.topic.get_all_subtopics()
         self.assertEqual(
             subtopics, [{
                 'skill_ids': ['skill_id_1'],
                 'id': 1,
-                'thumbnail_filename': 'image.png',
+                'thumbnail_filename': 'image.svg',
                 'title': 'Title'}])
 
     def test_delete_canonical_story(self):
@@ -402,7 +402,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_add_uncategorized_skill_id(self):
         self.topic.subtopics.append(
             topic_domain.Subtopic(
-                'id_2', 'Title2', ['skill_id_2'], 'image.png'))
+                'id_2', 'Title2', ['skill_id_2'], 'image.svg'))
         with self.assertRaisesRegexp(
             Exception,
             'The skill id skill_id_1 already exists in subtopic with id 1'):
@@ -488,8 +488,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_update_thumbnail_filename(self):
         self.assertEqual(self.topic.thumbnail_filename, None)
-        self.topic.update_thumbnail_filename('img.png')
-        self.assertEqual(self.topic.thumbnail_filename, 'img.png')
+        self.topic.update_thumbnail_filename('img.svg')
+        self.assertEqual(self.topic.thumbnail_filename, 'img.svg')
 
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):
@@ -520,10 +520,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_update_subtopic_thumbnail_filename(self):
         self.assertEqual(len(self.topic.subtopics), 1)
         self.assertEqual(
-            self.topic.subtopics[0].thumbnail_filename, 'image.png')
-        self.topic.update_subtopic_thumbnail_filename(1, 'new_image.png')
+            self.topic.subtopics[0].thumbnail_filename, 'image.svg')
+        self.topic.update_subtopic_thumbnail_filename(1, 'new_image.svg')
         self.assertEqual(
-            self.topic.subtopics[0].thumbnail_filename, 'new_image.png')
+            self.topic.subtopics[0].thumbnail_filename, 'new_image.svg')
 
         with self.assertRaisesRegexp(
             Exception, 'The subtopic with id invalid_id does not exist.'):
@@ -544,9 +544,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_cannot_move_existing_skill_to_subtopic(self):
         self.topic.subtopics = [
-            topic_domain.Subtopic(1, 'Title', ['skill_id_1'], 'image.png'),
+            topic_domain.Subtopic(1, 'Title', ['skill_id_1'], 'image.svg'),
             topic_domain.Subtopic(2, 'Another title', ['skill_id_1'],
-                                  'image.png')]
+                                  'image.svg')]
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_1 is already present in the target subtopic'):

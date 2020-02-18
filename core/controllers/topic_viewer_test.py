@@ -54,7 +54,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
             self.topic_id, 'public_topic_name', 'abbrev')
         self.topic.uncategorized_skill_ids.append(self.skill_id_1)
         self.topic.subtopics.append(topic_domain.Subtopic(
-            1, 'subtopic_name', [self.skill_id_2], 'image.png'))
+            1, 'subtopic_name', [self.skill_id_2], 'image.svg'))
         self.topic.next_subtopic_id = 2
         self.topic.canonical_story_references.append(
             topic_domain.StoryReference.create_default_story_reference(
@@ -125,7 +125,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                 'additional_story_dicts': [],
                 'uncategorized_skill_ids': [self.skill_id_1],
                 'subtopics': [{
-                    u'thumbnail_filename': u'image.png',
+                    u'thumbnail_filename': u'image.svg',
                     u'skill_ids': [self.skill_id_2],
                     u'id': 1,
                     u'title': u'subtopic_name'}],
@@ -171,7 +171,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     'additional_story_dicts': [],
                     'uncategorized_skill_ids': [self.skill_id_1],
                     'subtopics': [{
-                        u'thumbnail_filename': u'image.png',
+                        u'thumbnail_filename': u'image.svg',
                         u'skill_ids': [self.skill_id_2],
                         u'id': 1,
                         u'title': u'subtopic_name'}],

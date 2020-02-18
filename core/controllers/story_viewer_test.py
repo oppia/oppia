@@ -66,7 +66,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_1 = {
             'id': self.NODE_ID_1,
             'title': 'Title 1',
-            'thumbnail_filename': 'image_1.png',
+            'thumbnail_filename': 'image_1.svg',
             'destination_node_ids': ['node_3'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -79,7 +79,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_2 = {
             'id': self.NODE_ID_2,
             'title': 'Title 2',
-            'thumbnail_filename': 'image_2.png',
+            'thumbnail_filename': 'image_2.svg',
             'destination_node_ids': ['node_1'],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -92,7 +92,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.node_3 = {
             'id': self.NODE_ID_3,
             'title': 'Title 3',
-            'thumbnail_filename': 'image_3.png',
+            'thumbnail_filename': 'image_3.svg',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],

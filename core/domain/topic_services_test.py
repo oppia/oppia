@@ -292,7 +292,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'property_name': 'thumbnail_filename',
             'subtopic_id': 1,
             'old_value': None,
-            'new_value': 'image.png'
+            'new_value': 'image.svg'
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -301,7 +301,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(topic.subtopics), 1)
         self.assertEqual(topic.subtopics[0].title, 'New Title')
-        self.assertEqual(topic.subtopics[0].thumbnail_filename, 'image.png')
+        self.assertEqual(topic.subtopics[0].thumbnail_filename, 'image.svg')
 
     def test_cannot_create_topic_change_class_with_invalid_cmd(self):
         with self.assertRaisesRegexp(
@@ -464,7 +464,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME,
             'old_value': '',
-            'new_value': 'thumbnail.png'
+            'new_value': 'thumbnail.svg'
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.user_id_admin, self.TOPIC_ID, changelist,
@@ -473,7 +473,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
         self.assertEqual(topic.description, 'New Description')
         self.assertEqual(topic.abbreviated_name, 'short name')
-        self.assertEqual(topic.thumbnail_filename, 'thumbnail.png')
+        self.assertEqual(topic.thumbnail_filename, 'thumbnail.svg')
         self.assertEqual(topic.version, 3)
         self.assertEqual(topic_summary.version, 3)
 

@@ -127,6 +127,8 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         topic = (
             topic_models.TopicModel.get(self.TOPIC_ID))
         self.assertEqual(topic.subtopic_schema_version, 1)
+        topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.subtopic_schema_version, 2)
 
         # Start migration job.
         job_id = (
@@ -137,6 +139,10 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Verify the topic migrates correctly.
         updated_topic = (
             topic_models.TopicModel.get(self.TOPIC_ID))
+        self.assertEqual(
+            updated_topic.subtopic_schema_version,
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+        updated_topic = topic_fetchers.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             updated_topic.subtopic_schema_version,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)

@@ -199,7 +199,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
                 'rubrics': rubrics,
                 'explanation_dict': state_domain.SubtitledHtml(
                     '1', '<p>Explanation</p>').to_dict(),
-                'thumbnail_filename': 'image.png'
+                'thumbnail_filename': 'image.svg'
             },
             csrf_token=csrf_token,
             upload_files=((
@@ -219,7 +219,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': [],
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.png'
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -236,7 +236,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'description': 'Skill Description',
             'linked_topic_ids': [self.topic_id],
             'rubrics': 'invalid',
-            'thumbnail_filename': 'image.png'
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -254,7 +254,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'linked_topic_ids': [self.topic_id],
             'rubrics': [],
             'explanation_dict': 'explanation',
-            'thumbnail_filename': 'image.png'
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -270,7 +270,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'explanation_dict': {
                 'explanation': 'Explanation'
             },
-            'thumbnail_filename': 'image.png'
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
@@ -297,7 +297,7 @@ class NewSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             'rubrics': rubrics,
             'explanation_dict': state_domain.SubtitledHtml(
                 '1', '<p>Explanation</p>').to_dict(),
-            'thumbnail_filename': 'image.png'
+            'thumbnail_filename': 'image.svg'
         }
         json_response = self.post_json(
             self.url, payload, csrf_token=csrf_token,
