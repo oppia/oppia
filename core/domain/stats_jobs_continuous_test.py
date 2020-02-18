@@ -116,16 +116,15 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         # Check that the problematic values are present.
         self.assertEqual(job_key, 'eid:1:\x00\ufffd')
         self.assertEqual(job_summary_key, 'eid:all:\x00\ufffd')
-        # Check that a descriptive error message is present.
-        self.assertIn(
-            'Expected valid exploration id, version, and state name triple',
-            job_output)
-        self.assertIn(
-            'Expected valid exploration id, version, and state name triple',
-            job_summary_output)
-        # Check that the raised errors are present.
-        self.assertIn('\'ascii\' codec can\'t decode byte', job_output)
-        self.assertIn('\'ascii\' codec can\'t decode byte', job_summary_output)
+        # Check that helpful debug information is present.
+        self.assertRegexpMatches(
+            job_output,
+            'Expected valid exploration id, version, and state name triple, ',
+            'actual: UnicodeDecodeError.*ordinal not in range')
+        self.assertRegexpMatches(
+            job_summary_output,
+            'Expected valid exploration id, version, and state name triple, ',
+            'actual: UnicodeDecodeError.*ordinal not in range')
 
     def test_one_answer(self):
         with self._mock_job_class():

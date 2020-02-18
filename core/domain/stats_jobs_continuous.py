@@ -122,14 +122,14 @@ class InteractionAnswerSummariesMRJobManager(
                     Occurs when version mismatches and the new
                     version has a different interaction ID.
                 - Expected valid exploration id, version, and state name triple:
-                    Occurs when the reduced key can not be split into
+                    Occurs when the key to reduce can not be split into
                     components.
         """
         try:
             exploration_id, exploration_version, state_name = key.split(':')
         except Exception as e:
             yield (key, 'ERROR: Expected valid exploration id, version, and '
-                        'state name triple, actual: %s' % e)
+                        'state name triple, actual: %r' % e)
             return
 
         value_dicts = [
