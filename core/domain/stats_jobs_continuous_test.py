@@ -73,14 +73,15 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             @classmethod
             def _kickoff_batch_job_after_previous_one_ends(cls):
                 pass
-        return self.swap(stats_jobs_continuous,
-                         'InteractionAnswerSummariesAggregator',
-                         NonContinuousInteractionAnswerSummariesAggregator)
+        return self.swap(
+            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
+            NonContinuousInteractionAnswerSummariesAggregator)
 
     def _disable_state_name_validation(self):
         """Context manager that disables exploration state name validation."""
-        return self.swap(exp_domain.Exploration, '_require_valid_state_name',
-                         lambda unused_cls, unused_name: None)
+        return self.swap(
+            exp_domain.Exploration, '_require_valid_state_name',
+            lambda unused_cls, unused_name: None)
 
     def test_debug_message_for_malformed_keys(self):
         # Create an exploration with a malformed state name.
@@ -115,14 +116,15 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         self.assertEqual(job_key, 'eid:1:\x00\ufffd')
         self.assertEqual(job_summary_key, 'eid:all:\x00\ufffd')
         # Check that helpful debug information is present.
-        self.assertRegexpMatches(job_output,
-                                 'Expected valid exploration id, version, and '
-                                 'state name triple, actual: '
-                                 'UnicodeDecodeError.*ordinal not in range')
-        self.assertRegexpMatches(job_summary_output,
-                                 'Expected valid exploration id, version, and '
-                                 'state name triple, actual: '
-                                 'UnicodeDecodeError.*ordinal not in range')
+
+        self.assertRegexpMatches(
+            job_output,
+            'Expected valid exploration id, version, and state name triple, '
+            'actual: UnicodeDecodeError.*ordinal not in range')
+        self.assertRegexpMatches(
+            job_summary_output,
+            'Expected valid exploration id, version, and state name triple, '
+            'actual: UnicodeDecodeError.*ordinal not in range')
 
     def test_one_answer(self):
         with self._disable_batch_continuation():
