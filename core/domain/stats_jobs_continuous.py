@@ -121,11 +121,16 @@ class InteractionAnswerSummariesMRJobManager(
                 - Ignoring answers submitted to version:
                     Occurs when version mismatches and the new
                     version has a different interaction ID.
+                - Expected valid exploration id, version, and state name triple:
+                    Occurs when the reduced key can not be split into
+                    components.
         """
         try:
             exploration_id, exploration_version, state_name = key.split(':')
         except Exception as e:
-            raise Exception(u'Failed to split "%s" with ":".' % key)
+            yield (key, 'ERROR: Expected valid exploration id, version, and '
+                        'state name triple, actual: %s' % e)
+            return
 
         value_dicts = [
             ast.literal_eval(stringified_value)

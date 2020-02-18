@@ -19,6 +19,8 @@
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
+import ast
+
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_fetchers
@@ -28,6 +30,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import python_utils
 
 (exp_models, stats_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics])
@@ -71,11 +74,62 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         return stats_models.StateAnswersCalcOutputModel.get_model(
             exploration_id, exploration_version, state_name, calculation_id)
 
-    def test_one_answer(self):
-        with self.swap(
+    def _mock_job_class(self):
+        return self.swap(
             stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
+            MockInteractionAnswerSummariesAggregator)
 
+    def _invalid_state_names_permitted(self):
+        return self.swap(
+            exp_domain.Exploration, '_require_valid_state_name',
+            lambda unused_cls, unused_name: None)
+
+    def test_debug_message_for_faulty_keys(self):
+        # Prepare an exploration with a malformed state name.
+        exp_id = u'eid'
+        exp = self.save_new_valid_exploration(exp_id, 'author@website.com')
+        with self._invalid_state_names_permitted():
+            exp.rename_state(feconf.DEFAULT_INIT_STATE_NAME, '\u0000�')
+        # Submit an answer for the job to process.
+        event_services.AnswerSubmissionEventHandler.record(
+            exp_id, exp.version, exp.init_state_name, 'MultipleChoiceInput',
+            0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1',
+            5.0, {}, 'answer1')
+
+        with self._mock_job_class():
+            # Start job and fetch its output.
+            job_class, job_manager = (
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator,
+                stats_jobs_continuous.InteractionAnswerSummariesMRJobManager)
+
+            job_id = job_class.start_computation()
+
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+            (job_key, job_output), (job_summary_key, job_summary_output) = (
+                ast.literal_eval(o) for o in job_manager.get_output(job_id))
+
+        # Check that the problematic values are printed.
+        self.assertEqual(job_key, 'eid:1:\x00\ufffd')
+        self.assertEqual(job_summary_key, 'eid:all:\x00\ufffd')
+        # Check that a descriptive error message is present.
+        self.assertIn(
+            'Expected valid exploration id, version, and state name triple',
+            job_output)
+        self.assertIn(
+            'Expected valid exploration id, version, and state name triple',
+            job_summary_output)
+        # Check that the raised error is present.
+        self.assertIn('\'ascii\' codec can\'t decode byte', job_output)
+        self.assertIn('\'ascii\' codec can\'t decode byte', job_summary_output)
+
+    def test_one_answer(self):
+        with self._mock_job_class():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -177,10 +231,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertEqual(calculation_output, expected_calculation_output)
 
     def test_one_answer_ignored_for_deleted_exploration(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._mock_job_class():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -232,10 +283,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertIsNone(calc_output_model)
 
     def test_answers_across_multiple_exploration_versions(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._mock_job_class():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -390,10 +438,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         aggregation job should not include answers corresponding to exploration
         versions which do not match the latest version's interaction ID.
         """
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._mock_job_class():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -486,10 +531,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         answers are submitted to the new version, but the interaction ID is the
         same then old answers should still be aggregated.
         """
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._mock_job_class():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -574,10 +616,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         interaction type with answers submitted to both versions of the
         exploration.
         """
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._mock_job_class():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -719,10 +758,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 expected_calculation_all_versions_output)
 
     def test_multiple_computations_in_one_job(self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._mock_job_class():
             # Setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
@@ -802,10 +838,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
     def test_computation_with_different_interaction_id_for_same_exp_passes(
             self):
-        with self.swap(
-            stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
-            MockInteractionAnswerSummariesAggregator):
-
+        with self._mock_job_class():
             exp_id = 'eid'
             self.save_new_valid_exploration(exp_id, 'fake@user.com')
 
