@@ -109,7 +109,7 @@ handlers:
   upload: core/templates/dev/head/(.*\.(css))$
   secure: always
   expiration: "0"
-# Serve js scripts for gadgets, interactions, rich_text_components, custom ckeditor plugins
+# Serve js scripts for interactions, rich_text_components, custom ckeditor plugins
 # and objects under extensions. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
 # groups from the url pattern.
