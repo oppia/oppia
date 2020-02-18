@@ -79,7 +79,7 @@ def initiate_backup_restoration_process():
         'Navigate into the newest backup folder. \n'
         'There should be a file here of the form '
         '<date_time>.overall_export_metadata. \n'
-        'For example, "oppia-export-backups/20200213-090001/'
+        'For example, "<folder-name>/20200213-090001/'
         '20200213-090001.overall_export_metadata". '
         'This is the file you want to import.\n'
         'Please copy and enter the full path of this file\n')
