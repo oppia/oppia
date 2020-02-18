@@ -43,10 +43,8 @@ require(
   'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
-
 angular.module('oppia').directive('schemaBasedEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -58,9 +56,7 @@ angular.module('oppia').directive('schemaBasedEditor', [
         onInputBlur: '=',
         onInputFocus: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-editor.directive.html'),
+      template: require('./schema-based-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {}]
     };
