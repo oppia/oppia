@@ -18,6 +18,8 @@
 
 export class ObjectsDomainConstants {
   public static FRACTION_PARSING_ERRORS = {
+    INVALID_CHARS_LENGTH:
+      'None of the numbers of the fraction should be larger than 7 digits.',
     INVALID_CHARS:
       'Please only use numerical digits, spaces or forward slashes (/)',
     INVALID_FORMAT:
