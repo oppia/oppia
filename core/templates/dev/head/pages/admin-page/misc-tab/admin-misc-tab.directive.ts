@@ -23,10 +23,10 @@ require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
-  'UserService', 'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
+  'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
   function(
       $http, $window, AdminTaskManagerService, UrlInterpolationService,
-      UserService, ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL) {
+      ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -144,19 +144,15 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.dataExtractionQueryStatusMessage = message;
         };
 
-        UserService.getUserInfoAsync().then(function(userInfo) {
-          ctrl.username = userInfo.getUsername();
-        });
 
         ctrl.sendDummyMailToAdmin = function() {
-          $http.post(SEND_DUMMY_MAIL_HANDLER_URL, {
-            username: ctrl.username
-          }).then(function(response) {
-            ctrl.setStatusMessage(response.data.msg);
-          }, function(errorResponse) {
-            ctrl.setStatusMessage(
-              'Server error: ' + errorResponse.data.error);
-          });
+          $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
+            .then(function(response) {
+              ctrl.setStatusMessage(response.data.msg);
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
         };
 
         ctrl.submitQuery = function() {
