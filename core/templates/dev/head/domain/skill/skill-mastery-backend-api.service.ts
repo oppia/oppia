@@ -16,56 +16,69 @@
  * @fileoverview Service to send changes to skill mastery to the backend.
  */
 
-angular.module('oppia').factory('SkillMasteryBackendApiService', [
-  '$http', '$q', 'SKILL_MASTERY_DATA_URL_TEMPLATE',
-  function(
-      $http, $q, SKILL_MASTERY_DATA_URL_TEMPLATE) {
-    var _fetchSkillMasteryDegrees = function(
-        skillIds, successCallback, errorCallback) {
-      $http.get(SKILL_MASTERY_DATA_URL_TEMPLATE, {
-        params: {
-          comma_separated_skill_ids: skillIds.join(',')
-        }
-      }).then(
-        function(response) {
-          if (successCallback) {
-            successCallback(response.data.degrees_of_mastery);
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
-        });
-    };
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-    var _updateSkillMasteryDegrees = function(
-        masteryPerSkillMapping, successCallback, errorCallback) {
-      var putData = {
-        mastery_change_per_skill: masteryPerSkillMapping
-      };
-      $http.put(SKILL_MASTERY_DATA_URL_TEMPLATE, putData).then(
-        function(response) {
-          if (successCallback) {
-            successCallback();
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
-        });
-    };
+import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 
-    return {
-      fetchSkillMasteryDegrees: function(skillIds) {
-        return $q(function(resolve, reject) {
-          _fetchSkillMasteryDegrees(skillIds, resolve, reject);
-        });
-      },
-      updateSkillMasteryDegrees: function(masteryPerSkillMapping) {
-        return $q(function(resolve, reject) {
-          _updateSkillMasteryDegrees(masteryPerSkillMapping, resolve, reject);
-        });
+@Injectable({
+  providedIn: 'root'
+})
+export class SkillMasteryBackendApiService {
+  constructor(private httpClient: HttpClient) {}
+
+  _fetchSkillMasteryDegrees(skillIds: Array<string>,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    this.httpClient.get(SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE, {
+      params: {
+        comma_separated_skill_ids: skillIds.join(',')
       }
-    };
+    }).toPromise().then((response: any) => {
+      if (successCallback) {
+        successCallback(response.degrees_of_mastery);
+      }
+    }, (errorResponse) =>{
+      if (errorCallback) {
+        errorCallback(errorResponse);
+      }
+    });
   }
-]);
+
+  _updateSkillMasteryDegrees(masteryPerSkillMapping: {[key: string]: number},
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    let putData = {
+      mastery_change_per_skill: masteryPerSkillMapping
+    };
+
+    this.httpClient.put(SkillDomainConstants.SKILL_MASTERY_DATA_URL_TEMPLATE,
+      putData).toPromise().then((response: any) => {
+      if (successCallback) {
+        successCallback();
+      }
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback(errorResponse);
+      }
+    });
+  }
+
+  fetchSkillMasteryDegrees(skillIds: Array<string>): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._fetchSkillMasteryDegrees(skillIds, resolve, reject);
+    });
+  }
+
+  updateSkillMasteryDegrees(
+      masteryPerSkillMapping: {[key: string]: number}): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._updateSkillMasteryDegrees(masteryPerSkillMapping, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'SkillMasteryBackendApiService',
+  downgradeInjectable(SkillMasteryBackendApiService));
