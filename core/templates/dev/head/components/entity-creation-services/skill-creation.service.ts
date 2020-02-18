@@ -22,7 +22,7 @@ require(
   'components/entity-creation-services/skill-creation-backend-api.service.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
-  '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
+  '$rootScope', '$timeout', '$window', 'AlertsService',
   'SkillCreationBackendService', 'UrlInterpolationService',
   function(
       $rootScope, $timeout, $window, AlertsService,
