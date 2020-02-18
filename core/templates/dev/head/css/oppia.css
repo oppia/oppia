@@ -4359,7 +4359,7 @@ div.oppia-issues-learner-action {
   margin-bottom: 2em;
 }
 
-.oppia-issues-hexagon-text {
+.oppia-issues-playthrough-rectangle-text {
   position: absolute;
   z-index: 1000;
   width: 100%;
@@ -4369,28 +4369,44 @@ div.oppia-issues-learner-action {
 }
 
 .oppia-issues-playthrough-modal-btn {
-  background: transparent;
-  border-radius: 0;
+  background-color: #009A8B;
   border: none;
+  border-radius: 15px;
+  box-shadow: 10px 0 #008080;
+  color: #fff;
+  cursor: pointer;
+  font-size: 24px;
+  height: 150px;
+  outline: none;
+  padding: 20px 15px;
+  text-align: center;
 }
 
-/* Values below were experimentally generated using 'http://csshexagon.com' */
-.oppia-hexagon {
-  transform: scale(0.5);
-  position: relative;
-  width: 200px;
-  height: 115.47px;
-  background-color: #009A8B;
-  margin: 15px 0;
-  border-left: solid 2px #009A8B;
-  border-right: solid 2px #009A8B;
+.oppia-issues-playthrough-modal-btn:hover {
+  background-color: #00b3a0;
+}
+
+.oppia-issues-playthrough-modal-btn:active {
+  background-color: #00b3a0;
+  box-shadow: 0 10px #008080;
+  transform: translateY(4px);
+}
+
+.oppia-issues-playthrough-rectangle {
+  background-color: transparent;
+  color: white;
   font-size: 20px;
   font-weight: bold;
-  color: white;
+  height: 90px;
+  margin: 15px 0;
+  position: relative;
+  transform: scale(0.5);
+  width: 200px;
 }
 
-.oppia-hexagon:before,
-.oppia-hexagon:after {
+.oppia-issues-playthrough-rectangle:before,
+.oppia-issues-playthrough-rectangle:after {
+  background-color: inherit;
   content: "";
   position: absolute;
   z-index: -1;
@@ -4399,20 +4415,15 @@ div.oppia-issues-learner-action {
   -webkit-transform: scaleY(0.5774) rotate(-45deg);
   -ms-transform: scaleY(0.5774) rotate(-45deg);
   transform: scaleY(0.5774) rotate(-45deg);
-  background-color: inherit;
   left: 27.2893px;
 }
 
-.oppia-hexagon:before {
+.oppia-issues-playthrough-rectangle:before {
   top: -70.7107px;
-  border-top: solid 2.8284px #009A8B;
-  border-right: solid 2.8284px #009A8B;
 }
 
-.oppia-hexagon:after {
+.oppia-issues-playthrough-rectangle:after {
   bottom: -70.7107px;
-  border-bottom: solid 2.8284px #009A8B;
-  border-left: solid 2.8284px #009A8B;
 }
 
 .oppia-issues-content {
