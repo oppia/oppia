@@ -43,16 +43,6 @@ EMPTY_STATE_HIT_COUNTS_DICT = {
 }
 
 
-class MockInteractionAnswerSummariesAggregator(
-        stats_jobs_continuous.InteractionAnswerSummariesAggregator):
-    """A modified InteractionAnswerSummariesAggregator that does not start
-    a new batch job when the previous one has finished.
-    """
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
 class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
     """Tests for interaction answer view aggregations."""
 
@@ -75,6 +65,14 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
     def _mock_job_class(self):
         """Context manager to mock the job under test so it runs only once."""
+        class MockInteractionAnswerSummariesAggregator(
+                stats_jobs_continuous.InteractionAnswerSummariesAggregator):
+            """A modified InteractionAnswerSummariesAggregator that does not
+            start a new batch job when the previous one has finished.
+            """
+            @classmethod
+            def _kickoff_batch_job_after_previous_one_ends(cls):
+                pass
         return self.swap(
             stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
             MockInteractionAnswerSummariesAggregator)
