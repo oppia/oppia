@@ -401,6 +401,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertTrue(
             messages_summary['author_picture_data_url'].startswith(
                 'data:image/png;'))
+        self.assertTrue(messages_summary.get('created_on'))
         self.assertFalse(messages_summary.get('suggestion_html'))
         self.assertFalse(messages_summary.get('current_content_html'))
         self.assertFalse(messages_summary.get('description'))
