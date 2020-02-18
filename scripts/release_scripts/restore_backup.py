@@ -79,9 +79,10 @@ def initiate_backup_restoration_process():
         'Navigate into the newest backup folder. \n'
         'There should be a file here of the form '
         '<date_time>.overall_export_metadata. \n'
-        'For example, "20181122-090002.overall_export_metadata". '
+        'For example, "oppia-export-backups/20200213-090001/'
+        '20200213-090001.overall_export_metadata". '
         'This is the file you want to import.\n'
-        'Please copy and enter the path of this file\n')
+        'Please copy and enter the full path of this file\n')
     export_metadata_filepath = python_utils.INPUT()
     if not re.match(
             r'^oppia-export-backups/(\d{8}-\d{6})/\1\.overall_export_metadata$',
