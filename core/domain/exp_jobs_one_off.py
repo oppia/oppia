@@ -96,7 +96,7 @@ class MathExpressionInputInteractionOneOffJob(jobs.BaseMapReduceOneOffJobManager
                             if any(sep in rule for sep in SEPARATORS):
                                 yield (
                                     item.id,
-                                    '%s: %s' % ( 
+                                    '%s: %s' % (
                                         state_name.encode('utf-8'),
                                         rule.encode('utf-8')))
 
