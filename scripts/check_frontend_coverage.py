@@ -152,6 +152,7 @@ FULLY_COVERED_FILENAMES = [
     'guest-collection-progress.service.ts',
     'GuestCollectionProgressObjectFactory.ts',
     'HintObjectFactory.ts',
+    'id-generation.service.ts',
     'image-click-input-rules.service.ts',
     'image-click-input-validation.service.ts',
     'ImageClickInput.ts',
