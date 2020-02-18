@@ -98,8 +98,7 @@ describe('Collection rights object factory', () => {
 
       expect(() => {
         sampleCollectionRights.setPublic();
-      }).toThrow(
-          new Error('User is not allowed to edit this collection.'));
+      }).toThrowError('User is not allowed to edit this collection.');
       expect(sampleCollectionRights.isPrivate()).toBe(true);
       expect(sampleCollectionRights.isPublic()).toBe(false);
     }
@@ -141,8 +140,7 @@ describe('Collection rights object factory', () => {
 
       expect(() => {
         sampleCollectionRights.setPrivate();
-      }).toThrow(new Error('User is not allowed to unpublish this collection.'));
-
+      }).toThrowError('User is not allowed to unpublish this collection.');
       // Verify that the status remains unchanged.
       expect(sampleCollectionRights.isPrivate()).toBe(false);
       expect(sampleCollectionRights.isPublic()).toBe(true);
