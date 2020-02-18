@@ -103,7 +103,6 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             job_class, job_manager = (
                 stats_jobs_continuous.InteractionAnswerSummariesAggregator,
                 stats_jobs_continuous.InteractionAnswerSummariesMRJobManager)
-
             job_id = job_class.start_computation()
 
             self.assertEqual(
@@ -113,10 +112,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+
             (job_key, job_output), (job_summary_key, job_summary_output) = (
                 ast.literal_eval(o) for o in job_manager.get_output(job_id))
 
-        # Check that the problematic values are printed.
+        # Check that the problematic values are present.
         self.assertEqual(job_key, 'eid:1:\x00\ufffd')
         self.assertEqual(job_summary_key, 'eid:all:\x00\ufffd')
         # Check that a descriptive error message is present.
@@ -126,7 +126,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         self.assertIn(
             'Expected valid exploration id, version, and state name triple',
             job_summary_output)
-        # Check that the raised error is present.
+        # Check that the raised errors are present.
         self.assertIn('\'ascii\' codec can\'t decode byte', job_output)
         self.assertIn('\'ascii\' codec can\'t decode byte', job_summary_output)
 
