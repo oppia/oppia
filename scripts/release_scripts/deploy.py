@@ -23,13 +23,13 @@ IMPORTANT NOTES:
 1.  Before running this script, you must install third-party dependencies by
     running
 
-        python -m scripts.install_third_party_libs
+        python -m scripts.release_scripts.install_third_party_libs
 
     at least once.
 
 2.  This script should be run from the oppia root folder:
 
-        python -m scripts.deploy --app_name=[app_name]
+        python -m scripts.release_scripts.deploy --app_name=[app_name]
 
     where [app_name] is the name of your app. Note that the root folder MUST be
     named 'oppia'.

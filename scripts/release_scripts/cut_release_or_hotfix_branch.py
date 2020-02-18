@@ -20,15 +20,16 @@ Usage: Run this script from your oppia root folder:
 
 For release branch:
 
-    python -m scripts.cut_release_or_hotfix_branch --release_version="x.y.z"
+    python -m scripts.release_scripts.cut_release_or_hotfix_branch
+    --release_version="x.y.z"
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3. The generated branch
 name will be release-x.y.z, e.g. release-2.5.3.
 
 For hotfix branch:
 
-    python -m scripts.cut_release_or_hotfix_branch --release_version="x.y.z"
-    --hotfix_number=d
+    python -m scripts.release_scripts.cut_release_or_hotfix_branch
+    --release_version="x.y.z" --hotfix_number=d
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3,
 d is number of the hotfix being created, e.g. 1. The generated branch
