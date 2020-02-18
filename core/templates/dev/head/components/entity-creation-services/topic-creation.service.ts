@@ -18,13 +18,15 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
+require(
+  'components/entity-creation-services/topic-creation-backend-api.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
-  '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
-  'UrlInterpolationService',
+  '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
+  'TopicCreationBackendService', 'UrlInterpolationService',
   function(
-      $http, $rootScope, $timeout, $uibModal, $window, AlertsService,
-      UrlInterpolationService) {
+      $rootScope, $timeout, $uibModal, $window, AlertsService,
+      TopicCreationBackendService, UrlInterpolationService) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
 
@@ -74,20 +76,19 @@ angular.module('oppia').factory('TopicCreationService', [
           AlertsService.clearWarnings();
 
           $rootScope.loadingMessage = 'Creating topic';
-          $http.post('/topic_editor_handler/create_new', {
-            name: topic.topicName,
-            abbreviated_name: topic.abbreviatedTopicName
-          }).then(function(response) {
-            $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
-                TOPIC_EDITOR_URL_TEMPLATE, {
-                  topic_id: response.data.topicId
-                }
-              );
-            }, 150);
-          }, function() {
-            $rootScope.loadingMessage = '';
-          });
+          TopicCreationBackendService.createTopic(
+            topic.topicName, topic.abbreviatedTopicName).then(
+            function(response) {
+              $timeout(function() {
+                $window.location = UrlInterpolationService.interpolateUrl(
+                  TOPIC_EDITOR_URL_TEMPLATE, {
+                    topic_id: response.data.topicId
+                  }
+                );
+              }, 150);
+            }, function() {
+              $rootScope.loadingMessage = '';
+            });
         });
       }
     };

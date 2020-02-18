@@ -1,3 +1,4 @@
+
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,22 +12,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
- * @fileoverview Unit test for CollectionCreationBackendApiService.
+ * @fileoverview Unit test for TopicCreationBackendApiService.
  */
 
-// eslint-disable-next-line max-len
-require('components/entity-creation-services/collection-creation-backend-api.service.ts');
-
+require(
+  'components/entity-creation-services/topic-creation-backend-api.service.ts');
+require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Collection Creation backend service', function() {
-  var CollectionCreationBackendService = null;
+fdescribe('Topic Creation backend service', function() {
+  var TopicCreationBackendService = null;
   var $httpBackend = null;
   var $rootScope = null;
-  var SAMPLE_COLLECTION_ID = 'hyuy4GUlvTqJ';
-  var SUCCESS_STATUS_CODE = 200;
-  var ERROR_STATUS_CODE = 500;
+  var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
 
@@ -37,11 +37,18 @@ describe('Collection Creation backend service', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    CollectionCreationBackendService = $injector.get(
-      'CollectionCreationBackendService');
+  beforeEach(angular.mock.inject(function($injector, $q) {
+    TopicCreationBackendService = $injector.get(
+      'TopicCreationBackendService');
     $httpBackend = $injector.get('$httpBackend');
     $rootScope = $injector.get('$rootScope');
+    CsrfService = $injector.get('CsrfTokenService');
+
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
   }));
 
   afterEach(function() {
@@ -49,39 +56,32 @@ describe('Collection Creation backend service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully create a new topic and obtain the topic ID',
-    (done) => {
+  it('should successfully create a new topic and obtain the skill ID',
+    () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/collection_editor_handler/create_new').respond(
-        SUCCESS_STATUS_CODE, {collectionId: SAMPLE_COLLECTION_ID});
-      CollectionCreationBackendService.createCollection().then(
-        successHandler, failHandler);
-
+      $httpBackend.expectPOST('/topic_editor_handler/create_new').respond(
+        200, {topic_id: 'hyuy4GUlvTqJ'});
+        TopicCreationBackendService.createTopic(
+          'topic-name', 'topic-abbr-name').then(successHandler, failHandler);
       $httpBackend.flush();
-      $rootScope.$digest();
-
-      expect(successHandler).toHaveBeenCalled();
+      expect(successHandler).toHaveBeenCalledWith('hyuy4GUlvTqJ');
       expect(failHandler).not.toHaveBeenCalled();
-      done();
     });
 
   it('should fail to create a new topic and call the fail handler',
-    (done) => {
+    () => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/collection_editor_handler/create_new').respond(
-        ERROR_STATUS_CODE);
-      CollectionCreationBackendService.createCollection().then(
+      $httpBackend.expectPOST('/topic_editor_handler/create_new').respond(
+        500, 'Error creating a new topic.');
+        TopicCreationBackendService.createTopic('topic-name', 'topic-abbr-name').then(
         successHandler, failHandler);
-
       $httpBackend.flush();
-      $rootScope.$digest();
-
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalled();
-      done();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error creating a new topic.');
     });
 });

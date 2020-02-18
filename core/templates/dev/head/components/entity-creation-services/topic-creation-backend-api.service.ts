@@ -22,11 +22,11 @@ angular.module('oppia').factory('TopicCreationBackendService', [
       $http, $q) {
     var _createTopic = function(
         successCallback, errorCallback, abbreviatedTopicName, topicName) {
-      var putData = {
+      var postData = {
         topicName: topicName,
         abbreviated_name: abbreviatedTopicName
-      }    
-      $http.post('/topic_editor_handler/create_new', putData)
+      };
+      $http.post('/topic_editor_handler/create_new', postData)
         .then(function(response) {
           if (successCallback) {
             successCallback(response.data.topic_id);
