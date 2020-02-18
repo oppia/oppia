@@ -30,7 +30,6 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
-import python_utils
 
 (exp_models, stats_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.statistics])
@@ -75,11 +74,14 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             exploration_id, exploration_version, state_name, calculation_id)
 
     def _mock_job_class(self):
+        """Context manager to mock the job under test so it runs only once."""
         return self.swap(
             stats_jobs_continuous, 'InteractionAnswerSummariesAggregator',
             MockInteractionAnswerSummariesAggregator)
 
     def _invalid_state_names_permitted(self):
+        """Context manager to stop validating the names of exploration states.
+        """
         return self.swap(
             exp_domain.Exploration, '_require_valid_state_name',
             lambda unused_cls, unused_name: None)
