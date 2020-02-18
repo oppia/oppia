@@ -153,8 +153,8 @@ describe('ItemSelectionInputValidationService', () => {
     expect(() => {
       validatorService.getAllWarnings(
         currentState, {}, goodAnswerGroups, goodDefaultOutcome);
-    }).toThrow(new Error(
-      'Expected customization arguments to have property: choices'));
+    }).toThrow(
+      'Expected customization arguments to have property: choices');
   });
 
   it(
