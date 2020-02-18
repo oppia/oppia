@@ -27,6 +27,7 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
+
 class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
