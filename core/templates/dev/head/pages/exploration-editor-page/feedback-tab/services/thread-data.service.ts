@@ -28,8 +28,9 @@ require(
 
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ExplorationDataService',
-  'FeedbackThreadObjectFactory', 'LoggerService', 'SuggestionThreadObjectFactory',
-  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED',
+  'FeedbackThreadObjectFactory', 'LoggerService',
+  'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED',
+  'STATUS_IGNORED',
   function(
       $http, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, LoggerService, SuggestionThreadObjectFactory,
@@ -174,7 +175,8 @@ angular.module('oppia').factory('ThreadDataService', [
           threadId, action, commitMsg, reviewMsg, onSuccess, onFailure) {
         var thread = getThreadById(threadId);
         if (thread === null) {
-          return $q.reject('Can not resolve a suggestion to nonexistent thread.');
+          return $q.reject(
+            'Can not resolve a suggestion to nonexistent thread.');
         }
 
         return $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, {

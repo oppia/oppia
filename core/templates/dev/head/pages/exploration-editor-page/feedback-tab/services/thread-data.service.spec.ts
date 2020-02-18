@@ -218,7 +218,7 @@ describe('retrieving threads service', function() {
       .and.returnValue(thread);
 
     $httpBackend.whenGET('/threadlisthandler/' + expId).respond({
-      feedback_thread_dicts: [ mockThread ],
+      feedback_thread_dicts: [mockThread],
       suggestion_thread_dicts: []
     });
     $httpBackend.whenGET(
@@ -239,30 +239,30 @@ describe('retrieving threads service', function() {
 
   it('should use reject handler when fetching a message from a thread fails',
     function(done) {
-    var loggerErrorSpy = spyOn(LoggerService, 'error').and.callThrough();
-    var mockThread = mockFeedbackThreads[0];
-    var thread = new FeedbackThread(
-      mockThread.status, mockThread.subject, mockThread.summary,
-      mockThread.originalAuthorName, mockThread.lastUpdated,
-      mockThread.messageCount, mockThread.stateName, mockThread.threadId
-    );
+      var loggerErrorSpy = spyOn(LoggerService, 'error').and.callThrough();
+      var mockThread = mockFeedbackThreads[0];
+      var thread = new FeedbackThread(
+        mockThread.status, mockThread.subject, mockThread.summary,
+        mockThread.originalAuthorName, mockThread.lastUpdated,
+        mockThread.messageCount, mockThread.stateName, mockThread.threadId
+      );
 
-    spyOn(FeedbackThreadObjectFactory, 'createFromBackendDict')
-      .and.returnValue(thread);
-    var setMessagesSpy = spyOn(thread, 'setMessages').and.callThrough();
+      spyOn(FeedbackThreadObjectFactory, 'createFromBackendDict')
+        .and.returnValue(thread);
+      var setMessagesSpy = spyOn(thread, 'setMessages').and.callThrough();
 
-    $httpBackend.expect('GET', '/threadhandler/' + thread.threadId).respond(
-      500, 'Error on fetching messages from a thread.');
-    ThreadDataService.fetchMessages(thread.threadId).then(
-      done, function() {
-        expect(setMessagesSpy).not.toHaveBeenCalled();
-        expect(loggerErrorSpy).toHaveBeenCalledWith(
-          'Error on fetching messages from a thread.');
-        done();
-      }
-    );
-    $httpBackend.flush();
-  });
+      $httpBackend.expect('GET', '/threadhandler/' + thread.threadId).respond(
+        500, 'Error on fetching messages from a thread.');
+      ThreadDataService.fetchMessages(thread.threadId).then(
+        done, function() {
+          expect(setMessagesSpy).not.toHaveBeenCalled();
+          expect(loggerErrorSpy).toHaveBeenCalledWith(
+            'Error on fetching messages from a thread.');
+          done();
+        }
+      );
+      $httpBackend.flush();
+    });
 
   it('should successfully fetch feedback stats', function() {
     var successHandler = jasmine.createSpy('success');
@@ -285,8 +285,8 @@ describe('retrieving threads service', function() {
       var failHandler = jasmine.createSpy('fail');
       $httpBackend.expect('GET', '/feedbackstatshandler/' + expId).respond(500,
         'Error on fetch feedback stats');
-        ThreadDataService.fetchFeedbackStats().then(
-          successHandler, failHandler);
+      ThreadDataService.fetchFeedbackStats().then(
+        successHandler, failHandler);
       $httpBackend.flush();
 
       expect(ThreadDataService.getOpenThreadsCount()).toBe(0);
@@ -307,7 +307,7 @@ describe('retrieving threads service', function() {
     }];
 
     expect(ThreadDataService.getOpenThreadsCount()).toBe(0);
-    
+
     $httpBackend.whenGET(
       '/suggestionlisthandler?target_type=exploration&target_id=' + expId
     ).respond({ suggestions: mockSuggestions });
@@ -319,7 +319,7 @@ describe('retrieving threads service', function() {
     ThreadDataService.createNewThread(subject, 'Text', successCallback)
       .then(function(threadData) {
         expect(threadData.feedbackThreads[0].subject).toBe(subject);
-      
+
         expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
         expect(successCallback).toHaveBeenCalled();
       });
@@ -364,20 +364,21 @@ describe('retrieving threads service', function() {
 
   it('should use reject handler when adding a new message in an inexistent' +
     ' thread', function(done) {
-      var invalidThreadId = '0';
-      var successCallback = jasmine.createSpy('success');
-      var failureCallback = jasmine.createSpy('failure');
-      ThreadDataService.addNewMessage(
-        invalidThreadId, 'Message', 'open', successCallback, failureCallback)
-        .then(done,
-          function(error) {
-          expect(error).toBe('Can not add message to nonexistent thread.');
+    var invalidThreadId = '0';
+    var successCallback = jasmine.createSpy('success');
+    var failureCallback = jasmine.createSpy('failure');
+    ThreadDataService.addNewMessage(
+      invalidThreadId, 'Message', 'open', successCallback, failureCallback)
+      .then(done,
+        function(error) {
+          expect(error).toBe(
+            'Can not add message to nonexistent thread.');
           expect(successCallback).not.toHaveBeenCalled();
           expect(failureCallback).not.toHaveBeenCalled();
           done();
         });
-      $rootScope.$digest();
-    });
+    $rootScope.$digest();
+  });
 
   it('should successfully add a new message in a thread when its status' +
     ' is different than old status and its status is close', function(done) {
@@ -403,14 +404,14 @@ describe('retrieving threads service', function() {
     ThreadDataService.fetchFeedbackStats();
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
-    
+
     // Post message
     $httpBackend.expectPOST('/threadhandler/' + 'abc1').respond(200, {});
     // Fetch message
     $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({});
     ThreadDataService.addNewMessage(
       threadId, 'Message', 'close', successCallback, failureCallback).then(
-        done);
+      done);
     $httpBackend.flush(2);
 
     expect(ThreadDataService.getOpenThreadsCount()).toBe(0);
@@ -445,14 +446,14 @@ describe('retrieving threads service', function() {
     ThreadDataService.fetchFeedbackStats();
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
-    
+
     // Post message
     $httpBackend.expectPOST('/threadhandler/' + 'abc1').respond(200, {});
     // Fetch message
     $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({});
     ThreadDataService.addNewMessage(
       threadId, 'Message', 'open', successCallback, failureCallback).then(
-        done);
+      done);
     $httpBackend.flush(2);
 
     expect(ThreadDataService.getOpenThreadsCount()).toBe(2);
@@ -484,14 +485,14 @@ describe('retrieving threads service', function() {
     ThreadDataService.fetchFeedbackStats();
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
-    
+
     // Post message
     $httpBackend.expectPOST('/threadhandler/' + 'abc1').respond(200, {});
     // Fetch message
     $httpBackend.expect('GET', '/threadhandler/' + threadId).respond({});
     ThreadDataService.addNewMessage(
       threadId, 'Message', 'open', successCallback, failureCallback).then(
-        done);
+      done);
     $httpBackend.flush(2);
 
     expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
@@ -501,21 +502,22 @@ describe('retrieving threads service', function() {
 
   it('should use reject handler when resolving a suggestion in an inexistent' +
     ' thread', function(done) {
-      var invalidThreadId = '0';
-      var successCallback = jasmine.createSpy('success');
-      var failureCallback = jasmine.createSpy('failure');
-      ThreadDataService.resolveSuggestion(
-        invalidThreadId, 'accept', 'Commit', 'Review', successCallback,
-        failureCallback)
-        .then(done,
-          function(error) {
-          expect(error).toBe('Can not resolve a suggestion to nonexistent thread.');
+    var invalidThreadId = '0';
+    var successCallback = jasmine.createSpy('success');
+    var failureCallback = jasmine.createSpy('failure');
+    ThreadDataService.resolveSuggestion(
+      invalidThreadId, 'accept', 'Commit', 'Review', successCallback,
+      failureCallback)
+      .then(done,
+        function(error) {
+          expect(error).toBe(
+            'Can not resolve a suggestion to nonexistent thread.');
           expect(successCallback).not.toHaveBeenCalled();
           expect(failureCallback).not.toHaveBeenCalled();
           done();
         });
-      $rootScope.$digest();
-    });
+    $rootScope.$digest();
+  });
 
   it('should successfully resolve a suggestion', function(done) {
     var successCallback = jasmine.createSpy('successCallback');
@@ -537,13 +539,13 @@ describe('retrieving threads service', function() {
     ThreadDataService.fetchFeedbackStats();
     $httpBackend.flush();
     expect(ThreadDataService.getOpenThreadsCount()).toBe(1);
-    
+
     $httpBackend.expectPUT(
       '/suggestionactionhandler/exploration/' + expId + '/' + 'abc1')
       .respond(200, {});
     ThreadDataService.resolveSuggestion(
       'abc1', 'Message', 'status', 'a', true, successCallback, failureCallback)
-        .then(successCallback, failureCallback);
+      .then(successCallback, failureCallback);
     $httpBackend.flush();
 
     expect(ThreadDataService.getOpenThreadsCount()).toBe(0);
