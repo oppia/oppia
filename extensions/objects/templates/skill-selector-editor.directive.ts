@@ -21,16 +21,14 @@ require('domain/skill/skill-domain.constants.ajs.ts');
 require('services/context.service.ts');
 
 angular.module('oppia').directive('skillSelectorEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/skill-selector-editor.directive.html'),
+      template: require('./skill-selector-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$scope', 'ContextService', 'ENTITY_TYPE',
