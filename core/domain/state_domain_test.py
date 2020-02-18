@@ -226,18 +226,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             }))
         interaction_id = 'TextInput'
         init_state.update_interaction_id(interaction_id)
-        default_outcome_dict = {
-            'dest': 'Introduction',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>The default outcome.</p>'},
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'param_changes': [],
-            'refresher_exploration_id': None
-        }
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml(
+                'default_outcome', '<p>The default outcome.</p>'),
+            False, [], None, None
+        )
 
-        init_state.update_interaction_default_outcome(default_outcome_dict)
+        init_state.update_interaction_default_outcome(default_outcome)
 
         answer_group_dict = {
             'outcome': {
@@ -869,19 +864,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_default_outcome(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        default_outcome_dict = {
-            'dest': 'Introduction',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': ''},
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'param_changes': [],
-            'refresher_exploration_id': None
-        }
-
+        default_outcome = state_domain.Outcome(
+            'Introduction', state_domain.SubtitledHtml('default_outcome', ''),
+            False, [], None, None
+        )
         exploration.init_state.update_interaction_default_outcome(
-            default_outcome_dict)
+            default_outcome
+        )
         exploration.init_state.update_content(
             state_domain.SubtitledHtml.from_dict({
                 'content_id': 'default_outcome',
@@ -1198,14 +1187,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration.init_state.interaction.confirmed_unclassified_answers,
             answer_groups_list)
-
-    def test_cannot_update_non_dict_interaction_default_outcome(self):
-        exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-
-        with self.assertRaisesRegexp(
-            Exception, 'Expected default_outcome_dict to be a dict'):
-            exploration.init_state.update_interaction_default_outcome(
-                'invalid_default_outcome')
 
     def test_cannot_update_non_list_interaction_answer_groups(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
