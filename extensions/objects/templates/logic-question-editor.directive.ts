@@ -29,16 +29,14 @@ import LOGIC_PROOF_DEFAULT_QUESTION_DATA from
 
 
 angular.module('oppia').directive('logicQuestionEditor', [
-  '$timeout', 'UrlInterpolationService',
-  function($timeout, UrlInterpolationService) {
+  '$timeout', function($timeout) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/logic-question-editor.directive.html'),
+      template: require('./logic-question-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

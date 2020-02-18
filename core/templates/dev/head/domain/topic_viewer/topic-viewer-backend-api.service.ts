@@ -16,38 +16,52 @@
  * @fileoverview Service to get topic data.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { TopicViewerDomainConstants } from
+  'domain/topic_viewer/topic-viewer-domain.constants';
 
-angular.module('oppia').factory('TopicViewerBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'TOPIC_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, TOPIC_DATA_URL_TEMPLATE) {
-    var topicDataDict = null;
-    var _fetchTopicData = function(topicName, successCallback, errorCallback) {
-      var topicDataUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_DATA_URL_TEMPLATE, {
-          topic_name: topicName
-        });
+@Injectable({
+  providedIn: 'root'
+})
+export class TopicViewerBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private urlInterpolation: UrlInterpolationService) {}
 
-      $http.get(topicDataUrl).then(function(response) {
-        topicDataDict = angular.copy(response.data);
+  private topicDataDict = null;
+  private _fetchTopicData(
+      topicName: string, successCallback: any, errorCallback: any): any {
+    var topicDataUrl = this.urlInterpolation.interpolateUrl(
+      TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
+        topic_name: topicName
+      });
+
+    this.http.get(
+      topicDataUrl, { observe: 'response' }).toPromise().then(
+      (response) => {
+        this.topicDataDict = Object.assign({}, response.body);
         if (successCallback) {
-          successCallback(topicDataDict);
+          successCallback(this.topicDataDict);
         }
-      }, function(errorResponse) {
+      }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.body);
         }
       });
-    };
-
-    return {
-      fetchTopicData: function(topicName) {
-        return $q(function(resolve, reject) {
-          _fetchTopicData(topicName, resolve, reject);
-        });
-      }
-    };
   }
-]);
+
+  fetchTopicData(topicName: string): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._fetchTopicData(topicName, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'TopicViewerBackendApiService', downgradeInjectable(
+    TopicViewerBackendApiService));

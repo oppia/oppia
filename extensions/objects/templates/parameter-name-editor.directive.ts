@@ -20,16 +20,14 @@
 // available in the context in which it is used.
 
 angular.module('oppia').directive('parameterNameEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/parameter-name-editor.directive.html'),
+      template: require('./parameter-name-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$attrs', 'ExplorationParamSpecsService',

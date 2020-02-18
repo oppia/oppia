@@ -18,6 +18,7 @@
       "app.constants": ["core/templates/dev/head/app.constants"],
       "components/*": ["core/templates/dev/head/components/*"],
       "domain/*": ["core/templates/dev/head/domain/*"],
+      "expressions/*": ["core/templates/dev/head/expressions/*"],
       "pages/*": ["core/templates/dev/head/pages/*"],
       "services/*": ["core/templates/dev/head/services/*"],
       "classifiers/*": ["extensions/classifiers/*"],
