@@ -116,7 +116,6 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
         self.assertEqual(job_key, 'eid:1:\x00\ufffd')
         self.assertEqual(job_summary_key, 'eid:all:\x00\ufffd')
         # Check that helpful debug information is present.
-
         self.assertRegexpMatches(
             job_output,
             'Expected valid exploration id, version, and state name triple, '
