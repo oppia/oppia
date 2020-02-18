@@ -15,34 +15,29 @@
 /**
  * @fileoverview Unit tests for TopicViewerBackendApiService.
  */
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-<<<<<<< HEAD
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
 import { ReadOnlyTopicObjectFactory } from
   'domain/topic_viewer/read-only-topic-object.factory';
 import { SkillSummaryObjectFactory } from
   'domain/skill/SkillSummaryObjectFactory';
-import { StorySummaryObjectFactory } from
-  'domain/story/StorySummaryObjectFactory';
 import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
+import { TopicViewerBackendApiService } from
+  'domain/topic_viewer/topic-viewer-backend-api.service';
 import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-
-require('domain/topic_viewer/topic-viewer-backend-api.service.ts');
-
-describe('Topic viewer backend API service', function() {
-  var TopicViewerBackendApiService = null;
-  var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
-  var UndoRedoService = null;
+fdescribe('Topic viewer backend API service', () => {
+  let topicViewerBackendApiService:
+    TopicViewerBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  let sampleDataResults = null;
   var sampleDataResultsObjects = null;
   let readOnlyTopicObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value(
       'SkillSummaryObjectFactory', new SkillSummaryObjectFactory());
@@ -51,6 +46,7 @@ describe('Topic viewer backend API service', function() {
         new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
         new SkillSummaryObjectFactory()));
   }));
+
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -58,34 +54,13 @@ describe('Topic viewer backend API service', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector) {
-    TopicViewerBackendApiService = $injector.get(
-      'TopicViewerBackendApiService');
-    readOnlyTopicObjectFactory = $injector.get('ReadOnlyTopicObjectFactory');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
-=======
-import { HttpClientTestingModule, HttpTestingController } from
-  '@angular/common/http/testing';
-import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
-
-import { TopicViewerBackendApiService } from
-  'domain/topic_viewer/topic-viewer-backend-api.service';
-
-describe('Topic viewer backend API service', () => {
-  let topicViewerBackendApiService:
-    TopicViewerBackendApiService = null;
-  let httpTestingController: HttpTestingController;
-  let sampleDataResults = null;
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
     });
     httpTestingController = TestBed.get(HttpTestingController);
     topicViewerBackendApiService = TestBed.get(TopicViewerBackendApiService);
->>>>>>> upstream/develop
+    readOnlyTopicObjectFactory = TestBed.get(ReadOnlyTopicObjectFactory);
 
     // Sample topic object returnable from the backend
     sampleDataResults = {
@@ -119,20 +94,16 @@ describe('Topic viewer backend API service', () => {
         skill_id_2: 'Skill Description 2'
       }
     };
-<<<<<<< HEAD
 
     sampleDataResultsObjects = readOnlyTopicObjectFactory.createFromBackendDict(
       sampleDataResults);
-  }));
-=======
   });
->>>>>>> upstream/develop
 
   afterEach(() => {
     httpTestingController.verify();
   });
 
-  it('should successfully fetch an existing topic from the backend',
+  fit('should successfully fetch an existing topic from the backend',
     fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -145,11 +116,7 @@ describe('Topic viewer backend API service', () => {
 
       flushMicrotasks();
 
-<<<<<<< HEAD
       expect(successHandler).toHaveBeenCalledWith(sampleDataResultsObjects);
-=======
-      expect(successHandler).toHaveBeenCalled();
->>>>>>> upstream/develop
       expect(failHandler).not.toHaveBeenCalled();
     })
   );

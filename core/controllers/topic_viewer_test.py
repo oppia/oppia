@@ -140,6 +140,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                     self.skill_id_2: 'Skill Description 2'
                 }
             }
+            print(json_response)
             self.assertDictContainsSubset(expected_dict, json_response)
 
     def test_get_with_user_logged_in(self):
@@ -187,6 +188,7 @@ class TopicPageDataHandlerTests(BaseTopicViewerControllerTests):
                         self.skill_id_2: 'Skill Description 2'
                     }
                 }
+                print(json_response)
                 self.assertDictContainsSubset(expected_dict, json_response)
 
             self.logout()

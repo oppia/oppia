@@ -16,37 +16,19 @@
  * @fileoverview Service to get topic data.
  */
 
-<<<<<<< HEAD
-require('domain/topic_viewer/read-only-topic-object.factory');
-require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
-require('domain/utilities/url-interpolation.service.ts');
-
-angular.module('oppia').factory('TopicViewerBackendApiService', [
-  '$http', '$q', 'ReadOnlyTopicObjectFactory', 'UrlInterpolationService',
-  'TOPIC_DATA_URL_TEMPLATE', function(
-      $http, $q, ReadOnlyTopicObjectFactory, UrlInterpolationService,
-      TOPIC_DATA_URL_TEMPLATE) {
-    var readOnlyTopic = null;
-    var _fetchTopicData = function(topicName, successCallback, errorCallback) {
-      var topicDataUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_DATA_URL_TEMPLATE, {
-          topic_name: topicName
-        });
-
-      $http.get(topicDataUrl).then(function(response) {
-        readOnlyTopic = ReadOnlyTopicObjectFactory.createFromBackendDict(
-          angular.copy(response.data));
-        if (successCallback) {
-          successCallback(readOnlyTopic);
-=======
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
+import { ReadOnlyTopicObjectFactory } from
+  'domain/topic_viewer/read-only-topic-object.factory';
+import { SkillSummaryObjectFactory } from
+  'domain/skill/SkillSummaryObjectFactory';
+import { SubtopicObjectFactory } from 'domain/topic/SubtopicObjectFactory';
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -56,6 +38,8 @@ export class TopicViewerBackendApiService {
     private http: HttpClient,
     private urlInterpolation: UrlInterpolationService) {}
 
+  private readOnlyTopicObjectFactory: ReadOnlyTopicObjectFactory = null;
+  private readOnlyTopic = null;
   private topicDataDict = null;
   private _fetchTopicData(
       topicName: string, successCallback: any, errorCallback: any): any {
@@ -63,14 +47,17 @@ export class TopicViewerBackendApiService {
       TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE, {
         topic_name: topicName
       });
-
+    var readOnlyTopicObjectFactory = new ReadOnlyTopicObjectFactory(
+      new SubtopicObjectFactory(new SkillSummaryObjectFactory()),
+      new SkillSummaryObjectFactory());
     this.http.get(
       topicDataUrl, { observe: 'response' }).toPromise().then(
       (response) => {
         this.topicDataDict = Object.assign({}, response.body);
+        this.readOnlyTopic = readOnlyTopicObjectFactory.createFromBackendDict(
+          this.topicDataDict);
         if (successCallback) {
-          successCallback(this.topicDataDict);
->>>>>>> upstream/develop
+          successCallback(this.readOnlyTopic);
         }
       }, (errorResponse) => {
         if (errorCallback) {
