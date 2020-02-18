@@ -618,14 +618,14 @@ angular.module('oppia').directive('questionsList', [
                       });
                     });
                   };
-                  // the saveAndCommit function is called when the contents of
+
+                  // The saveAndCommit function is called when the contents of
                   // a question is changed or the skill linkages are modified.
                   // The user has to enter a commit message if the contents of
                   // the question is edited but, if only the skill linkages are
                   // modified then no commit message is required from the user
                   // as there is already a default commit message present in the
                   // backend for modification of skill linkages.
-
                   $scope.saveAndCommit = function() {
                     $scope.validationError = $scope.question.validate(
                       $scope.misconceptionsBySkill);
