@@ -14,7 +14,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for CollectionCreationBackendApiService.
+ * @fileoverview Unit test for TopicCreationBackendApiService.
  */
 
 require(
