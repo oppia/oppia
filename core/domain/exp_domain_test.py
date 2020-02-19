@@ -493,9 +493,9 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Restore a valid exploration.
         init_state = exploration.states[exploration.init_state_name]
-        default_outcome_dict = init_state.interaction.default_outcome.to_dict()
-        default_outcome_dict['dest'] = exploration.init_state_name
-        init_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = init_state.interaction.default_outcome
+        default_outcome.dest = exploration.init_state_name
+        init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
 
         # Ensure an invalid destination can also be detected for answer groups.
@@ -705,7 +705,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Restore a valid exploration.
         interaction.id = 'TextInput'
         init_state.update_interaction_answer_groups(answer_groups)
-        init_state.update_interaction_default_outcome(default_outcome.to_dict())
+        init_state.update_interaction_default_outcome(default_outcome)
         exploration.validate()
 
         init_state.update_interaction_solution({
@@ -1497,19 +1497,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.add_states(['DEF'])
 
-        default_outcome_dict = {
-            'dest': 'DEF',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Default outcome for state1</p>'
-            },
-            'param_changes': [],
-            'labelled_as_correct': False,
-            'refresher_exploration_id': 'refresher_exploration_id',
-            'missing_prerequisite_skill_id': None
-        }
+        default_outcome = state_domain.Outcome(
+            'DEF', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], 'refresher_exploration_id', None,
+        )
         exploration.init_state.update_interaction_default_outcome(
-            default_outcome_dict)
+            default_outcome
+        )
 
         with self.assertRaisesRegexp(
             Exception,
@@ -7524,18 +7519,12 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
         state3.update_interaction_customization_args(customization_args_dict3)
         state4.update_interaction_customization_args(customization_args_dict4)
 
-        default_outcome_dict1 = {
-            'dest': 'state2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Default outcome for state1</p>'
-            },
-            'param_changes': [],
-            'labelled_as_correct': False,
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        state1.update_interaction_default_outcome(default_outcome_dict1)
+        default_outcome = state_domain.Outcome(
+            'state2', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Default outcome for state1</p>'),
+            False, [], None, None
+        )
+        state1.update_interaction_default_outcome(default_outcome)
 
         hint_list2 = [{
             'hint_content': {
