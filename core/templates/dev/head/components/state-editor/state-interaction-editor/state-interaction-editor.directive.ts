@@ -445,8 +445,6 @@ angular.module('oppia').directive('stateInteractionEditor', [
 
             $scope.userBlueImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/avatar/user_blue_72px.webp');
-            $scope.userBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-              '/avatar/user_black_72px.png');
             $scope.$on('stateEditorInitialized', function(evt, stateData) {
               if (stateData === undefined || $.isEmptyObject(stateData)) {
                 throw new Error('Expected stateData to be defined but ' +
