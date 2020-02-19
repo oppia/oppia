@@ -118,6 +118,8 @@ import { ParamChangeObjectFactory } from
   'domain/exploration/ParamChangeObjectFactory';
 import { ParamChangesObjectFactory } from
   'domain/exploration/ParamChangesObjectFactory';
+import { ParamMetadataObjectFactory } from
+  'domain/exploration/ParamMetadataObjectFactory';
 import { ParamSpecObjectFactory } from
   'domain/exploration/ParamSpecObjectFactory';
 import { ParamSpecsObjectFactory } from
@@ -236,6 +238,7 @@ import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
 import { WrittenTranslationsObjectFactory } from
   'domain/exploration/WrittenTranslationsObjectFactory';
+import { from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -293,6 +296,8 @@ export class UpgradedServices {
       new NormalizeWhitespacePunctuationAndCasePipe();
     upgradedServices['ParamChangeObjectFactory'] =
       new ParamChangeObjectFactory();
+    upgradedServices['ParamMetadataObjectFactory'] =
+      new ParamMetadataObjectFactory();
     upgradedServices['ParamTypeObjectFactory'] =
       new ParamTypeObjectFactory();
     upgradedServices['PlaythroughIssueObjectFactory'] =
