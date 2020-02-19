@@ -784,6 +784,8 @@ class I18nDictsTests(test_utils.GenericTestBase):
                 key_list = [line[:line.find(':')].strip() for line in lines]
                 for key in key_list:
                     self.assertTrue(key.startswith('"I18N_'))
+                    if not key.startswith('"I18N_'):
+                        self.log_line('Bad line in file: %s' % filename)
                 self.assertEqual(sorted(key_list), key_list)
 
     def test_keys_match_en_qqq(self):
