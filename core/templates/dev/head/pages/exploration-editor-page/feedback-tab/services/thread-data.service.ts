@@ -182,7 +182,7 @@ angular.module('oppia').factory('ThreadDataService', [
           thread.status =
             action === ACTION_ACCEPT_SUGGESTION ? STATUS_FIXED : STATUS_IGNORED;
           _openThreadsCount -= 1;
-          _fetchMessages(threadId);
+          return _fetchMessages(threadId);
         }).then(onSuccess, onFailure);
       }
     };
