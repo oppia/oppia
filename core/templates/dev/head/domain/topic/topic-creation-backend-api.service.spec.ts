@@ -59,10 +59,11 @@ describe('Topic creation backend api service', function() {
 
       $httpBackend.expectPOST('/topic_editor_handler/create_new').respond(
         200, {topic_id: 'hyuy4GUlvTqJ'});
-        TopicCreationBackendApiService.createTopic(
+      TopicCreationBackendApiService.createTopic(
           'topic-name', 'topic-abbr-name').then(successHandler, failHandler);
       $httpBackend.flush();
-      expect(successHandler).toHaveBeenCalledWith({topic_id: 'hyuy4GUlvTqJ'});
+      expect(successHandler).toHaveBeenCalledWith(
+        {topic_id: 'hyuy4GUlvTqJ'});
       expect(failHandler).not.toHaveBeenCalled();
     });
 
@@ -73,7 +74,8 @@ describe('Topic creation backend api service', function() {
 
       $httpBackend.expectPOST('/topic_editor_handler/create_new').respond(
         500, 'Error creating a new topic.');
-        TopicCreationBackendApiService.createTopic('topic-name', 'topic-abbr-name').then(
+      TopicCreationBackendApiService.createTopic(
+          'topic-name', 'topic-abbr-name').then(
         successHandler, failHandler);
       $httpBackend.flush();
       expect(successHandler).not.toHaveBeenCalled();
