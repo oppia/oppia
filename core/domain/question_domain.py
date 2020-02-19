@@ -228,15 +228,16 @@ class Question(python_utils.OBJECT):
             dict. The converted question_state_dict.
         """
         # Get the voiceovers_mapping metadata.
-        voiceovers = (question_state_dict['recorded_voiceovers']
+        voiceovers_mapping = (question_state_dict['recorded_voiceovers']
                       ['voiceovers_mapping'])
-        for voiceover_state in voiceovers.values():
-            for language_code in voiceover_state.values():
+        language_codes_to_audio_metadata = voiceovers_mapping.values()
+        for language_codes in language_codes_to_audio_metadata:
+            for audio_metadata in language_codes.values():
                 # Initialize duration_secs with 0.0 for every voiceover
                 # recording under Content, Feedback, Hints, and Solutions.
                 # This is necessary to keep the state functional
                 # when migrating to v31.
-                language_code['duration_secs'] = 0.0
+                audio_metadata['duration_secs'] = 0.0
         return question_state_dict
 
 

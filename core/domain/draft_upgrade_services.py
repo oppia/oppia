@@ -106,18 +106,20 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
                 # Get the language code to access the language code correctly.
-                voiceover_changes = change.new_value['voiceovers_mapping']
+                new_voiceovers_mapping = change.new_value['voiceovers_mapping']
                 # Initialize the value to migrate draft state to v31.
-                for voiceover_state in voiceover_changes.values():
-                    for language_code in voiceover_state.values():
-                        language_code['duration_secs'] = 0.0
+                language_codes_to_audio_metadata = (
+                    new_voiceovers_mapping.values())
+                for language_codes in language_codes_to_audio_metadata:
+                    for audio_metadata in language_codes.values():
+                        audio_metadata['duration_secs'] = 0.0
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
                     'state_name': change.state_name,
                     'new_value': {
-                        'voiceovers_mapping': voiceover_changes
+                        'voiceovers_mapping': new_voiceovers_mapping
                     }
                 })
         return draft_change_list

@@ -651,13 +651,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_voiceover, 'needs_update', 'hello'):
                 audio_voiceover.validate()
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected duration_secs to be a float or int'
+            utils.ValidationError, 'Expected duration_secs to be a float'
             ):
             with self.swap(audio_voiceover, 'duration_secs', 'test'):
                 audio_voiceover.validate()
         with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected duration_secs to be a float'
+            ):
+            with self.swap(audio_voiceover, 'duration_secs', 10):
+                audio_voiceover.validate()
+        with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected duration_secs to be positive number'
+            'Expected duration_secs to be positive number, '
+            'or zero if not yet specified'
             ):
             with self.swap(audio_voiceover, 'duration_secs', -3.45):
                 audio_voiceover.validate()
@@ -2011,16 +2017,24 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             Exception, 'Expected needs_update to be a bool'):
             self.voiceover.validate()
 
-    def test_validate_non_numerical_duration_secs(self):
+    def test_validate_float_duration_secs(self):
         self.voiceover.validate()
         self.voiceover.duration_secs = 'duration_secs'
         with self.assertRaisesRegexp(
-            Exception, 'Expected duration_secs to be a float or int'):
+            Exception, 'Expected duration_secs to be a float'):
+            self.voiceover.validate()
+    
+    def test_validate_int_duration_secs(self):
+        self.voiceover.validate()
+        self.voiceover.duration_secs = 10
+        with self.assertRaisesRegexp(
+            Exception, 'Expected duration_secs to be a float'):
             self.voiceover.validate()
 
     def test_validate_negative_duration_seconds(self):
         self.voiceover.validate()
         self.voiceover.duration_secs = -1.45
         with self.assertRaisesRegexp(
-            Exception, 'Expected duration_secs to be positive number'):
+            Exception, 'Expected duration_secs to be positive number, '
+            'or zero if not yet specified'):
             self.voiceover.validate()
