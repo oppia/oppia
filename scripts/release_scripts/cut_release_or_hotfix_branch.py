@@ -227,10 +227,10 @@ def _get_hotfix_branch_type_and_name(target_version, hotfix_number):
             target_version, hotfix_number))
 
 
-def execute_branch_cut():
+def execute_branch_cut(args=None):
     """Pushes the new release branch to Github."""
 
-    parsed_args = _PARSER.parse_args()
+    parsed_args = _PARSER.parse_args(args=args)
     if parsed_args.release_version:
         target_version = parsed_args.release_version
     else:
