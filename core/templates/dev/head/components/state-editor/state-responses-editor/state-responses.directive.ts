@@ -571,10 +571,10 @@ angular.module('oppia').directive('stateResponses', [
 
           var getDeletedChoicesIndex = function(
               newAnswerChoices, oldAnswerChoices) {
-            oldAnswerChoicesArray = oldAnswerChoices.map(function(elem) {
+            var oldAnswerChoicesArray = oldAnswerChoices.map(function(elem) {
               return elem.label;
             }) ;
-            newAnswerChoicesArray = newAnswerChoices.map(function(elem) {
+            var newAnswerChoicesArray = newAnswerChoices.map(function(elem) {
               return elem.label;
             }) ;
             var deletedChoicesIndex = oldAnswerChoicesArray.filter(
@@ -593,6 +593,7 @@ angular.module('oppia').directive('stateResponses', [
 
           var validateAnwerGroupsOnChoiceDeletion = function(index) {
             var requiresUpdation = false;
+            var count = 0;
             var answerGroups = ResponsesService.getAnswerGroups();
             for (var i = 0; i < answerGroups.length; i++) {
               var rules = answerGroups[i].rules;
