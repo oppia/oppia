@@ -22,11 +22,11 @@ require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
 angular.module('oppia').directive('adminConfigTab', [
-  '$window', 'AdminConfigTabBackendApiService', 'AdminDataService',
-  'AdminTaskManagerService', 'UrlInterpolationService',
+  '$rootScope', '$window', 'AdminConfigTabBackendApiService',
+  'AdminDataService', 'AdminTaskManagerService', 'UrlInterpolationService',
   function(
-      $window, AdminConfigTabBackendApiService, AdminDataService,
-      AdminTaskManagerService, UrlInterpolationService) {
+      $rootScope, $window, AdminConfigTabBackendApiService,
+      AdminDataService, AdminTaskManagerService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -49,6 +49,9 @@ angular.module('oppia').directive('adminConfigTab', [
         ctrl.reloadConfigProperties = function() {
           AdminDataService.getDataAsync().then(function(response) {
             ctrl.configProperties = response.config_properties;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular
+            $rootScope.$apply();
           });
         };
 

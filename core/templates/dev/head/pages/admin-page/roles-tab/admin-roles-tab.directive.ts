@@ -25,10 +25,10 @@ require('pages/admin-page/services/admin-task-manager.service.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminRolesTab', [
-  '$http', 'AdminDataService', 'AdminTaskManagerService',
+  '$http', '$rootScope', 'AdminDataService', 'AdminTaskManagerService',
   'UrlInterpolationService', 'ADMIN_ROLE_HANDLER_URL',
   function(
-      $http, AdminDataService, AdminTaskManagerService,
+      $http, $rootScope, AdminDataService, AdminTaskManagerService,
       UrlInterpolationService, ADMIN_ROLE_HANDLER_URL) {
     return {
       restrict: 'E',
@@ -139,6 +139,9 @@ angular.module('oppia').directive('adminRolesTab', [
             }
             ctrl.graphData.finalStateIds = finalStateIds;
             ctrl.graphDataLoaded = true;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular
+            $rootScope.$apply();
           });
         };
       }]
