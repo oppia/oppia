@@ -1,4 +1,3 @@
-
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,18 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit test for CollectionCreationBackendApiService.
+ * @fileoverview Unit test for SkillCreationBackendApiService.
  */
 
-require(
-  'components/entity-creation-services/skill-creation-backend-api.service.ts');
+require('domain/skill/skill-creation-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 
 describe('Skill Creation backend service', function() {
-  var SkillCreationBackendService = null;
+  var SkillCreationBackendApiService = null;
   var $httpBackend = null;
-  var $rootScope = null;
   var rubricDict = null;
   var CsrfService = null;
 
@@ -39,10 +36,9 @@ describe('Skill Creation backend service', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector, $q) {
-    SkillCreationBackendService = $injector.get(
-      'SkillCreationBackendService');
+    SkillCreationBackendApiService = $injector.get(
+      'SkillCreationBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
     CsrfService = $injector.get('CsrfTokenService');
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
@@ -69,7 +65,7 @@ describe('Skill Creation backend service', function() {
 
       $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
         200, {skill_id: 'hyuy4GUlvTqJ'});
-      SkillCreationBackendService.createSkill(
+      SkillCreationBackendApiService.createSkill(
         'test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
         successHandler, failHandler);
       $httpBackend.flush();
@@ -84,7 +80,7 @@ describe('Skill Creation backend service', function() {
 
       $httpBackend.expectPOST('/skill_editor_handler/create_new').respond(
         500, 'Error creating a new skill.');
-      SkillCreationBackendService.createSkill(
+      SkillCreationBackendApiService.createSkill(
         'test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
         successHandler, failHandler);
       $httpBackend.flush();

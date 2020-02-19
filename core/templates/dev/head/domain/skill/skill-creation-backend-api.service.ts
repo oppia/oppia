@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for posting the skills
+ * @fileoverview Backend service for creating a new skills
  */
 
-angular.module('oppia').factory('SkillCreationBackendService', [
+angular.module('oppia').factory('SkillCreationBackendApiService', [
   '$http', '$q',
   function($http, $q) {
     var _createSkill = function(successCallback, errorCallback,

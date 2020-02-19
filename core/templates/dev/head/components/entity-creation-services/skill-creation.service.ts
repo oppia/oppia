@@ -18,8 +18,7 @@
 
 require('domain/utilities/url-interpolation.service.ts');
 require('services/alerts.service.ts');
-require(
-  'components/entity-creation-services/skill-creation-backend-api.service.ts');
+require('domain/skill/skill-creation-backend-api.service.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
   '$rootScope', '$timeout', '$window', 'AlertsService',
