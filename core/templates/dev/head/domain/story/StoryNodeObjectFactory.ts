@@ -228,19 +228,15 @@ export class StoryNode {
   providedIn: 'root'
 })
 export class StoryNodeObjectFactory {
-  // TODO(#7176): Replace 'any' with the exact type. This has been kept as
-  // 'any' because 'storyNodeBackendObject' is a dict with underscore_cased
-  // keys which give tslint errors against underscore_casing in favor of
-  // camelCasing.
-  createFromBackendDict(storyNodeBackendObject: any): StoryNode {
+  createFromBackendDict(storyNodeBackendObject: StoryNode): StoryNode {
     return new StoryNode(
       storyNodeBackendObject.id, storyNodeBackendObject.title,
-      storyNodeBackendObject.destination_node_ids,
-      storyNodeBackendObject.prerequisite_skill_ids,
-      storyNodeBackendObject.acquired_skill_ids,
+      storyNodeBackendObject.destinationNodeIds,
+      storyNodeBackendObject.prerequisiteSkillIds,
+      storyNodeBackendObject.acquiredSkillIds,
       storyNodeBackendObject.outline,
-      storyNodeBackendObject.outline_is_finalized,
-      storyNodeBackendObject.exploration_id
+      storyNodeBackendObject.outlineIsFinalized,
+      storyNodeBackendObject.explorationId
     );
   }
 

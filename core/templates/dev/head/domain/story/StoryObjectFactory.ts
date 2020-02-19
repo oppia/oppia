@@ -125,14 +125,14 @@ export class Story {
 })
 export class StoryObjectFactory {
   constructor(private storyContentsObjectFactory: StoryContentsObjectFactory) {}
-  createFromBackendDict(storyBackendDict: any): Story {
+  createFromBackendDict(storyBackendDict: Story): Story {
     return new Story(
       storyBackendDict.id, storyBackendDict.title,
       storyBackendDict.description, storyBackendDict.notes,
       this.storyContentsObjectFactory.createFromBackendDict(
-        storyBackendDict.story_contents),
-      storyBackendDict.language_code,
-      storyBackendDict.version, storyBackendDict.corresponding_topic_id
+        storyBackendDict.storyContents),
+      storyBackendDict.languageCode,
+      storyBackendDict.version, storyBackendDict.correspondingTopicId
     );
   }
 

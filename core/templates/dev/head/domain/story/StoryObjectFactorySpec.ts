@@ -37,22 +37,22 @@ describe('Story object factory', () => {
       description: 'Story description',
       notes: 'Notes',
       version: 1,
-      corresponding_topic_id: 'topic_id',
+      correspondingTopicId: 'topic_id',
       story_contents: {
-        initial_node_id: 'node_1',
+        initialNodeId: 'node_1',
         nodes: [{
           id: 'node_1',
           title: 'Title 1',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
-          destination_node_ids: [],
+          prerequisiteSkillIds: [],
+          acquiredSkillIds: [],
+          destinationNodeIds: [],
           outline: 'Outline',
-          exploration_id: null,
-          outline_is_finalized: false
+          explorationId: null,
+          outlineIsFinalized: false
         }],
-        next_node_id: 'node_3'
+        nextNodeId: 'node_3'
       },
-      language_code: 'en'
+      languageCode: 'en'
     };
     _sampleStory = storyObjectFactory.createFromBackendDict(
       sampleStoryBackendDict);
@@ -87,22 +87,22 @@ describe('Story object factory', () => {
       description: 'Story description 2',
       notes: 'Notes 2',
       version: 1,
-      corresponding_topic_id: 'topic_id_2',
+      correspondingTopicId: 'topic_id_2',
       story_contents: {
-        initial_node_id: 'node_2',
+        initialNodeId: 'node_2',
         nodes: [{
           id: 'node_2',
           title: 'Title 2',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
-          destination_node_ids: [],
+          prerequisiteSkillIds: [],
+          acquiredSkillIds: [],
+          destinationNodeIds: [],
           outline: 'Outline',
-          exploration_id: null,
-          outline_is_finalized: false
+          explorationId: null,
+          outlineIsFinalized: false
         }],
-        next_node_id: 'node_3'
+        nextNodeId: 'node_3'
       },
-      language_code: 'en'
+      languageCode: 'en'
     });
 
     expect(_sampleStory).not.toBe(secondStory);

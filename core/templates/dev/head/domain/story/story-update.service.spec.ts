@@ -66,32 +66,32 @@ describe('Story update service', function() {
       description: 'Story description',
       notes: 'Story notes',
       version: 1,
-      corresponding_topic_id: 'topic_id',
+      correspondingTopicId: 'topic_id',
       story_contents: {
-        initial_node_id: 'node_2',
+        initialNodeId: 'node_2',
         nodes: [
           {
             id: 'node_1',
             title: 'Title 1',
-            prerequisite_skill_ids: ['skill_1'],
-            acquired_skill_ids: ['skill_2'],
-            destination_node_ids: [],
+            prerequisiteSkillIds: ['skill_1'],
+            acquiredSkillIds: ['skill_2'],
+            destinationNodeIds: [],
             outline: 'Outline',
-            exploration_id: null,
-            outline_is_finalized: false
+            explorationId: null,
+            outlineIsFinalized: false
           }, {
             id: 'node_2',
             title: 'Title 2',
-            prerequisite_skill_ids: ['skill_3'],
-            acquired_skill_ids: ['skill_4'],
-            destination_node_ids: ['node_1'],
+            prerequisiteSkillIds: ['skill_3'],
+            acquiredSkillIds: ['skill_4'],
+            destinationNodeIds: ['node_1'],
             outline: 'Outline 2',
-            exploration_id: 'exp_1',
-            outline_is_finalized: true
+            explorationId: 'exp_1',
+            outlineIsFinalized: true
           }],
-        next_node_id: 'node_3'
+        nextNodeId: 'node_3'
       },
-      language_code: 'en'
+      languageCode: 'en'
     };
     _sampleStory = storyObjectFactory.createFromBackendDict(
       sampleStoryBackendObject);
@@ -193,10 +193,10 @@ describe('Story update service', function() {
       _sampleStory, 'node_1', 'node_2');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
-      property_name: 'destination_node_ids',
-      new_value: ['node_2'],
-      old_value: [],
-      node_id: 'node_1'
+      propertyName: 'destination_node_ids',
+      new_Vlue: ['node_2'],
+      oldValue: [],
+      nodeId: 'node_1'
     }]);
   });
 
@@ -225,10 +225,10 @@ describe('Story update service', function() {
       _sampleStory, 'node_1', 'skill_1');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
-      property_name: 'prerequisite_skill_ids',
-      new_value: [],
-      old_value: ['skill_1'],
-      node_id: 'node_1'
+      propertyName: 'prerequisite_skill_ids',
+      newValue: [],
+      oldValue: ['skill_1'],
+      nodeId: 'node_1'
     }]);
   });
 
@@ -257,10 +257,10 @@ describe('Story update service', function() {
       _sampleStory, 'node_1', 'skill_2');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
-      property_name: 'acquired_skill_ids',
-      new_value: [],
-      old_value: ['skill_2'],
-      node_id: 'node_1'
+      propertyName: 'acquired_skill_ids',
+      newValue: [],
+      oldValue: ['skill_2'],
+      nodeId: 'node_1'
     }]);
   });
 
@@ -290,10 +290,10 @@ describe('Story update service', function() {
       _sampleStory, 'node_2', 'node_1');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
-      property_name: 'destination_node_ids',
-      new_value: [],
-      old_value: ['node_1'],
-      node_id: 'node_2'
+      propertyName: 'destination_node_ids',
+      newValue: [],
+      oldValue: ['node_1'],
+      nodeId: 'node_2'
     }]);
   });
 
@@ -317,7 +317,7 @@ describe('Story update service', function() {
       StoryUpdateService.addStoryNode(_sampleStory, 'Title 2');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'add_story_node',
-        node_id: 'node_3',
+        nodeId: 'node_3',
         title: 'Title 2'
       }]);
     }
@@ -347,7 +347,7 @@ describe('Story update service', function() {
       StoryUpdateService.deleteStoryNode(_sampleStory, 'node_1');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'delete_story_node',
-        node_id: 'node_1'
+        nodeId: 'node_1'
       }]);
     }
   );
@@ -372,9 +372,9 @@ describe('Story update service', function() {
       StoryUpdateService.finalizeStoryNodeOutline(_sampleStory, 'node_1');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_node_outline_status',
-        new_value: true,
-        old_value: false,
-        node_id: 'node_1'
+        newValue: true,
+        oldValue: false,
+        nodeId: 'node_1'
       }]);
     }
   );
@@ -399,9 +399,9 @@ describe('Story update service', function() {
     StoryUpdateService.unfinalizeStoryNodeOutline(_sampleStory, 'node_2');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_outline_status',
-      new_value: false,
-      old_value: true,
-      node_id: 'node_2'
+      newValue: false,
+      oldValue: true,
+      nodeId: 'node_2'
     }]);
   });
 
@@ -427,10 +427,10 @@ describe('Story update service', function() {
         _sampleStory, 'node_1', 'new outline');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_node_property',
-        property_name: 'outline',
-        new_value: 'new outline',
-        old_value: 'Outline',
-        node_id: 'node_1'
+        propertyName: 'outline',
+        newValue: 'new outline',
+        oldValue: 'Outline',
+        nodeId: 'node_1'
       }]);
     }
   );
@@ -457,10 +457,10 @@ describe('Story update service', function() {
         _sampleStory, 'node_1', 'new title');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_node_property',
-        property_name: 'title',
-        new_value: 'new title',
-        old_value: 'Title 1',
-        node_id: 'node_1'
+        propertyName: 'title',
+        newValue: 'new title',
+        oldValue: 'Title 1',
+        nodeId: 'node_1'
       }]);
     }
   );
@@ -494,10 +494,10 @@ describe('Story update service', function() {
       _sampleStory, 'node_1', 'exp_2');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_story_node_property',
-      property_name: 'exploration_id',
-      new_value: 'exp_2',
-      old_value: null,
-      node_id: 'node_1'
+      propertyName: 'exploration_id',
+      newValue: 'exp_2',
+      oldValue: null,
+      nodeId: 'node_1'
     }]);
   });
 
@@ -518,9 +518,9 @@ describe('Story update service', function() {
       StoryUpdateService.setInitialNodeId(_sampleStory, 'node_1');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_contents_property',
-        property_name: 'initial_node_id',
-        new_value: 'node_1',
-        old_value: 'node_2'
+        propertyName: 'initial_node_id',
+        newValue: 'node_1',
+        oldValue: 'node_2'
       }]);
     }
   );
@@ -539,9 +539,9 @@ describe('Story update service', function() {
       StoryUpdateService.setStoryTitle(_sampleStory, 'new title');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_property',
-        property_name: 'title',
-        new_value: 'new title',
-        old_value: 'Story title'
+        propertyName: 'title',
+        newValue: 'new title',
+        oldValue: 'Story title'
       }]);
     }
   );
@@ -560,9 +560,9 @@ describe('Story update service', function() {
       StoryUpdateService.setStoryDescription(_sampleStory, 'new description');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_property',
-        property_name: 'description',
-        new_value: 'new description',
-        old_value: 'Story description'
+        propertyName: 'description',
+        newValue: 'new description',
+        oldValue: 'Story description'
       }]);
     }
   );
@@ -581,9 +581,9 @@ describe('Story update service', function() {
       StoryUpdateService.setStoryNotes(_sampleStory, 'new notes');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_property',
-        property_name: 'notes',
-        new_value: 'new notes',
-        old_value: 'Story notes'
+        propertyName: 'notes',
+        newValue: 'new notes',
+        oldValue: 'Story notes'
       }]);
     }
   );
@@ -602,9 +602,9 @@ describe('Story update service', function() {
       StoryUpdateService.setStoryLanguageCode(_sampleStory, 'fi');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'update_story_property',
-        property_name: 'language_code',
-        new_value: 'fi',
-        old_value: 'en'
+        propertyName: 'language_code',
+        newValue: 'fi',
+        oldValue: 'en'
       }]);
     }
   );

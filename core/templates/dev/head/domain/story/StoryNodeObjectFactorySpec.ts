@@ -30,12 +30,12 @@ describe('Story node object factory', () => {
     var sampleStoryNodeBackendDict = {
       id: 'node_1',
       title: 'Title 1',
-      prerequisite_skill_ids: ['skill_1'],
-      acquired_skill_ids: ['skill_2'],
-      destination_node_ids: ['node_2'],
+      prerequisiteSkillIds: ['skill_1'],
+      acquiredSkillIds: ['skill_2'],
+      destinationNodeIds: ['node_2'],
       outline: 'Outline',
-      exploration_id: null,
-      outline_is_finalized: false
+      explorationId: null,
+      outlineIsFinalized: false
     };
     _sampleStoryNode = storyNodeObjectFactory.createFromBackendDict(
       sampleStoryNodeBackendDict);

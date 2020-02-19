@@ -33,8 +33,8 @@ describe('Story summary object factory', () => {
     const sampleStorySummaryBackendDict = {
       id: 'sample_story_id',
       title: 'Story title',
-      node_count: 5,
-      story_is_published: true
+      nodeCount: 5,
+      storyIsPublished: true
     };
     _sampleStorySummary = factory.createFromBackendDict(
       sampleStorySummaryBackendDict

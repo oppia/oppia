@@ -53,15 +53,15 @@ export class StorySummaryObjectFactory {
     id: string;
     title: string;
     // eslint-disable-next-line camelcase
-    node_count: number;
+    nodecount: number;
     // eslint-disable-next-line camelcase
-    story_is_published: boolean;
+    storyIsPublished: boolean;
   }): StorySummary {
     return new StorySummary(
       storySummaryBackendDict.id,
       storySummaryBackendDict.title,
-      storySummaryBackendDict.node_count,
-      storySummaryBackendDict.story_is_published
+      storySummaryBackendDict.nodeCount,
+      storySummaryBackendDict.storyIsPublished
     );
   }
 }

@@ -70,22 +70,22 @@ describe('Editable story backend API service', function() {
         notes: 'Notes',
         version: 1,
         story_contents: {
-          initial_node_id: 'node_1',
+          initialNodeId: 'node_1',
           nodes: [{
             id: 'node_1',
-            prerequisite_skill_ids: [],
-            acquired_skill_ids: [],
-            destination_node_ids: [],
+            prerequisiteSkillIds: [],
+            acquiredSkillIds: [],
+            destinationNodeIds: [],
             outline: 'Outline',
-            exploration_id: null,
-            outline_is_finalized: false
+            explorationId: null,
+            outlineIsFinalized: false
           }],
-          next_node_id: 'node_3'
+          nextNodeId: 'node_3'
         },
-        language_code: 'en'
+        languagCode: 'en'
       },
-      topic_name: 'Topic Name',
-      story_is_published: true,
+      topicName: 'Topic Name',
+      storyIsPublished: true,
       skill_summaries: [{
         id: 'skill_1',
         description: 'Skill Description'

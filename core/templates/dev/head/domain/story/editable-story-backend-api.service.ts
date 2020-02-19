@@ -32,8 +32,8 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
 
       $http.get(storyDataUrl).then(function(response) {
         var story = angular.copy(response.data.story);
-        var topicName = angular.copy(response.data.topic_name);
-        var storyIsPublished = response.data.story_is_published;
+        var topicName = angular.copy(response.data.topicName);
+        var storyIsPublished = response.data.storyIsPublished;
         var skillSummaries = angular.copy(response.data.skill_summaries);
         if (successCallback) {
           successCallback({
@@ -55,13 +55,13 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
         successCallback, errorCallback) {
       var editableStoryDataUrl = UrlInterpolationService.interpolateUrl(
         EDITABLE_STORY_DATA_URL_TEMPLATE, {
-          story_id: storyId
+          storyId: storyId
         });
 
       var putData = {
         version: storyVersion,
-        commit_message: commitMessage,
-        change_dicts: changeList
+        commitMessage: commitMessage,
+        changeDicts: changeList
       };
       $http.put(editableStoryDataUrl, putData).then(function(response) {
         // The returned data is an updated story dict.
@@ -81,11 +81,11 @@ angular.module('oppia').factory('EditableStoryBackendApiService', [
         storyId, newStoryStatusIsPublic, successCallback, errorCallback) {
       var storyPublishUrl = UrlInterpolationService.interpolateUrl(
         STORY_PUBLISH_URL_TEMPLATE, {
-          story_id: storyId
+          storyId: storyId
         });
 
       var putData = {
-        new_story_status_is_public: newStoryStatusIsPublic
+        newStoryStatusIsPublic: newStoryStatusIsPublic
       };
       $http.put(storyPublishUrl, putData).then(function(response) {
         if (successCallback) {
