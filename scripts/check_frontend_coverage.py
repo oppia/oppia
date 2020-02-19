@@ -222,6 +222,7 @@ FULLY_COVERED_FILENAMES = [
     'page-title.service.ts',
     'ParamChangeObjectFactory.ts',
     'ParamChangesObjectFactory.ts',
+    'parameter-metadata.service.ts',
     'ParamMetadataObjectFactory.ts',
     'ParamSpecObjectFactory.ts',
     'ParamSpecsObjectFactory.ts',
