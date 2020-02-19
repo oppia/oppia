@@ -36,7 +36,7 @@ angular.module('oppia').directive('roleGraph', [
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         graphData: '=',
         // A boolean value to signify whether graphData is completely loaded.
-        graphDataLoaded: '@'
+        graphDataLoaded: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/roles-tab/admin-roles-tab.directive.html'),
