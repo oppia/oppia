@@ -79,9 +79,10 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
     def _disable_state_name_validation(self):
         """Context manager that disables exploration state name validation."""
-        return self.swap(
-            exp_domain.Exploration, '_require_valid_state_name',
-            lambda unused_cls, unused_name: None)
+        def no_op(*args, **kwargs):
+            """Does nothing."""
+            pass
+        return self.swap(exp_domain.Exploration, '_validate_state_name', no_op)
 
     def test_debug_message_for_malformed_keys(self):
         # Create an exploration with a malformed state name.
