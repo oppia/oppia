@@ -148,7 +148,7 @@ angular.module('oppia').directive('adminMiscTab', [
         ctrl.sendDummyMailToAdmin = function() {
           $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
             .then(function(response) {
-              ctrl.setStatusMessage(response.data.msg);
+              ctrl.setStatusMessage('Success! Mail sent to admin.');
             }, function(errorResponse) {
               ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.data.error);

@@ -121,7 +121,6 @@ class DummyMailTest(test_utils.GenericTestBase):
         dummy_system_name = 'DUMMY_SYSTEM_NAME'
         dummy_system_address = 'dummy@system.com'
         dummy_receiver_address = 'admin@system.com'
-        dummy_email_body = 'This is a test mail from %s' % (dummy_system_name)
 
         send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
         system_name_ctx = self.swap(
@@ -149,7 +148,8 @@ class DummyMailTest(test_utils.GenericTestBase):
             self.assertEqual(messages[0].to, dummy_receiver_address)
             self.assertEqual(
                 messages[0].subject.decode(), 'Test Mail')
-            self.assertIn(dummy_email_body, messages[0].html.decode())
+            self.assertIn('This is a test mail from DUMMY_SYSTEM_NAME',
+                          messages[0].html.decode())
 
 
 class EmailRightsTest(test_utils.GenericTestBase):

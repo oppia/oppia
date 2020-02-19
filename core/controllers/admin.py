@@ -641,10 +641,7 @@ class SendDummyMailToAdminHandler(base.BaseHandler):
     def post(self):
         username = self.username
         if feconf.CAN_SEND_EMAILS:
-            response = {
-                'msg': 'Success! Mail sent to admin.',
-            }
             email_manager.send_dummy_mail_to_admin(username)
-            self.render_json(response)
+            self.render_json({'msg': 'Success! Mail sent to admin.'})
         else:
             raise self.InvalidInputException('This app cannot send emails.')

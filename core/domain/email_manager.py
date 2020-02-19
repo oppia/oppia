@@ -377,12 +377,10 @@ def send_dummy_mail_to_admin(username):
         username: str. Username of the sender.
     """
 
-    email_name = feconf.SYSTEM_EMAIL_NAME
-    email_address = feconf.SYSTEM_EMAIL_ADDRESS
     email_body = 'This is a test mail from %s.' % (username)
     email_subject = 'Test Mail'
     system_name_email = '%s <%s>' % (
-        email_name, email_address)
+        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
 
     email_services.send_mail(
         system_name_email, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
