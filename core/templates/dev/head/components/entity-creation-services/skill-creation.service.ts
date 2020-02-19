@@ -22,10 +22,10 @@ require('domain/skill/skill-creation-backend-api.service.ts');
 
 angular.module('oppia').factory('SkillCreationService', [
   '$rootScope', '$timeout', '$window', 'AlertsService',
-  'SkillCreationBackendService', 'UrlInterpolationService',
+  'SkillCreationBackendApiService', 'UrlInterpolationService',
   function(
       $rootScope, $timeout, $window, AlertsService,
-      SkillCreationBackendService, UrlInterpolationService) {
+      SkillCreationBackendApiService, UrlInterpolationService) {
     var CREATE_NEW_SKILL_URL_TEMPLATE = (
       '/skill_editor/<skill_id>');
     var skillCreationInProgress = false;
@@ -42,7 +42,7 @@ angular.module('oppia').factory('SkillCreationService', [
         skillCreationInProgress = true;
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating skill';
-        SkillCreationBackendService.createSkill(
+        SkillCreationBackendApiService.createSkill(
           description, rubrics, explanation, linkedTopicIds)
           .then(function(response) {
             $timeout(function() {
