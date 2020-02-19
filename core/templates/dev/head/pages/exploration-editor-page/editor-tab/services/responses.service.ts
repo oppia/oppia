@@ -120,6 +120,19 @@ angular.module('oppia').factory('ResponsesService', [
       }
     };
 
+    var _reduceRuleIndexByOne = function(answerGroupIndex, ruleIndex) {
+      if (_answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x > 0) {
+        _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
+      }
+      _saveAnswerGroups(_answerGroups);
+    };
+
+    var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
+      _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
+        _answerChoices.length;
+      _saveAnswerGroups(_answerGroups);
+    };
+
     var _updateAnswerGroup = function(index, updates, callback) {
       var answerGroup = _answerGroups[index];
       if (updates.hasOwnProperty('rules')) {
@@ -292,6 +305,12 @@ angular.module('oppia').factory('ResponsesService', [
         }
         _saveDefaultOutcome(outcome);
         callback(_defaultOutcomeMemento);
+      },
+      reduceRuleIndexByOne: function(answerGroupIndex, ruleIndex) {
+        return _reduceRuleIndexByOne(answerGroupIndex, ruleIndex);
+      },
+      makeRuleInvalid: function(answerGroupIndex, ruleIndex) {
+        return _makeRuleInvalid(answerGroupIndex, ruleIndex);
       },
       updateConfirmedUnclassifiedAnswers: function(
           confirmedUnclassifiedAnswers) {

@@ -568,6 +568,47 @@ angular.module('oppia').directive('stateResponses', [
             var activeStateName = $scope.stateName;
             return outcome && (outcome.dest === activeStateName);
           };
+
+          var getDeletedChoicesIndex = function(
+              newAnswerChoices, oldAnswerChoices) {
+            oldAnswerChoicesArray = oldAnswerChoices.map(function(elem) {
+              return elem.label;
+            }) ;
+            newAnswerChoicesArray = newAnswerChoices.map(function(elem) {
+              return elem.label;
+            }) ;
+            var deletedChoicesIndex = oldAnswerChoicesArray.filter(
+              function(elem) {
+                return newAnswerChoicesArray.indexOf(elem) === -1;
+              }
+            ).map(function(elem) {
+              return oldAnswerChoicesArray.indexOf(elem) ;
+            });
+            var finalDeletedChoicesIndex = [];
+            for (var i = 0; i < deletedChoicesIndex.length; i++) {
+              finalDeletedChoicesIndex.push(deletedChoicesIndex[i] - i);
+            }
+            return finalDeletedChoicesIndex;
+          };
+
+          var validateAnwerGroupsOnChoiceDeletion = function(index) {
+            var requiresUpdation = false;
+            var answerGroups = ResponsesService.getAnswerGroups();
+            for (var i = 0; i < answerGroups.length; i++) {
+              var rules = answerGroups[i].rules;
+              for (var j = 0; j < rules.length; j++) {
+                if (index < rules[j].inputs.x) {
+                  ResponsesService.reduceRuleIndexByOne(i, j);
+                  requiresUpdation = true;
+                } else if (index === rules[j].inputs.x) {
+                  ResponsesService.makeRuleInvalid(i, j);
+                  requiresUpdation = true;
+                }
+              }
+            }
+            return requiresUpdation;
+          };
+
           ctrl.$onInit = function() {
             $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
               SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
@@ -636,6 +677,26 @@ angular.module('oppia').directive('stateResponses', [
             });
 
             $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
+              var interactionId = $scope.getCurrentInteractionId();
+              if (interactionId === 'MultipleChoiceInput') {
+                var oldAnswerChoices = ResponsesService.getAnswerChoices();
+                if (newAnswerChoices !== null && oldAnswerChoices !== null) {
+                  var deletedChoicesIndex = getDeletedChoicesIndex(
+                    newAnswerChoices, oldAnswerChoices);
+                  if (deletedChoicesIndex.length > 0) {
+                    deletedChoicesIndex.forEach(function(index) {
+                      var requiresUpdation =
+                        validateAnwerGroupsOnChoiceDeletion(index);
+                      if (requiresUpdation) {
+                        var answerGroups = ResponsesService.getAnswerGroups();
+                        $scope.onSaveInteractionAnswerGroups(answerGroups);
+                        $scope.refreshWarnings()();
+                      }
+                    });
+                  }
+                }
+              }
+
               ResponsesService.updateAnswerChoices(
                 newAnswerChoices, function(newAnswerGroups) {
                   $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
