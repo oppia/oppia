@@ -1,4 +1,3 @@
-
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,15 +16,13 @@
  * @fileoverview Unit test for TopicCreationBackendApiService.
  */
 
-require(
-  'components/entity-creation-services/topic-creation-backend-api.service.ts');
+require('domain/topic/topic-creation-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 
-fdescribe('Topic Creation backend service', function() {
-  var TopicCreationBackendService = null;
+describe('Topic creation backend api service', function() {
+  var TopicCreationBackendApiService = null;
   var $httpBackend = null;
-  var $rootScope = null;
   var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -38,10 +35,9 @@ fdescribe('Topic Creation backend service', function() {
   }));
 
   beforeEach(angular.mock.inject(function($injector, $q) {
-    TopicCreationBackendService = $injector.get(
-      'TopicCreationBackendService');
+    TopicCreationBackendApiService = $injector.get(
+      'TopicCreationBackendApiService');
     $httpBackend = $injector.get('$httpBackend');
-    $rootScope = $injector.get('$rootScope');
     CsrfService = $injector.get('CsrfTokenService');
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
@@ -63,10 +59,10 @@ fdescribe('Topic Creation backend service', function() {
 
       $httpBackend.expectPOST('/topic_editor_handler/create_new').respond(
         200, {topic_id: 'hyuy4GUlvTqJ'});
-        TopicCreationBackendService.createTopic(
+        TopicCreationBackendApiService.createTopic(
           'topic-name', 'topic-abbr-name').then(successHandler, failHandler);
       $httpBackend.flush();
-      expect(successHandler).toHaveBeenCalledWith('hyuy4GUlvTqJ');
+      expect(successHandler).toHaveBeenCalledWith({topic_id: 'hyuy4GUlvTqJ'});
       expect(failHandler).not.toHaveBeenCalled();
     });
 
@@ -77,7 +73,7 @@ fdescribe('Topic Creation backend service', function() {
 
       $httpBackend.expectPOST('/topic_editor_handler/create_new').respond(
         500, 'Error creating a new topic.');
-        TopicCreationBackendService.createTopic('topic-name', 'topic-abbr-name').then(
+        TopicCreationBackendApiService.createTopic('topic-name', 'topic-abbr-name').then(
         successHandler, failHandler);
       $httpBackend.flush();
       expect(successHandler).not.toHaveBeenCalled();

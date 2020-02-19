@@ -11,25 +11,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /**
- * @fileoverview Service to notify about creation of collection and obtain
- * collection_id.
+ * @fileoverview Service to notify about creation of topic and obtain
+ * topic_id.
  */
 
-angular.module('oppia').factory('TopicCreationBackendService', [
+angular.module('oppia').factory('TopicCreationBackendApiService', [
   '$http', '$q',
   function(
       $http, $q) {
     var _createTopic = function(
         successCallback, errorCallback, abbreviatedTopicName, topicName) {
       var postData = {
-        topicName: topicName,
+        name: topicName,
         abbreviated_name: abbreviatedTopicName
       };
       $http.post('/topic_editor_handler/create_new', postData)
         .then(function(response) {
           if (successCallback) {
-            successCallback(response.data.topic_id);
+            successCallback(response.data);
           }
         }, function(response) {
           if (errorCallback) {
