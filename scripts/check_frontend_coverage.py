@@ -292,7 +292,6 @@ FULLY_COVERED_FILENAMES = [
     'StorySummaryObjectFactory.ts',
     'SubtitledHtmlObjectFactory.ts',
     'subtopic-viewer-backend-api.service.ts',
-    'subtopic-viewer-domain.constants.ajs.ts',
     'subtopic-viewer-domain.constants.ts',
     'SubtopicPageContentsObjectFactory.ts',
     'SuggestionImprovementTaskObjectFactory.ts',
