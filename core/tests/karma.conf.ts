@@ -31,7 +31,9 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
-      'core/templates/dev/head/AppInit.ts',
+      // Any of the *.module.ts files could be used here, we use
+      // about-page.module.ts because it is first alphabetically.
+      'core/templates/dev/head/pages/about-page/about-page.module.ts',
       // This is a file that is generated on running the run_frontend_tests.py
       // script. This generated file is a combination of all the spec files
       // since Karma is unable to run tests on multiple files due to some
