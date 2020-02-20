@@ -16,6 +16,7 @@
  * @fileoverview Component for a subtopic tile.
  */
 
+require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 
 angular.module('oppia').directive('subtopicSummaryTile', [

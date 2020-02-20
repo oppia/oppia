@@ -16,62 +16,60 @@
  * @fileoverview Service to get subtopic data.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
-require('domain/subtopic_viewer/subtopic-viewer-domain.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
+import cloneDeep from 'lodash/cloneDeep';
+
 import { ReadOnlySubtopicPageObjectFactory } from
   'domain/subtopic_viewer/ReadOnlySubtopicPageObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { SubtopicPageContentsObjectFactory } from
-  'domain/topic/SubtopicPageContentsObjectFactory';
-import { VoiceoverObjectFactory } from
-  'domain/exploration/VoiceoverObjectFactory';
+import { SubtopicViewerDomainConstants } from
+  'domain/subtopic_viewer/subtopic-viewer-domain.constants';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
 
-angular.module('oppia').factory('SubtopicViewerBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService',
-  'SUBTOPIC_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService,
-      SUBTOPIC_DATA_URL_TEMPLATE) {
-    var subtopicDataObject = null;
-    var readOnlySubtopicPageObjectFactory =
-    new ReadOnlySubtopicPageObjectFactory(
-      new SubtopicPageContentsObjectFactory(
-        new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()),
-        new SubtitledHtmlObjectFactory()
-      )
-    );
-    var _fetchSubtopicData = function(
-        topicName, subtopicId, successCallback, errorCallback) {
-      var subtopicDataUrl = UrlInterpolationService.interpolateUrl(
-        SUBTOPIC_DATA_URL_TEMPLATE, {
-          topic_name: topicName,
-          subtopic_id: subtopicId
-        });
+@Injectable({
+  providedIn: 'root'
+})
+export class SubtopicViewerBackendApiService {
+  constructor(
+    private http: HttpClient,
+    private readOnlySubtopicPageFactory: ReadOnlySubtopicPageObjectFactory,
+    private urlInterpolation: UrlInterpolationService) {}
 
-      $http.get(subtopicDataUrl).then(function(response) {
-        subtopicDataObject =
-        readOnlySubtopicPageObjectFactory.createFromBackendDict(
-          angular.copy(response.data)
-        );
-        if (successCallback) {
-          successCallback(subtopicDataObject);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
+  private _fetchSubtopicData(
+      topicName: string, subtopicId: string,
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback: (reason?: any) => void): void {
+    var subtopicDataUrl = this.urlInterpolation.interpolateUrl(
+      SubtopicViewerDomainConstants.SUBTOPIC_DATA_URL_TEMPLATE, {
+        topic_name: topicName,
+        subtopic_id: subtopicId
       });
-    };
 
-    return {
-      fetchSubtopicData: function(topicName, subtopicId) {
-        return $q(function(resolve, reject) {
-          _fetchSubtopicData(topicName, subtopicId, resolve, reject);
-        });
+    this.http.get(subtopicDataUrl).toPromise().then((response) => {
+      let subtopicDataObject =
+      this.readOnlySubtopicPageFactory.createFromBackendDict(
+        cloneDeep(response)
+      );
+      if (successCallback) {
+        successCallback(subtopicDataObject);
       }
-    };
+    }, (errorResponse) => {
+      if (errorCallback) {
+        errorCallback(errorResponse);
+      }
+    });
   }
-]);
+
+  fetchSubtopicData(topicName: string, subtopicId: string): Promise<object> {
+    return new Promise((resolve, reject) => {
+      this._fetchSubtopicData(topicName, subtopicId, resolve, reject);
+    });
+  }
+}
+
+angular.module('oppia').factory(
+  'SubtopicViewerBackendApiService',
+  downgradeInjectable(SubtopicViewerBackendApiService));

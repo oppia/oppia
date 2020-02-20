@@ -16,6 +16,7 @@
  * @fileoverview Directive for the navbar breadcrumb of the subtopic viewer.
  */
 
+require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 
