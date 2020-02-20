@@ -36,7 +36,11 @@ angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
         for (var i = 0; i < explorationIds.length; i++) {
           returnValue.push(null);
         }
-        return $q.resolve(returnValue);
+
+        if (errorCallback) {
+          errorCallback(returnValue);
+        }
+        return;
       }
 
       var explorationSummaryDataUrl = EXPLORATION_SUMMARY_DATA_URL_TEMPLATE;
@@ -58,9 +62,9 @@ angular.module('oppia').factory('ExplorationSummaryBackendApiService', [
           }
           successCallback(summaries);
         }
-      }, function(errorResponse) {
+      })['catch'](function(errorResponse) {
         if (errorCallback) {
-          errorCallback(errorResponse.data);
+          errorCallback(errorResponse.data || errorResponse);
         }
       });
     };
