@@ -46,7 +46,7 @@ var CreatorDashboardPage = function() {
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(explorationTitle) {
-    waitFor.elementToExist(
+    waitFor.visibilityOf(
       element(by.css('.protractor-test-exploration-dashboard-card')));
     var allExplorationDashboardCard = element.all(
       by.css('.protractor-test-exploration-dashboard-card'));

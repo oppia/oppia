@@ -84,15 +84,6 @@ var visibilityOf = function(element, errorMessage) {
     until.visibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
-/**
- * @param {Object} elementFinder - Element finding expression that
- *                                 retrieves an element, e.g.
- *                                 element(by.css(...))
- */
-var elementToExist = function(elementFinder) {
-  return browser.wait(
-    until.presenceOf(elementFinder));
-};
 
 exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
@@ -100,4 +91,3 @@ exports.invisibilityOf = invisibilityOf;
 exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
-exports.elementToExist = elementToExist;
