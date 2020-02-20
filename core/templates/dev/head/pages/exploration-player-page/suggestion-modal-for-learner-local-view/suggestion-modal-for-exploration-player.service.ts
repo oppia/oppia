@@ -19,7 +19,6 @@
 require('components/ck-editor-helpers/ck-editor-4-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-4-widgets.initializer.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
@@ -27,16 +26,13 @@ require('services/alerts.service.ts');
 require('services/suggestion-modal.service.ts');
 
 angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
-  '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
-  function($http, $uibModal, AlertsService, UrlInterpolationService) {
-    var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration-player-page/templates/' +
-      'exploration-player-suggestion-modal.directive.html'
-    );
-
+  '$http', '$uibModal', 'AlertsService',
+  function($http, $uibModal, AlertsService) {
     var _showEditStateContentSuggestionModal = function() {
       $uibModal.open({
-        templateUrl: _templateUrl,
+        template: require(
+          'pages/exploration-player-page/templates/' +
+          'exploration-player-suggestion-modal.directive.html'),
         backdrop: 'static',
         resolve: {},
         controller: [
@@ -103,8 +99,8 @@ angular.module('oppia').factory('SuggestionModalForExplorationPlayerService', [
           AlertsService.addWarning(res);
         });
         $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration-player-page/templates/' +
+          template: require(
+            'pages/exploration-player-page/templates/' +
             'learner-suggestion-submitted-modal.template.html'),
           backdrop: true,
           resolve: {},

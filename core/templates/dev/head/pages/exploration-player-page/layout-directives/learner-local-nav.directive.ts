@@ -36,8 +36,7 @@ require(
   'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 angular.module('oppia').directive('learnerLocalNav', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -72,8 +71,8 @@ angular.module('oppia').directive('learnerLocalNav', [
           };
           ctrl.showFlagExplorationModal = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-player-page/templates/' +
+              template: require(
+                'pages/exploration-player-page/templates/' +
                 'flag-exploration-modal.template.html'),
               backdrop: true,
               controller: [
@@ -119,8 +118,8 @@ angular.module('oppia').directive('learnerLocalNav', [
                 AlertsService.addWarning(error);
               });
               $uibModal.open({
-                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration-player-page/templates/' +
+                template: require(
+                  'pages/exploration-player-page/templates/' +
                   'exploration-successfully-flagged-modal.template.html'),
                 backdrop: true,
                 controller: [
