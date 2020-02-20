@@ -20,7 +20,7 @@ require('domain/skill/skill-creation-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 
-describe('Skill Creation backend service', function() {
+describe('Skill Creation backend api service', function() {
   var SkillCreationBackendApiService = null;
   var $httpBackend = null;
   var rubricDict = null;
