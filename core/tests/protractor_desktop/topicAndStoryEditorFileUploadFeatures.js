@@ -28,7 +28,7 @@ var SkillEditorPage = require('../protractor_utils/SkillEditorPage.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
-fdescribe('Topic editor functionality', function() {
+describe('Topic editor functionality', function() {
   var topicsAndSkillsDashboardPage = null;
   var topicEditorPage = null;
   var topicName = 'Topic 1';
@@ -53,7 +53,7 @@ fdescribe('Topic editor functionality', function() {
     topicsAndSkillsDashboardPage.editTopic(topicName);
   });
 
-  fit('should edit topic name, abbreviated topic name, ' +
+  it('should edit topic name, abbreviated topic name, ' +
     'thumbnail and description correctly', function() {
     newTopicName = 'Topic 1 edited'
     topicEditorPage.changeTopicName(newTopicName);
