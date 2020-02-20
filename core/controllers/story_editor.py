@@ -59,32 +59,32 @@ class EditableStoryDataHandler(base.BaseHandler):
                 % (story_version, version_from_payload))
 
     @acl_decorators.can_edit_story
-    def get(self, story_id):
+    def get(self, storyId):
         """Populates the data on the individual story page."""
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
-        topic_id = story.corresponding_topic_id
-        topic = topic_fetchers.get_topic_by_id(topic_id, strict=False)
-        skill_ids = topic.get_all_skill_ids()
-        skill_summaries = skill_services.get_multi_skill_summaries(skill_ids)
-        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
+        story = story_fetchers.get_story_by_id(storyId, strict=False)
+        topicId = story.correspondingTopicId
+        topic = topic_fetchers.get_topic_by_id(topicId, strict=False)
+        skillIds = topic.get_all_skill_ids()
+        skillSummaries = skill_services.get_multi_skill_summaries(skillIds)
+        skillSummaryDicts = [summary.to_dict() for summary in skill_summaries]
 
         for story_reference in topic.canonical_story_references:
-            if story_reference.story_id == story_id:
-                story_is_published = story_reference.story_is_published
+            if story_reference.story_id == storyId:
+                storyIsPublished = story_reference.storyIsPublished
 
         self.values.update({
             'story': story.to_dict(),
-            'topic_name': topic.name,
-            'story_is_published': story_is_published,
-            'skill_summaries': skill_summary_dicts
+            'topicName': topic.name,
+            'storyIsPublished': storyIsPublished,
+            'skillSummaries': skillSummaryDicts
         })
 
         self.render_json(self.values)
 
     @acl_decorators.can_edit_story
-    def put(self, story_id):
+    def put(self, storyId):
         """Updates properties of the given story."""
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
+        story = story_fetchers.get_story_by_id(storyId, strict=False)
 
         version = self.payload.get('version')
         self._require_valid_version(version, story.version)
@@ -97,11 +97,11 @@ class EditableStoryDataHandler(base.BaseHandler):
         ]
         try:
             story_services.update_story(
-                self.user_id, story_id, change_list, commit_message)
+                self.userId, storyId, changeList, commitMssage)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        story_dict = story_fetchers.get_story_by_id(story_id).to_dict()
+        story_dict = story_fetchers.get_story_by_id(storyId).to_dict()
 
         self.values.update({
             'story': story_dict
@@ -112,7 +112,7 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_story
     def delete(self, story_id):
         """Handles Delete requests."""
-        story_services.delete_story(self.user_id, story_id)
+        story_services.delete_story(self.userId, storyId)
         self.render_json(self.values)
 
 
@@ -122,19 +122,19 @@ class StoryPublishHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_story
-    def put(self, story_id):
+    def put(self, storyId):
         """Published/unpublished given story."""
-        story = story_fetchers.get_story_by_id(story_id, strict=False)
-        topic_id = story.corresponding_topic_id
+        story = story_fetchers.get_story_by_id(storyId, strict=False)
+        topicId = story.correspondingTopicId
 
         new_story_status_is_public = self.payload.get(
-            'new_story_status_is_public')
+            'newStoryStatusIsPublic')
         if not isinstance(new_story_status_is_public, bool):
             raise self.InvalidInputException
 
         if new_story_status_is_public:
-            topic_services.publish_story(topic_id, story_id, self.user_id)
+            topic_services.publish_story(topicId, storyId, self.userId)
         else:
-            topic_services.unpublish_story(topic_id, story_id, self.user_id)
+            topic_services.unpublish_story(topicId, storyId, self.userId)
 
         self.render_json(self.values)
