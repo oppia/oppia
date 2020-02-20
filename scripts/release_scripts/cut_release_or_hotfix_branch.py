@@ -318,6 +318,7 @@ def execute_branch_cut(target_version, hotfix_number):
 
 
 def main(args=None):
+    """Main method for creating a release or hotfix branch."""
     parsed_args = _PARSER.parse_args(args=args)
     if parsed_args.release_version:
         target_version = parsed_args.release_version
