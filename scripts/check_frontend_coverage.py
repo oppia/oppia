@@ -271,6 +271,7 @@ FULLY_COVERED_FILENAMES = [
     'set-input-validation.service.ts',
     'SetInput.ts',
     'sidebar-status.service.ts',
+    'skill-creation-backend-api.service.ts',
     'skill-domain.constants.ajs.ts',
     'skill-domain.constants.ts',
     'skill-editor-page.constants.ajs.ts',

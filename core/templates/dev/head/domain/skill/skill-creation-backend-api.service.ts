@@ -29,7 +29,7 @@ angular.module('oppia').factory('SkillCreationBackendApiService', [
       };
       $http.post('/skill_editor_handler/create_new', postData)
         .then(function(response) {
-          let skillId = response.data.skill_id;
+          let skillId = response.data;
           if (successCallback) {
             successCallback(skillId);
           }

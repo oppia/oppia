@@ -69,7 +69,7 @@ describe('Skill Creation backend service', function() {
         'test_des_1', rubricDict, 'explaination', ['test_id_11']).then(
         successHandler, failHandler);
       $httpBackend.flush();
-      expect(successHandler).toHaveBeenCalledWith('hyuy4GUlvTqJ');
+      expect(successHandler).toHaveBeenCalledWith({skill_id: 'hyuy4GUlvTqJ'});
       expect(failHandler).not.toHaveBeenCalled();
     });
 
