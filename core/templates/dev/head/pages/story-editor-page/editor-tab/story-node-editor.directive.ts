@@ -117,6 +117,7 @@ angular.module('oppia').directive('storyNodeEditor', [
           $scope.checkCanSaveExpId = function() {
             $scope.canSaveExpId = $scope.explorationIdPattern.test(
               $scope.explorationId);
+            $scope.showInvalidExpError = false;
           };
           $scope.updateTitle = function(newTitle) {
             if (newTitle === $scope.currentTitle) {
