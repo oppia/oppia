@@ -66,10 +66,10 @@ class EditableStoryDataHandler(base.BaseHandler):
         topic = topic_fetchers.get_topic_by_id(topicId, strict=False)
         skillIds = topic.get_all_skill_ids()
         skillSummaries = skill_services.get_multi_skill_summaries(skillIds)
-        skillSummaryDicts = [summary.to_dict() for summary in skill_summaries]
+        skillSummaryDicts = [summary.to_dict() for summary in skillSummaries]
 
         for story_reference in topic.canonical_story_references:
-            if story_reference.story_id == storyId:
+            if story_reference.storyId == storyId:
                 storyIsPublished = story_reference.storyIsPublished
 
         self.values.update({
@@ -89,28 +89,28 @@ class EditableStoryDataHandler(base.BaseHandler):
         version = self.payload.get('version')
         self._require_valid_version(version, story.version)
 
-        commit_message = self.payload.get('commit_message')
-        change_dicts = self.payload.get('change_dicts')
+        commitMessage = self.payload.get('commitMessage')
+        changeDicts = self.payload.get('changeDicts')
         change_list = [
-            story_domain.StoryChange(change_dict)
-            for change_dict in change_dicts
+            story_domain.StoryChange(changeDict)
+            for changeDict in changeDicts
         ]
         try:
             story_services.update_story(
-                self.userId, storyId, changeList, commitMssage)
+                self.userId, storyId, changeList, commitMessage)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        story_dict = story_fetchers.get_story_by_id(storyId).to_dict()
+        storyDict = story_fetchers.get_story_by_id(storyId).to_dict()
 
         self.values.update({
-            'story': story_dict
+            'story': storyDict
         })
 
         self.render_json(self.values)
 
     @acl_decorators.can_delete_story
-    def delete(self, story_id):
+    def delete(self, storyId):
         """Handles Delete requests."""
         story_services.delete_story(self.userId, storyId)
         self.render_json(self.values)
@@ -129,10 +129,10 @@ class StoryPublishHandler(base.BaseHandler):
 
         new_story_status_is_public = self.payload.get(
             'newStoryStatusIsPublic')
-        if not isinstance(new_story_status_is_public, bool):
+        if not isinstance(newStoryStatusIsPublic, bool):
             raise self.InvalidInputException
 
-        if new_story_status_is_public:
+        if newStoryStatusIsPublic:
             topic_services.publish_story(topicId, storyId, self.userId)
         else:
             topic_services.unpublish_story(topicId, storyId, self.userId)
