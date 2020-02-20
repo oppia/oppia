@@ -1064,6 +1064,7 @@ class SendDummyMailTest(test_utils.GenericTestBase):
             generated_response = self.post_json(
                 '/sendDummyMailToAdminHandler', payload={},
                 csrf_token=csrf_token, expected_status_int=200)
+            self.assertEqual(generated_response, {})
 
         with self.swap(feconf, 'CAN_SEND_EMAILS', False):
             generated_response = self.post_json(
