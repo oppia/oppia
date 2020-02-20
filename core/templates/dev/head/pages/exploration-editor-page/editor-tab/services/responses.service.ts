@@ -70,6 +70,11 @@ angular.module('oppia').factory('ResponsesService', [
     var _confirmedUnclassifiedAnswers = null;
     var _answerChoices = null;
 
+    // A boolean flag to check whether we need to update and save the
+    // answer groups when the answer choices are modified in the case of
+    // MultipleChoiceInput interaction.
+    var _multiChoiceInputAnswerGroupRequiresUpdation = false;
+
     var _verifySolution = function() {
       // This checks if the solution is valid once a rule has been changed or
       // added.
@@ -121,16 +126,16 @@ angular.module('oppia').factory('ResponsesService', [
     };
 
     var _reduceRuleIndexByOne = function(answerGroupIndex, ruleIndex) {
-      if (_answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x > 0) {
-        _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
-      }
+      _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x--;
       _saveAnswerGroups(_answerGroups);
+      _multiChoiceInputAnswerGroupRequiresUpdation = true;
     };
 
     var _makeRuleInvalid = function(answerGroupIndex, ruleIndex) {
       _answerGroups[answerGroupIndex].rules[ruleIndex].inputs.x =
         _answerChoices.length;
       _saveAnswerGroups(_answerGroups);
+      _multiChoiceInputAnswerGroupRequiresUpdation = true;
     };
 
     var _updateAnswerGroup = function(index, updates, callback) {
@@ -322,6 +327,15 @@ angular.module('oppia').factory('ResponsesService', [
       updateAnswerChoices: function(newAnswerChoices, callback) {
         var oldAnswerChoices = angular.copy(_answerChoices);
         _answerChoices = newAnswerChoices;
+
+        // If the interaction is MultipleChoiceInput, update the answer groups
+        // to refer to the new answer options.
+        if (StateInteractionIdService.savedMemento === 'MultipleChoiceInput') {
+          if (_answerGroupsMemento &&
+             _multiChoiceInputAnswerGroupRequiresUpdation) {
+            callback(_answerGroupsMemento);
+          }
+        }
 
         // If the interaction is ItemSelectionInput, update the answer groups
         // to refer to the new answer options.

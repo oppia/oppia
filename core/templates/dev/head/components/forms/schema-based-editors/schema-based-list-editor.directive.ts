@@ -27,12 +27,14 @@ require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
-  'NestedDirectivesRecursionTimeoutPreventionService',
+  'NestedDirectivesRecursionTimeoutPreventionService', 'ResponsesService',
   'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
+  'StateInteractionIdService',
   function(
       FocusManagerService, IdGenerationService,
-      NestedDirectivesRecursionTimeoutPreventionService,
-      SchemaDefaultValueService, SchemaUndefinedLastElementService) {
+      NestedDirectivesRecursionTimeoutPreventionService, ResponsesService,
+      SchemaDefaultValueService, SchemaUndefinedLastElementService,
+      StateInteractionIdService) {
     return {
       scope: {
         localValue: '=',
@@ -214,6 +216,22 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
 
             $scope.deleteElement = function(index) {
+              var answerGroups = ResponsesService.getAnswerGroups();
+
+              if (StateInteractionIdService.savedMemento ===
+                    'MultipleChoiceInput') {
+                for (var i = 0; i < answerGroups.length; i++) {
+                  var rules = answerGroups[i].rules;
+                  for (var j = 0; j < rules.length; j++) {
+                    if (index < rules[j].inputs.x) {
+                      ResponsesService.reduceRuleIndexByOne(i, j);
+                    } else if (index === rules[j].inputs.x) {
+                      ResponsesService.makeRuleInvalid(i, j);
+                    }
+                  }
+                }
+              }
+
               // Need to let the RTE know that HtmlContent has been changed.
               $scope.$broadcast('externalHtmlContentChange');
               $scope.localValue.splice(index, 1);
