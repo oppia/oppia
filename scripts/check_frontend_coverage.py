@@ -327,6 +327,7 @@ FULLY_COVERED_FILENAMES = [
     'text-input.tokenizer.ts',
     'TextInput.ts',
     'thread-status-display.service.ts',
+    'topic-creation-backend-api.service.ts',
     'topic-domain.constants.ajs.ts',
     'topic-domain.constants.ts',
     'topic-editor-page.constants.ajs.ts',
