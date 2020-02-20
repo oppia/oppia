@@ -218,6 +218,9 @@ angular.module('oppia').directive('schemaBasedListEditor', [
             $scope.deleteElement = function(index) {
               var answerGroups = ResponsesService.getAnswerGroups();
 
+              // If the interaction type is MultipleChoiceInput, we need to
+              // handle the deletion of answer choices and update the answer
+              // groups accordingly in order to match the new answer choices.
               if (StateInteractionIdService.savedMemento ===
                     'MultipleChoiceInput') {
                 for (var i = 0; i < answerGroups.length; i++) {
