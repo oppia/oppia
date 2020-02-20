@@ -16,22 +16,39 @@
  * @fileoverview Service that manages admin data.
  */
 
-require('pages/admin-page/admin-page.constants.ajs.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('AdminDataService', [
-  '$http', 'ADMIN_HANDLER_URL',
-  function($http, ADMIN_HANDLER_URL) {
-    var dataPromise = null;
-    return {
-      getDataAsync: function() {
-        if (dataPromise) {
-          return dataPromise;
-        }
-        dataPromise = $http.get(ADMIN_HANDLER_URL).then(function(response) {
-          return response.data;
-        });
-        return dataPromise;
-      }
-    };
+import { AdminPageConstants } from
+  'pages/admin-page/admin-page.constants';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AdminDataService {
+  dataPromise: Promise<Object>;
+
+  constructor(private http: HttpClient) {
+    this.dataPromise = null;
   }
-]);
+
+  _getDataAsync(): Promise<Object> {
+    if (this.dataPromise) {
+      return this.dataPromise;
+    }
+
+    this.dataPromise = this.http.get(
+      AdminPageConstants.ADMIN_HANDLER_URL).toPromise();
+
+    return this.dataPromise;
+  }
+
+  getDataAsync(): Promise<Object> {
+    return this._getDataAsync();
+  }
+}
+
+angular.module('oppia').factory(
+  'AdminDataService',
+  downgradeInjectable(AdminDataService));
