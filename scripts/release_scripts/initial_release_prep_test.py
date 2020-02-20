@@ -23,6 +23,7 @@ import constants
 from core.tests import test_utils
 import python_utils
 from scripts import common
+from scripts.release_scripts import cut_release_or_hotfix_branch
 from scripts.release_scripts import initial_release_prep
 
 
@@ -142,21 +143,21 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_is_called'] = True
-        def mock_require_cwd_to_be_oppia():
+        def mock_execute_branch_cut(
+                unused_target_version, unused_hotfix_number):
             check_function_calls['execute_branch_cut_is_called'] = True
-            raise Exception('Exception raised to stop branch cut.')
         def mock_input():
             return '1.2.3'
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible',
             mock_open_tab)
-        cwd_swap = self.swap(
-            common, 'require_cwd_to_be_oppia', mock_require_cwd_to_be_oppia)
+        branch_cut_swap = self.swap(
+            cut_release_or_hotfix_branch, 'execute_branch_cut',
+            mock_execute_branch_cut)
         input_swap = self.swap(
             python_utils, 'INPUT', mock_input)
-        with open_tab_swap, cwd_swap, input_swap, self.assertRaisesRegexp(
-            Exception, 'Exception raised to stop branch cut.'):
+        with open_tab_swap, branch_cut_swap, input_swap:
             initial_release_prep.cut_release_branch()
         self.assertEqual(check_function_calls, expected_check_function_calls)
 
@@ -172,20 +173,21 @@ class InitialReleasePrepTests(test_utils.GenericTestBase):
         def mock_open_tab(unused_url):
             check_function_calls[
                 'open_new_tab_in_browser_if_possible_is_called'] = True
-        def mock_require_cwd_to_be_oppia():
+        def mock_execute_branch_cut(
+                unused_target_version, unused_hotfix_number):
             check_function_calls['execute_branch_cut_is_called'] = True
-            raise Exception('Exception raised to stop branch cut.')
         def mock_input():
             return 'invalid'
 
         open_tab_swap = self.swap(
             common, 'open_new_tab_in_browser_if_possible',
             mock_open_tab)
-        cwd_swap = self.swap(
-            common, 'require_cwd_to_be_oppia', mock_require_cwd_to_be_oppia)
+        branch_cut_swap = self.swap(
+            cut_release_or_hotfix_branch, 'execute_branch_cut',
+            mock_execute_branch_cut)
         input_swap = self.swap(
             python_utils, 'INPUT', mock_input)
-        with open_tab_swap, cwd_swap, input_swap:
+        with open_tab_swap, branch_cut_swap, input_swap:
             with self.assertRaises(AssertionError):
                 initial_release_prep.cut_release_branch()
         self.assertEqual(check_function_calls, expected_check_function_calls)
