@@ -29,9 +29,6 @@ require('domain/exploration/SolutionObjectFactory.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
-  'interaction-details-cache.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/services/' +
   'solution-verification.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -44,36 +41,29 @@ require(
   'state-interaction-id.service.ts');
 
 describe('Solution Verification Service', function() {
-  beforeEach(function() {
-    angular.mock.module('oppia');
-    // Set a global value for INTERACTION_SPECS that will be used by all the
-    // descendant dependencies.
-    angular.mock.module(function($provide) {
-      $provide.value('AngularNameService', new AngularNameService());
-      $provide.constant('INTERACTION_SPECS', {
-        TextInput: {
-          display_mode: 'inline',
-          is_terminal: false
-        },
-        TerminalInteraction: {
-          display_mode: 'inline',
-          is_terminal: true
-        }
-      });
+  var ess, siis, scas, sof, svs, see;
+  var mockExplorationData;
+
+  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('oppia', function($provide) {
+    $provide.value('AngularNameService', new AngularNameService());
+    $provide.constant('INTERACTION_SPECS', {
+      TextInput: {
+        display_mode: 'inline',
+        is_terminal: false
+      },
+      TerminalInteraction: {
+        display_mode: 'inline',
+        is_terminal: true
+      }
     });
-  });
+  }));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
     }
   }));
-
-  var ess, siis, scas, idc, sof, svs, see, IS, mockFunctions;
-  var rootScope;
-  var mockExplorationData;
-  var successCallbackSpy, errorCallbackSpy;
-
   beforeEach(function() {
     mockExplorationData = {
       explorationId: 0,
@@ -89,12 +79,9 @@ describe('Solution Verification Service', function() {
     ess = $injector.get('ExplorationStatesService');
     siis = $injector.get('StateInteractionIdService');
     scas = $injector.get('StateCustomizationArgsService');
-    idc = $injector.get('InteractionDetailsCacheService');
     sof = $injector.get('SolutionObjectFactory');
     see = $injector.get('StateEditorService');
     svs = $injector.get('SolutionVerificationService');
-    IS = $injector.get('INTERACTION_SPECS');
-    rootScope = $injector.get('$rootScope');
 
     ess.init({
       'First State': {
@@ -213,49 +200,45 @@ describe('Solution Verification Service', function() {
     });
   }));
 
-  describe('Success case', function() {
-    it('should verify a correct solution', function() {
-      var state = ess.getState('First State');
-      siis.init(
-        'First State', state.interaction.id, state.interaction, 'widget_id');
-      scas.init(
-        'First State', state.interaction.customizationArgs,
-        state.interaction, 'widget_customization_args');
+  it('should verify a correct solution', function() {
+    var state = ess.getState('First State');
+    siis.init(
+      'First State', state.interaction.id, state.interaction, 'widget_id');
+    scas.init(
+      'First State', state.interaction.customizationArgs,
+      state.interaction, 'widget_customization_args');
 
-      siis.savedMemento = 'TextInput';
-      ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
+    siis.savedMemento = 'TextInput';
+    ess.saveSolution('First State', sof.createNew(false, 'abc', 'nothing'));
 
-      expect(
-        svs.verifySolution('First State', state.interaction,
-          ess.getState('First State').interaction.solution.correctAnswer)
-      ).toBe(true);
+    expect(
+      svs.verifySolution('First State', state.interaction,
+        ess.getState('First State').interaction.solution.correctAnswer)
+    ).toBe(true);
 
-      see.setInQuestionMode(true);
-      state.interaction.answerGroups[0].outcome.dest = 'First State';
-      state.interaction.answerGroups[0].outcome.labelledAsCorrect = true;
-      expect(
-        svs.verifySolution('First State', state.interaction,
-          ess.getState('First State').interaction.solution.correctAnswer)
-      ).toBe(true);
-    });
+    see.setInQuestionMode(true);
+    state.interaction.answerGroups[0].outcome.dest = 'First State';
+    state.interaction.answerGroups[0].outcome.labelledAsCorrect = true;
+    expect(
+      svs.verifySolution('First State', state.interaction,
+        ess.getState('First State').interaction.solution.correctAnswer)
+    ).toBe(true);
   });
 
-  describe('Failure case', function() {
-    it('should verify an incorrect solution', function() {
-      var state = ess.getState('First State');
-      siis.init(
-        'First State', state.interaction.id, state.interaction, 'widget_id');
-      scas.init(
-        'First State', state.interaction.customizationArgs,
-        state.interaction, 'widget_customization_args');
+  it('should verify an incorrect solution', function() {
+    var state = ess.getState('First State');
+    siis.init(
+      'First State', state.interaction.id, state.interaction, 'widget_id');
+    scas.init(
+      'First State', state.interaction.customizationArgs,
+      state.interaction, 'widget_customization_args');
 
-      siis.savedMemento = 'TextInput';
-      ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
+    siis.savedMemento = 'TextInput';
+    ess.saveSolution('First State', sof.createNew(false, 'xyz', 'nothing'));
 
-      expect(
-        svs.verifySolution('First State', state.interaction,
-          ess.getState('First State').interaction.solution.correctAnswer)
-      ).toBe(false);
-    });
+    expect(
+      svs.verifySolution('First State', state.interaction,
+        ess.getState('First State').interaction.solution.correctAnswer)
+    ).toBe(false);
   });
 });

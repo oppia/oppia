@@ -35,10 +35,6 @@ angular.module('oppia').constant(
   CollectionEditorPageConstants.COLLECTION_TITLE_INPUT_FOCUS_LABEL);
 
 angular.module('oppia').constant(
-  'SEARCH_EXPLORATION_URL_TEMPLATE',
-  CollectionEditorPageConstants.SEARCH_EXPLORATION_URL_TEMPLATE);
-
-angular.module('oppia').constant(
   'EVENT_COLLECTION_INITIALIZED',
   CollectionEditorPageConstants.EVENT_COLLECTION_INITIALIZED);
 angular.module('oppia').constant(

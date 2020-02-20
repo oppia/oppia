@@ -17,20 +17,17 @@
  */
 
 require('components/concept-card/concept-card.directive.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService',
+  function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Skillreview/directives/' +
-        'skillreview.directive.html'),
+      template: require('./skillreview.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', '$uibModal', 'ContextService', 'ENTITY_TYPE',
@@ -45,9 +42,8 @@ angular.module('oppia').directive('oppiaNoninteractiveSkillreview', [
               ContextService.removeCustomEntityContext;
             ContextService.setCustomEntityContext(ENTITY_TYPE.SKILL, skillId);
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/concept-card/concept-card-modal.template.html'
-              ),
+              template: require(
+                'components/concept-card/concept-card-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
