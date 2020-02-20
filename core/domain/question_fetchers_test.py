@@ -68,7 +68,7 @@ class QuestionFetchersUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
-    
+
     def test_get_no_questions_with_no_skill_ids(self):
         questions, _, _ = (
             question_fetchers.get_questions_and_skill_descriptions_by_skill_ids(
