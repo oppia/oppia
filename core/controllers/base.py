@@ -181,7 +181,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.role = (
             feconf.ROLE_ID_GUEST
             if self.user_id is None else user_settings.role)
-        self.user = user_services.UserActionsInfo(self.user_id)
+        self.user = user_services.UserActionsInfo(self.user_id, self.gae_id)
 
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
@@ -209,21 +209,25 @@ class BaseHandler(webapp2.RequestHandler):
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
         if self.request.uri.startswith('https://oppiaserver.appspot.com'):
-            return self.redirect(
+            self.redirect(
                 b'https://oppiatestserver.appspot.com', permanent=True)
-
-        if self.REDIRECT_DELETED_USERS and self.user_is_scheduled_for_deletion:
-            return self.redirect(feconf.PENDING_ACCOUNT_DELETION_URL)
+            return
 
         if (self.REDIRECT_DELETED_USERS and
                 self.request.referrer and
                 self.user_id and
                 self.request.referrer.endswith(
                     feconf.PENDING_ACCOUNT_DELETION_URL)):
-            return self.redirect('/logout?redirect_url=%s' % self.request.uri)
+            self.redirect('/logout?redirect_url=%s' % self.request.uri)
+            return
+
+        if self.REDIRECT_DELETED_USERS and self.user_is_scheduled_for_deletion:
+            self.redirect(feconf.PENDING_ACCOUNT_DELETION_URL)
+            return
 
         if self.partially_logged_in:
-            return self.redirect('/logout?redirect_url=%s' % self.request.uri)
+            self.redirect('/logout?redirect_url=%s' % self.request.uri)
+            return
 
         if self.payload is not None and self.REQUIRE_PAYLOAD_CSRF_CHECK:
             try:

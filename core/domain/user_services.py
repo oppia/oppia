@@ -526,6 +526,21 @@ def get_user_role_from_id(user_id):
     return user_settings.role
 
 
+def get_user_role_from_gae_id(gae_id):
+    """Returns role of the user with given gae_id.
+
+    Args:
+        gae_id: str. The unique GAE ID of the user.
+
+    Returns:
+        str. Role of the user with given id.
+    """
+    user_settings = get_user_settings_by_gae_id(gae_id)
+    if user_settings is None:
+        return feconf.ROLE_ID_GUEST
+    return user_settings.role
+
+
 def get_usernames_by_role(role):
     """Get usernames of all the users with given role ID.
 
@@ -561,9 +576,11 @@ class UserActionsInfo(python_utils.OBJECT):
         actions: list(str). A list of actions accessible to the role.
     """
 
-    def __init__(self, user_id=None):
+    def __init__(self, user_id=None, gae_id=None):
         self._user_id = user_id
-        self._role = get_user_role_from_id(user_id)
+        self._role = (
+            get_user_role_from_gae_id(gae_id)
+            if gae_id else get_user_role_from_id(user_id))
         self._actions = role_services.get_all_actions(self._role)
 
     @property

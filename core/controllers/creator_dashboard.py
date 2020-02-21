@@ -312,6 +312,7 @@ class NotificationsHandler(base.BaseHandler):
     """Provides data about unseen notifications."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    REDIRECT_DELETED_USERS = False
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):

@@ -210,12 +210,14 @@ class ProfilePictureHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     REDIRECT_DELETED_USERS = False
 
-    @acl_decorators.can_manage_own_profile
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.values.update({
-            'profile_picture_data_url': user_settings.profile_picture_data_url
+            'profile_picture_data_url': (
+                user_settings.profile_picture_data_url
+                if user_settings else None)
         })
         self.render_json(self.values)
 
