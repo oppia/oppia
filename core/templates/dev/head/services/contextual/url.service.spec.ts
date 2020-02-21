@@ -180,7 +180,7 @@ describe('Url Service', () => {
     mockLocation.pathname = '/story_editor/abcdefgij';
     expect(function() {
       urlService.getStoryIdFromUrl();
-    }).toThrow();
+    }).toThrowError();
 
     mockLocation.pathname = '/storyeditor/abcdefgijklm';
     expect(function() {

@@ -313,7 +313,7 @@ if (typeof Object.create !== 'function') {
         throw new Error('Cannot set a null [[Prototype]]');
       }
       if (typeof o !== 'object') {
-        throw TypeError('Argument must be an object');
+        throw new TypeError('Argument must be an object');
       }
       F.prototype = o;
       return new F();

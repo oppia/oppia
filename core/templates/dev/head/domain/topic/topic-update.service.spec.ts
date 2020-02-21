@@ -202,7 +202,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeAdditionalStory(_sampleTopic, 'story_5');
-    }).toThrow();
+    }).toThrowError();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -575,7 +575,7 @@ describe('Topic update service', function() {
     expect(function() {
       TopicUpdateService.removeSkillFromSubtopic(
         _sampleTopic, 1, _firstSkillSummary);
-    }).toThrow();
+    }).toThrowError();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 

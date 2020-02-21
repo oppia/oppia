@@ -108,7 +108,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
                 '\nData: ' + data
               );
               e.message += additionalInfo;
-              throw e;
+              throw new Error(e)  ;
             }
           } else {
             var additionalInfo = (
@@ -117,7 +117,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
               '\nData: ' + data
             );
             exception.message += additionalInfo;
-            throw exception;
+            throw new Error(exception);
           }
         }
         assetsCache[filename] = assetBlob;

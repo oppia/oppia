@@ -358,7 +358,7 @@ angular.module('oppia').directive('answerGroupEditor', [
                 '\nState Name: ' + StateEditorService.getActiveStateName()
               );
               e.message += additionalInfo;
-              throw e;
+              throw new Error(e);
             }
           };
 

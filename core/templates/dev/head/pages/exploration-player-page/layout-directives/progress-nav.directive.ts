@@ -98,7 +98,7 @@ angular.module('oppia').directive('progressNav', [
               var additionalInfo = ('\nSubmit button debug logs:' +
                 '\ninterationId: ' + $scope.interactionId);
               e.message += additionalInfo;
-              throw e;
+              throw new Error(e);
             }
           };
 
