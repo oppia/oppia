@@ -53,6 +53,8 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
     USER_C_USERNAME = 'c'
     USER_D_EMAIL = 'd@example.com'
     USER_D_USERNAME = 'd'
+    USER_D_ID = 'user_id'
+    USER_D_GAE_ID = 'gae_id'
 
     def _get_migrated_model_ids(self, job_output):
         """Get successfully migrated model IDs."""
@@ -94,6 +96,30 @@ class UserIdMigrationJobTests(test_utils.GenericTestBase):
         self._run_one_off_job()
         output = self._run_one_off_job()
         self.assertIn(['ALREADY DONE', [(self.user_a_id, '')]], output)
+
+    def test_one_user_user_settings_model(self):
+        original_model = user_models.UserSettingsModel(
+            id=self.USER_D_ID,
+            gae_id=self.USER_D_ID,
+            gae_user_id=self.USER_D_GAE_ID,
+            email=self.USER_D_EMAIL,
+        )
+        original_model.put()
+
+        migrated_model_ids = self._get_migrated_model_ids(
+            self._run_one_off_job())
+        migrated_model = user_models.UserSettingsModel.get_by_id(
+            migrated_model_ids[-1])
+
+        self.assertNotEqual(original_model.id, migrated_model.id)
+        self.assertEqual(original_model.gae_user_id, migrated_model.gae_user_id)
+        self.assertEqual(original_model.email, migrated_model.email)
+        self.assertEqual(original_model.created_on, migrated_model.created_on)
+        self.assertEqual(
+            original_model.last_updated, migrated_model.last_updated)
+
+        self.assertIsNone(
+            user_models.UserSettingsModel.get_by_id(self.USER_D_ID))
 
     def test_one_user_one_model_full_id(self):
         original_model = user_models.CompletedActivitiesModel(
