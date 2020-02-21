@@ -1270,6 +1270,10 @@ def main(args=None):
         if not options.minify_third_party_libs_only:
             hashes = generate_hashes()
             build_using_webpack()
+            # Note: We do not generate app.yaml for a local build
+            # by excluding prod sections from app_dev.yaml since the
+            # handlers used in prod sections include build folders
+            # which are not present for a local build.
             generate_app_yaml(deploy_mode=options.deploy_mode)
             generate_build_directory(hashes)
 
