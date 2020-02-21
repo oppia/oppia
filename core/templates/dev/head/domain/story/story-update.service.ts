@@ -437,7 +437,8 @@ angular.module('oppia').factory('StoryUpdateService', [
         var newPrerequisiteSkillIds = angular.copy(oldPrerequisiteSkillIds);
         var index = newPrerequisiteSkillIds.indexOf(skillId);
         if (index === -1) {
-          throw new Error('The given prerequisite skill is not part of the node');
+          throw new Error(
+            'The given prerequisite skill is not part of the node');
         }
         newPrerequisiteSkillIds.splice(index, 1);
 
@@ -491,7 +492,8 @@ angular.module('oppia').factory('StoryUpdateService', [
         var newAcquiredSkillIds = angular.copy(oldAcquiredSkillIds);
         var index = newAcquiredSkillIds.indexOf(skillId);
         if (index === -1) {
-          throw new Error('The given acquired skill id is not part of the node');
+          throw new Error(
+            'The given acquired skill id is not part of the node');
         }
         newAcquiredSkillIds.splice(index, 1);
 
