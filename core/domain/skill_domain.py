@@ -846,7 +846,7 @@ class Skill(python_utils.OBJECT):
             old_content_ids = [self.skill_contents.explanation.content_id]
 
         self.skill_contents.explanation = (
-            state_domain.SubtitledHtml.from_dict(explanation))
+            state_domain.SubtitledHtml.from_dict(explanation.to_dict()))
 
         new_content_ids = [self.skill_contents.explanation.content_id]
         self._update_content_ids_in_assets(old_content_ids, new_content_ids)
