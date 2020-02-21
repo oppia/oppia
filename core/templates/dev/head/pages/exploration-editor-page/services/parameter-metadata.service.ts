@@ -97,9 +97,9 @@ angular.module('oppia').factory('ParameterMetadataService', [
       state.interaction.answerGroups.forEach(function(group) {
         ExpressionInterpolationService.getParamsFromString(
           group.outcome.feedback.getHtml()).forEach(function(paramName, index) {
-            result.push(ParamMetadataObjectFactory.createWithGetAction(
+          result.push(ParamMetadataObjectFactory.createWithGetAction(
             paramName, PARAM_SOURCE_FEEDBACK, index));
-          });
+        });
       });
 
       return result;

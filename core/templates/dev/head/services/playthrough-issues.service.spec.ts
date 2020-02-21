@@ -139,15 +139,15 @@ describe('Playthrough Issues Service', function() {
 
   it('should render issue statement when its type is' +
   ' MultipleIncorrectSubmissions', function() {
-      var copiedBackendIssue = angular.copy(backendIssues[0]);
-      var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
-        copiedBackendIssue);
-      var stateName = issue.issueCustomizationArgs.state_name.value;
+    var copiedBackendIssue = angular.copy(backendIssues[0]);
+    var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+      copiedBackendIssue);
+    var stateName = issue.issueCustomizationArgs.state_name.value;
 
-      expect(PlaythroughIssuesService.renderIssueStatement(issue))
-        .toBe('Several learners submitted answers to card "' + stateName +
-        '" several times, then gave up and quit.');
-    });
+    expect(PlaythroughIssuesService.renderIssueStatement(issue))
+      .toBe('Several learners submitted answers to card "' + stateName +
+      '" several times, then gave up and quit.');
+  });
 
   it('should render issue statement when its type is EarlyQuit', function() {
     var copiedBackendIssue = angular.copy(backendIssues[0]);
@@ -174,17 +174,17 @@ describe('Playthrough Issues Service', function() {
 
   it('should render issue suggestion when its type is' +
     ' MultipleIncorrectSubmissions', function() {
-      var copiedBackendIssue = angular.copy(backendIssues[0]);
-      var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
-        copiedBackendIssue);
-      var stateName = issue.issueCustomizationArgs.state_name.value;
+    var copiedBackendIssue = angular.copy(backendIssues[0]);
+    var issue = PlaythroughIssueObjectFactory.createFromBackendDict(
+      copiedBackendIssue);
+    var stateName = issue.issueCustomizationArgs.state_name.value;
 
-      expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
-        .toEqual(['Check the wording of the card "' + stateName +
-        '" to ensure it is not confusing.',
-        'Consider addressing the answers submitted in the sample' +
-        ' playthroughs explicitly using answer groups.']);
-    });
+    expect(PlaythroughIssuesService.renderIssueSuggestions(issue))
+      .toEqual(['Check the wording of the card "' + stateName +
+      '" to ensure it is not confusing.',
+      'Consider addressing the answers submitted in the sample' +
+      ' playthroughs explicitly using answer groups.']);
+  });
 
   it('should render issue suggestion when its type is EarlyQuit', function() {
     var copiedBackendIssue = angular.copy(backendIssues[0]);

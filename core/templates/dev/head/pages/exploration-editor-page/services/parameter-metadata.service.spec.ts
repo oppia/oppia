@@ -255,7 +255,8 @@ describe('Parameter Metadata Service', function() {
 
   it('should get unset parameters info', function() {
     expect(ParameterMetadataService.getUnsetParametersInfo(
-      ['Hola', 'State2'])).toEqual([{
+      ['Hola', 'State2']))
+      .toEqual([{
         paramName: 'ParamChange2',
         stateName: null
       }, {
@@ -264,13 +265,14 @@ describe('Parameter Metadata Service', function() {
       }, {
         paramName: 'FeedbackValue',
         stateName: 'Hola'
-      },{
+      }, {
         paramName: 'StateFeedbackValue',
         stateName: 'State'
       }]);
 
     expect(ParameterMetadataService.getUnsetParametersInfo(
-      ['State', 'State3'])).toEqual([{
+      ['State', 'State3']))
+      .toEqual([{
         paramName: 'ParamChange2',
         stateName: null
       }, {
