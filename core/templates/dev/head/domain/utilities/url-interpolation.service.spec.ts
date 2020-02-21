@@ -80,35 +80,38 @@ describe('URL Interpolation Service', () => {
   });
 
   it('should throw an error for erroneous URLs', () => {
-    expect(uis.interpolateUrl.bind(uis, null, null)).toThrow(
-      new Error('Invalid or empty URL template passed in: \'null\''));
-    expect(uis.interpolateUrl.bind(uis, null, {})).toThrow(
-      new Error('Invalid or empty URL template passed in: \'null\''));
-    expect(uis.interpolateUrl.bind(uis, undefined, {})).toThrow(
-      new Error('Invalid or empty URL template passed in: \'undefined\''));
-    expect(uis.interpolateUrl.bind(uis, '', {})).toThrow(
-      new Error('Invalid or empty URL template passed in: \'\''));
-    expect(uis.interpolateUrl.bind(uis, '', null)).toThrow(
-      new Error('Invalid or empty URL template passed in: \'\''));
+    expect(uis.interpolateUrl.bind(uis, null, null))
+      .toThrowError('Invalid or empty URL template passed in: \'null\'');
+    expect(uis.interpolateUrl.bind(uis, null, {}))
+      .toThrowError('Invalid or empty URL template passed in: \'null\'');
+    expect(uis.interpolateUrl.bind(uis, undefined, {}))
+      .toThrowError(
+        'Invalid or empty URL template passed in: \'undefined\'');
+    expect(uis.interpolateUrl.bind(uis, '', {}))
+      .toThrowError('Invalid or empty URL template passed in: \'\'');
+    expect(uis.interpolateUrl.bind(uis, '', null))
+      .toThrowError('Invalid or empty URL template passed in: \'\'');
   });
 
   it('should throw an error for erroneous interpolation values', () => {
-    expect(uis.interpolateUrl.bind(alertsObject, 'url', null)).toThrow(
-      new Error('Expected an object of interpolation values to be passed ' +
-            'into interpolateUrl.'));
-    expect(uis.interpolateUrl.bind(alertsObject, 'url', undefined)).toThrow(
-      new Error('Expected an object of interpolation values to be passed ' +
-            'into interpolateUrl.'));
+    expect(uis.interpolateUrl.bind(alertsObject, 'url', null))
+      .toThrowError(
+        'Expected an object of interpolation values to be passed ' +
+        'into interpolateUrl.');
+    expect(uis.interpolateUrl.bind(alertsObject, 'url', undefined))
+      .toThrowError(
+        'Expected an object of interpolation values to be passed ' +
+        'into interpolateUrl.');
     expect(
       uis.interpolateUrl.bind(alertsObject, '/test_url/<param>', 'value')
     ).toThrowError(
       'Expected an object of interpolation values to be passed into ' +
-        'interpolateUrl.');
+      'interpolateUrl.');
     expect(
       uis.interpolateUrl.bind(alertsObject, '/test_url/<param>', ['value'])
     ).toThrowError(
       'Expected an object of interpolation values to be passed into ' +
-        'interpolateUrl.');
+      'interpolateUrl.');
   });
 
   it('should interpolate URLs not requiring parameters', () => {
@@ -319,73 +322,71 @@ describe('URL Interpolation Service', () => {
 
   it('should throw an error for empty path', () => {
     expect(uis.getStaticImageUrl.bind(uis, null)).toThrowError(
-        'Empty path passed in method.');
+      'Empty path passed in method.');
     expect(uis.getStaticImageUrl.bind(uis, '')).toThrowError(
-        'Empty path passed in method.');
+      'Empty path passed in method.');
 
     expect(uis.getStaticVideoUrl.bind(uis, null)).toThrowError(
-        'Empty path passed in method.');
+      'Empty path passed in method.');
     expect(uis.getStaticVideoUrl.bind(uis, '')).toThrowError(
-        'Empty path passed in method.');
+      'Empty path passed in method.');
 
     expect(uis.getInteractionThumbnailImageUrl.bind(uis, null)).toThrowError(
-        'Empty interactionId passed in getInteractionThumbnailImageUrl.');
+      'Empty interactionId passed in getInteractionThumbnailImageUrl.');
     expect(uis.getInteractionThumbnailImageUrl.bind(uis, '')).toThrowError(
-        'Empty interactionId passed in getInteractionThumbnailImageUrl.');
+      'Empty interactionId passed in getInteractionThumbnailImageUrl.');
 
     expect(uis.getDirectiveTemplateUrl.bind(uis, null)).toThrowError(
       'Empty path passed in method.');
     expect(uis.getDirectiveTemplateUrl.bind(uis, '')).toThrowError(
       'Empty path passed in method.');
 
-    expect(uis.getStaticAssetUrl.bind(uis, null)).toThrow(
-      new Error('Empty path passed in method.'));
-    expect(uis.getStaticAssetUrl.bind(uis, '')).toThrow(
-      new Error('Empty path passed in method.'));
+    expect(uis.getStaticAssetUrl.bind(uis, null))
+      .toThrowError('Empty path passed in method.');
+    expect(uis.getStaticAssetUrl.bind(uis, ''))
+      .toThrowError('Empty path passed in method.');
 
-    expect(uis.getExtensionResourceUrl.bind(uis, null)).toThrow(
-      new Error('Empty path passed in method.'));
-    expect(uis.getExtensionResourceUrl.bind(uis, '')).toThrow(
-      new Error('Empty path passed in method.'));
+    expect(uis.getExtensionResourceUrl.bind(uis, null))
+      .toThrowError('Empty path passed in method.');
+    expect(uis.getExtensionResourceUrl.bind(uis, ''))
+      .toThrowError('Empty path passed in method.');
   });
 
   it('should throw an error for path not beginning with forward slash',
     () => {
-      expect(uis.getStaticImageUrl.bind(uis, 'test_fail.png')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
-      expect(uis.getStaticImageUrl.bind(uis, 'test_url/fail.png')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
+      expect(uis.getStaticImageUrl.bind(uis, 'test_fail.png')).toThrowError(
+        'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.');
+      expect(uis.getStaticImageUrl.bind(uis, 'test_url/fail.png')).toThrowError(
+        'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.');
 
-      expect(uis.getStaticVideoUrl.bind(uis, 'test_fail.png')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.'));
-      expect(uis.getStaticVideoUrl.bind(uis, 'test_url/fail.png')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.'));
+      expect(uis.getStaticVideoUrl.bind(uis, 'test_fail.png'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_fail.png' + '\'.');
+      expect(uis.getStaticVideoUrl.bind(uis, 'test_url/fail.png'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_url/fail.png' + '\'.');
 
-      expect(uis.getDirectiveTemplateUrl.bind(uis, 'test_fail.html')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
+      expect(uis.getDirectiveTemplateUrl.bind(uis, 'test_fail.html'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.');
       expect(
-        uis.getDirectiveTemplateUrl.bind(uis, 'test_url/fail.html')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
+        uis.getDirectiveTemplateUrl.bind(uis, 'test_url/fail.html'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.');
 
-      expect(uis.getStaticAssetUrl.bind(uis, 'test_fail.html')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
-      expect(uis.getStaticAssetUrl.bind(uis, 'test_url/fail.html')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
+      expect(uis.getStaticAssetUrl.bind(uis, 'test_fail.html'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.');
+      expect(uis.getStaticAssetUrl.bind(uis, 'test_url/fail.html'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.');
 
-      expect(uis.getExtensionResourceUrl.bind(uis, 'test_fail.html')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.'));
+      expect(uis.getExtensionResourceUrl.bind(uis, 'test_fail.html'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_fail.html' + '\'.');
       expect(
-        uis.getExtensionResourceUrl.bind(uis, 'test_url/fail.html')).toThrow(
-        new Error(
-          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.'));
+        uis.getExtensionResourceUrl.bind(uis, 'test_url/fail.html'))
+        .toThrowError(
+          'Path must start with \'\/\': \'' + 'test_url/fail.html' + '\'.');
     });
 });
