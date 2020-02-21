@@ -436,9 +436,16 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+            'node_id': self.NODE_ID_2,
+            'old_value': '2',
+            'new_value': '1'
+        }), story_domain.StoryChange({
+            'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'property_name': (
+                story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
             'node_id': self.NODE_ID_1,
             'old_value': '0',
-            'new_value': '1'
+            'new_value': '2'
         })]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
@@ -453,14 +460,14 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': self.NODE_ID_2,
+            'node_id': self.NODE_ID_1,
             'old_value': '2',
             'new_value': '0'
         }), story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
-            'node_id': self.NODE_ID_1,
+            'node_id': self.NODE_ID_2,
             'old_value': '1',
             'new_value': '2'
         }), story_domain.StoryChange({
@@ -488,11 +495,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story_services.update_story(
             self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
         self.assertEqual(
-            exp_services.get_story_id_linked_to_exploration('2'), self.STORY_ID)
+            exp_services.get_story_id_linked_to_exploration('0'), self.STORY_ID)
         self.assertEqual(
             exp_services.get_story_id_linked_to_exploration('1'), self.STORY_ID)
         self.assertIsNone(
-            exp_services.get_story_id_linked_to_exploration('0'))
+            exp_services.get_story_id_linked_to_exploration('2'))
 
         story_services.delete_story(self.USER_ID, self.STORY_ID)
         self.assertIsNone(
