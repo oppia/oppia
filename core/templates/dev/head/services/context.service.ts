@@ -110,7 +110,7 @@ export class ContextService {
     }
   }
 
-  isContextLessonRelated(): boolean {
+  canEntityReferToSkills(): boolean {
     return (
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.TOPIC_EDITOR ||
       this.getPageContext() === ServicesConstants.PAGE_CONTEXT.SKILL_EDITOR ||

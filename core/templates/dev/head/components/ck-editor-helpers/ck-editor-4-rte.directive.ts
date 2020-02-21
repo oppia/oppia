@@ -36,13 +36,13 @@ angular.module('oppia').directive('ckEditor4Rte', [
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
-        var contextIsLessonRelated = ContextService.isContextLessonRelated();
+        var canReferToSkills = ContextService.canEntityReferToSkills();
 
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
             componentDefn.isComplex) ||
-            (!contextIsLessonRelated && componentDefn.isLessonRelated))) {
+            (!canReferToSkills && componentDefn.isLessonRelated))) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
