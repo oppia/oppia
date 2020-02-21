@@ -381,9 +381,9 @@ describe('Suggestions Improvements', function() {
 
     improvementsTab.setShowOnlyOpenTasks(false);
     var acceptedTask = improvementsTab.getSuggestionTask(
-      suggestionDescription1);
+      'Status changed to \'Fixed\'');
     var rejectedTask = improvementsTab.getSuggestionTask(
-      suggestionDescription2);
+      'Status changed to \'Ignored\'');
     expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 
