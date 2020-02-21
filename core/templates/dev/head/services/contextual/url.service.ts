@@ -68,7 +68,7 @@ export class UrlService {
     if (pathname.match(/\/topic_editor\/(\w|-){12}/g)) {
       return pathname.split('/')[2];
     }
-    throw Error('Invalid topic id url');
+    throw new Error('Invalid topic id url');
   }
 
   getTopicNameFromLearnerUrl(): string {
@@ -76,7 +76,7 @@ export class UrlService {
     if (pathname.match(/\/(story|topic|subtopic|practice_session)/g)) {
       return decodeURIComponent(pathname.split('/')[2]);
     }
-    throw Error('Invalid URL for topic');
+    throw new Error('Invalid URL for topic');
   }
 
   getClassroomNameFromUrl(): string {
@@ -84,7 +84,7 @@ export class UrlService {
     if (pathname.match(/\/classroom/g)) {
       return decodeURIComponent(pathname.split('/')[2]);
     }
-    throw Error('Invalid URL for classroom');
+    throw new Error('Invalid URL for classroom');
   }
 
   getSubtopicIdFromUrl(): string {
@@ -93,7 +93,7 @@ export class UrlService {
     if (pathname.match(/\/subtopic/g) && argumentsArray.length === 4) {
       return decodeURIComponent(argumentsArray[3]);
     }
-    throw Error('Invalid URL for subtopic');
+    throw new Error('Invalid URL for subtopic');
   }
 
   getStoryIdFromUrl(): string {
@@ -101,7 +101,7 @@ export class UrlService {
     if (pathname.match(/\/(story_editor|review_test)\/(\w|-){12}/g)) {
       return pathname.split('/')[2];
     }
-    throw Error('Invalid story id url');
+    throw new Error('Invalid story id url');
   }
 
   getStoryIdFromViewerUrl(): string {
@@ -109,7 +109,7 @@ export class UrlService {
     if (pathname.match(/\/story\/(\w|-){12}/g)) {
       return pathname.split('/')[2];
     }
-    throw Error('Invalid story id url');
+    throw new Error('Invalid story id url');
   }
 
   getStoryIdInPlayer(): string | null {
@@ -128,7 +128,7 @@ export class UrlService {
     let pathname = this.getPathname();
     let skillId = pathname.split('/')[2];
     if (skillId.length !== 12) {
-      throw Error('Invalid Skill Id');
+      throw new Error('Invalid Skill Id');
     }
     return skillId;
   }
@@ -183,7 +183,7 @@ export class UrlService {
     if (pathname.match(/\/(profile)/g)) {
       return decodeURIComponent(pathname.split('/')[2]);
     }
-    throw Error('Invalid profile URL');
+    throw new Error('Invalid profile URL');
   }
 
   getCollectionIdFromUrl(): string {
@@ -191,7 +191,7 @@ export class UrlService {
     if (pathname.match(/\/(collection)/g)) {
       return decodeURIComponent(pathname.split('/')[2]);
     }
-    throw Error('Invalid collection URL');
+    throw new Error('Invalid collection URL');
   }
 
   getCollectionIdFromEditorUrl(): string {
@@ -199,7 +199,7 @@ export class UrlService {
     if (pathname.match(/\/(collection_editor\/create)/g)) {
       return decodeURIComponent(pathname.split('/')[3]);
     }
-    throw Error('Invalid collection editor URL');
+    throw new Error('Invalid collection editor URL');
   }
 
   getExplorationVersionFromUrl(): number | null {

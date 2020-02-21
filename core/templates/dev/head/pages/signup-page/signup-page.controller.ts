@@ -162,7 +162,7 @@ angular.module('oppia').directive('signupPage', [
               } else if (canReceiveEmailUpdates === 'no') {
                 requestParams.can_receive_email_updates = false;
               } else {
-                throw Error(
+                throw new Error(
                   'Invalid value for email preferences: ' +
                   canReceiveEmailUpdates);
               }
@@ -204,7 +204,7 @@ angular.module('oppia').directive('signupPage', [
                             $window.location = loginUrl;
                           }, 150);
                         } else {
-                          throw Error('Login url not found.');
+                          throw new Error('Login url not found.');
                         }
                       }
                     );

@@ -201,7 +201,7 @@ describe('Skill object factory', function() {
 
       expect(function() {
         skill.updateRubricForDifficulty('invalid difficulty', 'explanation 2');
-      }).toThrow();
+      }).toThrowError();
     });
 
     it('should get the correct next misconception id', function() {

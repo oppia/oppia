@@ -113,7 +113,7 @@ angular.module('oppia').factory('ReadOnlyCollectionBackendApiService', [
         if (_collectionDetailsCache[collectionId]) {
           return _collectionDetailsCache[collectionId];
         } else {
-          throw Error('collection has not been fetched');
+          throw new Error('collection has not been fetched');
         }
       },
 

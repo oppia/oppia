@@ -106,17 +106,17 @@ describe('Url Service', () => {
     mockLocation.pathname = '/topic_editor/abcdefgij';
     expect(function() {
       urlService.getTopicIdFromUrl();
-    }).toThrow();
+    }).toThrowError();
 
     mockLocation.pathname = '/topiceditor/abcdefgijklm';
     expect(function() {
       urlService.getTopicIdFromUrl();
-    }).toThrow();
+    }).toThrowError();
 
     mockLocation.pathname = '/topic_editor';
     expect(function() {
       urlService.getTopicIdFromUrl();
-    }).toThrow();
+    }).toThrowError();
   });
 
   it('should correctly retrieve topic name from url', () => {
@@ -185,24 +185,24 @@ describe('Url Service', () => {
     mockLocation.pathname = '/storyeditor/abcdefgijklm';
     expect(function() {
       urlService.getStoryIdFromUrl();
-    }).toThrow();
+    }).toThrowError();
 
     mockLocation.pathname = '/story_editor';
     expect(function() {
       urlService.getStoryIdFromUrl();
-    }).toThrow();
+    }).toThrowError();
   });
 
   it('should correctly retrieve story id from story viewer url', () => {
     mockLocation.pathname = '/story_viewer/abcdefgijklm';
     expect(function() {
       urlService.getStoryIdFromViewerUrl();
-    }).toThrow();
+    }).toThrowError();
 
     mockLocation.pathname = '/story/abcdefg';
     expect(function() {
       urlService.getStoryIdFromViewerUrl();
-    }).toThrow();
+    }).toThrowError();
 
     mockLocation.pathname = '/story/abcdefgijklm';
     expect(
@@ -218,7 +218,7 @@ describe('Url Service', () => {
     mockLocation.pathname = '/skill_editor/abcdefghijk';
     expect(function() {
       urlService.getSkillIdFromUrl();
-    }).toThrow();
+    }).toThrowError();
   });
 
   it('should correctly retrieve story id from url in player', () => {

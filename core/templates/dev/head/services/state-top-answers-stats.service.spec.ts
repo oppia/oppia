@@ -279,7 +279,7 @@ describe('StateTopAnswersStatsService', function() {
     it('throws when fetching stats about non-existent states', function() {
       expect(function() {
         StateTopAnswersStatsService.getStateStats('Me Llamo');
-      }).toThrow();
+      }).toThrowError();
     });
 
     it('registers handlers to ExplorationStatesService', function() {
@@ -381,7 +381,7 @@ describe('StateTopAnswersStatsService', function() {
         spyOn(ChangeListService, 'addState');
         expect(function() {
           StateTopAnswersStatsService.getStateStats('Me Llamo');
-        }).toThrow();
+        }).toThrowError();
 
         ExplorationStatesService.addState('Me Llamo');
 
@@ -400,7 +400,7 @@ describe('StateTopAnswersStatsService', function() {
         ExplorationStatesService.deleteState('Hola').then(function() {
           expect(function() {
             StateTopAnswersStatsService.getStateStats('Hola');
-          }).toThrow();
+          }).toThrowError();
         }).then(done, done.fail);
         $rootScope.$digest();
       });
@@ -418,7 +418,7 @@ describe('StateTopAnswersStatsService', function() {
 
         expect(function() {
           StateTopAnswersStatsService.getStateStats('Hola');
-        }).toThrow();
+        }).toThrowError();
       });
     });
 

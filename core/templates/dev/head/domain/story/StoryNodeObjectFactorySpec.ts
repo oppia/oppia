@@ -75,25 +75,25 @@ describe('Story node object factory', () => {
     () => {
       expect(() => {
         _sampleStoryNode.addDestinationNodeId('node_2');
-      }).toThrow();
+      }).toThrowError();
       expect(() => {
         _sampleStoryNode.addPrerequisiteSkillId('skill_1');
-      }).toThrow();
+      }).toThrowError();
       expect(() => {
         _sampleStoryNode.addAcquiredSkillId('skill_2');
-      }).toThrow();
+      }).toThrowError();
     });
 
   it('should correctly throw error when invalid values are deleted from arrays',
     () => {
       expect(() => {
         _sampleStoryNode.removeDestinationNodeId('node_5');
-      }).toThrow();
+      }).toThrowError();
       expect(() => {
         _sampleStoryNode.removePrerequisiteSkillId('skill_4');
-      }).toThrow();
+      }).toThrowError();
       expect(() => {
         _sampleStoryNode.removeAcquiredSkillId('skill_4');
-      }).toThrow();
+      }).toThrowError();
     });
 });

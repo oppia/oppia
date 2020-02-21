@@ -47,7 +47,7 @@ describe('HTML to text', function() {
         var fn = function() {
           return $filter('convertUnicodeWithParamsToHtml')(s);
         };
-        expect(fn).toThrow();
+        expect(fn).toThrowError();
       });
     }));
 

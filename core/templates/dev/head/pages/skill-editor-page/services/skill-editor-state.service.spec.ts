@@ -306,7 +306,7 @@ describe('Skill editor state service', function() {
     function() {
       expect(function() {
         SkillEditorStateService.saveSkill('commit message');
-      }).toThrow();
+      }).toThrowError();
     });
 
   it('should not save the skill if there are no pending changes',

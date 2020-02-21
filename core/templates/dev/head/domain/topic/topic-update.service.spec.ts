@@ -232,7 +232,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeCanonicalStory(_sampleTopic, 'story_10');
-    }).toThrow();
+    }).toThrowError();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -269,7 +269,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeUncategorizedSkill(_sampleTopic, 'skill_10');
-    }).toThrow();
+    }).toThrowError();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -342,7 +342,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.setSubtopicTitle(_sampleTopic, 10, 'title2');
-    }).toThrow();
+    }).toThrowError();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -379,7 +379,7 @@ describe('Topic update service', function() {
 
     expect(function() {
       UndoRedoService.undoChange(_sampleTopic);
-    }).toThrow();
+    }).toThrowError();
   });
 
   it('should properly remove/add a newly created subtopic', function() {
@@ -413,7 +413,7 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.deleteSubtopic(_sampleTopic, 10);
-    }).toThrow();
+    }).toThrowError();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
@@ -526,11 +526,11 @@ describe('Topic update service', function() {
     expect(function() {
       TopicUpdateService.moveSkillToSubtopic(
         _sampleTopic, null, 1, _secondSkillSummary);
-    }).toThrow();
+    }).toThrowError();
     expect(function() {
       TopicUpdateService.moveSkillToSubtopic(
         _sampleTopic, 1, 2, _secondSkillSummary);
-    }).toThrow();
+    }).toThrowError();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 

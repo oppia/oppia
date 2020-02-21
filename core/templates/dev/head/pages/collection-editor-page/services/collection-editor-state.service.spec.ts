@@ -409,7 +409,7 @@ describe('Collection editor state service', function() {
     function() {
       expect(function() {
         CollectionEditorStateService.saveCollection('Commit message');
-      }).toThrow();
+      }).toThrowError();
     }
   );
 

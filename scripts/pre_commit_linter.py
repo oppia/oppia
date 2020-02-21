@@ -210,7 +210,21 @@ BAD_PATTERNS_JS_AND_TS_REGEXP = [
         'excluded_dirs': ()
     },
     {
-        'regexp': re.compile(r'\bthrow\s*\''),
+        'regexp': re.compile(r'throw\s\b(\bError|\bTypeError|\bRangeError)\('),
+        'message': 'Please use \'throw new \' instead of '
+                   '\'throw nameoferror\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'throw\s\b(\bSyntaxError|\bDimensionError)\('),
+        'message': 'Please use \'throw new \' instead of '
+                   '\'throw nameoferror\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': re.compile(r'\b(\bthrow\s*\'|\bthrow\s\w+;)'),
         'message': 'Please use '
                    '\'throw new Error(message as string)\' '
                    'instead of \'throw \'',

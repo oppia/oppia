@@ -109,7 +109,7 @@ describe('Exploration Property Service', function() {
 
     child._isValid = function(value) {
       if (!value) {
-        throw Error('this.displayed should have a valid value.');
+        throw new Error('this.displayed should have a valid value.');
       }
       return Boolean(value);
     };

@@ -65,6 +65,6 @@ describe('Admin Data Service', function() {
       expect(response).toEqual(sampleAdminData);
     });
 
-    expect($httpBackend.flush).toThrow();
+    expect($httpBackend.flush).toThrowError();
   });
 });
