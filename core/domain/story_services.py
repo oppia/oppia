@@ -243,6 +243,10 @@ def _save_story(committer_id, story, commit_message, change_list):
                     ' it. Invalid exploration: %s' % exp.id)
             for state_name in exp.states:
                 state = exp.states[state_name]
+                if state.param_changes:
+                    raise utils.ValidationError(
+                        'Expected no exploration to have parameter values in'
+                        ' it. Invalid exploration: %s' % exp.id)
                 if (
                         state.interaction.id and
                         state.interaction.id not in valid_interaction_ids):

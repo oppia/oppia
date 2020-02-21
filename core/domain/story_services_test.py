@@ -534,11 +534,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             })
         ]
 
-        valid_interaction_ids = [
-            'Continue', 'EndExploration', 'NumericInput', 'TextInput',
-            'FractionInput', 'NumberWithUnits', 'MultipleChoiceInput',
-            'ItemSelectionInput']
-
         with self.assertRaisesRegexp(
             Exception, 'Expected explorations to only have the following '
             'interactions'):
@@ -575,6 +570,44 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected no exploration to have parameter values in'
             ' it. Invalid exploration: exp_id_1'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
+        self.save_new_valid_exploration(
+            'exp_id_2', self.user_id_a, title='title 2', category='Category 1',
+            interaction_id='LogicProof')
+        exp_services.update_exploration(
+            self.user_id_a, 'exp_id_2', [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_specs',
+                'new_value': {
+                    'param1':
+                        param_domain.ParamSpec('UnicodeString').to_dict()
+                }
+            }), exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_PARAM_CHANGES,
+                'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_value': [
+                    param_domain.ParamChange('param1', 'Copier', {}).to_dict()]
+            })],
+            '')
+        self.publish_exploration(self.user_id_a, 'exp_id_2')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': 'exp_id_1',
+                'new_value': 'exp_id_2'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected no exploration to have parameter values in'
+            ' it. Invalid exploration: exp_id_2'):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
