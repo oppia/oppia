@@ -1,0 +1,27 @@
+<div class="oppia-login-required-message-container">
+  <div class="oppia-mascot-avatar-container">
+    <img class="oppia-mascot-avatar"
+         ng-src="<[$ctrl.OPPIA_AVATAR_IMAGE_URL]>" alt="">
+  </div>
+  <div class="oppia-login-required-message">
+    Oops! You haven't logged in yet.
+    <br>
+    Log in <a style="color: #009688;" ng-click="$ctrl.onLoginButtonClicked()">here</a> to start contributing!
+  </div>
+</div>
+
+<style>
+  .oppia-login-required-message-container {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    margin: auto;
+    width: 100%;
+  }
+  .oppia-login-required-message {
+    color: #4a4a4a;
+    font-size: 28px;
+  }
+</style>

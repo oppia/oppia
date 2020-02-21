@@ -1,0 +1,111 @@
+<!-- Select Skill View -->
+<div ng-if="currentMode === 'MODE_SELECT_SKILL'">
+  <div class="modal-header">
+    <h3 ng-if="skillSummaries.length == 0">
+      No skills linked to topic
+    </h3>
+    <h3 ng-if="skillSummaries.length > 0">
+      <[instructionMessage]>
+    </h3>
+  </div>
+  <div class="modal-body select-skill-modal">
+    <div ng-if="skillSummaries.length == 0">
+      You can only create questions for topics that have atleast one skill
+      attached to it. Please link a skill to this topic before adding questions.
+    </div>
+    <div class="list-group">
+      <md-card layout="row" class="list-view-item">
+        Search By Skill
+        <input type="text" class="form-control" placeholder="Enter a skill name" ng-model="skillFilterText" autofocus>
+      </md-card>
+      <div style="max-height: 50vh; overflow-y: auto;">
+        <a class="list-group-item protractor-test-skill-item"
+           ng-repeat="skillSummary in skillSummariesInitial | filter:skillFilterText"
+           ng-click="selectOrDeselectSkill(skillSummary)"
+           ng-class="{'list-group-item-success': (skillSummary.isSelected)}">
+          <label class="list-group-item-heading"><[skillSummary.description]></label>
+        </a>
+        <hr ng-if="skillSummariesInitial.length > 0">
+        <a class="list-group-item protractor-test-skill-item"
+           ng-repeat="skillSummary in skillSummariesFinal | filter:skillFilterText"
+           ng-click="selectOrDeselectSkill(skillSummary)"
+           ng-class="{'list-group-item-success': (skillSummary.isSelected)}">
+          <label class="list-group-item-heading"><[skillSummary.description]></label>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer" ng-switch="skillSummaries.length > 0">
+    <div ng-switch-when="true">
+      <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-success protractor-test-confirm-skill-button"
+              ng-disabled="selectedSkillIds.length === 0"
+              ng-click="goToNextStep()"> Next
+      </button>
+    </div>
+    <div ng-switch-when="false">
+      <button class="btn btn-secondary" ng-click="closeModal()"> Ok </button>
+    </div>
+  </div>
+</div>
+<!-- Select Difficulty View -->
+<div ng-if="currentMode === 'MODE_SELECT_DIFFICULTY'">
+  <div class="modal-header">
+    <h3 ng-if="linkedSkillsWithDifficulty.length == 0">
+      Select skills you would like to link to the question.
+    </h3>
+    <h3 ng-if="linkedSkillsWithDifficulty.length > 0">
+      Select the difficulty per skill (rubrics for each difficulty mentioned alongside):
+    </h3>
+  </div>
+  <div class="modal-body select-skill-modal">
+    <div ng-if="linkedSkillsWithDifficulty.length == 0">
+      You can only set difficulty after selecting skills linked to the question. Please go back and link skill(s) to this question.
+    </div>
+    <div class="list-group">
+      <div class="list-group-item"  ng-repeat="skillWithDifficulty in linkedSkillsWithDifficulty track by $index">
+        <label class="list-group-item-heading" style="font-size: 1em;"><[skillWithDifficulty.getDescription()]></label>
+        <md-radio-group ng-model="skillWithDifficulty._difficulty">
+          <md-radio-button value="0.3">
+            <strong> Easy </strong>
+            <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][0].getExplanation()">
+            </angular-html-bind>
+            <div ng-if="skillIdToRubricsObject[skillWithDifficulty.getId()][0].getExplanation() === ''">
+              <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+            </div>
+          </md-radio-button>
+
+          <md-radio-button value="0.6">
+            <strong> Medium </strong>
+            <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][1].getExplanation()">
+            </angular-html-bind>
+            <div ng-if="skillIdToRubricsObject[skillWithDifficulty.getId()][1].getExplanation() === ''">
+              <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+            </div>
+          </md-radio-button>
+
+          <md-radio-button value="0.9">
+            <strong> Hard </strong>
+            <angular-html-bind html-data="skillIdToRubricsObject[skillWithDifficulty.getId()][2].getExplanation()">
+            </angular-html-bind>
+            <div ng-if="skillIdToRubricsObject[skillWithDifficulty.getId()][2].getExplanation() === ''">
+              <span class="oppia-placeholder"> This rubric has not yet been specified </span>
+            </div>
+          </md-radio-button>
+        </md-radio-group>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer" ng-switch="linkedSkillsWithDifficulty.length > 0">
+    <div ng-switch-when="true">
+      <button class="btn btn-secondary" ng-click="cancelModal()"> Cancel </button>
+      <button class="btn btn-success protractor-test-confirm-skill-difficulty-button"
+              ng-disabled="linkedSkillsWithDifficulty.length === 0"
+              ng-click="startQuestionCreation()"> Done
+      </button>
+    </div>
+    <div ng-switch-when="false">
+      <button class="btn btn-secondary" ng-click="goToSelectSkillView()"> Back </button>
+    </div>
+  </div>
+</div>

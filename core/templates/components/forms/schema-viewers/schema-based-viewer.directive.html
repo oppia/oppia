@@ -1,0 +1,20 @@
+<schema-based-primitive-viewer ng-if="($ctrl.schema().type === 'bool' || $ctrl.schema().type === 'int' || $ctrl.schema().type == 'float')" local-value="$ctrl.localValue">
+</schema-based-primitive-viewer>
+
+<schema-based-custom-viewer ng-if="$ctrl.schema().type === 'custom'" obj-type="$ctrl.schema().obj_type"
+                            local-value="$ctrl.localValue">
+</schema-based-custom-viewer>
+
+<schema-based-dict-viewer ng-if="$ctrl.schema().type === 'dict'" property-schemas="$ctrl.schema().properties"
+                          local-value="$ctrl.localValue">
+</schema-based-dict-viewer>
+
+<schema-based-html-viewer ng-if="$ctrl.schema().type === 'html'" local-value="$ctrl.localValue">
+</schema-based-html-viewer>
+
+<schema-based-list-viewer ng-if="$ctrl.schema().type === 'list'" item-schema="$ctrl.schema().items"
+                          local-value="$ctrl.localValue">
+</schema-based-list-viewer>
+
+<schema-based-unicode-viewer ng-if="$ctrl.schema().type === 'unicode'" local-value="$ctrl.localValue">
+</schema-based-unicode-viewer>

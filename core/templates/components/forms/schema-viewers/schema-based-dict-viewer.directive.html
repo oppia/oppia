@@ -1,0 +1,11 @@
+<div role="form">
+  <div ng-repeat="property in propertySchemas()">
+    <div class="form-group">
+      <label><[getHumanReadablePropertyDescription(property)]></label>
+      <div>
+        <schema-based-viewer schema="property.schema" local-value="localValue[property.name]">
+        </schema-based-viewer>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+<b>Latest Message</b>
+<p><[getLatestMessage().text]></p>
+<div ng-if="getHumanReadableUpdatedStatus() !== null">
+  <em>Status changed to '<[getHumanReadableUpdatedStatus()]>'</em>
+</div>
+<div class="text-right">
+  <span ng-if="getLatestMessage().author === null">
+    <em>(anonymously submitted)</em>
+  </span>
+  <span ng-if="getLatestMessage().author !== null">
+    by <strong><[getLatestMessage().author]></strong>
+  </span>
+  <span ng-if="wasUpdatedToday()">at </span>
+  <span ng-if="!wasUpdatedToday()">on </span>
+  <span>
+    <[getLocaleAbbreviatedDatetimeString()]>
+  </span>
+</div>

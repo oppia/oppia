@@ -1,0 +1,47 @@
+<div class="modal-header">
+  <h3>Review translation</h3>
+</div>
+
+<div class="modal-body">
+  <section class="oppia-suggestion-review-container">
+    <div class="oppia-suggestion-review-panel-container" style="float: left;">
+      <strong>Content to translate:</strong>
+      <div class="oppia-suggestion-review-panel">
+        <angular-html-bind html-data="contentHtml">
+        </angular-html-bind>
+      </div>
+    </div>
+    <div class="oppia-suggestion-review-panel-container" style="float: right;">
+      <strong> Translation:</strong>
+      <div class="oppia-suggestion-review-panel">
+        <angular-html-bind html-data="translationHtml">
+        </angular-html-bind>
+      </div>
+    </div>
+  </section>
+  <div ng-show="reviewable" class="oppia-suggestion-review-message">
+    Review message (required if rejecting):
+    <input class="protractor-test-suggestion-review-message" type="text" ng-model="reviewMessage" style="width: 100%">
+  </div>
+  <div ng-show="reviewable" class="oppia-suggestion-review-message">
+    Brief Description of Changes (required if accepting):
+    <input class="protractor-test-suggestion-commit-message" type="text" ng-model="commitMessage" style="width: 100%">
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-secondary" ng-if="!reviewable" ng-click="cancel()">Cancel</button>
+  <span uib-tooltip="Enter review message before rejecting" tooltip-placement="bottom" tooltip-enable="reviewMessage.length == 0">
+    <button class="btn btn-danger" ng-if="reviewable" ng-disabled="reviewMessage.length == 0" ng-click="reject()">Reject</button>
+  </span>
+  <span uib-tooltip="Enter commit message before accepting" tooltip-placement="bottom" tooltip-enable="commitMessage.length == 0">
+    <button class="btn btn-success" ng-if="reviewable" ng-disabled="commitMessage.length == 0" ng-click="accept()">Accept</button>
+  </span>
+</div>
+
+<style>
+  .oppia-suggestion-review-message {
+    margin-left: 10px;
+    margin-top: 20px;
+  }
+</style>

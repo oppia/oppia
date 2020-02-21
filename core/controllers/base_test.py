@@ -55,7 +55,7 @@ PADDING = 1
 
 class UniqueTemplateNamesTests(test_utils.GenericTestBase):
     """Tests to ensure that all template filenames in
-    core/templates/dev/head/pages have unique filenames. This is required
+    core/templates/pages have unique filenames. This is required
     for the backend tests to work correctly since they fetch templates
     from this directory based on name of the template. For details, refer
     get_filepath_from_filename function in test_utils.py.
@@ -149,10 +149,10 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
             # This url is ignored since it is only needed for a protractor test.
             # The backend tests fetch templates from
-            # core/templates/dev/head/pages instead of webpack_bundles since we
+            # core/templates/pages instead of webpack_bundles since we
             # skip webpack compilation for backend tests.
             # The console_errors.html template is present in
-            # core/templates/dev/head/tests and we want one canonical
+            # core/templates/tests and we want one canonical
             # directory for retrieving templates so we ignore this url.
             if url == '/console_errors':
                 continue
