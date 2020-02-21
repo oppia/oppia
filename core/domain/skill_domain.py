@@ -840,7 +840,6 @@ class Skill(python_utils.OBJECT):
         Args:
             explanation: dict. The new explanation of the skill.
         """
-        print(type(explanation))
         old_content_ids = []
         if self.skill_contents.explanation:
             old_content_ids = [self.skill_contents.explanation.content_id]
