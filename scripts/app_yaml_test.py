@@ -60,7 +60,7 @@ class AppYamlTests(test_utils.GenericTestBase):
         self.assertEqual(prod_start_count, 1)
         self.assertEqual(prod_end_count, 1)
 
-    def test_dev_start_is_present_before_dev_end(self):
+    def test_prod_start_is_present_before_prod_end(self):
         """Test that dev start is present before dev end."""
         prod_start_index = self.lines.index(PROD_STATIC_START)
         prod_end_index = self.lines.index(PROD_STATIC_END)
