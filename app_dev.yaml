@@ -16,6 +16,12 @@ inbound_services:
 - mail
 
 default_expiration: "10m"
+# Note: The handlers in this file contain two separate sections:
+# DEV_SECTION: Required for a local build.
+# PROD_SECTION: Required for a prod build.
+# The comments representing the start & end of these sections should
+# not be modified since they are required for generation of app.yaml.
+# The backend tests to verify this structure: scripts/app_yaml_test.py
 handlers:
 # PRODUCTION STATIC START
 - url: /third_party/static
@@ -41,11 +47,35 @@ handlers:
   static_dir: build
   secure: always
   expiration: "90d"
+- url: /third_party/generated
+  static_dir: third_party/generated
+  secure: always
+  expiration: "0"
+# Serve js scripts and css files under core/templates/dev/head.
+# This regex allows us to recursively serve js scripts.
+# "\1" inserts text captured by the capture group in the URL pattern.
+- url: /templates/dev/head/(.*\.(css))$
+  static_files: core/templates/dev/head/\1
+  upload: core/templates/dev/head/(.*\.(css))$
+  secure: always
+  expiration: "0"
+# Serve js scripts for interactions, rich_text_components, custom ckeditor plugins
+# and objects under extensions. This regex allows us to recursively serve js
+# scripts under the three specified directories. "\1" and "\2" insert capture
+# groups from the url pattern.
+- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
+  static_files: extensions/\1/\2
+  upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(png))$
+  secure: always
+  expiration: "0"
+- url: /extensions/ckeditor_plugins/(.*\.(js))$
+  static_files: extensions/ckeditor_plugins/\1
+  upload: extensions/ckeditor_plugins/(.*\.(js))$
+  secure: always
+  expiration: "0"
 # PRODUCTION STATIC END
 
 # DEVELOPMENT STATIC START
-# Please do not modify the above comment.
-# It is required for correct generation of app.yaml in prod_env.
 - url: /webpack_bundles
   static_dir: webpack_bundles
   secure: always
@@ -92,11 +122,6 @@ handlers:
   upload: extensions/objects/templates/(.*\.html)
   secure: always
   expiration: "0"
-# Please do not modify the below comment.
-# It is required for correct generation of app.yaml in prod_env.
-# DEVELOPMENT STATIC END
-
-# COMMON FOR DEV AND PROD
 - url: /third_party/generated
   static_dir: third_party/generated
   secure: always
@@ -123,6 +148,7 @@ handlers:
   upload: extensions/ckeditor_plugins/(.*\.(js))$
   secure: always
   expiration: "0"
+# DEVELOPMENT STATIC END
 
 # DYNAMIC
 - url: /mapreduce(/.*)?
