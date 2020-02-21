@@ -105,7 +105,7 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             if (change.cmd == exp_domain.CMD_ADD_CUSTOMIZATION_ARG and
                     change.property_name ==
                     exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS and
-                        change.interaction_id == 'SetInput'):
+                    change.interaction_id == 'SetInput'):
                 draft_change_list[i] = exp_domain.ExplorationChange({
                     'interaction_id': 'SetInput',
                     'cmd': exp_domain.CMD_ADD_CUSTOMIZATION_ARG,
