@@ -43,7 +43,6 @@ import argparse
 import json
 import re
 import subprocess
-import sys
 
 import python_utils
 import release_constants
@@ -233,6 +232,10 @@ def execute_branch_cut(target_version, hotfix_number):
     Args:
         target_version: str. The release version.
         hotfix_number: int. The number for the hotfix branch.
+
+    Raises:
+        Exception: Travis tests are failing on the branch from which
+            the new branch is cut.
     """
 
     # Construct the new branch name.
@@ -273,10 +276,9 @@ def execute_branch_cut(target_version, hotfix_number):
         if answer in release_constants.AFFIRMATIVE_CONFIRMATIONS:
             break
         elif answer:
-            python_utils.PRINT(
-                'Tests should pass on %s before this script is run. '
-                'Exiting.' % branch_to_check)
-            sys.exit()
+            raise Exception(
+                'Tests should pass on %s before this script is run.' % (
+                    branch_to_check))
 
     # Cut a new release or hotfix branch.
     if new_branch_type == release_constants.BRANCH_TYPE_HOTFIX:

@@ -336,8 +336,10 @@ class CutReleaseOrHotfixBranchTests(test_utils.GenericTestBase):
             with self.verify_target_branch_swap:
                 with self.verify_target_version_swap, self.open_tab_swap:
                     with self.get_remote_alias_swap, self.check_call_swap:
-                        with input_swap, self.assertRaises(
-                            SystemExit):
+                        with input_swap, self.assertRaisesRegexp(
+                            Exception,
+                            'Tests should pass on develop before this '
+                            'script is run.'):
                             cut_release_or_hotfix_branch.execute_branch_cut(
                                 '1.2.3', 0)
 
