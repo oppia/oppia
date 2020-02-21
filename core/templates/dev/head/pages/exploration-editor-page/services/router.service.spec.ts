@@ -142,7 +142,7 @@ describe('Router Service', function() {
   }));
 
   it('should navigate to main tab when tab is already on main',
-    function(done) {    
+    function(done) {
       var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
       var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
 
@@ -160,21 +160,21 @@ describe('Router Service', function() {
       // setTimeout is being used here to not conflict with $timeout.flush
       // for fadeIn Jquery method. This first setTimeout is to wait the default
       // time for fadeOut Jquery method to complete, which is 400 miliseconds.
-      // Ref:
+      // Ref: https://api.jquery.com/fadeout/
       setTimeout(function() {
         // Waiting for $applyAsync be called, which can take ~10 miliseconds
-        // according to this ref: 
+        // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
         setTimeout(function() {
           expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
           expect(RouterService.getActiveTabName()).toBe('main');
 
           $interval.flush(300);
-          
+
           expect(broadcastSpy).toHaveBeenCalled();
 
           done();
 
-          expect(applyAsyncSpy).toHaveBeenCalled();          
+          expect(applyAsyncSpy).toHaveBeenCalled();
         }, 20);
         $timeout.flush(150);
       }, 400);
@@ -182,47 +182,47 @@ describe('Router Service', function() {
 
   it('should not navigate to main tab when current location is already on' +
     ' main tab', function(done) {
-      var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
-      var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
+    var broadcastSpy = spyOn($rootScope, '$broadcast').and.callThrough();
+    var applyAsyncSpy = spyOn($rootScope, '$applyAsync').and.callThrough();
 
-      // @ts-ignore
-      var jQuerySpy = spyOn(window, '$');
-      jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
-        $(document.createElement('div')));
-      jQuerySpy.and.callThrough();
+    // @ts-ignore
+    var jQuerySpy = spyOn(window, '$');
+    jQuerySpy.withArgs('.oppia-editor-cards-container').and.returnValue(
+      $(document.createElement('div')));
+    jQuerySpy.and.callThrough();
 
-      expect(RouterService.getActiveTabName()).toBe('main');
-      RouterService.navigateToMainTab('newState');
-      // To $watch the first $location.path call.
-      $rootScope.$apply();
+    expect(RouterService.getActiveTabName()).toBe('main');
+    RouterService.navigateToMainTab('newState');
+    // To $watch the first $location.path call.
+    $rootScope.$apply();
 
-      // setTimeout is being used here to not conflict with $timeout.flush
-      // for fadeIn Jquery method. This first setTimeout is to wait the default
-      // time for fadeOut Jquery method to complete, which is 400 miliseconds.
-      // Ref:
+    // setTimeout is being used here to not conflict with $timeout.flush
+    // for fadeIn Jquery method. This first setTimeout is to wait the default
+    // time for fadeOut Jquery method to complete, which is 400 miliseconds.
+    // Ref: https://api.jquery.com/fadeout/
+    setTimeout(function() {
+      // Waiting for $applyAsync be called, which can take ~10 miliseconds
+      // according to this ref: https://docs.angularjs.org/api/ng/type/$rootScope.Scope#$applyAsync
       setTimeout(function() {
-        // Waiting for $applyAsync be called, which can take ~10 miliseconds
-        // according to this ref: 
-        setTimeout(function() {
-          expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
-          expect(RouterService.getActiveTabName()).toBe('main');
+        expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
+        expect(RouterService.getActiveTabName()).toBe('main');
 
-          $interval.flush(300);
+        $interval.flush(300);
 
-          expect(broadcastSpy).toHaveBeenCalled();
-          
-          done();
+        expect(broadcastSpy).toHaveBeenCalled();
 
-          expect(applyAsyncSpy).toHaveBeenCalled();
+        done();
 
-          RouterService.navigateToMainTab('newState');
-          $rootScope.$apply();
+        expect(applyAsyncSpy).toHaveBeenCalled();
 
-          expect(RouterService.getActiveTabName()).toBe('main');
-        }, 20);
-        $timeout.flush(150);
-      }, 400);
-    });
+        RouterService.navigateToMainTab('newState');
+        $rootScope.$apply();
+
+        expect(RouterService.getActiveTabName()).toBe('main');
+      }, 20);
+      $timeout.flush(150);
+    }, 400);
+  });
 
   it('should navigate to main tab when current location is not main',
     function() {
@@ -278,7 +278,7 @@ describe('Router Service', function() {
     RouterService.navigateToPreviewTab();
     $timeout.flush(200);
     $rootScope.$apply();
-    
+
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
     expect(RouterService.getActiveTabName()).toBe('preview');
 
@@ -371,12 +371,12 @@ describe('Router Service', function() {
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
     expect(RouterService.getActiveTabName()).toBe('feedback');
     $interval.flush(300);
-    
+
     // navigateToMainTab is called
     $rootScope.$apply();
     expect(RouterService.getCurrentStateFromLocationPath()).toBe(null);
     $rootScope.$apply();
-    
+
     expect(RouterService.getActiveTabName()).toBe('feedback');
     expect(RouterService.isLocationSetToNonStateEditorTab()).toBe(true);
     $rootScope.$apply();
@@ -390,7 +390,7 @@ describe('Router Service', function() {
     RouterService.navigateToMainTab(null);
     $rootScope.$apply();
     expect(broadcastSpy).toHaveBeenCalledWith('externalSave');
-    
+
     // Change to a valid path during the call.
     locationPathSpy.and.returnValue('/gui/initState');
 
