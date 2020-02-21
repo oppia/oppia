@@ -16,15 +16,15 @@
  * @fileoverview Unit test for TopicCreationBackendApiService.
  */
 
-require('domain/topic/topic-creation-backend-api.service.ts');
-require('services/csrf-token.service.ts');
+import {  TopicCreationBackendApiService } from
+'domain/topic/topic-creation-backend-api.service.ts'
 import { UpgradedServices } from 'services/UpgradedServices';
+import { TestBed, fakeAsync } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 describe('Topic creation backend api service', function() {
-  var TopicCreationBackendApiService = null;
-  var $httpBackend = null;
-  var CsrfService = null;
-
+  let topicCreationBackendApiService = null;
+  let httpTestingController: HttpTestingController;
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -34,22 +34,17 @@ describe('Topic creation backend api service', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    TopicCreationBackendApiService = $injector.get(
-      'TopicCreationBackendApiService');
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
     });
-  }));
+    httpTestingController = TestBed.get(HttpTestingController);
+    topicCreationBackendApiService = TestBed.get(
+      TopicCreationBackendApiService);
+  });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(()=> {
+    httpTestingController.verify();
   });
 
   it('should successfully create a new topic and obtain the skill ID',
@@ -57,18 +52,17 @@ describe('Topic creation backend api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expectPOST('/topic_editor_handler/create_new').respond(
-        200, {topic_id: 'hyuy4GUlvTqJ'});
-      TopicCreationBackendApiService.createTopic(
+      topicCreationBackendApiService.createTopic(
         'topic-name', 'topic-abbr-name').then(successHandler, failHandler);
-      $httpBackend.flush();
-      expect(successHandler).toHaveBeenCalledWith(
-        {topic_id: 'hyuy4GUlvTqJ'});
-      expect(failHandler).not.toHaveBeenCalled();
+        var req = httpTestingController.expectOne(
+          '/topic_data_handler/0');
+        expect(req.request.method).toEqual('POST');
+        req.flush(sampleDataResults);
+    
     });
 
   it('should fail to create a new topic and call the fail handler',
-    () => {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 

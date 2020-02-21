@@ -16,35 +16,46 @@
  * @fileoverview Service to notify about creation of topic and obtain
  * topic_id.
  */
+import { downgradeInjectable } from "@angular/upgrade/static";
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
 
-angular.module('oppia').factory('TopicCreationBackendApiService', [
-  '$http', '$q',
-  function(
-      $http, $q) {
-    var _createTopic = function(
-        successCallback, errorCallback, abbreviatedTopicName, topicName) {
-      var postData = {
-        name: topicName,
-        abbreviated_name: abbreviatedTopicName
-      };
-      $http.post('/topic_editor_handler/create_new', postData)
-        .then(function(response) {
-          if (successCallback) {
-            successCallback(response.data);
-          }
-        }, function(response) {
-          if (errorCallback) {
-            errorCallback(response.data);
-          }
-        });
-    };
+@Injectable({
+  providedIn: 'root'
+})
 
-    return {
-      createTopic: function(topicName, abbreviatedTopicName) {
-        return $q(function(resolve, reject) {
-          _createTopic(resolve, reject, abbreviatedTopicName, topicName);
-        });
-      }
-    };
+export class TopicCreationBackendApiService {
+  topicDataDict: any;
+  constructor(
+    private http: HttpClient) { }
+
+  _createTopic(successCallback, errorCallback, topicName, abbreviatedTopicName): void  {
+    let postData = {
+      name: topicName,
+      abbreviated_name: abbreviatedTopicName
+    }
+    this.http.post(
+      '/topic_editor_handler/create_new', postData).toPromise()
+      .then((response:any) => {
+        console.log(response);
+        if (successCallback) {
+          successCallback({
+            topicId:response.topic_id
+          });
+        }
+      }, (errorResponse) => {
+        if (errorCallback) {
+          errorCallback(errorResponse.body)
+          console.log(errorResponse)
+        }
+      });
   }
-]);
+
+  createTopic(topicName: string, abbreviatedTopicName: string): Promise<Object> {
+    return new Promise((resolve, reject) => {
+      this._createTopic(resolve, reject, topicName, abbreviatedTopicName)
+    });
+  }
+}
+angular.module('oppia').factory('TopicCreationBackendApiService',
+  downgradeInjectable(TopicCreationBackendApiService));
