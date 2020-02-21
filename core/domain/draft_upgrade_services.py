@@ -102,14 +102,15 @@ class DraftUpgradeUtil(python_utils.OBJECT):
             list(ExplorationChange). The converted draft_change_list.
         """
         for i, change in enumerate(draft_change_list):
-            if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
+            if (change.cmd == exp_domain.CMD_ADD_CUSTOMIZATION_ARG and
                     change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS and
+                        change.interaction_id == 'SetInput'):
                 draft_change_list[i] = exp_domain.ExplorationChange({
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'interaction_id': 'SetInput',
+                    'cmd': exp_domain.CMD_ADD_CUSTOMIZATION_ARG,
                     'property_name': (
                         exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                    'state_name': change.state_name,
                     'new_value': {
                         'buttonText': change.new_value
                     }
