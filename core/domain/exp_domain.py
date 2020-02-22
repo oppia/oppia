@@ -2350,7 +2350,7 @@ class Exploration(python_utils.OBJECT):
         for state_dict in states_dict.values():
             # Get the voiceovers_mapping metadata.
             voiceovers_mapping = (state_dict['recorded_voiceovers']
-                          ['voiceovers_mapping'])
+                                  ['voiceovers_mapping'])
             language_codes_to_audio_metadata = voiceovers_mapping.values()
             for language_codes in language_codes_to_audio_metadata:
                 for audio_metadata in language_codes.values():

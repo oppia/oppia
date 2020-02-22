@@ -2004,7 +2004,7 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Expected duration_secs to be a float'):
             self.voiceover.validate()
-    
+
     def test_validate_int_duration_secs(self):
         self.voiceover.validate()
         self.voiceover.duration_secs = 10
