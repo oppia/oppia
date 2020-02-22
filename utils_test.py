@@ -328,3 +328,11 @@ class UtilsTests(test_utils.GenericTestBase):
             Exception, 'Unsupported audio language code: invalid_code'):
             utils.get_supported_audio_language_description(
                 invalid_language_code)
+
+    def test_snake_case_to_camel_case(self):
+        camel_case_str1 = utils.snake_case_to_camel_case('user_id_number')
+        camel_case_str2 = utils.snake_case_to_camel_case('hello_world')
+        camel_case_str3 = utils.snake_case_to_camel_case('test1')
+        self.assertEqual(camel_case_str1, 'userIdNumber')
+        self.assertEqual(camel_case_str2, 'helloWorld')
+        self.assertEqual(camel_case_str3, 'test1')
