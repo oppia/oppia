@@ -24,67 +24,122 @@ require('App.ts');
 require('domain/skill/skill-rights-backend-api.service.ts');
 require('pages/skill-editor-page/skill-editor-page.controller.ts');
 require('services/csrf-token.service.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+import { SkillRightsBackendApiService } from './skill-rights-backend-api.service';
 
-describe('Skill rights backend API service', function() {
-  var SkillRightsBackendApiService = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
-  var CsrfService = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector, $q) {
-    SkillRightsBackendApiService = $injector.get(
-      'SkillRightsBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
-    CsrfService = $injector.get('CsrfTokenService');
-
-    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
-      var deferred = $q.defer();
-      deferred.resolve('sample-csrf-token');
-      return deferred.promise;
+fdescribe('Skill rights backend API service', () => {
+  let skillRightsBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
     });
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    skillRightsBackendApiService=TestBed.get(SkillRightsBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  })
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
-  it('should report a cached skill rights after caching it', function() {
+  it('should report a cached skill rights after caching it', fakeAsync(() => {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     // The skill should not currently be cached.
-    expect(SkillRightsBackendApiService.isCached('0')).toBe(false);
+    expect(skillRightsBackendApiService.isCached('0')).toBe(false);
     // Cache a skill.
-    SkillRightsBackendApiService.cacheSkillRights('0', {
+    skillRightsBackendApiService.cacheSkillRights('0', {
       skill_id: '0',
-      can_edit_skill: true
+      can_edit_skill_description: true
     });
 
     // It should now be cached.
-    expect(SkillRightsBackendApiService.isCached('0')).toBe(true);
+    expect(skillRightsBackendApiService.isCached('0')).toBe(true);
 
     // A new skill should not have been fetched from the backend. Also,
     // the returned skill should match the expected skill object.
-    SkillRightsBackendApiService.loadSkillRights('0').then(
+    skillRightsBackendApiService.loadSkillRights('0').then(
       successHandler, failHandler);
-    $rootScope.$digest();
+    flushMicrotasks();
 
     expect(successHandler).toHaveBeenCalledWith({
       skill_id: '0',
       can_edit_skill: true
     });
     expect(failHandler).not.toHaveBeenCalled();
-  });
-});
+  }));
+
+})
+
+
+
+
+
+
+
+// describe('Skill rights backend API service', function() {
+//   var SkillRightsBackendApiService = null;
+//   var $rootScope = null;
+//   var $scope = null;
+//   var $httpBackend = null;
+//   var CsrfService = null;
+
+//   beforeEach(angular.mock.module('oppia'));
+//   beforeEach(angular.mock.module('oppia', function($provide) {
+//     var ugs = new UpgradedServices();
+//     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+//       $provide.value(key, value);
+//     }
+//   }));
+
+//   beforeEach(angular.mock.inject(function($injector, $q) {
+//     SkillRightsBackendApiService = $injector.get(
+//       'SkillRightsBackendApiService');
+//     $rootScope = $injector.get('$rootScope');
+//     $scope = $rootScope.$new();
+//     $httpBackend = $injector.get('$httpBackend');
+//     CsrfService = $injector.get('CsrfTokenService');
+
+//     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
+//       var deferred = $q.defer();
+//       deferred.resolve('sample-csrf-token');
+//       return deferred.promise;
+//     });
+//   }));
+
+//   afterEach(function() {
+//     $httpBackend.verifyNoOutstandingExpectation();
+//     $httpBackend.verifyNoOutstandingRequest();
+//   });
+
+//   it('should report a cached skill rights after caching it', function() {
+//     var successHandler = jasmine.createSpy('success');
+//     var failHandler = jasmine.createSpy('fail');
+
+//     // The skill should not currently be cached.
+//     expect(SkillRightsBackendApiService.isCached('0')).toBe(false);
+//     // Cache a skill.
+//     SkillRightsBackendApiService.cacheSkillRights('0', {
+//       skill_id: '0',
+//       can_edit_skill: true
+//     });
+
+//     // It should now be cached.
+//     expect(SkillRightsBackendApiService.isCached('0')).toBe(true);
+
+//     // A new skill should not have been fetched from the backend. Also,
+//     // the returned skill should match the expected skill object.
+//     SkillRightsBackendApiService.loadSkillRights('0').then(
+//       successHandler, failHandler);
+//     $rootScope.$digest();
+
+//     expect(successHandler).toHaveBeenCalledWith({
+//       skill_id: '0',
+//       can_edit_skill: true
+//     });
+//     expect(failHandler).not.toHaveBeenCalled();
+//   });
+// });

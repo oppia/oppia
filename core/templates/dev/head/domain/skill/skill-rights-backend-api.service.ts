@@ -1,6 +1,3 @@
-import { HttpClient } from "@angular/common/http";
-import { UrlInterpolationService } from "domain/utilities/url-interpolation.service";
-
 // Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,46 +16,83 @@ import { UrlInterpolationService } from "domain/utilities/url-interpolation.serv
  * @fileoverview Service to change the rights of skills in the backend.
  */
 
-
-
-
-
+import { cloneDeep } from "lodash";
+import { downgradeInjectable } from "@angular/upgrade/static";
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { ISkillRightBackendInterface } from "./SkillRightsObjectFactory";
+import { SkillEditorPageConstants } from 'pages/skill-editor-page/skill-editor-page.constants.ts';
+import { UrlInterpolationService } from "domain/utilities/url-interpolation.service";
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class SkillRightsBackendApiService {
+  skillRightsCache: any = null;
+  skillRightBackendDict:ISkillRightBackendInterface = null;
+  
   constructor(
     private urlInterpolationService: UrlInterpolationService,
-    private http: HttpClient
-  ){}
+    private http: HttpClient) { }
 
+  _fetchSkillRights(skillId, successCallback, errorCallback) {
+    let skillRightsUrl = this.urlInterpolationService.interpolateUrl(
+      SkillEditorPageConstants.SKILL_RIGHTS_URL_TEMPLATE, {
+      skill_id: skillId
+    });
 
-  _fetchSkillRights(skillId: string,
-    successCallback: (value?: Object | PromiseLike<Object>) => void,
-    errorCallback: (reason?: any) => void) {
-      var skillRightsUrl = this.urlInterpolationService.interpolateUrl(
-        SKILL_RIGHTS_URL_TEMPLATE, {
-          skill_id: skillId
+    this.http.get(skillRightsUrl, { observe: 'response' }).toPromise().then((response) => {
+      var responseData = response.body;
+      if (successCallback) {
+        successCallback({
+          skill_id: responseData['skill_id'],
+          can_edit_skill_description: responseData['can_edit_skill_description']
         });
+      }
+    }, function (errorResponse) {
+      if (errorCallback) {
+        errorCallback(errorResponse.data);
+      }
+    });
+  };
 
-      this.http.get(skillRightsUrl).toPromise().then((response) => {
-        var responseData = response.data;
-        if (successCallback) {
-          successCallback({
-            skill_id: responseData.skill_id,
-            can_edit_skill_description: responseData.can_edit_skill_description
-          });
+  _isCached(skillId) {
+    return this.skillRightsCache.hasOwnProperty(skillId);
+  };
+
+  fetchSkillRights(skillId: string) {
+    return new Promise((resolve, reject) => {
+      this._fetchSkillRights(skillId, resolve, reject);
+    });
+  }
+
+  loadSkillRights(skillId:string) {
+    return new Promise((resolve, reject) => {
+      if (this._isCached(skillId)) {
+        if(resolve) {
+          resolve(this.skillRightsCache[skillId]);
         }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
+      } else {
+          this._fetchSkillRights(skillId, (skillRights:ISkillRightBackendInterface) => {
+            this.skillRightsCache[skillId] = skillRights;
+            if(resolve) {
+              resolve(this.skillRightsCache[skillId]);
+            }
+          }, reject);
         }
-      });
-    };
+    });
+  }
+  isCached(skillId:string) {
+    return this._isCached(skillId);
+  }
+  cacheSkillRights(skillId:string, skillRights) {
+    this.skillRightsCache.skillId = cloneDeep(skillRights);
+  }
   
 }
+angular.module('oppia').factory(
+  'SkillRightsBackendApiService', downgradeInjectable(SkillRightsBackendApiService));
 
 
 
