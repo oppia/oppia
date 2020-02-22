@@ -19,16 +19,16 @@
 
 describe('Mark All Audio And Translations AsNeeding Update Controller',
   function() {
-    var $scope, ctrl, $uibModalInstance;
+    var $scope, $uibModalInstance;
 
     beforeEach(angular.mock.module('oppia'));
     beforeEach(angular.mock.inject(
-      function($injector, $controller, $rootScope) {
+      function($controller, $rootScope) {
         $scope = $rootScope.$new();
         $uibModalInstance = jasmine.createSpyObj(
           '$uibModalInstance', ['close', 'dismiss']);
 
-        ctrl = $controller(
+        $controller(
           'MarkAllAudioAndTranslationsAsNeedingUpdateController', {
             $scope: $scope,
             $uibModalInstance: $uibModalInstance
