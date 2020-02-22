@@ -40,6 +40,8 @@ angular.module('oppia').directive('adminMiscTab', [
         var ctrl = this;
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
+        var SEND_DUMMY_MAIL_HANDLER_URL = (
+          '/sendDummyMailToAdminHandler');
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
@@ -140,6 +142,17 @@ angular.module('oppia').directive('adminMiscTab', [
         var setDataExtractionQueryStatusMessage = function(message) {
           ctrl.showDataExtractionQueryStatus = true;
           ctrl.dataExtractionQueryStatusMessage = message;
+        };
+
+
+        ctrl.sendDummyMailToAdmin = function() {
+          $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
+            .then(function(response) {
+              ctrl.setStatusMessage('Success! Mail sent to admin.');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
         };
 
         ctrl.submitQuery = function() {

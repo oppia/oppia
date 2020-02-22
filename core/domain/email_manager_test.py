@@ -114,6 +114,44 @@ class EmailToAdminTest(test_utils.GenericTestBase):
             self.assertIn('Dummy Body', messages[0].html.decode())
 
 
+class DummyMailTest(test_utils.GenericTestBase):
+    """Test that emails are correctly sent to the testing email id."""
+
+    def test_sending_emails(self):
+        dummy_system_name = 'DUMMY_SYSTEM_NAME'
+        dummy_system_address = 'dummy@system.com'
+        dummy_receiver_address = 'admin@system.com'
+
+        send_email_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+        system_name_ctx = self.swap(
+            feconf, 'SYSTEM_EMAIL_NAME', dummy_system_name)
+        system_email_ctx = self.swap(
+            feconf, 'SYSTEM_EMAIL_ADDRESS', dummy_system_address)
+        admin_email_ctx = self.swap(
+            feconf, 'ADMIN_EMAIL_ADDRESS', dummy_receiver_address)
+
+        with send_email_ctx, system_name_ctx, system_email_ctx, admin_email_ctx:
+            # Make sure there are no emails already sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=dummy_receiver_address)
+            self.assertEqual(len(messages), 0)
+
+            # Send an email.
+            email_manager.send_dummy_mail_to_admin(dummy_system_name)
+
+            # Make sure emails are sent.
+            messages = self.mail_stub.get_sent_messages(
+                to=dummy_receiver_address)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].sender, 'DUMMY_SYSTEM_NAME <dummy@system.com>')
+            self.assertEqual(messages[0].to, dummy_receiver_address)
+            self.assertEqual(
+                messages[0].subject.decode(), 'Test Mail')
+            self.assertIn('This is a test mail from DUMMY_SYSTEM_NAME',
+                          messages[0].html.decode())
+
+
 class EmailRightsTest(test_utils.GenericTestBase):
     """Test that only certain users can send certain types of emails."""
 
