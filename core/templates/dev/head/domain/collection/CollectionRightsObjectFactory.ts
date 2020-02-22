@@ -24,61 +24,61 @@ import { Injectable } from '@angular/core';
 
 export interface ICollectionRights {
   getCollectionId: () => number;
-  canEdit: () => boolean;
-  isPrivate: () => boolean;
-  canUnpublish: () => boolean;
+  getCanEdit: () => boolean;
+  getIsPrivate: () => boolean;
+  getCanUnpublish: () => boolean;
   getOwnerNames: () => string[];
 }
 
 export class CollectionRights {
-  _collectionId: number;
-  _canEdit: boolean;
-  _canUnpublish: boolean;
-  _isPrivate: boolean;
-  _ownerNames: string[];
+  collectionId: number;
+  canEdit: boolean;
+  canUnpublish: boolean;
+  isPrivate: boolean;
+  ownerNames: string[];
 
   // TODO(#7176): Replace 'any' with the exact type. This has been kept as
   // 'any' because 'collectionRightsObject' is a dict with
   // underscore_cased keys which give tslint errors against underscore_casing
   // in favor of camelCasing.
   constructor(collectionRightsObject: any) {
-    this._collectionId = collectionRightsObject.collection_id;
-    this._canEdit = collectionRightsObject.can_edit;
-    this._canUnpublish = collectionRightsObject.can_unpublish;
-    this._isPrivate = collectionRightsObject.is_private;
-    this._ownerNames = collectionRightsObject.owner_names;
+    this.collectionId = collectionRightsObject.collection_id;
+    this.canEdit = collectionRightsObject.can_edit;
+    this.canUnpublish = collectionRightsObject.can_unpublish;
+    this.isPrivate = collectionRightsObject.is_private;
+    this.ownerNames = collectionRightsObject.owner_names;
   }
 
   getCollectionId(): number {
-    return this._collectionId;
+    return this.collectionId;
   }
 
   // Returns true if the the user can edit the collection. This property is
   // immutable.
-  canEdit(): boolean {
-    return this._canEdit;
+  getCanEdit(): boolean {
+    return this.canEdit;
   }
 
   // Returns true if the user can unpublish the collection.
-  canUnpublish(): boolean {
-    return this._canUnpublish;
+  getCanUnpublish(): boolean {
+    return this.canUnpublish;
   }
 
   // Returns true if the collection is private.
-  isPrivate(): boolean {
-    return this._isPrivate;
+  getIsPrivate(): boolean {
+    return this.isPrivate;
   }
 
   // Returns true if the collection is public.
-  isPublic(): boolean {
-    return !this._isPrivate;
+  getIsPublic(): boolean {
+    return !this.isPrivate;
   }
 
   // Sets isPrivate to false only if the user can edit the corresponding
   // collection.
   setPublic(): void {
-    if (this.canEdit()) {
-      this._isPrivate = false;
+    if (this.getCanEdit()) {
+      this.isPrivate = false;
     } else {
       throw new Error('User is not allowed to edit this collection.');
     }
@@ -86,8 +86,8 @@ export class CollectionRights {
 
   // Sets isPrivate to true only if canUnpublish and canEdit are both true.
   setPrivate(): void {
-    if (this.canEdit() && this.canUnpublish()) {
-      this._isPrivate = true;
+    if (this.getCanEdit() && this.getCanUnpublish()) {
+      this.isPrivate = true;
     } else {
       throw new Error('User is not allowed to unpublish this collection.');
     }
@@ -95,7 +95,7 @@ export class CollectionRights {
 
   // Returns the owner names of the collection. This property is immutable.
   getOwnerNames(): string[] {
-    return cloneDeep(this._ownerNames);
+    return cloneDeep(this.ownerNames);
   }
 
   // Returns the reference to the internal ownerNames array; this function is
@@ -105,7 +105,7 @@ export class CollectionRights {
   // object, so changes to the array itself may internally break the domain
   // object.
   getBindableOwnerNames(): string[] {
-    return this._ownerNames;
+    return this.ownerNames;
   }
 
   // Reassigns all values within this collection to match the existing
@@ -114,11 +114,11 @@ export class CollectionRights {
   // Note that the collection nodes within this collection will be completely
   // redefined as copies from the specified collection rights
   copyFromCollectionRights(otherCollectionRights: ICollectionRights): void {
-    this._collectionId = otherCollectionRights.getCollectionId();
-    this._canEdit = otherCollectionRights.canEdit();
-    this._isPrivate = otherCollectionRights.isPrivate();
-    this._canUnpublish = otherCollectionRights.canUnpublish();
-    this._ownerNames = otherCollectionRights.getOwnerNames();
+    this.collectionId = otherCollectionRights.getCollectionId();
+    this.canEdit = otherCollectionRights.getCanEdit();
+    this.isPrivate = otherCollectionRights.getIsPrivate();
+    this.canUnpublish = otherCollectionRights.getCanUnpublish();
+    this.ownerNames = otherCollectionRights.getOwnerNames();
   }
 }
 

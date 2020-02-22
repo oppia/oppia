@@ -73,12 +73,12 @@ describe('Collection rights object factory', () => {
 
     var sampleCollectionRights = collectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
-    expect(sampleCollectionRights.isPrivate()).toBe(true);
-    expect(sampleCollectionRights.isPublic()).toBe(false);
+    expect(sampleCollectionRights.getIsPrivate()).toBe(true);
+    expect(sampleCollectionRights.getIsPublic()).toBe(false);
 
     sampleCollectionRights.setPublic();
-    expect(sampleCollectionRights.isPrivate()).toBe(false);
-    expect(sampleCollectionRights.isPublic()).toBe(true);
+    expect(sampleCollectionRights.getIsPrivate()).toBe(false);
+    expect(sampleCollectionRights.getIsPublic()).toBe(true);
   });
 
   it('should throw error and not be able to set public when canEdit is false',
@@ -93,14 +93,14 @@ describe('Collection rights object factory', () => {
 
       var sampleCollectionRights = collectionRightsObjectFactory.create(
         initialCollectionRightsBackendObject);
-      expect(sampleCollectionRights.isPrivate()).toBe(true);
-      expect(sampleCollectionRights.isPublic()).toBe(false);
+      expect(sampleCollectionRights.getIsPrivate()).toBe(true);
+      expect(sampleCollectionRights.getIsPublic()).toBe(false);
 
       expect(() => {
         sampleCollectionRights.setPublic();
       }).toThrow(new Error('User is not allowed to edit this collection.'));
-      expect(sampleCollectionRights.isPrivate()).toBe(true);
-      expect(sampleCollectionRights.isPublic()).toBe(false);
+      expect(sampleCollectionRights.getIsPrivate()).toBe(true);
+      expect(sampleCollectionRights.getIsPublic()).toBe(false);
     }
   );
 
@@ -115,12 +115,12 @@ describe('Collection rights object factory', () => {
 
     var sampleCollectionRights = collectionRightsObjectFactory.create(
       initialCollectionRightsBackendObject);
-    expect(sampleCollectionRights.isPrivate()).toBe(false);
-    expect(sampleCollectionRights.isPublic()).toBe(true);
+    expect(sampleCollectionRights.getIsPrivate()).toBe(false);
+    expect(sampleCollectionRights.getIsPublic()).toBe(true);
 
     sampleCollectionRights.setPrivate();
-    expect(sampleCollectionRights.isPrivate()).toBe(true);
-    expect(sampleCollectionRights.isPublic()).toBe(false);
+    expect(sampleCollectionRights.getIsPrivate()).toBe(true);
+    expect(sampleCollectionRights.getIsPublic()).toBe(false);
   });
 
   it('should throw error when when canUnpublish is false during unpublishing',
@@ -135,8 +135,8 @@ describe('Collection rights object factory', () => {
 
       var sampleCollectionRights = collectionRightsObjectFactory.create(
         noUnpublishCollectionRightsBackendObject);
-      expect(sampleCollectionRights.isPrivate()).toBe(false);
-      expect(sampleCollectionRights.isPublic()).toBe(true);
+      expect(sampleCollectionRights.getIsPrivate()).toBe(false);
+      expect(sampleCollectionRights.getIsPublic()).toBe(true);
 
       expect(() => {
         sampleCollectionRights.setPrivate();
@@ -144,8 +144,8 @@ describe('Collection rights object factory', () => {
         new Error('User is not allowed to unpublish this collection.'));
 
       // Verify that the status remains unchanged.
-      expect(sampleCollectionRights.isPrivate()).toBe(false);
-      expect(sampleCollectionRights.isPublic()).toBe(true);
+      expect(sampleCollectionRights.getIsPrivate()).toBe(false);
+      expect(sampleCollectionRights.getIsPublic()).toBe(true);
     }
   );
 
@@ -155,9 +155,9 @@ describe('Collection rights object factory', () => {
 
     expect(
       emptyCollectionRightsBackendObject.getCollectionId()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.canEdit()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.isPrivate()).toBeUndefined();
+    expect(emptyCollectionRightsBackendObject.getCanEdit()).toBeUndefined();
+    expect(emptyCollectionRightsBackendObject.getCanUnpublish()).toBeUndefined();
+    expect(emptyCollectionRightsBackendObject.getIsPrivate()).toBeUndefined();
     expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual([]);
   });
 
@@ -179,9 +179,9 @@ describe('Collection rights object factory', () => {
     emptyCollectionRightsBackendObject.copyFromCollectionRights(
       sampleCollectionRights);
     expect(emptyCollectionRightsBackendObject.getCollectionId()).toEqual(0);
-    expect(emptyCollectionRightsBackendObject.canEdit()).toBe(true);
-    expect(emptyCollectionRightsBackendObject.canUnpublish()).toBe(false);
-    expect(emptyCollectionRightsBackendObject.isPrivate()).toBe(false);
+    expect(emptyCollectionRightsBackendObject.getCanEdit()).toBe(true);
+    expect(emptyCollectionRightsBackendObject.getCanUnpublish()).toBe(false);
+    expect(emptyCollectionRightsBackendObject.getIsPrivate()).toBe(false);
     expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual(['A']);
   });
 });
