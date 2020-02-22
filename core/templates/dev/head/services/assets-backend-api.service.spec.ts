@@ -27,7 +27,7 @@ import { ImageFileObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 // Jquery is needed in this file because some tests will spyOn Jquery methods.
-// The spies won't work correctly without the import.
+// The spies won't actually spy Jquery methods without the import.
 import $ from 'jquery';
 
 require('domain/utilities/url-interpolation.service.ts');
@@ -298,6 +298,10 @@ describe('Assets Backend API Service', function() {
       spyOn($, 'ajax').and.callFake(function() {
         var d = $.Deferred();
         d.reject({
+          // responseText contains a XSSI Prefix, which is represented by )]}'
+          // string. That's why double quotes is being used here. It's not
+          // possible to use \' instead of ' so the XSSI Prefix won't be
+          // evaluated correctly.
           /* eslint-disable quotes */
           responseText: ")]}'\n{ \"message\": \"" + errorMessage + "\" }"
           /* eslint-enable quotes */

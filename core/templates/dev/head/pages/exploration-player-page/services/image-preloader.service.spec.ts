@@ -71,6 +71,7 @@ describe('Image preloader service', function() {
   var UrlInterpolationService = null;
   var $rootScope = null;
   var explorationDict = null;
+  var exploration = null;
   var requestUrl1 = null;
   var requestUrl2 = null;
   var requestUrl3 = null;
@@ -474,17 +475,25 @@ describe('Image preloader service', function() {
         filename: 's6Hint1_height_60_width_60.png'
       });
 
-    var exploration = eof.createFromBackendDict(explorationDict);
-    ips.init(exploration);
-    ips.kickOffImagePreloader(exploration.getInitialState().name);
+    exploration = eof.createFromBackendDict(explorationDict);
   }));
 
   it('should be in exploration player after init is called', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     expect(ips.inExplorationPlayer()).toBe(true);
+  });
+
+  it('should not be in exploration player before init is called', function() {
+    expect(ips.inExplorationPlayer()).toBe(false);
   });
 
   it('should maintain the correct number of download requests in queue',
     function() {
+      ips.init(exploration);
+      ips.kickOffImagePreloader(exploration.getInitialState().name);
+
       $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
       $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
       $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
@@ -520,6 +529,9 @@ describe('Image preloader service', function() {
     });
 
   it('should properly restart pre-loading from a new state', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
     ips.restartImagePreloader('State 6');
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
@@ -529,6 +541,9 @@ describe('Image preloader service', function() {
 
   it('should start preloader when state changes and there is at least' +
     ' one file downloading', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     $httpBackend.expect('GET', requestUrl4).respond(201, 'image data 4');
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
     expect(ips.isLoadingImageFile(
@@ -544,6 +559,9 @@ describe('Image preloader service', function() {
 
   it('should not start preloader when state changes and there is no' +
     ' file downloading', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
     $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
     $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
@@ -562,6 +580,9 @@ describe('Image preloader service', function() {
 
   it('should check that there is sync between AssetsBackendApi Service and' +
     'ImagePreloader Service', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     var filenamesOfImageCurrentlyDownloading = (
       ips.getFilenamesOfImageCurrentlyDownloading());
     var imageFilesCurrentlyBeingRequested = (
@@ -576,6 +597,9 @@ describe('Image preloader service', function() {
 
   it('should maintain the filenames of image which failed to download',
     function() {
+      ips.init(exploration);
+      ips.kickOffImagePreloader(exploration.getInitialState().name);
+
       $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
       $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
       $httpBackend.expect('GET', requestUrl3).respond(404);
@@ -594,6 +618,9 @@ describe('Image preloader service', function() {
     });
 
   it('should calculate the dimensions of the image file', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     var dimensions1 = ips.getDimensionsOfImage(
       'sIOFeedback_height_50_width_50.png');
     expect(dimensions1.width).toBe(50);
@@ -615,6 +642,9 @@ describe('Image preloader service', function() {
   });
 
   it('should get image url', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
     $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
     $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
@@ -641,6 +671,9 @@ describe('Image preloader service', function() {
 
   it('should get image url when first loading fails and the second' +
     ' one is successful', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     $httpBackend.expect('GET', requestUrl1).respond(404);
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
     expect(ips.isInFailedDownload(
@@ -667,6 +700,9 @@ describe('Image preloader service', function() {
 
   it('should not get image url when loading image fails in both requests',
     function() {
+      ips.init(exploration);
+      ips.kickOffImagePreloader(exploration.getInitialState().name);
+
       $httpBackend.expect('GET', requestUrl1).respond(404);
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
       expect(ips.isInFailedDownload(
@@ -693,6 +729,9 @@ describe('Image preloader service', function() {
 
   it('should call the successful callback when loading an image after' +
     ' trying to get its image url', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
@@ -712,6 +751,9 @@ describe('Image preloader service', function() {
 
   it('should call the failed callback when loading an image fails after' +
   ' trying to get its image url', function() {
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 

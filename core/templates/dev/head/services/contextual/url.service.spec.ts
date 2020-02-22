@@ -17,12 +17,13 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import { UrlService } from 'services/contextual/url.service';
 import { WindowRef } from './window-ref.service';
 
 describe('Url Service', () => {
   let urlService: UrlService = null;
-  let windowRef = null;
+  let windowRef: WindowRef = null;
   let sampleHash = 'sampleHash';
   let pathname = '/embed';
   let mockLocation = null;
