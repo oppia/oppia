@@ -22,7 +22,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
 require('App.ts');
-require('expressions/expression-parser.service.js');
+require('expressions/expression-parser.service.ts');
 require('expressions/expression-syntax-tree.service.ts');
 require('expressions/expression-type-parser.service.ts');
 require('services/utils.service.ts');

@@ -64,11 +64,19 @@ describe('datetimeformatter', () => {
   });
 
   it('should provide correct date format MM/DD/YYY string', () => {
-    expect(df.getLocaleDateString(NOW_MILLIS)).toBe('11/21/2014');
-    expect(df.getLocaleDateString(NaN)).toBe('Invalid Date');
-
-    // Some enviroments will consider null date as 1/1/1970 other as 12/31/1969
-    const possibleExpectedDates = ['1/1/1970', '12/31/1969'];
-    expect(possibleExpectedDates).toContain(df.getLocaleDateString(null));
+    // Note to developers: This test is not ideal, because it tests the
+    // implementation rather than the interface. However, we have not found
+    // a way to retrieve the browser current locale that is used on
+    // Date methods. Since each user can have different date formats in
+    // their browser, this makes it tricky to test the returned day,
+    // month and year of df.getLocaleDateString, which is why
+    // toLocaleDateString() needs to be computed in the expected
+    // value of the test as well.
+    expect((new Date(NOW_MILLIS)).toLocaleDateString()).toBe(
+      df.getLocaleDateString(NOW_MILLIS));
+    expect((new Date(NaN).toLocaleDateString())).toBe(
+      df.getLocaleDateString(NaN));
+    expect((new Date(null)).toLocaleDateString()).toBe(
+      df.getLocaleDateString(null));
   });
 });

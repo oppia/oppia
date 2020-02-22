@@ -18,7 +18,6 @@
  */
 
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
-require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -29,14 +28,12 @@ require(
 
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
-  'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',
-  'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED',
-  'STATUS_IGNORED',
+  'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
+  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED',
   function(
       $http, $log, $q, AlertsService, ExplorationDataService,
-      FeedbackThreadObjectFactory, SuggestionObjectFactory,
-      SuggestionThreadObjectFactory, ACTION_ACCEPT_SUGGESTION, STATUS_FIXED,
-      STATUS_IGNORED) {
+      FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
+      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED) {
     var _expId = ExplorationDataService.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
@@ -72,38 +69,37 @@ angular.module('oppia').factory('ThreadDataService', [
     // Number of open threads that need action
     var _openThreadsCount = 0;
 
-    var _fetchThreads = function(onSuccess = () => {}) {
+    var _fetchThreads = function() {
       var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
       var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
         params: {target_type: 'exploration', target_id: _expId}
       });
 
       return $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
-        _data.feedbackThreads = res[0].data.feedback_thread_dicts.map(
+        let [threadsResponse, suggestionsResponse] = res.map(r => r.data);
+        _data.feedbackThreads = threadsResponse.feedback_thread_dicts.map(
           FeedbackThreadObjectFactory.createFromBackendDict);
 
         _data.suggestionThreads = [];
-        var suggestionThreads = res[0].data.suggestion_thread_dicts;
-        if (suggestionThreads.length !== res[1].data.suggestions.length) {
+        if (threadsResponse.suggestion_thread_dicts.length !==
+            suggestionsResponse.suggestions.length) {
           $log.error('Number of suggestion threads doesn\'t match number of' +
                      'suggestion objects');
+          return _data;
         }
         // TODO(brianrodri@): Move this pairing logic into the backend.
-        for (var i = 0; i < suggestionThreads.length; i++) {
-          for (var j = 0; j < res[1].data.suggestions.length; j++) {
-            var suggestion = (
-              SuggestionObjectFactory.createFromBackendDict(
-                res[1].data.suggestions[j]));
-            if (suggestionThreads[i].thread_id === suggestion.getThreadId()) {
-              var suggestionThread = (
+        for (let threadDict of threadsResponse.suggestion_thread_dicts) {
+          for (let suggestionDict of suggestionsResponse.suggestions) {
+            if (threadDict.thread_id === suggestionDict.suggestion_id) {
+              _data.suggestionThreads.push(
                 SuggestionThreadObjectFactory.createFromBackendDicts(
-                  suggestionThreads[i], res[1].data.suggestions[j]));
-              _data.suggestionThreads.push(suggestionThread);
+                  threadDict, suggestionDict));
               break;
             }
           }
         }
-      }).then(onSuccess);
+        return _data;
+      });
     };
 
     var _fetchMessages = function(threadId) {
@@ -113,12 +109,8 @@ angular.module('oppia').factory('ThreadDataService', [
     };
 
     return {
-      data: _data,
-      getData: function() {
-        return _data;
-      },
-      fetchThreads: function(onSuccess) {
-        return _fetchThreads(onSuccess);
+      fetchThreads: function() {
+        return _fetchThreads();
       },
       fetchMessages: function(threadId) {
         return _fetchMessages(threadId);
@@ -190,6 +182,9 @@ angular.module('oppia').factory('ThreadDataService', [
           thread.status =
             action === ACTION_ACCEPT_SUGGESTION ? STATUS_FIXED : STATUS_IGNORED;
           _openThreadsCount -= 1;
+          // TODO(#8678): Update the cache with the message
+          // instead of fetching the messages everytime from the backend
+          return _fetchMessages(threadId);
         }).then(onSuccess, onFailure);
       }
     };

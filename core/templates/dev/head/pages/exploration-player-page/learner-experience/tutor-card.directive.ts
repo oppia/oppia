@@ -78,9 +78,7 @@ angular.module('oppia').directive('tutorCard', [
         getDisplayedCard: '&displayedCard',
         startCardChangeAnimation: '=',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/learner-experience/' +
-        'tutor-card.directive.html'),
+      template: require('./tutor-card.directive.html'),
       controller: [
         '$anchorScroll', '$location', '$rootScope', '$scope',
         'AudioPlayerService', 'AudioPreloaderService',
