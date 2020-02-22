@@ -838,7 +838,7 @@ class Skill(python_utils.OBJECT):
         """Updates the explanation of the skill.
 
         Args:
-            explanation: dict. The new explanation of the skill.
+            explanation: SubtitledHtml. The new explanation of the skill.
         """
         old_content_ids = []
         if self.skill_contents.explanation:
