@@ -360,7 +360,12 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
-                    state.update_interaction_default_outcome(change.new_value)
+                    new_outcome = None
+                    if change.new_value:
+                        new_outcome = state_domain.Outcome.from_dict(
+                            change.new_value
+                        )
+                    state.update_interaction_default_outcome(new_outcome)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
