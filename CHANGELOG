@@ -1,5 +1,117 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.9.0 (22 Feb 2020)
+------------------------
+Bug fixes
+* Fix #8694: Places CSS for the loading message in the correct place. (#8695)
+* Fix #8603: fixing the invalid date in suggestion thread (#8673)
+* Fix #8600: Adds new placeholder message for feedback. (#8634)
+* Fix #8596: Removes unexpected div focus from interaction preview bar. (#8633)
+* Fix #8610: Makes backdrop static for profile image upload/edit modal. (#8620)
+* Fix #8608: Adds controllerAs for the map interaction (#8619)
+* Fix #8439. Buggy interaction with the author profiles element (#8460)
+* Fix #8209. Fixed fraction input errors. (#8454)
+* Fixes #8434: fixing one off jobs in prod_env (#8435)
+* Fix #8375: Add check for _submitAnswerFn (#8413)
+* Fixes #8371 Removing End interaction text.  (#8376)
+* Fix #8330: Add min selection message for interactions with radio buttons (#8365)
+* Learner Dahsboard fix UI detail (#8358)
+* Fix #8049 Changed display of oppia-icon-accessibility-label (#8328)
+* Fix #8215: Grammatical correctness while displaying date & time (#8357)
+
+Server Errors
+* Fix #6757: Add response headers to prevent caching of /userinfohandler (#8526)
+* Fix #8181: Change $apply to $applyAsync in Base.ts and library-page.directive.ts (#8466)
+* Fix #8464: Add a check for Error object in $exceptionHandler (#8465)
+
+Translations
+* Fix #8598: Console Error when Recording Voiceover (#8641)
+* Adds Malay language to the supported audio languages (#8585)
+
+Miscellaneous
+* Add swap to Google Fonts link (#8554)
+* Fix #8518: Add Security.txt (#8533)
+* Adds codeowner for community dashboard and translation project (#8494)
+* Update installation section of README (#8486)
+* Removed obsolete todo from PromoBar (#8457)
+* Tidy up feedback services (#8282)
+* Fix part of #7450: Make private global function public (#8255)
+* Fix part of #8038: Creates a backend service for collection-creation.service.ts (#8407)
+* Fix #7372: Added a cassifierTrainingJob.to_player_dict() function (#7931)
+
+Release team
+* Fix app.yaml generation (#8562)
+* Updates for maintenance mode (#8516)
+* Updates for renaming Changelog label (#8515)
+* Fixes issue with the update_changelog release script (#8478)
+* Modify release info generation for release summary to be generated independently  (#8474)
+* Fix instructions in changelog updation (#8473)
+* Updates to automation scripts to resolve issues faced in previous releases (#8425)
+
+Learner/Creator Pages
+* Fix #8602: Fetch the messages after updating the suggestion (#8624)
+* Fix part of #7643: Use webpack for more directives (#8540)
+* Fix #8449: Learn again button was surfaced incorrectly (#8536)
+* Fix delete card icon shown even when not editable (#8535)
+* Fix #8398: Use webpack to load HTML in interactions (#8503)
+* Fix #8403. Added shadow for nodes in collection view. (#8428)
+* Fix #8400. Changed 'audio' text and added an icon. (#8420)
+* Fix #8331: Add submit button for multiple choice interaction (mobile only) (#8374)
+* Fix #6433: Refactor open playthrough modal (#8117)
+* Fix #7336: add getLastUpdateTime() methods to Improvement Tasks  (#8101)
+* Fix #7661: Improvement icon notification in the navigation bar (#7865)
+
+Speed improvement
+* Fix #7605: Remove GLOBALS.TRANSLATOR_PROVIDER_FOR_TEST from karma-globals.ts (#8344)
+
+Data handling
+* Replace 'Admin' user_id with 'admin' (#8483)
+* Fix #8202: Delete GeneralFeedbackThreadUserModel that have user_id equal to None (#8481)
+* Wipeout 3.6: User ID migration changes (#8361)
+* Wipeout 4.4: Add account to be deleted page and send email (#8341)
+* Fix #8301: Implement delete_multi for exploration and collection right models (#8319)
+
+QA Team
+* Fix part of #6240: Admin one off jobs (#8455)
+* Fix part of #4057: Increase frontend test services from Milestone 2.2 (2nd PR) (#8433)
+* Fix part of #4057: Increase frontend test services from Milestone 2.2 (1st PR) (#8432)
+* Milestone 2.1 (5th PR) - Increase coverage for three services  (#8387)
+* Milestone 2.1 (4th PR) - Increase coverage for three services  (#8379)
+* Milestone 2.1 (3rd PR) - Increase coverage for three services (#8373)
+* Milestone 2.1 (2nd PR) - Increase coverage for three services (#8345)
+* Milestone 2.1 (1st PR) - Increase coverage for collection-rights-backend-api.service.ts and validators.service.ts (#8281)
+
+Angular Migration
+* Adds interceptor for Angular (#8507)
+* Fix #7403. Changed mathjs imports to partial imports. (#8467)
+* Migrate StoryViewerBackendApiService to angular (#8438)
+* Migrate ReviewTestBackendApiService to angular (#8302)
+* Upgrades StateImprovement Service to Angular (#8116)
+
+Developer experience
+* Fix #7957: Convert e2e bash script to a Python script (#8543)
+* Fix #8534: Revert commit related to failing test (#8537)
+* Increase angular timeout (#8509)
+* Increase the frontend tests timeout to 1 minute (#8502)
+* Remove unused file from FE coverage (#8459)
+* Fix frontend test timeout (#8453)
+* Updates Angular version in package.json & yarn.lock (#8430)
+* Fix pylint linter decoding error. (#8418)
+* Fix #7601: Remove separate typescript compilation (#8412)
+* Fix part of #7450: Tests private method through public interface (#8411)
+* Fix #7830, Added a custom lint check to ensure that there is an empty line between imports and fileoverview. (#8409)
+* Fix #8125. Changed setup.py to rename yarn folder (#8405)
+* Revert commits from frontend test configuration changes. (#8388)
+* Fix #7427: Added args in the docstring of core/jobs_registry.py (#8386)
+* Fix #8380: Move non-file-upload tests back to Travis (#8381)
+* Fix #7427: Adds args in docstring of core/domain/story_domain.py (#8377)
+* Adds readme to various folders (#8329)
+* Fix #8077: Upgrades Angular JS to version 1.7.9 (#8254)
+* Add new CircleCI job in order to check if any fully covered frontend file has decreased after PR changes (#8130)
+* Changes popper.js name to popper-core in manifest.json (#8442)
+* Fixes part of #5939: Custom pylint extension to ensure that docstring follow correct format. (#8410)
+
+
 v2.8.9 (01 Feb 2020)
 ------------------------
 Speed improvements
