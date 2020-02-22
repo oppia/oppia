@@ -156,7 +156,8 @@ describe('Collection rights object factory', () => {
     expect(
       emptyCollectionRightsBackendObject.getCollectionId()).toBeUndefined();
     expect(emptyCollectionRightsBackendObject.getCanEdit()).toBeUndefined();
-    expect(emptyCollectionRightsBackendObject.getCanUnpublish()).toBeUndefined();
+    expect(emptyCollectionRightsBackendObject.getCanUnpublish())
+      .toBeUndefined();
     expect(emptyCollectionRightsBackendObject.getIsPrivate()).toBeUndefined();
     expect(emptyCollectionRightsBackendObject.getOwnerNames()).toEqual([]);
   });
