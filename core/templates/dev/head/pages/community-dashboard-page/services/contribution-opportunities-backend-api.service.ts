@@ -39,7 +39,7 @@ export class ContributionOpportunitiesBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
   ) {}
-  /**  TODO: for some reason not able to import types (
+  /**  TODO(srijanreddy98): for some reason not able to import types (
   * OPPORTUNITY_TYPE_SKILL,
   * OPPORTUNITY_TYPE_TRANSLATION,
   * OPPORTUNITY_TYPE_VOICEOVER
