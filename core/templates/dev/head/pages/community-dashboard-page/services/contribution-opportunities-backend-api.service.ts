@@ -102,3 +102,6 @@ export class ContributionOpportunitiesBackendApiService {
   }
 }
 
+angular.module('oppia').factory(
+  'ContributionOpportunitiesBackendApiService',
+  downgradeInjectable(ContributionOpportunitiesBackendApiService));
