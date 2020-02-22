@@ -142,7 +142,7 @@ def mock_get_template(unused_self, filename):
         jinja2.environment.Template. The template for the given file.
     """
     filepath = get_filepath_from_filename(
-        filename, os.path.join('core', 'templates', 'dev', 'head', 'pages'))
+        filename, os.path.join('core', 'templates', 'pages'))
     with python_utils.open_file(filepath, 'r') as f:
         file_content = f.read()
     return jinja2.environment.Template(file_content)
