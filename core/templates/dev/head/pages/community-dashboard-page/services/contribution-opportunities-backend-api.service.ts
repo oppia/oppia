@@ -17,72 +17,88 @@
  * contributors to contribute.
  */
 
-require('domain/opportunity/ExplorationOpportunitySummaryObjectFactory.ts');
-require('domain/opportunity/SkillOpportunityObjectFactory.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import {
+  UrlInterpolationService
+} from 'domain/utilities/url-interpolation.service';
+import {
+  ExplorationOpportunitySummary
+} from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import {
+  SkillOpportunity
+} from 'domain/opportunity/SkillOpportunityObjectFactory';
 
-angular.module('oppia').factory('ContributionOpportunitiesBackendApiService', [
-  '$http', 'ExplorationOpportunitySummaryObjectFactory',
-  'SkillOpportunityObjectFactory', 'UrlInterpolationService',
-  'OPPORTUNITY_TYPE_SKILL', 'OPPORTUNITY_TYPE_TRANSLATION',
-  'OPPORTUNITY_TYPE_VOICEOVER',
-  function($http, ExplorationOpportunitySummaryObjectFactory,
-      SkillOpportunityObjectFactory, UrlInterpolationService,
-      OPPORTUNITY_TYPE_SKILL, OPPORTUNITY_TYPE_TRANSLATION,
-      OPPORTUNITY_TYPE_VOICEOVER) {
-    var urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
-    var _getOpportunityFromDict = function(opportunityType, opportunityDict) {
-      if (
-        opportunityType === OPPORTUNITY_TYPE_VOICEOVER ||
-        opportunityType === OPPORTUNITY_TYPE_TRANSLATION) {
-        return ExplorationOpportunitySummaryObjectFactory.createFromBackendDict(
-          opportunityDict);
-      } else if (opportunityType === OPPORTUNITY_TYPE_SKILL) {
-        return SkillOpportunityObjectFactory.createFromBackendDict(
-          opportunityDict);
+@Injectable({
+  providedIn: 'root'
+})
+export class ContributionOpportunitiesBackendApiService {
+  urlTemplate = '/opportunitiessummaryhandler/<opportunityType>';
+  constructor(
+    private urlInterpolationService: UrlInterpolationService,
+    private http: HttpClient
+  ) {}
+  /**  TODO: for some reason not able to import types (
+  * OPPORTUNITY_TYPE_SKILL,
+  * OPPORTUNITY_TYPE_TRANSLATION,
+  * OPPORTUNITY_TYPE_VOICEOVER
+  * )from constants.ts in assets */
+  _getOpportunityFromDict(opportunityType, opportunityDict) {
+    if (
+      opportunityType === 'voiceover' ||
+      opportunityType === 'translation') {
+      return new ExplorationOpportunitySummary(opportunityDict.id,
+        opportunityDict.topic_name, opportunityDict.story_title,
+        opportunityDict.chapter_title, opportunityDict.content_count,
+        opportunityDict.translation_counts);
+    } else if (opportunityType === 'skill') {
+      return new SkillOpportunity(
+        opportunityDict.id, opportunityDict.skill_description,
+        opportunityDict.topic_name, opportunityDict.question_count);
+    }
+  }
+
+  _fetchOpportunities(opportunityType, params, successCallback) {
+    this.http.get(this.urlInterpolationService.interpolateUrl(
+      this.urlTemplate, { opportunityType }
+    ), {
+      params
+    }).toPromise().then((data: any) => {
+      let opportunities = [];
+      for (let index in data.opportunities) {
+        opportunities.push(this._getOpportunityFromDict(
+          opportunityType, data.opportunities[index]));
       }
-    };
-    var _fetchOpportunities = function(
-        opportunityType, params, successCallback) {
-      return $http.get(
-        UrlInterpolationService.interpolateUrl(
-          urlTemplate, {opportunityType: opportunityType}
-        ), {
-          params: params
-        }).then(function(response) {
-        var data = response.data;
-        var opportunities = [];
-        for (var index in data.opportunities) {
-          opportunities.push(_getOpportunityFromDict(
-            opportunityType, data.opportunities[index]));
-        }
+      if (successCallback) {
         successCallback(opportunities, data.next_cursor, data.more);
-      });
-    };
-    return {
-      fetchSkillOpportunities: function(cursor, successCallback) {
-        var params = {
-          cursor: cursor
-        };
-        return _fetchOpportunities(
-          OPPORTUNITY_TYPE_SKILL, params, successCallback);
-      },
-      fetchTranslationOpportunities: function(
-          languageCode, cursor, successCallback) {
-        var params = {
-          language_code: languageCode,
-          cursor: cursor
-        };
-        return _fetchOpportunities(
-          OPPORTUNITY_TYPE_TRANSLATION, params, successCallback);
-      },
-      fetchVoiceoverOpportunities: function(
-          languageCode, cursor, successCallback) {
-        var params = {
-          language_code: languageCode,
-          cursor: cursor
-        };
-        return _fetchOpportunities(
-          OPPORTUNITY_TYPE_VOICEOVER, params, successCallback);
       }
+    }, (err) => {
+      // console.log(err);
+    });
+  }
+  fetchSkillOpportunities(cursor, successCallback) {
+    let params = {
+      cursor: cursor
     };
-  }]);
+    return this._fetchOpportunities(
+      'skill', params, successCallback);
+  }
+  fetchTranslationOpportunities( languageCode, cursor, successCallback ) {
+    let params = {
+      language_code: languageCode,
+      cursor: cursor
+    };
+    return this._fetchOpportunities(
+      'translation', params, successCallback);
+  }
+  fetchVoiceoverOpportunities(languageCode, cursor, successCallback) {
+    const params = {
+      language_code: languageCode,
+      cursor: cursor
+    };
+    return this._fetchOpportunities(
+      'voiceover', params, successCallback);
+  }
+}
+
