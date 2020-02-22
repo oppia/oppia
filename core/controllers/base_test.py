@@ -63,7 +63,7 @@ class UniqueTemplateNamesTests(test_utils.GenericTestBase):
 
     def test_template_filenames_are_unique(self):
         templates_dir = os.path.join(
-            'core', 'templates', 'dev', 'head', 'pages')
+            'core', 'templates', 'pages')
         all_template_names = []
         for root, _, filenames in os.walk(templates_dir):
             template_filenames = [
@@ -798,7 +798,7 @@ class I18nDictsTests(test_utils.GenericTestBase):
         """Tests that keys in HTML files are present in en.json."""
         en_key_list = self._extract_keys_from_json_file('en.json')
         dirs_to_search = [
-            os.path.join('core', 'templates', 'dev', 'head'),
+            os.path.join('core', 'templates', ''),
             'extensions']
         files_checked = 0
         missing_keys_count = 0

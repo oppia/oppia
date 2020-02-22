@@ -707,8 +707,7 @@ def _lint_all_files(
     config_path_for_css_in_html = os.path.join(
         parent_dir, 'oppia', '.stylelintrc')
     config_path_for_oppia_css = os.path.join(
-        parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
-        'css', '.stylelintrc')
+        parent_dir, 'oppia', 'core', 'templates', 'css', '.stylelintrc')
     if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
         python_utils.PRINT('')
         python_utils.PRINT(
