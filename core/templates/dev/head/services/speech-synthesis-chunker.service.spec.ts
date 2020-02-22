@@ -17,6 +17,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+
 import { SpeechSynthesisChunkerService } from
   'services/speech-synthesis-chunker.service';
 
@@ -34,8 +35,8 @@ describe('Speech Synthesis Chunker Service', () => {
   describe('formatLatexToSpeakableText', () => {
     it('should properly convert subtraction in LaTeX to speakable text',
       () => {
-        var latex1 = '5-3';
-        var latex2 = 'i-j';
+        var latex1 = '5 - 3';
+        var latex2 = 'i - j';
         var speakableLatex1 =
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
         var speakableLatex2 =
@@ -81,10 +82,10 @@ describe('Speech Synthesis Chunker Service', () => {
 
     it('should properly convert exponents in LaTeX to speakable text',
       () => {
-        var latex1 = 'x^2';
-        var latex2 = '42^4';
-        var latex3 = 'x^62';
-        var latex4 = '3n^4x';
+        var latex1 = 'x ^ 2';
+        var latex2 = '42 ^ 4';
+        var latex3 = 'x ^ 62';
+        var latex4 = '3n ^ 4x';
         var speakableLatex1 =
           speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
         var speakableLatex2 =
@@ -106,11 +107,11 @@ describe('Speech Synthesis Chunker Service', () => {
       var latex2 = '\\\\cos{0}';
       var latex3 = '\\\\tan{uv}';
       var speakableLatex1 =
-          speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
+        speechSynthesisChunkerService.formatLatexToSpeakableText(latex1);
       var speakableLatex2 =
-          speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
+        speechSynthesisChunkerService.formatLatexToSpeakableText(latex2);
       var speakableLatex3 =
-          speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
+        speechSynthesisChunkerService.formatLatexToSpeakableText(latex3);
       expect(speakableLatex1).toEqual('the sine of 90');
       expect(speakableLatex2).toEqual('the cosine of 0');
       expect(speakableLatex3).toEqual('the tangent of u v');
@@ -118,21 +119,21 @@ describe('Speech Synthesis Chunker Service', () => {
   });
 
   describe('convertToSpeakableText', () => {
-    it('should properly convert to speakable text when raw_latex-with-value' +
-      ' attribute is setted', () => {
+    it('should properly convert the raw_latex-with-value attribute to' +
+      ' speakable text', () => {
       const html = (
-        '<oppia-noninteractive-math raw_latex-with-value="5-1">' +
+        '<oppia-noninteractive-math raw_latex-with-value="5 - 1">' +
         '</oppia-noninteractive-math>' +
         '<li>Speech</li>' +
         '<li>Text</li>'
       );
 
       expect(speechSynthesisChunkerService.convertToSpeakableText(html))
-        .toBe('5 minus 1Speech. Text. ');
+        .toBe('5 minus 1 Speech. Text. ');
     });
 
-    it('should properly convert to speakable text when text-with-value' +
-      ' attribute is setted', () => {
+    it('should properly convert the text-with-value attribute to' +
+      ' speakable text', () => {
       const html = (
         '<oppia-noninteractive-link text-with-value="&quot;">' +
         '</oppia-noninteractive-link>' +
@@ -155,11 +156,16 @@ describe('Speech Synthesis Chunker Service', () => {
 
     beforeEach(() => {
       spyOn(window, 'SpeechSynthesisUtterance').and.returnValue(
-        // @ts-ignore
+        // @ts-ignore mock doesn't have all property and methods of a native
+        // SpeechSynthesisUtterance
         mockSpeechSynthesisUtteran);
     });
 
     it('should not speak when chunk is too short', () => {
+      const speakSpy = spyOn(window.speechSynthesis, 'speak').and
+        .callFake(function() {
+          mockSpeechSynthesisUtteran.onend();
+        });
       const speechSynthesisUtterance = (
         new MockSpeechSynthesisUtteranceConstructor('a'));
       const callbackSpy = jasmine.createSpy('callback');
@@ -167,9 +173,14 @@ describe('Speech Synthesis Chunker Service', () => {
         speechSynthesisUtterance, callbackSpy);
 
       expect(callbackSpy).toHaveBeenCalled();
+      expect(speakSpy).not.toHaveBeenCalled();
     });
 
     it('should not speak when chunk is a falsy value', () => {
+      const speakSpy = spyOn(window.speechSynthesis, 'speak').and
+        .callFake(function() {
+          mockSpeechSynthesisUtteran.onend();
+        });
       const speechSynthesisUtterance = (
         new MockSpeechSynthesisUtteranceConstructor(''));
       const callbackSpy = jasmine.createSpy('callback');
@@ -177,9 +188,12 @@ describe('Speech Synthesis Chunker Service', () => {
         speechSynthesisUtterance, callbackSpy);
 
       expect(callbackSpy).toHaveBeenCalled();
+      expect(speakSpy).not.toHaveBeenCalled();
     });
 
     it('should speak speech twice', () => {
+      // For some reason, just call install doesn't work, we need to uninstall
+      // first so then actually install.
       jasmine.clock().uninstall();
       jasmine.clock().install();
 
