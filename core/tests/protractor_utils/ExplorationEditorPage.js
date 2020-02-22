@@ -17,24 +17,23 @@
  * tests.
  */
 var waitFor = require('./waitFor.js');
-
 var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
 var ExplorationEditorHistoryTab = require(
-  '../protractor_utils/ExplorationEditorHistoryTab.js'
-);
+  '../protractor_utils/ExplorationEditorHistoryTab.js');
 var ExplorationEditorImprovementsTab = require(
   '../protractor_utils/ExplorationEditorImprovementsTab.js'
 );
 var ExplorationEditorMainTab = require(
-  '../protractor_utils/ExplorationEditorMainTab.js'
-);
+  '../protractor_utils/ExplorationEditorMainTab.js');
 var ExplorationEditorSettingsTab = require(
   '../protractor_utils/ExplorationEditorSettingsTab.js');
 var ExplorationEditorStatsTab = require(
   '../protractor_utils/ExplorationEditorStatsTab.js');
 var ExplorationEditorTranslationTab = require(
   '../protractor_utils/ExplorationEditorTranslationTab.js');
+var ExplorationPlayerPage = require(
+  '../protractor_utils/ExplorationPlayerPage.js');
 
 var ExplorationEditorPage = function() {
   /*
@@ -62,6 +61,9 @@ var ExplorationEditorPage = function() {
   this.getTranslationTab = function() {
     return new ExplorationEditorTranslationTab
       .ExplorationEditorTranslationTab();
+  };
+  this.getPreviewTab = function() {
+    return new ExplorationPlayerPage.ExplorationPlayerPage();
   };
 
   /*
