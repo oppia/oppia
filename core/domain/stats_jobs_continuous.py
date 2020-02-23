@@ -122,7 +122,7 @@ class InteractionAnswerSummariesMRJobManager(
                     Occurs when version mismatches and the new
                     version has a different interaction ID.
                 - Expected valid exploration id, version, and state name triple:
-                    Occurs when the key to reduce can not be split into
+                    Occurs when the key to reduce cannot be split into
                     components.
         """
         try:
