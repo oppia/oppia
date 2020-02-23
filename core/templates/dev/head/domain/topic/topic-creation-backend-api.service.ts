@@ -18,12 +18,12 @@
  */
 
 export interface ITopicBackendInterface {
-  name: string,
-  abbreviated_name: string
+  'name': string,
+  'abbreviated_name': string
 }
-import { downgradeInjectable } from "@angular/upgrade/static";
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
@@ -33,31 +33,32 @@ export class TopicCreationBackendApiService {
   constructor(private http: HttpClient) { }
 
   _createTopic(
-    successCallback: (value?: Object | PromiseLike<Object>) => void,
-    errorCallback:(reason?: any) => void,
-    topicName, abbreviatedTopicName): void  {
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback:(reason?: any) => void,
+      topicName, abbreviatedTopicName): void {
     let postData:ITopicBackendInterface = {
       name: topicName,
       abbreviated_name: abbreviatedTopicName
-    }
+    };
     this.http.post(
       '/topic_editor_handler/create_new', postData).toPromise()
-      .then((response:{ topicId:string }) => {
+      .then((response: { topicId:string }) => {
         if (successCallback) {
           successCallback({
-            topicId:response.topicId
+            topicId: response.topicId
           });
         }
       }, (errorResponse) => {
         if (errorCallback) {
-          errorCallback(errorResponse.body)
+          errorCallback(errorResponse.body);
         }
       });
   }
 
-  createTopic(topicName: string, abbreviatedTopicName: string): PromiseLike<Object> {
+  createTopic(
+      topicName: string, abbreviatedTopicName: string): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
-      this._createTopic(resolve, reject, topicName, abbreviatedTopicName)
+      this._createTopic(resolve, reject, topicName, abbreviatedTopicName);
     });
   }
 }

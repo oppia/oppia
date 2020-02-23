@@ -21,17 +21,18 @@ import { HttpClientTestingModule, HttpTestingController }
   from '@angular/common/http/testing';
 import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 import { CsrfTokenService } from 'services/csrf-token.service';
-import {  TopicCreationBackendApiService } from
-  'domain/topic/topic-creation-backend-api.service.ts'
-  
-describe('Topic creation backend api service', function() {
+import { TopicCreationBackendApiService } from
+  'domain/topic/topic-creation-backend-api.service.ts';
+
+describe('Topic creation backend api service', () => {
   var csrfService: CsrfTokenService = null;
   var httpTestingController: HttpTestingController = null;
   var topicCreationBackendApiService:TopicCreationBackendApiService = null;
   var postData = {
-    name : 'topic-name',
-    abbreviated_name:'topic-abbr-name'
+    name: 'topic-name',
+    abbreviated_name: 'topic-abbr-name'
   };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -42,7 +43,6 @@ describe('Topic creation backend api service', function() {
     httpTestingController = TestBed.get(HttpTestingController);
     topicCreationBackendApiService = TestBed.get(
       TopicCreationBackendApiService);
-
     spyOn(csrfService, 'getTokenAsync').and.callFake(() => {
       return new Promise((resolve) => {
         resolve('sample-csrf-token');
@@ -60,9 +60,9 @@ describe('Topic creation backend api service', function() {
       let failHandler = jasmine.createSpy('fail');
       topicCreationBackendApiService.createTopic(
         'topic-name', 'topic-abbr-name').then(
-          successHandler);
+        successHandler);
       var req = httpTestingController.expectOne(
-          '/topic_editor_handler/create_new');
+        '/topic_editor_handler/create_new');
       expect(req.request.method).toEqual('POST');
       expect(req.request.body).toEqual(postData);
       req.flush(postData);
@@ -79,11 +79,12 @@ describe('Topic creation backend api service', function() {
         'topic-name', 'topic-abbr-name').then(
         successHandler, failHandler);
       const errorResponse = new HttpErrorResponse({
-          error: 'test 404 error',
-          status: 404,
-          statusText: 'Not Found'
-        });
-      var req = httpTestingController.expectOne('/topic_editor_handler/create_new');
+        error: 'test 404 error',
+        status: 404,
+        statusText: 'Not Found'
+      });
+      var req = httpTestingController.expectOne(
+        '/topic_editor_handler/create_new');
       req.error(new ErrorEvent('Error'), errorResponse);
       flushMicrotasks();
       expect(req.request.method).toEqual('POST');

@@ -21,10 +21,10 @@ require('services/alerts.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
-  '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
+  '$rootScope', '$uibModal', '$window', 'AlertsService',
   'TopicCreationBackendApiService', 'UrlInterpolationService',
   function(
-      $rootScope, $timeout, $uibModal, $window, AlertsService,
+      $rootScope, $uibModal, $window, AlertsService,
       TopicCreationBackendApiService, UrlInterpolationService) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topic_id>';
     var topicCreationInProgress = false;
@@ -81,11 +81,11 @@ angular.module('oppia').factory('TopicCreationService', [
           TopicCreationBackendApiService.createTopic(
             topic.topicName, topic.abbreviatedTopicName).then(
             function(response) {
-                $window.location = UrlInterpolationService.interpolateUrl(
-                  TOPIC_EDITOR_URL_TEMPLATE, {
-                    topic_id: response.topicId
-                  }
-                );
+              $window.location = UrlInterpolationService.interpolateUrl(
+                TOPIC_EDITOR_URL_TEMPLATE, {
+                  topic_id: response.topicId
+                }
+              );
             }, function() {
               $rootScope.loadingMessage = '';
             });

@@ -37,6 +37,7 @@ import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
+import { RequestInterceptor } from 'services/request-interceptor.service';
 import { ServicesConstants } from 'services/services.constants';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants';
@@ -46,7 +47,6 @@ import { TopicsAndSkillsDashboardDomainConstants } from
 import { TopicsAndSkillsDashboardPageConstants } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 /* eslint-enable max-len */
-import { RequestInterceptor } from 'services/request-interceptor.service';
 
 @NgModule({
   imports: [
