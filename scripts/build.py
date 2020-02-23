@@ -58,8 +58,8 @@ EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
 TEMPLATES_DEV_DIR = os.path.join('templates', '')
 TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('core', 'templates', ''),
-    'staging_dir': os.path.join('backend_prod_files', 'templates', ''),
-    'out_dir': os.path.join('build', 'templates', '')
+    'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
+    'out_dir': os.path.join('build', 'templates', 'head', '')
 }
 WEBPACK_DIRNAMES_TO_DIRPATHS = {
     'staging_dir': os.path.join('backend_prod_files', 'webpack_bundles', ''),
