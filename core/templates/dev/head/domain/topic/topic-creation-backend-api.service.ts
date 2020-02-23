@@ -16,6 +16,7 @@
  * @fileoverview Service to notify about creation of topic and obtain
  * topic_id.
  */
+
 export interface ITopicBackendInterface {
   name: string,
   abbreviated_name: string
@@ -29,9 +30,7 @@ import { Injectable } from "@angular/core";
 })
 
 export class TopicCreationBackendApiService {
-  topicDataDict: any;
-  constructor(
-    private http: HttpClient) { }
+  constructor(private http: HttpClient) { }
 
   _createTopic(
     successCallback: (value?: Object | PromiseLike<Object>) => void,
@@ -42,16 +41,14 @@ export class TopicCreationBackendApiService {
       abbreviated_name: abbreviatedTopicName
     }
     this.http.post(
-      '/topic_editor_handler/create_new', { data: postData }).toPromise()
-      .then((response:any) => {
-        console.log(response);
+      '/topic_editor_handler/create_new', postData).toPromise()
+      .then((response:{ topicId:string }) => {
         if (successCallback) {
           successCallback({
-            topicId:response.data.topic_id
+            topicId:response.topicId
           });
         }
       }, (errorResponse) => {
-        console.log(errorResponse)
         if (errorCallback) {
           errorCallback(errorResponse.body)
         }

@@ -22,7 +22,7 @@ import 'zone.js';
 import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
@@ -46,6 +46,7 @@ import { TopicsAndSkillsDashboardDomainConstants } from
 import { TopicsAndSkillsDashboardPageConstants } from
   'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants';
 /* eslint-enable max-len */
+import { RequestInterceptor } from 'services/request-interceptor.service';
 
 @NgModule({
   imports: [
@@ -66,7 +67,12 @@ import { TopicsAndSkillsDashboardPageConstants } from
     SkillDomainConstants,
     TopicDomainConstants,
     TopicsAndSkillsDashboardDomainConstants,
-    TopicsAndSkillsDashboardPageConstants
+    TopicsAndSkillsDashboardPageConstants,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    }
   ]
 })
 class TopicsAndSkillsDashboardPageModule {

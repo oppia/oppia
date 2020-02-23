@@ -83,7 +83,7 @@ angular.module('oppia').factory('TopicCreationService', [
             function(response) {
                 $window.location = UrlInterpolationService.interpolateUrl(
                   TOPIC_EDITOR_URL_TEMPLATE, {
-                    topic_id: response.data.topicId
+                    topic_id: response.topicId
                   }
                 );
             }, function() {
