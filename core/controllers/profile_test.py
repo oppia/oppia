@@ -549,8 +549,10 @@ class EmailPreferencesTests(test_utils.GenericTestBase):
 class ProfilePictureHandlerTests(test_utils.GenericTestBase):
 
     def test_get_profile_picture_with_updated_value(self):
-        self.get_json(
-            '/preferenceshandler/profile_picture', expected_status_int=401)
+        response = self.get_json(
+            '/preferenceshandler/profile_picture', expected_status_int=200)
+        self.assertEqual(
+            response['profile_picture_data_url'], None)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.login(self.OWNER_EMAIL)
@@ -793,6 +795,14 @@ class DeleteAccountHandlerTests(test_utils.GenericTestBase):
 
 class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
 
+    def setUp(self):
+        super(PendingAccountDeletionPageTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.login(self.EDITOR_EMAIL)
+        user_services.mark_user_for_deletion(
+            user_services.get_user_id_from_username(self.EDITOR_USERNAME),
+            [], [])
+
     def test_get_pending_account_deletion_page(self):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
             response = self.get_html_response('/pending-account-deletion')
@@ -802,6 +812,12 @@ class PendingAccountDeletionPageTests(test_utils.GenericTestBase):
         with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', False):
             self.get_html_response('/pending-account-deletion',
                                    expected_status_int=404)
+
+    def test_get_pending_account_deletion_page_redirect(self):
+        self.logout()
+        with self.swap(constants, 'ENABLE_ACCOUNT_DELETION', True):
+            self.get_html_response(
+                '/pending-account-deletion', expected_status_int=302)
 
 
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
