@@ -37,12 +37,43 @@ angular.module('oppia').factory('ThreadDataService', [
       ThreadMessageObjectFactory, ACTION_ACCEPT_SUGGESTION, STATUS_FIXED,
       STATUS_IGNORED, STATUS_OPEN) {
     let expId = ExplorationDataService.explorationId;
-    let FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + expId;
-    let FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
-    let SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' + expId;
-    let SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
-    let THREAD_HANDLER_URL = '/threadhandler';
-    let THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
+
+    let getThreadListHandlerUrl = function() {
+      return '/threadlisthandler/';
+    };
+
+    let getFeedbackStatsHandlerUrl = function() {
+      return UrlInterpolationService.interpolateUrl(
+        '/feedbackstatshandler/<exploration_id>', {
+          exploration_id: expId
+        });
+    };
+
+    let getFeedbackThreadViewEventUrl = function(threadId) {
+      return UrlInterpolationService.interpolateUrl(
+        '/feedbackhandler/thread_view_event/<thread_id>', {
+          thread_id: threadId
+        });
+    };
+
+    let getSuggestionActionHandlerUrl = function(threadId) {
+      return UrlInterpolationService.interpolateUrl(
+        '/suggestionactionhandler/<exploration_id>/<thread_id>', {
+          exploration_id: expId,
+          thread_id: threadId
+        });
+    };
+
+    let getThreadHandlerUrl = function(threadId) {
+      return UrlInterpolationService.interpolateUrl(
+        '/threadhandler/<thread_id>', {
+          thread_id: threadId
+        });
+    };
+
+    let getSuggestionListHandlerUrl = function() {
+      return '/suggestionlisthandler';
+    };
 
     // Holds all the threads for this exploration. This is an object whose
     // values are objects, each representing threads, keyed by their IDs.
@@ -81,10 +112,10 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       fetchThreads: function() {
-        let suggestionPromise = $http.get(SUGGESTION_LIST_HANDLER_URL, {
+        let suggestionPromise = $http.get(getSuggestionListHandlerUrl(), {
           params: {target_type: 'exploration', target_id: expId}
         });
-        let threadPromise = $http.get(THREAD_LIST_HANDLER_URL);
+        let threadPromise = $http.get(getThreadListHandlerUrl());
 
         return $q.all([suggestionPromise, threadPromise]).then(response => {
           let [suggestionResponse, threadResponse] = response.map(r => r.data);
@@ -109,14 +140,14 @@ angular.module('oppia').factory('ThreadDataService', [
       fetchMessages: function(thread) {
         let threadId = thread.threadId;
 
-        return $http.get(THREAD_HANDLER_URL + '/' + threadId).then(response => {
+        return $http.get(getThreadHandlerUrl(threadId)).then(response => {
           thread.setMessages(response.data.messages.map(
             ThreadMessageObjectFactory.createFromBackendDict));
         });
       },
 
       fetchFeedbackStats: function() {
-        return $http.get(FEEDBACK_STATS_HANDLER_URL).then(response => {
+        return $http.get(getFeedbackStatsHandlerUrl()).then(response => {
           openThreadsCount = response.data.num_open_threads;
         });
       },
@@ -126,7 +157,7 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       createNewThread: function(newSubject, newText) {
-        return $http.post(THREAD_LIST_HANDLER_URL, {
+        return $http.post(getThreadListHandlerUrl(), {
           state_name: null,
           subject: newSubject,
           text: newText
@@ -140,8 +171,7 @@ angular.module('oppia').factory('ThreadDataService', [
 
       markThreadAsSeen: function(thread) {
         let threadId = thread.threadId;
-
-        return $http.post(FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId, {
+        return $http.post(getFeedbackThreadViewEventUrl(threadId), {
           thread_id: threadId
         });
       },
@@ -151,7 +181,7 @@ angular.module('oppia').factory('ThreadDataService', [
         let oldStatus = thread.status;
         let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
 
-        return $http.post(THREAD_HANDLER_URL + '/' + threadId, {
+        return $http.post(getThreadHandlerUrl(threadId), {
           updated_status: updatedStatus,
           updated_subject: null,
           text: newMessage
@@ -170,7 +200,7 @@ angular.module('oppia').factory('ThreadDataService', [
           thread, action, commitMsg, reviewMsg, audioUpdateRequired) {
         let threadId = thread.threadId;
 
-        return $http.put(SUGGESTION_ACTION_HANDLER_URL + '/' + threadId, {
+        return $http.put(getSuggestionActionHandlerUrl(threadId), {
           action: action,
           review_message: reviewMsg,
           commit_message: action === ACTION_ACCEPT_SUGGESTION ? commitMsg : null
