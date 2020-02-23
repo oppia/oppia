@@ -779,19 +779,12 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'
+            ), False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -1757,36 +1750,24 @@ class ExplorationContentValidationJobForCKEditorTests(
             )
         }
 
-        default_outcome_dict1 = {
-            'dest': 'State2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
+        default_outcome1 = state_domain.Outcome(
+            'State2', state_domain.SubtitledHtml(
+                'default_outcome',
+                '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
+            ), False, [], None, None
+        )
+        default_outcome2 = state_domain.Outcome(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
                     '<pre>Hello this is <b> testing '
                     '<oppia-noninteractive-image filepath-with-value="amp;quot;'
                     'random.png&amp;quot;"></oppia-noninteractive-image> in '
                     '</b>progress</pre>'
-
                 )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
+            ), False, [], None, None,
+        )
 
         mock_validate_context = self.swap(
             state_domain.SubtitledHtml, 'validate', mock_validate)
@@ -1799,8 +1780,8 @@ class ExplorationContentValidationJobForCKEditorTests(
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
 
-            state1.update_interaction_default_outcome(default_outcome_dict1)
-            state2.update_interaction_default_outcome(default_outcome_dict2)
+            state1.update_interaction_default_outcome(default_outcome1)
+            state2.update_interaction_default_outcome(default_outcome2)
             exp_services.save_new_exploration(self.albert_id, exploration)
             job_id = (
                 exp_jobs_one_off
@@ -1939,22 +1920,18 @@ class InteractionCustomizationArgsValidationJobTests(
                 '</oppia-noninteractive-tabs>'
             )
         }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
+        default_outcome2 = state_domain.Outcome(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
                     '<p><oppia-noninteractive-link text-with-value="'
                     '&amp;quot;What is a link?&amp;quot;" url-with-'
                     'value="&amp;quot;htt://link.com&amp'
                     ';quot;"></oppia-noninteractive-link></p>'
                 )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
+            ), False, [], None, None
+        )
         content3_dict = {
             'content_id': 'content',
             'html': (
@@ -1969,7 +1946,7 @@ class InteractionCustomizationArgsValidationJobTests(
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
-            state2.update_interaction_default_outcome(default_outcome_dict2)
+            state2.update_interaction_default_outcome(default_outcome2)
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)
