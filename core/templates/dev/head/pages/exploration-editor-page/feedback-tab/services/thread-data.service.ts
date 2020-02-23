@@ -29,13 +29,13 @@ require(
 angular.module('oppia').factory('ThreadDataService', [
   '$http', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
-  'ThreadMessageObjectFactory', 'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED',
-  'STATUS_IGNORED', 'STATUS_OPEN',
+  'ThreadMessageObjectFactory', 'UrlInterpolationService',
+  'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
   function(
       $http, $q, AlertsService, ExplorationDataService,
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
-      ThreadMessageObjectFactory, ACTION_ACCEPT_SUGGESTION, STATUS_FIXED,
-      STATUS_IGNORED, STATUS_OPEN) {
+      ThreadMessageObjectFactory, UrlInterpolationService,
+      ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     let expId = ExplorationDataService.explorationId;
 
     let getThreadListHandlerUrl = function() {
