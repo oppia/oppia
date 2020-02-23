@@ -214,7 +214,7 @@ exports.config = {
 
 
   // How long to wait for a page to load.
-  getPageTimeout: 20000,
+  getPageTimeout: 60000,
 
   // ----- What tests to run -----
   //
@@ -231,7 +231,14 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['--lang=en-EN', '--window-size=1285x1000']
+      args: [
+        '--lang=en-EN',
+        '--window-size=1285x1000',
+        // These arguments let us simulate recording from a microphone
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
+        '--use-file-for-fake-audio-capture=data/cafe.mp3',
+      ]
     },
     prefs: {
       intl: {
