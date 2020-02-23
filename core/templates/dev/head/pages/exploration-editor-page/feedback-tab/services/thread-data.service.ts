@@ -210,8 +210,8 @@ angular.module('oppia').factory('ThreadDataService', [
           openThreadsCount -= 1;
           // TODO(#8678): Update the cache with the message
           // instead of fetching the messages everytime from the backend
-          return _fetchMessages(threadId);
-        }).then(onSuccess, onFailure);
+          return this.fetchMessages(threadId);
+        });
       }
     };
   }
