@@ -16,7 +16,7 @@
  * @fileoverview Factory for creating new frontend instances of SubtitledHtml
  * domain objects.
  */
-export interface SubtitledHtmlBackendInterface {
+export interface ISubtitledHtmlBackendInterface {
   'content_id': string,
   'html': string
 }
@@ -47,7 +47,7 @@ export class SubtitledHtml {
     return !this._html;
   }
 
-  toBackendDict(): SubtitledHtmlBackendInterface {
+  toBackendDict(): ISubtitledHtmlBackendInterface {
     return {
       html: this._html,
       content_id: this._contentId
@@ -64,7 +64,7 @@ export class SubtitledHtml {
 })
 export class SubtitledHtmlObjectFactory {
   createFromBackendDict(
-      subtitledHtmlBackendDict: SubtitledHtmlBackendInterface): SubtitledHtml {
+      subtitledHtmlBackendDict: ISubtitledHtmlBackendInterface): SubtitledHtml {
     return new SubtitledHtml(
       subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
   }

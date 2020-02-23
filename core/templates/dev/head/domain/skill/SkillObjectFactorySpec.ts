@@ -15,6 +15,7 @@
 /**
  * @fileoverview Unit tests for SkillObjectFactory.
  */
+
 import { ConceptCardObjectFactory } from
   'domain/skill/ConceptCardObjectFactory';
 import { MisconceptionObjectFactory } from
@@ -31,17 +32,17 @@ import { TestBed } from '@angular/core/testing';
 const constants = require('constants.ts');
 
 describe('Skill object factory', () => {
-  let skillObjectFactory;
-  let conceptCardObjectFactory;
-  let rubricObjectFactory;
-  let misconceptionObjectFactory;
-  let misconceptionDict1;
-  let misconceptionDict2;
-  let rubricDict;
-  let skillContentsDict;
-  let skillDict;
-  let skillDifficulties;
-  let subtitledHtmlObjectFactory;
+  let skillObjectFactory:SkillObjectFactory = null;
+  let conceptCardObjectFactory:ConceptCardObjectFactory = null;
+  let rubricObjectFactory:RubricObjectFactory = null;
+  let misconceptionObjectFactory:MisconceptionObjectFactory = null;
+  let misconceptionDict1 = null;
+  let misconceptionDict2 = null;
+  let rubricDict = null;
+  let skillContentsDict = null;
+  let skillDict = null;
+  let skillDifficulties = null;
+  let subtitledHtmlObjectFactory:SubtitledHtmlObjectFactory = null;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -115,7 +116,7 @@ describe('Skill object factory', () => {
   });
 
   it('should create a new skill from a backend dictionary', () => {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.getId()).toEqual('1');
     expect(skill.getDescription()).toEqual('test description');
     expect(skill.getMisconceptions()).toEqual(
@@ -135,13 +136,13 @@ describe('Skill object factory', () => {
   });
 
   it('Should find misconception by id', () => {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.findMisconceptionById('4')).toEqual(
       misconceptionObjectFactory.createFromBackendDict(misconceptionDict2));
   });
 
   it('should delete a misconception given its id', () => {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
     skill.deleteMisconception('2');
     expect(skill.getMisconceptions()).toEqual(
       [misconceptionObjectFactory.createFromBackendDict(
@@ -149,7 +150,7 @@ describe('Skill object factory', () => {
   });
 
   it('should throw validation errors', () => {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
     skill.getConceptCard().setExplanation(
       subtitledHtmlObjectFactory.createDefault('', 'review_material'));
     expect(skill.getValidationIssues()).toEqual([
@@ -160,7 +161,7 @@ describe('Skill object factory', () => {
   });
 
   it('should add/update a rubric given difficulty', () => {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.getRubrics()[0].getExplanation()).toEqual('explanation');
     expect(skill.getRubrics().length).toEqual(1);
 
@@ -177,7 +178,7 @@ describe('Skill object factory', () => {
   });
 
   it('should get the correct next misconception id', () => {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.getNextMisconceptionId()).toEqual(6);
     skill.deleteMisconception(4);
     expect(skill.getNextMisconceptionId()).toEqual(6);
@@ -198,12 +199,12 @@ describe('Skill object factory', () => {
   });
 
   it('should convert to a backend dictionary', () => {
-    var skill = skillObjectFactory.createFromBackendDict(skillDict);
+    let skill = skillObjectFactory.createFromBackendDict(skillDict);
     expect(skill.toBackendDict()).toEqual(skillDict);
   });
 
   it('should be able to create an interstitial skill', () => {
-    var skill = skillObjectFactory.createInterstitialSkill();
+    let skill = skillObjectFactory.createInterstitialSkill();
     expect(skill.getId()).toEqual(null);
     expect(skill.getDescription()).toEqual('Skill description loading');
     expect(skill.getMisconceptions()).toEqual([]);
