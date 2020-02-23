@@ -394,12 +394,12 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
                             'received %s' % change.new_value)
-                    # Explicity convert the duration_secs value from
+                    # Explicitly convert the duration_secs value from
                     # int to float. Reason for this is the data from
                     # the frontend will be able to match the backend
                     # state model for Voiceover properly. Also js
                     # treats any number that can be float and int as
-                    # int (No Explicity types). For example,
+                    # int (no explicit types). For example,
                     # 10.000 is not 10.000 it is 10.
                     new_voiceovers_mapping = (
                         change.new_value['voiceovers_mapping'])
