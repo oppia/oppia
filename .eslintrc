@@ -165,6 +165,10 @@
     "no-unused-vars": [
       "off"
     ],
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
     "one-var": [
       "off"
     ],
