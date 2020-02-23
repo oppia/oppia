@@ -17,8 +17,8 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
-require('services/alerts.service.ts');
 require('domain/topic/topic-creation-backend-api.service.ts');
+require('services/alerts.service.ts');
 
 angular.module('oppia').factory('TopicCreationService', [
   '$rootScope', '$uibModal', '$window', 'AlertsService',
