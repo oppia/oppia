@@ -60,14 +60,14 @@ class MultipleChoiceInput(base.BaseInteraction):
             }
         },
         'default_value': [''],
-        # },
-        #  {
-        # 'name': 'showChoicesInShuffledOrder',
-        # 'description': 'Shuffle answer choices',
-        # 'schema': {
-        #     'type': 'bool',
-        # },
-        # 'default_value': True
+        },
+         {
+        'name': 'showChoicesInShuffledOrder',
+        'description': 'Shuffle answer choices',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
     }]
 
     _answer_visualization_specs = [{

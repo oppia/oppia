@@ -582,13 +582,13 @@
         "default_value": [
           ""
         ]
-      // }, {
-      //   "name": "showChoicesInShuffledOrder",
-      //   "description": "Shuffle answer choices",
-      //   "schema": {
-      //       "type": "bool"
-      //   },
-      //   "default_value": true
+      }, {
+        "name": "showChoicesInShuffledOrder",
+        "description": "Shuffle answer choices",
+        "schema": {
+            "type": "bool"
+        },
+        "default_value": true
     }
     ],
     "is_terminal": false,

@@ -1446,7 +1446,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '"&amp;quot;&amp;quot;" alt-with-value='
                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
                     '</p></p>')
-            ]}
+            ]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
         customization_args_dict3 = {
             'choices': {'value': [

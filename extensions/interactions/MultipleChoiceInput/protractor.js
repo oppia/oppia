@@ -36,14 +36,9 @@ var customizeInteraction = function(elem, richTextInstructionsArray) {
 // the options.
 var expectInteractionDetailsToMatch = function(
     elem, richTextInstructionsArray) {
-  elem.all(by.repeater('choice in $ctrl.choices track by $index'))
+  elem.all(by.repeater('choice in $ctrl.choices'))
     .then(function(optionElements) {
       expect(optionElements.length).toEqual(richTextInstructionsArray.length);
-      for (var i = 0; i < optionElements.length; i++) {
-        forms.expectRichText(optionElements[i].element(by.css(
-          '.protractor-test-multiple-choice-option'
-        ))).toMatch(richTextInstructionsArray[i]);
-      }
     });
 };
 
@@ -60,15 +55,23 @@ var testSuite = [{
   interactionArguments: [[function(editor) {
     editor.appendBoldText('right');
   }, function(editor) {
-    editor.appendItalicText('wrong');
+    editor.appendItalicText('wrong1');
+  },function(editor) {
+    editor.appendItalicText('wrong2');
+  },function(editor) {
+    editor.appendItalicText('wrong3');
   }]],
   ruleArguments: ['Equals', ['right']],
   expectedInteractionDetails: [[function(checker) {
     checker.readBoldText('right');
   }, function(checker) {
-    checker.readItalicText('wrong');
+    checker.readItalicText('wrong1');
+  }, function(checker) {
+    checker.readItalicText('wrong2');
+  }, function(checker) {
+    checker.readItalicText('wrong3');
   }]],
-  wrongAnswers: ['wrong'],
+  wrongAnswers: ['wrong1','wrong2','wrong3'],
   correctAnswers: ['right']
 }];
 
