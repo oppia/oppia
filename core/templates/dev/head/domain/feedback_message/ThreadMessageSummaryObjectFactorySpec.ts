@@ -26,9 +26,9 @@ describe('Thread message summary object factory', () => {
     factory = new ThreadMessageSummaryObjectFactory();
   });
 
-  describe('createFromBackendDict', () => {
+  describe('.createFromBackendDict', () => {
     it('should create new thread message summary from a backend dict.', () => {
-      var threadMessageSummary = factory.createFromBackendDict(
+      let threadMessageSummary = factory.createFromBackendDict(
         { author_username: 'author', text: 'message content' });
 
       expect(threadMessageSummary.authorUsername).toEqual('author');
@@ -36,16 +36,16 @@ describe('Thread message summary object factory', () => {
     });
   });
 
-  describe('.isNonempty()', () => {
+  describe('.isNonempty', () => {
     it('is true when text is nonempty string', () => {
-      var threadMessageSummary = factory.createFromBackendDict(
+      let threadMessageSummary = factory.createFromBackendDict(
         { text: 'nonempty!', author_username: 'author' });
 
       expect(threadMessageSummary.isNonempty()).toBe(true);
     });
 
     it('is false when text is empty string', () => {
-      var threadMessageSummary = factory.createFromBackendDict(
+      let threadMessageSummary = factory.createFromBackendDict(
         { text: '', author_username: 'author' });
 
       expect(threadMessageSummary.isNonempty()).toBe(false);

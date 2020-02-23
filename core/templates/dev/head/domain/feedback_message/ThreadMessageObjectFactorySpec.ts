@@ -26,9 +26,9 @@ describe('Thread message object factory', () => {
     factory = new ThreadMessageObjectFactory();
   });
 
-  describe('createFromBackendDict', () => {
+  describe('.createFromBackendDict', () => {
     it('should create a new thread message from a backend dict.', () => {
-      var threadMessage = factory.createFromBackendDict({
+      let threadMessage = factory.createFromBackendDict({
         author_username: 'author',
         created_on: 1000,
         entity_type: 'exploration',
@@ -54,10 +54,9 @@ describe('Thread message object factory', () => {
 
   describe('.getSummary', () => {
     it('should return the same author and text as message.', () => {
-      var threadMessage = factory.createFromBackendDict({
+      let threadMessage = factory.createFromBackendDict({
         author_username: 'author',
         text: 'message content',
-
         created_on: 1000,
         entity_type: 'exploration',
         entity_id: 'exploration.exp1.thread1',
@@ -73,11 +72,10 @@ describe('Thread message object factory', () => {
     });
   });
 
-  describe('.hasSubjectUpdate()', () => {
+  describe('.hasSubjectUpdate', () => {
     it('is true when updatedSubject is non-null', () => {
-      var threadMessage = factory.createFromBackendDict({
+      let threadMessage = factory.createFromBackendDict({
         updated_subject: 'a new descriptive subject!',
-
         author_username: 'author',
         created_on: 1000,
         entity_type: 'exploration',
@@ -92,9 +90,8 @@ describe('Thread message object factory', () => {
     });
 
     it('is false when updatedSubject is null', () => {
-      var threadMessage = factory.createFromBackendDict({
+      let threadMessage = factory.createFromBackendDict({
         updated_subject: null,
-
         author_username: 'author',
         created_on: 1000,
         entity_type: 'exploration',
@@ -109,11 +106,10 @@ describe('Thread message object factory', () => {
     });
   });
 
-  describe('.hasStatusUpdate()', () => {
+  describe('.hasStatusUpdate', () => {
     it('is true when updatedStatus is non-null', () => {
-      var threadMessage = factory.createFromBackendDict({
+      let threadMessage = factory.createFromBackendDict({
         updated_status: 'open',
-
         author_username: 'author',
         created_on: 1000,
         entity_type: 'exploration',
@@ -128,9 +124,8 @@ describe('Thread message object factory', () => {
     });
 
     it('is false when updatedStatus is null', () => {
-      var threadMessage = factory.createFromBackendDict({
+      let threadMessage = factory.createFromBackendDict({
         updated_status: null,
-
         author_username: 'author',
         created_on: 1000,
         entity_type: 'exploration',
@@ -145,11 +140,10 @@ describe('Thread message object factory', () => {
     });
   });
 
-  describe('.isNonempty()', () => {
+  describe('.isNonempty', () => {
     it('is true when text is nonempty string', () => {
-      var threadMessage = factory.createFromBackendDict({
+      let threadMessage = factory.createFromBackendDict({
         text: 'nonempty!',
-
         author_username: 'author',
         created_on: 1000,
         entity_type: 'exploration',
@@ -164,9 +158,8 @@ describe('Thread message object factory', () => {
     });
 
     it('is false when text is empty string', () => {
-      var threadMessage = factory.createFromBackendDict({
+      let threadMessage = factory.createFromBackendDict({
         text: '',
-
         author_username: 'author',
         created_on: 1000,
         entity_type: 'exploration',
