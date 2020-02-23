@@ -39,7 +39,10 @@ angular.module('oppia').factory('ThreadDataService', [
     let expId = ExplorationDataService.explorationId;
 
     let getThreadListHandlerUrl = function() {
-      return '/threadlisthandler/';
+      return UrlInterpolationService.interpolateUrl(
+        '/threadlisthandler/<exploration_id>', {
+          exploration_id: expId
+        });
     };
 
     let getFeedbackStatsHandlerUrl = function() {
