@@ -92,7 +92,8 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
         """Converts draft change list from state version 30 to 31. State
         version 31 adds a customization arg for the "Add" button text
-        in SetInput interaction.
+        in SetInput interaction, for which there should be no changes
+        to drafts.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
@@ -101,21 +102,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-        for i, change in enumerate(draft_change_list):
-            if (change.cmd == exp_domain.CMD_ADD_CUSTOMIZATION_ARG and
-                    change.property_name ==
-                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS and
-                    change.interaction_id == 'SetInput'):
-                draft_change_list[i] = exp_domain.ExplorationChange({
-                    'interaction_id': 'SetInput',
-                    'cmd': exp_domain.CMD_ADD_CUSTOMIZATION_ARG,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
-                    'new_value': {
-                        'buttonText': change.new_value
-                    }
-                })
-
         return draft_change_list
 
     @classmethod

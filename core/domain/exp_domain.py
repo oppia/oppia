@@ -83,9 +83,6 @@ CMD_DELETE_STATE = 'delete_state'
 # This takes additional 'state_name', 'content_id', 'language_code' and
 # 'content_html' and 'translation_html' parameters.
 CMD_ADD_TRANSLATION = 'add_translation'
-# This takes additional 'property_name', 'interaction_id' and
-# 'new_value' parameters.
-CMD_ADD_CUSTOMIZATION_ARG = 'add_customization_arg'
 # This takes additional 'property_name' and 'new_value' parameters.
 CMD_EDIT_STATE_PROPERTY = 'edit_state_property'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -187,11 +184,6 @@ class ExplorationChange(change_domain.BaseChange):
         'required_attribute_names': [
             'state_name', 'content_id', 'language_code', 'content_html',
             'translation_html'],
-        'optional_attribute_names': []
-    }, {
-        'name': CMD_ADD_CUSTOMIZATION_ARG,
-        'required_attribute_names': [
-            'property_name', 'interaction_id', 'new_value'],
         'optional_attribute_names': []
     }, {
         'name': CMD_EDIT_STATE_PROPERTY,
