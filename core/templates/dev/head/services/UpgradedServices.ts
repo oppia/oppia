@@ -239,6 +239,8 @@ import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
+import { WrittenTranslationsObjectFactory } 
+  from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 @Injectable({
   providedIn: 'root'
