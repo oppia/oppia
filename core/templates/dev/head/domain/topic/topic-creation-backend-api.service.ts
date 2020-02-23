@@ -16,6 +16,10 @@
  * @fileoverview Service to notify about creation of topic and obtain
  * topic_id.
  */
+export interface ITopicBackendInterface {
+  name: string,
+  abbreviated_name: string
+}
 import { downgradeInjectable } from "@angular/upgrade/static";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
@@ -29,29 +33,32 @@ export class TopicCreationBackendApiService {
   constructor(
     private http: HttpClient) { }
 
-  _createTopic(successCallback, errorCallback, topicName, abbreviatedTopicName): void  {
-    let postData = {
+  _createTopic(
+    successCallback: (value?: Object | PromiseLike<Object>) => void,
+    errorCallback:(reason?: any) => void,
+    topicName, abbreviatedTopicName): void  {
+    let postData:ITopicBackendInterface = {
       name: topicName,
       abbreviated_name: abbreviatedTopicName
     }
     this.http.post(
-      '/topic_editor_handler/create_new', postData).toPromise()
+      '/topic_editor_handler/create_new', { data: postData }).toPromise()
       .then((response:any) => {
         console.log(response);
         if (successCallback) {
           successCallback({
-            topicId:response.topic_id
+            topicId:response.data.topic_id
           });
         }
       }, (errorResponse) => {
+        console.log(errorResponse)
         if (errorCallback) {
           errorCallback(errorResponse.body)
-          console.log(errorResponse)
         }
       });
   }
 
-  createTopic(topicName: string, abbreviatedTopicName: string): Promise<Object> {
+  createTopic(topicName: string, abbreviatedTopicName: string): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
       this._createTopic(resolve, reject, topicName, abbreviatedTopicName)
     });
