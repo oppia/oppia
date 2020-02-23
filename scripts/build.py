@@ -58,8 +58,8 @@ EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
 TEMPLATES_DEV_DIR = os.path.join('templates', '')
 TEMPLATES_CORE_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('core', 'templates', ''),
-    'staging_dir': os.path.join('backend_prod_files', 'templates', 'head', ''),
-    'out_dir': os.path.join('build', 'templates', 'head', '')
+    'staging_dir': os.path.join('backend_prod_files', 'templates', ''),
+    'out_dir': os.path.join('build', 'templates', '')
 }
 WEBPACK_DIRNAMES_TO_DIRPATHS = {
     'staging_dir': os.path.join('backend_prod_files', 'webpack_bundles', ''),
@@ -1082,7 +1082,7 @@ def _verify_filepath_hash(relative_filepath, file_hashes):
         KeyError: The filename's hash cannot be found in the hash dict.
     """
     # Final filepath example:
-    # head/pages/base.240933e7564bd72a4dde42ee23260c5f.html.
+    # pages/base.240933e7564bd72a4dde42ee23260c5f.html.
     if not file_hashes:
         raise ValueError('Hash dict is empty')
 
