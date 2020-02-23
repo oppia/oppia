@@ -223,7 +223,7 @@ import { TopicObjectFactory } from
   'domain/topic/TopicObjectFactory';
 import { TopicSummaryObjectFactory } from
   'domain/topic/TopicSummaryObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { UnitsObjectFactory }WrittenTranslationObjectFactory from 'domain/objects/UnitsObjectFactory';
 import { UrlInterpolationService } from
   'domain/utilities/url-interpolation.service';
 import { UrlService } from 'services/contextual/url.service';
@@ -239,7 +239,7 @@ import { WinnowingPreprocessingService } from
   'classifiers/winnowing-preprocessing.service';
 import { WrittenTranslationObjectFactory } from
   'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } 
+import { WrittenTranslationsObjectFactory }
   from 'domain/exploration/WrittenTranslationsObjectFactory';
 
 @Injectable({
