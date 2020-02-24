@@ -20,15 +20,14 @@
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {
-  UrlInterpolationService
-} from 'domain/utilities/url-interpolation.service';
-import {
-  ExplorationOpportunitySummary
-} from 'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
-import {
-  SkillOpportunity
-} from 'domain/opportunity/SkillOpportunityObjectFactory';
+
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+import { ExplorationOpportunitySummary } from
+  'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
+import { SkillOpportunity } from
+  'domain/opportunity/SkillOpportunityObjectFactory';
+const constants = require('constants.ts');
 
 @Injectable({
   providedIn: 'root'
@@ -39,69 +38,91 @@ export class ContributionOpportunitiesBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
   ) {}
-  /**  TODO(srijanreddy98): for some reason not able to import types (
-  * OPPORTUNITY_TYPE_SKILL,
-  * OPPORTUNITY_TYPE_TRANSLATION,
-  * OPPORTUNITY_TYPE_VOICEOVER
-  * )from constants.ts in assets */
-  _getOpportunityFromDict(opportunityType, opportunityDict) {
+  _getOpportunityFromDict(
+      opportunityType: OpportunityType,
+      opportunityDict
+  ): ExplorationOpportunitySummary | SkillOpportunity {
     if (
-      opportunityType === 'voiceover' ||
-      opportunityType === 'translation') {
+      opportunityType === constants.OPPORTUNITY_TYPE_VOICEOVER ||
+      opportunityType === constants.OPPORTUNITY_TYPE_TRANSLATION) {
       return new ExplorationOpportunitySummary(opportunityDict.id,
         opportunityDict.topic_name, opportunityDict.story_title,
         opportunityDict.chapter_title, opportunityDict.content_count,
         opportunityDict.translation_counts);
-    } else if (opportunityType === 'skill') {
+    } else if (opportunityType === constants.OPPORTUNITY_TYPE_SKILL) {
       return new SkillOpportunity(
         opportunityDict.id, opportunityDict.skill_description,
         opportunityDict.topic_name, opportunityDict.question_count);
     }
   }
 
-  _fetchOpportunities(opportunityType, params, successCallback) {
+  _fetchOpportunities(
+      opportunityType: OpportunityType,
+      params, successCallback, errorCallback
+  ): void {
     this.http.get(this.urlInterpolationService.interpolateUrl(
       this.urlTemplate, { opportunityType }
-    ), {
-      params
-    }).toPromise().then((data: any) => {
-      let opportunities = [];
-      for (let index in data.opportunities) {
+    ), { params }).toPromise().then((data: any) => {
+      const opportunities = [];
+      for (const index in data.opportunities) {
         opportunities.push(this._getOpportunityFromDict(
           opportunityType, data.opportunities[index]));
       }
       if (successCallback) {
         successCallback(opportunities, data.next_cursor, data.more);
       }
-    }, (err) => {
-      // console.log(err);
+    }, (error) => {
+      if (errorCallback) {
+        errorCallback(error);
+      }
     });
   }
-  fetchSkillOpportunities(cursor, successCallback) {
-    let params = {
+
+  fetchSkillOpportunities(
+      cursor,
+      successCallback,
+      errorCallback?
+  ): void {
+    const params = {
       cursor: cursor
     };
     return this._fetchOpportunities(
-      'skill', params, successCallback);
+      constants.OPPORTUNITY_TYPE_SKILL, params, successCallback, errorCallback);
   }
-  fetchTranslationOpportunities( languageCode, cursor, successCallback ) {
-    let params = {
-      language_code: languageCode,
-      cursor: cursor
-    };
-    return this._fetchOpportunities(
-      'translation', params, successCallback);
-  }
-  fetchVoiceoverOpportunities(languageCode, cursor, successCallback) {
+
+  fetchTranslationOpportunities(
+      languageCode: String,
+      cursor,
+      successCallback,
+      errorCallback?
+  ): void {
     const params = {
       language_code: languageCode,
       cursor: cursor
     };
     return this._fetchOpportunities(
-      'voiceover', params, successCallback);
+      constants.OPPORTUNITY_TYPE_TRANSLATION,
+      params, successCallback, errorCallback);
+  }
+
+  fetchVoiceoverOpportunities(
+      languageCode: String,
+      cursor,
+      successCallback,
+      errorCallback?
+  ): void {
+    const params = {
+      language_code: languageCode,
+      cursor: cursor
+    };
+    return this._fetchOpportunities(
+      constants.OPPORTUNITY_TYPE_VOICEOVER,
+      params, successCallback, errorCallback);
   }
 }
 
 angular.module('oppia').factory(
   'ContributionOpportunitiesBackendApiService',
   downgradeInjectable(ContributionOpportunitiesBackendApiService));
+
+  type OpportunityType = 'skill' | 'voiceover' | 'translation';
