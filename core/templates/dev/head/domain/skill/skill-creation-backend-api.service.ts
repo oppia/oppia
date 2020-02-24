@@ -41,12 +41,12 @@ export class SkillCreationBackendApiService {
       successCallback: (value?: Object | PromiseLike<Object>) => void,
       errorCallback:(reason?: any) => void,
       description, rubrics, explanation, linkedTopicIds): void {
-        let postData:ISkillBackendInterface = {
-          description: description,
-          linked_topic_ids: linkedTopicIds,
-          explanation_dict: explanation,
-          rubrics: rubrics
-        };
+    let postData:ISkillBackendInterface = {
+      description: description,
+      linked_topic_ids: linkedTopicIds,
+      explanation_dict: explanation,
+      rubrics: rubrics
+    };
     this.http.post(
       '/skill_editor_handler/create_new', postData).toPromise()
       .then((response: { skillId:string }) => {
@@ -63,7 +63,7 @@ export class SkillCreationBackendApiService {
   }
 
   createSkill(description:string, rubrics:any, explanation:string,
-    linkedTopicIds:string[]): PromiseLike<Object> {
+      linkedTopicIds:string[]): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
       this._createSkill(resolve, reject,
         description, rubrics, explanation, linkedTopicIds);
