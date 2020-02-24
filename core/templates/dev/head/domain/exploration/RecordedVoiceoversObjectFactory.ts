@@ -19,7 +19,7 @@
 export interface IRecordedVoiceOverBackendInterface {
   'voiceovers_mapping': {
     [propName: string]: {
-      [propName: string]: VoiceoverInterface
+      [propName: string]: IVoiceoverInterface
     }
   }
 }
@@ -33,10 +33,10 @@ export interface IVoiceoverMapping {
     [propName: string]: Voiceover
   }
 }
-import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-import { VoiceoverObjectFactory, VoiceoverInterface, Voiceover } from
+import { VoiceoverObjectFactory, IVoiceoverInterface, Voiceover } from
   'domain/exploration/VoiceoverObjectFactory';
 export class RecordedVoiceovers {
   voiceoversMapping: IVoiceoverMapping;
