@@ -515,7 +515,6 @@
 /core/templates/dev/head/pages/header_css_libs.html @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/dev/head/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
-/gulpfile.js @jameesjohn @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
