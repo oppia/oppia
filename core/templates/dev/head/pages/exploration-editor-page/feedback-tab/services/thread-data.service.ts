@@ -38,13 +38,6 @@ angular.module('oppia').factory('ThreadDataService', [
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     let expId = ExplorationDataService.explorationId;
 
-    let getThreadListHandlerUrl = function() {
-      return UrlInterpolationService.interpolateUrl(
-        '/threadlisthandler/<exploration_id>', {
-          exploration_id: expId
-        });
-    };
-
     let getFeedbackStatsHandlerUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         '/feedbackstatshandler/<exploration_id>', {
@@ -52,16 +45,20 @@ angular.module('oppia').factory('ThreadDataService', [
         });
     };
 
-    let getFeedbackThreadViewEventUrl = function(threadId) {
+    let getThreadListHandlerUrl = function() {
       return UrlInterpolationService.interpolateUrl(
-        '/feedbackhandler/thread_view_event/<thread_id>', {
-          thread_id: threadId
+        '/threadlisthandler/<exploration_id>', {
+          exploration_id: expId
         });
+    };
+
+    let getSuggestionListHandlerUrl = function() {
+      return '/suggestionlisthandler';
     };
 
     let getSuggestionActionHandlerUrl = function(threadId) {
       return UrlInterpolationService.interpolateUrl(
-        '/suggestionactionhandler/<exploration_id>/<thread_id>', {
+        '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
           exploration_id: expId,
           thread_id: threadId
         });
@@ -74,8 +71,11 @@ angular.module('oppia').factory('ThreadDataService', [
         });
     };
 
-    let getSuggestionListHandlerUrl = function() {
-      return '/suggestionlisthandler';
+    let getFeedbackThreadViewEventUrl = function(threadId) {
+      return UrlInterpolationService.interpolateUrl(
+        '/feedbackhandler/thread_view_event/<thread_id>', {
+          thread_id: threadId
+        });
     };
 
     // Holds all the threads for this exploration. This is an object whose
