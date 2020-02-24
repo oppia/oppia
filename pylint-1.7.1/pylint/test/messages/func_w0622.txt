@@ -1,2 +1,0 @@
-W:  8:function: Redefining built-in 'type'
-W: 11: Redefining built-in 'map'

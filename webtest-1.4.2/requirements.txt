@@ -1,7 +1,0 @@
-webtest[tests]
-webob>=1.2
-lxml
-pyquery
-beautifulsoup4
-Sphinx
-pep8

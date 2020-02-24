@@ -1,1 +1,0 @@
-W:  4: Module import itself

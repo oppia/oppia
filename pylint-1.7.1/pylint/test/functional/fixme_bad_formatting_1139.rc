@@ -1,2 +1,0 @@
-[MESSAGES CONTROL]
-msg-template={C}:{line:3d},{column:2d}: {obj}: {msg} ({symbol}, {msg_id})

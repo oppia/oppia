@@ -1,1 +1,0 @@
-bad-inline-option:3::Unable to consider inline option 'errors-only'

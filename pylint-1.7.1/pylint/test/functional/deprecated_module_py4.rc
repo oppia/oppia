@@ -1,4 +1,0 @@
-[Messages Control]
-deprecated-modules=deprecated
-disable=all
-enable=deprecated-module

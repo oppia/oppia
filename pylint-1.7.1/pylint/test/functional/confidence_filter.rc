@@ -1,3 +1,0 @@
-[Messages Control]
-disable=no-init,too-few-public-methods,undefined-variable,print-statement
-confidence=INFERENCE,HIGH,UNDEFINED

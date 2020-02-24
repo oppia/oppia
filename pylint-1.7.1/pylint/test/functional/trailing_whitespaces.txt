@@ -1,3 +1,0 @@
-trailing-whitespace:6::Trailing whitespace
-trailing-whitespace:8::Trailing whitespace
-trailing-whitespace:11::Trailing whitespace

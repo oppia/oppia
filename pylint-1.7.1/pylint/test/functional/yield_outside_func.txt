@@ -1,1 +1,0 @@
-yield-outside-function:2::Yield outside function

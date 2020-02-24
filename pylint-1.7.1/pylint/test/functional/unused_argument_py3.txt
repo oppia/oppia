@@ -1,2 +1,0 @@
-unused-argument:3:func:Unused argument 'first'
-unused-argument:3:func:Unused argument 'second'

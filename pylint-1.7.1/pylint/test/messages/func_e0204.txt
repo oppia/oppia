@@ -1,3 +1,0 @@
-E: 10:Abcd.__init__: Method should have "self" as first argument
-E: 14:Abcd.abdc: Method should have "self" as first argument
-

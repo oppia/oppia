@@ -1,3 +1,0 @@
-E: 11:do_nothing: Using variable 'base' before assignment
-W: 11:do_nothing: Statement seems to have no effect
-

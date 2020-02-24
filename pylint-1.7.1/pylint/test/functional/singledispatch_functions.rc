@@ -1,3 +1,0 @@
-[testoptions]
-;http://bugs.python.org/issue10445
-max_pyver=3.0

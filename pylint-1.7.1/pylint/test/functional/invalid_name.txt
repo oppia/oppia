@@ -1,3 +1,0 @@
-invalid-name:10::"Invalid constant name ""aaa"""
-invalid-name:14::"Invalid constant name ""time"""
-invalid-name:30:a:"Invalid function name ""a"""

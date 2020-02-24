@@ -1,1 +1,0 @@
-nonlocal-and-global:4:bad:"Name 'missing' is nonlocal and global"

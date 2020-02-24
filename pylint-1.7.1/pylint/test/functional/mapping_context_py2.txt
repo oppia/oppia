@@ -1,1 +1,0 @@
-not-a-mapping:19::Non-mapping value SomeClass() is used in a mapping context

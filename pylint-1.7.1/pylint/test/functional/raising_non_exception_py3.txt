@@ -1,1 +1,0 @@
-raising-non-exception:13::Raising a new style class which doesn't inherit from BaseException

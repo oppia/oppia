@@ -1,1 +1,0 @@
-continue-in-finally:9::'continue' not supported inside 'finally' clause

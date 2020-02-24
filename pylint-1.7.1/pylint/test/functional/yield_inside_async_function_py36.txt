@@ -1,1 +1,0 @@
-yield-inside-async-function:12:bad_coro:Yield inside async function

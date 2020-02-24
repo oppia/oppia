@@ -1,1 +1,0 @@
-unused-variable:2::Unused variable 'VAR':HIGH

@@ -1,1 +1,0 @@
-not-an-iterable:17::Non-iterable value SomeClass() is used in an iterating context

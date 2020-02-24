@@ -1,1 +1,0 @@
-return-in-init:5:MyClass.__init__:Explicit return in __init__

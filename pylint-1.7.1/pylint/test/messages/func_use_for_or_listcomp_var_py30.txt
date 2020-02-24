@@ -1,3 +1,0 @@
-E:  6: Using variable 'C' before assignment
-W: 15: Using possibly undefined loop variable 'var1'
-

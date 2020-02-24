@@ -1,1 +1,0 @@
-W:  6: Anomalous Unicode escape in byte string: '\u'. String constant might be missing an r or u prefix.
