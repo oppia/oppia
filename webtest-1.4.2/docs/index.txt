@@ -1,0 +1,379 @@
+Testing Applications with WebTest
++++++++++++++++++++++++++++++++++
+
+:author: Ian Bicking <ianb@colorstudy.com>
+:maintainer: Gael Pasgrimaud <gael@gawel.org>
+
+
+.. contents::
+
+
+Status & License
+================
+
+WebTest is an extraction of ``paste.fixture.TestApp``, rewriting
+portions to use `WebOb <http://docs.webob.org/>`_.  It is under
+active development as part of the Paste cloud of packages.
+
+Feedback and discussion should take place on the `Pylons discuss list
+<https://groups.google.com/forum/?fromgroups#!forum/pylons-discuss>`_, and bugs
+should go into the `Github tracker
+<https://github.com/Pylons/webtest/issues>`_.
+
+This library is licensed under an `MIT-style license <license.html>`_.
+
+Installation
+============
+
+You can use pip or easy_install to get the latest stable release::
+
+    $ pip install WebTest
+    $ easy_install WebTest
+
+Or if you want the development version::
+
+    $ pip install https://nodeload.github.com/Pylons/webtest/tar.gz/master
+
+What This Does
+==============
+
+WebTest helps you test your WSGI-based web applications.  This can be
+any application that has a WSGI interface, including an application
+written in a framework that supports WSGI (which includes most
+actively developed Python web frameworks -- almost anything that even
+nominally supports WSGI should be testable).
+
+With this you can test your web applications without starting an HTTP
+server, and without poking into the web framework shortcutting
+pieces of your application that need to be tested.  The tests WebTest
+runs are entirely equivalent to how a WSGI HTTP server would call an
+application.  By testing the full stack of your application, the
+WebTest testing model is sometimes called a *functional test*,
+*integration test*, or *acceptance test* (though the latter two are
+not particularly good descriptions).  This is in contrast to a *unit
+test* which tests a particular piece of functionality in your
+application.  While complex programming tasks are often is suited to
+unit tests, template logic and simple web programming is often best
+done with functional tests; and regardless of the presence of unit
+tests, no testing strategy is complete without high-level tests to
+ensure the entire programming system works together.
+
+WebTest helps you create tests by providing a convenient interface to
+run WSGI applications and verify the output.
+
+TestApp
+=======
+
+The most important object in WebTest is :class:`~webtest.TestApp`, the wrapper
+for WSGI applications.  To use it, you simply instantiate it with your WSGI
+application. (Note: if your WSGI application requires any configuration, you
+must set that up manually in your tests.)
+
+.. code-block:: python
+
+    >>> from webtest import TestApp
+    >>> from webtest.debugapp import debug_app
+    >>> app = TestApp(debug_app)
+    >>> res = app.get('/form.html')
+    >>> res.status
+    '200 OK'
+    >>> res.form
+    <Form />
+
+Making Requests
+---------------
+
+To make a request, use:
+
+.. code-block:: python
+
+    app.get('/path', [headers], [extra_environ], ...)
+
+This does a request for ``/path``, with any extra headers or WSGI
+environment keys that you indicate.  This returns a response object,
+based on `webob.Response
+<http://docs.webob.org/en/latest/reference.html#response>`_.  It has some
+additional methods to make it easier to test.
+
+If you want to do a POST request, use:
+
+.. code-block:: python
+
+    app.post('/path', {'vars': 'values'}, [headers], [extra_environ],
+             [upload_files], ...)
+
+Specifically the second argument is the *body* of the request.  You
+can pass in a dictionary (or dictionary-like object), or a string
+body (dictionary objects are turned into HTML form submissions).
+
+You can also pass in the keyword argument upload_files, which is a
+list of ``[(fieldname, filename, fild_content)]``.  File uploads use a
+different form submission data type to pass the structured data.
+
+For other verbs you can use:
+
+.. code-block:: python
+
+    app.put(path, params, ...)
+    app.delete(path, ...)
+
+These do PUT and DELETE requests.
+
+
+Modifying the Environment & Simulating Authentication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The best way to simulate authentication is if your application looks
+in ``environ['REMOTE_USER']`` to see if someone is authenticated.
+Then you can simply set that value, like:
+
+.. code-block:: python
+
+    app.get('/secret', extra_environ=dict(REMOTE_USER='bob'))
+
+If you want *all* your requests to have this key, do:
+
+.. code-block:: python
+
+    app = TestApp(my_app, extra_environ=dict(REMOTE_USER='bob'))
+
+What Is Tested By Default
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A key concept behind WebTest is that there's lots of things you
+shouldn't have to check everytime you do a request.  It is assumed
+that the response will either be a 2xx or 3xx response; if it isn't an
+exception will be raised (you can override this for a request, of
+course).  The WSGI application is tested for WSGI compliance with
+a slightly modified version of `wsgiref.validate
+<http://python.org/doc/current/lib/module-wsgiref.validate.html>`_
+(modified to support arguments to ``InputWrapper.readline``)
+automatically.  Also it checks that nothing is printed to the
+``environ['wsgi.errors']`` error stream, which typically indicates a
+problem (one that would be non-fatal in a production situation, but if
+you are testing is something you should avoid).
+
+To indicate another status is expected, use the keyword argument
+``status=404`` to (for example) check that it is a 404 status, or
+``status="*"`` to allow any status.
+
+If you expect errors to be printed, use ``expect_errors=True``.
+
+The Response Object
+-------------------
+
+The response object is based on `webob.Response
+<http://docs.webob.org/en/latest/reference.html#response>`_ with some additions
+to help with testing.
+
+The inherited attributes that are most interesting:
+
+``response.status``:
+    The text status of the response, e.g., ``"200 OK"``.
+
+``response.headers``:
+    A dictionary-like object of the headers in the response.
+
+``response.body``:
+    The text body of the response.
+
+``response.unicode_body``:
+    The unicode text body of the response.
+
+``response.request``:
+    The `webob.Request object
+    <http://docs.webob.org/en/latest/reference.html#request>`_ used to generate
+    this response.
+
+The added methods:
+
+``response.follow(**kw)``:
+    Follows the redirect, returning the new response.  It is an error
+    if this response wasn't a redirect.  Any keyword arguments are
+    passed to ``app.get`` (e.g., ``status``).
+
+``x in response``:
+    Returns True if the string is found in the response body.
+    Whitespace is normalized for this test.
+
+``response.mustcontain(string1, string2, ...)``:
+    Raises an error if any of the strings are not found in the
+    response.  It also prints out the response in that case, so
+    you can see the real response.
+
+``response.showbrowser()``:
+    Opens the HTML response in a browser; useful for debugging.
+
+``str(response)``:
+    Gives a slightly-compacted version of the response.  This is
+    compacted to remove newlines, making it easier to use with
+    `doctest <http://python.org/doc/current/lib/module-doctest.html>`_
+
+``response.click(description=None, linkid=None, href=None, anchor=None, index=None, verbose=False)``:
+    Clicks the described link (`see docstring for more
+    <./class-webtest.TestResponse.html#click>`_)
+
+``response.forms``:
+    Return a dictionary of forms; you can use both indexes (refer to
+    the forms in order) or the string ids of forms (if you've given
+    them ids) to identify the form.  See :ref:`form-submissions` for
+    more on the form objects.
+
+``response.form``:
+    If there is just a single form, this returns that.  It is an error
+    if you use this and there are multiple forms.
+
+.. _form-submissions:
+
+Form Submissions
+================
+
+You can fill out and submit forms from your tests.  First you get the
+form:
+
+.. code-block:: python
+
+    >>> res = app.get('/form.html')
+    >>> form = res.form
+
+Then you fill it in fields:
+
+.. code-block:: python
+
+    >>> print(form.action)
+    /form-submit
+    >>> print(form.method)
+    POST
+    >>> # dict of fields
+    >>> form.fields.values() #doctest: +SKIP
+    [(u'name', [<Text name="name">]), (u'submit', [<Submit name="submit">])]
+    >>> form['name'] = 'Bob'
+    >>> # When names don't point to a single field:
+    >>> form.set('name', 'Bob', index=0)
+
+Then you can submit:
+
+.. code-block:: python
+
+    >>> # Submit with no particular submit button pressed:
+    >>> res = form.submit()
+    >>> # Or submit a button:
+    >>> res = form.submit('submit')
+    >>> print(res)
+    Response: 200 OK
+    Content-Type: text/plain
+    ...
+    -- Body ----------
+    name=Bob&submit=Submit%21
+
+Select fields can only be set to valid values (i.e., values in an
+``<option>``) but you can also use
+``form['select-field'].force_value('value')`` to enter values not
+present in an option.
+
+Parsing the Body
+================
+
+There are several ways to get parsed versions of the response.  These
+are the attributes:
+
+``response.html``:
+    Return a `BeautifulSoup
+    <http://www.crummy.com/software/BeautifulSoup/>`_ version of the
+    response body.
+
+``response.xml``:
+    Return an `ElementTree
+    <http://python.org/doc/current/lib/module-xml.etree.ElementTree.html>`_
+    version of the response body.
+
+``response.lxml``:
+    Return an `lxml <http://codespeak.net/lxml/>`_ version of the
+    response body.
+
+``response.pyquery``:
+    Return an `PyQuery <http://pypi.python.org/pypi/pyquery>`_ version of the
+    response body.
+
+``response.json``:
+    Return the parsed JSON (parsed with `simplejson
+    <http://svn.red-bean.com/bob/simplejson/tags/simplejson-1.7/docs/index.html>`_).
+
+In each case the content-type must be correct or an AttributeError is
+raised.  If you do not have the necessary library installed (none of
+them are required by WebTest), you will get an ImportError.
+
+Examples:
+
+.. code-block:: python
+
+    >>> from webtest import TestRequest
+    >>> from webtest import TestResponse
+    >>> res = TestResponse(content_type='text/html', body=b'''
+    ... <html><body><div id="content">hey!</div></body>''')
+    >>> res.request = TestRequest.blank('/')
+    >>> res.html #doctest: +SKIP
+    <BLANKLINE>
+    <html><body><div id="content">hey!</div></body></html>
+    >>> res.html.__class__ #doctest: +SKIP
+    <class 'BeautifulSoup.BeautifulSoup'>
+    >>> res.lxml
+    <Element html at ...>
+    >>> res.lxml.xpath('//body/div')[0].text
+    'hey!'
+    >>> res = TestResponse(content_type='application/json',
+    ...                    body=b'{"a":1,"b":2}')
+    >>> res.request = TestRequest.blank('/')
+    >>> list(res.json.values())
+    [1, 2]
+    >>> res = TestResponse(content_type='application/xml',
+    ...                    body=b'<xml><message>hey!</message></xml>')
+    >>> res.request = TestRequest.blank('/')
+    >>> res.xml
+    <Element ...>
+    >>> res.xml[0].tag
+    'message'
+    >>> res.xml[0].text
+    'hey!'
+    >>> res.lxml
+    <Element xml at ...>
+    >>> res.lxml[0].tag
+    'message'
+    >>> res.lxml[0].text
+    'hey!'
+    >>> res.pyquery('message') #doctest: +SKIP
+    [<message>]
+    >>> res.pyquery('message').text() #doctest: +SKIP
+    'hey!'
+
+
+Framework Hooks
+===============
+
+Frameworks can detect that they are in a testing environment by the
+presence (and truth) of the WSGI environmental variable
+``"paste.testing"`` (the key name is inherited from
+``paste.fixture``).
+
+More generally, frameworks can detect that something (possibly a test
+fixture) is ready to catch unexpected errors by the presence and truth
+of ``"paste.throw_errors"`` (this is sometimes set outside of testing
+fixtures too, when an error-handling middleware is in place).
+
+Frameworks that want to expose the inner structure of the request may
+use ``"paste.testing_variables"``.  This will be a dictionary -- any
+values put into that dictionary will become attributes of the response
+object.  So if you do ``env["paste.testing_variables"]['template'] =
+template_name`` in your framework, then ``response.template`` will be
+``template_name``.
+
+
+API
+====
+
+.. include:: modules/webtest.txt
+.. include:: modules/ext.txt
+.. include:: modules/sel.txt
+
+.. include:: news.txt
+.. include:: license.txt

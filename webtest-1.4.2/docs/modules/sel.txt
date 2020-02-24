@@ -1,0 +1,72 @@
+:mod:`webtest.sel` -- Functional Testing with Selenium
+--------------------------------------------------------
+
+.. automodule:: webtest.sel
+
+.. autoclass:: SeleniumApp
+   :members:
+
+.. autoclass:: Selenium
+   :members:
+
+.. autofunction:: selenium
+
+
+Response API
+~~~~~~~~~~~~
+
+Some of the return values return instances of these classes:
+
+.. autoclass:: TestResponse
+   :members:
+
+.. autoclass:: Document
+   :members:
+
+.. autoclass:: Element
+   :members:
+
+.. autoclass:: Form
+   :members:
+
+Environment variables
+~~~~~~~~~~~~~~~~~~~~~
+
+Those value are used if found in environment:
+
+- ``SELENIUM_HOST``: Default to ``127.0.0.1``
+
+- ``SELENIUM_PORT``: Default to ``4444``
+
+- ``SELENIUM_BIND``: IP used to bind extra servers (WSGI Server/File server).
+  Default to ``127.0.0.1``
+
+- ``SELENIUM_DRIVER``: The driver used to start the browser. Usualy something
+  in ``*chrome``, ``*firefox``, ``*googlechrome``. Default to
+  ``*googlechrome``. You can get the full list by running::
+  
+    $ java -jar selenium-server.jar -interactive
+    cmd=getNewBrowserSession
+
+
+- ``SELENIUM_KEEP_OPEN``: If exist then browser session are not closed so you
+  can introspect the problem on failure.
+
+- ``SELENIUM_JAR``: If selenium is not running then this jar is used to run
+  selenium.
+
+Examples
+~~~~~~~~
+
+Testing a wsgi application
+***************************
+
+.. literalinclude:: ../../tests/test_selenium.py
+   :pyobject: TestApp
+
+Testing the jquery.ui website
+*****************************
+
+.. literalinclude:: ../../tests/test_selenium.py
+   :pyobject: TestJQueryUI
+

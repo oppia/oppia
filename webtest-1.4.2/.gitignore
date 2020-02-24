@@ -1,0 +1,17 @@
+WebTest.egg-info/
+build/
+dist/
+bin/
+parts/
+develop-eggs/
+docs/_build/
+docs/_themes/
+.installed.cfg
+.tox
+*.jar
+*.swp
+*.pyc
+.project
+.pydevproject
+.settings/
+.coverage

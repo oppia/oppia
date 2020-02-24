@@ -1,0 +1,24 @@
+:mod:`webtest.ext` -- Using an external process
+-----------------------------------------------
+
+.. automodule:: webtest.ext
+
+.. autoclass:: TestApp
+   :members:
+
+.. autofunction:: casperjs
+
+
+Using casperjs to run tests
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The js part:
+
+.. literalinclude:: ../../tests/test_casperjs.js
+   :language: javascript
+
+The python part:
+
+.. literalinclude:: ../../tests/test_casperjs.py
+   :pyobject: test_casperjs
+

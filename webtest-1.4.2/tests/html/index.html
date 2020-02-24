@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+      <script language="javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js"></script>
+      <script language="javascript" src="/app.js"></script>
+      <title>It Works!</title>
+    </head>
+    <body>
+        <h1>It Works!</h1>
+        <div id="message">
+        </div>
+        <form action="/post" id="myform" method="post" enctype="multipart/form-data">
+          <div>
+            <label for="mytext">Text</label>
+            <input type="text" id="mytext" name="mytext" value="" />
+          </div>
+
+          <div>
+            <label for="myfile">File</label>
+            <input type="file" id="myfile" name="myfile" value="" />
+          </div>
+
+          <div>
+            <input type="radio" id="radio_true" name="myradio" value="true" />
+            <label for="radio_true">true</label>
+            <input type="radio" id="radio_false" name="myradio" value="false" />
+            <label for="radio_true">false</label>
+          </div>
+
+          <div>
+            <input type="checkbox" id="mycheckbox_true" name="mycheckbox" value="true" />
+            <label for="mycheckbox_true">true</label>
+            <input type="checkbox" id="mycheckbox_false" name="mycheckbox" value="false" />
+            <label for="mycheckbox_false">false</label>
+          </div>
+
+          <div>
+            <label for="myselect">Text</label>
+            <select id="myselect" name="myselect">
+              <option value="value1">value1</option>
+              <option value="value2">value2</option>
+              <option value="value3">value3</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="mymultiselect">Text</label>
+            <select id="mymultiselect" name="mymultiselect" multiple="multiple">
+              <option value="value1">value1</option>
+              <option value="value2">value2</option>
+              <option value="value3">value3</option>
+            </select>
+          </div>
+
+          <input type="hidden" name="redirect" value="%(redirect)s" />
+          <input type="submit" name="go" value="GO" />
+        </form>
+    </body>
+</html>

@@ -1,0 +1,19 @@
+Metadata-Version: 1.1
+Name: browsermob-proxy
+Version: 0.7.1
+Summary: A library for interacting with the Browsermob Proxy
+Home-page: http://oss.theautomatedtester.co.uk/browsermob-proxy-py
+Author: David Burns
+Author-email: david.burns at theautomatedtester dot co dot uk
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: Microsoft :: Windows
+Classifier: Operating System :: MacOS :: MacOS X
+Classifier: Topic :: Software Development :: Testing
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Programming Language :: Python
