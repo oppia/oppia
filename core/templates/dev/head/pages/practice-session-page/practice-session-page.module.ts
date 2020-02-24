@@ -19,10 +19,10 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { Component, NgModule, StaticProvider } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 // This component is needed to force-bootstrap Angular at the beginning of the
 // app.
@@ -37,11 +37,12 @@ import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants';
 import { ObjectsDomainConstants } from
   'domain/objects/objects-domain.constants';
-import { QuestionPlayerConstants } from
-  'components/question-directives/question-player/question-player.constants';
-import { ServicesConstants } from 'services/services.constants';
 import { PracticeSessionPageConstants } from
   'pages/practice-session-page/practice-session-page.constants';
+import { QuestionPlayerConstants } from
+  'components/question-directives/question-player/question-player.constants';
+import { RequestInterceptor } from 'services/request-interceptor.service';
+import { ServicesConstants } from 'services/services.constants';
 
 @NgModule({
   imports: [
@@ -55,6 +56,11 @@ import { PracticeSessionPageConstants } from
     ServiceBootstrapComponent
   ],
   providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: RequestInterceptor,
+      multi: true
+    },
     AppConstants,
     InteractionsExtensionsConstants,
     ObjectsDomainConstants,
@@ -81,7 +87,7 @@ declare var angular: any;
 
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+  'ngAudio', require('angular-cookies'), 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
   downgradedModule
