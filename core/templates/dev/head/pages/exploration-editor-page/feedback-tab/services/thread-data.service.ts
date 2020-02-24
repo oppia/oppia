@@ -36,7 +36,7 @@ angular.module('oppia').factory('ThreadDataService', [
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       ThreadMessageObjectFactory, UrlInterpolationService,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
-    let expId = ExplorationDataService.explorationId;
+    let expId = ExplorationDataService.explorationId.toString();
 
     let getFeedbackStatsHandlerUrl = function() {
       return UrlInterpolationService.interpolateUrl(
@@ -60,21 +60,21 @@ angular.module('oppia').factory('ThreadDataService', [
       return UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
           exploration_id: expId,
-          thread_id: threadId
+          thread_id: threadId.toString()
         });
     };
 
     let getThreadHandlerUrl = function(threadId) {
       return UrlInterpolationService.interpolateUrl(
         '/threadhandler/<thread_id>', {
-          thread_id: threadId
+          thread_id: threadId.toString()
         });
     };
 
     let getFeedbackThreadViewEventUrl = function(threadId) {
       return UrlInterpolationService.interpolateUrl(
         '/feedbackhandler/thread_view_event/<thread_id>', {
-          thread_id: threadId
+          thread_id: threadId.toString()
         });
     };
 
