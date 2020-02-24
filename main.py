@@ -698,6 +698,8 @@ URLS = MAPREDUCE_HANDLERS + [
         collection_editor.ExplorationMetadataSearchHandler),
     get_redirect_route(
         r'/explorationdataextractionhandler', admin.DataExtractionQueryHandler),
+    get_redirect_route(
+        r'/sendDummyMailToAdminHandler', admin.SendDummyMailToAdminHandler),
     get_redirect_route(r'/frontend_errors', FrontendErrorHandler),
     get_redirect_route(r'/logout', base.LogoutPage),
 
