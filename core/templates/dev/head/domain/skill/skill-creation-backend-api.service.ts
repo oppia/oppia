@@ -16,37 +16,60 @@
  * @fileoverview Backend service for creating a new skills
  */
 
-angular.module('oppia').factory('SkillCreationBackendApiService', [
-  '$http', '$q',
-  function($http, $q) {
-    var _createSkill = function(successCallback, errorCallback,
-        description, rubrics, explanation, linkedTopicIds) {
-      let postData = {
-        description: description,
-        linked_topic_ids: linkedTopicIds,
-        explanation_dict: explanation,
-        rubrics: rubrics
-      };
-      $http.post('/skill_editor_handler/create_new', postData)
-        .then(function(response) {
-          let skillId = response.data;
-          if (successCallback) {
-            successCallback(skillId);
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
-        });
-    };
-
-    return {
-      createSkill: function(description, rubrics, explanation, linkedTopicIds) {
-        return $q(function(resolve, reject) {
-          _createSkill(resolve, reject, description,
-            rubrics, explanation, linkedTopicIds);
-        });
-      }
-    };
+export interface ISkillBackendInterface {
+  'description': string,
+  'linked_topic_ids': string[],
+  'explanation_dict': string,
+  'rubrics': {
+    'explanation': string,
+    'difficulty':string
   }
-]);
+}
+
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+
+export class SkillCreationBackendApiService {
+  constructor(private http: HttpClient) { }
+
+  _createSkill(
+      successCallback: (value?: Object | PromiseLike<Object>) => void,
+      errorCallback:(reason?: any) => void,
+      description, rubrics, explanation, linkedTopicIds): void {
+        let postData:ISkillBackendInterface = {
+          description: description,
+          linked_topic_ids: linkedTopicIds,
+          explanation_dict: explanation,
+          rubrics: rubrics
+        };
+    this.http.post(
+      '/skill_editor_handler/create_new', postData).toPromise()
+      .then((response: { skillId:string }) => {
+        if (successCallback) {
+          successCallback({
+            topicId: response.skillId
+          });
+        }
+      }, (errorResponse) => {
+        if (errorCallback) {
+          errorCallback(errorResponse.body);
+        }
+      });
+  }
+
+  createTopic(description:string, rubrics:any, explanation:string,
+    linkedTopicIds:string[]): PromiseLike<Object> {
+    return new Promise((resolve, reject) => {
+      this._createSkill(resolve, reject,
+        description, rubrics, explanation, linkedTopicIds);
+    });
+  }
+}
+angular.module('oppia').factory('SkillCreationBackendApiService',
+  downgradeInjectable(SkillCreationBackendApiService));
+
