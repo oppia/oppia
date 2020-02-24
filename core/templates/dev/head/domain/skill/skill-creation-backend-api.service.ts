@@ -62,7 +62,7 @@ export class SkillCreationBackendApiService {
       });
   }
 
-  createTopic(description:string, rubrics:any, explanation:string,
+  createSkill(description:string, rubrics:any, explanation:string,
     linkedTopicIds:string[]): PromiseLike<Object> {
     return new Promise((resolve, reject) => {
       this._createSkill(resolve, reject,
