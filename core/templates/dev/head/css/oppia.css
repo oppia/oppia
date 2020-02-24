@@ -875,14 +875,20 @@ textarea {
 .dropdown-menu {
   padding: 5px 0;
   margin: 2px 0 0;
-  margin-left: 10px;
-  max-width: 700px;
+  max-width: 220px;
   min-width: 160px;
   font-size: 14px;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
   box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
+
+@media (max-width: 740px) {
+  .dropdown-menu  {
+    margin-left: 10px;
+    max-width: 700px;
+  }
 }
 
 .open > .dropdown-menu {
