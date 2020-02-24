@@ -96,8 +96,8 @@ angular.module('oppia').directive('topicsList', [
             // As additional stories are not supported initially, it's not
             // being shown, for now.
             $scope.TOPIC_HEADINGS = [
-              'name', 'subtopic_count', 'skill_count',
-              'canonical_story_count', 'topic_status'
+              'index', 'name', 'canonical_story_count', 'subtopic_count',
+              'skill_count', 'topic_status'
             ];
           };
         }
