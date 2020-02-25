@@ -141,6 +141,9 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       fetchMessages: function(thread) {
+        if (!thread) {
+          throw Error('Trying to update a non-existent thread');
+        }
         let threadId = thread.threadId;
 
         return $http.get(getThreadHandlerUrl(threadId)).then(response => {
@@ -173,6 +176,9 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       markThreadAsSeen: function(thread) {
+        if (!thread) {
+          throw Error('Trying to update a non-existent thread');
+        }
         let threadId = thread.threadId;
         return $http.post(getFeedbackThreadViewEventUrl(threadId), {
           thread_id: threadId
@@ -180,6 +186,9 @@ angular.module('oppia').factory('ThreadDataService', [
       },
 
       addNewMessage: function(thread, newMessage, newStatus) {
+        if (!thread) {
+          throw Error('Trying to update a non-existent thread');
+        }
         let threadId = thread.threadId;
         let oldStatus = thread.status;
         let updatedStatus = (oldStatus === newStatus) ? null : newStatus;
@@ -201,6 +210,9 @@ angular.module('oppia').factory('ThreadDataService', [
 
       resolveSuggestion: function(
           thread, action, commitMsg, reviewMsg, audioUpdateRequired) {
+        if (!thread) {
+          throw Error('Trying to update a non-existent thread');
+        }
         let threadId = thread.threadId;
 
         return $http.put(getSuggestionActionHandlerUrl(threadId), {

@@ -59,21 +59,24 @@ angular.module('oppia').directive('feedbackTab', [
             ThreadStatusDisplayService, UrlInterpolationService, UserService) {
           var ctrl = this;
           var _resetTmpMessageFields = function() {
-            ctrl.tmpMessage.status = ctrl.activeThread ?
-              ctrl.activeThread.status : null;
+            ctrl.tmpMessage.status =
+              ctrl.activeThread && ctrl.activeThread.status;
             ctrl.tmpMessage.text = '';
           };
+
           ctrl.clearActiveThread = function() {
             ctrl.activeThread = null;
             _resetTmpMessageFields();
           };
+
           // Fetches the threads again if any thread is updated.
           ctrl.fetchUpdatedThreads = function() {
-            var threadPromise = ThreadDataService.fetchThreads()
-              .then(data => ctrl.threadData = data);
-            ctrl.threadIsStale = false;
-            return threadPromise;
+            return ThreadDataService.fetchThreads().then(data => {
+              ctrl.threadData = data;
+              ctrl.threadIsStale = false;
+            });
           };
+
           ctrl.onBackButtonClicked = function() {
             ctrl.clearActiveThread();
             if (ctrl.threadIsStale) {
