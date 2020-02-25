@@ -5225,7 +5225,7 @@ tags: []
 title: Title
 """)
 
-   YAML_CONTENT_V36 = ("""author_notes: ''
+    YAML_CONTENT_V36 = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7668,8 +7668,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'choices': {'value': [
                 '<p>This is value1 for MultipleChoice</p>',
                 '<p>This is value2 for MultipleChoice</p>'
-            ]}
-            'showChoicesInShuffledOrder': {'value': 'true'}
+            ]},
+            'showChoicesInShuffledOrder': {'value': True}
         }
         customization_args_dict3 = {
             'choices': {'value': [

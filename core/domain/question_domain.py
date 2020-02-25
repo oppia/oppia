@@ -219,7 +219,7 @@ class Question(python_utils.OBJECT):
         """Converts from version 30 to 31. Version 31 adds a new
         customization arg to MultipleChoiceInput which allows
         answer choices to be shuffled.
-        
+
         Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
@@ -227,13 +227,13 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-        if question_state_dict['interaction']['id']=='MultipleChoiceInput':
+        if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
             customization_args = question_state_dict[
                 'interaction']['customization_args']
             customization_args.update({
                 'showChoicesInShuffledOrder': {
                     'value': True
-                        }
+                }
             })
 
         return question_state_dict

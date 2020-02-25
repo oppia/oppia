@@ -60,8 +60,7 @@ class MultipleChoiceInput(base.BaseInteraction):
             }
         },
         'default_value': [''],
-        },
-         {
+    }, {
         'name': 'showChoicesInShuffledOrder',
         'description': 'Shuffle answer choices',
         'schema': {

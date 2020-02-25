@@ -56,9 +56,9 @@ var testSuite = [{
     editor.appendBoldText('right');
   }, function(editor) {
     editor.appendItalicText('wrong1');
-  },function(editor) {
+  }, function(editor) {
     editor.appendItalicText('wrong2');
-  },function(editor) {
+  }, function(editor) {
     editor.appendItalicText('wrong3');
   }]],
   ruleArguments: ['Equals', ['right']],
@@ -71,7 +71,7 @@ var testSuite = [{
   }, function(checker) {
     checker.readItalicText('wrong3');
   }]],
-  wrongAnswers: ['wrong1','wrong2','wrong3'],
+  wrongAnswers: ['wrong1', 'wrong2', 'wrong3'],
   correctAnswers: ['right']
 }];
 

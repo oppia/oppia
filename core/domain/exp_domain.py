@@ -2331,7 +2331,7 @@ class Exploration(python_utils.OBJECT):
                 answer_group['tagged_skill_misconception_id'] = None
                 del answer_group['tagged_misconception_id']
         return states_dict
-    
+
     @classmethod
     def _convert_states_v30_dict_to_v31_dict(cls, states_dict):
         """Converts from version 30 to 31. Version 31 adds a new
@@ -2342,7 +2342,7 @@ class Exploration(python_utils.OBJECT):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
-                
+
         Returns:
             dict. The converted states_dict.
         """
@@ -2353,7 +2353,7 @@ class Exploration(python_utils.OBJECT):
                 customization_args.update({
                     'showChoicesInShuffledOrder': {
                         'value': True
-                         }
+                    }
                 })
 
         return states_dict
@@ -3224,7 +3224,7 @@ class Exploration(python_utils.OBJECT):
 
     @classmethod
     def _convert_v35_dict_to_v36_dict(cls, exploration_dict):
-        """Converts a v30 exploration dict into a v31 exploration dict.
+        """Converts a v35 exploration dict into a v36 exploration dict.
         adds a new customization arg to MultipleChoiceInput which allows
         answer choices to be shuffled.
         """
