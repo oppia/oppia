@@ -215,16 +215,9 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
-<<<<<<< HEAD
-    def _convert_state_v31_dict_to_v32_dict(cls, question_state_dict):
-        """Converts from version 31 to 32. Version 32 adds a new
-        customization arg to SetInput interaction which allows
-        creators to add custom text to the "Add" button.
-=======
     def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
         """Converts from version 30 to 31. Version 31 updates the
         Voiceover model to have an initialized duration_secs attribute of 0.0.
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
@@ -234,19 +227,6 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-<<<<<<< HEAD
-        if question_state_dict['interaction']['id'] == 'SetInput':
-            customization_args = question_state_dict[
-                'interaction']['customization_args']
-            customization_args.update({
-                'buttonText': {
-                    'value': 'Add item'
-                }
-            })
-
-        return question_state_dict
-
-=======
         # Get the voiceovers_mapping metadata.
         voiceovers_mapping = (question_state_dict['recorded_voiceovers']
                               ['voiceovers_mapping'])
@@ -261,7 +241,6 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
 
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
     @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):

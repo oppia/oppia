@@ -89,18 +89,10 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
-<<<<<<< HEAD
-    def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list):
-        """Converts draft change list from state version 31 to 32. State
-        version 32 adds a customization arg for the "Add" button text
-        in SetInput interaction, for which there should be no changes
-        to drafts.
-=======
     def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
         """Converts draft change list from state version 30 to 31. State
         Version 31 adds the duration_secs float for the Voiceover
         section of state.
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
 
         Args:
             draft_change_list: list(ExplorationChange). The list of
@@ -109,8 +101,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
-<<<<<<< HEAD
-=======
         for i, change in enumerate(draft_change_list):
             if (change.cmd == exp_domain.CMD_EDIT_STATE_PROPERTY and
                     change.property_name ==
@@ -132,7 +122,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
                         'voiceovers_mapping': new_voiceovers_mapping
                     }
                 })
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
         return draft_change_list
 
     @classmethod

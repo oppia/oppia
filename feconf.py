@@ -174,11 +174,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-<<<<<<< HEAD
-CURRENT_STATE_SCHEMA_VERSION = 32
-=======
 CURRENT_STATE_SCHEMA_VERSION = 31
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible

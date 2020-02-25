@@ -80,7 +80,7 @@ CMD_ADD_STATE = 'add_state'
 CMD_RENAME_STATE = 'rename_state'
 # This takes an additional 'state_name' parameter.
 CMD_DELETE_STATE = 'delete_state'
-# This takes additional 'state_name', 'content_id', 'language_code' and
+# This takes addition 'state_name', 'content_id', 'language_code' and
 # 'content_html' and 'translation_html' parameters.
 CMD_ADD_TRANSLATION = 'add_translation'
 # This takes additional 'property_name' and 'new_value' parameters.
@@ -2333,18 +2333,11 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
-<<<<<<< HEAD
-    def _convert_states_v31_dict_to_v32_dict(cls, states_dict):
-        """Converts from version 31 to 32. Version 32 adds a new
-        customization arg to SetInput interaction which allows
-        creators to add custom text to the "Add" button.
-=======
     def _convert_states_v30_dict_to_v31_dict(cls, states_dict):
         """Converts from version 30 to 31. Version 31 updates the
         Voiceover model to have an initialized duration_secs attribute
         of 0.0. This will be updated when a new mp3 audio file is uploaded
         for the exploration.
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2355,19 +2348,6 @@ class Exploration(python_utils.OBJECT):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-<<<<<<< HEAD
-            if state_dict['interaction']['id'] == 'SetInput':
-                customization_args = state_dict[
-                    'interaction']['customization_args']
-                customization_args.update({
-                    'buttonText': {
-                        'value': 'Add item'
-                    }
-                })
-
-        return states_dict
-
-=======
             # Get the voiceovers_mapping metadata.
             voiceovers_mapping = (state_dict['recorded_voiceovers']
                                   ['voiceovers_mapping'])
@@ -2382,7 +2362,6 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
 
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
     @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
@@ -2418,11 +2397,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-<<<<<<< HEAD
-    CURRENT_EXP_SCHEMA_VERSION = 37
-=======
     CURRENT_EXP_SCHEMA_VERSION = 36
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3252,21 +3227,6 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-<<<<<<< HEAD
-    def _convert_v36_dict_to_v37_dict(cls, exploration_dict):
-        """Converts a v36 exploration dict into a v37 exploration dict.
-        Adds a new customization arg to SetInput interactions
-        which allows creators to customize the "Add item" button.
-        """
-        exploration_dict['schema_version'] = 37
-
-        exploration_dict['states'] = cls._convert_states_v31_dict_to_v32_dict(
-            exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 32
-
-        return exploration_dict
-
-=======
     def _convert_v35_dict_to_v36_dict(cls, exploration_dict):
         """Converts a v35 exploration dict into a v36 exploration dict.
         Updates existing explorations to match the Voiceover class to have
@@ -3289,7 +3249,6 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
 
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
     @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
@@ -3503,14 +3462,6 @@ class Exploration(python_utils.OBJECT):
                 exploration_dict)
             exploration_schema_version = 36
 
-<<<<<<< HEAD
-        if exploration_schema_version == 36:
-            exploration_dict = cls._convert_v36_dict_to_v37_dict(
-                exploration_dict)
-            exploration_schema_version = 37
-
-=======
->>>>>>> 5c1d39315b604af3cbb18cddab3c3789561f1e08
         return (exploration_dict, initial_schema_version)
 
     @classmethod
