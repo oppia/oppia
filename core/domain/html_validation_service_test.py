@@ -1481,9 +1481,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, 'image/png')
-        fs.commit(owner_id, 'image/abc2.png', raw_image, 'image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, 'image/png')
+        fs.commit('image/abc1.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc2.png', raw_image, mimetype='image/png')
+        fs.commit('image/abc3.png', raw_image, mimetype='image/png')
 
         for test_case in test_cases:
             self.assertEqual(
