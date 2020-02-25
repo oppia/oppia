@@ -590,7 +590,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
 class QuestionMigrationTests(test_utils.GenericTestBase):
 
-    def test_migrate_question_state_from_v30_to_v31(self):
+    def test_migrate_question_state_from_v31_to_v32(self):
         answer_group = {
             'outcome': {
                 'dest': 'abc',
@@ -663,7 +663,7 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             language_code='en',
             version=0,
             linked_skill_ids=['skill_id'],
-            question_state_data_schema_version=30)
+            question_state_data_schema_version=31)
         commit_cmd = question_domain.QuestionChange({
             'cmd': question_domain.CMD_CREATE_NEW
         })
@@ -672,12 +672,12 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
             'user_id_admin', 'question model created', commit_cmd_dicts)
 
         current_schema_version_swap = self.swap(
-            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 31)
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 32)
 
         with current_schema_version_swap:
             question = question_fetchers.get_question_from_model(question_model)
 
-        self.assertEqual(question.question_state_data_schema_version, 31)
+        self.assertEqual(question.question_state_data_schema_version, 32)
 
         cust_args = question.question_state_data.interaction.customization_args
         self.assertEqual(cust_args['buttonText']['value'], 'Add item')

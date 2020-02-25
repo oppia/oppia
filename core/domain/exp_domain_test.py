@@ -5224,7 +5224,7 @@ states_schema_version: 30
 tags: []
 title: Title
 """)
-    YAML_CONTENT_V36 = ("""author_notes: ''
+    YAML_CONTENT_V37 = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -5234,7 +5234,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -5346,12 +5346,12 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V36
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V37
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -5786,7 +5786,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -5904,7 +5904,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -5936,7 +5936,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -6053,7 +6053,7 @@ states:
         content: {}
         default_outcome: {}
         hint_1: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -6103,7 +6103,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -6227,7 +6227,7 @@ states:
         default_outcome: {}
         hint_1: {}
         solution: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -6259,7 +6259,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -6379,7 +6379,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -6441,7 +6441,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -6558,7 +6558,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -7012,7 +7012,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V36_IMAGE_DIMENSIONS = ("""author_notes: ''
+    YAML_CONTENT_V37_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -7022,7 +7022,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   Introduction:
     classifier_model_id: null
@@ -7248,7 +7248,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: title
 """)
@@ -7363,7 +7363,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V36_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V37_WITH_IMAGE_CAPTION = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -7373,7 +7373,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 36
+schema_version: 37
 states:
   (untitled state):
     classifier_model_id: null
@@ -7487,7 +7487,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 31
+states_schema_version: 32
 tags: []
 title: Title
 """)
@@ -7505,7 +7505,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V36_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V37_IMAGE_DIMENSIONS)
 
 
     def test_load_from_v27_without_image_caption(self):
@@ -7518,7 +7518,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V36_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V37_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):

@@ -215,8 +215,8 @@ class Question(python_utils.OBJECT):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v30_dict_to_v31_dict(cls, question_state_dict):
-        """Converts from version 30 to 31. Version 31 adds a new
+    def _convert_state_v31_dict_to_v32_dict(cls, question_state_dict):
+        """Converts from version 31 to 32. Version 32 adds a new
         customization arg to SetInput interaction which allows
         creators to add custom text to the "Add" button.
 

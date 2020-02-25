@@ -2333,8 +2333,8 @@ class Exploration(python_utils.OBJECT):
         return states_dict
 
     @classmethod
-    def _convert_states_v30_dict_to_v31_dict(cls, states_dict):
-        """Converts from version 30 to 31. Version 31 adds a new
+    def _convert_states_v31_dict_to_v32_dict(cls, states_dict):
+        """Converts from version 31 to 32. Version 32 adds a new
         customization arg to SetInput interaction which allows
         creators to add custom text to the "Add" button.
 
@@ -2393,7 +2393,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 36
+    CURRENT_EXP_SCHEMA_VERSION = 37
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3223,16 +3223,16 @@ class Exploration(python_utils.OBJECT):
         return exploration_dict
 
     @classmethod
-    def _convert_v35_dict_to_v36_dict(cls, exploration_dict):
-        """Converts a v35 exploration dict into a v36 exploration dict.
+    def _convert_v36_dict_to_v37_dict(cls, exploration_dict):
+        """Converts a v36 exploration dict into a v37 exploration dict.
         Adds a new customization arg to SetInput interactions
         which allows creators to customize the "Add item" button.
         """
-        exploration_dict['schema_version'] = 36
+        exploration_dict['schema_version'] = 37
 
-        exploration_dict['states'] = cls._convert_states_v30_dict_to_v31_dict(
+        exploration_dict['states'] = cls._convert_states_v31_dict_to_v32_dict(
             exploration_dict['states'])
-        exploration_dict['states_schema_version'] = 31
+        exploration_dict['states_schema_version'] = 32
 
         return exploration_dict
 
@@ -3448,6 +3448,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v35_dict_to_v36_dict(
                 exploration_dict)
             exploration_schema_version = 36
+
+        if exploration_schema_version == 36:
+            exploration_dict = cls._convert_v36_dict_to_v37_dict(
+                exploration_dict)
+            exploration_schema_version = 37
 
         return (exploration_dict, initial_schema_version)
 

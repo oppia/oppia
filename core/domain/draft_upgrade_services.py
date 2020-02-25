@@ -89,9 +89,9 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
-    def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
-        """Converts draft change list from state version 30 to 31. State
-        version 31 adds a customization arg for the "Add" button text
+    def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list):
+        """Converts draft change list from state version 31 to 32. State
+        version 32 adds a customization arg for the "Add" button text
         in SetInput interaction, for which there should be no changes
         to drafts.
 
