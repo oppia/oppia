@@ -865,7 +865,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                     self.TRANSLATION_LANGUAGE_CODE: {
                         'filename': 'filename3.mp3',
                         'file_size_bytes': 3000,
-                        'needs_update': False
+                        'needs_update': False,
+                        'duration_secs': 42.43
                     }
                 },
                 'default_outcome': {}
