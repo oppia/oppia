@@ -24,7 +24,7 @@ import { UpgradedServices } from 'services/UpgradedServices';
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
-describe('retrieving threads service', function() {
+describe('ThreadDataService', function() {
   let expId = 'exp1';
   let $httpBackend = null;
   let ThreadDataService = null;

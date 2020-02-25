@@ -36,19 +36,17 @@ angular.module('oppia').factory('ThreadDataService', [
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       ThreadMessageObjectFactory, UrlInterpolationService,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
-    let expId = ExplorationDataService.explorationId;
-
     let getFeedbackStatsHandlerUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         '/feedbackstatshandler/<exploration_id>', {
-          exploration_id: expId + ''
+          exploration_id: ExplorationDataService.explorationId + ''
         });
     };
 
     let getThreadListHandlerUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         '/threadlisthandler/<exploration_id>', {
-          exploration_id: expId + ''
+          exploration_id: ExplorationDataService.explorationId + ''
         });
     };
 
@@ -59,7 +57,7 @@ angular.module('oppia').factory('ThreadDataService', [
     let getSuggestionActionHandlerUrl = function(threadId) {
       return UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
-          exploration_id: expId + '',
+          exploration_id: ExplorationDataService.explorationId + '',
           thread_id: threadId + ''
         });
     };
@@ -116,7 +114,10 @@ angular.module('oppia').factory('ThreadDataService', [
 
       fetchThreads: function() {
         let suggestionPromise = $http.get(getSuggestionListHandlerUrl(), {
-          params: {target_type: 'exploration', target_id: expId}
+          params: {
+            target_type: 'exploration',
+            target_id: ExplorationDataService.explorationId,
+          }
         });
         let threadPromise = $http.get(getThreadListHandlerUrl());
 
