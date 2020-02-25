@@ -1385,6 +1385,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }, {
             'html_content': (
+                '<oppia-noninteractive-image caption-with-value="&amp;quot;'
+                '&amp;quot;" filepath-with-value="">'
+                '</oppia-noninteractive-image>'
                 '<oppia-noninteractive-collapsible content-with-value="&amp;'
                 'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
                 'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
@@ -1410,6 +1413,64 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }, {
             'html_content': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+                'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
+                'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
+                'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
+                '"></oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                u'<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+                'quot;abc2_height_32_width_32.png&amp;amp;amp;quot;\&amp;quot;'
+                '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
+                'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
+                '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
+                'Header&amp;quot;"></oppia-noninteractive-collapsible>'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-collapsible content-with-value="" '
+                'heading-with-value="&amp;quot;Sample Header&amp;quot;'
+                '"></oppia-noninteractive-collapsible>'
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+                'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
+                '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
+                'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
+                'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
+                '"></oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                u'<oppia-noninteractive-collapsible content-with-value="" '
+                'heading-with-value="&amp;quot;Sample Header&amp;quot;'
+                '"></oppia-noninteractive-collapsible>'
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+                'quot;abc2_height_32_width_32.png&amp;amp;amp;quot;\&amp;quot;'
+                '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
+                'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
+                '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
+                'Header&amp;quot;"></oppia-noninteractive-collapsible>'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-tabs tab_contents-with-value="">'
+                '</oppia-noninteractive-tabs>'
                 '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
                 'quot;title&amp;quot;:&amp;quot;tab1&amp;quot;,&amp;quot;'
                 'content&amp;quot;:&amp;quot;&amp;lt;'
@@ -1440,7 +1501,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-tabs>'
             ),
             'expected_output': (
-                u'<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
+                u'<oppia-noninteractive-tabs tab_contents-with-value="">'
+                '</oppia-noninteractive-tabs>'
+                '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
                 'quot;title&amp;quot;:&amp;quot;tab1&amp;quot;,&amp;quot;'
                 'content&amp;quot;:&amp;quot;&amp;lt;'
                 'oppia-noninteractive-image alt-with-value=\&amp;quot;&amp;'
@@ -1489,6 +1552,40 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
                     False, exp_id, test_case['html_content']),
                 test_case['expected_output'])
+    
+    # pylint: disable=anomalous-backslash-in-string
+    def test_add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks_for_questions( # pylint: disable=line-too-long
+            self):
+        html_content = (
+            '<oppia-noninteractive-collapsible content-with-value="&amp;'
+            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+            'quot;\&amp;quot; filepath-with-value=\&quot;&amp;amp;quot;'
+            '&amp;amp;quot;\&quot;&gt;&amp;lt;'
+            '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
+            'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
+            'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
+            '"></oppia-noninteractive-collapsible>')
+        expected_output = (
+            u'<oppia-noninteractive-collapsible content-with-value="&amp;'
+            'quot;&amp;lt;p&amp;gt;You have opened the collapsible block.'
+            '&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;'
+            'Sample Header&amp;quot;"></oppia-noninteractive-collapsible>')
+
+        exp_id = 'eid'
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs.commit('image/abc2.png', raw_image, mimetype='image/png')
+        self.assertEqual(
+            html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
+                True, exp_id, html_content), expected_output)
 
     def test_add_dimensions_to_image_tags_with_invalid_filepath_with_value(
             self):
@@ -1521,6 +1618,15 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags(
+                False, exp_id, html_content)
+
+        self.assertEqual(len(observed_log_messages), 1)
+        self.assertEqual(
+            observed_log_messages[0],
+            'Exploration exp_id failed to load image: abc1.png')
+
+        with assert_raises_context_manager, logging_swap:
+            html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
                 False, exp_id, html_content)
 
         self.assertEqual(len(observed_log_messages), 1)

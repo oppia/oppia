@@ -105,22 +105,6 @@ class DraftUpgradeUtil(python_utils.OBJECT):
 
     @classmethod
     def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
-        """Converts from version 30 to 31. Version 31 updates the
-        Voiceover model to have an initialized duration_secs attribute
-        of 0.0. This will be updated when a new mp3 audio file is uploaded
-        for the exploration.
-
-        Args:
-            draft_change_list: list(ExplorationChange). The list of
-                ExplorationChange domain objects to upgrade.
-
-        Returns:
-            list(ExplorationChange). The converted draft_change_list.
-        """
-        return draft_change_list
-
-    @classmethod
-    def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
         """Converts draft change list from state version 30 to 31. State
         Version 31 adds the duration_secs float for the Voiceover
         section of state.
