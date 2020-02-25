@@ -7253,7 +7253,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 30
+states_schema_version: 31
 tags: []
 title: title
 """)

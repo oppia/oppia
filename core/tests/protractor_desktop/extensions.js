@@ -117,7 +117,7 @@ describe('Interactions', function() {
     libraryPage = new LibraryPage.LibraryPage();
   });
 
-  fit('should pass their own test suites', function() {
+  it('should pass their own test suites', function() {
     users.createUser('user@interactions.com', 'userInteractions');
     users.login('user@interactions.com');
     workflow.createExploration();
