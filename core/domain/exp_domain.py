@@ -2379,10 +2379,13 @@ class Exploration(python_utils.OBJECT):
         """
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
+        # The following schema versions require exploration_id to be passed as
+        # as additional parameter in the conversion_fn.
+        special_case_schema_versions = [24, 30]
 
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
-        if current_states_schema_version == 24:
+        if current_states_schema_version in special_case_schema_versions:
             conversion_fn = functools.partial(conversion_fn, exploration_id)
         versioned_exploration_states['states'] = conversion_fn(
             versioned_exploration_states['states'])

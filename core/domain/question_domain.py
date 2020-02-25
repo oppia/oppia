@@ -245,13 +245,12 @@ class Question(python_utils.OBJECT):
         Returns:
             dict. The converted question_state_dict.
         """
-        for key, state_dict in question_state_dict.items():
-            add_dimensions_to_image_tags = functools.partial(
-                html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
-                True, question_id)
-            question_state_dict[key] = state_domain.State.convert_html_fields_in_state( # pylint: disable=line-too-long
-                state_dict,
-                add_dimensions_to_image_tags)
+        add_dimensions_to_image_tags = functools.partial(
+            html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks, # pylint: disable=line-too-long
+            True, question_id)
+        question_state_dict = state_domain.State.convert_html_fields_in_state( # pylint: disable=line-too-long
+            question_state_dict,
+            add_dimensions_to_image_tags)
 
         return question_state_dict
 
