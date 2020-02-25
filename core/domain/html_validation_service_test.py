@@ -1552,7 +1552,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
                     False, exp_id, test_case['html_content']),
                 test_case['expected_output'])
-    
+
     # pylint: disable=anomalous-backslash-in-string
     def test_add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks_for_questions( # pylint: disable=line-too-long
             self):
