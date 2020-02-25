@@ -1370,8 +1370,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
                 'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
                 'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-                'quot;\&amp;quot; filepath-with-value=\&quot;&amp;amp;quot;&amp;amp;quot;\&quot;'
-                '&gt;&amp;lt;'
+                'quot;\&amp;quot; filepath-with-value=\&quot;&amp;amp;quot;'
+                '&amp;amp;quot;\&quot;&gt;&amp;lt;'
                 '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
                 'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
                 'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
@@ -1481,9 +1481,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DatastoreBackedFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
-        fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc2.png', raw_image, mimetype='image/png')
-        fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
+        fs.commit(owner_id, 'image/abc1.png', raw_image, 'image/png')
+        fs.commit(owner_id, 'image/abc2.png', raw_image, 'image/png')
+        fs.commit(owner_id, 'image/abc3.png', raw_image, 'image/png')
 
         for test_case in test_cases:
             self.assertEqual(
