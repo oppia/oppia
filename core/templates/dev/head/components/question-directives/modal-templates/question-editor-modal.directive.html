@@ -39,11 +39,18 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-secondary" ng-click="cancel()"> Cancel </button>
-  <button title="To Save please add: interaction, hint, solution and address all misconceptions"
+  <button ng-if="newQuestionIsBeingCreated"
+          title="To Save please add: interaction, hint, solution and address all misconceptions"
           class="btn btn-success protractor-test-save-question-button"
           ng-click="done()"
           ng-disabled="isSaveButtonDisabled()">
     Done
+  </button>
+  <button ng-if="!newQuestionIsBeingCreated"
+          class="btn btn-success protractor-test-save-question-button"
+          ng-click="saveAndCommit()"
+          ng-disabled="isSaveAndCommitButtonDisabled()">
+    Save and Commit
   </button>
 </div>
 <style>
