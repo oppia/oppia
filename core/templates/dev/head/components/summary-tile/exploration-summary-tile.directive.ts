@@ -101,33 +101,7 @@ angular.module('oppia').directive('explorationSummaryTile', [
             $scope, $http, $window, DateTimeFormatService,
             RatingComputationService, UrlService, UserService,
             WindowDimensionsService, ACTIVITY_TYPE_EXPLORATION) {
-          $scope.userIsLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
-          });
-          $scope.ACTIVITY_TYPE_EXPLORATION = ACTIVITY_TYPE_EXPLORATION;
-          var contributorsSummary = $scope.getContributorsSummary() || {};
-          $scope.contributors = Object.keys(
-            contributorsSummary).sort(
-            function(contributorUsername1, contributorUsername2) {
-              var commitsOfContributor1 = contributorsSummary[
-                contributorUsername1].num_commits;
-              var commitsOfContributor2 = contributorsSummary[
-                contributorUsername2].num_commits;
-              return commitsOfContributor2 - commitsOfContributor1;
-            }
-          );
-
-          $scope.isRefresherExploration = false;
-          if ($scope.getParentExplorationIds()) {
-            $scope.isRefresherExploration = (
-              $scope.getParentExplorationIds().length > 0);
-          }
-
-          $scope.avatarsList = [];
-
-          $scope.MAX_AVATARS_TO_DISPLAY = 5;
-
+          var ctrl = this;
           $scope.setHoverState = function(hoverState) {
             $scope.explorationIsCurrentlyHoveredOver = hoverState;
           };
@@ -173,6 +147,11 @@ angular.module('oppia').directive('explorationSummaryTile', [
                 $scope.getStoryNodeId()) {
                 storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
                 storyNodeIdToAdd = $scope.getStoryNodeId();
+              } else if (
+                urlParams.hasOwnProperty('story_id') &&
+                urlParams.hasOwnProperty('node_id')) {
+                storyIdToAdd = urlParams.story_id;
+                storyNodeIdToAdd = $scope.getStoryNodeId();
               }
 
               if (collectionIdToAdd) {
@@ -194,21 +173,48 @@ angular.module('oppia').directive('explorationSummaryTile', [
             }
           };
 
-          if (!$scope.mobileCutoffPx) {
-            $scope.mobileCutoffPx = 0;
-          }
-          $scope.isWindowLarge = (
-            WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
-
-          WindowDimensionsService.registerOnResizeHook(function() {
-            $scope.isWindowLarge = (
-              WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
-            $scope.$apply();
-          });
-
           $scope.getCompleteThumbnailIconUrl = function() {
             return UrlInterpolationService.getStaticImageUrl(
               $scope.getThumbnailIconUrl());
+          };
+          ctrl.$onInit = function() {
+            $scope.userIsLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            });
+            $scope.ACTIVITY_TYPE_EXPLORATION = ACTIVITY_TYPE_EXPLORATION;
+            var contributorsSummary = $scope.getContributorsSummary() || {};
+            $scope.contributors = Object.keys(
+              contributorsSummary).sort(
+              function(contributorUsername1, contributorUsername2) {
+                var commitsOfContributor1 = contributorsSummary[
+                  contributorUsername1].num_commits;
+                var commitsOfContributor2 = contributorsSummary[
+                  contributorUsername2].num_commits;
+                return commitsOfContributor2 - commitsOfContributor1;
+              }
+            );
+
+            $scope.isRefresherExploration = false;
+            if ($scope.getParentExplorationIds()) {
+              $scope.isRefresherExploration = (
+                $scope.getParentExplorationIds().length > 0);
+            }
+
+            $scope.avatarsList = [];
+
+            $scope.MAX_AVATARS_TO_DISPLAY = 5;
+            if (!$scope.mobileCutoffPx) {
+              $scope.mobileCutoffPx = 0;
+            }
+            $scope.isWindowLarge = (
+              WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+
+            WindowDimensionsService.registerOnResizeHook(function() {
+              $scope.isWindowLarge = (
+                WindowDimensionsService.getWidth() >= $scope.mobileCutoffPx);
+              $scope.$apply();
+            });
           };
         }
       ]

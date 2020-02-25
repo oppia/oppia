@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Jobs for queries personalized to individual users."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -392,26 +393,6 @@ class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
                         model_instance.id,
                         ', '.join(exp_ids_removed)),
                     1)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, len(values))
-
-
-class UserGaeIdOneOffJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for populating UserSettingsModel with gae_id."""
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """Return a list of datastore class references to map over."""
-        return [user_models.UserSettingsModel]
-
-    @staticmethod
-    def map(model_instance):
-        """Implements the map function for this job."""
-        if model_instance.gae_id is None:
-            model_instance.gae_id = model_instance.id
-        model_instance.put(update_last_updated_time=False)
-        yield ('SUCCESS', model_instance.id)
 
     @staticmethod
     def reduce(key, values):

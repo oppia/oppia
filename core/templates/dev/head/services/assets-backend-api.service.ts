@@ -44,6 +44,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
 
     var ASSET_TYPE_AUDIO = 'audio';
     var ASSET_TYPE_IMAGE = 'image';
+    var ASSET_TYPE_THUMBNAIL = 'thumbnail';
 
     var GCS_PREFIX = ('https://storage.googleapis.com/' +
       GCS_RESOURCE_BUCKET_NAME);
@@ -53,9 +54,18 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     var IMAGE_DOWNLOAD_URL_TEMPLATE = (
       (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
       '/<entity_type>/<entity_id>/assets/image/<filename>');
+    var THUMBNAIL_DOWNLOAD_URL_TEMPLATE = (
+      (DEV_MODE ? '/assetsdevhandler' : GCS_PREFIX) +
+      '/<entity_type>/<entity_id>/assets/thumbnail/<filename>');
 
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
+
+    var ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE = {
+      [ASSET_TYPE_AUDIO]: AUDIO_DOWNLOAD_URL_TEMPLATE,
+      [ASSET_TYPE_IMAGE]: IMAGE_DOWNLOAD_URL_TEMPLATE,
+      [ASSET_TYPE_THUMBNAIL]: THUMBNAIL_DOWNLOAD_URL_TEMPLATE
+    };
 
     // Map from asset filename to asset blob.
     var assetsCache = {};
@@ -76,8 +86,9 @@ angular.module('oppia').factory('AssetsBackendApiService', [
         responseType: 'blob',
         url: _getDownloadUrl(entityType, entityId, filename, assetType),
         timeout: canceler.promise
-      }).success(function(data) {
+      }).then(function(response) {
         var assetBlob = null;
+        var data = response.data;
         try {
           assetBlob = new Blob([data], {type: data.type});
         } catch (exception) {
@@ -117,7 +128,7 @@ angular.module('oppia').factory('AssetsBackendApiService', [
           successCallback(
             ImageFileObjectFactory.createNew(filename, assetBlob));
         }
-      }).error(function() {
+      }, function() {
         errorCallback(filename);
       })['finally'](function() {
         _removeFromFilesCurrentlyBeingRequested(filename, assetType);
@@ -198,9 +209,10 @@ angular.module('oppia').factory('AssetsBackendApiService', [
     };
 
     var _getDownloadUrl = function(entityType, entityId, filename, assetType) {
+      var urlTemplate = null;
+      urlTemplate = ASSET_TYPE_TO_DOWNLOAD_URL_TEMPLATE[assetType];
       return UrlInterpolationService.interpolateUrl(
-        (assetType === ASSET_TYPE_AUDIO ? AUDIO_DOWNLOAD_URL_TEMPLATE :
-        IMAGE_DOWNLOAD_URL_TEMPLATE), {
+        urlTemplate, {
           entity_id: entityId,
           entity_type: entityType,
           filename: filename
@@ -279,6 +291,10 @@ angular.module('oppia').factory('AssetsBackendApiService', [
       getImageUrlForPreview: function(entityType, entityId, filename) {
         return _getDownloadUrl(
           entityType, entityId, filename, ASSET_TYPE_IMAGE);
+      },
+      getThumbnailUrlForPreview: function(entityType, entityId, filename) {
+        return _getDownloadUrl(
+          entityType, entityId, filename, ASSET_TYPE_THUMBNAIL);
       }
     };
   }

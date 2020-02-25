@@ -32,34 +32,35 @@ require('services/debouncer.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
-  'MathExpressionInputRulesService',
+  '$timeout', 'MathExpressionInputRulesService',
   'UrlInterpolationService',
   function(
-      MathExpressionInputRulesService,
+      $timeout, MathExpressionInputRulesService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/MathExpressionInput/directives/' +
-        'math-expression-input-interaction.directive.html'),
+      template: require('./math-expression-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
+        '$scope', '$attrs', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
         'CurrentInteractionService',
         function(
-            $scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
+            $scope, $attrs, $element, LABEL_FOR_CLEARING_FOCUS,
             DebouncerService, DeviceInfoService, WindowDimensionsService,
             CurrentInteractionService) {
           var ctrl = this;
-          var guppyDivElt = $element[0].querySelector('.guppy-div');
+          var guppyDivElt, guppyDivId, guppyInstance;
+          var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
+            '/overrides/guppy/oppia_symbols.json');
+          var labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          var answer = {
+            ascii: '',
+            latex: ''
+          };
 
-          // Dynamically assigns a unique id to the guppy-div
-          guppyDivElt.setAttribute(
-            'id', 'guppy_' + Math.floor(Math.random() * 100000000));
-          var guppyDivId = guppyDivElt.id;
           /**
            * Adds a button overlay and invisible text field used to bring up
            * the keyboard on mobile devices.
@@ -146,62 +147,6 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
               setGuppyContentFromInput();
             });
           };
-          var oppiaSymbolsUrl = UrlInterpolationService.getStaticAssetUrl(
-            '/overrides/guppy/oppia_symbols.json');
-          Guppy.init({
-            symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
-              oppiaSymbolsUrl]});
-          var guppyInstance = new Guppy(guppyDivId, {
-            settings: {
-              empty_content: (
-                '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
-              buttons: []
-            },
-            events: {
-              done: function(e) {
-                ctrl.submitAnswer();
-              },
-              change: function(e) {
-                // Need to manually trigger the digest cycle
-                // to make any 'watchers' aware of changes in answer.
-                $scope.$apply();
-              },
-              ready: function() {
-                if (DeviceInfoService.isMobileUserAgent() &&
-                  DeviceInfoService.hasTouchEvents()) {
-                  ctrl.mobileOverlayIsShown = true;
-                  // Wait for the scope change to apply. Since we interact with
-                  // the DOM elements, they need to be added by angular before
-                  // the function is called. Timeout of 0 to wait
-                  // until the end of the current digest cycle,
-                  // false to not start a new digest cycle.
-                  // A new cycle is not needed since no angular variables
-                  // are changed within the function.
-                  $timeout(makeGuppyMobileFriendly, 0, false);
-                }
-              }
-            }
-          });
-
-          guppyInstance.render();
-          var labelForFocusTarget = $attrs.labelForFocusTarget || null;
-
-          $scope.$on('focusOn', function(e, name) {
-            if (!labelForFocusTarget) {
-              return;
-            }
-
-            if (name === labelForFocusTarget) {
-              guppyInstance.activate();
-            } else if (name === LABEL_FOR_CLEARING_FOCUS) {
-              guppyInstance.deactivate();
-            }
-          });
-
-          var answer = {
-            ascii: '',
-            latex: ''
-          };
 
           ctrl.isCurrentAnswerValid = function() {
             var latexAnswer = guppyInstance.latex();
@@ -223,9 +168,62 @@ angular.module('oppia').directive('oppiaInteractiveMathExpressionInput', [
             CurrentInteractionService.onSubmit(
               answer, MathExpressionInputRulesService);
           };
+          ctrl.$onInit = function() {
+            guppyDivElt = $element[0].querySelector('.guppy-div');
 
-          CurrentInteractionService.registerCurrentInteraction(
-            ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
+            // Dynamically assigns a unique id to the guppy-div
+            guppyDivElt.setAttribute(
+              'id', 'guppy_' + Math.floor(Math.random() * 100000000));
+            guppyDivId = guppyDivElt.id;
+            guppyInstance = new Guppy(guppyDivId, {
+              settings: {
+                empty_content: (
+                  '\\color{grey}{\\text{\\small{Type a formula here.}}}'),
+                buttons: []
+              },
+              events: {
+                done: function(e) {
+                  ctrl.submitAnswer();
+                },
+                change: function(e) {
+                  // Need to manually trigger the digest cycle
+                  // to make any 'watchers' aware of changes in answer.
+                  $scope.$apply();
+                },
+                ready: function() {
+                  if (DeviceInfoService.isMobileUserAgent() &&
+                    DeviceInfoService.hasTouchEvents()) {
+                    ctrl.mobileOverlayIsShown = true;
+                    // Wait for the scope change to apply. Since we interact
+                    // with the DOM elements, they need to be added by angular
+                    // before the function is called. Timeout of 0 to wait
+                    // until the end of the current digest cycle,
+                    // false to not start a new digest cycle.
+                    // A new cycle is not needed since no angular variables
+                    // are changed within the function.
+                    $timeout(makeGuppyMobileFriendly, 0, false);
+                  }
+                }
+              }
+            });
+            Guppy.init({
+              symbols: ['/third_party/static/guppy-b5055b/sym/symbols.json',
+                oppiaSymbolsUrl]});
+            guppyInstance.render();
+            CurrentInteractionService.registerCurrentInteraction(
+              ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
+            $scope.$on('focusOn', function(e, name) {
+              if (!labelForFocusTarget) {
+                return;
+              }
+
+              if (name === labelForFocusTarget) {
+                guppyInstance.activate();
+              } else if (name === LABEL_FOR_CLEARING_FOCUS) {
+                guppyInstance.deactivate();
+              }
+            });
+          };
         }
       ]
     };

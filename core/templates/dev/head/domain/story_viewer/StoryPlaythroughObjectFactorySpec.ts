@@ -16,30 +16,18 @@
  * @fileoverview Tests for StoryPlaythroughObjectFactory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { TestBed } from '@angular/core/testing';
 
-require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
+import { StoryPlaythroughObjectFactory } from
+  'domain/story_viewer/StoryPlaythroughObjectFactory';
 
-describe('Story playthrough object factory', function() {
-  var StoryPlaythroughObjectFactory = null;
-  var _sampleSubtopic = null;
-  var _sampleStoryNode = null;
+describe('Story playthrough object factory', () => {
+  let storyPlaythroughObjectFactory: StoryPlaythroughObjectFactory = null;
   var _samplePlaythroughObject = null;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  beforeEach(angular.mock.inject(function($injector) {
-    StoryPlaythroughObjectFactory = $injector.get(
-      'StoryPlaythroughObjectFactory');
+  beforeEach(() => {
+    storyPlaythroughObjectFactory = TestBed.get(
+      StoryPlaythroughObjectFactory);
 
     var firstSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
@@ -77,9 +65,9 @@ describe('Story playthrough object factory', function() {
         secondSampleReadOnlyStoryNodeBackendDict]
     };
     _samplePlaythroughObject =
-      StoryPlaythroughObjectFactory.createFromBackendDict(
+      storyPlaythroughObjectFactory.createFromBackendDict(
         storyPlaythroughBackendObject);
-  }));
+  });
 
   it('should correctly return all the values', function() {
     expect(_samplePlaythroughObject.getInitialNode().getId()).toEqual('node_1');

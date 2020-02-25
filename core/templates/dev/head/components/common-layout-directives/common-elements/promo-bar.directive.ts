@@ -18,19 +18,16 @@
  * dismissible.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/promo-bar.service.ts');
 
 angular.module('oppia').directive('promoBar', [
-  '$window', 'PromoBarService', 'UrlInterpolationService',
-  function($window, PromoBarService, UrlInterpolationService) {
+  '$window', 'PromoBarService',
+  function($window, PromoBarService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/common-elements/' +
-        'promo-bar.directive.html'),
+      template: require('./promo-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {
@@ -60,20 +57,17 @@ angular.module('oppia').directive('promoBar', [
               return false;
             }
           };
-
-          PromoBarService.getPromoBarData().then(function(promoBarObject) {
-            ctrl.promoBarIsEnabled = promoBarObject.promoBarEnabled;
-            ctrl.promoBarMessage = promoBarObject.promoBarMessage;
-          });
-
-          // TODO(bhenning): Utilize cookies for tracking when a promo is
-          // dismissed. Cookies allow for a longer-lived memory of whether the
-          // promo is dismissed.
-          ctrl.promoIsVisible = !isPromoDismissed();
-
           ctrl.dismissPromo = function() {
             ctrl.promoIsVisible = false;
             setPromoDismissed(true);
+          };
+          ctrl.$onInit = function() {
+            PromoBarService.getPromoBarData().then(function(promoBarObject) {
+              ctrl.promoBarIsEnabled = promoBarObject.promoBarEnabled;
+              ctrl.promoBarMessage = promoBarObject.promoBarMessage;
+            });
+
+            ctrl.promoIsVisible = !isPromoDismissed();
           };
         }
       ]

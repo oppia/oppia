@@ -22,11 +22,10 @@ require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
 
 require('components/forms/validators/is-float.filter.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/stateful/focus-manager.service.ts');
 
 angular.module('oppia').directive('schemaBasedFloatEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -38,21 +37,12 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
         onInputBlur: '=',
         onInputFocus: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-float-editor.directive.html'),
+      template: require('./schema-based-float-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$timeout', 'FocusManagerService',
         function($scope, $filter, $timeout, FocusManagerService) {
           var ctrl = this;
-          ctrl.hasLoaded = false;
-          ctrl.isUserCurrentlyTyping = false;
-          ctrl.hasFocusedAtLeastOnce = false;
-
-          ctrl.labelForErrorFocusTarget =
-            FocusManagerService.generateFocusLabel();
-
           ctrl.validate = function(localValue) {
             return $filter('isFloat')(localValue) !== undefined;
           };
@@ -101,16 +91,22 @@ angular.module('oppia').directive('schemaBasedFloatEditor', [
               ctrl.isUserCurrentlyTyping = true;
             }
           };
+          ctrl.$onInit = function() {
+            ctrl.hasLoaded = false;
+            ctrl.isUserCurrentlyTyping = false;
+            ctrl.hasFocusedAtLeastOnce = false;
 
-          if (ctrl.localValue === undefined) {
-            ctrl.localValue = 0.0;
-          }
-
-          // This prevents the red 'invalid input' warning message from flashing
-          // at the outset.
-          $timeout(function() {
-            ctrl.hasLoaded = true;
-          });
+            ctrl.labelForErrorFocusTarget =
+              FocusManagerService.generateFocusLabel();
+            if (ctrl.localValue === undefined) {
+              ctrl.localValue = 0.0;
+            }
+            // This prevents the red 'invalid input' warning message from
+            // flashing at the outset.
+            $timeout(function() {
+              ctrl.hasLoaded = true;
+            });
+          };
         }
       ]
     };

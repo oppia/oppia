@@ -15,6 +15,7 @@
 # limitations under the License.]
 
 """Commands for operations on topics, and related models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -25,7 +26,6 @@ from core.domain import exp_fetchers
 from core.domain import opportunity_services
 from core.domain import rights_manager
 from core.domain import role_services
-from core.domain import skill_services
 from core.domain import state_domain
 from core.domain import story_fetchers
 from core.domain import subtopic_page_domain
@@ -160,6 +160,8 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
     model = topic_models.TopicModel(
         id=topic.id,
         name=topic.name,
+        abbreviated_name=topic.abbreviated_name,
+        thumbnail_filename=topic.thumbnail_filename,
         canonical_name=topic.canonical_name,
         description=topic.description,
         language_code=topic.language_code,
@@ -283,8 +285,8 @@ def apply_change_list(topic_id, change_list):
             elif change.cmd == topic_domain.CMD_DELETE_ADDITIONAL_STORY:
                 topic.delete_additional_story(change.story_id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
-                _add_uncategorized_skill_id_to_topic(
-                    topic, change.new_uncategorized_skill_id)
+                topic.add_uncategorized_skill_id(
+                    change.new_uncategorized_skill_id)
             elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
                 topic.remove_uncategorized_skill_id(
                     change.uncategorized_skill_id)
@@ -300,11 +302,17 @@ def apply_change_list(topic_id, change_list):
                         topic_domain.TOPIC_PROPERTY_NAME):
                     topic.update_name(change.new_value)
                 elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_ABBREVIATED_NAME):
+                    topic.update_abbreviated_name(change.new_value)
+                elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_DESCRIPTION):
                     topic.update_description(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_THUMBNAIL_FILENAME):
+                    topic.update_thumbnail_filename(change.new_value)
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 subtopic_page_id = (
@@ -356,21 +364,6 @@ def apply_change_list(topic_id, change_list):
         raise
 
 
-def _add_uncategorized_skill_id_to_topic(topic, uncategorized_skill_id):
-    """Adds an uncategorized skill_id to a topic.
-
-    Args:
-        topic: Topic. Topic to be modified.
-        uncategorized_skill_id: str. Skill ID to be added.
-    """
-    skill_ids_for_unpublished_skills = [
-        skill_rights.id for skill_rights in (
-            skill_services.get_all_unpublished_skill_rights())]
-    if uncategorized_skill_id in skill_ids_for_unpublished_skills:
-        raise Exception('Cannot assign unpublished skills to a topic')
-    topic.add_uncategorized_skill_id(uncategorized_skill_id)
-
-
 def _save_topic(committer_id, topic, commit_message, change_list):
     """Validates a topic and commits it to persistent storage. If
     successful, increments the version number of the incoming topic domain
@@ -412,6 +405,9 @@ def _save_topic(committer_id, topic, commit_message, change_list):
 
     topic_model.description = topic.description
     topic_model.name = topic.name
+    topic_model.canonical_name = topic.canonical_name
+    topic_model.abbreviated_name = topic.abbreviated_name
+    topic_model.thumbnail_filename = topic.thumbnail_filename
     topic_model.canonical_story_references = [
         reference.to_dict() for reference in topic.canonical_story_references
     ]

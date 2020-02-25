@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Exploration-related jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -761,8 +762,8 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         super(ExplorationValidityJobManagerTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_validation_errors_are_not_raised_for_valid_exploration(self):
@@ -778,19 +779,12 @@ class ExplorationValidityJobManagerTests(test_utils.GenericTestBase):
         intro_state.update_interaction_id('TextInput')
         end_state.update_interaction_id('EndExploration')
 
-        default_outcome_dict = {
-            'dest': 'End',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Introduction</p>'
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-
-        intro_state.update_interaction_default_outcome(default_outcome_dict)
+        default_outcome = state_domain.Outcome(
+            'End', state_domain.SubtitledHtml(
+                'default_outcome', '<p>Introduction</p>'
+            ), False, [], None, None
+        )
+        intro_state.update_interaction_default_outcome(default_outcome)
         end_state.update_interaction_default_outcome(None)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
@@ -913,8 +907,8 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         super(ExplorationMigrationJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_exp(self):
@@ -1034,7 +1028,7 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
         classifier_model_id = classifier_models.ClassifierTrainingJobModel.create( # pylint: disable=line-too-long
             'TextClassifier', 'TextInput', self.NEW_EXP_ID, exploration.version,
             datetime.datetime.utcnow(), {}, initial_state_name,
-            feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
+            feconf.TRAINING_JOB_STATUS_COMPLETE, 1)
         # Store training job model for the classifier model.
         classifier_models.TrainingJobExplorationMappingModel.create(
             self.NEW_EXP_ID, exploration.version, initial_state_name,
@@ -1100,8 +1094,8 @@ class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
         super(InteractionAuditOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_exp_state_pairs_are_produced_for_all_interactions_in_single_exp(
@@ -1215,8 +1209,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         super(ItemSelectionInteractionOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_exp_state_pairs_are_produced_only_for_desired_interactions(self):
@@ -1405,8 +1399,8 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
         super(ViewableExplorationsAuditJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_output_contains_only_viewable_private_explorations(self):
@@ -1518,8 +1512,8 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
         super(HintsAuditOneOffJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_number_of_hints_tabulated_are_correct_in_single_exp(self):
@@ -1688,8 +1682,8 @@ class ExplorationContentValidationJobForCKEditorTests(
         super(ExplorationContentValidationJobForCKEditorTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_for_validation_job(self):
@@ -1756,36 +1750,24 @@ class ExplorationContentValidationJobForCKEditorTests(
             )
         }
 
-        default_outcome_dict1 = {
-            'dest': 'State2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
-                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
-                )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
+        default_outcome1 = state_domain.Outcome(
+            'State2', state_domain.SubtitledHtml(
+                'default_outcome',
+                '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
+            ), False, [], None, None
+        )
+        default_outcome2 = state_domain.Outcome(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
                     '<pre>Hello this is <b> testing '
                     '<oppia-noninteractive-image filepath-with-value="amp;quot;'
                     'random.png&amp;quot;"></oppia-noninteractive-image> in '
                     '</b>progress</pre>'
-
                 )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
+            ), False, [], None, None,
+        )
 
         mock_validate_context = self.swap(
             state_domain.SubtitledHtml, 'validate', mock_validate)
@@ -1798,8 +1780,8 @@ class ExplorationContentValidationJobForCKEditorTests(
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
 
-            state1.update_interaction_default_outcome(default_outcome_dict1)
-            state2.update_interaction_default_outcome(default_outcome_dict2)
+            state1.update_interaction_default_outcome(default_outcome1)
+            state2.update_interaction_default_outcome(default_outcome2)
             exp_services.save_new_exploration(self.albert_id, exploration)
             job_id = (
                 exp_jobs_one_off
@@ -1912,8 +1894,8 @@ class InteractionCustomizationArgsValidationJobTests(
             InteractionCustomizationArgsValidationJobTests, self).setUp()
 
         # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_for_customization_arg_validation_job(self):
@@ -1938,22 +1920,18 @@ class InteractionCustomizationArgsValidationJobTests(
                 '</oppia-noninteractive-tabs>'
             )
         }
-        default_outcome_dict2 = {
-            'dest': 'State1',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': (
+        default_outcome2 = state_domain.Outcome(
+            'State1',
+            state_domain.SubtitledHtml(
+                'default_outcome',
+                (
                     '<p><oppia-noninteractive-link text-with-value="'
                     '&amp;quot;What is a link?&amp;quot;" url-with-'
                     'value="&amp;quot;htt://link.com&amp'
                     ';quot;"></oppia-noninteractive-link></p>'
                 )
-            },
-            'labelled_as_correct': False,
-            'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
+            ), False, [], None, None
+        )
         content3_dict = {
             'content_id': 'content',
             'html': (
@@ -1968,7 +1946,7 @@ class InteractionCustomizationArgsValidationJobTests(
         with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(
                 state_domain.SubtitledHtml.from_dict(content1_dict))
-            state2.update_interaction_default_outcome(default_outcome_dict2)
+            state2.update_interaction_default_outcome(default_outcome2)
             state3.update_content(
                 state_domain.SubtitledHtml.from_dict(content3_dict))
             exp_services.save_new_exploration(self.albert_id, exploration)
@@ -2173,7 +2151,7 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
             translator_ids=[self.user_b_id]
         )
         exp_summary_model.put()
-        exp_services.delete_exploration_summary(exploration.id)
+        exp_services.delete_exploration_summaries([exploration.id])
 
         job_id = (
             exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())

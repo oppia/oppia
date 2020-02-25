@@ -25,7 +25,6 @@ require(
 require('directives/angular-html-bind.directive.ts');
 require('directives/mathjax-bind.directive.ts');
 
-require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
 require('services/alerts.service.ts');
 require('services/page-title.service.ts');
@@ -44,39 +43,38 @@ angular.module('oppia').directive('subtopicViewerPage', [
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$window', 'AlertsService',
-        'PageTitleService', 'SubtitledHtmlObjectFactory',
-        'SubtopicViewerBackendApiService', 'UrlService',
+        'PageTitleService', 'SubtopicViewerBackendApiService', 'UrlService',
         'WindowDimensionsService', 'FATAL_ERROR_CODES',
         function(
             $rootScope, $window, AlertsService,
-            PageTitleService, SubtitledHtmlObjectFactory,
-            SubtopicViewerBackendApiService, UrlService,
+            PageTitleService, SubtopicViewerBackendApiService, UrlService,
             WindowDimensionsService, FATAL_ERROR_CODES) {
           var ctrl = this;
 
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
           };
-          ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
-          ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
+          ctrl.$onInit = function() {
+            ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+            ctrl.subtopicId = UrlService.getSubtopicIdFromUrl();
 
-          $rootScope.loadingMessage = 'Loading';
-          SubtopicViewerBackendApiService.fetchSubtopicData(
-            ctrl.topicName, ctrl.subtopicId).then(
-            function(subtopicDataDict) {
-              ctrl.pageContents =
-                SubtitledHtmlObjectFactory.createFromBackendDict(
-                  subtopicDataDict.page_contents.subtitled_html);
-              ctrl.subtopicTitle = subtopicDataDict.subtopic_title;
-              PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
-              $rootScope.loadingMessage = '';
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get subtopic data');
+            $rootScope.loadingMessage = 'Loading';
+            SubtopicViewerBackendApiService.fetchSubtopicData(
+              ctrl.topicName, ctrl.subtopicId).then(
+              function(subtopicDataObject) {
+                ctrl.pageContents = (
+                  subtopicDataObject.getPageContents().getSubtitledHtml());
+                ctrl.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+                PageTitleService.setPageTitle(ctrl.subtopicTitle + ' - Oppia');
+                $rootScope.loadingMessage = '';
+              },
+              function(errorResponse) {
+                if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                  AlertsService.addWarning('Failed to get subtopic data');
+                }
               }
-            }
-          );
+            );
+          };
         }
       ]
     };

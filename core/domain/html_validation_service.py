@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """HTML validation service."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -602,7 +603,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
         soup = bs4.BeautifulSoup(
             soup_data.replace('<br>', '<br/>'), 'html.parser')
 
-        is_invalid = _validate_soup_for_rte(soup, rte_format, err_dict)
+        is_invalid = validate_soup_for_rte(soup, rte_format, err_dict)
 
         if is_invalid:
             err_dict['strings'].append(html_data)
@@ -617,7 +618,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
                     unescape_html(collapsible['content-with-value']))
                 soup_for_collapsible = bs4.BeautifulSoup(
                     content_html.replace('<br>', '<br/>'), 'html.parser')
-                is_invalid = _validate_soup_for_rte(
+                is_invalid = validate_soup_for_rte(
                     soup_for_collapsible, rte_format, err_dict)
             if is_invalid:
                 err_dict['strings'].append(html_data)
@@ -629,7 +630,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
                 content_html = tab_content['content']
                 soup_for_tabs = bs4.BeautifulSoup(
                     content_html.replace('<br>', '<br/>'), 'html.parser')
-                is_invalid = _validate_soup_for_rte(
+                is_invalid = validate_soup_for_rte(
                     soup_for_tabs, rte_format, err_dict)
                 if is_invalid:
                     err_dict['strings'].append(html_data)
@@ -640,7 +641,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
     return err_dict
 
 
-def _validate_soup_for_rte(soup, rte_format, err_dict):
+def validate_soup_for_rte(soup, rte_format, err_dict):
     """Validate content in given soup for given RTE format.
 
     Args:
@@ -739,7 +740,7 @@ def validate_customization_args(html_list):
 
     for tag in tags_to_original_html_strings:
         html_string = tags_to_original_html_strings[tag]
-        err_msg_list = list(_validate_customization_args_in_tag(tag))
+        err_msg_list = list(validate_customization_args_in_tag(tag))
         for err_msg in err_msg_list:
             if err_msg:
                 if err_msg not in err_dict:
@@ -750,7 +751,7 @@ def validate_customization_args(html_list):
     return err_dict
 
 
-def _validate_customization_args_in_tag(tag):
+def validate_customization_args_in_tag(tag):
     """Validates customization arguments of Rich Text Components in a soup.
 
     Args:
@@ -779,7 +780,7 @@ def _validate_customization_args_in_tag(tag):
             for component_name in simple_component_tag_names:
                 for component_tag in soup_for_collapsible.findAll(
                         name=component_name):
-                    for err_msg in _validate_customization_args_in_tag(
+                    for err_msg in validate_customization_args_in_tag(
                             component_tag):
                         yield err_msg
 
@@ -792,7 +793,7 @@ def _validate_customization_args_in_tag(tag):
                 for component_name in simple_component_tag_names:
                     for component_tag in soup_for_tabs.findAll(
                             name=component_name):
-                        for err_msg in _validate_customization_args_in_tag(
+                        for err_msg in validate_customization_args_in_tag(
                                 component_tag):
                             yield err_msg
     except Exception as e:

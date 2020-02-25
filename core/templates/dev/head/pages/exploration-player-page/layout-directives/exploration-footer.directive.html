@@ -22,6 +22,11 @@
     padding-left: 0;
   }
 
+  .oppia-exploration-footer .author-profile-dropdown-menu li > a {
+    color: #094142;
+    padding: 3px 6px;
+  }
+
   .oppia-exploration-footer .author-profile a:hover {
     text-decoration: none;
   }
@@ -52,7 +57,7 @@
     box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
     float: left;
     list-style-type: none;
-    margin:0 0 8px 0;
+    margin: 0 0 8px 0;
   }
 
   .oppia-exploration-footer .author-profile-dropdown-menu li {
@@ -62,11 +67,6 @@
     text-overflow: clip;
     white-space: nowrap;
     width: 100%;
-  }
-
-  .oppia-exploration-footer .author-profile-dropdown-menu li > a {
-    color: #094142;
-    padding: 3px 6px;
   }
 
   .oppia-exploration-footer .author-profile-dropdown-menu li a:hover {
@@ -184,7 +184,8 @@
                aria-haspopup="true"
                aria-expanded="false">
               <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
-                  ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}">
+                  ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"
+                  data-toggle="dropdown">
               </h4>
             </a>
             <ul uib-dropdown-menu class="author-profile-dropdown-menu uib-dropdown-menu"

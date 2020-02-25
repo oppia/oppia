@@ -40,17 +40,6 @@ angular.module('oppia').directive('solutionExplanationEditor', [
         '$scope', 'EditabilityService', 'StateSolutionService',
         function($scope, EditabilityService, StateSolutionService) {
           var ctrl = this;
-          ctrl.isEditable = EditabilityService.isEditable();
-          ctrl.editSolutionForm = {};
-          ctrl.explanationEditorIsOpen = false;
-
-          ctrl.StateSolutionService = StateSolutionService;
-
-          ctrl.EXPLANATION_FORM_SCHEMA = {
-            type: 'html',
-            ui_config: {}
-          };
-
           ctrl.openExplanationEditor = function() {
             if (ctrl.isEditable) {
               ctrl.explanationEditorIsOpen = true;
@@ -76,12 +65,24 @@ angular.module('oppia').directive('solutionExplanationEditor', [
             ctrl.explanationEditorIsOpen = false;
           };
 
-          $scope.$on('externalSave', function() {
-            if (ctrl.explanationEditorIsOpen &&
-              ctrl.editSolutionForm.$valid) {
-              ctrl.saveThisExplanation();
-            }
-          });
+          ctrl.$onInit = function() {
+            $scope.$on('externalSave', function() {
+              if (ctrl.explanationEditorIsOpen &&
+                ctrl.editSolutionForm.$valid) {
+                ctrl.saveThisExplanation();
+              }
+            });
+            ctrl.isEditable = EditabilityService.isEditable();
+            ctrl.editSolutionForm = {};
+            ctrl.explanationEditorIsOpen = false;
+
+            ctrl.StateSolutionService = StateSolutionService;
+
+            ctrl.EXPLANATION_FORM_SCHEMA = {
+              type: 'html',
+              ui_config: {}
+            };
+          };
         }
       ]
     };

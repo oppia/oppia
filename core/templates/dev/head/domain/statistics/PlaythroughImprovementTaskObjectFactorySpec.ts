@@ -256,6 +256,7 @@ describe('PlaythroughImprovementTaskObjectFactory', function() {
 
         expect(this.resolveIssueSpy).toHaveBeenCalledWith(this.issue);
         expect(this.task.getStatus()).not.toEqual('open');
+        expect(this.task.isObsolete()).toBe(true);
       });
 
       it('keeps the task after cancel', function() {

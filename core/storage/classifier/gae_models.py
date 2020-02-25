@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for storing the classification data models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -63,16 +64,23 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     # It is incremented by TTL when a job with status NEW is picked up by VM.
     next_scheduled_check_time = ndb.DateTimeProperty(required=True,
                                                      indexed=True)
-    # The classifier data which will be populated when storing the results of
-    # the job.
-    classifier_data = ndb.JsonProperty(default=None)
     # The schema version for the data that is being classified.
     data_schema_version = ndb.IntegerProperty(required=True, indexed=True)
 
     @staticmethod
     def get_deletion_policy():
-        """Classifier training job is not related to users."""
+        """ClassifierTrainingJobModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """ClassifierTrainingJobModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -108,7 +116,7 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
     def create(
             cls, algorithm_id, interaction_id, exp_id, exp_version,
             next_scheduled_check_time, training_data, state_name, status,
-            classifier_data, data_schema_version):
+            data_schema_version):
         """Creates a new ClassifierTrainingJobModel entry.
 
         Args:
@@ -124,7 +132,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             state_name: str. The name of the state to which the classifier
                 belongs.
             status: str. The status of the training job.
-            classifier_data: dict|None. The data stored as result of training.
             data_schema_version: int. The schema version for the data.
 
         Returns:
@@ -143,7 +150,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
             next_scheduled_check_time=next_scheduled_check_time,
             state_name=state_name, status=status,
             training_data=training_data,
-            classifier_data=classifier_data,
             data_schema_version=data_schema_version
             )
 
@@ -194,7 +200,6 @@ class ClassifierTrainingJobModel(base_models.BaseModel):
                 next_scheduled_check_time=job_dict['next_scheduled_check_time'],
                 state_name=job_dict['state_name'], status=job_dict['status'],
                 training_data=job_dict['training_data'],
-                classifier_data=job_dict['classifier_data'],
                 data_schema_version=job_dict['data_schema_version'])
 
             job_models.append(training_job_instance)
@@ -222,8 +227,20 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
     @staticmethod
     def get_deletion_policy():
-        """Training job exploration mapping is not related to users."""
+        """TrainingJobExplorationMappingModel is not related to users."""
         return base_models.DELETION_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """TrainingJobExplorationMappingModel doesn't have any field with
+        user ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
 
     @classmethod
     def _generate_id(cls, exp_id, exp_version, state_name):

@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
+require('domain/question/QuestionObjectFactory');
 require('domain/question/editable-question-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 
@@ -24,8 +25,11 @@ require('services/csrf-token.service.ts');
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 describe('Editable question backend API service', function() {
   var EditableQuestionBackendApiService = null;
+  var QuestionObjectFactory;
   var sampleDataResults = null;
   var $rootScope = null;
   var $scope = null;
@@ -34,7 +38,7 @@ describe('Editable question backend API service', function() {
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.module(
-    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    'oppia', TranslatorProviderForTests));
 
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
@@ -46,6 +50,7 @@ describe('Editable question backend API service', function() {
   beforeEach(angular.mock.inject(function($injector, $q) {
     EditableQuestionBackendApiService = $injector.get(
       'EditableQuestionBackendApiService');
+    QuestionObjectFactory = $injector.get('QuestionObjectFactory');
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
@@ -97,7 +102,10 @@ describe('Editable question backend API service', function() {
             id: 'TextInput'
           },
           param_changes: [],
-          solicit_answer_details: false
+          solicit_answer_details: false,
+          written_translations: {
+            translations_mapping: {}
+          },
         },
         language_code: 'en',
         version: 1
@@ -110,6 +118,48 @@ describe('Editable question backend API service', function() {
     $httpBackend.verifyNoOutstandingExpectation();
     $httpBackend.verifyNoOutstandingRequest();
   });
+
+  it('should successfully create a new question', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    var skillsId = ['0', '01', '02'];
+    var skillDifficulties = [1, 1, 2];
+    var questionDict = QuestionObjectFactory.createFromBackendDict(
+      sampleDataResults.question_dict);
+
+    $httpBackend.expectPOST('/question_editor_handler/create_new').respond(
+      200, {question_id: '0'});
+    EditableQuestionBackendApiService.createQuestion(
+      skillsId, skillDifficulties, questionDict).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith('0');
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should use the rejection handler when create question fails',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      var skillsId = ['0', '01', '02'];
+      var skillDifficulties = [1, 1, 2];
+      var questionDict = QuestionObjectFactory.createFromBackendDict(
+        sampleDataResults.question_dict);
+
+      $httpBackend.expectPOST('/question_editor_handler/create_new').respond(
+        500, 'Error creating a new question.');
+      EditableQuestionBackendApiService.createQuestion(
+        skillsId, skillDifficulties, questionDict).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Error creating a new question.');
+    });
 
   it('should successfully fetch an existing question from the backend',
     function() {
@@ -196,5 +246,83 @@ describe('Editable question backend API service', function() {
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalledWith(
       'Question with given id doesn\'t exist.');
+  });
+
+  it('should edit an existing question', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    var questionId = '0';
+    var skillIdsTaskArray = ['1', '2', 1];
+    var difficulty = 1;
+
+    $httpBackend.expectPUT('/manage_question_skill_link/' + questionId)
+      .respond(200);
+    EditableQuestionBackendApiService.editQuestionSkillLinks(
+      questionId, skillIdsTaskArray, difficulty).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should use the rejection handler when editing an existing' +
+    ' question fails', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    var questionId = '0';
+    var skillIdsTaskArray = ['1', '2', 1];
+    var difficulty = 1;
+
+    $httpBackend.expectPUT('/manage_question_skill_link/' + questionId)
+      .respond(500, 'Error loading question 0.');
+    EditableQuestionBackendApiService.editQuestionSkillLinks(
+      questionId, skillIdsTaskArray, difficulty).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error loading question 0.');
+  });
+
+  it('should change difficulty from an existing question', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    var questionId = '0';
+    var skillId = '1';
+    var difficulty = 1;
+
+    $httpBackend.expectPUT('/manage_question_skill_link/' + questionId)
+      .respond(200);
+    EditableQuestionBackendApiService.changeDifficulty(
+      questionId, skillId, difficulty).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should use the rejection handler when changing the difficulty of ' +
+    'an existing question fails', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    var questionId = '0';
+    var skillId = '1';
+    var difficulty = 1;
+
+    $httpBackend.expectPUT('/manage_question_skill_link/' + questionId)
+      .respond(500, 'Error changing difficulty.');
+    EditableQuestionBackendApiService.changeDifficulty(
+      questionId, skillId, difficulty).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error changing difficulty.');
   });
 });

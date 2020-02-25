@@ -21,6 +21,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -28,6 +29,7 @@ import copy
 import logging
 
 from core.domain import exp_domain
+from core.domain import subscription_services
 from core.platform import models
 import feconf
 import python_utils
@@ -273,8 +275,27 @@ def get_exploration_summaries_matching_ids(exp_ids):
         corresponding to the given exploration ids. If an ExplorationSummary
         does not exist, the corresponding returned list element is None.
     """
-    return [get_exploration_summary_from_model(model)if model else None
+    return [get_exploration_summary_from_model(model) if model else None
             for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
+
+
+def get_exploration_summaries_subscribed_to(user_id):
+    """Returns a list of ExplorationSummary domain objects that the user
+    subscribes to.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        list(ExplorationSummary). List of ExplorationSummary domain objects that
+        the user subscribes to.
+    """
+    return [
+        summary for summary in
+        get_exploration_summaries_matching_ids(
+            subscription_services.get_exploration_ids_subscribed_to(user_id)
+        ) if summary is not None
+    ]
 
 
 def get_exploration_by_id(exploration_id, strict=True, version=None):

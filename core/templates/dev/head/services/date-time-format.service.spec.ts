@@ -29,8 +29,12 @@ describe('datetimeformatter', () => {
 
     // Mock Date() to give a time of NOW_MILLIS in GMT. (Unfortunately, there
     // doesn't seem to be a good way to set the timezone locale directly.)
-    spyOn(window, 'Date').and.callFake(function() {
-      return new OldDate(NOW_MILLIS);
+    spyOn(window, 'Date').and.callFake(function(millisSinceEpoch = 0) {
+      if (millisSinceEpoch === 0) {
+        return new OldDate(NOW_MILLIS);
+      } else {
+        return new OldDate(millisSinceEpoch);
+      }
     });
   });
 
@@ -41,5 +45,38 @@ describe('datetimeformatter', () => {
     expect(df.isRecent(NOW_MILLIS - 72 * 60 * 60 * 1000)).toBe(true);
     // 8 days ago is not recent.
     expect(df.isRecent(NOW_MILLIS - 8 * 24 * 60 * 60 * 1000)).toBe(false);
+  });
+
+  it('should provide correct locale abbreviated datetime string', () => {
+    let expectedDatetime = new Date(NOW_MILLIS - 1).toLocaleTimeString([], {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    });
+    expect(df.getLocaleAbbreviatedDatetimeString(NOW_MILLIS - 1)).toBe(
+      expectedDatetime);
+    expect(
+      df.getLocaleAbbreviatedDatetimeString(
+        NOW_MILLIS + 48 * 60 * 60 * 1000)).toBe('Nov 23');
+    expect(
+      df.getLocaleAbbreviatedDatetimeString(
+        NOW_MILLIS - 365 * 24 * 60 * 60 * 1000)).toBe('11/21/13');
+  });
+
+  it('should provide correct date format MM/DD/YYY string', () => {
+    // Note to developers: This test is not ideal, because it tests the
+    // implementation rather than the interface. However, we have not found
+    // a way to retrieve the browser current locale that is used on
+    // Date methods. Since each user can have different date formats in
+    // their browser, this makes it tricky to test the returned day,
+    // month and year of df.getLocaleDateString, which is why
+    // toLocaleDateString() needs to be computed in the expected
+    // value of the test as well.
+    expect((new Date(NOW_MILLIS)).toLocaleDateString()).toBe(
+      df.getLocaleDateString(NOW_MILLIS));
+    expect((new Date(NaN).toLocaleDateString())).toBe(
+      df.getLocaleDateString(NaN));
+    expect((new Date(null)).toLocaleDateString()).toBe(
+      df.getLocaleDateString(null));
   });
 });

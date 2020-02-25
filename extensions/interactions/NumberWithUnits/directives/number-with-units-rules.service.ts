@@ -18,41 +18,23 @@
 
 import { Injectable } from '@angular/core';
 import { downgradeInjectable } from '@angular/upgrade/static';
-// TODO(#7403): Convert this to partial imports.
-import math from 'mathjs';
+
+import { unit } from 'mathjs';
 
 import { NumberWithUnitsObjectFactory } from
-  'domain/objects/NumberWithUnitsObjectFactory.ts';
+  'domain/objects/NumberWithUnitsObjectFactory';
+import { UtilsService } from 'services/utils.service';
 
 // Rules service for number with units interaction.
 @Injectable({
   providedIn: 'root'
 })
 export class NumberWithUnitsRulesService {
-  constructor(private unitsObjectFactory: NumberWithUnitsObjectFactory) {
+  constructor(private unitsObjectFactory: NumberWithUnitsObjectFactory,
+    private utilsService: UtilsService) {
     try {
       this.unitsObjectFactory.createCurrencyUnits();
     } catch (parsingError) {}
-  }
-  // Checks if a === b.
-  private isEquivalent(a: any, b: any): boolean {
-    // Create arrays of property names
-    var aProps = Object.getOwnPropertyNames(a);
-    var bProps = Object.getOwnPropertyNames(b);
-    if (aProps.length !== bProps.length) {
-      return false;
-    }
-    for (var i = 0; i < aProps.length; i++) {
-      var propName = aProps[i];
-      if (typeof a[propName] === 'object' && !this.isEquivalent(
-        a[propName], b[propName])) {
-        return false;
-      }
-      if (typeof a[propName] !== 'object' && a[propName] !== b[propName]) {
-        return false;
-      }
-    }
-    return true;
   }
   // TODO(#7165): Replace 'any' with the exact type.
   IsEqualTo(answer: any, inputs: any): boolean {
@@ -67,7 +49,7 @@ export class NumberWithUnitsRulesService {
       answerString).toDict();
     var inputsList = this.unitsObjectFactory.fromRawInputString(
       inputsString).toDict();
-    return this.isEquivalent(answerList, inputsList);
+    return this.utilsService.isEquivalent(answerList, inputsList);
   }
   // TODO(#7165): Replace 'any' with the exact type.
   IsEquivalentTo(answer: any, inputs: any): boolean {
@@ -83,7 +65,7 @@ export class NumberWithUnitsRulesService {
     }
     var answerString = answer.toMathjsCompatibleString();
     var inputsString = inputs.toMathjsCompatibleString();
-    return math.unit(answerString).equals(math.unit(inputsString));
+    return unit(answerString).equals(unit(inputsString));
   }
 }
 

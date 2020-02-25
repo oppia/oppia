@@ -49,6 +49,8 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require(
@@ -115,7 +117,7 @@ describe('Answer classification service with string classifier disabled',
     });
 
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
 
     var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION;
     var acs, sof, oof, acrof, stateName, state;
@@ -408,7 +410,7 @@ describe('Answer classification service with string classifier enabled',
     });
 
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
 
     var EXPLICIT_CLASSIFICATION, DEFAULT_OUTCOME_CLASSIFICATION,
       STATISTICAL_CLASSIFICATION;
@@ -628,7 +630,7 @@ describe('Answer classification service with training data classification',
     });
 
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
 
     var EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION;
     var acs, sof, oof, acrof, stateName, state, state2,

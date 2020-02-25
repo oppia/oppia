@@ -65,12 +65,16 @@ var TopicsAndSkillsDashboardPage = function() {
   var mergeSkillsButtons = element.all(
     by.css('.protractor-test-merge-skills-button'));
   var confirmSkillsMergeButton = element(
-    by.css('.protractor-test-confirm-skills-merge-button'));
+    by.css('.protractor-test-confirm-skill-selection-button'));
+  var searchSkillInput = element(by.css('.protractor-test-search-skill-input'));
   var editConceptCardExplanationButton = element(
     by.css('.protractor-test-edit-concept-card'));
   var saveConceptCardExplanationButton = element(
     by.css('.protractor-test-save-concept-card'));
-
+  var topicNamesInTopicSelectModal = element.all(
+    by.css('.protractor-test-topic-name-in-topic-select-modal'));
+  var abbreviatedTopicNameField = element(
+    by.css('.protractor-test-new-abbreviated-topic-name-field'));
   this.get = function() {
     browser.get(DASHBOARD_URL);
     waitFor.pageToFullyLoad();
@@ -103,13 +107,33 @@ var TopicsAndSkillsDashboardPage = function() {
     });
   };
 
-  this.createTopicWithTitle = function(title) {
+  this.assignSkillWithIndexToTopicByTopicName = function(
+      skillIndex, topicName) {
+    assignSkillToTopicButtons.then(function(elems) {
+      elems[skillIndex].click();
+      topicNamesInTopicSelectModal.then(function(topics) {
+        for (var i = 0; i < topics.length; i++) {
+          (function(topic) {
+            topic.getText().then(function(isTarget) {
+              if (isTarget === topicName) {
+                topic.click();
+                confirmMoveButton.click();
+              }
+            });
+          })(topics[i]);
+        }
+      });
+    });
+  };
+
+  this.createTopic = function(title, abbreviatedName) {
     waitFor.elementToBeClickable(
       createTopicButton,
       'Create Topic button takes too long to be clickable');
     createTopicButton.click();
 
     topicNameField.sendKeys(title);
+    abbreviatedTopicNameField.sendKeys(abbreviatedName);
     confirmTopicCreationButton.click();
     waitFor.pageToFullyLoad();
   };
@@ -206,6 +230,13 @@ var TopicsAndSkillsDashboardPage = function() {
     skillsListItems.then(function(elems) {
       expect(elems.length).toBe(number);
     });
+  };
+
+  this.searchSkillByName = function(name) {
+    waitFor.visibilityOf(
+      searchSkillInput,
+      'searchSkillInput takes too long to be visible.');
+    searchSkillInput.sendKeys(name);
   };
 };
 

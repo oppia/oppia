@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for core.domain.question_services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -60,11 +61,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.save_new_skill(
-            'skill_1', self.admin_id, 'Skill Description 1')
+            'skill_1', self.admin_id, description='Skill Description 1')
         self.save_new_skill(
-            'skill_2', self.admin_id, 'Skill Description 2')
+            'skill_2', self.admin_id, description='Skill Description 2')
         self.save_new_skill(
-            'skill_3', self.admin_id, 'Skill Description 3')
+            'skill_3', self.admin_id, description='Skill Description 3')
 
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
@@ -374,10 +375,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertIsNone(question_summaries[1])
 
     def test_delete_question(self):
-        question_rights_model = question_models.QuestionRightsModel.get(
-            self.question_id)
-        self.assertFalse(question_rights_model is None)
-
         question_summary_model = question_models.QuestionSummaryModel.get(
             self.question_id)
         self.assertFalse(question_summary_model is None)
@@ -388,11 +385,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'Entity for class QuestionModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionModel.get(self.question_id)
-
-        with self.assertRaisesRegexp(Exception, (
-            'Entity for class QuestionRightsModel with id %s not found' % (
-                self.question_id))):
-            question_models.QuestionRightsModel.get(self.question_id)
 
         with self.assertRaisesRegexp(Exception, (
             'Entity for class QuestionSummaryModel with id %s not found' % (
@@ -546,38 +538,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_compute_summary_of_question(self):
         question_summary = question_services.compute_summary_of_question(
-            self.question, self.editor_id)
+            self.question)
 
         self.assertEqual(question_summary.id, self.question_id)
         self.assertEqual(
             question_summary.question_content,
             feconf.DEFAULT_INIT_STATE_CONTENT_STR)
-
-    def test_get_question_summaries_by_creator_id(self):
-        question_summaries = (
-            question_services.get_question_summaries_by_creator_id(
-                self.editor_id))
-
-        self.assertEqual(len(question_summaries), 3)
-        question_summaries.sort(key=lambda summary: summary.last_updated)
-        question_ids = [summary.id for summary in question_summaries]
-        self.assertEqual(question_ids[0], self.question_id)
-        self.assertEqual(question_ids[1], self.question_id_1)
-        self.assertEqual(question_ids[2], self.question_id_2)
-
-    def test_created_question_rights(self):
-        question_rights = question_services.get_question_rights(
-            self.question_id)
-
-        self.assertTrue(question_rights.is_creator(self.editor_id))
-        self.assertEqual(question_rights.creator_id, self.editor_id)
-
-        self.assertIsNone(
-            question_services.get_question_rights('question_id', strict=False))
-        with self.assertRaisesRegexp(
-            Exception, 'Entity for class QuestionRightsModel with id '
-            'question_id not found'):
-            question_services.get_question_rights('question_id')
 
     def test_get_skills_of_question(self):
         # If the question id doesnt exist at all, it returns an empty list.
@@ -718,3 +684,112 @@ class QuestionMigrationTests(test_utils.GenericTestBase):
 
         answer_groups = question.question_state_data.interaction.answer_groups
         self.assertEqual(answer_groups[0].tagged_skill_misconception_id, None)
+
+    def test_migrate_question_state_from_v30_to_v31(self):
+        answer_group = {
+            'outcome': {
+                'dest': 'abc',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Feedback</p>'
+                },
+                'labelled_as_correct': True,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_skill_misconception_id': None
+        }
+        question_state_dict = {
+            'content': {
+                'content_id': 'content_1',
+                'html': 'Question 1'
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
+                    }
+                }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'explanation': {}
+                }
+            },
+            'interaction': {
+                'answer_groups': [answer_group],
+                'confirmed_unclassified_answers': [],
+                'customization_args': {},
+                'default_outcome': {
+                    'dest': None,
+                    'feedback': {
+                        'content_id': 'feedback_1',
+                        'html': 'Correct Answer'
+                    },
+                    'param_changes': [],
+                    'refresher_exploration_id': None,
+                    'labelled_as_correct': True,
+                    'missing_prerequisite_skill_id': None
+                },
+                'hints': [{
+                    'hint_content': {
+                        'content_id': 'hint_1',
+                        'html': 'Hint 1'
+                    }
+                }],
+                'solution': {
+                    'correct_answer': 'This is the correct answer',
+                    'answer_is_exclusive': False,
+                    'explanation': {
+                        'content_id': 'explanation_1',
+                        'html': 'Solution explanation'
+                    }
+                },
+                'id': 'TextInput'
+            },
+            'param_changes': [],
+            'solicit_answer_details': False,
+            'classifier_model_id': None
+        }
+        question_model = question_models.QuestionModel(
+            id='question_id',
+            question_state_data=question_state_dict,
+            language_code='en',
+            version=0,
+            linked_skill_ids=['skill_id'],
+            question_state_data_schema_version=30)
+        commit_cmd = question_domain.QuestionChange({
+            'cmd': question_domain.CMD_CREATE_NEW
+        })
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        question_model.commit(
+            'user_id_admin', 'question model created', commit_cmd_dicts)
+
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STATE_SCHEMA_VERSION', 31)
+
+        with current_schema_version_swap:
+            question = question_fetchers.get_question_from_model(question_model)
+
+        self.assertEqual(question.question_state_data_schema_version, 31)
+        self.assertEqual(question.question_state_data
+                         .recorded_voiceovers.to_dict(), {
+                             'voiceovers_mapping': {
+                                 'content': {
+                                     'en': {
+                                         'filename': 'test.mp3',
+                                         'file_size_bytes': 100,
+                                         'needs_update': False,
+                                         'duration_secs': 0.0}}}})

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for typed object classes (mostly normalization)."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -218,6 +219,16 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.check_normalization(
             objects.MathLatexString, mappings, invalid_vals)
+
+    def test_skill_id_string_validation(self):
+        """Tests objects of type SkillSelector."""
+        mappings = [
+            ('skill_id', u'skill_id'), (u'abcdef123_', u'abcdef123_'),
+        ]
+        invalid_vals = [3.0, {'a': 1}, [1, 2, 1], None]
+
+        self.check_normalization(
+            objects.SkillSelector, mappings, invalid_vals)
 
     def test_sanitized_url_validation(self):
         mappings = [
@@ -474,7 +485,7 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEqual(count, 38)
+        self.assertEqual(count, 39)
 
 
 class ObjectDefinitionTests(test_utils.GenericTestBase):

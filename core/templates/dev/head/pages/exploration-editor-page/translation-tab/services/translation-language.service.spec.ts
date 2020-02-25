@@ -30,6 +30,12 @@ describe('Translation language service', function() {
     $provide.value('LanguageUtilService', {
       getAllVoiceoverLanguageCodes: function() {
         return ['en', 'hi'];
+      },
+      getAudioLanguageDescription: function(activeLanguageCode) {
+        var descriptions = {
+          en: 'English'
+        };
+        return descriptions[activeLanguageCode];
       }
     });
   }));
@@ -59,5 +65,16 @@ describe('Translation language service', function() {
       tls.setActiveLanguageCode(null);
       expect(tls.getActiveLanguageCode()).toBeNull();
     });
+
+    it('should show the language description', function() {
+      tls.setActiveLanguageCode('en');
+      expect(tls.getActiveLanguageDescription()).toBe('English');
+    });
+
+    it('shouldn\'t show the language description of invalid state name',
+      function() {
+        tls.setActiveLanguageCode('eng');
+        expect(tls.getActiveLanguageDescription()).toBeNull();
+      });
   });
 });

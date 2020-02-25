@@ -21,6 +21,8 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require('pages/signup-page/signup-page.controller.ts');
 require('services/csrf-token.service.ts');
 
@@ -30,7 +32,7 @@ describe('Signup controller', function() {
     var $componentController, CsrfService;
 
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
       var ugs = new UpgradedServices();
       for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -71,6 +73,11 @@ describe('Signup controller', function() {
           };
         }
       });
+      // Refer: https://www.codelord.net/2017/01/09/
+      // unit-testing-angular-components-with-%24componentcontroller/
+      // Angular and $componentController does not take care of
+      // $onInit lifecycle hook, so we need to call it explicitly.
+      ctrl.$onInit();
     }));
 
     it('should show warning if user has not agreed to terms', function() {

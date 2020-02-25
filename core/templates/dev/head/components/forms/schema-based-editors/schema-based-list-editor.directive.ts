@@ -19,7 +19,6 @@
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/id-generation.service.ts');
 require('services/nested-directives-recursion-timeout-prevention.service.ts');
 require('services/schema-default-value.service.ts');
@@ -30,12 +29,10 @@ angular.module('oppia').directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
   'NestedDirectivesRecursionTimeoutPreventionService',
   'SchemaDefaultValueService', 'SchemaUndefinedLastElementService',
-  'UrlInterpolationService',
   function(
       FocusManagerService, IdGenerationService,
       NestedDirectivesRecursionTimeoutPreventionService,
-      SchemaDefaultValueService, SchemaUndefinedLastElementService,
-      UrlInterpolationService) {
+      SchemaDefaultValueService, SchemaUndefinedLastElementService) {
     return {
       scope: {
         localValue: '=',
@@ -50,12 +47,11 @@ angular.module('oppia').directive('schemaBasedListEditor', [
         validators: '&',
         labelForFocusTarget: '&'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-list-editor.directive.html'),
+      template: require('./schema-based-list-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
+        var ctrl = this;
         var baseFocusLabel = (
           $scope.labelForFocusTarget() ||
           IdGenerationService.generateNewId() + '-');
@@ -71,48 +67,6 @@ angular.module('oppia').directive('schemaBasedListEditor', [
           return (
             index === 0 ? baseFocusLabel : baseFocusLabel + index.toString());
         };
-
-        $scope.isAddItemButtonPresent = true;
-        $scope.addElementText = 'Add element';
-        if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
-          $scope.addElementText = $scope.uiConfig().add_element_text;
-        }
-
-        // Only hide the 'add item' button in the case of single-line unicode
-        // input.
-        $scope.isOneLineInput = true;
-        if ($scope.itemSchema().type !== 'unicode' ||
-            $scope.itemSchema().hasOwnProperty('choices')) {
-          $scope.isOneLineInput = false;
-        } else if ($scope.itemSchema().ui_config) {
-          if ($scope.itemSchema().ui_config.coding_mode) {
-            $scope.isOneLineInput = false;
-          } else if (
-            $scope.itemSchema().ui_config.hasOwnProperty('rows') &&
-            $scope.itemSchema().ui_config.rows > 2) {
-            $scope.isOneLineInput = false;
-          }
-        }
-
-        $scope.minListLength = null;
-        $scope.maxListLength = null;
-        $scope.showDuplicatesWarning = false;
-        if ($scope.validators()) {
-          for (var i = 0; i < $scope.validators().length; i++) {
-            if ($scope.validators()[i].id === 'has_length_at_most') {
-              $scope.maxListLength = $scope.validators()[i].max_value;
-            } else if ($scope.validators()[i].id === 'has_length_at_least') {
-              $scope.minListLength = $scope.validators()[i].min_value;
-            } else if ($scope.validators()[i].id === 'is_uniquified') {
-              $scope.showDuplicatesWarning = true;
-            }
-          }
-        }
-
-        while ($scope.localValue.length < $scope.minListLength) {
-          $scope.localValue.push(
-            SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-        }
 
         $scope.hasDuplicates = function() {
           var valuesSoFar = {};
@@ -134,103 +88,146 @@ angular.module('oppia').directive('schemaBasedListEditor', [
               !$scope.hasDuplicates());
           }
         };
+        ctrl.$onInit = function() {
+          $scope.isAddItemButtonPresent = true;
+          $scope.addElementText = 'Add element';
+          if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
+            $scope.addElementText = $scope.uiConfig().add_element_text;
+          }
 
-        $scope.$watch('localValue', validate, true);
-
-        if ($scope.len === undefined) {
-          $scope.addElement = function() {
-            if ($scope.isOneLineInput) {
-              $scope.hideAddItemButton();
+          // Only hide the 'add item' button in the case of single-line unicode
+          // input.
+          $scope.isOneLineInput = true;
+          if ($scope.itemSchema().type !== 'unicode' ||
+              $scope.itemSchema().hasOwnProperty('choices')) {
+            $scope.isOneLineInput = false;
+          } else if ($scope.itemSchema().ui_config) {
+            if ($scope.itemSchema().ui_config.coding_mode) {
+              $scope.isOneLineInput = false;
+            } else if (
+              $scope.itemSchema().ui_config.hasOwnProperty('rows') &&
+              $scope.itemSchema().ui_config.rows > 2) {
+              $scope.isOneLineInput = false;
             }
+          }
 
+          $scope.minListLength = null;
+          $scope.maxListLength = null;
+          $scope.showDuplicatesWarning = false;
+          if ($scope.validators()) {
+            for (var i = 0; i < $scope.validators().length; i++) {
+              if ($scope.validators()[i].id === 'has_length_at_most') {
+                $scope.maxListLength = $scope.validators()[i].max_value;
+              } else if ($scope.validators()[i].id === 'has_length_at_least') {
+                $scope.minListLength = $scope.validators()[i].min_value;
+              } else if ($scope.validators()[i].id === 'is_uniquified') {
+                $scope.showDuplicatesWarning = true;
+              }
+            }
+          }
+
+          while ($scope.localValue.length < $scope.minListLength) {
             $scope.localValue.push(
               SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-            FocusManagerService.setFocus(
-              $scope.getFocusLabel($scope.localValue.length - 1));
-          };
+          }
+          $scope.$watch('localValue', validate, true);
 
-          var _deleteLastElementIfUndefined = function() {
-            var lastValueIndex = $scope.localValue.length - 1;
-            var valueToConsiderUndefined = (
-              SchemaUndefinedLastElementService.getUndefinedValue(
-                $scope.itemSchema()));
-            if ($scope.localValue[lastValueIndex] ===
-                valueToConsiderUndefined) {
-              $scope.deleteElement(lastValueIndex);
-            }
-          };
+          if ($scope.len === undefined) {
+            $scope.addElement = function() {
+              if ($scope.isOneLineInput) {
+                $scope.hideAddItemButton();
+              }
 
-          var deleteEmptyElements = function() {
-            for (var i = 0; i < $scope.localValue.length - 1; i++) {
-              if ($scope.localValue[i].length === 0) {
-                $scope.deleteElement(i);
-                i--;
+              $scope.localValue.push(
+                SchemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+              FocusManagerService.setFocus(
+                $scope.getFocusLabel($scope.localValue.length - 1));
+            };
+
+            var _deleteLastElementIfUndefined = function() {
+              var lastValueIndex = $scope.localValue.length - 1;
+              var valueToConsiderUndefined = (
+                SchemaUndefinedLastElementService.getUndefinedValue(
+                  $scope.itemSchema()));
+              if ($scope.localValue[lastValueIndex] ===
+                  valueToConsiderUndefined) {
+                $scope.deleteElement(lastValueIndex);
+              }
+            };
+
+            var deleteEmptyElements = function() {
+              for (var i = 0; i < $scope.localValue.length - 1; i++) {
+                if ($scope.localValue[i].length === 0) {
+                  $scope.deleteElement(i);
+                  i--;
+                }
+              }
+            };
+
+            if ($scope.localValue.length === 1) {
+              if ($scope.localValue[0].length === 0) {
+                $scope.isAddItemButtonPresent = false;
               }
             }
-          };
 
-          if ($scope.localValue.length === 1) {
-            if ($scope.localValue[0].length === 0) {
+            $scope.lastElementOnBlur = function() {
+              _deleteLastElementIfUndefined();
+              $scope.showAddItemButton();
+            };
+
+            $scope.showAddItemButton = function() {
+              deleteEmptyElements();
+              $scope.isAddItemButtonPresent = true;
+            };
+
+            $scope.hideAddItemButton = function() {
               $scope.isAddItemButtonPresent = false;
-            }
-          }
+            };
 
-          $scope.lastElementOnBlur = function() {
-            _deleteLastElementIfUndefined();
-            $scope.showAddItemButton();
-          };
-
-          $scope.showAddItemButton = function() {
-            deleteEmptyElements();
-            $scope.isAddItemButtonPresent = true;
-          };
-
-          $scope.hideAddItemButton = function() {
-            $scope.isAddItemButtonPresent = false;
-          };
-
-          $scope._onChildFormSubmit = function(evt) {
-            if (!$scope.isAddItemButtonPresent) {
-              /**
-               * If form submission happens on last element of the set (i.e the
-               * add item button is absent) then automatically add the element
-               * to the list.
-               */
-              if (($scope.maxListLength === null ||
-                   $scope.localValue.length < $scope.maxListLength) &&
-                  !!$scope.localValue[$scope.localValue.length - 1]) {
-                $scope.addElement();
+            $scope._onChildFormSubmit = function(evt) {
+              if (!$scope.isAddItemButtonPresent) {
+                /**
+                 * If form submission happens on last element of the set (i.e
+                 * the add item button is absent) then automatically add the
+                 * element to the list.
+                 */
+                if (($scope.maxListLength === null ||
+                     $scope.localValue.length < $scope.maxListLength) &&
+                    !!$scope.localValue[$scope.localValue.length - 1]) {
+                  $scope.addElement();
+                }
+              } else {
+                /**
+                 * If form submission happens on existing element remove focus
+                 * from it
+                 */
+                (<HTMLElement>document.activeElement).blur();
               }
-            } else {
-              /**
-               * If form submission happens on existing element remove focus
-               * from it
-               */
-              (<HTMLElement>document.activeElement).blur();
+              evt.stopPropagation();
+            };
+
+            $scope.$on(
+              'submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
+            $scope.$on(
+              'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
+            $scope.$on(
+              'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
+
+            $scope.deleteElement = function(index) {
+              // Need to let the RTE know that HtmlContent has been changed.
+              $scope.$broadcast('externalHtmlContentChange');
+              $scope.localValue.splice(index, 1);
+            };
+          } else {
+            if ($scope.len <= 0) {
+              throw 'Invalid length for list editor: ' + $scope.len;
             }
-            evt.stopPropagation();
-          };
-
-          $scope.$on('submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
-          $scope.$on(
-            'submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
-          $scope.$on(
-            'submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
-
-          $scope.deleteElement = function(index) {
-            // Need to let the RTE know that HtmlContent has been changed.
-            $scope.$broadcast('externalHtmlContentChange');
-            $scope.localValue.splice(index, 1);
-          };
-        } else {
-          if ($scope.len <= 0) {
-            throw 'Invalid length for list editor: ' + $scope.len;
+            if ($scope.len !== $scope.localValue.length) {
+              throw 'List editor length does not match length of input ' +
+              'value: ' + $scope.len + ' ' + $scope.localValue;
+            }
           }
-          if ($scope.len !== $scope.localValue.length) {
-            throw 'List editor length does not match length of input value: ' +
-              $scope.len + ' ' + $scope.localValue;
-          }
-        }
+        };
       }]
     };
   }

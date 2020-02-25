@@ -16,6 +16,7 @@
  * @fileoverview Directive for the navbar breadcrumb of the subtopic viewer.
  */
 
+require('domain/classroom/classroom-domain.constants.ajs.ts');
 require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 
@@ -32,18 +33,21 @@ angular.module('oppia').directive('subtopicViewerNavbarBreadcrumb', [
         'TOPIC_VIEWER_URL_TEMPLATE', function(
             $scope, SubtopicViewerBackendApiService, UrlService,
             TOPIC_VIEWER_URL_TEMPLATE) {
-          $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
+          var ctrl = this;
           $scope.getTopicUrl = function() {
             return UrlInterpolationService.interpolateUrl(
               TOPIC_VIEWER_URL_TEMPLATE, {
                 topic_name: $scope.topicName
               });
           };
-          SubtopicViewerBackendApiService.fetchSubtopicData(
-            $scope.topicName, UrlService.getSubtopicIdFromUrl()).then(
-            function(subtopicDataDict) {
-              $scope.subtopicTitle = subtopicDataDict.subtopic_title;
-            });
+          ctrl.$onInit = function() {
+            $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
+            SubtopicViewerBackendApiService.fetchSubtopicData(
+              $scope.topicName, UrlService.getSubtopicIdFromUrl()).then(
+              function(subtopicDataObject) {
+                $scope.subtopicTitle = subtopicDataObject.getSubtopicTitle();
+              });
+          };
         }
       ]
     };

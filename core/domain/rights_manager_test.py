@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for classes and methods relating to user rights."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -244,6 +245,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_moderator = user_services.UserActionsInfo(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
+        self.login(self.ADMIN_EMAIL)
 
     def test_get_exploration_rights_for_nonexistent_exploration(self):
         non_exp_id = 'this_exp_does_not_exist_id'
@@ -805,6 +807,7 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.user_moderator = user_services.UserActionsInfo(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
+        self.login(self.ADMIN_EMAIL)
 
     def test_get_collection_rights_for_nonexistent_collection(self):
         non_col_id = 'this_collection_does_not_exist_id'

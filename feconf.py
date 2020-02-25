@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Stores various configuration options and constants for Oppia."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -173,7 +174,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 31
+CURRENT_STATE_SCHEMA_VERSION = 32
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -294,6 +295,8 @@ DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
 
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
+# Default abbreviated name for a newly-minted topic.
+DEFAULT_ABBREVIATED_TOPIC_NAME = ''
 # Default content id for the subtopic page's content.
 DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
 
@@ -354,7 +357,8 @@ MAILGUN_API_KEY = None
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
 
-# Committer id for system actions.
+# Committer id for system actions. The username for the system committer
+# (i.e. admin) is also 'admin'.
 SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
@@ -443,6 +447,7 @@ EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
 EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
 EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
 EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES = 'voiceover_application_updates'
+EMAIL_INTENT_ACCOUNT_DELETED = 'account_deleted'
 # Possible intents for email sent in bulk.
 BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
 BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
@@ -515,6 +520,16 @@ MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 # suggestions automatically after a threshold time.
 SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
 SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
+
+# The system usernames are reserved usernames. Before adding new value to this
+# dict, make sure that there aren't any similar usernames in the datastore.
+# Note: All bot user IDs and usernames should start with "Oppia" and end with
+# "Bot".
+SYSTEM_USERS = {
+    SYSTEM_COMMITTER_ID: SYSTEM_COMMITTER_ID,
+    MIGRATION_BOT_USER_ID: MIGRATION_BOT_USERNAME,
+    SUGGESTION_BOT_USER_ID: SUGGESTION_BOT_USERNAME
+}
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
@@ -654,6 +669,7 @@ FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
+FETCH_SKILLS_URL_PREFIX = '/fetch_skills'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
@@ -692,6 +708,9 @@ QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
 QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+DELETE_ACCOUNT_URL = '/delete-account'
+DELETE_ACCOUNT_HANDLER_URL = '/delete-account-handler'
+PENDING_ACCOUNT_DELETION_URL = '/pending-account-deletion'
 REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
 REVIEW_TEST_URL_PREFIX = '/review_test'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -708,7 +727,7 @@ SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
-STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
+STORY_PROGRESS_URL_PREFIX = '/story_progress_handler'
 STORY_PUBLISH_HANDLER = '/story_publish_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'

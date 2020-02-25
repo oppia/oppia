@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base-components/header.template.html', {"title": "Oppia"})
+    @load('base-components/header.template.html', {"title": "Oppia"})
     <base href="/search/">
     <style>
       html, body {
@@ -14,7 +14,7 @@
     <div ng-controller="Base">
       <base-content>
         <navbar-breadcrumb>
-          <search-bar></search-bar>
+          <search-bar enable-dropup="false"></search-bar>
         </navbar-breadcrumb>
 
         <content>
@@ -27,6 +27,6 @@
       </base-content>
     </div>
 
-    @require('../footer_js_libs.html')
+    @load('pages/footer_js_libs.html')
   </body>
 </html>

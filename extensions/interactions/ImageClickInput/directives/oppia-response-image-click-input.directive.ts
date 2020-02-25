@@ -20,27 +20,26 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponseImageClickInput', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/ImageClickInput/directives/' +
-        'image-click-input-response.directive.html'),
+      template: require('./image-click-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'HtmlEscaperService',
         function($attrs, HtmlEscaperService) {
           var ctrl = this;
-          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          ctrl.clickRegionLabel = '(Clicks on ' + (
-            _answer.clickedRegions.length > 0 ?
-              '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+          ctrl.$onInit = function() {
+            var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+            ctrl.clickRegionLabel = '(Clicks on ' + (
+              _answer.clickedRegions.length > 0 ?
+                '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+          };
         }
       ]
     };

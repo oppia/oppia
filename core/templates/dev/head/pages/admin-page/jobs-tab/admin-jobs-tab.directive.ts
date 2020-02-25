@@ -22,11 +22,13 @@ require('pages/admin-page/services/admin-data.service.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminJobsTab', [
-  '$http', '$timeout', 'AdminDataService', 'UrlInterpolationService',
-  'ADMIN_HANDLER_URL', 'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
+  '$http', '$rootScope', '$timeout', 'AdminDataService',
+  'UrlInterpolationService', 'ADMIN_HANDLER_URL',
+  'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
   function(
-      $http, $timeout, AdminDataService, UrlInterpolationService,
-      ADMIN_HANDLER_URL, ADMIN_JOB_OUTPUT_URL_TEMPLATE) {
+      $http, $rootScope, $timeout, AdminDataService,
+      UrlInterpolationService, ADMIN_HANDLER_URL,
+      ADMIN_JOB_OUTPUT_URL_TEMPLATE) {
     return {
       restrict: 'E',
       scope: {},
@@ -38,24 +40,6 @@ angular.module('oppia').directive('adminJobsTab', [
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
-        ctrl.HUMAN_READABLE_CURRENT_TIME = '';
-        ctrl.CONTINUOUS_COMPUTATIONS_DATA = {};
-        ctrl.ONE_OFF_JOB_SPECS = {};
-        ctrl.UNFINISHED_JOB_DATA = {};
-        ctrl.AUDIT_JOB_SPECS = {};
-        ctrl.RECENT_JOB_DATA = {};
-        AdminDataService.getDataAsync().then(function(response) {
-          ctrl.HUMAN_READABLE_CURRENT_TIME = (
-            response.human_readeable_current_time);
-          ctrl.CONTINUOUS_COMPUTATIONS_DATA = (
-            response.continuous_computations_data);
-          ctrl.ONE_OFF_JOB_SPECS = response.one_off_job_specs;
-          ctrl.UNFINISHED_JOB_DATA = response.unfinished_job_data;
-          ctrl.AUDIT_JOB_SPECS = response.audit_job_specs;
-          ctrl.RECENT_JOB_DATA = response.recent_job_data;
-        });
-
-        ctrl.showingJobOutput = false;
         ctrl.showJobOutput = function(jobId) {
           var adminJobOutputUrl = UrlInterpolationService.interpolateUrl(
             ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
@@ -130,6 +114,29 @@ angular.module('oppia').directive('adminJobsTab', [
             ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
+        };
+        ctrl.$onInit = function() {
+          ctrl.HUMAN_READABLE_CURRENT_TIME = '';
+          ctrl.CONTINUOUS_COMPUTATIONS_DATA = {};
+          ctrl.ONE_OFF_JOB_SPECS = {};
+          ctrl.UNFINISHED_JOB_DATA = {};
+          ctrl.AUDIT_JOB_SPECS = {};
+          ctrl.RECENT_JOB_DATA = {};
+          AdminDataService.getDataAsync().then(function(response) {
+            ctrl.HUMAN_READABLE_CURRENT_TIME = (
+              response.human_readeable_current_time);
+            ctrl.CONTINUOUS_COMPUTATIONS_DATA = (
+              response.continuous_computations_data);
+            ctrl.ONE_OFF_JOB_SPECS = response.one_off_job_specs;
+            ctrl.UNFINISHED_JOB_DATA = response.unfinished_job_data;
+            ctrl.AUDIT_JOB_SPECS = response.audit_job_specs;
+            ctrl.RECENT_JOB_DATA = response.recent_job_data;
+            // TODO(#8521): Remove the use of $rootScope.$apply()
+            // once the directive is migrated to angular
+            $rootScope.$apply();
+          });
+
+          ctrl.showingJobOutput = false;
         };
       }]
     };

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.base_model.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -47,6 +48,14 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(NotImplementedError):
             base_models.BaseModel.has_reference_to_user_id('user_id')
 
+    def test_get_user_id_migration_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_user_id_migration_policy()
+
+    def test_get_user_id_migration_field(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_user_id_migration_field()
+
     def test_error_cases_for_get_method(self):
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
             base_models.BaseModel.get('Invalid id')
@@ -63,6 +72,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_export_data(self):
         with self.assertRaises(NotImplementedError):
             base_models.BaseModel.export_data('user_id')
+
+    def test_get_export_policy(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.get_export_policy()
 
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
@@ -161,6 +174,20 @@ class TestVersionedModel(base_models.VersionedModel):
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            base_models.BaseCommitLogEntryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                base_models.BaseCommitLogEntryModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(base_models.BaseCommitLogEntryModel.user_id))
+
     def test_base_class_get_instance_id_raises_not_implemented_error(self):
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
@@ -169,6 +196,22 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
 
 class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            base_models.BaseSnapshotMetadataModel
+            .get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.ONE_FIELD)
+
+    def test_get_user_id_migration_field(self):
+        # We need to compare the field types not the field values, thus using
+        # python_utils.UNICODE.
+        self.assertEqual(
+            python_utils.UNICODE(
+                base_models.BaseSnapshotMetadataModel
+                .get_user_id_migration_field()),
+            python_utils.UNICODE(
+                base_models.BaseSnapshotMetadataModel.committer_id))
 
     def test_exists_for_user_id(self):
         model1 = base_models.BaseSnapshotMetadataModel(

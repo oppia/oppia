@@ -12,18 +12,36 @@
       <i class="material-icons">play_arrow</i>
     </button>
   </div>
-  <div class="oppia-content-wrapper oppia-audio-bar-info">
-    <div ng-if="!cannotRecord && !checkingMicrophonePermission">
-      No audio recorded.<span ng-if="canVoiceover"> Press <i class="material-icons">mic</i>  to start recording.</span>
+  <div class="d-block d-xl-none oppia-content-wrapper oppia-audio-bar-info">
+    <div class="padding-small-screen">
+      <div ng-if="!cannotRecord && !checkingMicrophonePermission">
+        <span ng-if="canVoiceover"> Press <i class="material-icons">mic</i>  to record.</span>
+      </div>
+      <div ng-if="checkingMicrophonePermission">
+        Loading microphone.<loading-dots></loading-dots>
+      </div>
+      <div ng-if="recordingPermissionDenied && cannotRecord">
+        Permission needed for recording.
+      </div>
+      <div ng-if="unsupportedBrowser && cannotRecord">
+        Microphone is not supported.
+      </div>
     </div>
-    <div ng-if="checkingMicrophonePermission">
-      Loading microphone.<loading-dots></loading-dots>
-    </div>
-    <div ng-if="recordingPermissionDenied && cannotRecord">
-      You need to grant permission for this application to use your microphone.
-    </div>
-    <div ng-if="unsupportedBrowser && cannotRecord">
-      Sorry, your browser does not support recording feature.
+  </div>
+  <div class="d-none d-xl-block oppia-content-wrapper oppia-audio-bar-info">
+    <div class="padding-large-screen">
+      <div ng-if="!cannotRecord && !checkingMicrophonePermission">
+        No audio recorded.<span ng-if="canVoiceover"> Press <i class="material-icons">mic</i>  to start recording.</span>
+      </div>
+      <div ng-if="checkingMicrophonePermission">
+        Loading microphone.<loading-dots></loading-dots>
+      </div>
+      <div ng-if="recordingPermissionDenied && cannotRecord">
+        You need to grant permission for this application to use your microphone.
+      </div>
+      <div ng-if="unsupportedBrowser && cannotRecord">
+        Sorry, your browser does not support recording feature.
+      </div>
     </div>
   </div>
   <div class="oppia-content-wrapper">
@@ -38,7 +56,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-upload-audio protractor-test-upload-audio-button"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio protractor-test-accessibility-translation-upload-audio"
             uib-tooltip="Upload"
             tooltip-placement="above"
             ng-click="openAddAudioTranslationModal()"
@@ -74,7 +92,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper" ng-if="voiceoverRecorder.status().isRecording">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-stop-record"
             uib-tooltip="Stop"
             tooltip-placement="above"
             ng-click="stopRecording()"
@@ -91,7 +109,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper" ng-if="!voiceoverRecorder.status().isRecording && audioBlob">
-    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-action-button oppia-audio-bar-button-transition protractor-test-confirm-record"
             ng-click="saveRecordedAudio()"
             aria-label="Save the recorded audio">
       Confirm
@@ -139,7 +157,7 @@
     </div>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio-button"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-upload-audio"
             uib-tooltip="Upload audio"
             tooltip-placement="above"
             ng-hide="!canVoiceover"
@@ -148,7 +166,7 @@
     </button>
   </div>
   <div class="oppia-content-wrapper">
-    <button class="btn oppia-audio-button oppia-audio-bar-button-transition"
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-delete-record"
             uib-tooltip="Delete"
             tooltip-placement="above"
             ng-hide="!canVoiceover"
@@ -234,7 +252,7 @@
     width: 0 !important;
   }
   .oppia-content-wrapper {
-    margin: 0 10px;
+    margin: 0 5px;
   }
   .oppia-audio-bar-info {
     background-color: #009688;
@@ -244,8 +262,14 @@
     font-size: 12px;
     height: 38px;
     line-height: 27px;
-    padding: 5px 40px;
     text-align: center;
+  }
+  .oppia-audio-bar-info .padding-small-screen {
+    padding: 5px 2px;
+    font-size: 11px;
+  }
+  .oppia-audio-bar-info .padding-large-screen {
+    padding: 5px 20px;
   }
   .oppia-audio-button {
     background-color: #009688;

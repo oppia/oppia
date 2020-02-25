@@ -35,9 +35,12 @@ angular.module('oppia').directive('collectionFooter', [
       controllerAs: '$ctrl',
       controller: ['UrlService', function(UrlService) {
         var ctrl = this;
-        ctrl.collectionId = UrlService.getCollectionIdFromUrl();
-
-        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
+        ctrl.$onInit = function() {
+          ctrl.collectionId = UrlService.getCollectionIdFromUrl();
+        };
       }]
     };
   }]);

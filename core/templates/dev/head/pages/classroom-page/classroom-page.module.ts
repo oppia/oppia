@@ -32,6 +32,7 @@ import { HttpClientModule } from '@angular/common/http';
 })
 export class ServiceBootstrapComponent {}
 
+import { AppConstants } from 'app.constants';
 import { ClassroomDomainConstants } from
   'domain/classroom/classroom-domain.constants';
 
@@ -47,6 +48,7 @@ import { ClassroomDomainConstants } from
     ServiceBootstrapComponent
   ],
   providers: [
+    AppConstants,
     ClassroomDomainConstants
   ]
 })
@@ -68,12 +70,11 @@ declare var angular: any;
 
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+  'ngAudio', require('angular-cookies'), 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
   downgradedModule
-].concat(
-  window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
+])
   // This directive is the downgraded version of the Angular component to
   // bootstrap the Angular 8.
   .directive(

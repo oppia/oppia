@@ -20,28 +20,26 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponseInteractiveMap', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/InteractiveMap/directives/' +
-        'interactive-map-short-response.directive.html'),
+      template: require('./interactive-map-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
-        ctrl.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
-        ctrl.formattedCoords += ', ';
-        ctrl.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
-        ctrl.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
+        ctrl.$onInit = function() {
+          var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
+          ctrl.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
+          ctrl.formattedCoords += ', ';
+          ctrl.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
+          ctrl.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
+        };
       }]
     };
   }

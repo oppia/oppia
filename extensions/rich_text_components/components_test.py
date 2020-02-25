@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for rich text components."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -129,6 +130,21 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
 
         self.check_validation(
             components.Math, valid_items, invalid_items)
+
+    def test_skillreview_validation(self):
+        """Tests skillreview component validation."""
+        valid_items = [{
+            'skill_summary-with-value':
+                '{\'id\': \'skill_id\', \'description\': '
+                '\'skill_description\'}',
+        }]
+        invalid_items = [{
+            'skill_summary-with-value': 'javascript:alert(5);',
+            'text-with-value': 'Hello'
+        }]
+
+        self.check_validation(
+            components.Skillreview, valid_items, invalid_items)
 
     def test_tabs_validation(self):
         """Tests collapsible component validation."""

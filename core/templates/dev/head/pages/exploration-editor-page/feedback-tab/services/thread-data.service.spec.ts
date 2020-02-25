@@ -26,13 +26,14 @@ import { SuggestionObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 
 describe('retrieving threads service', function() {
   var expId = '12345';
-  beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(function() {
     angular.mock.module('oppia');
     angular.mock.module(function($provide) {
@@ -51,13 +52,13 @@ describe('retrieving threads service', function() {
     }
   }));
 
-  var ThreadDataService, httpBackend;
-  beforeEach(angular.mock.inject(function($httpBackend, _ThreadDataService_) {
+  var ThreadDataService, $httpBackend;
+  beforeEach(angular.mock.inject(function(_$httpBackend_, _ThreadDataService_) {
     ThreadDataService = _ThreadDataService_;
-    httpBackend = $httpBackend;
+    $httpBackend = _$httpBackend_;
   }));
 
-  it('should retrieve feedback threads', function() {
+  it('should retrieve feedback threads', function(done) {
     var mockFeedbackThreads = [
       {
         last_updated: 1441870501230.642,
@@ -79,11 +80,11 @@ describe('retrieving threads service', function() {
       }
     ];
 
-    var mockGeneralSuggestionThreads = [
+    var mockSuggestions = [
       {
         assigned_reviewer_id: null,
         author_name: 'author_1',
-        change_cmd: {
+        change: {
           new_value: {
             html: 'new content html',
             audio_translation: {}
@@ -97,15 +98,14 @@ describe('retrieving threads service', function() {
         last_updated: 1528564605944.896,
         score_category: 'content.Algebra',
         status: 'received',
-        suggestion_id: 'exploration.exp_1.1234',
+        suggestion_id: 'exp_1.1234',
         suggestion_type: 'edit_exploration_state_content',
         target_id: 'exp_1',
         target_type: 'exploration',
         target_version_at_submission: 1,
-        thread_id: 'exp_1.1234'
       }
     ];
-    var feedbackThreadsForSuggestionThreads = [
+    var mockSuggestionThreads = [
       {
         description: 'Suggestion',
         last_updated: 1441870501231.642,
@@ -117,27 +117,27 @@ describe('retrieving threads service', function() {
         thread_id: 'exp_1.1234'
       }
     ];
-    httpBackend.whenGET('/threadlisthandler/' + expId).respond({
-      threads: mockFeedbackThreads.concat(feedbackThreadsForSuggestionThreads)
-    });
 
-    httpBackend.whenGET(
-      '/generalsuggestionlisthandler?target_type=exploration' +
-      '&target_id=' + expId).respond({
-      suggestions: mockGeneralSuggestionThreads
+    $httpBackend.whenGET('/threadlisthandler/' + expId).respond({
+      feedback_thread_dicts: mockFeedbackThreads,
+      suggestion_thread_dicts: mockSuggestionThreads
     });
+    $httpBackend.whenGET(
+      '/suggestionlisthandler?target_type=exploration&target_id=' + expId
+    ).respond({ suggestions: mockSuggestions });
 
-    ThreadDataService.fetchThreads(function() {
-      for (var i = 0; i < mockFeedbackThreads.length; i++) {
-        expect(ThreadDataService.getData().feedbackThreads).toContain(
-          mockFeedbackThreads[i]);
+
+    ThreadDataService.fetchThreads().then(threadData => {
+      for (let feedbackThread of mockFeedbackThreads) {
+        expect(threadData.feedbackThreads).toContain(jasmine.objectContaining(
+          { threadId: feedbackThread.thread_id }));
       }
 
-      for (var i = 0; i < mockGeneralSuggestionThreads.length; i++) {
-        expect(ThreadDataService.getData().suggestionThreads).toContain(
-          mockGeneralSuggestionThreads[i]);
+      for (let suggestionThread of mockSuggestionThreads) {
+        expect(threadData.suggestionThreads).toContain(jasmine.objectContaining(
+          { threadId: suggestionThread.thread_id }));
       }
-    });
-    httpBackend.flush();
+    }).then(done, done.fail);
+    $httpBackend.flush();
   });
 });

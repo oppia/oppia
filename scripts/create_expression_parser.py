@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """This script produces the expression parser."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -42,32 +43,13 @@ def main(args=None):
     expression_parser_definition = os.path.join(
         'core', 'templates', 'dev', 'head', 'expressions', 'parser.pegjs')
     expression_parser_js = os.path.join(
-        'core', 'templates', 'dev', 'head', 'expressions',
-        'expression-parser.service.js')
+        'core', 'templates', 'dev', 'head', 'expressions', 'parser.js')
 
     common.install_npm_library('pegjs', '0.8.0', common.OPPIA_TOOLS_DIR)
 
     subprocess.check_call([
         os.path.join(common.NODE_MODULES_PATH, 'pegjs', 'bin', 'pegjs'),
         expression_parser_definition, expression_parser_js])
-
-    for line in fileinput.input(files=[expression_parser_js], inplace=True):
-        # Inside this loop the STDOUT will be redirected to the file,
-        # expression_parser_js. The end='' is needed to avoid double line
-        # breaks.
-        python_utils.PRINT(
-            re.sub(
-                r'module\.exports.*$',
-                'angular.module(\'oppia\').factory('
-                '\'ExpressionParserService\', [\'$log\', function($log) {',
-                line), end='')
-
-    for line in fileinput.input(files=[expression_parser_js], inplace=True):
-        # Inside this loop the STDOUT will be redirected to the file,
-        # expression_parser_js. The end='' is needed to avoid double line
-        # breaks.
-        python_utils.PRINT(
-            re.sub(r'^\}\)\(\);\s*$', '}]);', line), end='')
 
     python_utils.PRINT('Done!')
 

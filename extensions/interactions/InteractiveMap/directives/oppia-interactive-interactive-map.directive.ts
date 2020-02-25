@@ -43,23 +43,14 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
       bindToController: {
         getLastAnswer: '&lastAnswer'
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/InteractiveMap/directives/' +
-        'interactive-map-interaction.directive.html'),
+      template: require('./interactive-map-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$attrs', '$scope', '$timeout', 'BrowserCheckerService',
+        '$attrs', '$scope', 'BrowserCheckerService',
         'CurrentInteractionService', function(
-            $attrs, $scope, $timeout, BrowserCheckerService,
+            $attrs, $scope, BrowserCheckerService,
             CurrentInteractionService) {
           var ctrl = this;
-          ctrl.coords = [
-            HtmlEscaperService.escapedJsonToObj($attrs.latitudeWithValue),
-            HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
-          ctrl.zoom = (
-            HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
-          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
-          ctrl.mapMarkers = {};
           var coords = ctrl.coords || [0, 0];
           var zoomLevel = parseInt(ctrl.zoom, 10) || 0;
 
@@ -105,15 +96,6 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
             };
           };
 
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-            ctrl.setOverlay();
-          });
-
-          $scope.$on('showInteraction', function() {
-            refreshMap();
-          });
-
           var refreshMap = function() {
             ctrl.mapOptions = {
               center: {
@@ -137,30 +119,48 @@ angular.module('oppia').directive('oppiaInteractiveInteractiveMap', [
                 ctrl.getLastAnswer()[0], ctrl.getLastAnswer()[1]);
             }
           };
-
-          $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
-            function() {
-              if (!ctrl.interactionIsActive) {
-                ctrl.setOverlay();
-              }
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
+              ctrl.setOverlay();
             });
 
-          $scope.$on('leafletDirectiveMap.interactiveMap.mouseout', function() {
-            if (!ctrl.interactionIsActive) {
-              ctrl.hideOverlay();
-            }
-          });
-          $scope.$on('leafletDirectiveMap.interactiveMap.click',
-            function(evt, args) {
-              if (ctrl.interactionIsActive) {
-                var newLat = args.leafletEvent.latlng.lat;
-                var newLng = args.leafletEvent.latlng.lng;
-                changeMarkerPosition(newLat, newLng);
-                CurrentInteractionService.onSubmit(
-                  [newLat, newLng], InteractiveMapRulesService);
-              }
+            $scope.$on('showInteraction', function() {
+              refreshMap();
             });
-          refreshMap();
+
+            $scope.$on('leafletDirectiveMap.interactiveMap.mouseover',
+              function() {
+                if (!ctrl.interactionIsActive) {
+                  ctrl.setOverlay();
+                }
+              });
+
+            $scope.$on(
+              'leafletDirectiveMap.interactiveMap.mouseout', function() {
+                if (!ctrl.interactionIsActive) {
+                  ctrl.hideOverlay();
+                }
+              });
+            $scope.$on('leafletDirectiveMap.interactiveMap.click',
+              function(evt, args) {
+                if (ctrl.interactionIsActive) {
+                  var newLat = args.leafletEvent.latlng.lat;
+                  var newLng = args.leafletEvent.latlng.lng;
+                  changeMarkerPosition(newLat, newLng);
+                  CurrentInteractionService.onSubmit(
+                    [newLat, newLng], InteractiveMapRulesService);
+                }
+              });
+            ctrl.coords = [
+              HtmlEscaperService.escapedJsonToObj($attrs.latitudeWithValue),
+              HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
+            ctrl.zoom = (
+              HtmlEscaperService.escapedJsonToObj($attrs.zoomWithValue));
+            ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+            ctrl.mapMarkers = {};
+            refreshMap();
+          };
         }
       ]
     };

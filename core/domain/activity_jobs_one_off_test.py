@@ -15,13 +15,12 @@
 # limitations under the License.
 
 """Unit tests for core.domain.activity_jobs_one_off."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
 import ast
-import types
 
-from core.controllers import base
 from core.domain import activity_jobs_one_off
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -33,20 +32,12 @@ from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
+import feconf
 import python_utils
 
 gae_search_services = models.Registry.import_search_services()
 
-(
-    collection_models, config_models,
-    exp_models, question_models,
-    skill_models, story_models,
-    topic_models) = (
-        models.Registry.import_models([
-            models.NAMES.collection, models.NAMES.config,
-            models.NAMES.exploration, models.NAMES.question,
-            models.NAMES.skill, models.NAMES.story,
-            models.NAMES.topic]))
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
 
 class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
@@ -117,134 +108,161 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
                 'key', 'value'))
 
 
-class SnapshotMetadataModelsIndexesJobTest(test_utils.GenericTestBase):
-    """Tests for QuestionSummaryModel migration."""
+class ReplaceAdminIdOneOffJobTests(test_utils.GenericTestBase):
 
-    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
-        activity_jobs_one_off.SnapshotMetadataModelsIndexesJob]
-
-    TESTED_MODEL_TYPES = [
-        collection_models.CollectionSnapshotMetadataModel,
-        collection_models.CollectionRightsSnapshotMetadataModel,
-        config_models.ConfigPropertySnapshotMetadataModel,
-        exp_models.ExplorationSnapshotMetadataModel,
-        exp_models.ExplorationRightsSnapshotMetadataModel,
-        question_models.QuestionSnapshotMetadataModel,
-        question_models.QuestionRightsSnapshotMetadataModel,
-        skill_models.SkillSnapshotMetadataModel,
-        skill_models.SkillRightsSnapshotMetadataModel,
-        story_models.StorySnapshotMetadataModel,
-        topic_models.TopicSnapshotMetadataModel,
-        topic_models.SubtopicPageSnapshotMetadataModel,
-        topic_models.TopicRightsSnapshotMetadataModel
-    ]
-
-    def setUp(self):
-        def empty(*_):
-            """Function that takes any number of arguments and does nothing."""
-            pass
-
-        # We don't want to add ConfigPropertySnapshotMetadataModel for CSRF
-        # secret, so we need to skip the CSRF token init.
-        with self.swap(
-            base.CsrfTokenManager, 'init_csrf_secret',
-            types.MethodType(empty, base.CsrfTokenManager)
-        ):
-            super(SnapshotMetadataModelsIndexesJobTest, self).setUp()
+    USER_1_ID = 'user_1_id'
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
-        job_id = (
-            activity_jobs_one_off.SnapshotMetadataModelsIndexesJob.create_new())
-        activity_jobs_one_off.SnapshotMetadataModelsIndexesJob.enqueue(job_id)
+        job_id = activity_jobs_one_off.ReplaceAdminIdOneOffJob.create_new()
+        activity_jobs_one_off.ReplaceAdminIdOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
         stringified_output = (
-            activity_jobs_one_off.SnapshotMetadataModelsIndexesJob
-            .get_output(job_id))
-        eval_output = [ast.literal_eval(stringified_item)
-                       for stringified_item in stringified_output]
-        output = [(eval_item[0], int(eval_item[1]))
-                  for eval_item in eval_output]
-        return output
+            activity_jobs_one_off.ReplaceAdminIdOneOffJob.get_output(job_id))
+        eval_output = [ast.literal_eval(stringified_item) for
+                       stringified_item in stringified_output]
+        return eval_output
 
-    def _check_model_validity(self, original_model, migrated_model):
-        """Checks if the model was migrated correctly."""
-        self.assertEqual(
-            migrated_model.committer_id,
-            original_model.committer_id)
-        self.assertEqual(
-            migrated_model.commit_type,
-            original_model.commit_type)
-        self.assertEqual(
-            migrated_model.commit_message,
-            original_model.commit_message)
-        self.assertEqual(
-            migrated_model.commit_cmds,
-            original_model.commit_cmds)
-        self.assertEqual(
-            migrated_model.last_updated,
-            original_model.last_updated)
-
-    def test_successful_migration_all_model_types(self):
-        for model_type in self.TESTED_MODEL_TYPES:
-            instance_id = 'id_1'
-            model = model_type(
-                id=instance_id,
-                committer_id='committer_id',
-                commit_type='create',
-                commit_message='commit message',
-                commit_cmds=[{'cmd': 'some_command'}])
-            model.put()
-
-            output = self._run_one_off_job()
-            self.assertEqual(output, [(u'SUCCESS', 1)])
-            migrated_model = model_type.get_by_id(instance_id)
-            self._check_model_validity(model, migrated_model)
-
-            model.delete()
-
-    def test_successful_migration_multiple_models(self):
-        instance_id_1 = 'id_1'
-        instance_id_2 = 'id_2'
-        instance_id_3 = 'id_3'
-        collection_model = collection_models.CollectionSnapshotMetadataModel(
-            id=instance_id_1,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_message='commit message 1',
-            commit_cmds=[{'cmd': 'some_command'}])
-        collection_model.put()
-        exploration_model = exp_models.ExplorationSnapshotMetadataModel(
-            id=instance_id_2,
-            committer_id='committer_id',
+    def test_one_snapshot_model_wrong(self):
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='exp_1_id',
+            committer_id='Admin',
             commit_type='create',
             commit_message='commit message 2',
-            commit_cmds=[{'cmd': 'some_command'}])
-        exploration_model.put()
-        skill_model = skill_models.SkillRightsSnapshotMetadataModel(
-            id=instance_id_3,
-            committer_id='committer_id',
-            commit_type='create',
-            commit_message='commit message 3',
-            commit_cmds=[{'cmd': 'some_command'}])
-        skill_model.put()
+            commit_cmds=[{'cmd': 'some_command'}]).put()
 
         output = self._run_one_off_job()
-        self.assertEqual(output, [(u'SUCCESS', 3)])
+        self.assertIn(['SUCCESS-RENAMED-SNAPSHOT', ['exp_1_id']], output)
 
-        migrated_collection_model = (
-            collection_models.CollectionSnapshotMetadataModel.get_by_id(
-                instance_id_1))
-        self._check_model_validity(collection_model, migrated_collection_model)
-        migrated_exploration_model = (
-            exp_models.ExplorationSnapshotMetadataModel.get_by_id(
-                instance_id_2))
-        self._check_model_validity(
-            exploration_model, migrated_exploration_model)
-        migrated_skill_model = (
-            skill_models.SkillRightsSnapshotMetadataModel.get_by_id(
-                instance_id_3))
-        self._check_model_validity(skill_model, migrated_skill_model)
+        migrated_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                'exp_1_id'))
+        self.assertEqual(
+            migrated_model.committer_id, feconf.SYSTEM_COMMITTER_ID)
+
+    def test_one_snapshot_model_correct(self):
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='exp_1_id',
+            committer_id=self.USER_1_ID,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]).put()
+
+        output = self._run_one_off_job()
+        self.assertIn(['SUCCESS-KEPT-SNAPSHOT', 1], output)
+
+        migrated_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                'exp_1_id'))
+        self.assertEqual(migrated_model.committer_id, self.USER_1_ID)
+
+    def test_one_commit_model_wrong(self):
+        exp_models.ExplorationCommitLogEntryModel(
+            id='exp_1_id-1',
+            exploration_id='exp_1_id',
+            user_id='Admin',
+            username='Admin',
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}],
+            post_commit_status='public').put()
+
+        output = self._run_one_off_job()
+        self.assertIn(['SUCCESS-RENAMED-COMMIT', ['exp_1_id-1']], output)
+
+        migrated_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id('exp_1_id-1'))
+        self.assertEqual(migrated_model.user_id, feconf.SYSTEM_COMMITTER_ID)
+
+    def test_one_commit_model_correct(self):
+        exp_models.ExplorationCommitLogEntryModel(
+            id='exp_1_id-1',
+            exploration_id='exp_1_id',
+            user_id=self.USER_1_ID,
+            username='user',
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}],
+            post_commit_status='public').put()
+
+        output = self._run_one_off_job()
+        self.assertIn(['SUCCESS-KEPT-COMMIT', 1], output)
+
+        migrated_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id('exp_1_id-1'))
+        self.assertEqual(migrated_model.user_id, self.USER_1_ID)
+
+    def test_multiple(self):
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='exp_1_id-1',
+            committer_id='Admin',
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]).put()
+        exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='exp_1_id-2',
+            committer_id=self.USER_1_ID,
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}]).put()
+        exp_models.ExplorationCommitLogEntryModel(
+            id='exp_1_id-1',
+            exploration_id='exp_1_id',
+            user_id='Admin',
+            username='Admin',
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}],
+            post_commit_status='public').put()
+        exp_models.ExplorationCommitLogEntryModel(
+            id='exp_1_id-2',
+            exploration_id='exp_1_id',
+            user_id='Admin',
+            username='Admin',
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}],
+            post_commit_status='public').put()
+        exp_models.ExplorationCommitLogEntryModel(
+            id='exp_1_id-3',
+            exploration_id='exp_1_id',
+            user_id=self.USER_1_ID,
+            username='user',
+            commit_type='create',
+            commit_message='commit message 2',
+            commit_cmds=[{'cmd': 'some_command'}],
+            post_commit_status='public').put()
+
+        output = self._run_one_off_job()
+        self.assertIn(
+            ['SUCCESS-RENAMED-SNAPSHOT', ['exp_1_id-1']], output)
+        self.assertIn(['SUCCESS-KEPT-SNAPSHOT', 1], output)
+        self.assertIn(
+            ['SUCCESS-RENAMED-COMMIT', ['exp_1_id-1', 'exp_1_id-2']], output)
+        self.assertIn(['SUCCESS-KEPT-COMMIT', 1], output)
+
+        migrated_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                'exp_1_id-1'))
+        self.assertEqual(
+            migrated_model.committer_id, feconf.SYSTEM_COMMITTER_ID)
+        migrated_model = (
+            exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
+                'exp_1_id-2'))
+        self.assertEqual(migrated_model.committer_id, self.USER_1_ID)
+
+        migrated_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exp_1_id-1'))
+        self.assertEqual(migrated_model.user_id, feconf.SYSTEM_COMMITTER_ID)
+        migrated_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exp_1_id-2'))
+        self.assertEqual(migrated_model.user_id, feconf.SYSTEM_COMMITTER_ID)
+        migrated_model = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'exp_1_id-3'))
+        self.assertEqual(migrated_model.user_id, self.USER_1_ID)

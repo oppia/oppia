@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the admin page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -290,7 +291,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(owner_id, exploration)
 
         topic = topic_domain.Topic.create_default_topic(
-            topic_id=topic_id, name='topic')
+            topic_id=topic_id, name='topic', abbreviated_name='abbrev')
         topic_services.save_new_topic(owner_id, topic)
 
         story = story_domain.Story.create_default_story(
@@ -872,7 +873,11 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            topic_id, user_id, 'Name', 'Description', [], [], [], [], 1)
+            topic_id, user_id, name='Name',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='Description', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=1)
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
@@ -1042,3 +1047,28 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         self.assertEqual(result_explorations, [])
         result_collections = search_services.search_collections('Welcome', 2)[0]
         self.assertEqual(result_collections, [])
+
+
+class SendDummyMailTest(test_utils.GenericTestBase):
+    """"Tests for sending test mails to admin."""
+
+    def setUp(self):
+        super(SendDummyMailTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+    def test_send_dummy_mail(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        csrf_token = self.get_new_csrf_token()
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            generated_response = self.post_json(
+                '/sendDummyMailToAdminHandler', payload={},
+                csrf_token=csrf_token, expected_status_int=200)
+            self.assertEqual(generated_response, {})
+
+        with self.swap(feconf, 'CAN_SEND_EMAILS', False):
+            generated_response = self.post_json(
+                '/sendDummyMailToAdminHandler', payload={},
+                csrf_token=csrf_token, expected_status_int=400)
+            self.assertEqual(
+                generated_response['error'], 'This app cannot send emails.')

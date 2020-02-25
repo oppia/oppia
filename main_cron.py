@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Main package for URL routing and the index page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -32,6 +33,11 @@ URLS = [
         r'/cron/mail/admin/job_status', cron.JobStatusMailerHandler),
     main.get_redirect_route(
         r'/cron/users/dashboard_stats', cron.CronDashboardStatsHandler),
+    main.get_redirect_route(
+        r'/cron/users/user_deletion', cron.CronUserDeletionHandler),
+    main.get_redirect_route(
+        r'/cron/users/verify_user_deletion',
+        cron.CronVerifyUserDeletionHandler),
     main.get_redirect_route(
         r'/cron/explorations/recommendations',
         cron.CronExplorationRecommendationsHandler),

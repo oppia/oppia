@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the creator dashboard and the notifications dashboard."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -709,9 +710,13 @@ class CreatorDashboardHandlerTests(test_utils.GenericTestBase):
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['topic_summary_dicts']), 0)
             self.save_new_topic(
-                'topic_id', self.owner_id, 'Name', 'Description',
-                ['story_id_1', 'story_id_2'], ['story_id_3'],
-                ['skill_id_1', 'skill_id_2'], [], 1)
+                'topic_id', self.owner_id, name='Name',
+                abbreviated_name='abbrev', thumbnail_filename=None,
+                description='Description',
+                canonical_story_ids=['story_id_1', 'story_id_2'],
+                additional_story_ids=['story_id_3'],
+                uncategorized_skill_ids=['skill_id_1', 'skill_id_2'],
+                subtopics=[], next_subtopic_id=1)
             response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
             self.assertEqual(len(response['topic_summary_dicts']), 1)
             self.assertTrue(isinstance(response['topic_summary_dicts'], list))
@@ -870,7 +875,7 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-    def _get_recent_notifications_mock_by_viewer(self, unused_user_id):
+    def _get_recent_user_changes_mock_by_viewer(self, unused_user_id):
         """Returns a single feedback thread by VIEWER_ID."""
         return (
             100000, [{
@@ -882,7 +887,7 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }])
 
-    def _get_recent_notifications_mock_by_anonymous_user(self, unused_user_id):
+    def _get_recent_user_changes_mock_by_anonymous_user(self, unused_user_id):
         """Returns a single feedback thread by an anonymous user."""
         return (
             200000, [{
@@ -900,8 +905,8 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
         """
         with self.swap(
             user_jobs_continuous.DashboardRecentUpdatesAggregator,
-            'get_recent_notifications',
-            self._get_recent_notifications_mock_by_viewer):
+            'get_recent_user_changes',
+            self._get_recent_user_changes_mock_by_viewer):
 
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(self.DASHBOARD_DATA_URL)
@@ -913,8 +918,8 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
 
         with self.swap(
             user_jobs_continuous.DashboardRecentUpdatesAggregator,
-            'get_recent_notifications',
-            self._get_recent_notifications_mock_by_anonymous_user):
+            'get_recent_user_changes',
+            self._get_recent_user_changes_mock_by_anonymous_user):
 
             self.login(self.VIEWER_EMAIL)
             response = self.get_json(self.DASHBOARD_DATA_URL)
@@ -926,8 +931,8 @@ class NotificationsDashboardHandlerTests(test_utils.GenericTestBase):
     def test_get_unseen_notifications_data(self):
         with self.swap(
             user_jobs_continuous.DashboardRecentUpdatesAggregator,
-            'get_recent_notifications',
-            self._get_recent_notifications_mock_by_anonymous_user):
+            'get_recent_user_changes',
+            self._get_recent_user_changes_mock_by_anonymous_user):
             self.login(self.VIEWER_EMAIL)
             response = self.get_json('/notificationshandler')
             self.assertEqual(response['num_unseen_notifications'], 1)

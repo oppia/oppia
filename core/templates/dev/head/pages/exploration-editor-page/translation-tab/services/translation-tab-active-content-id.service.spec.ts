@@ -27,6 +27,12 @@ require(
 
 describe('Translation tab active content id service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
+    var ugs = new UpgradedServices();
+    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
+      $provide.value(key, value);
+    }
+  }));
+  beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StateRecordedVoiceoversService', {
       displayed: {
         getAllContentId: function() {
@@ -34,12 +40,6 @@ describe('Translation tab active content id service', function() {
         }
       }
     });
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
   }));
   var ttacis = null;
 

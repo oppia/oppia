@@ -48,18 +48,11 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
         '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$location', '$scope', 'AdminDataService',
+        '$http', '$location', '$rootScope', '$scope', 'AdminDataService',
         'AdminRouterService', 'CsrfTokenService', 'DEV_MODE',
-        function($http, $location, $scope, AdminDataService,
+        function($http, $location, $rootScope, $scope, AdminDataService,
             AdminRouterService, CsrfTokenService, DEV_MODE) {
           var ctrl = this;
-          ctrl.userEmail = '';
-          AdminDataService.getDataAsync().then(function(response) {
-            ctrl.userEmail = response.user_email;
-          });
-          ctrl.inDevMode = DEV_MODE;
-
-          ctrl.statusMessage = '';
           ctrl.isActivitiesTabOpen = function() {
             return AdminRouterService.isActivitiesTabOpen();
           };
@@ -75,16 +68,25 @@ angular.module('oppia').directive('adminPage', ['UrlInterpolationService',
           ctrl.isMiscTabOpen = function() {
             return AdminRouterService.isMiscTabOpen();
           };
-
-          CsrfTokenService.initializeToken();
-
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;
           };
 
-          $scope.$on('$locationChangeSuccess', function() {
-            AdminRouterService.showTab($location.path().replace('/', '#'));
-          });
+          ctrl.$onInit = function() {
+            $scope.$on('$locationChangeSuccess', function() {
+              AdminRouterService.showTab($location.path().replace('/', '#'));
+            });
+            ctrl.userEmail = '';
+            AdminDataService.getDataAsync().then(function(response) {
+              ctrl.userEmail = response.user_email;
+              // TODO(#8521): Remove the use of $rootScope.$apply()
+              // once the directive is migrated to angular
+              $rootScope.$apply();
+            });
+            ctrl.inDevMode = DEV_MODE;
+            ctrl.statusMessage = '';
+            CsrfTokenService.initializeToken();
+          };
         }
       ]
     };

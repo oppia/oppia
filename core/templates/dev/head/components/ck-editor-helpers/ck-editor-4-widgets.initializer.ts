@@ -20,12 +20,13 @@
 require('rich_text_components/richTextComponentsRequires.ts');
 require('services/html-escaper.service.ts');
 require('services/rte-helper.service.ts');
+require('services/context.service.ts');
 
 angular.module('oppia').run([
-  '$timeout', '$compile', '$rootScope', 'RteHelperService',
-  'HtmlEscaperService',
-  function($timeout, $compile, $rootScope, RteHelperService,
-      HtmlEscaperService) {
+  '$compile', '$rootScope', '$timeout', 'RteHelperService',
+  'HtmlEscaperService', 'ContextService',
+  function($compile, $rootScope, $timeout, RteHelperService,
+      HtmlEscaperService, ContextService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
@@ -61,6 +62,11 @@ angular.module('oppia').run([
             template: componentTemplate,
             draggable: false,
             edit: function() {
+              // The following check allows the editing of the RTE components
+              // only in editor pages.
+              if (!ContextService.canAddOrEditComponents()) {
+                return;
+              }
               editor.fire('lockSnapshot', {
                 dontUpdate: true
               });

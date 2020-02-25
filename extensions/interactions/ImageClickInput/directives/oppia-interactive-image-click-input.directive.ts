@@ -20,6 +20,7 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/url-interpolation.service.ts');
 require(
   'interactions/ImageClickInput/directives/' +
   'image-click-input-rules.service.ts');
@@ -44,9 +45,7 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
       bindToController: {
         getLastAnswer: '&lastAnswer'
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/ImageClickInput/directives/' +
-        'image-click-input-interaction.directive.html'),
+      template: require('./image-click-input-interaction.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$element', '$attrs', '$scope', 'CurrentInteractionService',
@@ -54,61 +53,6 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
           var ctrl = this;
           var imageAndRegions = HtmlEscaperService.escapedJsonToObj(
             $attrs.imageAndRegionsWithValue);
-          ctrl.highlightRegionsOnHover =
-            ($attrs.highlightRegionsOnHoverWithValue === 'true');
-          ctrl.filepath = imageAndRegions.imagePath;
-          ctrl.imageUrl = '';
-          ctrl.loadingIndicatorUrl = UrlInterpolationService
-            .getStaticImageUrl(LOADING_INDICATOR_URL);
-          ctrl.isLoadingIndicatorShown = false;
-          ctrl.isTryAgainShown = false;
-
-          if (ImagePreloaderService.inExplorationPlayer()) {
-            ctrl.isLoadingIndicatorShown = true;
-            ctrl.dimensions = (
-              ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
-            // For aligning the gif to the center of it's container
-            var loadingIndicatorSize = (
-              (ctrl.dimensions.height < 124) ? 24 : 120);
-            ctrl.imageContainerStyle = {
-              height: ctrl.dimensions.height + 'px'
-            };
-            ctrl.loadingIndicatorStyle = {
-              height: loadingIndicatorSize + 'px',
-              width: loadingIndicatorSize + 'px'
-            };
-
-            ctrl.loadImage = function() {
-              ImagePreloaderService.getImageUrl(ctrl.filepath)
-                .then(function(objectUrl) {
-                  ctrl.isTryAgainShown = false;
-                  ctrl.isLoadingIndicatorShown = false;
-                  ctrl.imageUrl = objectUrl;
-                }, function() {
-                  ctrl.isTryAgainShown = true;
-                  ctrl.isLoadingIndicatorShown = false;
-                });
-            };
-            ctrl.loadImage();
-          } else {
-            // This is the case when user is in exploration editor or in
-            // preview mode. We don't have loading indicator or try again for
-            // showing images in the exploration editor or in preview mode. So
-            // we directly assign the url to the imageUrl.
-            ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-              ContextService.getEntityType(), ContextService.getEntityId(),
-              ctrl.filepath);
-          }
-
-          ctrl.mouseX = 0;
-          ctrl.mouseY = 0;
-          ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
-          if (!ctrl.interactionIsActive) {
-            ctrl.lastAnswer = ctrl.getLastAnswer();
-          }
-
-          ctrl.currentlyHoveredRegions = [];
-          ctrl.allRegions = imageAndRegions.labeledRegions;
           ctrl.updateCurrentlyHoveredRegions = function() {
             for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
               var labeledRegion = imageAndRegions.labeledRegions[i];
@@ -121,15 +65,6 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
               }
             }
           };
-          if (!ctrl.interactionIsActive) {
-            /* The following lines highlight the learner's last answer for this
-              card. This need only be done at the beginning as if he submits
-              an answer, based on EVENT_NEW_CARD_AVAILABLE, the image is made
-              inactive, so his last selection would be higlighted.*/
-            ctrl.mouseX = ctrl.getLastAnswer().clickPosition[0];
-            ctrl.mouseY = ctrl.getLastAnswer().clickPosition[1];
-            ctrl.updateCurrentlyHoveredRegions();
-          }
           ctrl.getRegionDimensions = function(index) {
             var image = $($element).find('.oppia-image-click-img');
             var labeledRegion = imageAndRegions.labeledRegions[index];
@@ -157,12 +92,6 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             }
             return 'inline';
           };
-          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
-            ctrl.interactionIsActive = false;
-            ctrl.lastAnswer = {
-              clickPosition: [ctrl.mouseX, ctrl.mouseY]
-            };
-          });
           ctrl.getDotLocation = function() {
             var image = $($element).find('.oppia-image-click-img');
             var dotLocation = {
@@ -201,8 +130,80 @@ angular.module('oppia').directive('oppiaInteractiveImageClickInput', [
             CurrentInteractionService.onSubmit(
               answer, ImageClickInputRulesService);
           };
+          ctrl.$onInit = function() {
+            $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+              ctrl.interactionIsActive = false;
+              ctrl.lastAnswer = {
+                clickPosition: [ctrl.mouseX, ctrl.mouseY]
+              };
+            });
+            ctrl.highlightRegionsOnHover =
+              ($attrs.highlightRegionsOnHoverWithValue === 'true');
+            ctrl.filepath = imageAndRegions.imagePath;
+            ctrl.imageUrl = '';
+            ctrl.loadingIndicatorUrl = UrlInterpolationService
+              .getStaticImageUrl(LOADING_INDICATOR_URL);
+            ctrl.isLoadingIndicatorShown = false;
+            ctrl.isTryAgainShown = false;
 
-          CurrentInteractionService.registerCurrentInteraction(null, null);
+            if (ImagePreloaderService.inExplorationPlayer()) {
+              ctrl.isLoadingIndicatorShown = true;
+              ctrl.dimensions = (
+                ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
+              // For aligning the gif to the center of it's container
+              var loadingIndicatorSize = (
+                (ctrl.dimensions.height < 124) ? 24 : 120);
+              ctrl.imageContainerStyle = {
+                height: ctrl.dimensions.height + 'px'
+              };
+              ctrl.loadingIndicatorStyle = {
+                height: loadingIndicatorSize + 'px',
+                width: loadingIndicatorSize + 'px'
+              };
+
+              ctrl.loadImage = function() {
+                ImagePreloaderService.getImageUrl(ctrl.filepath)
+                  .then(function(objectUrl) {
+                    ctrl.isTryAgainShown = false;
+                    ctrl.isLoadingIndicatorShown = false;
+                    ctrl.imageUrl = objectUrl;
+                  }, function() {
+                    ctrl.isTryAgainShown = true;
+                    ctrl.isLoadingIndicatorShown = false;
+                  });
+              };
+              ctrl.loadImage();
+            } else {
+              // This is the case when user is in exploration editor or in
+              // preview mode. We don't have loading indicator or try again for
+              // showing images in the exploration editor or in preview mode. So
+              // we directly assign the url to the imageUrl.
+              ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+                ContextService.getEntityType(), ContextService.getEntityId(),
+                ctrl.filepath);
+            }
+
+            ctrl.mouseX = 0;
+            ctrl.mouseY = 0;
+            ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+            if (!ctrl.interactionIsActive) {
+              ctrl.lastAnswer = ctrl.getLastAnswer();
+            }
+
+            ctrl.currentlyHoveredRegions = [];
+            ctrl.allRegions = imageAndRegions.labeledRegions;
+            if (!ctrl.interactionIsActive) {
+              /* The following lines highlight the learner's last answer for
+                this card. This need only be done at the beginning as if he
+                submits an answer, based on EVENT_NEW_CARD_AVAILABLE, the image
+                is made inactive, so his last selection would be higlighted.*/
+              ctrl.mouseX = ctrl.getLastAnswer().clickPosition[0];
+              ctrl.mouseY = ctrl.getLastAnswer().clickPosition[1];
+              ctrl.updateCurrentlyHoveredRegions();
+            }
+
+            CurrentInteractionService.registerCurrentInteraction(null, null);
+          };
         }
       ]
     };

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for query MR job."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -131,17 +132,17 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         user_e_settings.last_created_an_exploration = (
             user_e_settings.last_created_an_exploration -
             datetime.timedelta(days=10))
-        # Last edited time also changes when user creates an explorationan.
+        # Last edited time also changes when user creates an exploration.
         user_e_settings.last_edited_an_exploration = (
             datetime.datetime.utcnow() - datetime.timedelta(days=10))
-        user_e_settings.last_logged_in = (
+        user_services.update_last_logged_in(
+            user_e_settings,
             user_e_settings.last_logged_in - datetime.timedelta(days=10))
-        user_services._save_user_settings(user_e_settings) # pylint: disable=protected-access
 
         user_a_settings = user_services.get_user_settings(self.user_a_id)
-        user_a_settings.last_logged_in = (
+        user_services.update_last_logged_in(
+            user_a_settings,
             user_a_settings.last_logged_in - datetime.timedelta(days=3))
-        user_services._save_user_settings(user_a_settings) # pylint: disable=protected-access
 
         # Set tmpsuperadm1n as admin in ADMIN_USERNAMES config property.
         self.set_admins(['tmpsuperadm1n'])
@@ -172,8 +173,7 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
 
         # Test for legacy user.
         user_settings = user_services.get_user_settings(self.user_a_id)
-        user_settings.last_logged_in = None
-        user_services._save_user_settings(user_settings) # pylint: disable=protected-access
+        user_services.update_last_logged_in(user_settings, None)
 
         query_id = user_query_services.save_new_query_model(
             self.submitter_id, has_not_logged_in_for_n_days=6)

@@ -54,32 +54,36 @@ angular.module('oppia').directive('topicViewerPage', [
           ctrl.setActiveTab = function(newActiveTabName) {
             ctrl.activeTab = newActiveTabName;
           };
-          ctrl.setActiveTab('story');
-
           ctrl.checkMobileView = function() {
             return (WindowDimensionsService.getWidth() < 500);
           };
-          ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+          ctrl.$onInit = function() {
+            ctrl.setActiveTab('story');
+            ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
 
-          PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
+            PageTitleService.setPageTitle(ctrl.topicName + ' - Oppia');
 
-          $rootScope.loadingMessage = 'Loading';
-          TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
-            function(topicDataDict) {
-              ctrl.topicId = topicDataDict.topic_id;
-              ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
-              ctrl.degreesOfMastery = topicDataDict.degrees_of_mastery;
-              ctrl.skillDescriptions = topicDataDict.skill_descriptions;
-              ctrl.subtopics = topicDataDict.subtopics;
-              $rootScope.loadingMessage = '';
-              ctrl.topicId = topicDataDict.id;
-            },
-            function(errorResponse) {
-              if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
-                AlertsService.addWarning('Failed to get dashboard data');
+            $rootScope.loadingMessage = 'Loading';
+            TopicViewerBackendApiService.fetchTopicData(ctrl.topicName).then(
+              function(topicDataDict) {
+                ctrl.topicId = topicDataDict.topic_id;
+                ctrl.canonicalStoriesList = topicDataDict.canonical_story_dicts;
+                ctrl.degreesOfMastery = topicDataDict.degrees_of_mastery;
+                ctrl.skillDescriptions = topicDataDict.skill_descriptions;
+                ctrl.subtopics = topicDataDict.subtopics;
+                $rootScope.loadingMessage = '';
+                ctrl.topicId = topicDataDict.id;
+                // TODO(#8521): Remove the use of $rootScope.$apply()
+                // once the controller is migrated to angular.
+                $rootScope.$apply();
+              },
+              function(errorResponse) {
+                if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+                  AlertsService.addWarning('Failed to get dashboard data');
+                }
               }
-            }
-          );
+            );
+          };
         }
       ]
     };

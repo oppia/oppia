@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the handler that returns concept card for a skill."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -60,11 +61,11 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id, self.admin_id, 'Description',
+            self.skill_id, self.admin_id, description='Description',
             skill_contents=self.skill_contents)
         self.skill_id_1 = skill_services.get_new_skill_id()
         self.save_new_skill(
-            self.skill_id_1, self.admin_id, 'Description',
+            self.skill_id_1, self.admin_id, description='Description',
             skill_contents=self.skill_contents_1)
         self.skill_id_2 = skill_services.get_new_skill_id()
 

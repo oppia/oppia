@@ -33,10 +33,7 @@ import { HttpClientModule } from '@angular/common/http';
 export class ServiceBootstrapComponent {}
 
 import { AppConstants } from 'app.constants';
-import { InteractionsExtensionsConstants } from
-  'interactions/interactions-extension.constants';
-import { ObjectsDomainConstants } from
-  'domain/objects/objects-domain.constants';
+
 
 @NgModule({
   imports: [
@@ -51,8 +48,6 @@ import { ObjectsDomainConstants } from
   ],
   providers: [
     AppConstants,
-    InteractionsExtensionsConstants,
-    ObjectsDomainConstants,
   ]
 })
 class GetStartedPageModule {
@@ -73,7 +68,7 @@ declare var angular: any;
 
 angular.module('oppia', [
   'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
-  'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+  'ngAudio', require('angular-cookies'), 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
   'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
   'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
   downgradedModule

@@ -30,16 +30,19 @@ require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'answer-submit-action.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/issues/' +
+  'multiple-incorrect-submissions-issue.directive.ts');
 require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').factory('LearnerActionRenderService', [
-  '$sce', 'ExplorationStatesService',
-  'HtmlEscaperService', 'ACTION_TYPE_ANSWER_SUBMIT',
-  'ACTION_TYPE_EXPLORATION_QUIT', 'ACTION_TYPE_EXPLORATION_START',
+  'ExplorationStatesService', 'HtmlEscaperService',
+  'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
+  'ACTION_TYPE_EXPLORATION_START',
   function(
-      $sce, ExplorationStatesService,
-      HtmlEscaperService, ACTION_TYPE_ANSWER_SUBMIT,
-      ACTION_TYPE_EXPLORATION_QUIT, ACTION_TYPE_EXPLORATION_START) {
+      ExplorationStatesService, HtmlEscaperService,
+      ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
+      ACTION_TYPE_EXPLORATION_START) {
     var renderExplorationStartActionHTML = function(stateName, actionIndex) {
       var statement =
         actionIndex + '. Started exploration at card "' + stateName + '".';
@@ -90,37 +93,6 @@ angular.module('oppia').factory('LearnerActionRenderService', [
     };
 
     /**
-     * Renders the correct HTML for the table display for MultipleIncorrect
-     * issue.
-     * @param {LearnerAction[]} finalBlock.
-     * @returns {string}
-     */
-    var renderLearnerActionsTableForMultipleIncorrectIssue = function(
-        finalBlock) {
-      var index = finalBlock.length - 1;
-      var stateName =
-        finalBlock[index].actionCustomizationArgs.state_name.value;
-
-      var tableHTML =
-        '<table class="oppia-issues-learner-action-table"><tr><th>Answer</th>' +
-        '<th>Feedback</th></tr>';
-      for (var i = 0; i < index; i++) {
-        if (finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT) {
-          continue;
-        }
-        var answer =
-          finalBlock[i].actionCustomizationArgs.submitted_answer.value;
-        var feedback =
-          finalBlock[i].actionCustomizationArgs.feedback.value._html;
-        feedback = feedback.replace('{{answer}}', answer);
-        tableHTML +=
-          '<tr><td>' + answer + '</td><td>' + feedback + '</td></tr>';
-      }
-      tableHTML += '</table>';
-      return tableHTML;
-    };
-
-    /**
      * Renders the correct HTML for the learner action.
      * @param {LearnerAction} learnerAction.
      * @param {int} actionIndex.
@@ -153,45 +125,6 @@ angular.module('oppia').factory('LearnerActionRenderService', [
       }
     };
 
-    /**
-     * Checks whether the block length is less than an explicit maximum value.
-     * The block is limitied to a maximum number of learner actions so that the
-     * display modal is cleaner. When this bound is exceeded, actions are added
-     * to the next block which can be accessed by an 'extend' button.
-     */
-    var withinBlockUpperBound = function(blockLength) {
-      return blockLength < 4;
-    };
-
-    /**
-     * Helper object to maintain the status of different display blocks while
-     * splitting up learner actions. This object will be updated as learner
-     * actions are inserted.
-     */
-    var groupedDisplayBlocks = {
-      displayBlocks: null,
-      localBlock: null,
-      latestStateName: null,
-      /**
-       * Inserts new learner action into existing block or creates a new block
-       * correctly, following a change in state.
-       */
-      handleChangeInState: function(action) {
-        this.latestStateName = action.actionCustomizationArgs.state_name.value;
-        if (withinBlockUpperBound(this.localBlock.length)) {
-          // Add action to block.
-          this.localBlock.unshift(action);
-          return;
-        }
-        // Push current block to list of blocks and action into new block.
-        this.displayBlocks.push(this.localBlock);
-        this.localBlock = [action];
-      },
-      handleSameState: function(action) {
-        this.localBlock.unshift(action);
-      }
-    };
-
     return {
       /**
        * Returns the HTML for the final display block in a MultipleIncorrect
@@ -202,62 +135,13 @@ angular.module('oppia').factory('LearnerActionRenderService', [
        */
       renderFinalDisplayBlockForMISIssueHTML: function(
           block, actionStartIndex) {
-        var index = block.length - 1;
-        var stateName = block[index].actionCustomizationArgs.state_name.value;
-        var htmlString = '';
-        for (
-          var i = 0; block[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT; i++) {
-          htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
-        }
-        htmlString +=
-          '<span class="oppia-issues-learner-action">' +
-          (actionStartIndex + i).toString() +
-          '. Submitted the following answers in card "' + stateName +
-          '"</span>';
-        htmlString += renderLearnerActionsTableForMultipleIncorrectIssue(block);
-        htmlString += renderLearnerActionHTML(
-          block[index], actionStartIndex + i + 1);
-        return $sce.trustAsHtml(htmlString);
+        var el = $('<multiple-incorrect-submissions-issue>');
+        el.attr('final-block', HtmlEscaperService.objToEscapedJson(block));
+        el.attr('action-start-index', actionStartIndex);
+        return ($('<span>').append(el)).html();
       },
-      renderLearnerAction: function(learnerAction, blockIndex, actionIndex) {
-        return renderLearnerActionHTML(
-          learnerAction, blockIndex + actionIndex);
+      renderLearnerAction: function(learnerAction, actionIndex) {
+        return renderLearnerActionHTML(learnerAction, actionIndex);
       },
-      renderDisplayBlockHTML: function(block, actionStartIndex) {
-        var htmlString = '';
-        for (var i = 0; i < block.length; i++) {
-          htmlString += renderLearnerActionHTML(block[i], actionStartIndex + i);
-        }
-        return $sce.trustAsHtml(htmlString);
-      },
-      /**
-       * Splits up the entire set of learner actions into correct display blocks
-       * to be displayed in sequence in the playthroughs modal.
-       * @param {LearnerActions[]} learnerActions.
-       * @returns {LearnerActions[][]}
-       */
-      getDisplayBlocks: function(learnerActions) {
-        var lastIndex = learnerActions.length - 1;
-        groupedDisplayBlocks.displayBlocks = [];
-        groupedDisplayBlocks.localBlock = [learnerActions[lastIndex]];
-        groupedDisplayBlocks.latestStateName =
-          learnerActions[lastIndex].actionCustomizationArgs.state_name.value;
-        for (var i = lastIndex - 1; i >= 0; i--) {
-          var action = learnerActions[i];
-          var currentStateName =
-            action.actionCustomizationArgs.state_name.value;
-          if (currentStateName !== groupedDisplayBlocks.latestStateName) {
-            groupedDisplayBlocks.handleChangeInState(action);
-          } else {
-            groupedDisplayBlocks.handleSameState(action);
-          }
-        }
-        // If there is a local block with actions at the end, push it.
-        if (groupedDisplayBlocks.localBlock) {
-          groupedDisplayBlocks.displayBlocks.push(
-            groupedDisplayBlocks.localBlock);
-        }
-        return groupedDisplayBlocks.displayBlocks;
-      }
     };
   }]);

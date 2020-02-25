@@ -40,12 +40,11 @@ angular.module('oppia').directive('adminMiscTab', [
         var ctrl = this;
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
+        var SEND_DUMMY_MAIL_HANDLER_URL = (
+          '/sendDummyMailToAdminHandler');
 
         var irreversibleActionMessage = (
           'This action is irreversible. Are you sure?');
-
-        ctrl.topicIdForRegeneratingOpportunities = null;
-        ctrl.regenerationMessage = null;
 
         ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
@@ -145,6 +144,17 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.dataExtractionQueryStatusMessage = message;
         };
 
+
+        ctrl.sendDummyMailToAdmin = function() {
+          $http.post(SEND_DUMMY_MAIL_HANDLER_URL)
+            .then(function(response) {
+              ctrl.setStatusMessage('Success! Mail sent to admin.');
+            }, function(errorResponse) {
+              ctrl.setStatusMessage(
+                'Server error: ' + errorResponse.data.error);
+            });
+        };
+
         ctrl.submitQuery = function() {
           var STATUS_PENDING = (
             'Data extraction query has been submitted. Please wait.');
@@ -172,6 +182,10 @@ angular.module('oppia').directive('adminMiscTab', [
           ctrl.stateName = '';
           ctrl.numAnswers = 0;
           ctrl.showDataExtractionQueryStatus = false;
+        };
+        ctrl.$onInit = function() {
+          ctrl.topicIdForRegeneratingOpportunities = null;
+          ctrl.regenerationMessage = null;
         };
       }]
     };

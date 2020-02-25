@@ -20,6 +20,7 @@ Domain objects capture domain-specific logic and are agnostic of how the
 objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -1196,3 +1197,22 @@ class CollectionSummary(python_utils.OBJECT):
             user_id in self.editor_ids
             or user_id in self.owner_ids
             or self.community_owned)
+
+    def is_private(self):
+        """Checks whether the collection is private.
+
+        Returns:
+            bool. Whether the collection is private.
+        """
+        return self.status == constants.ACTIVITY_STATUS_PRIVATE
+
+    def is_solely_owned_by_user(self, user_id):
+        """Checks whether the collection is solely owned by the user.
+
+        Args:
+            user_id: str. The id of the user.
+
+        Returns:
+            bool. Whether the collection is solely owned by the user.
+        """
+        return user_id in self.owner_ids and len(self.owner_ids) == 1

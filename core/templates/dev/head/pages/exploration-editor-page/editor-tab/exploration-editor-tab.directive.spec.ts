@@ -28,6 +28,7 @@ import { AnswerStatsObjectFactory } from
   'domain/exploration/AnswerStatsObjectFactory';
 import { ClassifierObjectFactory } from
   'domain/classifier/ClassifierObjectFactory';
+import { DebugInfoTrackerService } from 'services/debug-info-tracker.service';
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
 import { ExplorationFeaturesService } from
@@ -82,7 +83,7 @@ require(
 
 describe('Exploration editor tab controller', function() {
   describe('ExplorationEditorTab', function() {
-    var ecs, ess, scs, rootScope, $componentController;
+    var ecs, ess, scs, scope, rootScope, $componentController;
     var explorationEditorTabCtrl;
 
     beforeEach(angular.mock.module('oppia'));
@@ -98,6 +99,7 @@ describe('Exploration editor tab controller', function() {
       $provide.value(
         'AnswerStatsObjectFactory', new AnswerStatsObjectFactory());
       $provide.value('ClassifierObjectFactory', new ClassifierObjectFactory());
+      $provide.value('DebugInfoTrackerService', new DebugInfoTrackerService());
       $provide.value(
         'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
       $provide.value(
@@ -312,15 +314,21 @@ describe('Exploration editor tab controller', function() {
         }
       });
 
+      scope = $rootScope.$new();
       explorationEditorTabCtrl = $componentController('explorationEditorTab', {
-        ExplorationStatesService: ess
+        ExplorationStatesService: ess,
+        $scope: scope
       }, {});
     }));
 
     it('should correctly broadcast the stateEditorInitialized flag with ' +
        'the state data', function() {
       ecs.setActiveStateName('Third State');
+      ecs.updateStateInteractionEditorInitialised();
+      ecs.updateStateResponsesInitialised();
+      ecs.updateStateEditorDirectiveInitialised();
       explorationEditorTabCtrl.initStateEditor();
+      scope.$digest();
       expect(
         rootScope.$broadcast
       ).toHaveBeenCalledWith(

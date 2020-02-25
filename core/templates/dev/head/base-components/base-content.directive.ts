@@ -20,13 +20,11 @@ require('base-components/warning-loader.directive.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/sidebar/sidebar-status.service.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/url.service.ts');
 require('services/stateful/background-mask.service.ts');
 
 angular.module('oppia').directive('baseContent', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -37,8 +35,7 @@ angular.module('oppia').directive('baseContent', [
         footer: '?pageFooter',
         navOptions: '?navOptions',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/base-components/base-content.directive.html'),
+      template: require('./base-content.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$rootScope', '$window', 'BackgroundMaskService',
         'SidebarStatusService', 'UrlService', 'SITE_FEEDBACK_FORM_URL',
@@ -55,13 +52,10 @@ angular.module('oppia').directive('baseContent', [
           }
 
           var ctrl = this;
-          ctrl.iframed = UrlService.isIframed();
-          ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
           ctrl.isSidebarShown = () => SidebarStatusService.isSidebarShown();
           ctrl.closeSidebarOnSwipe = () => SidebarStatusService.closeSidebar();
           ctrl.isBackgroundMaskActive = () => (
             BackgroundMaskService.isMaskActive());
-          ctrl.DEV_MODE = $rootScope.DEV_MODE;
           ctrl.skipToMainContent = function() {
             var mainContentElement = document.getElementById(
               'oppia-main-content');
@@ -72,6 +66,11 @@ angular.module('oppia').directive('baseContent', [
             mainContentElement.tabIndex = -1;
             mainContentElement.scrollIntoView();
             mainContentElement.focus();
+          };
+          ctrl.$onInit = function() {
+            ctrl.iframed = UrlService.isIframed();
+            ctrl.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
+            ctrl.DEV_MODE = $rootScope.DEV_MODE;
           };
         }
       ]

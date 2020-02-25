@@ -16,7 +16,6 @@
  * @fileoverview Directive for asking learner for answer details.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require(
   'pages/exploration-player-page/services/learner-answer-info.service.ts');
@@ -24,16 +23,14 @@ require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('services/exploration-html-formatter.service.ts');
 
 angular.module('oppia').directive('learnerAnswerInfoCard', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         getSubmitAnswerFn: '&submitAnswer'
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/learner-experience/' +
-        'learner-answer-info-card.directive.html'),
+      template: require('./learner-answer-info-card.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'ExplorationEngineService', 'ExplorationHtmlFormatterService',
@@ -41,7 +38,6 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
         function(ExplorationEngineService, ExplorationHtmlFormatterService,
             LearnerAnswerInfoService, PlayerTranscriptService) {
           var ctrl = this;
-          ctrl.answerDetails = null;
           var interaction = ExplorationEngineService.getState().interaction;
           ctrl.submitLearnerAnswerInfo = function() {
             LearnerAnswerInfoService.recordLearnerAnswerInfo(
@@ -59,6 +55,9 @@ angular.module('oppia').directive('learnerAnswerInfoCard', [
             return ExplorationHtmlFormatterService.getAnswerHtml(
               LearnerAnswerInfoService.getCurrentAnswer(), interaction.id,
               interaction.customizationArgs);
+          };
+          ctrl.$onInit = function() {
+            ctrl.answerDetails = null;
           };
         }
       ]

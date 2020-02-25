@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Common utilities for test classes."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -577,7 +578,7 @@ tags: []
             is_super_admin: bool. Whether the user is a super admin.
        """
         os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_user_id_from_email(email)
+        os.environ['USER_ID'] = self.get_gae_id_from_email(email)
         os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
 
     def logout(self):
@@ -913,8 +914,10 @@ tags: []
         # Signup uses a custom urlfetch mock (URLFetchServiceMock), instead
         # of the stub provided by testbed. This custom mock is disabled
         # immediately once the signup is complete. This is done to avoid
-        # external  calls being made to Gravatar when running the backend
+        # external calls being made to Gravatar when running the backend
         # tests.
+        gae_id = self.get_gae_id_from_email(email)
+        user_services.create_new_user(gae_id, email)
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
@@ -1007,15 +1010,28 @@ tags: []
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def get_user_id_from_email(self, email):
-        """Gets the user_id corresponding to the given email.
+        """Gets the user ID corresponding to the given email.
 
         Args:
             email: str. A valid email stored in the App Engine database.
 
         Returns:
-            user_id: str. ID of the user possessing the given email.
+            str. ID of the user possessing the given email.
         """
-        return current_user_services.get_user_id_from_email(email)
+        gae_id = self.get_gae_id_from_email(email)
+        return (
+            user_services.get_user_settings_by_gae_id(gae_id).user_id)
+
+    def get_gae_id_from_email(self, email):
+        """Gets the GAE user ID corresponding to the given email.
+
+        Args:
+            email: str. A valid email stored in the App Engine database.
+
+        Returns:
+            str. GAE ID of the user possessing the given email.
+        """
+        return current_user_services.get_gae_id_from_email(email)
 
     def save_new_default_exploration(
             self, exploration_id, owner_id, title='A title'):
@@ -1367,7 +1383,7 @@ tags: []
             self, story_id, owner_id, title, description, notes,
             corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Saves a new skill with a default version 1 story contents
+        """Saves a new story with a default version 1 story contents
         data dictionary.
 
         This function should only be used for creating stories in tests
@@ -1410,9 +1426,10 @@ tags: []
             }])
 
     def save_new_topic(
-            self, topic_id, owner_id, name, description,
-            canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
-            subtopics, next_subtopic_id,
+            self, topic_id, owner_id, name='topic', abbreviated_name='topic',
+            thumbnail_filename='topic.png', description='description',
+            canonical_story_ids=None, additional_story_ids=None,
+            uncategorized_skill_ids=None, subtopics=None, next_subtopic_id=0,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
 
@@ -1420,6 +1437,8 @@ tags: []
             topic_id: str. ID for the topic to be created.
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
+            abbreviated_name: str. The abbreviated name of the topic.
+            thumbnail_filename: str|None. The thumbnail filename of the topic.
             description: str. The desscription of the topic.
             canonical_story_ids: list(str). The list of ids of canonical stories
                 that are part of the topic.
@@ -1438,14 +1457,17 @@ tags: []
         """
         canonical_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in canonical_story_ids
+            for story_id in (canonical_story_ids or [])
         ]
         additional_story_references = [
             topic_domain.StoryReference.create_default_story_reference(story_id)
-            for story_id in additional_story_ids
+            for story_id in (additional_story_ids or [])
         ]
+        uncategorized_skill_ids = (uncategorized_skill_ids or [])
+        subtopics = (subtopics or [])
         topic = topic_domain.Topic(
-            topic_id, name, description, canonical_story_references,
+            topic_id, name, abbreviated_name, thumbnail_filename,
+            description, canonical_story_references,
             additional_story_references, uncategorized_skill_ids, subtopics,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
             language_code, 0, feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION
@@ -1454,7 +1476,8 @@ tags: []
         return topic
 
     def save_new_topic_with_subtopic_schema_v1(
-            self, topic_id, owner_id, name, canonical_name, description,
+            self, topic_id, owner_id, name, abbreviated_name,
+            canonical_name, description,
             canonical_story_references, additional_story_references,
             uncategorized_skill_ids, next_subtopic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
@@ -1474,6 +1497,7 @@ tags: []
             topic_id: str. ID for the topic to be created.
             owner_id: str. The user_id of the creator of the topic.
             name: str. The name of the topic.
+            abbreviated_name: str. The abbreviated name of the topic.
             canonical_name: str. The canonical name (lowercase) of the topic.
             description: str. The desscription of the topic.
             canonical_story_references: list(StoryReference). A set of story
@@ -1496,6 +1520,7 @@ tags: []
         topic_model = topic_models.TopicModel(
             id=topic_id,
             name=name,
+            abbreviated_name=abbreviated_name,
             canonical_name=canonical_name,
             description=description,
             language_code=language_code,
@@ -1569,7 +1594,6 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
-        question_services.create_new_question_rights(question_id, owner_id)
         question_model = question_models.QuestionModel(
             id=question_id,
             question_state_data=self.VERSION_27_STATE_DICT,
@@ -1584,8 +1608,8 @@ tags: []
 
     def save_new_skill(
             self, skill_id, owner_id,
-            description, misconceptions=None, rubrics=None, skill_contents=None,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            description='description', misconceptions=None, rubrics=None,
+            skill_contents=None, language_code=constants.DEFAULT_LANGUAGE_CODE,
             prerequisite_skill_ids=None):
         """Creates an Oppia Skill and saves it.
 
@@ -1670,7 +1694,6 @@ tags: []
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
         """
-        skill_services.create_new_skill_rights(skill_id, owner_id)
         if rubrics is None:
             rubrics = [
                 skill_domain.Rubric(
@@ -1815,6 +1838,97 @@ tags: []
             yield
         finally:
             setattr(obj, attr, original)
+
+    @contextlib.contextmanager
+    def swap_with_checks(
+            self, obj, attr, new_value, expected_args=None,
+            expected_kwargs=None, called=True):
+        """Swap an object's function value within the context of a
+        'with' statement. The object can be anything that supports
+        getattr and setattr, such as class instances, modules, ...
+
+        Examples:
+            If you want to check subprocess.Popen is invoked twice
+            like `subprocess.Popen(['python'], shell=True)` and
+            `subprocess.Popen(['python2], shell=False), you can first
+            define the mock function, then the swap, and just run the
+            target function in context, as follows:
+                def mock_popen(command, shell):
+                    return
+
+                popen_swap = self.swap_with_checks(
+                    subprocess, 'Popen', mock_popen, expected_args=[
+                        (['python'],), (['python2'],)], expected_kwargs=[
+                            {'shell': True,}, {'shell': False}])
+                with popen_swap:
+                    function_that_invokes_popen()
+
+        Args:
+            obj: *. the Python object whose attribute you want to swap.
+            attr: str. The name of the function to be swapped.
+            new_value: function. The new function you want to use.
+            expected_args: None|list(tuple). The expected args that you
+                want this function to be invoked with. When its value is None,
+                args will not be checked. If the value type is list, the
+                function will check whether the called args is the first element
+                in the list. If matched, this tuple will be removed from the
+                list.
+            expected_kwargs: None|list(dict). The expected keyword args
+                you want this function to be invoked with. Similar to
+                expected_args.
+            called: bool. Whether the function is expected to be invoked. This
+                will always be checked.
+
+        Yields:
+            context: The context with function replaced.
+        """
+        original = getattr(obj, attr)
+        # The actual error message will also include detail assert error message
+        # via the `self.longMessage` below.
+        msg = 'Expected checks failed when swapping out in %s.%s tests.' % (
+            obj.__name__, attr)
+
+        def wrapper(*args, **kwargs):
+            """Wrapper function for the new value. This function will do the
+            check before the wrapped function is invoked. After the function
+            finished, the wrapper will update how many times this function is
+            invoked.
+
+            Args:
+                args: tuple. The args passed into `attr` function.
+                kwargs: dict. The key word args passed into `attr` function.
+
+            Returns:
+                Result of `new_value`.
+            """
+            wrapper.called = True
+            if expected_args is not None:
+                self.assertEqual(args, expected_args[0], msg=msg)
+                expected_args.pop(0)
+            if expected_kwargs is not None:
+                self.assertEqual(kwargs, expected_kwargs[0], msg=msg)
+                expected_kwargs.pop(0)
+            result = new_value(*args, **kwargs)
+            return result
+
+        wrapper.called = False
+        setattr(obj, attr, wrapper)
+        error_occurred = False
+        try:
+            # This will show the detailed assert message.
+            self.longMessage = True
+            yield
+        except Exception:
+            error_occurred = True
+            # Raise issues thrown by the called function or assert error.
+            raise
+        finally:
+            setattr(obj, attr, original)
+            if not error_occurred:
+                self.assertEqual(wrapper.called, called, msg=msg)
+                self.assertFalse(expected_args, msg=msg)
+                self.assertFalse(expected_kwargs, msg=msg)
+            self.longMessage = False
 
     @contextlib.contextmanager
     def login_context(self, email, is_super_admin=False):

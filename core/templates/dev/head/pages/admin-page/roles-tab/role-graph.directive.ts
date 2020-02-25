@@ -36,16 +36,16 @@ angular.module('oppia').directive('roleGraph', [
         //  - 'finalStateIds': The list of ids corresponding to terminal states
         graphData: '=',
         // A boolean value to signify whether graphData is completely loaded.
-        graphDataLoaded: '@'
+        graphDataLoaded: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/roles-tab/admin-roles-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$element', '$timeout', '$filter', 'StateGraphLayoutService',
+        '$element', '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
-            $element, $timeout, $filter, StateGraphLayoutService,
+            $element, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
           var getElementDimensions = function() {
@@ -93,12 +93,14 @@ angular.module('oppia').directive('roleGraph', [
             }
           };
 
-          if (ctrl.graphDataLoaded) {
-            ctrl.drawGraph(
-              ctrl.graphData.nodes, ctrl.graphData.links,
-              ctrl.graphData.initStateId, ctrl.graphData.finalStateIds
-            );
-          }
+          ctrl.$onInit = function() {
+            if (ctrl.graphDataLoaded) {
+              ctrl.drawGraph(
+                ctrl.graphData.nodes, ctrl.graphData.links,
+                ctrl.graphData.initStateId, ctrl.graphData.finalStateIds
+              );
+            }
+          };
         }
       ]
     };

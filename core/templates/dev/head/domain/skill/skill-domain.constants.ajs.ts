@@ -33,6 +33,10 @@ angular.module('oppia').constant(
   SkillDomainConstants.SKILL_DATA_URL_TEMPLATE);
 
 angular.module('oppia').constant(
+  'FETCH_SKILLS_URL_TEMPLATE',
+  SkillDomainConstants.FETCH_SKILLS_URL_TEMPLATE);
+
+angular.module('oppia').constant(
   'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
   SkillDomainConstants.SKILL_EDITOR_QUESTION_URL_TEMPLATE);
 

@@ -37,7 +37,7 @@
               <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2 float-left">Language</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div class="row">
-                  <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select float-right" ng-model="$ctrl.explorationLanguageCodeService.displayed" ng-change="$ctrl.saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.explorationLanguageCodeService.getAllLanguageCodes()" width="85%" style="margin-right: 0;">
+                  <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select float-right" ng-model="$ctrl.explorationLanguageCodeService.displayed" ng-change="$ctrl.saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in $ctrl.explorationLanguageCodeService.getSupportedContentLanguages()" width="85%" style="margin-right: 0;">
                   </select>
                 </div>
                 <div class="row">

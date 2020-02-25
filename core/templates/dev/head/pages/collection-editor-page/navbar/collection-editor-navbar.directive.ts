@@ -61,24 +61,6 @@ angular.module('oppia').directive('collectionEditorNavbar', [
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var ctrl = this;
-          ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
-          ctrl.collection = CollectionEditorStateService.getCollection();
-          ctrl.collectionRights = (
-            CollectionEditorStateService.getCollectionRights());
-
-          ctrl.isLoadingCollection = (
-            CollectionEditorStateService.isLoadingCollection);
-          ctrl.validationIssues = [];
-          ctrl.isSaveInProgress = (
-            CollectionEditorStateService.isSavingCollection);
-
-          ctrl.getActiveTabName = RouterService.getActiveTabName;
-          ctrl.selectMainTab = RouterService.navigateToMainTab;
-          ctrl.selectPreviewTab = RouterService.navigateToPreviewTab;
-          ctrl.selectSettingsTab = RouterService.navigateToSettingsTab;
-          ctrl.selectStatsTab = RouterService.navigateToStatsTab;
-          ctrl.selectHistoryTab = RouterService.navigateToHistoryTab;
-
           var _validateCollection = function() {
             if (ctrl.collectionRights.isPrivate()) {
               ctrl.validationIssues = (
@@ -104,12 +86,6 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                   ctrl.collectionRights);
               });
           };
-
-          $scope.$on(
-            EVENT_COLLECTION_INITIALIZED, _validateCollection);
-          $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
-          $scope.$on(
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
 
           ctrl.getWarningsCount = function() {
             return ctrl.validationIssues.length;
@@ -156,6 +132,10 @@ angular.module('oppia').directive('collectionEditorNavbar', [
 
             modalInstance.result.then(function(commitMessage) {
               CollectionEditorStateService.saveCollection(commitMessage);
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -251,6 +231,9 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                   'Add metadata: ' + metadataList.join(', ') + '.');
                 CollectionEditorStateService.saveCollection(
                   commitMessage, _publishCollection);
+              }, function() {
+                // This callback is triggered when the Cancel button is
+                // clicked. No further action is needed.
               });
             } else {
               _publishCollection();
@@ -270,6 +253,43 @@ angular.module('oppia').directive('collectionEditorNavbar', [
                 AlertsService.addWarning(
                   'There was an error when unpublishing the collection.');
               });
+          };
+          ctrl.isLoadingCollection = function() {
+            return CollectionEditorStateService.isLoadingCollection();
+          };
+          ctrl.isSaveInProgress = function() {
+            return CollectionEditorStateService.isSavingCollection();
+          };
+          ctrl.getActiveTabName = function() {
+            return RouterService.getActiveTabName();
+          };
+          ctrl.selectMainTab = function() {
+            RouterService.navigateToMainTab();
+          };
+          ctrl.selectPreviewTab = function() {
+            RouterService.navigateToPreviewTab();
+          };
+          ctrl.selectSettingsTab = function() {
+            RouterService.navigateToSettingsTab();
+          };
+          ctrl.selectStatsTab = function() {
+            RouterService.navigateToStatsTab();
+          };
+          ctrl.selectHistoryTab = function() {
+            RouterService.navigateToHistoryTab();
+          };
+          ctrl.$onInit = function() {
+            $scope.$on(
+              EVENT_COLLECTION_INITIALIZED, _validateCollection);
+            $scope.$on(EVENT_COLLECTION_REINITIALIZED, _validateCollection);
+            $scope.$on(
+              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateCollection);
+            ctrl.collectionId = UrlService.getCollectionIdFromEditorUrl();
+            ctrl.collection = CollectionEditorStateService.getCollection();
+            ctrl.collectionRights = (
+              CollectionEditorStateService.getCollectionRights());
+
+            ctrl.validationIssues = [];
           };
         }
       ]

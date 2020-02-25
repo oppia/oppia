@@ -35,6 +35,8 @@ describe('Learner answer details service', function() {
   var sampleDataResults = null;
   var $httpBackend = null;
   var CsrfService = null;
+  var $q = null;
+  var LearnerAnswerInfoObjectFactory = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(function() {
@@ -45,8 +47,6 @@ describe('Learner answer details service', function() {
       $provide.value(
         'LearnerAnswerDetailsObjectFactory',
         new LearnerAnswerDetailsObjectFactory());
-      $provide.value(
-        'LearnerAnswerInfoObjectFactory', new LearnerAnswerInfoObjectFactory());
     });
   });
   beforeEach(angular.mock.module('oppia', function($provide) {
@@ -56,25 +56,14 @@ describe('Learner answer details service', function() {
     }
   }));
 
-  beforeEach(angular.mock.inject(function($injector, $q) {
+  beforeEach(angular.mock.inject(function($injector, _$q_) {
     LearnerAnswerDetailsDataService = $injector.get(
       'LearnerAnswerDetailsDataService');
+    $q = _$q_;
+    LearnerAnswerInfoObjectFactory = $injector.get(
+      'LearnerAnswerInfoObjectFactory');
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
-
-    sampleDataResults = {
-      learner_answer_info_data: [{
-        state_name: 'fakeStateName',
-        interaction_id: 'fakeInteractionId',
-        customization_args: 'fakeCustomizationArgs',
-        learner_answer_info_dicts: [{
-          id: '123',
-          answer: 'My answer',
-          answer_details: 'My answer details',
-          created_on: 123456
-        }]
-      }]
-    };
 
     spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
       return $q.resolve('sample-csrf-token');
@@ -86,23 +75,74 @@ describe('Learner answer details service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully fetch learner answer info data from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  describe('when .fetchLearnerAnswerInfoData is called', function() {
+    beforeEach(function() {
+      sampleDataResults = {
+        learner_answer_info_data: [{
+          state_name: 'fakeStateName',
+          interaction_id: 'fakeInteractionId',
+          customization_args: 'fakeCustomizationArgs',
+          learner_answer_info_dicts: []
+        }]
+      };
+    });
 
-      $httpBackend.expect('GET', '/learneranswerinfohandler/' +
-        'learner_answer_details/exploration/12345').respond(sampleDataResults);
-      LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+    it('should successfully fetch learner answer info data from the backend',
+      function() {
+        sampleDataResults.learner_answer_info_data[0]
+          .learner_answer_info_dicts = [{
+            id: '123',
+            answer: 'My answer',
+            answer_details: 'My answer details',
+            created_on: 123456
+          }];
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+        var successHandler = jasmine.createSpy('success');
+        var failHandler = jasmine.createSpy('fail');
 
-  it('should delete learner answer info',
+        var createFromBackendDictSpy = spyOn(LearnerAnswerInfoObjectFactory,
+          'createFromBackendDict');
+
+        $httpBackend.expect('GET', '/learneranswerinfohandler/' +
+          'learner_answer_details/exploration/12345').respond(
+          sampleDataResults);
+        LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
+          successHandler, failHandler);
+        $httpBackend.flush();
+
+        expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+        expect(failHandler).not.toHaveBeenCalled();
+        expect(createFromBackendDictSpy).toHaveBeenCalledTimes(
+          sampleDataResults.learner_answer_info_data[0]
+            .learner_answer_info_dicts.length);
+        expect(LearnerAnswerDetailsDataService.getData().length)
+          .toBe(sampleDataResults.learner_answer_info_data.length);
+      });
+
+    it('should not create info dicts if it is not in learner answer info',
+      function() {
+        var successHandler = jasmine.createSpy('success');
+        var failHandler = jasmine.createSpy('fail');
+
+        var createFromBackendDictSpy = spyOn(LearnerAnswerInfoObjectFactory,
+          'createFromBackendDict');
+
+        $httpBackend.expect('GET', '/learneranswerinfohandler/' +
+          'learner_answer_details/exploration/12345').respond(
+          sampleDataResults);
+        LearnerAnswerDetailsDataService.fetchLearnerAnswerInfoData().then(
+          successHandler, failHandler);
+        $httpBackend.flush();
+
+        expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+        expect(failHandler).not.toHaveBeenCalled();
+        expect(createFromBackendDictSpy).not.toHaveBeenCalled();
+        expect(LearnerAnswerDetailsDataService.getData().length)
+          .toBe(sampleDataResults.learner_answer_info_data.length);
+      });
+  });
+
+  it('should delete learner answer info when correct id is provided',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
@@ -116,6 +156,23 @@ describe('Learner answer details service', function() {
 
       expect(successHandler).toHaveBeenCalledWith(200);
       expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
+
+  it('should not delete learner answer info when incorrect id is provided',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+      $httpBackend.expect('DELETE', '/learneranswerinfohandler/' +
+      'learner_answer_details/exploration/12345?state_name=fakeStateName&' +
+      'learner_answer_info_id=fakeId').respond(404);
+      LearnerAnswerDetailsDataService.deleteLearnerAnswerInfo(
+        '12345', 'fakeStateName', 'fakeId').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(undefined);
     }
   );
 });

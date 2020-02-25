@@ -24,14 +24,16 @@ angular.module('oppia').directive('sideNavigationBar', [
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/common-layout-directives/navigation-bars/' +
-        'side-navigation-bar.directive.html'),
+      template: require('./side-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
-      controller: ['$timeout', '$window', function($timeout, $window) {
+      controller: ['$window', function($window) {
         var ctrl = this;
-        ctrl.currentUrl = $window.location.pathname;
-        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        ctrl.getStaticImageUrl = function(imagePath) {
+          return UrlInterpolationService.getStaticImageUrl(imagePath);
+        };
+        ctrl.$onInit = function() {
+          ctrl.currentUrl = $window.location.pathname;
+        };
       }]
     };
   }]);

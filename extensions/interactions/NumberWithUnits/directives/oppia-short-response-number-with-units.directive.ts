@@ -17,26 +17,24 @@
  */
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaShortResponseNumberWithUnits', [
   'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
-  'UrlInterpolationService', function(HtmlEscaperService,
-      NumberWithUnitsObjectFactory, UrlInterpolationService) {
+  function(HtmlEscaperService, NumberWithUnitsObjectFactory) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/NumberWithUnits/directives/' +
-        'number-with-units-short-response.directive.html'),
+      template: require('./number-with-units-short-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        ctrl.answer = NumberWithUnitsObjectFactory.fromDict(
-          answer).toString();
+        ctrl.$onInit = function() {
+          var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+          ctrl.answer = (
+            NumberWithUnitsObjectFactory.fromDict(answer).toString());
+        };
       }]
     };
   }

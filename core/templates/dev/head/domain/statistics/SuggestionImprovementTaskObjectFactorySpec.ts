@@ -184,6 +184,7 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
       var mockThread = {threadId: 1};
       var task = SuggestionImprovementTaskObjectFactory.createNew(mockThread);
 
+      expect(task.isObsolete()).toBe(false);
       expect(task.getDirectiveData()).toBe(mockThread);
       expect(task.getDirectiveType()).toEqual(SUGGESTION_IMPROVEMENT_TASK_TYPE);
     });
@@ -191,13 +192,17 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
 
   describe('.fetchTasks', function() {
     it('fetches threads from the backend', function(done) {
-      spyOn(ThreadDataService, 'fetchThreads').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'fetchMessages').and.callFake($q.resolve);
-      spyOn(ThreadDataService, 'getData').and.returnValue({
-        suggestionThreads: [{threadId: 'abc1'}, {threadId: 'def2'}]
-      });
+      var threads = {
+        suggestionThreads: [{ threadId: 'abc1' }, { threadId: 'def2' }]
+      };
+
+      spyOn(ThreadDataService, 'fetchThreads').and
+        .returnValue($q.resolve(threads));
+      var fetchMessagesSpy = spyOn(ThreadDataService, 'fetchMessages');
 
       SuggestionImprovementTaskObjectFactory.fetchTasks().then(function(tasks) {
+        expect(fetchMessagesSpy)
+          .toHaveBeenCalledTimes(threads.suggestionThreads.length);
         expect(tasks[0].getDirectiveData().threadId).toEqual('abc1');
         expect(tasks[1].getDirectiveData().threadId).toEqual('def2');
       }).then(done, done.fail);
@@ -272,6 +277,13 @@ describe('SuggestionImprovementTaskObjectFactory', function() {
     describe('.getDirectiveData', function() {
       it('returns the thread', function() {
         expect(this.task.getDirectiveData()).toBe(this.mockThread);
+      });
+    });
+
+    describe('.getLastUpdatedTime', function() {
+      it('returns the time when this task was last updated', function() {
+        expect(this.task.getLastUpdatedTime())
+          .toBe(this.mockThread.last_updated);
       });
     });
 

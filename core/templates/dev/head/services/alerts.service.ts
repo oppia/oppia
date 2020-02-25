@@ -78,7 +78,7 @@ export class AlertsService {
    * exception to cause a hard failure in the frontend.
    * @param {string} warning - The warning message to display.
    */
-  fatalWarning(warning: string): Error {
+  fatalWarning(warning: string): void {
     this.addWarning(warning);
     throw new Error(warning);
   }

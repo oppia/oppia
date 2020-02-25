@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="oppia" itemscope itemtype="http://schema.org/Organization">
   <head>
-    @require('../../base-components/header.template.html', {"title": "Oppia: Teach, Learn, Explore"})
+    @load('base-components/header.template.html', {"title": "Oppia: Teach, Learn, Explore"})
     <link rel="prerender" href="/library">
   </head>
   <body>
@@ -28,6 +28,6 @@
       }
     </style>
 
-    @require('../footer_js_libs.html')
+    @load('pages/footer_js_libs.html')
   </body>
 </html>

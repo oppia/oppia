@@ -40,10 +40,7 @@ angular.module('oppia').directive('playthroughIssues', [
       controller: [
         '$scope', 'PlaythroughIssuesService',
         function($scope, PlaythroughIssuesService) {
-          PlaythroughIssuesService.getIssues().then(function(issues) {
-            $scope.issues = issues;
-          });
-
+          var ctrl = this;
           $scope.getIssueIndex = function(issue) {
             return $scope.issues.indexOf(issue);
           };
@@ -80,6 +77,11 @@ angular.module('oppia').directive('playthroughIssues', [
             document.getElementById(
               'issueNav' + nextIssueIndex).classList.add('bg-clr');
             $scope.currentIssueIndex = nextIssueIndex;
+          };
+          ctrl.$onInit = function() {
+            PlaythroughIssuesService.getIssues().then(function(issues) {
+              $scope.issues = issues;
+            });
           };
         }
       ]

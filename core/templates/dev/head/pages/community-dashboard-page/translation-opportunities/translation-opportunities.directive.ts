@@ -53,15 +53,6 @@ angular.module('oppia').directive(
             TranslateTextService, TranslationLanguageService, UserService) {
           var ctrl = this;
           var userIsLoggedIn = false;
-          ctrl.opportunities = [];
-          ctrl.opportunitiesAreLoading = true;
-          ctrl.moreOpportunitiesAvailable = true;
-          ctrl.progressBarRequired = true;
-
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            userIsLoggedIn = userInfo.isLoggedIn();
-          });
-
           var getOpportunitySummary = function(expId) {
             for (var index in ctrl.opportunities) {
               if (ctrl.opportunities[index].id === expId) {
@@ -73,42 +64,27 @@ angular.module('oppia').directive(
           var updateWithNewOpportunities = function(opportunities, more) {
             for (var index in opportunities) {
               var opportunity = opportunities[index];
-              var subheading = (
-                opportunity.topic_name + ' - ' + opportunity.story_title);
-              var heading = opportunity.chapter_title;
-              var progressPercentage = '0.00';
-              var totalContentCount = opportunity.content_count;
+              var subheading = opportunity.getOpportunitySubheading();
+              var heading = opportunity.getOpportunityHeading();
+              var totalContentCount = opportunity.getContentCount();
               var languageCode = (
                 TranslationLanguageService.getActiveLanguageCode());
               var languageDescription = (
                 TranslationLanguageService.getActiveLanguageDescription());
-              if (
-                opportunity.translation_counts.hasOwnProperty(languageCode) && (
-                  totalContentCount > 0)) {
-                var progressPercentage = (
-                  (opportunity.translation_counts[languageCode] /
-                    totalContentCount) * 100).toFixed(2);
-              }
+              var progressPercentage = (
+                opportunity.getTranslationProgressPercentage(languageCode));
+
               ctrl.opportunities.push({
-                id: opportunity.id,
+                id: opportunity.getExplorationId(),
                 heading: heading,
                 subheading: subheading,
-                progressPercentage: progressPercentage,
+                progressPercentage: progressPercentage.toFixed(2),
                 actionButtonTitle: 'Translate'
               });
             }
             ctrl.moreOpportunitiesAvailable = more;
             ctrl.opportunitiesAreLoading = false;
           };
-
-          $scope.$on('activeLanguageChanged', function() {
-            ctrl.opportunities = [];
-            ctrl.opportunitiesAreLoading = true;
-            ctrl.moreOpportunitiesAvailable = true;
-            ContributionOpportunitiesService.getTranslationOpportunities(
-              TranslationLanguageService.getActiveLanguageCode(),
-              updateWithNewOpportunities);
-          });
 
           ctrl.onLoadMoreOpportunities = function() {
             if (
@@ -209,10 +185,27 @@ angular.module('oppia').directive(
               ]
             });
           };
+          ctrl.$onInit = function() {
+            $scope.$on('activeLanguageChanged', function() {
+              ctrl.opportunities = [];
+              ctrl.opportunitiesAreLoading = true;
+              ctrl.moreOpportunitiesAvailable = true;
+              ContributionOpportunitiesService.getTranslationOpportunities(
+                TranslationLanguageService.getActiveLanguageCode(),
+                updateWithNewOpportunities);
+            });
+            ctrl.opportunities = [];
+            ctrl.opportunitiesAreLoading = true;
+            ctrl.moreOpportunitiesAvailable = true;
+            ctrl.progressBarRequired = true;
 
-          ContributionOpportunitiesService.getTranslationOpportunities(
-            TranslationLanguageService.getActiveLanguageCode(),
-            updateWithNewOpportunities);
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              userIsLoggedIn = userInfo.isLoggedIn();
+            });
+            ContributionOpportunitiesService.getTranslationOpportunities(
+              TranslationLanguageService.getActiveLanguageCode(),
+              updateWithNewOpportunities);
+          };
         }
       ]
     };

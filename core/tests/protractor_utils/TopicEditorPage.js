@@ -20,6 +20,7 @@
 var dragAndDropScript = require('html-dnd').code;
 var forms = require('./forms.js');
 var waitFor = require('./waitFor.js');
+var path = require('path');
 
 var TopicEditorPage = function() {
   var EDITOR_URL_PREFIX = '/topic_editor/';
@@ -34,6 +35,8 @@ var TopicEditorPage = function() {
 
   var topicNameField = element(
     by.css('.protractor-test-topic-name-field'));
+  var abbreviatedTopicNameField = element(
+    by.css('.protractor-test-abbreviated-topic-name-field'));
   var topicDescriptionField = element(
     by.css('.protractor-test-topic-description-field'));
   var saveTopicButton = element(
@@ -87,6 +90,16 @@ var TopicEditorPage = function() {
   var questionItem = element(by.css('.protractor-test-question-list-item'));
   var selectSkillDropdown = element(
     by.css('.protractor-test-select-skill-dropdown'));
+  var customTopicThumbnail = element(
+    by.css('.protractor-test-custom-photo'));
+  var topicThumbnailClickable = element(
+    by.css('.protractor-test-photo-clickable'));
+  var topicThumbnailUploadInput = element(
+    by.css('.protractor-test-photo-upload-input'));
+  var topicThumbnailCropper = element(
+    by.css('.cropper-container'));
+  var topicThumbnailSubmitButton = element(
+    by.css('.protractor-test-photo-upload-submit'));
 
   var dragAndDrop = function(fromElement, toElement) {
     browser.executeScript(dragAndDropScript, fromElement, toElement);
@@ -95,6 +108,35 @@ var TopicEditorPage = function() {
   this.get = function(topicId) {
     browser.get(EDITOR_URL_PREFIX + topicId);
     return waitFor.pageToFullyLoad();
+  };
+
+  this.getTopicThumbnailSource = function() {
+    return customTopicThumbnail.getAttribute('src');
+  };
+
+  this.uploadThumbnail = function(imgPath) {
+    topicThumbnailClickable.click();
+    absPath = path.resolve(__dirname, imgPath);
+    return topicThumbnailUploadInput.sendKeys(absPath);
+  };
+
+  this.publishTopic = function() {
+    publishTopicButton.click();
+    return waitFor.invisibilityOf(
+      publishTopicButton, 'Topic is taking too long to publish.');
+  };
+
+  this.submitTopicThumbnail = function(imgPath) {
+    return this.uploadThumbnail(imgPath).then(function() {
+      waitFor.visibilityOf(
+        topicThumbnailCropper, 'Photo cropper is taking too long to appear');
+    }).then(function() {
+      topicThumbnailSubmitButton.click();
+    }).then(function() {
+      return waitFor.invisibilityOf(
+        topicThumbnailUploadInput,
+        'Photo uploader is taking too long to disappear');
+    });
   };
 
   this.expectNumberOfQuestionsForSkillWithDescriptionToBe = function(
@@ -281,6 +323,15 @@ var TopicEditorPage = function() {
 
   this.expectTopicNameToBe = function(name) {
     expect(topicNameField.getAttribute('value')).toEqual(name);
+  };
+
+  this.changeAbbreviatedTopicName = function(newName) {
+    abbreviatedTopicNameField.clear();
+    abbreviatedTopicNameField.sendKeys(newName);
+  };
+
+  this.expectAbbreviatedTopicNameToBe = function(name) {
+    expect(abbreviatedTopicNameField.getAttribute('value')).toEqual(name);
   };
 
   this.changeTopicDescription = function(newDescription) {

@@ -21,58 +21,57 @@
 // in via initArgs.
 
 angular.module('oppia').directive('logicErrorCategoryEditor', [
-  'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/logic-error-category-editor.directive.html'),
+      template: require('./logic-error-category-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
         var ctrl = this;
-        ctrl.alwaysEditable = true;
-        ctrl.errorCategories = [{
-          name: 'parsing',
-          humanReadable: 'Unparseable'
-        }, {
-          name: 'typing',
-          humanReadable: 'Ill-typed'
-        }, {
-          name: 'line',
-          humanReadable: 'Incorrect line'
-        }, {
-          name: 'layout',
-          humanReadable: 'Wrong indenting'
-        }, {
-          name: 'variables',
-          humanReadable: 'Variables error'
-        }, {
-          name: 'logic',
-          humanReadable: 'Invalid deduction'
-        }, {
-          name: 'target',
-          humanReadable: 'Target not proved'
-        }, {
-          name: 'mistake',
-          humanReadable: 'Unspecified'
-        }];
+        ctrl.$onInit = function() {
+          $scope.$watch('$ctrl.localValue.category', function() {
+            ctrl.value = ctrl.localValue.category.name;
+          });
+          ctrl.alwaysEditable = true;
+          ctrl.errorCategories = [{
+            name: 'parsing',
+            humanReadable: 'Unparseable'
+          }, {
+            name: 'typing',
+            humanReadable: 'Ill-typed'
+          }, {
+            name: 'line',
+            humanReadable: 'Incorrect line'
+          }, {
+            name: 'layout',
+            humanReadable: 'Wrong indenting'
+          }, {
+            name: 'variables',
+            humanReadable: 'Variables error'
+          }, {
+            name: 'logic',
+            humanReadable: 'Invalid deduction'
+          }, {
+            name: 'target',
+            humanReadable: 'Target not proved'
+          }, {
+            name: 'mistake',
+            humanReadable: 'Unspecified'
+          }];
 
-        ctrl.localValue = {
-          category: ctrl.errorCategories[0]
-        };
-        for (var i = 0; i < ctrl.errorCategories.length; i++) {
-          if (ctrl.errorCategories[i].name === ctrl.value) {
-            ctrl.localValue.category = ctrl.errorCategories[i];
+          ctrl.localValue = {
+            category: ctrl.errorCategories[0]
+          };
+          for (var i = 0; i < ctrl.errorCategories.length; i++) {
+            if (ctrl.errorCategories[i].name === ctrl.value) {
+              ctrl.localValue.category = ctrl.errorCategories[i];
+            }
           }
-        }
-
-        $scope.$watch('$ctrl.localValue.category', function() {
-          ctrl.value = ctrl.localValue.category.name;
-        });
+        };
       }]
     };
   }]);

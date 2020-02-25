@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/url-interpolation.service.ts');
+require('domain/topic_viewer/topic-viewer-domain.constants.ajs.ts');
 
 angular.module('oppia').directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -41,8 +42,8 @@ angular.module('oppia').directive('storySummaryTile', [
               });
           };
 
-          ctrl.getStaticImageUrl = function(url) {
-            return UrlInterpolationService.getStaticImageUrl(url);
+          ctrl.getStaticImageUrl = function(imagePath) {
+            return UrlInterpolationService.getStaticImageUrl(imagePath);
           };
         }
       ]

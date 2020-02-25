@@ -15,77 +15,80 @@
 /**
  * @fileoverview Unit tests for Validators Service.
  */
+import { TestBed } from '@angular/core/testing';
+import { AppConstants } from 'app.constants';
+import { NormalizeWhitespacePipe } from
+  'filters/string-utility-filters/normalize-whitespace.pipe';
+import { AlertsService } from 'services/alerts.service';
+import { ValidatorsService } from 'services/validators.service';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+describe('Validators service', () => {
+  let vs: ValidatorsService = null;
 
-require('services/validators.service.ts');
-
-describe('Validators service', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  describe('validators service', function() {
-    beforeEach(angular.mock.module(function($provide) {
-      $provide.constant('INVALID_NAME_CHARS', '#xyz');
-    }));
-
-    var vs = null;
-
-    beforeEach(angular.mock.inject(function($injector) {
-      vs = $injector.get('ValidatorsService');
-    }));
-
-    it('should correctly validate entity names', function() {
-      expect(vs.isValidEntityName('b')).toBe(true);
-      expect(vs.isValidEntityName('b   ')).toBe(true);
-      expect(vs.isValidEntityName('   b')).toBe(true);
-      expect(vs.isValidEntityName('bd')).toBe(true);
-
-      expect(vs.isValidEntityName('')).toBe(false);
-      expect(vs.isValidEntityName('   ')).toBe(false);
-      expect(vs.isValidEntityName('x')).toBe(false);
-      expect(vs.isValidEntityName('y')).toBe(false);
-      expect(vs.isValidEntityName('bx')).toBe(false);
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [AlertsService, NormalizeWhitespacePipe]
     });
+    vs = TestBed.get(ValidatorsService);
+    /* eslint-disable dot-notation */
+    AppConstants['INVALID_NAME_CHARS'] = '#xyz';
+    /* eslint-enable dot-notation */
+  });
 
-    it('should correctly validate exploration titles', function() {
-      expect(vs.isValidExplorationTitle('b')).toBe(true);
-      expect(vs.isValidExplorationTitle('abc def')).toBe(true);
+  it('should correctly validate entity names', () => {
+    expect(vs.isValidEntityName('b', null, null)).toBe(true);
+    expect(vs.isValidEntityName('b   ', null, null)).toBe(true);
+    expect(vs.isValidEntityName('   b', null, null)).toBe(true);
+    expect(vs.isValidEntityName('bd', null, null)).toBe(true);
 
-      expect(vs.isValidExplorationTitle('')).toBe(false);
-      expect(vs.isValidExplorationTitle(null)).toBe(false);
-      expect(vs.isValidExplorationTitle(undefined)).toBe(false);
-      expect(vs.isValidExplorationTitle(
-        'A title with invalid characters #')).toBe(false);
-      expect(vs.isValidExplorationTitle(
-        'A title that is toooooooooooooooooooooooooo too long.')).toBe(false);
-    });
+    expect(vs.isValidEntityName('', true, null)).toBe(false);
+    expect(vs.isValidEntityName('   ', null, null)).toBe(false);
+    expect(vs.isValidEntityName('x', null, null)).toBe(false);
+    expect(vs.isValidEntityName('y', null, null)).toBe(false);
+    expect(vs.isValidEntityName('bx', true, null)).toBe(false);
+  });
 
-    it('should correctly validate non-emptiness', function() {
-      expect(vs.isNonempty('b')).toBe(true);
-      expect(vs.isNonempty('abc def')).toBe(true);
+  it('should correctly validate exploration titles', () => {
+    expect(vs.isValidExplorationTitle('b', null)).toBe(true);
+    expect(vs.isValidExplorationTitle('abc def', null)).toBe(true);
 
-      expect(vs.isNonempty('')).toBe(false);
-      expect(vs.isNonempty(null)).toBe(false);
-      expect(vs.isNonempty(undefined)).toBe(false);
-    });
+    expect(vs.isValidExplorationTitle('', null)).toBe(false);
+    expect(vs.isValidExplorationTitle(null, null)).toBe(false);
+    expect(vs.isValidExplorationTitle(undefined, null)).toBe(false);
+    expect(vs.isValidExplorationTitle(
+      'A title with invalid characters #', null)).toBe(false);
+    expect(vs.isValidExplorationTitle(
+      'A title that is toooooooooooooooooooooooooo too long.', true)).toBe(
+      false);
+  });
 
-    it('should correctly validate exploration IDs', function() {
-      expect(vs.isValidExplorationId('b')).toBe(true);
-      expect(vs.isValidExplorationId('2')).toBe(true);
-      expect(vs.isValidExplorationId('asbfjkdAFS-_')).toBe(true);
+  it('should correctly validate non-emptiness', () => {
+    expect(vs.isNonempty('b', null)).toBe(true);
+    expect(vs.isNonempty('abc def', null)).toBe(true);
 
-      expect(vs.isValidExplorationId('abc def')).toBe(false);
-      expect(vs.isValidExplorationId('')).toBe(false);
-      expect(vs.isValidExplorationId('abcd;')).toBe(false);
-    });
+    expect(vs.isNonempty('', null)).toBe(false);
+    expect(vs.isNonempty(null, null)).toBe(false);
+    expect(vs.isNonempty(undefined, true)).toBe(false);
+  });
+
+  it('should correctly validate exploration IDs', () => {
+    expect(vs.isValidExplorationId('b', null)).toBe(true);
+    expect(vs.isValidExplorationId('2', null)).toBe(true);
+    expect(vs.isValidExplorationId('asbfjkdAFS-_', null)).toBe(true);
+
+    expect(vs.isValidExplorationId('abc def', null)).toBe(false);
+    expect(vs.isValidExplorationId('', null)).toBe(false);
+    expect(vs.isValidExplorationId('abcd;', true)).toBe(false);
+  });
+
+  it('should correctly validate state name', () => {
+    expect(vs.isValidStateName('abc def', null)).toBe(true);
+
+    expect(vs.isValidStateName('', null)).toBe(false);
+    expect(vs.isValidStateName(
+      'A state name with invalid character x', null)).toBe(false);
+    expect(vs.isValidStateName(
+      'A state name that is toooooooooooooooooooooooo long', true))
+      .toBe(false);
   });
 });

@@ -16,138 +16,76 @@
  * @fileoverview Unit tests for the States object factory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// StatesObjectFactory.ts is upgraded to Angular 8.
-import { AnswerGroupObjectFactory } from
-  'domain/exploration/AnswerGroupObjectFactory';
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { HintObjectFactory } from 'domain/exploration/HintObjectFactory';
-import { OutcomeObjectFactory } from
-  'domain/exploration/OutcomeObjectFactory';
-import { ParamChangeObjectFactory } from
-  'domain/exploration/ParamChangeObjectFactory';
-import { ParamChangesObjectFactory } from
-  'domain/exploration/ParamChangesObjectFactory';
-import { RecordedVoiceoversObjectFactory } from
-  'domain/exploration/RecordedVoiceoversObjectFactory';
-import { RuleObjectFactory } from 'domain/exploration/RuleObjectFactory';
-import { SubtitledHtmlObjectFactory } from
-  'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
+import { TestBed } from '@angular/core/testing';
+
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { StateObjectFactory } from 'domain/state/StateObjectFactory';
+import { StatesObjectFactory } from 'domain/exploration/StatesObjectFactory';
 import { VoiceoverObjectFactory } from
   'domain/exploration/VoiceoverObjectFactory';
-import { WrittenTranslationObjectFactory } from
-  'domain/exploration/WrittenTranslationObjectFactory';
-import { WrittenTranslationsObjectFactory } from
-  'domain/exploration/WrittenTranslationsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-require('domain/exploration/StatesObjectFactory.ts');
+const constants = require('constants.ts');
 
-require('domain/state/StateObjectFactory.ts');
-
-describe('States object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
-        new OutcomeObjectFactory(new SubtitledHtmlObjectFactory()),
-        new RuleObjectFactory()));
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'HintObjectFactory', new HintObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'OutcomeObjectFactory', new OutcomeObjectFactory(
-        new SubtitledHtmlObjectFactory()));
-    $provide.value(
-      'ParamChangeObjectFactory', new ParamChangeObjectFactory());
-    $provide.value(
-      'ParamChangesObjectFactory', new ParamChangesObjectFactory(
-        new ParamChangeObjectFactory()));
-    $provide.value(
-      'RecordedVoiceoversObjectFactory',
-      new RecordedVoiceoversObjectFactory(new VoiceoverObjectFactory()));
-    $provide.value('RuleObjectFactory', new RuleObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-    $provide.value('VoiceoverObjectFactory', new VoiceoverObjectFactory());
-    $provide.value(
-      'WrittenTranslationObjectFactory',
-      new WrittenTranslationObjectFactory());
-    $provide.value(
-      'WrittenTranslationsObjectFactory',
-      new WrittenTranslationsObjectFactory(
-        new WrittenTranslationObjectFactory()));
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  var oldValueForNewStateTemplate = null;
-
-  describe('StatesObjectFactory', function() {
+describe('States object factory', () => {
+  describe('StatesObjectFactory', () => {
     var scope, sof, ssof, statesDict, statesWithAudioDict, vof;
 
-    beforeEach(angular.mock.module(function($provide) {
-      $provide.constant('NEW_STATE_TEMPLATE', {
-        classifier_model_id: null,
-        content: {
-          content_id: 'content',
-          html: ''
-        },
-        recorded_voiceovers: {
-          voiceovers_mapping: {
-            content: {},
-            default_outcome: {}
-          }
-        },
-        interaction: {
-          answer_groups: [],
-          confirmed_unclassified_answers: [],
-          customization_args: {
-            rows: {
-              value: 1
-            },
-            placeholder: {
-              value: 'Type your answer here.'
-            }
-          },
-          default_outcome: {
-            dest: '(untitled state)',
-            feedback: {
-              content_id: 'default_outcome',
-              html: ''
-            },
-            param_changes: [],
-            labelled_as_correct: false,
-            refresher_exploration_id: null,
-            missing_prerequisite_skill_id: null
-          },
-          hints: [],
-          solution: null,
-          id: 'TextInput'
-        },
-        param_changes: [],
-        solicit_answer_details: false,
-        written_translations: {
-          translations_mapping: {
-            content: {},
-            default_outcome: {}
-          }
+    constants.NEW_STATE_TEMPLATE = {
+      classifier_model_id: null,
+      content: {
+        content_id: 'content',
+        html: ''
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
         }
-      });
-    }));
+      },
+      interaction: {
+        answer_groups: [],
+        confirmed_unclassified_answers: [],
+        customization_args: {
+          rows: {
+            value: 1
+          },
+          placeholder: {
+            value: 'Type your answer here.'
+          }
+        },
+        default_outcome: {
+          dest: '(untitled state)',
+          feedback: {
+            content_id: 'default_outcome',
+            html: ''
+          },
+          param_changes: [],
+          labelled_as_correct: false,
+          refresher_exploration_id: null,
+          missing_prerequisite_skill_id: null
+        },
+        hints: [],
+        solution: null,
+        id: 'TextInput'
+      },
+      param_changes: [],
+      solicit_answer_details: false,
+      written_translations: {
+        translations_mapping: {
+          content: {},
+          default_outcome: {}
+        }
+      }
+    };
 
-    beforeEach(angular.mock.inject(function($injector) {
-      ssof = $injector.get('StatesObjectFactory');
-      sof = $injector.get('StateObjectFactory');
-      vof = $injector.get('VoiceoverObjectFactory');
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [CamelCaseToHyphensPipe]
+      });
+      ssof = TestBed.get(StatesObjectFactory);
+      sof = TestBed.get(StateObjectFactory);
+      vof = TestBed.get(VoiceoverObjectFactory);
 
       statesDict = {
         'first state': {
@@ -218,50 +156,58 @@ describe('States object factory', function() {
                 en: {
                   filename: 'myfile1.mp3',
                   file_size_bytes: 0.5,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 0.5
                 },
                 'hi-en': {
                   filename: 'myfile3.mp3',
                   file_size_bytes: 0.8,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 0.8
                 }
               },
               default_outcome: {
                 he: {
                   filename: 'myfile10.mp3',
                   file_size_bytes: 0.5,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 0.5
                 }
               },
               feedback_1: {
                 zh: {
                   filename: 'myfile4.mp3',
                   file_size_bytes: 1.1,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 1.1
                 }
               },
               hint_1: {
                 es: {
                   filename: 'myfile5.mp3',
                   file_size_bytes: 0.7,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 0.7
                 },
                 zh: {
                   filename: 'myfile6.mp3',
                   file_size_bytes: 0.9,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 0.9
                 },
                 'hi-en': {
                   filename: 'myfile8.mp3',
                   file_size_bytes: 1.2,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 1.2
                 }
               },
               hint_2: {
                 cs: {
                   filename: 'myfile7.mp3',
                   file_size_bytes: 0.2,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 0.2
                 }
               }
             }
@@ -332,7 +278,8 @@ describe('States object factory', function() {
                 'hi-en': {
                   filename: 'myfile2.mp3',
                   file_size_bytes: 0.8,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 0.8
                 }
               },
               default_outcome: {},
@@ -340,7 +287,8 @@ describe('States object factory', function() {
                 de: {
                   filename: 'myfile9.mp3',
                   file_size_bytes: 0.5,
-                  needs_update: false
+                  needs_update: false,
+                  duration_secs: 0.5
                 }
               }
             }
@@ -379,9 +327,9 @@ describe('States object factory', function() {
           }
         }
       };
-    }));
+    });
 
-    it('should create a new state given a state name', function() {
+    it('should create a new state given a state name', () => {
       var newStates = ssof.createFromBackendDict(statesDict);
       newStates.addState('new state');
       expect(newStates.getState('new state')).toEqual(
@@ -433,29 +381,32 @@ describe('States object factory', function() {
         }));
     });
 
-    it('should correctly get all audio language codes in states', function() {
+    it('should correctly get all audio language codes in states', () => {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllVoiceoverLanguageCodes())
         .toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs', 'de']);
     });
 
-    it('should correctly get all audio translations in states', function() {
+    it('should correctly get all audio translations in states', () => {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllVoiceovers('hi-en'))
         .toEqual({
           'first state': [vof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 0.8,
-            needs_update: false
+            needs_update: false,
+            duration_secs: 0.8
           }), vof.createFromBackendDict({
             filename: 'myfile8.mp3',
             file_size_bytes: 1.2,
-            needs_update: false
+            needs_update: false,
+            duration_secs: 1.2
           })],
           'second state': [vof.createFromBackendDict({
             filename: 'myfile2.mp3',
             file_size_bytes: 0.8,
-            needs_update: false
+            needs_update: false,
+            duration_secs: 0.8
           })]
         });
     });

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the cron jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -27,6 +28,7 @@ from core.domain import email_manager
 from core.domain import recommendations_jobs_one_off
 from core.domain import suggestion_services
 from core.domain import user_jobs_one_off
+from core.domain import wipeout_jobs_one_off
 from core.platform import models
 import feconf
 import utils
@@ -89,6 +91,26 @@ class CronDashboardStatsHandler(base.BaseHandler):
         """Handles GET requests."""
         user_jobs_one_off.DashboardStatsOneOffJob.enqueue(
             user_jobs_one_off.DashboardStatsOneOffJob.create_new())
+
+
+class CronUserDeletionHandler(base.BaseHandler):
+    """Handler for running the user deletion one off job."""
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        wipeout_jobs_one_off.UserDeletionOneOffJob.enqueue(
+            wipeout_jobs_one_off.UserDeletionOneOffJob.create_new())
+
+
+class CronVerifyUserDeletionHandler(base.BaseHandler):
+    """Handler for running the user deletion verification one off job."""
+
+    @acl_decorators.can_perform_cron_tasks
+    def get(self):
+        """Handles GET requests."""
+        wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.enqueue(
+            wipeout_jobs_one_off.VerifyUserDeletionOneOffJob.create_new())
 
 
 class CronExplorationRecommendationsHandler(base.BaseHandler):

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for Oppia suggestions."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -23,7 +24,8 @@ import feconf
 
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models(
+    [models.NAMES.base_model, models.NAMES.user])
 
 # Constants defining types of entities to which suggestions can be created.
 TARGET_TYPE_EXPLORATION = 'exploration'
@@ -143,6 +145,11 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """General suggestion needs to be pseudonymized for the user."""
         return base_models.DELETION_POLICY.LOCALLY_PSEUDONYMIZE
 
+    @staticmethod
+    def get_export_policy():
+        """Model contains user data."""
+        return base_models.EXPORT_POLICY.CONTAINS_USER_DATA
+
     @classmethod
     def has_reference_to_user_id(cls, user_id):
         """Check whether GeneralSuggestionModel exists for the user.
@@ -155,7 +162,33 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         return cls.query(
             ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
-        ).get() is not None
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralSuggestionModel has two fields that contain user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the author_id and
+        final_reviewer_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.author_id == old_user_id,
+                cls.final_reviewer_id == old_user_id)).fetch():
+            if model.author_id == old_user_id:
+                model.author_id = new_user_id
+            if model.final_reviewer_id == old_user_id:
+                model.final_reviewer_id = new_user_id
+            migrated_models.append(model)
+        GeneralSuggestionModel.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def create(
@@ -335,6 +368,20 @@ class GeneralSuggestionModel(base_models.BaseModel):
 
         return user_data
 
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for author_id and
+        final_reviewer_id.
+        """
+        user_ids = [self.author_id]
+        # We don't need to check final_reviewer_id if it is None.
+        if self.final_reviewer_id is not None:
+            user_ids.append(self.final_reviewer_id)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)
+
 
 class GeneralVoiceoverApplicationModel(base_models.BaseModel):
     """A general model for voiceover application of an entity.
@@ -383,7 +430,35 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         """
         return cls.query(
             ndb.OR(cls.author_id == user_id, cls.final_reviewer_id == user_id)
-        ).get() is not None
+        ).get(keys_only=True) is not None
+
+    @staticmethod
+    def get_user_id_migration_policy():
+        """GeneralVoiceoverApplicationModel has two fields that contain user
+        ID.
+        """
+        return base_models.USER_ID_MIGRATION_POLICY.CUSTOM
+
+    @classmethod
+    def migrate_model(cls, old_user_id, new_user_id):
+        """Migrate model to use the new user ID in the author_id and
+        final_reviewer_id.
+
+        Args:
+            old_user_id: str. The old user ID.
+            new_user_id: str. The new user ID.
+        """
+        migrated_models = []
+        for model in cls.query(ndb.OR(
+                cls.author_id == old_user_id,
+                cls.final_reviewer_id == old_user_id)).fetch():
+            if model.author_id == old_user_id:
+                model.author_id = new_user_id
+            if model.final_reviewer_id == old_user_id:
+                model.final_reviewer_id = new_user_id
+            migrated_models.append(model)
+        GeneralVoiceoverApplicationModel.put_multi(
+            migrated_models, update_last_updated_time=False)
 
     @classmethod
     def get_user_voiceover_applications(cls, author_id, status=None):
@@ -442,3 +517,25 @@ class GeneralVoiceoverApplicationModel(base_models.BaseModel):
         return cls.query(ndb.AND(
             cls.target_type == target_type, cls.target_id == target_id,
             cls.language_code == language_code)).fetch()
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
+
+    def verify_model_user_ids_exist(self):
+        """Check if UserSettingsModel exists for author_id and
+        final_reviewer_id.
+        """
+        user_ids = [self.author_id]
+        # We don't need to check final_reviewer_id if it is None.
+        if self.final_reviewer_id is not None:
+            user_ids.append(self.final_reviewer_id)
+        user_ids = [user_id for user_id in user_ids
+                    if user_id not in feconf.SYSTEM_USERS]
+        user_settings_models = user_models.UserSettingsModel.get_multi(
+            user_ids, include_deleted=True)
+        return all(model is not None for model in user_settings_models)

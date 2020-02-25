@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for Skill-related one-off jobs."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -49,8 +50,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 constants.SKILL_DIFFICULTIES[1], 'Explanation 2'),
             skill_domain.Rubric(
                 constants.SKILL_DIFFICULTIES[2], 'Explanation 3')]
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.process_and_flush_pending_tasks()
 
     def test_migration_job_does_not_convert_up_to_date_skill(self):

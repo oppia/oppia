@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests the methods defined in story fetchers."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -42,8 +43,11 @@ class StoryFetchersUnitTests(test_utils.GenericTestBase):
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.TOPIC_ID, self.USER_ID, 'Topic', 'A new topic', [], [], [], [],
-            0)
+            self.TOPIC_ID, self.USER_ID, name='Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
             self.TOPIC_ID)

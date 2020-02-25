@@ -15,6 +15,7 @@
 """Controllers for the topics and skills dashboard, from where topics and skills
 are created.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -73,32 +74,16 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                             self.user, topic_rights)
                     )
 
-        skill_ids_for_private_skills_by_user = [
-            skill_rights.id for skill_rights in (
-                skill_services.get_unpublished_skill_rights_by_creator(
-                    self.user_id))]
-
-        skill_ids_for_unpublished_skills = [
-            skill_rights.id for skill_rights in (
-                skill_services.get_all_unpublished_skill_rights())]
-
         untriaged_skill_summary_dicts = []
         mergeable_skill_summary_dicts = []
         for skill_summary_dict in skill_summary_dicts:
             skill_id = skill_summary_dict['id']
             if (skill_id not in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in skill_ids_for_unpublished_skills) and (
-                        skill_id not in merged_skill_ids):
+                    skill_id not in merged_skill_ids):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
             if (skill_id in skill_ids_assigned_to_some_topic) and (
-                    skill_id not in skill_ids_for_unpublished_skills) and (
-                        skill_id not in merged_skill_ids):
+                    skill_id not in merged_skill_ids):
                 mergeable_skill_summary_dicts.append(skill_summary_dict)
-
-        unpublished_skill_summary_dicts = [
-            summary.to_dict() for summary in (
-                skill_services.get_multi_skill_summaries(
-                    skill_ids_for_private_skills_by_user))]
 
         can_delete_topic = (
             role_services.ACTION_DELETE_TOPIC in self.user.actions)
@@ -115,7 +100,6 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         self.values.update({
             'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
             'mergeable_skill_summary_dicts': mergeable_skill_summary_dicts,
-            'unpublished_skill_summary_dicts': unpublished_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'can_delete_topic': can_delete_topic,
             'can_create_topic': can_create_topic,
@@ -132,10 +116,12 @@ class NewTopicHandler(base.BaseHandler):
     def post(self):
         """Handles POST requests."""
         name = self.payload.get('name')
-
+        abbreviated_name = self.payload.get('abbreviated_name')
         topic_domain.Topic.require_valid_name(name)
+        topic_domain.Topic.require_valid_abbreviated_name(abbreviated_name)
         new_topic_id = topic_services.get_new_topic_id()
-        topic = topic_domain.Topic.create_default_topic(new_topic_id, name)
+        topic = topic_domain.Topic.create_default_topic(
+            new_topic_id, name, abbreviated_name)
         topic_services.save_new_topic(self.user_id, topic)
 
         self.render_json({
@@ -181,7 +167,6 @@ class NewSkillHandler(base.BaseHandler):
             new_skill_id, description, rubrics)
         skill.update_explanation(explanation_dict)
         skill_services.save_new_skill(self.user_id, skill)
-        skill_services.publish_skill(skill.id, self.user_id)
 
         self.render_json({
             'skillId': new_skill_id

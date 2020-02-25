@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the learner dashboard."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -112,7 +113,7 @@ class LearnerDashboardHandler(base.BaseHandler):
                 number_of_nonexistent_activities),
             'completed_to_incomplete_collections': (
                 completed_to_incomplete_collections),
-            'thread_summaries': thread_summaries,
+            'thread_summaries': [s.to_dict() for s in thread_summaries],
             'number_of_unread_threads': number_of_unread_threads,
             'subscription_list': subscription_list
         })
@@ -174,7 +175,9 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
                 'description': suggestion_thread.subject,
                 'author_username': authors_settings[0].username,
                 'author_picture_data_url': (
-                    authors_settings[0].profile_picture_data_url)
+                    authors_settings[0].profile_picture_data_url),
+                'created_on': utils.get_time_in_millisecs(
+                    messages[0].created_on)
             }
             message_summary_list.append(suggestion_summary)
             messages.pop(0)

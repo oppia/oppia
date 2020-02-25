@@ -21,6 +21,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Exploration model class. This will enable the exploration
 storage model to be changed without affecting this module and others above it.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -258,15 +259,11 @@ def export_to_zip_file(exploration_id, version=None):
         zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
-            # Currently, the version number of all files is 1, since they are
-            # not modifiable post-upload.
-            # TODO(sll): When allowing editing of files, implement versioning
-            # for them.
-            file_contents = fs.get(filepath, version=1)
+            file_contents = fs.get(filepath)
 
             str_filepath = 'assets/%s' % filepath
             assert isinstance(str_filepath, python_utils.UNICODE)
@@ -363,7 +360,12 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME):
-                    state.update_interaction_default_outcome(change.new_value)
+                    new_outcome = None
+                    if change.new_value:
+                        new_outcome = state_domain.Outcome.from_dict(
+                            change.new_value
+                        )
+                    state.update_interaction_default_outcome(new_outcome)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS):
@@ -392,6 +394,22 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected recorded_voiceovers to be a dict, '
                             'received %s' % change.new_value)
+                    # Explicitly convert the duration_secs value from
+                    # int to float. Reason for this is the data from
+                    # the frontend will be able to match the backend
+                    # state model for Voiceover properly. Also js
+                    # treats any number that can be float and int as
+                    # int (no explicit types). For example,
+                    # 10.000 is not 10.000 it is 10.
+                    new_voiceovers_mapping = (
+                        change.new_value['voiceovers_mapping'])
+                    language_codes_to_audio_metadata = (
+                        new_voiceovers_mapping.values())
+                    for language_codes in language_codes_to_audio_metadata:
+                        for audio_metadata in language_codes.values():
+                            audio_metadata['duration_secs'] = (
+                                float(audio_metadata['duration_secs'])
+                            )
                     recorded_voiceovers = (
                         state_domain.RecordedVoiceovers.from_dict(
                             change.new_value))
@@ -665,54 +683,77 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
             corresponding to the exploration. Otherwise, marks them as deleted
             but keeps the corresponding models in the datastore.
     """
+    delete_explorations(
+        committer_id, [exploration_id], force_deletion=force_deletion)
+
+
+def delete_explorations(committer_id, exploration_ids, force_deletion=False):
+    """Delete the explorations with the given exploration_ids.
+
+    IMPORTANT: Callers of this function should ensure that committer_id has
+    permissions to delete these explorations, prior to calling this function.
+
+    If force_deletion is True the explorations and its histories are fully
+    deleted and are unrecoverable. Otherwise, the explorations and all its
+    histories are marked as deleted, but the corresponding models are still
+    retained in the datastore. This last option is the preferred one.
+
+    Args:
+        committer_id: str. The id of the user who made the commit.
+        exploration_ids: list(str). The ids of the explorations to be deleted.
+        force_deletion: bool. If True, completely deletes the storage models
+            corresponding to the explorations. Otherwise, marks them as deleted
+            but keeps the corresponding models in the datastore.
+    """
     # TODO(sll): Delete the files too?
-
-    exploration_rights_model = exp_models.ExplorationRightsModel.get(
-        exploration_id)
-    exploration_rights_model.delete(
-        committer_id, '', force_deletion=force_deletion)
-
-    exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    exploration_model.delete(
-        committer_id, feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
+    exp_models.ExplorationRightsModel.delete_multi(
+        exploration_ids, committer_id, '', force_deletion=force_deletion)
+    exp_models.ExplorationModel.delete_multi(
+        exploration_ids, committer_id,
+        feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
 
-    # This must come after the exploration is retrieved. Otherwise the memcache
-    # key will be reinstated.
-    exploration_memcache_key = exp_fetchers.get_exploration_memcache_key(
-        exploration_id)
-    memcache_services.delete(exploration_memcache_key)
+    # This must come after the explorations are retrieved. Otherwise the
+    # memcache keys will be reinstated.
+    exploration_memcache_keys = [
+        exp_fetchers.get_exploration_memcache_key(exploration_id)
+        for exploration_id in exploration_ids]
+    memcache_services.delete_multi(exploration_memcache_keys)
 
-    # Delete the exploration from search.
-    search_services.delete_explorations_from_search_index([exploration_id])
+    # Delete the explorations from search.
+    search_services.delete_explorations_from_search_index(exploration_ids)
 
-    # Delete the exploration summary, regardless of whether or not
+    # Delete the exploration summaries, regardless of whether or not
     # force_deletion is True.
-    delete_exploration_summary(exploration_id)
+    delete_exploration_summaries(exploration_ids)
 
-    # Remove the exploration from the featured activity references, if
+    # Remove the explorations from the featured activity references, if
     # necessary.
-    activity_services.remove_featured_activity(
-        constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
+    activity_services.remove_featured_activities(
+        constants.ACTIVITY_TYPE_EXPLORATION, exploration_ids)
 
     # Remove from subscribers.
     taskqueue_services.defer(
-        delete_exploration_from_subscribed_users,
+        delete_explorations_from_subscribed_users,
         taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-        exploration_id)
+        exploration_ids)
 
 
-def delete_exploration_from_subscribed_users(exploration_id):
-    """Remove exploration from all subscribers' activity_ids.
+def delete_explorations_from_subscribed_users(exploration_ids):
+    """Remove explorations from all subscribers' activity_ids.
 
     Args:
-        exploration_id: The id of the exploration to delete.
+        exploration_ids: list(str). The ids of the explorations to delete.
     """
+    if not exploration_ids:
+        return
+
     subscription_models = user_models.UserSubscriptionsModel.query(
-        user_models.UserSubscriptionsModel.activity_ids ==
-        exploration_id).fetch()
+        user_models.UserSubscriptionsModel.activity_ids.IN(exploration_ids)
+    ).fetch()
     for model in subscription_models:
-        model.activity_ids.remove(exploration_id)
+        model.activity_ids = [
+            id_ for id_ in model.activity_ids if id_ not in exploration_ids]
     user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
@@ -1048,15 +1089,15 @@ def save_exploration_summary(exp_summary):
     index_explorations_given_ids([exp_summary.id])
 
 
-def delete_exploration_summary(exploration_id):
-    """Delete an exploration summary model.
+def delete_exploration_summaries(exploration_ids):
+    """Delete multiple exploration summary models.
 
     Args:
-        exploration_id: str. The id of the exploration summary to be
+        exploration_ids: list(str). The id of the exploration summaries to be
             deleted.
     """
-
-    exp_models.ExpSummaryModel.get(exploration_id).delete()
+    summary_models = exp_models.ExpSummaryModel.get_multi(exploration_ids)
+    exp_models.ExpSummaryModel.delete_multi(summary_models)
 
 
 def revert_exploration(
@@ -1191,9 +1232,9 @@ def save_new_exploration_from_yaml_and_assets(
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exploration_id))
-        fs.commit(committer_id, asset_filename, asset_content)
+        fs.commit(asset_filename, asset_content)
 
     if (exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
@@ -1511,16 +1552,8 @@ def get_user_exploration_data(
             exploration_id, exploration.version, exploration.states))
     for index, state_name in enumerate(exploration.states):
         if classifier_training_jobs[index] is not None:
-            classifier_data = classifier_training_jobs[
-                index].classifier_data
-            algorithm_id = classifier_training_jobs[index].algorithm_id
-            data_schema_version = (
-                classifier_training_jobs[index].data_schema_version)
-            state_classifier_mapping[state_name] = {
-                'algorithm_id': algorithm_id,
-                'classifier_data': classifier_data,
-                'data_schema_version': data_schema_version
-            }
+            state_classifier_mapping[state_name] = (
+                classifier_training_jobs[index].to_player_dict())
 
     editor_dict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,

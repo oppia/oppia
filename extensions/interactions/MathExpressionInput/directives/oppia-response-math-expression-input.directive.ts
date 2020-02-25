@@ -22,24 +22,22 @@
 
 require('directives/mathjax-bind.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaResponseMathExpressionInput', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService', function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/MathExpressionInput/directives/' +
-        'math-expression-input-response.directive.html'),
+      template: require('./math-expression-input-response.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.latexAnswer = HtmlEscaperService.escapedJsonToObj(
-          $attrs.answer).latex;
+        ctrl.$onInit = function() {
+          ctrl.latexAnswer = HtmlEscaperService.escapedJsonToObj(
+            $attrs.answer).latex;
+        };
       }]
     };
   }

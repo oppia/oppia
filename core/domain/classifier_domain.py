@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Domain objects for classifier models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -290,6 +291,21 @@ class ClassifierTrainingJob(python_utils.OBJECT):
             'state_name': self._state_name,
             'status': self._status,
             'training_data': self._training_data,
+            'classifier_data': self._classifier_data,
+            'data_schema_version': self._data_schema_version
+        }
+
+    def to_player_dict(self):
+        """Constructs a dict containing a training job domain object's
+        algorithm_id, classifier_data and data_schema_version.
+
+        Returns:
+            A dict containing training job domain object's algorithm_id,
+            classifier_data and data_schema_version.
+        """
+
+        return {
+            'algorithm_id': self._algorithm_id,
             'classifier_data': self._classifier_data,
             'data_schema_version': self._data_schema_version
         }

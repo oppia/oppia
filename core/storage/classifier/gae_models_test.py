@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for core.storage.classifier.gae_models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -44,8 +45,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             'TextClassifier', 'TextInput', 'exp_id1', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW,
-            None, 1)
+            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
 
         training_job = (
             classifier_models.ClassifierTrainingJobModel.get(job_id))
@@ -61,7 +61,6 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             training_job.training_data,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}])
-        self.assertEqual(training_job.classifier_data, None)
         self.assertEqual(training_job.data_schema_version, 1)
 
     def test_query_new_and_pending_training_jobs(self):
@@ -70,23 +69,23 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
             'TextClassifier', 'TextInput', 'exp_id1', 1,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, None, 1)
+            'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
         classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', 'exp_id2', 2,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, None, 1)
+            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
         classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', 'exp_id3', 3,
             next_scheduled_check_time + datetime.timedelta(
                 minutes=feconf.CLASSIFIER_JOB_TTL_MINS),
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, None, 1)
+            'state_name2', feconf.TRAINING_JOB_STATUS_PENDING, 1)
         classifier_models.ClassifierTrainingJobModel.create(
             'TextClassifier', 'TextInput', 'exp_id4', 4,
             next_scheduled_check_time,
             [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-            'state_name2', feconf.TRAINING_JOB_STATUS_FAILED, None, 1)
+            'state_name2', feconf.TRAINING_JOB_STATUS_FAILED, 1)
 
         training_jobs, cursor, more = (
             classifier_models.ClassifierTrainingJobModel.
@@ -126,7 +125,6 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                 'algorithm_id'],
             'training_data': [],
             'status': feconf.TRAINING_JOB_STATUS_NEW,
-            'classifier_data': None,
             'data_schema_version': 1
         })
         job_dicts_list.append({
@@ -139,7 +137,6 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                 'algorithm_id'],
             'training_data': [],
             'status': feconf.TRAINING_JOB_STATUS_NEW,
-            'classifier_data': None,
             'data_schema_version': 1
         })
 
@@ -163,7 +160,6 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             training_job1.status,
             feconf.TRAINING_JOB_STATUS_NEW)
-        self.assertEqual(training_job1.classifier_data, None)
         self.assertEqual(training_job1.data_schema_version, 1)
 
         training_job2 = (
@@ -182,7 +178,6 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             training_job2.status,
             feconf.TRAINING_JOB_STATUS_NEW)
-        self.assertEqual(training_job2.classifier_data, None)
         self.assertEqual(training_job2.data_schema_version, 1)
 
     def test_raise_exception_by_mocking_collision(self):
@@ -202,8 +197,7 @@ class ClassifierTrainingJobModelUnitTests(test_utils.GenericTestBase):
                     'TextClassifier', 'TextInput', 'exp_id1', 1,
                     next_scheduled_check_time,
                     [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
-                    'state_name2', feconf.TRAINING_JOB_STATUS_NEW,
-                    None, 1)
+                    'state_name2', feconf.TRAINING_JOB_STATUS_NEW, 1)
 
 
 class TrainingJobExplorationMappingModelUnitTests(test_utils.GenericTestBase):

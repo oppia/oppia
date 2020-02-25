@@ -16,74 +16,99 @@
  * @fileoverview unit tests for the local save services.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// LocalStorageService.ts is upgraded to Angular 8.
+import { TestBed } from '@angular/core/testing';
+
 import { ExplorationDraftObjectFactory } from
   'domain/exploration/ExplorationDraftObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { LocalStorageService } from 'services/local-storage.service';
 
-require('services/local-storage.service.ts');
-
-describe('LocalStorageService', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value(
-      'ExplorationDraftObjectFactory', new ExplorationDraftObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  describe('behavior in editor', function() {
-    var LocalStorageService = null;
-    var ExplorationDraftObjectFactory = null;
-    var explorationIdOne = '100';
-    var draftChangeListIdOne = 2;
-    var changeList = [];
-    var explorationIdTwo = '101';
-    var draftChangeListIdTwo = 1;
-    var draftDictOne = {
+describe('LocalStorageService', () => {
+  describe('behavior in editor', () => {
+    let localStorageService = null;
+    let explorationDraftObjectFactory = null;
+    const explorationIdOne = '100';
+    const draftChangeListIdOne = 2;
+    const changeList = [];
+    const explorationIdTwo = '101';
+    const draftChangeListIdTwo = 1;
+    const draftDictOne = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListIdOne
     };
-    var draftDictTwo = {
+    const draftDictTwo = {
       draftChanges: changeList,
       draftChangeListId: draftChangeListIdTwo
     };
-    var draftOne = null;
-    var draftTwo = null;
+    let draftOne = null;
+    let draftTwo = null;
 
-    beforeEach(angular.mock.inject(function($injector) {
-      LocalStorageService = $injector.get('LocalStorageService');
-      ExplorationDraftObjectFactory = $injector.get(
-        'ExplorationDraftObjectFactory');
-      draftOne = ExplorationDraftObjectFactory.createFromLocalStorageDict(
+    beforeEach(() => {
+      localStorageService = TestBed.get(LocalStorageService);
+      explorationDraftObjectFactory = TestBed.get(
+        ExplorationDraftObjectFactory);
+
+      draftOne = explorationDraftObjectFactory.createFromLocalStorageDict(
         draftDictOne);
-      draftTwo = ExplorationDraftObjectFactory.createFromLocalStorageDict(
+      draftTwo = explorationDraftObjectFactory.createFromLocalStorageDict(
         draftDictTwo);
-    }));
+    });
 
-    it('should correctly save the draft', function() {
-      LocalStorageService.saveExplorationDraft(explorationIdOne,
+    it('should verify that storage is available', () => {
+      expect(localStorageService.isStorageAvailable()).toBe(true);
+    });
+
+    it('should correctly save the draft', () => {
+      localStorageService.saveExplorationDraft(explorationIdOne,
         changeList, draftChangeListIdOne);
-      LocalStorageService.saveExplorationDraft(explorationIdTwo,
+      localStorageService.saveExplorationDraft(explorationIdTwo,
         changeList, draftChangeListIdTwo);
-      expect(LocalStorageService.getExplorationDraft(
+      expect(localStorageService.getExplorationDraft(
         explorationIdOne)).toEqual(draftOne);
-      expect(LocalStorageService.getExplorationDraft(
+      expect(localStorageService.getExplorationDraft(
         explorationIdTwo)).toEqual(draftTwo);
     });
 
-    it('should correctly remove the draft', function() {
-      LocalStorageService.saveExplorationDraft(explorationIdTwo,
+    it('should correctly change and save a draft', () => {
+      localStorageService.saveExplorationDraft(explorationIdOne,
+        changeList, draftChangeListIdOne);
+      expect(localStorageService.getExplorationDraft(
+        explorationIdOne)).toEqual(draftOne);
+
+      const draftChangeListIdOneChanged = 3;
+      const draftOneChanged = explorationDraftObjectFactory
+        .createFromLocalStorageDict({
+          draftChanges: changeList,
+          draftChangeListId: draftChangeListIdOneChanged
+        });
+      localStorageService.saveExplorationDraft(explorationIdOne,
+        changeList, draftChangeListIdOneChanged);
+      expect(localStorageService.getExplorationDraft(
+        explorationIdOne)).toEqual(draftOneChanged);
+    });
+
+    it('should correctly remove the draft', () => {
+      localStorageService.saveExplorationDraft(explorationIdTwo,
         changeList, draftChangeListIdTwo);
-      LocalStorageService.removeExplorationDraft(explorationIdTwo);
-      expect(LocalStorageService.getExplorationDraft(
+      localStorageService.removeExplorationDraft(explorationIdTwo);
+      expect(localStorageService.getExplorationDraft(
         explorationIdTwo)).toBeNull();
+    });
+
+    it('should correctly save a language code', () => {
+      localStorageService.updateLastSelectedTranslationLanguageCode('en');
+      expect(localStorageService.getLastSelectedTranslationLanguageCode())
+        .toBe('en');
+
+      localStorageService.updateLastSelectedTranslationLanguageCode('hi');
+      expect(localStorageService.getLastSelectedTranslationLanguageCode())
+        .toBe('hi');
+    });
+
+    it('should not save a language code when storage is not available', () => {
+      spyOn(localStorageService, 'isStorageAvailable').and.returnValue(false);
+      localStorageService.updateLastSelectedTranslationLanguageCode('en');
+      expect(localStorageService.getLastSelectedTranslationLanguageCode())
+        .toBeNull();
     });
   });
 });

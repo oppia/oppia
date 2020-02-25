@@ -45,21 +45,27 @@ angular.module('oppia').directive('topicEditorNavbar', [
             TopicRightsBackendApiService, TopicEditorRoutingService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-          $scope.topicId = UrlService.getTopicIdFromUrl();
-          $scope.topic = TopicEditorStateService.getTopic();
-          $scope.topicSkillIds = $scope.topic.getSkillIds();
-          $scope.validationIssues = [];
-          $scope.topicRights = TopicEditorStateService.getTopicRights();
-          $scope.isSaveInProgress = TopicEditorStateService.isSavingTopic;
-          $scope.getActiveTabName = TopicEditorRoutingService.getActiveTabName;
-          $scope.selectMainTab = TopicEditorRoutingService.navigateToMainTab;
-          $scope.selectSubtopicsTab =
-            TopicEditorRoutingService.navigateToSubtopicsTab;
-          $scope.selectQuestionsTab =
-            TopicEditorRoutingService.navigateToQuestionsTab;
+          var ctrl = this;
+          $scope.isSaveInProgress = function() {
+            return TopicEditorStateService.isSavingTopic();
+          };
+          $scope.getActiveTabName = function() {
+            return TopicEditorRoutingService.getActiveTabName();
+          };
+          $scope.selectMainTab = function() {
+            TopicEditorRoutingService.navigateToMainTab();
+          };
+          $scope.selectSubtopicsTab = function() {
+            TopicEditorRoutingService.navigateToSubtopicsTab();
+          };
+          $scope.selectQuestionsTab = function() {
+            TopicEditorRoutingService.navigateToQuestionsTab();
+          };
 
           var _validateTopic = function() {
             $scope.validationIssues = $scope.topic.validate();
+            $scope.prepublishValidationIssues = (
+              $scope.topic.prepublishValidate());
           };
 
           $scope.publishTopic = function() {
@@ -89,6 +95,10 @@ angular.module('oppia').directive('topicEditorNavbar', [
                   AlertsService.addSuccessMessage(
                     successToast, 1000);
                 });
+              }, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
               return;
             }
@@ -128,6 +138,13 @@ angular.module('oppia').directive('topicEditorNavbar', [
 
           $scope.getWarningsCount = function() {
             return $scope.validationIssues.length;
+          };
+
+          $scope.getTotalWarningsCount = function() {
+            var validationIssuesCount = $scope.validationIssues.length;
+            var prepublishValidationIssuesCount = (
+              $scope.prepublishValidationIssues.length);
+            return validationIssuesCount + prepublishValidationIssuesCount;
           };
 
           $scope.saveChanges = function() {
@@ -172,10 +189,18 @@ angular.module('oppia').directive('topicEditorNavbar', [
               });
           };
 
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _validateTopic);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _validateTopic);
-          $scope.$on(
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateTopic);
+          ctrl.$onInit = function() {
+            $scope.topicId = UrlService.getTopicIdFromUrl();
+            $scope.topic = TopicEditorStateService.getTopic();
+            $scope.topicSkillIds = $scope.topic.getSkillIds();
+            $scope.validationIssues = [];
+            $scope.prepublishValidationIssues = [];
+            $scope.topicRights = TopicEditorStateService.getTopicRights();
+            $scope.$on(EVENT_TOPIC_INITIALIZED, _validateTopic);
+            $scope.$on(EVENT_TOPIC_REINITIALIZED, _validateTopic);
+            $scope.$on(
+              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateTopic);
+          };
         }
       ]
     };

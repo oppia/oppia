@@ -22,11 +22,10 @@ require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 
 require('filters/convert-unicode-with-params-to-html.filter.ts');
-require('domain/utilities/url-interpolation.service.ts');
 require('services/contextual/device-info.service.ts');
 
 angular.module('oppia').directive('schemaBasedUnicodeEditor', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  function() {
     return {
       restrict: 'E',
       scope: {},
@@ -39,61 +38,15 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
         onInputBlur: '=',
         onInputFocus: '='
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema-based-editors/' +
-        'schema-based-unicode-editor.directive.html'),
+      template: require('./schema-based-unicode-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$filter', '$sce', '$translate', 'DeviceInfoService',
-        function($scope, $filter, $sce, $translate, DeviceInfoService) {
+        '$scope', '$filter', '$sce', '$timeout', '$translate',
+        'DeviceInfoService',
+        function(
+            $scope, $filter, $sce, $timeout, $translate,
+            DeviceInfoService) {
           var ctrl = this;
-          if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {
-            // Flag that is flipped each time the codemirror view is
-            // shown. (The codemirror instance needs to be refreshed
-            // every time it is unhidden.)
-            ctrl.codemirrorStatus = false;
-            var CODING_MODE_NONE = 'none';
-
-            ctrl.codemirrorOptions = {
-              // Convert tabs to spaces.
-              extraKeys: {
-                Tab: function(cm) {
-                  var spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
-                  cm.replaceSelection(spaces);
-                  // Move the cursor to the end of the selection.
-                  var endSelectionPos = cm.getDoc().getCursor('head');
-                  cm.getDoc().setCursor(endSelectionPos);
-                }
-              },
-              indentWithTabs: false,
-              lineNumbers: true
-            };
-
-            if (ctrl.isDisabled()) {
-              ctrl.codemirrorOptions.readOnly = 'nocursor';
-            }
-            // Note that only 'coffeescript', 'javascript', 'lua', 'python',
-            // 'ruby' and 'scheme' have CodeMirror-supported syntax
-            // highlighting. For other languages, syntax highlighting will not
-            // happen.
-            if (ctrl.uiConfig().coding_mode !== CODING_MODE_NONE) {
-              ctrl.codemirrorOptions.mode = ctrl.uiConfig().coding_mode;
-            }
-
-            setTimeout(function() {
-              ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
-            }, 200);
-
-            // When the form view is opened, flip the status flag. The
-            // timeout seems to be needed for the line numbers etc. to display
-            // properly.
-            $scope.$on('schemaBasedFormsShown', function() {
-              setTimeout(function() {
-                ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
-              }, 200);
-            });
-          }
-
           ctrl.onKeypress = function(evt) {
             if (evt.keyCode === 13) {
               $scope.$emit('submittedSchemaBasedUnicodeForm');
@@ -132,6 +85,55 @@ angular.module('oppia').directive('schemaBasedUnicodeEditor', [
           ctrl.getDisplayedValue = function() {
             return $sce.trustAsHtml(
               $filter('convertUnicodeWithParamsToHtml')(ctrl.localValue));
+          };
+          ctrl.$onInit = function() {
+            if (ctrl.uiConfig() && ctrl.uiConfig().coding_mode) {
+              // Flag that is flipped each time the codemirror view is
+              // shown. (The codemirror instance needs to be refreshed
+              // every time it is unhidden.)
+              ctrl.codemirrorStatus = false;
+              var CODING_MODE_NONE = 'none';
+
+              ctrl.codemirrorOptions = {
+                // Convert tabs to spaces.
+                extraKeys: {
+                  Tab: function(cm) {
+                    var spaces = Array(
+                      cm.getOption('indentUnit') + 1).join(' ');
+                    cm.replaceSelection(spaces);
+                    // Move the cursor to the end of the selection.
+                    var endSelectionPos = cm.getDoc().getCursor('head');
+                    cm.getDoc().setCursor(endSelectionPos);
+                  }
+                },
+                indentWithTabs: false,
+                lineNumbers: true
+              };
+
+              if (ctrl.isDisabled()) {
+                ctrl.codemirrorOptions.readOnly = 'nocursor';
+              }
+              // Note that only 'coffeescript', 'javascript', 'lua', 'python',
+              // 'ruby' and 'scheme' have CodeMirror-supported syntax
+              // highlighting. For other languages, syntax highlighting will not
+              // happen.
+              if (ctrl.uiConfig().coding_mode !== CODING_MODE_NONE) {
+                ctrl.codemirrorOptions.mode = ctrl.uiConfig().coding_mode;
+              }
+
+              $timeout(function() {
+                ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
+              }, 200);
+
+              // When the form view is opened, flip the status flag. The
+              // timeout seems to be needed for the line numbers etc. to display
+              // properly.
+              $scope.$on('schemaBasedFormsShown', function() {
+                $timeout(function() {
+                  ctrl.codemirrorStatus = !ctrl.codemirrorStatus;
+                }, 200);
+              });
+            }
           };
         }
       ]

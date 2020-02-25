@@ -50,7 +50,7 @@ FileDiff = collections.namedtuple('FileDiff', ['status', 'name'])
 # Git hash of /dev/null, refers to an 'empty' commit.
 GIT_NULL_COMMIT = '4b825dc642cb6eb9a060e54bf8d69288fbee4904'
 
-# caution, __file__ is here *OPPiA/.git/hooks* and not in *OPPIA/scripts*.
+# CAUTION: __file__ is here *OPPIA/.git/hooks* and not in *OPPIA/scripts*.
 LINTER_MODULE = 'scripts.pre_commit_linter'
 FILE_DIR = os.path.abspath(os.path.dirname(__file__))
 OPPIA_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir)
@@ -58,10 +58,11 @@ LINTER_FILE_FLAG = '--files'
 PYTHON_CMD = 'python'
 OPPIA_PARENT_DIR = os.path.join(FILE_DIR, os.pardir, os.pardir, os.pardir)
 NPM_CMD = os.path.join(
-    OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'npm')
+    OPPIA_PARENT_DIR, 'oppia_tools', 'node-10.18.0', 'bin', 'npm')
 YARN_CMD = os.path.join(
     OPPIA_PARENT_DIR, 'oppia_tools', 'yarn-v1.17.3', 'bin', 'yarn')
 FRONTEND_TEST_SCRIPT = 'run_frontend_tests'
+TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT = 'check_e2e_tests_are_captured_in_ci'
 GIT_IS_DIRTY_CMD = 'git status --porcelain --untracked-files=no'
 
 
@@ -282,13 +283,6 @@ def start_python_script(scriptname):
     return task.returncode
 
 
-def start_npm_audit():
-    """Starts the npm audit checks and returns the returncode of the task."""
-    task = subprocess.Popen([YARN_CMD, 'audit'])
-    task.communicate()
-    return task.returncode
-
-
 def has_uncommitted_files():
     """Returns true if the repo contains modified files that are uncommitted.
     Ignores untracked files.
@@ -345,18 +339,19 @@ def does_diff_include_js_or_ts_files(files_to_lint):
     return False
 
 
-def does_diff_include_package_json(files_to_lint):
-    """Returns true if diff includes package.json or yarn.lock.
+def does_diff_include_travis_yml_or_js_files(files_to_lint):
+    """Returns true if diff includes .travis.yml or Javascript files.
 
     Args:
         files_to_lint: list(str). List of files to be linted.
 
     Returns:
-        bool. Whether the diff contains changes in package.json or
-            yarn.lock.
+        bool. Whether the diff contains changes in travis.yml or
+        Javascript files.
     """
+
     for filename in files_to_lint:
-        if filename == 'package.json' or filename == 'yarn.lock':
+        if filename.endswith('.js') or filename.endswith('.travis.yml'):
             return True
     return False
 
@@ -395,19 +390,20 @@ def main(args=None):
                     python_utils.PRINT(
                         'Push failed, please correct the linting issues above.')
                     sys.exit(1)
-            if does_diff_include_package_json(files_to_lint):
-                npm_audit_status = start_npm_audit()
-                if npm_audit_status != 0:
-                    python_utils.PRINT(
-                        'Push failed, please correct the npm audit issues '
-                        'above.')
-                    sys.exit(1)
             frontend_status = 0
+            travis_ci_check_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = start_python_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 python_utils.PRINT(
                     'Push aborted due to failing frontend tests.')
+                sys.exit(1)
+            if does_diff_include_travis_yml_or_js_files(files_to_lint):
+                travis_ci_check_status = start_python_script(
+                    TRAVIS_CI_PROTRACTOR_CHECK_SCRIPT)
+            if travis_ci_check_status != 0:
+                python_utils.PRINT(
+                    'Push aborted due to failing e2e test configuration check.')
                 sys.exit(1)
     return
 

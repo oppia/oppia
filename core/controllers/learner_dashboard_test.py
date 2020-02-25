@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the learner dashboard and the notifications dashboard."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -27,6 +28,7 @@ from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback])
@@ -427,12 +429,16 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
                 suggestion.change.state_name].content.html)
         response_dict = self.get_json(thread_url)
         messages_summary = response_dict['message_summary_list'][0]
+        first_suggestion = feedback_services.get_messages(thread_id)[0]
 
         self.assertEqual(
             messages_summary['author_username'], self.EDITOR_USERNAME)
         self.assertTrue(
             messages_summary['author_picture_data_url'].startswith(
                 'data:image/png;'))
+        self.assertEqual(
+            utils.get_time_in_millisecs(first_suggestion.created_on),
+            messages_summary['created_on'])
         self.assertEqual(
             messages_summary['suggestion_html'], '<p>new content html</p>')
         self.assertEqual(

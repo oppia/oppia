@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Classes for Rich Text Components in Oppia."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -46,7 +47,8 @@ class BaseRteComponent(python_utils.OBJECT):
         'MathLatexString': objects.MathLatexString,
         'ListOfTabs': objects.ListOfTabs,
         'int': objects.Int,
-        'bool': objects.Boolean
+        'bool': objects.Boolean,
+        'SkillSelector': objects.SkillSelector
     }
 
     @classmethod
@@ -123,6 +125,10 @@ class Link(BaseRteComponent):
 
 class Math(BaseRteComponent):
     """Class for Math component."""
+
+
+class Skillreview(BaseRteComponent):
+    """Class for Skillreview component."""
 
 
 class Tabs(BaseRteComponent):

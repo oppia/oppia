@@ -22,26 +22,25 @@
 
 require('directives/angular-html-bind.directive.ts');
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveCollapsible', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService',
+  function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Collapsible' +
-        '/directives/collapsible.directive.html'),
+      template: require('./collapsible.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.heading = HtmlEscaperService.escapedJsonToObj(
-          $attrs.headingWithValue);
-        ctrl.content = HtmlEscaperService.escapedJsonToObj(
-          $attrs.contentWithValue);
+        ctrl.$onInit = function() {
+          ctrl.heading = HtmlEscaperService.escapedJsonToObj(
+            $attrs.headingWithValue);
+          ctrl.content = HtmlEscaperService.escapedJsonToObj(
+            $attrs.contentWithValue);
+        };
       }]
     };
   }

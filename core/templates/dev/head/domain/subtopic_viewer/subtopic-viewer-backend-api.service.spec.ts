@@ -16,77 +16,89 @@
  * @fileoverview Unit tests for SubtopicViewerBackendApiService.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
-require('domain/subtopic_viewer/subtopic-viewer-backend-api.service.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-describe('Subtopic viewer backend API service', function() {
-  var SubtopicViewerBackendApiService = null;
-  var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
-  var UndoRedoService = null;
+import { SubtopicViewerBackendApiService } from
+  'domain/subtopic_viewer/subtopic-viewer-backend-api.service';
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
+describe('Subtopic viewer backend API service', () => {
+  let subtopicViewerBackendApiService: SubtopicViewerBackendApiService = null;
+  let httpTestingController: HttpTestingController;
+  // Sample subtopic page contents object returnable from the backend
+  let sampleDataResults = {
+    subtopic_title: 'Subtopic Title',
+    page_contents: {
+      subtitled_html: {
+        html: 'test content',
+        content_id: 'content'
+      },
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {
+            en: {
+              filename: 'test.mp3',
+              file_size_bytes: 100,
+              needs_update: false
+            }
+          }
+        }
+      }
     }
-  }));
+  };
 
-  beforeEach(angular.mock.inject(function($injector) {
-    SubtopicViewerBackendApiService = $injector.get(
-      'SubtopicViewerBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
 
-    // Sample subtopic page contents object returnable from the backend
-    sampleDataResults = {
-      subtopic_title: 'Subtopic Title',
-      page_contents: {}
-    };
-  }));
+    subtopicViewerBackendApiService = TestBed.get(
+      SubtopicViewerBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch an existing subtopic from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/subtopic_data_handler/topic/0').respond(
-        sampleDataResults);
-      SubtopicViewerBackendApiService.fetchSubtopicData('topic', '0').then(
+      subtopicViewerBackendApiService.fetchSubtopicData('topic', '0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne(
+        '/subtopic_data_handler/topic/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults);
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalled();
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 
   it('should use the rejection handler if the backend request failed',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect(
-        'GET', '/subtopic_data_handler/topic/0').respond(
-        500, 'Error loading subtopic.');
-      SubtopicViewerBackendApiService.fetchSubtopicData('topic', '0').then(
+      subtopicViewerBackendApiService.fetchSubtopicData('topic', '0').then(
         successHandler, failHandler);
-      $httpBackend.flush();
+      let req = httpTestingController.expectOne(
+        '/subtopic_data_handler/topic/0');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading subtopic.', {
+        status: 500, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading subtopic.');
-    }
+      expect(failHandler).toHaveBeenCalled();
+    })
   );
 });

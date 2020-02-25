@@ -19,6 +19,7 @@ stored in the database. In particular, the various query methods should
 delegate to the Story model class. This will enable the story
 storage model to be changed without affecting this module and others above it.
 """
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -205,6 +206,7 @@ def _save_story(committer_id, story, commit_message, change_list):
             exp_ids.append(node.exploration_id)
     exp_summaries = (
         exp_fetchers.get_exploration_summaries_matching_ids(exp_ids))
+
     exp_summaries_dict = {
         exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
     }
@@ -215,6 +217,14 @@ def _save_story(committer_id, story, commit_message, change_list):
                 'Expected story to only reference valid explorations, '
                 'but found an exploration with ID: %s (was it deleted?)' %
                 node.exploration_id)
+
+    if exp_summaries:
+        common_exp_category = exp_summaries[0].category
+        for summary in exp_summaries:
+            if summary.category != common_exp_category:
+                raise utils.ValidationError(
+                    'All explorations in a story should be of the '
+                    'same category.')
 
     # Story model cannot be None as story is passed as parameter here and that
     # is only possible if a story model with that story id exists. Also this is

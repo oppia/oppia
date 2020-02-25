@@ -16,103 +16,102 @@
  * @fileoverview Unit tests for SearchExplorationsBackendApiService.
  */
 
-require('domain/collection/search-explorations-backend-api.service.ts');
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { SearchExplorationsBackendApiService } from
+  'domain/collection/search-explorations-backend-api.service';
 
-describe('Exploration search backend API service', function() {
-  var SearchExplorationsBackendApiService = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
+describe('Exploration search backend API service', () => {
+  let SearchExplorationsService: SearchExplorationsBackendApiService = null;
+  let httpTestingController: HttpTestingController;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(
-    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule]
+    });
 
-  beforeEach(angular.mock.inject(function($injector) {
-    SearchExplorationsBackendApiService = $injector.get(
-      'SearchExplorationsBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
-  }));
-
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+    SearchExplorationsService = TestBed.get(
+      SearchExplorationsBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
   });
 
-  it('should call the provided success handler on HTTP success', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    var query = escape(btoa('three'));
-
-    $httpBackend.expect('GET', '/exploration/metadata_search?q=' + query)
-      .respond(200, {collection_node_metadata_list: []});
-    SearchExplorationsBackendApiService.fetchExplorations('three')
-      .then(successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
-
-    expect(successHandler).toHaveBeenCalled();
-    expect(failHandler).not.toHaveBeenCalled();
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
-  it('should search for explorations from the backend', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    var query = escape(btoa('count'));
+  it('should call the provided success handler on HTTP success',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let query = escape(btoa('three'));
 
-    // Search result object returnable from the backend
-    var searchResults = {
-      collection_node_metadata_list: [{
-        id: '12',
-        objective:
-        'learn how to count permutations accurately and systematically',
-        title: 'Protractor Test'
-      }, {
-        id: '4',
-        objective:
-        'learn how to count permutations accurately and systematically',
-        title: 'Three Balls'
-      }]
-    };
+      SearchExplorationsService.fetchExplorations('three')
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/exploration/metadata_search?q=' + query);
+      req.flush({collection_node_metadata_list: []});
 
-    $httpBackend
-      .expect('GET', '/exploration/metadata_search?q=' + query)
-      .respond(200, searchResults);
-    SearchExplorationsBackendApiService.fetchExplorations('count')
-      .then(successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
+      flushMicrotasks();
 
-    expect(successHandler).toHaveBeenCalledWith(searchResults);
-    expect(failHandler).not.toHaveBeenCalled();
-  });
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
 
-  it('should call the provided fail handler on HTTP failure', function() {
-    var successHandler = jasmine.createSpy('success');
-    var failHandler = jasmine.createSpy('fail');
-    var query = escape(btoa('oppia'));
+  it('should search for explorations from the backend',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let query = escape(btoa('count'));
 
-    $httpBackend
-      .expect('GET', '/exploration/metadata_search?q=' + query).respond(500);
-    SearchExplorationsBackendApiService.fetchExplorations('oppia')
-      .then(successHandler, failHandler);
-    $httpBackend.flush();
-    $rootScope.$digest();
+      // Search result object returnable from the backend
+      let searchResults = {
+        collection_node_metadata_list: [{
+          id: '12',
+          objective:
+          'learn how to count permutations accurately and systematically',
+          title: 'Protractor Test'
+        }, {
+          id: '4',
+          objective:
+          'learn how to count permutations accurately and systematically',
+          title: 'Three Balls'
+        }]
+      };
 
-    expect(successHandler).not.toHaveBeenCalled();
-    expect(failHandler).toHaveBeenCalled();
-  });
+      SearchExplorationsService.fetchExplorations('count')
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/exploration/metadata_search?q=' + query);
+      req.flush(searchResults);
+
+      flushMicrotasks();
+
+      expect(successHandler).toHaveBeenCalledWith(searchResults);
+      expect(failHandler).not.toHaveBeenCalled();
+    })
+  );
+
+  it('should call the provided fail handler on HTTP failure',
+    fakeAsync(() => {
+      let successHandler = jasmine.createSpy('success');
+      let failHandler = jasmine.createSpy('fail');
+      let query = escape(btoa('oppia'));
+
+      SearchExplorationsService.fetchExplorations('oppia')
+        .then(successHandler, failHandler);
+      let req = httpTestingController.expectOne(
+        '/exploration/metadata_search?q=' + query);
+      req.flush('Error searching exploration', {
+        status: 500, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalled();
+    })
+  );
 });

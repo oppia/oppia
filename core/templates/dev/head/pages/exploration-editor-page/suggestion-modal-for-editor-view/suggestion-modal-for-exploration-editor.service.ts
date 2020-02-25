@@ -41,7 +41,7 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
 
     var _showEditStateContentSuggestionModal = function(
         activeThread, isSuggestionHandled, hasUnsavedChanges, isSuggestionValid,
-        setActiveThread = (threadId) => {}) {
+        setActiveThread = (threadId) => {}, threadUibModalInstance) {
       $uibModal.open({
         templateUrl: _templateUrl,
         backdrop: true,
@@ -109,6 +109,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             $scope.newContent = newContent;
 
             $scope.acceptSuggestion = function() {
+              if (threadUibModalInstance !== null) {
+                threadUibModalInstance.close();
+              }
               SuggestionModalService.acceptSuggestion(
                 $uibModalInstance,
                 {
@@ -126,6 +129,9 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
             };
 
             $scope.rejectSuggestion = function() {
+              if (threadUibModalInstance !== null) {
+                threadUibModalInstance.close();
+              }
               SuggestionModalService.rejectSuggestion(
                 $uibModalInstance,
                 {
@@ -172,18 +178,24 @@ angular.module('oppia').factory('SuggestionModalForExplorationEditorService', [
           function() {
             $log.error('Error resolving suggestion');
           });
+      }, function() {
+        // Note to developers:
+        // This callback is triggered when the Cancel button is clicked.
+        // No further action is needed.
       });
     };
 
     return {
-      showSuggestionModal: function(suggestionType, extraParams) {
+      showSuggestionModal: function(
+          suggestionType, extraParams, threadUibModalInstance = null) {
         if (suggestionType === 'edit_exploration_state_content') {
           _showEditStateContentSuggestionModal(
             extraParams.activeThread,
             extraParams.isSuggestionHandled,
             extraParams.hasUnsavedChanges,
             extraParams.isSuggestionValid,
-            extraParams.setActiveThread
+            extraParams.setActiveThread,
+            threadUibModalInstance
           );
         }
       }

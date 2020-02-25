@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the admin view."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -27,6 +28,7 @@ from core.controllers import base
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
+from core.domain import email_manager
 from core.domain import exp_domain
 from core.domain import exp_fetchers
 from core.domain import exp_services
@@ -307,7 +309,8 @@ class AdminHandler(base.BaseHandler):
             state_domain.Outcome(
                 None, state_domain.SubtitledHtml(
                     'feedback_id', '<p>Dummy Feedback</p>'),
-                True, [], None, None).to_dict()
+                True, [], None, None
+            )
         )
         question = question_domain.Question(
             question_id, state,
@@ -387,9 +390,9 @@ class AdminHandler(base.BaseHandler):
                 self.user_id, question_id_3, skill_id_3, 0.7)
 
             topic_1 = topic_domain.Topic.create_default_topic(
-                topic_id_1, 'Dummy Topic 1')
+                topic_id_1, 'Dummy Topic 1', 'abbrev')
             topic_2 = topic_domain.Topic.create_default_topic(
-                topic_id_2, 'Empty Topic')
+                topic_id_2, 'Empty Topic', 'abbrev')
 
             topic_1.add_canonical_story(story_id)
             topic_1.add_uncategorized_skill_id(skill_id_1)
@@ -436,9 +439,6 @@ class AdminHandler(base.BaseHandler):
 
             topic_services.publish_story(topic_id_1, story_id, self.user_id)
             topic_services.publish_topic(topic_id_1, self.user_id)
-            skill_services.publish_skill(skill_id_1, self.user_id)
-            skill_services.publish_skill(skill_id_2, self.user_id)
-            skill_services.publish_skill(skill_id_3, self.user_id)
         else:
             raise Exception('Cannot load new structures data in production.')
 
@@ -633,3 +633,16 @@ class DataExtractionQueryHandler(base.BaseHandler):
             'data': extracted_answers
         }
         self.render_json(response)
+
+
+class SendDummyMailToAdminHandler(base.BaseHandler):
+    """This function handles sending test emails."""
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        username = self.username
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_dummy_mail_to_admin(username)
+            self.render_json({})
+        else:
+            raise self.InvalidInputException('This app cannot send emails.')

@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the questions list in topic editors and skill editors."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -57,13 +58,30 @@ class QuestionsListHandler(base.BaseHandler):
         return_dicts = []
         for index, summary in enumerate(question_summaries):
             if summary is not None:
-                return_dicts.append({
-                    'summary': summary.to_dict(),
-                    'skill_descriptions': (
-                        merged_question_skill_links[index].skill_descriptions),
-                    'skill_difficulties': (
-                        merged_question_skill_links[index].skill_difficulties)
-                })
+                if len(skill_ids) == 1:
+                    return_dicts.append({
+                        'summary': summary.to_dict(),
+                        'skill_id': merged_question_skill_links[
+                            index].skill_ids[0],
+                        'skill_description': (
+                            merged_question_skill_links[
+                                index].skill_descriptions[0]),
+                        'skill_difficulty': (
+                            merged_question_skill_links[
+                                index].skill_difficulties[0])
+                    })
+                else:
+                    return_dicts.append({
+                        'summary': summary.to_dict(),
+                        'skill_ids': merged_question_skill_links[
+                            index].skill_ids,
+                        'skill_descriptions': (
+                            merged_question_skill_links[
+                                index].skill_descriptions),
+                        'skill_difficulties': (
+                            merged_question_skill_links[
+                                index].skill_difficulties)
+                    })
 
         self.values.update({
             'question_summary_dicts': return_dicts,

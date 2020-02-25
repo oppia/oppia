@@ -63,12 +63,14 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.linter_code = 0
         def mock_start_linter(unused_files_to_lint):
             return self.linter_code
-        self.does_diff_include_package_json = False
-        def mock_does_diff_include_package_json(unused_files_to_lint):
-            return self.does_diff_include_package_json
         self.does_diff_include_js_or_ts_files = False
         def mock_does_diff_include_js_or_ts_files(unused_files_to_lint):
             return self.does_diff_include_js_or_ts_files
+
+        self.does_diff_include_travis_yml_or_js_files = False
+        def mock_does_diff_include_travis_yml_or_js_files(
+                unused_files_to_lint):
+            return self.does_diff_include_travis_yml_or_js_files
 
         self.popen_swap = self.swap(subprocess, 'Popen', mock_popen)
         self.get_remote_name_swap = self.swap(
@@ -84,12 +86,13 @@ class PrePushHookTests(test_utils.GenericTestBase):
             subprocess, 'check_output', mock_check_output)
         self.start_linter_swap = self.swap(
             pre_push_hook, 'start_linter', mock_start_linter)
-        self.package_json_swap = self.swap(
-            pre_push_hook, 'does_diff_include_package_json',
-            mock_does_diff_include_package_json)
         self.js_or_ts_swap = self.swap(
             pre_push_hook, 'does_diff_include_js_or_ts_files',
             mock_does_diff_include_js_or_ts_files)
+        self.travis_yml_or_js_files_swap = self.swap(
+            pre_push_hook,
+            'does_diff_include_travis_yml_or_js_files',
+            mock_does_diff_include_travis_yml_or_js_files)
 
     def test_start_subprocess_for_result(self):
         with self.popen_swap:
@@ -330,10 +333,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.popen_swap:
             self.assertEqual(pre_push_hook.start_python_script('script'), 0)
 
-    def test_start_npm_audit(self):
-        with self.popen_swap:
-            self.assertEqual(pre_push_hook.start_npm_audit(), 0)
-
     def test_has_uncommitted_files(self):
         def mock_check_output(unused_cmd_tokens):
             return 'file1'
@@ -446,15 +445,15 @@ class PrePushHookTests(test_utils.GenericTestBase):
             pre_push_hook.does_diff_include_js_or_ts_files(
                 ['file1.html', 'file2.py']))
 
-    def test_does_diff_include_package_json_with_package_file(self):
+    def test_does_diff_include_travis_yml_or_js_files(self):
         self.assertTrue(
-            pre_push_hook.does_diff_include_package_json(
-                ['file1.js', 'package.json']))
+            pre_push_hook.does_diff_include_travis_yml_or_js_files(
+                ['file1.js', 'protractor.conf.js', '.travis.yml']))
 
-    def test_does_diff_include_package_json_with_no_file(self):
+    def test_does_diff_include_travis_yml_or_js_files_fail(self):
         self.assertFalse(
-            pre_push_hook.does_diff_include_package_json(
-                ['file1.html', 'file2.py']))
+            pre_push_hook.does_diff_include_travis_yml_or_js_files(
+                ['file1.ts', 'file2.ts', 'file3.html']))
 
     def test_repo_in_dirty_state(self):
         def mock_has_uncommitted_files():
@@ -498,22 +497,6 @@ class PrePushHookTests(test_utils.GenericTestBase):
             'Push failed, please correct the linting issues above.'
             in self.print_arr)
 
-    def test_npm_audit_failure(self):
-        self.does_diff_include_package_json = True
-        def mock_start_npm_audit():
-            return 1
-        start_npm_audit_swap = self.swap(
-            pre_push_hook, 'start_npm_audit', mock_start_npm_audit)
-        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
-            with self.collect_files_swap, self.uncommitted_files_swap:
-                with self.check_output_swap, self.start_linter_swap:
-                    with self.package_json_swap, start_npm_audit_swap:
-                        with self.assertRaises(SystemExit):
-                            pre_push_hook.main(args=[])
-        self.assertTrue(
-            'Push failed, please correct the npm audit issues above.'
-            in self.print_arr)
-
     def test_frontend_test_failure(self):
         self.does_diff_include_js_or_ts_files = True
         def mock_start_python_script(unused_script):
@@ -529,6 +512,24 @@ class PrePushHookTests(test_utils.GenericTestBase):
         self.assertTrue(
             'Push aborted due to failing frontend tests.' in self.print_arr)
 
+    def test_invalid_travis_e2e_test_suites_failure(self):
+        self.does_diff_include_travis_yml_or_js_files = True
+
+        def mock_start_python_script(unused_script):
+            return 1
+        start_python_script_swap = self.swap(
+            pre_push_hook, 'start_python_script', mock_start_python_script)
+        with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
+            with self.collect_files_swap, self.uncommitted_files_swap:
+                with self.check_output_swap, self.start_linter_swap:
+                    with start_python_script_swap:
+                        with self.travis_yml_or_js_files_swap:
+                            with self.assertRaises(SystemExit):
+                                pre_push_hook.main(args=[])
+        self.assertTrue(
+            'Push aborted due to failing e2e test configuration check.'
+            in self.print_arr)
+
     def test_main_with_install_arg(self):
         check_function_calls = {
             'install_hook_is_called': False
@@ -543,5 +544,5 @@ class PrePushHookTests(test_utils.GenericTestBase):
         with self.get_remote_name_swap, self.get_refs_swap, self.print_swap:
             with self.collect_files_swap, self.uncommitted_files_swap:
                 with self.check_output_swap, self.start_linter_swap:
-                    with self.package_json_swap, self.js_or_ts_swap:
+                    with self.js_or_ts_swap:
                         pre_push_hook.main(args=[])

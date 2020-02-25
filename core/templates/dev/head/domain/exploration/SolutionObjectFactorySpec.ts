@@ -16,50 +16,26 @@
  * @fileoverview Unit tests for the Solution object factory.
  */
 
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// SolutionObjectFactory.ts is upgraded to Angular 8.
-import { FractionObjectFactory } from 'domain/objects/FractionObjectFactory';
-import { SubtitledHtmlObjectFactory } from
+import { TestBed } from '@angular/core/testing';
+
+import { CamelCaseToHyphensPipe } from
+  'filters/string-utility-filters/camel-case-to-hyphens.pipe';
+import { ConvertToPlainTextPipe } from
+  'filters/string-utility-filters/convert-to-plain-text.pipe';
+import { SolutionObjectFactory } from
+  'domain/exploration/SolutionObjectFactory';
+import { SubtitledHtml } from
   'domain/exploration/SubtitledHtmlObjectFactory';
-import { UnitsObjectFactory } from 'domain/objects/UnitsObjectFactory';
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
 
-require('domain/exploration/SolutionObjectFactory.ts');
-
-describe('Solution object factory', function() {
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    $provide.value('FractionObjectFactory', new FractionObjectFactory());
-    $provide.value(
-      'SubtitledHtmlObjectFactory', new SubtitledHtmlObjectFactory());
-    $provide.value('UnitsObjectFactory', new UnitsObjectFactory());
-  }));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
-
-  describe('SolutionObjectFactory', function() {
-    var scope, sof, solution;
-    beforeEach(angular.mock.inject(function($injector, $rootScope) {
-      scope = $rootScope.$new();
-      sof = $injector.get('SolutionObjectFactory');
-      solution = sof.createFromBackendDict({
-        answer_is_exclusive: false,
-        correct_answer: 'This is a correct answer!',
-        explanation: {
-          content_id: 'solution',
-          html: 'This is the explanation to the answer'
-        }
+describe('Solution object factory', () => {
+  describe('SolutionObjectFactory', () => {
+    let sof, solution;
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [CamelCaseToHyphensPipe, ConvertToPlainTextPipe]
       });
-    }));
-
-
-    it('should create a new solution', function() {
-      expect(solution.toBackendDict()).toEqual({
+      sof = TestBed.get(SolutionObjectFactory);
+      solution = sof.createFromBackendDict({
         answer_is_exclusive: false,
         correct_answer: 'This is a correct answer!',
         explanation: {
@@ -69,7 +45,43 @@ describe('Solution object factory', function() {
       });
     });
 
-    it('should create summary correctly', function() {
+    it('should get the backend dict from a solution', () => {
+      const expectedSolution = {
+        answer_is_exclusive: false,
+        correct_answer: 'This is a correct answer!',
+        explanation: {
+          content_id: 'solution',
+          html: 'This is the explanation to the answer'
+        }
+      };
+
+      expect(solution.toBackendDict()).toEqual(expectedSolution);
+    });
+
+    it('should create a new solution from scratch', () => {
+      const solutionFromScratch = sof.createNew(
+        true,
+        'This is the correct answer!',
+        'This is the explanation to the answer',
+        'solution');
+      const expectedSolution = {
+        answer_is_exclusive: true,
+        correct_answer: 'This is the correct answer!',
+        explanation: {
+          content_id: 'solution',
+          html: 'This is the explanation to the answer'
+        }
+      };
+
+      expect(solutionFromScratch.toBackendDict()).toEqual(expectedSolution);
+    });
+
+    it('should create summary correctly', () => {
+      expect(solution.getSummary('GraphInput')).toEqual(
+        'One solution is "[Graph]". This is the explanation to the answer.');
+      expect(solution.getSummary('MusicNotesInput')).toEqual(
+        'One solution is "[Music Notes]". This is the explanation to the' +
+        ' answer.');
       expect(solution.getSummary('TextInput')).toEqual(
         'One solution is "&quot;This is a correct answer!&quot;". ' +
         'This is the explanation to the answer.');
@@ -98,6 +110,73 @@ describe('Solution object factory', function() {
       });
       expect(solution.getSummary('FractionInput')).toEqual(
         'One solution is "1/6". This is the explanation to the answer.');
+
+      solution.setCorrectAnswer({
+        correct: true
+      });
+      expect(solution.getSummary('LogicProof')).toEqual(
+        'One solution is "true". This is the explanation to the answer.');
+
+      solution.setCorrectAnswer({
+        type: 'real',
+        real: 1,
+        fraction: '',
+        units: []
+      });
+      expect(solution.getSummary('NumberWithUnits')).toEqual(
+        'One solution is "1". This is the explanation to the answer.');
+    });
+
+    it('should get oppia short answer', () => {
+      const interaction = {
+        id: '0',
+        customizationArgs: {
+          choices: {
+            value: 'This is a choice'
+          }
+        }
+      };
+      const expectedShortAnswerHtml = {
+        prefix: 'One',
+        answer: '<oppia-short-response-0 ' +
+          'answer="&amp;quot;This is a correct answer!&amp;quot;" ' +
+          'choices="&amp;quot;This is a choice&amp;quot;">' +
+          '</oppia-short-response-0>'
+      };
+
+      expect(solution.getOppiaShortAnswerResponseHtml(interaction)).toEqual(
+        expectedShortAnswerHtml);
+    });
+
+    it('should handle when answer exclusivity is true', () => {
+      const solution = sof.createFromBackendDict({
+        answer_is_exclusive: true,
+        correct_answer: 'This is a correct answer!',
+        explanation: {
+          content_id: 'solution',
+          html: 'This is the explanation to the answer'
+        }
+      });
+
+      expect(solution.answerIsExclusive).toBe(true);
+      expect(solution.getSummary('TestInput')).toEqual(
+        'The only solution is "&quot;This is a correct answer!&quot;". ' +
+        'This is the explanation to the answer.');
+    });
+
+    it('should change the explanation correctly', () => {
+      const newExplanation = new SubtitledHtml(
+        'This is the new explanation to the answer',
+        'solution'
+      );
+      solution.setExplanation(newExplanation);
+
+      expect(solution.explanation).toBe(newExplanation);
+      expect(solution.getOppiaSolutionExplanationResponseHtml()).toBe(
+        newExplanation.getHtml());
+      expect(solution.getSummary('TestInput')).toEqual(
+        'One solution is "&quot;This is a correct answer!&quot;". ' +
+        'This is the new explanation to the answer.');
     });
   });
 });

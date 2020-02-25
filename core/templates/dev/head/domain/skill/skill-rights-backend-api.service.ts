@@ -36,9 +36,7 @@ angular.module('oppia').factory('SkillRightsBackendApiService', [
         if (successCallback) {
           successCallback({
             skill_id: responseData.skill_id,
-            creator_id: responseData.creator_id,
-            can_edit_skill_description: responseData.can_edit_skill_description,
-            skill_is_private: responseData.skill_is_private
+            can_edit_skill_description: responseData.can_edit_skill_description
           });
         }
       }, function(errorResponse) {

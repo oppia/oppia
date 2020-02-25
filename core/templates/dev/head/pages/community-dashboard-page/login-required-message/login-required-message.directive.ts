@@ -20,8 +20,8 @@ require('services/site-analytics.service.ts');
 require('services/user.service.ts');
 
 angular.module('oppia').directive('loginRequiredMessage', [
-  'UrlInterpolationService', function(
-      UrlInterpolationService) {
+  '$timeout', 'UrlInterpolationService', function(
+      $timeout, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
@@ -33,13 +33,9 @@ angular.module('oppia').directive('loginRequiredMessage', [
         'login-required-message.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$timeout', '$window', 'SiteAnalyticsService', 'UserService',
-        function($scope, $timeout, $window, SiteAnalyticsService, UserService) {
+        '$scope', '$window', 'SiteAnalyticsService', 'UserService',
+        function($scope, $window, SiteAnalyticsService, UserService) {
           var ctrl = this;
-          ctrl.OPPIA_AVATAR_IMAGE_URL = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/avatar/oppia_avatar_100px.svg'));
-
           ctrl.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
             UserService.getLoginUrlAsync().then(
@@ -53,6 +49,11 @@ angular.module('oppia').directive('loginRequiredMessage', [
                 }
               }
             );
+          };
+          ctrl.$onInit = function() {
+            ctrl.OPPIA_AVATAR_IMAGE_URL = (
+              UrlInterpolationService.getStaticImageUrl(
+                '/avatar/oppia_avatar_100px.svg'));
           };
         }
       ]

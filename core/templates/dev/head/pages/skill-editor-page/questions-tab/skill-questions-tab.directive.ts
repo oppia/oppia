@@ -60,19 +60,24 @@ angular.module('oppia').directive('questionsTab', [
             StateEditorService, QuestionUndoRedoService, UndoRedoService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
             NUM_QUESTIONS_PER_PAGE) {
+          var ctrl = this;
           var _init = function() {
             $scope.skill = SkillEditorStateService.getSkill();
             $scope.getQuestionSummariesAsync =
               QuestionsListService.getQuestionSummariesAsync;
+            $scope.getGroupedSkillSummaries =
+              SkillEditorStateService.getGroupedSkillSummaries;
             $scope.isLastQuestionBatch =
              QuestionsListService.isLastQuestionBatch;
             $scope.skillIdToRubricsObject = {};
             $scope.skillIdToRubricsObject[$scope.skill.getId()] =
               $scope.skill.getRubrics();
           };
-          _init();
-          $scope.$on(EVENT_SKILL_INITIALIZED, _init);
-          $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
+          ctrl.$onInit = function() {
+            _init();
+            $scope.$on(EVENT_SKILL_INITIALIZED, _init);
+            $scope.$on(EVENT_SKILL_REINITIALIZED, _init);
+          };
         }
       ]
     };

@@ -15,6 +15,7 @@
 # limitations under the License.]
 
 """Getter commands for for question models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -47,6 +48,8 @@ def get_questions_and_skill_descriptions_by_skill_ids(
             batch of questions (or None if no more pages are left). The returned
             next cursor value is urlsafe.
     """
+    if not skill_ids:
+        return [], [], None
     question_skill_link_models, next_cursor = (
         question_models.QuestionSkillLinkModel
         .get_question_skill_links_by_skill_ids(

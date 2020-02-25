@@ -16,61 +16,78 @@
  * @fileoverview Validator service for the interaction.
  */
 
-require('interactions/base-interaction-validation.service.ts');
+import { downgradeInjectable } from '@angular/upgrade/static';
+import { Injectable } from '@angular/core';
 
-angular.module('oppia').factory('TextInputValidationService', [
-  'baseInteractionValidationService', 'INTERACTION_SPECS', 'WARNING_TYPES',
-  function(baseInteractionValidationService, INTERACTION_SPECS, WARNING_TYPES) {
-    return {
-      getCustomizationArgsWarnings: function(customizationArgs) {
-        var warningsList = [];
-        baseInteractionValidationService.requireCustomizationArguments(
-          customizationArgs,
-          ['placeholder', 'rows']);
+import { AppConstants } from 'app.constants';
+import { baseInteractionValidationService } from
+  'interactions/base-interaction-validation.service';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants';
 
-        var placeholder = customizationArgs.placeholder.value;
-        if (!angular.isString(placeholder)) {
-          warningsList.push({
-            type: WARNING_TYPES.ERROR,
-            message: (
-              'Placeholder text must be a string.')
-          });
-        }
+interface IWarning {
+  type: string,
+  message: string
+}
 
-        var isInt = function(n) {
-          return angular.isNumber(n) && n % 1 === 0;
-        };
+@Injectable({
+  providedIn: 'root'
+})
+export class TextInputValidationService {
+  constructor(private bivs: baseInteractionValidationService) {}
+  // TODO(#7165): Replace 'any' with the exact type.
+  getCustomizationArgsWarnings(customizationArgs: any): Array<IWarning> {
+    var warningsList = [];
+    this.bivs.requireCustomizationArguments(
+      customizationArgs,
+      ['placeholder', 'rows']);
 
-        var rows = customizationArgs.rows.value;
-        if (isInt(rows)) {
-          var textSpecs = INTERACTION_SPECS.TextInput;
-          var customizationArgSpecs = textSpecs.customization_arg_specs;
-          var rowsSpecs = customizationArgSpecs[1];
-          var minRows = rowsSpecs.schema.validators[0].min_value;
-          var maxRows = rowsSpecs.schema.validators[1].max_value;
-          if (rows < minRows || rows > maxRows) {
-            warningsList.push({
-              type: WARNING_TYPES.ERROR,
-              message: (
-                'Number of rows must be between ' + minRows + ' and ' +
-                maxRows + '.')
-            });
-          }
-        } else {
-          warningsList.push({
-            type: WARNING_TYPES.ERROR,
-            message: (
-              'Number of rows must be integral.')
-          });
-        }
-        return warningsList;
-      },
-      getAllWarnings: function(
-          stateName, customizationArgs, answerGroups, defaultOutcome) {
-        return this.getCustomizationArgsWarnings(customizationArgs).concat(
-          baseInteractionValidationService.getAllOutcomeWarnings(
-            answerGroups, defaultOutcome, stateName));
-      }
+    var placeholder = customizationArgs.placeholder.value;
+    if (!angular.isString(placeholder)) {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'Placeholder text must be a string.')
+      });
+    }
+
+    var isInt = function(n) {
+      return angular.isNumber(n) && n % 1 === 0;
     };
+
+    var rows = customizationArgs.rows.value;
+    if (isInt(rows)) {
+      var textSpecs = InteractionSpecsConstants.INTERACTION_SPECS.TextInput;
+      var customizationArgSpecs = textSpecs.customization_arg_specs;
+      var rowsSpecs = customizationArgSpecs[1];
+      var minRows = rowsSpecs.schema.validators[0].min_value;
+      var maxRows = rowsSpecs.schema.validators[1].max_value;
+      if (rows < minRows || rows > maxRows) {
+        warningsList.push({
+          type: AppConstants.WARNING_TYPES.ERROR,
+          message: (
+            'Number of rows must be between ' + minRows + ' and ' +
+            maxRows + '.')
+        });
+      }
+    } else {
+      warningsList.push({
+        type: AppConstants.WARNING_TYPES.ERROR,
+        message: (
+          'Number of rows must be integral.')
+      });
+    }
+    return warningsList;
   }
-]);
+  // TODO(#7165): Replace 'any' with the exact type.
+  getAllWarnings(
+      stateName: any, customizationArgs: any, answerGroups: any,
+      defaultOutcome: any): Array<IWarning> {
+    return this.getCustomizationArgsWarnings(customizationArgs).concat(
+      this.bivs.getAllOutcomeWarnings(
+        answerGroups, defaultOutcome, stateName));
+  }
+}
+
+angular.module('oppia').factory(
+  'TextInputValidationService',
+  downgradeInjectable(TextInputValidationService));

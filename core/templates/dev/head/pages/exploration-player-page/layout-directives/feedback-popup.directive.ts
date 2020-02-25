@@ -16,7 +16,6 @@
  * @fileoverview Directive for the feedback popup.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -37,45 +36,20 @@ require('services/stateful/focus-manager.service.ts');
 // The state-name argument is optional. If it is not provided, the feedback is
 // assumed to apply to the exploration as a whole.
 angular.module('oppia').directive('feedbackPopup', [
-  'ExplorationEngineService', 'UrlInterpolationService',
-  function(ExplorationEngineService, UrlInterpolationService) {
+  'ExplorationEngineService', function(ExplorationEngineService) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/layout-directives/' +
-        'feedback-popup.directive.html'),
+      template: require('./feedback-popup.directive.html'),
       controller: [
         '$scope', '$element', '$filter', '$http', '$log', '$timeout',
         'AlertsService', 'BackgroundMaskService', 'FocusManagerService',
         'PlayerPositionService', 'UserService', 'WindowDimensionsService',
-        'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
         function(
             $scope, $element, $filter, $http, $log, $timeout,
             AlertsService, BackgroundMaskService, FocusManagerService,
-            PlayerPositionService, UserService, WindowDimensionsService,
-            FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
-          $scope.feedbackText = '';
-          $scope.isSubmitterAnonymized = false;
-          $scope.isLoggedIn = null;
-          UserService.getUserInfoAsync().then(function(userInfo) {
-            $scope.isLoggedIn = userInfo.isLoggedIn();
-          });
-          $scope.feedbackSubmitted = false;
-          // We generate a random id since there may be multiple popover
-          // elements on the same page.
-          $scope.feedbackPopoverId = (
-            'feedbackPopover' + Math.random().toString(36).slice(2));
-          $scope.feedbackTitle = (
-            'Feedback when the user was at card "' +
-            PlayerPositionService.getCurrentStateName() + '"');
-
-          if (WindowDimensionsService.isWindowNarrow()) {
-            BackgroundMaskService.activateMask();
-          }
-
-          FocusManagerService.setFocus($scope.feedbackPopoverId);
-
+            PlayerPositionService, UserService, WindowDimensionsService) {
+          var ctrl = this;
           var feedbackUrl = (
             '/explorehandler/give_feedback/' +
             ExplorationEngineService.getExplorationId());
@@ -156,9 +130,31 @@ angular.module('oppia').directive('feedbackPopup', [
             BackgroundMaskService.deactivateMask();
           };
 
-          $scope.$on('$destroy', function() {
-            BackgroundMaskService.deactivateMask();
-          });
+          ctrl.$onInit = function() {
+            $scope.feedbackText = '';
+            $scope.isSubmitterAnonymized = false;
+            $scope.isLoggedIn = null;
+            UserService.getUserInfoAsync().then(function(userInfo) {
+              $scope.isLoggedIn = userInfo.isLoggedIn();
+            });
+            $scope.feedbackSubmitted = false;
+            // We generate a random id since there may be multiple popover
+            // elements on the same page.
+            $scope.feedbackPopoverId = (
+              'feedbackPopover' + Math.random().toString(36).slice(2));
+            $scope.feedbackTitle = (
+              'Feedback when the user was at card "' +
+              PlayerPositionService.getCurrentStateName() + '"');
+
+            if (WindowDimensionsService.isWindowNarrow()) {
+              BackgroundMaskService.activateMask();
+            }
+
+            FocusManagerService.setFocus($scope.feedbackPopoverId);
+            $scope.$on('$destroy', function() {
+              BackgroundMaskService.deactivateMask();
+            });
+          };
         }
       ]
     };

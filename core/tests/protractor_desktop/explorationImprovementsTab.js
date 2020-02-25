@@ -22,6 +22,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -368,7 +369,7 @@ describe('Suggestions Improvements', function() {
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription1]);
     improvementsTab.acceptSuggestion();
-    improvementsTab.closeModal();
+    waitFor.pageToFullyLoad();
 
     var taskToReject = improvementsTab.getSuggestionTask(
       suggestionDescription2);
@@ -376,13 +377,13 @@ describe('Suggestions Improvements', function() {
     expect(improvementsTab.getThreadMessages()).toEqual(
       [suggestionDescription2]);
     improvementsTab.rejectSuggestion();
-    improvementsTab.closeModal();
+    waitFor.pageToFullyLoad();
 
     improvementsTab.setShowOnlyOpenTasks(false);
     var acceptedTask = improvementsTab.getSuggestionTask(
-      suggestionDescription1);
+      'Status changed to \'Fixed\'');
     var rejectedTask = improvementsTab.getSuggestionTask(
-      suggestionDescription2);
+      'Status changed to \'Ignored\'');
     expect(improvementsTab.getTaskStatus(acceptedTask)).toEqual('Fixed');
     expect(improvementsTab.getTaskStatus(rejectedTask)).toEqual('Ignored');
 

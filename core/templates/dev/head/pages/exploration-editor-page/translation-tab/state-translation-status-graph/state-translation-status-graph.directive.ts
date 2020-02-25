@@ -58,8 +58,12 @@ angular.module('oppia').directive('stateTranslationStatusGraph', [
             $scope, $rootScope, ExplorationStatesService, GraphDataService,
             StateEditorService, StateRecordedVoiceoversService,
             StateWrittenTranslationsService, TranslationStatusService) {
-          $scope.getGraphData = GraphDataService.getGraphData;
-          $scope.nodeColors = TranslationStatusService.getAllStateStatusColors;
+          $scope.getGraphData = function() {
+            return GraphDataService.getGraphData();
+          };
+          $scope.nodeColors = function() {
+            return TranslationStatusService.getAllStateStatusColors();
+          };
           $scope.getActiveStateName = function() {
             return StateEditorService.getActiveStateName();
           };

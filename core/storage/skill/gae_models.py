@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Models for storing the skill data models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -27,12 +28,26 @@ from google.appengine.ext import ndb
 
 class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a skill snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
     """Storage model for the content of a skill snapshot."""
-    pass
+
+    @staticmethod
+    def get_export_policy():
+        """This model's export_data function implementation is still pending.
+
+       TODO(#8523): Implement this function.
+       """
+        return base_models.EXPORT_POLICY.TO_BE_IMPLEMENTED
 
 
 class SkillModel(base_models.VersionedModel):
@@ -95,6 +110,11 @@ class SkillModel(base_models.VersionedModel):
         """
         return cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id)
 
+    @staticmethod
+    def get_user_id_migration_policy():
+        """SkillModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE
+
     @classmethod
     def get_merged_skills(cls):
         """Returns the skill models which have been merged.
@@ -133,21 +153,18 @@ class SkillModel(base_models.VersionedModel):
             committer_user_settings_model.username
             if committer_user_settings_model else '')
 
-        skill_rights = SkillRightsModel.get_by_id(self.id)
-
-        status = ''
-        if skill_rights.skill_is_private:
-            status = constants.ACTIVITY_STATUS_PRIVATE
-        else:
-            status = constants.ACTIVITY_STATUS_PUBLIC
-
         skill_commit_log_entry = SkillCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            status, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()
+
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -182,6 +199,13 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. The commit id with the skill id and version number.
         """
         return 'skill-%s-%s' % (skill_id, version)
+
+    @staticmethod
+    def get_export_policy():
+        """This model is only stored for archive purposes. The commit log of
+        entities is not related to personal user data.
+        """
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
 
 class SkillSummaryModel(base_models.BaseModel):
@@ -233,126 +257,12 @@ class SkillSummaryModel(base_models.BaseModel):
         """
         return False
 
-
-class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
-    """Storage model for the metadata for a skill rights snapshot."""
-    pass
-
-
-class SkillRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Storage model for the content of a skill rights snapshot."""
-    pass
-
-
-class SkillRightsModel(base_models.VersionedModel):
-    """Storage model for the rights related to a skill.
-
-    The id of each instance is the id of the corresponding skill.
-    """
-    SNAPSHOT_METADATA_CLASS = SkillRightsSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = SkillRightsSnapshotContentModel
-    ALLOW_REVERT = False
-
-    # The user_id of the creator this skill.
-    creator_id = ndb.StringProperty(indexed=True, required=True)
-    # Whether the skill is private.
-    skill_is_private = ndb.BooleanProperty(
-        indexed=True, required=True, default=True)
+    @staticmethod
+    def get_export_policy():
+        """Model does not contain user data."""
+        return base_models.EXPORT_POLICY.NOT_APPLICABLE
 
     @staticmethod
-    def get_deletion_policy():
-        """Skill rights should be kept if associated skill is published."""
-        return base_models.DELETION_POLICY.KEEP_IF_PUBLIC
-
-    @classmethod
-    def has_reference_to_user_id(cls, user_id):
-        """Check whether SkillRightsModel or its snapshots references the given
-        user.
-
-        Args:
-            user_id: str. The ID of the user whose data should be checked.
-
-        Returns:
-            bool. Whether any models refer to the given user ID.
-        """
-        return (cls.query(cls.creator_id == user_id).get() is not None or
-                cls.SNAPSHOT_METADATA_CLASS.exists_for_user_id(user_id))
-
-    def _trusted_commit(
-            self, committer_id, commit_type, commit_message, commit_cmds):
-        """Record the event to the commit log after the model commit.
-
-        Note that this extends the superclass method.
-
-        Args:
-            committer_id: str. The user_id of the user who committed the
-                change.
-            commit_type: str. The type of commit. Possible values are in
-                core.storage.base_models.COMMIT_TYPE_CHOICES.
-            commit_message: str. The commit description message.
-            commit_cmds: list(dict). A list of commands, describing changes
-                made in this model, which should give sufficient information to
-                reconstruct the commit. Each dict always contains:
-                    cmd: str. Unique command.
-                and then additional arguments for that command.
-        """
-        super(SkillRightsModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
-
-        committer_user_settings_model = (
-            user_models.UserSettingsModel.get_by_id(committer_id))
-        committer_username = (
-            committer_user_settings_model.username
-            if committer_user_settings_model else '')
-
-        skill_rights = SkillRightsModel.get_by_id(self.id)
-
-        status = ''
-        if skill_rights.skill_is_private:
-            status = constants.ACTIVITY_STATUS_PRIVATE
-        else:
-            status = constants.ACTIVITY_STATUS_PUBLIC
-
-        SkillCommitLogEntryModel(
-            id=('rights-%s-%s' % (self.id, self.version)),
-            user_id=committer_id,
-            username=committer_username,
-            skill_id=self.id,
-            commit_type=commit_type,
-            commit_message=commit_message,
-            commit_cmds=commit_cmds,
-            version=None,
-            post_commit_status=status,
-            post_commit_community_owned=False,
-            post_commit_is_private=skill_rights.skill_is_private
-        ).put()
-
-    @classmethod
-    def get_unpublished_by_creator_id(cls, user_id):
-        """This function returns all skill rights that correspond to skills
-        that are private and are created by the provided user ID.
-
-        Args:
-            user_id: str. The user ID of the user that created the skill rights
-                being fetched.
-
-        Returns:
-            list(SkillRightsModel). A list of skill rights models that are
-                private and were created by the user with the provided
-                user ID.
-        """
-        return cls.query(
-            cls.creator_id == user_id,
-            cls.skill_is_private == True, # pylint: disable=singleton-comparison
-            cls.deleted == False) # pylint: disable=singleton-comparison
-
-    @classmethod
-    def get_unpublished(cls):
-        """This function returns all skill rights that correspond to skills
-        that are private.
-
-        Returns:
-            list(SkillRightsModel). A list of skill rights models that are
-            private.
-        """
-        return cls.query(cls.skill_is_private == True, cls.deleted == False) # pylint: disable=singleton-comparison
+    def get_user_id_migration_policy():
+        """SkillSummaryModel doesn't have any field with user ID."""
+        return base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE

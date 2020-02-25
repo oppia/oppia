@@ -4,10 +4,17 @@
     padding: 15px 11px;
   }
   editor-navigation .oppia-exploration-open-threads-count {
+    background-color: #4078C0;
+    border: 1px solid;
+    border-radius: 10px;
     bottom: 8px;
     color: white;
-    font-size: 9px;
+    font-size: 12px;
+    height: 16px;
+    line-height: 16px;
+    padding: 0 5px;
     position: relative;
+    text-shadow: 0 1px rgba(0, 0, 0, 0.25);
   }
   editor-navigation .oppia-exploration-open-threads-color {
     background-color: #4078C0;
@@ -19,6 +26,14 @@
     height: 15px;
     position: absolute;
     right: 3px;
+    text-align: center;
+  }
+  editor-navigation .oppia-exploration-open-threads-indicator-dropdown {
+    border-radius: 10%;
+    bottom: 25%;
+    height: 15px;
+    position: absolute;
+    right: 1px;
     text-align: center;
   }
   editor-navigation > ul > li.nav-link {
@@ -97,14 +112,14 @@
           </li>
         </ul>
       </li>
-      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="userIsLoggedIn" id="tutorialTranslationTab" ng-class="{'active': getActiveTabName() === 'translation'}">
+      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'translation'}">
         <a href="#" uib-tooltip="Tmaterial-iconsmaterial-iconsranslations and Voiceovers" tooltip-placement="bottom" ng-click="selectTranslationTab()"
            class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE029;</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Translations</span>
         </a>
       </li>
-      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="userIsLoggedIn" id="tutorialPreviewTab" ng-class="{'active': getActiveTabName() === 'preview'}">
+      <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-if="userIsLoggedIn" ng-class="{'active': getActiveTabName() === 'preview'}">
         <a href="#" uib-tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()"
            class="oppia-exploration-editor-tabs-dropdown-element">
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE037;</i>
@@ -131,6 +146,11 @@
           <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">trending_up</i>
           <span class="oppia-exploration-editor-tabs-dropdown-inner">Improvements</span>
         </a>
+        <div ng-show="getOpenTaskCount()" uib-tooltip="Open Tasks" tooltip-placement="bottom" class="oppia-exploration-open-threads-indicator-dropdown">
+          <span class="oppia-exploration-open-threads-count">
+            <[getOpenTaskCount()]>
+          </span>
+        </div>
       </li>
       <li class="dropdown-item oppia-exploration-editor-tabs-dropdown-item" ng-class="{'active': getActiveTabName() === 'history'}">
         <a href="#" uib-tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()"
@@ -151,15 +171,6 @@
               <[getOpenThreadsCount()]>&nbsp;open
           </span>
         </div>
-      </li>
-      <li ng-if="userIsLoggedIn" uib-dropdown class="dropdown-item oppia-exploration-editor-tabs-dropdown-item uib-dropdown uib-popover ng-cloak" popover-is-open="popoverControlObject.postTutorialHelpPopoverIsShown"
-          popover-placement="bottom" popover-trigger="'none'"
-          uib-popover="To get help in the future, click here!">
-        <a href="#" uib-tooltip="Help" tooltip-placement="bottom"
-           ng-click="showUserHelpModal()" class="oppia-exploration-editor-tabs-dropdown-element">
-          <i class="material-icons oppia-mobile-exploration-editor-tabs-icon">&#xE887;</i>
-          <span class="oppia-exploration-editor-tabs-dropdown-inner">Help</span>
-        </a>
       </li>
     </ul>
   </li>
@@ -207,7 +218,7 @@
 
   <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'settings'}"
       class="nav-item d-none d-lg-block">
-    <a  href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
+    <a href="#" uib-tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()"
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-settings-tab">
       <i class="material-icons">&#xE8B8;</i>
     </a>
@@ -227,6 +238,11 @@
        class="nav-link oppia-editor-navbar-tab-anchor protractor-test-improvements-tab">
       <i class="material-icons">trending_up</i>
     </a>
+    <div ng-show="getOpenTaskCount()" uib-tooltip="Open Tasks" tooltip-placement="bottom" class="oppia-exploration-open-threads-indicator">
+      <span class="oppia-exploration-open-threads-count">
+        <[getOpenTaskCount()]>
+      </span>
+    </div>
   </li>
 
   <li ng-if="isLargeScreen" ng-class="{'active': getActiveTabName() === 'history'}" class="nav-item d-none d-lg-block">

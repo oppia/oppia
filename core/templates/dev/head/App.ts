@@ -79,6 +79,15 @@ angular.module('oppia').config([
   function(
       $compileProvider, $cookiesProvider, $httpProvider,
       $interpolateProvider, $locationProvider, $provide) {
+    // Refer: https://docs.angularjs.org/guide/migration
+    // #migrate1.5to1.6-ng-services-$location
+    // The default hash-prefix used for URLs has changed from
+    // the empty string ('') to the bang ('!') in Angular v1.6.
+    // For example, rather than mydomain.com/#/a/b/c
+    // the URL will become mydomain.com/#!/a/b/c.  So, the line
+    // here is to change the prefix back to empty string.
+    $locationProvider.hashPrefix('');
+
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
       $provide.value(key, value);
@@ -110,8 +119,8 @@ angular.module('oppia').config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'AlertsService', 'CsrfTokenService',
-      function($q, $log, AlertsService, CsrfTokenService) {
+      '$exceptionHandler', '$q', '$log', 'AlertsService', 'CsrfTokenService',
+      function($exceptionHandler, $q, $log, AlertsService, CsrfTokenService) {
         return {
           request: function(config) {
             if (config.data) {
@@ -137,12 +146,23 @@ angular.module('oppia').config([
             // an error.
             if (rejection.status !== -1) {
               $log.error(rejection.data);
-
               var warningMessage = 'Error communicating with server.';
               if (rejection.data && rejection.data.error) {
                 warningMessage = rejection.data.error;
               }
               AlertsService.addWarning(warningMessage);
+              // rejection.config is an optional parameter.
+              // see https://docs.angularjs.org/api/ng/service/$http
+              var rejectionUrl = typeof rejection.config !== 'undefined' ? (
+                rejection.config.url) : '';
+              var additionalLoggingInfo = warningMessage +
+                '\n URL: ' + rejectionUrl +
+                '\n data: ' + JSON.stringify(rejection.data);
+              // $exceptionHandler is called directly instead of
+              // throwing an error to invoke it because the return
+              // statement below must execute. There are tests
+              // that rely on this.
+              $exceptionHandler(new Error(additionalLoggingInfo));
             }
             return $q.reject(rejection);
           }
@@ -203,11 +223,25 @@ angular.module('oppia').config(['toastrConfig', function(toastrConfig) {
 angular.module('oppia').factory('$exceptionHandler', [
   '$log', 'CsrfTokenService', function($log, CsrfTokenService) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
+    // Refer: https://docs.angularjs.org/guide/migration#-templaterequest-
+    // The tpload error namespace has changed in Angular v1.7.
+    // Previously, the tpload error was namespaced to $compile.
+    // So, the code that matches errors of the form [$compile:tpload]
+    // will no longer run in v1.7. It should be changed to match
+    // [$templateRequest:tpload].
     var TPLOAD_STATUS_CODE_REGEX = (
-      new RegExp(/\[\$compile:tpload\].*p1=(.*?)&p2=/));
+      new RegExp(/\[\$templateRequest:tpload\].*p1=(.*?)&p2=/));
     var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
     return function(exception, cause) {
+      // Exceptions are expected to be of Error type. If an error is thrown
+      // with a primitive data type, it must be converted to an Error object
+      // so that the error gets logged correctly.
+      // This check can be removed once all the manually thrown exceptions
+      // are converted to Error objects (see #8456).
+      if (!(exception instanceof Error)) {
+        exception = new Error(exception);
+      }
       var tploadStatusCode = exception.message.match(TPLOAD_STATUS_CODE_REGEX);
       // Suppress tpload errors which occur with p1 of -1 in the error URL
       // because -1 is the status code for aborted requests.

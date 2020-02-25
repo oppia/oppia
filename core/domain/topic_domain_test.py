@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Tests for topic domain objects."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -37,7 +38,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
-            self.topic_id, 'Name')
+            self.topic_id, 'Name', 'abbrev')
         self.topic.subtopics = [
             topic_domain.Subtopic(1, 'Title', ['skill_id_1'])]
         self.topic.next_subtopic_id = 2
@@ -50,10 +51,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_create_default_topic(self):
         """Tests the create_default_topic() function."""
-        topic = topic_domain.Topic.create_default_topic(self.topic_id, 'Name')
+        topic = topic_domain.Topic.create_default_topic(
+            self.topic_id, 'Name', 'abbrev')
         expected_topic_dict = {
             'id': self.topic_id,
             'name': 'Name',
+            'abbreviated_name': 'abbrev',
+            'thumbnail_filename': None,
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_references': [],
             'additional_story_references': [],
@@ -194,9 +198,30 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             topic_domain.Topic.require_valid_topic_id(topic_id)
 
+    def _assert_valid_abbreviated_name(
+            self, expected_error_substring, name):
+        """Checks that the topic passes strict validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            topic_domain.Topic.require_valid_abbreviated_name(name)
+
     def test_valid_topic_id(self):
         self._assert_valid_topic_id('Topic id should be a string', 10)
         self._assert_valid_topic_id('Topic id abc is invalid', 'abc')
+
+    def test_valid_abbreviated_name(self):
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name should be a string.', 10)
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name field should not be empty.', '')
+        self._assert_valid_abbreviated_name(
+            'Abbreviated name field should not exceed 12 characters.',
+            'this is a lengthy name.')
+
+    def test_thumbnail_filename_validation(self):
+        self.topic.thumbnail_filename = 1
+        self._assert_validation_error(
+            'Expected thumbnail filename to be a string, received 1')
 
     def test_subtopic_title_validation(self):
         self.topic.subtopics[0].title = 1
@@ -410,6 +435,16 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.topic.language_code, 'en')
         self.topic.update_language_code('bn')
         self.assertEqual(self.topic.language_code, 'bn')
+
+    def test_update_abbreviated_name(self):
+        self.assertEqual(self.topic.abbreviated_name, 'abbrev')
+        self.topic.update_abbreviated_name('name')
+        self.assertEqual(self.topic.abbreviated_name, 'name')
+
+    def test_update_thumbnail_filename(self):
+        self.assertEqual(self.topic.thumbnail_filename, None)
+        self.topic.update_thumbnail_filename('img.png')
+        self.assertEqual(self.topic.thumbnail_filename, 'img.png')
 
     def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
             self):
@@ -890,3 +925,30 @@ class TopicSummaryTests(test_utils.GenericTestBase):
                 'Expected subtopic_count to be non-negative, '
                 'received \'-1\'')):
             self.topic_summary.validate()
+
+
+class TopicRightsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopicRightsTests, self).setUp()
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+        self.topic_summary_dict = {
+            'topic_id': 'topic_id',
+            'manager_names': ['A'],
+            'topic_is_published': False,
+        }
+
+        self.topic_summary = topic_domain.TopicRights(
+            'topic_id', [self.user_id_a], False
+        )
+
+    def test_topic_summary_gets_created(self):
+        self.assertEqual(
+            self.topic_summary.to_dict(), self.topic_summary_dict)
+
+    def test_is_manager(self):
+        self.assertTrue(self.topic_summary.is_manager(self.user_id_a))
+        self.assertFalse(self.topic_summary.is_manager(self.user_id_b))

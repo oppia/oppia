@@ -21,22 +21,20 @@
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
-require('domain/editor/undo_redo/undo-redo.service.ts');
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require('domain/topic/editable-topic-backend-api.service.ts');
 require('services/csrf-token.service.ts');
 
 describe('Editable topic backend API service', function() {
   var EditableTopicBackendApiService = null;
   var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
   var $httpBackend = null;
-  var UndoRedoService = null;
   var CsrfService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(
-    angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    angular.mock.module('oppia', TranslatorProviderForTests));
   beforeEach(angular.mock.module('oppia', function($provide) {
     var ugs = new UpgradedServices();
     for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
@@ -47,9 +45,6 @@ describe('Editable topic backend API service', function() {
   beforeEach(angular.mock.inject(function($injector, $q) {
     EditableTopicBackendApiService = $injector.get(
       'EditableTopicBackendApiService');
-    UndoRedoService = $injector.get('UndoRedoService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 
@@ -70,6 +65,12 @@ describe('Editable topic backend API service', function() {
           story_id: 'story_1',
           story_is_published: true
         }],
+        canonical_story_summary_dicts: [{
+          id: '0',
+          title: 'Title',
+          node_count: 1,
+          story_is_published: false
+        }],
         additional_story_references: [{
           story_id: 'story_2',
           story_is_published: true
@@ -78,6 +79,7 @@ describe('Editable topic backend API service', function() {
         subtopics: [],
         language_code: 'en'
       },
+      grouped_skill_summary_dicts: {},
       skill_id_to_description_dict: {
         skill_id_1: 'Description 1'
       },
@@ -123,9 +125,26 @@ describe('Editable topic backend API service', function() {
         topicDict: sampleDataResults.topic_dict,
         skillIdToDescriptionDict:
           sampleDataResults.skill_id_to_description_dict,
+        groupedSkillSummaries: sampleDataResults.grouped_skill_summary_dicts,
         skillIdToRubricsDict: sampleDataResults.skill_id_to_rubrics_dict
       });
       expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
+
+  it('should use the rejection handler if the backend request failed',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect('GET', '/topic_editor_handler/data/1').respond(
+        500, 'Error loading topic 1.');
+      EditableTopicBackendApiService.fetchTopic('1').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error loading topic 1.');
     }
   );
 
@@ -147,21 +166,21 @@ describe('Editable topic backend API service', function() {
     }
   );
 
-  it('should use the rejection handler if the backend request failed',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler when fetching an existing subtopic' +
+    ' page fails', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/topic_editor_handler/data/1').respond(
-        500, 'Error loading topic 1.');
-      EditableTopicBackendApiService.fetchTopic('1').then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+    $httpBackend.expect(
+      'GET', '/subtopic_page_editor_handler/data/topicId/1')
+      .respond(500, 'Error loading subtopic 1.');
+    EditableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith('Error loading topic 1.');
-    }
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith('Error loading subtopic 1.');
+  });
 
   it('should update a topic after fetching it from the backend',
     function() {
@@ -224,6 +243,67 @@ describe('Editable topic backend API service', function() {
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith(
         'Topic with given id doesn\'t exist.');
+    }
+  );
+
+  it('should sucessfully fetch stories from a topic', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', '/topic_editor_story_handler/' + '0')
+      .respond(200, sampleDataResults);
+    EditableTopicBackendApiService.fetchStories('0').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith(
+      sampleDataResults.canonical_story_summary_dicts);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should use the rejection handler when fetching stories from a' +
+    ' topic fails', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect('GET', '/topic_editor_story_handler/' + '0')
+      .respond(500, 'Error loading story with id 0.');
+    EditableTopicBackendApiService.fetchStories('0').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Error loading story with id 0.');
+  });
+
+  it('should sucessfully delete a topic', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expectDELETE('/topic_editor_handler/data/' + '0')
+      .respond(200);
+    EditableTopicBackendApiService.deleteTopic('0').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+
+    expect(successHandler).toHaveBeenCalledWith(200);
+    expect(failHandler).not.toHaveBeenCalled();
+  });
+
+  it('should use the rejection handler when deleting a topic fails',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expectDELETE('/topic_editor_handler/data/' + '1')
+        .respond(500, 'Error deleting topic 1.');
+      EditableTopicBackendApiService.deleteTopic('1').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith('Error deleting topic 1.');
     }
   );
 });

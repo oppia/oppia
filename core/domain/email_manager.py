@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Config properties and functions for managing email notifications."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -181,6 +182,8 @@ SENDER_VALIDATORS = {
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES: (
         lambda x: x == feconf.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_ACCOUNT_DELETED: (
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_admin,
@@ -220,7 +223,8 @@ def _require_sender_id_is_valid(intent, sender_id):
 
 def _send_email(
         recipient_id, sender_id, intent, email_subject, email_html_body,
-        sender_email, bcc_admin=False, sender_name=None, reply_to_id=None):
+        sender_email, bcc_admin=False, sender_name=None, reply_to_id=None,
+        recipient_email=None):
     """Sends an email to the given recipient.
 
     This function should be used for sending all user-facing emails.
@@ -242,6 +246,10 @@ def _send_email(
             the email.
         reply_to_id: str or None. The unique reply-to id used in reply-to email
             address sent to recipient.
+        recipient_email: str or None. Override for the recipient email.
+            This should only be used when the user with user_id equal to
+            recipient_id does not exist or is deleted and their email cannot be
+            retrieved via get_email_from_user_id.
     """
 
     if sender_name is None:
@@ -249,7 +257,9 @@ def _send_email(
 
     _require_sender_id_is_valid(intent, sender_id)
 
-    recipient_email = user_services.get_email_from_user_id(recipient_id)
+    if recipient_email is None:
+        recipient_email = user_services.get_email_from_user_id(recipient_id)
+
     cleaned_html_body = html_cleaner.clean(email_html_body)
     if cleaned_html_body != email_html_body:
         log_new_error(
@@ -358,6 +368,23 @@ def send_job_failure_email(job_id):
             system_name_email, other_recipients,
             mail_subject, mail_body,
             mail_body.replace('\n', '<br/>'))
+
+
+def send_dummy_mail_to_admin(username):
+    """Send an email from the specified email address to admin.
+
+    Args:
+        username: str. Username of the sender.
+    """
+
+    email_body = 'This is a test mail from %s.' % (username)
+    email_subject = 'Test Mail'
+    system_name_email = '%s <%s>' % (
+        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
+
+    email_services.send_mail(
+        system_name_email, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
+        email_body, email_body.replace('\n', '<br/>'), bcc_admin=False)
 
 
 def send_mail_to_admin(email_subject, email_body):
@@ -1170,3 +1197,31 @@ def send_rejected_voiceover_application_email(
             user_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_VOICEOVER_APPLICATION_UPDATES,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
+
+
+def send_account_deleted_email(user_id, user_email):
+    """Sends an email to user whose account was deleted.
+
+    Args:
+        user_id: str. The id of the user whose account got deleted.
+        user_email: str. The email of the user whose account got deleted.
+    """
+    email_subject = 'Account deleted'
+
+    email_body_template = (
+        'Hi %s,<br><br>'
+        'Your account was successfully deleted.'
+        '- The Oppia Team<br>'
+        '<br>%s')
+
+    if not feconf.CAN_SEND_EMAILS:
+        log_new_error('This app cannot send emails to users.')
+        return
+
+    email_body = email_body_template % (
+        user_email, EMAIL_FOOTER.value)
+    _send_email(
+        user_id, feconf.SYSTEM_COMMITTER_ID,
+        feconf.EMAIL_INTENT_ACCOUNT_DELETED, email_subject, email_body,
+        feconf.NOREPLY_EMAIL_ADDRESS, bcc_admin=True,
+        recipient_email=user_email)

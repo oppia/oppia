@@ -44,10 +44,9 @@ angular.module('oppia').directive('storiesList', [
             EditableTopicBackendApiService, UrlService, UndoRedoService,
             UrlInterpolationService, TopicUpdateService,
             EVENT_STORY_SUMMARIES_INITIALIZED) {
+          var ctrl = this;
           var topicId = UrlService.getTopicIdFromUrl();
           var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<story_id>';
-          $scope.STORY_TABLE_COLUMN_HEADINGS = [
-            'title', 'node_count', 'publication_status'];
           $scope.openStoryEditor = function(storyId) {
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
@@ -63,6 +62,10 @@ angular.module('oppia').directive('storiesList', [
                     };
                   }
                 ]
+              }).result.then(function() {}, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               $window.open(
@@ -100,7 +103,16 @@ angular.module('oppia').directive('storiesList', [
                   $scope.storySummaries.splice(i, 1);
                 }
               }
+            }).result.then(function() {}, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
+          };
+
+          ctrl.$onInit = function() {
+            $scope.STORY_TABLE_COLUMN_HEADINGS = [
+              'title', 'node_count', 'publication_status'];
           };
         }
       ]

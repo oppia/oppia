@@ -66,7 +66,7 @@
       <label for="storyNodes" class="form-heading">Chapters</label>
       <div ng-if="nodes.length > 0">
         Select Initial Chapter
-        <select class="form-control"
+        <select class="form-control protractor-test-initial-chapter-select"
                 ng-model="initialNodeId"
                 ng-if="nodes.length > 0"
                 ng-options="node.getId() as node.getTitle() for node in nodes"
@@ -94,7 +94,7 @@
             <i style="font-size: 1.5em;" class="material-icons"> arrow_downward </i>
           </div>
         </div>
-        <h3 ng-if="disconnectedNodes.length > 0">
+        <h3 class="protractor-test-disconnected-node-warning" ng-if="disconnectedNodes.length > 0">
           The following chapters are disconnected from the graph
         </h3>
         <em ng-if="disconnectedNodes.length > 0">

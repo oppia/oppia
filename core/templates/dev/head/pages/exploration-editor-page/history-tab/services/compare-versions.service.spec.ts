@@ -45,6 +45,8 @@ import { WrittenTranslationsObjectFactory } from
 import { UpgradedServices } from 'services/UpgradedServices';
 // ^^^ This block is to be removed.
 
+import { TranslatorProviderForTests } from 'tests/test.extras';
+
 require(
   'pages/exploration-editor-page/history-tab/services/' +
   'compare-versions.service.ts');
@@ -66,7 +68,7 @@ describe('Compare versions service', function() {
     var mockExplorationData = null;
 
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('oppia', TranslatorProviderForTests));
     beforeEach(angular.mock.module('oppia', function($provide) {
       $provide.value(
         'AnswerGroupObjectFactory', new AnswerGroupObjectFactory(
@@ -1218,6 +1220,12 @@ describe('Compare versions service', function() {
         target: 2,
         linkProperty: 'added'
       }]);
+    });
+
+    it('shouldn\'t compare versions if v1 > v2.', function() {
+      expect(function() {
+        cvs.getDiffGraphData(8, 5);
+      }).toThrow(Error('Tried to compare v1 > v2.'));
     });
   });
 });

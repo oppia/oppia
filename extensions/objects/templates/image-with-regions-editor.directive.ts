@@ -22,24 +22,20 @@
 
 // TODO(czx): Uniquify the labels of image regions
 angular.module('oppia').directive('imageWithRegionsEditor', [
-  'AssetsBackendApiService',
-  'ContextService', 'UrlInterpolationService', 'ENTITY_TYPE',
-  function(AssetsBackendApiService,
-      ContextService, UrlInterpolationService, ENTITY_TYPE) {
+  'AssetsBackendApiService', 'ContextService', 'ENTITY_TYPE',
+  function(AssetsBackendApiService, ContextService, ENTITY_TYPE) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {
         value: '='
       },
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/objects/templates/image-with-regions-editor.directive.html'),
+      template: require('./image-with-regions-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$element', '$uibModal',
         function($scope, $element, $uibModal) {
           var ctrl = this;
-          ctrl.alwaysEditable = true;
           // Dynamically defines the CSS style for the region rectangle.
           ctrl.getRegionStyle = function(index) {
             if (index === ctrl.selectedRegion) {
@@ -97,7 +93,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
               width: 0,
               height: 0
             };
-            // Coordinates for currently drawn rectangle (when user is dragging)
+            // Coordinates for currently drawn rectangle (when user is
+            // dragging).
             ctrl.rectX = 0;
             ctrl.rectY = 0;
             ctrl.rectWidth = 0;
@@ -132,9 +129,6 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
             // Message to displaye when there is an error.
             ctrl.errorText = '';
           };
-
-          ctrl.initializeEditor();
-
           // Calculates the dimensions of the image, assuming that the width
           // of the image is scaled down to fit the svg element if necessary.
           var _calculateImageDimensions = function() {
@@ -167,24 +161,6 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
               ENTITY_TYPE.EXPLORATION, ContextService.getExplorationId(),
               encodeURIComponent(imageUrl));
           };
-
-          // Called when the image is changed to calculate the required
-          // width and height, especially for large images.
-          $scope.$watch('$ctrl.value.imagePath', function(newVal) {
-            if (newVal !== '') {
-              // Loads the image in hanging <img> tag so as to get the
-              // width and height.
-              $('<img/>').attr('src', ctrl.getPreviewUrl(newVal)).on(
-                'load', function() {
-                  ctrl.originalImageWidth = (
-                    <HTMLCanvasElement><any> this).width;
-                  ctrl.originalImageHeight = (
-                    <HTMLCanvasElement><any> this).height;
-                  $scope.$apply();
-                }
-              );
-            }
-          });
 
           var hasDuplicates = function(originalArray) {
             var array = originalArray.slice(0).sort();
@@ -498,9 +474,8 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
           };
           ctrl.resetEditor = function() {
             $uibModal.open({
-              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-                '/objects/templates/' +
-                'image-with-regions-reset-confirmation.directive.html'),
+              template: require(
+                './image-with-regions-reset-confirmation.directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [
@@ -518,6 +493,10 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
               ctrl.value.imagePath = '';
               ctrl.value.labeledRegions = [];
               ctrl.initializeEditor();
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
           ctrl.deleteRegion = function(index) {
@@ -532,6 +511,29 @@ angular.module('oppia').directive('imageWithRegionsEditor', [
               ctrl.hoveredRegion--;
             }
             ctrl.value.labeledRegions.splice(index, 1);
+          };
+          ctrl.$onInit = function() {
+            // Called when the image is changed to calculate the required
+            // width and height, especially for large images.
+            $scope.$watch('$ctrl.value.imagePath', function(newVal) {
+              if (newVal !== '') {
+                // Loads the image in hanging <img> tag so as to get the
+                // width and height.
+                $('<img/>').attr('src', ctrl.getPreviewUrl(newVal)).on(
+                  'load', function() {
+                    ctrl.originalImageWidth = (
+                      <HTMLCanvasElement><any> this).width;
+                    ctrl.originalImageHeight = (
+                      <HTMLCanvasElement><any> this).height;
+                    $scope.$apply();
+                  }
+                );
+              }
+            });
+            ctrl.alwaysEditable = true;
+            // The initializeEditor function is written separately since it
+            // is also called in resetEditor function.
+            ctrl.initializeEditor();
           };
         }
       ]

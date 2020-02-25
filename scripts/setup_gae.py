@@ -37,7 +37,8 @@ GAE_DOWNLOAD_ZIP_PATH = os.path.join('.', 'gae-download.zip')
 def main(args=None):
     """Runs the script to setup GAE."""
     unused_parsed_args = _PARSER.parse_args(args=args)
-    coverage_home = os.path.join(common.OPPIA_TOOLS_DIR, 'coverage-4.5.4')
+    coverage_home = os.path.join(
+        common.OPPIA_TOOLS_DIR, 'coverage-%s' % common.COVERAGE_VERSION)
 
     # Note that if the following line is changed so that it uses webob_1_1_1,
     # PUT requests from the frontend fail.

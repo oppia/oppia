@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests the methods defined in story services."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -46,8 +47,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.STORY_ID = story_services.get_new_story_id()
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.TOPIC_ID, self.USER_ID, 'Topic', 'A new topic', [], [], [], [],
-            0)
+            self.TOPIC_ID, self.USER_ID, name='Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
             self.TOPIC_ID)
@@ -226,10 +230,13 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_story_which_not_corresponding_topic_id(self):
         topic_id = topic_services.get_new_topic_id()
-        self.save_new_topic(
-            topic_id, self.USER_ID, 'A New Topic', 'A new topic description.',
-            [], [], [], [], 0)
         story_id = story_services.get_new_story_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, name='A New Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic description.', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
 
@@ -438,6 +445,53 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
 
+    def test_cannot_update_story_with_exps_with_different_categories(self):
+        self.save_new_valid_exploration(
+            'exp_id_1', self.user_id_a, title='title', category='Category 1')
+        self.publish_exploration(self.user_id_a, 'exp_id_1')
+
+        self.save_new_valid_exploration(
+            'exp_id_2', self.user_id_a, title='title', category='Category 2')
+        self.publish_exploration(self.user_id_a, 'exp_id_2')
+
+        change_list = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2,
+                'title': 'Title 2'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_1,
+                'old_value': None,
+                'new_value': 'exp_id_1'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                'node_id': 'node_1',
+                'old_value': [],
+                'new_value': ['node_2']
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID),
+                'node_id': self.NODE_ID_2,
+                'old_value': None,
+                'new_value': 'exp_id_2'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, 'All explorations in a story should be of the '
+            'same category'):
+            story_services.update_story(
+                self.USER_ID, self.STORY_ID, change_list, 'Updated story node.')
+
     def test_cannot_update_story_with_mismatch_of_story_versions(self):
         self.save_new_default_exploration(
             'exp_id', self.user_id_a, title='title')
@@ -478,8 +532,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_topic(
-            topic_id, self.USER_ID, 'A different topic', 'A new topic', [], [],
-            [], [], 0)
+            topic_id, self.USER_ID, name='A different topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, self.USER_ID, 'new title', 'Description', 'Notes',
             topic_id)
@@ -748,8 +805,11 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.owner_id = 'owner'
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.TOPIC_ID, self.USER_ID, 'New Topic', 'A new topic', [], [], [],
-            [], 0)
+            self.TOPIC_ID, self.USER_ID, name='New Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         story = story_domain.Story.create_default_story(
             self.STORY_1_ID, 'Title', self.TOPIC_ID)
         story.description = ('Description')
@@ -978,8 +1038,11 @@ class StoryContentsMigrationTests(test_utils.GenericTestBase):
         topic_id = topic_services.get_new_topic_id()
         user_id = 'user_id'
         self.save_new_topic(
-            topic_id, user_id, 'Topic', 'A new topic', [], [], [], [],
-            0)
+            topic_id, user_id, name='Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic', canonical_story_ids=[],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         self.save_new_story(
             story_id, user_id, 'Title', 'Description', 'Notes',
             topic_id)

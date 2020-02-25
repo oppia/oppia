@@ -33,7 +33,7 @@ angular.module('oppia').directive('selectTopics', [
         '$scope', '$uibModal', '$rootScope',
         function(
             $scope, $uibModal, $rootScope) {
-          $scope.topicSummaries = $scope.getTopicSummaries();
+          var ctrl = this;
           $scope.selectOrDeselectTopic = function(topicId, index) {
             if (!$scope.topicSummaries[index].isSelected) {
               $scope.selectedTopicIds.push(topicId);
@@ -43,6 +43,9 @@ angular.module('oppia').directive('selectTopics', [
               $scope.selectedTopicIds.splice(idIndex, 1);
               $scope.topicSummaries[index].isSelected = false;
             }
+          };
+          ctrl.$onInit = function() {
+            $scope.topicSummaries = $scope.getTopicSummaries();
           };
         }
       ]

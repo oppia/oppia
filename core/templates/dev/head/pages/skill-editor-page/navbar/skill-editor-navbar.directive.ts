@@ -37,23 +37,28 @@ angular.module('oppia').directive('skillEditorNavbar', [
       controller: [
         '$scope', '$uibModal', '$window', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
-        'SkillRightsBackendApiService', 'SkillEditorRoutingService',
+        'SkillEditorRoutingService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $uibModal, $window, AlertsService,
             UndoRedoService, SkillEditorStateService,
-            SkillRightsBackendApiService, SkillEditorRoutingService,
+            SkillEditorRoutingService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-          $scope.skill = SkillEditorStateService.getSkill();
-          $scope.skillRights = (
-            SkillEditorStateService.getSkillRights());
-          $scope.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
-          $scope.selectMainTab = SkillEditorRoutingService.navigateToMainTab;
-          $scope.isLoadingSkill = SkillEditorStateService.isLoadingSkill;
-          $scope.validationIssues = [];
-          $scope.isSaveInProgress = SkillEditorStateService.isSavingSkill;
+          var ctrl = this;
+          $scope.getActiveTabName = function() {
+            return SkillEditorRoutingService.getActiveTabName();
+          };
+          $scope.selectMainTab = function() {
+            SkillEditorRoutingService.navigateToMainTab();
+          };
+          $scope.isLoadingSkill = function() {
+            return SkillEditorStateService.isLoadingSkill();
+          };
+          $scope.isSaveInProgress = function() {
+            return SkillEditorStateService.isSavingSkill();
+          };
 
           $scope.getChangeListCount = function() {
             return UndoRedoService.getChangeCount();
@@ -79,6 +84,10 @@ angular.module('oppia').directive('skillEditorNavbar', [
                     };
                   }
                 ]
+              }).result.then(null, function() {
+                // Note to developers:
+                // This callback is triggered when the Cancel button is clicked.
+                // No further action is needed.
               });
             } else {
               SkillEditorRoutingService.navigateToQuestionsTab();
@@ -98,22 +107,10 @@ angular.module('oppia').directive('skillEditorNavbar', [
             return $scope.validationIssues.length;
           };
 
-          $scope.$on(EVENT_SKILL_INITIALIZED, _validateSkill);
-          $scope.$on(EVENT_SKILL_REINITIALIZED, _validateSkill);
-          $scope.$on(
-            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateSkill);
-
           $scope.isSkillSaveable = function() {
             return (
               $scope.getChangeListCount() > 0 &&
               $scope.validationIssues.length === 0);
-          };
-
-          $scope.isSkillPublishable = function() {
-            return (
-              $scope.skillRights.isPrivate() &&
-              $scope.validationIssues.length === 0 &&
-              $scope.getChangeListCount() === 0);
           };
 
           $scope.saveChanges = function() {
@@ -138,7 +135,20 @@ angular.module('oppia').directive('skillEditorNavbar', [
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
               AlertsService.addSuccessMessage('Changes Saved.');
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
+          };
+
+          ctrl.$onInit = function() {
+            $scope.skill = SkillEditorStateService.getSkill();
+            $scope.validationIssues = [];
+            $scope.$on(EVENT_SKILL_INITIALIZED, _validateSkill);
+            $scope.$on(EVENT_SKILL_REINITIALIZED, _validateSkill);
+            $scope.$on(
+              EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateSkill);
           };
         }]
     };

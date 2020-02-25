@@ -16,123 +16,121 @@
  * @fileoverview Unit tests for PretestQuestionBackendApiService.
  */
 
-require('domain/question/pretest-question-backend-api.service.ts');
-// TODO(#7222): Remove the following block of unnnecessary imports once
-// the code corresponding to the spec is upgraded to Angular 8.
-import { UpgradedServices } from 'services/UpgradedServices';
-// ^^^ This block is to be removed.
+import { HttpClientTestingModule, HttpTestingController } from
+  '@angular/common/http/testing';
+import { TestBed, fakeAsync, flushMicrotasks } from '@angular/core/testing';
+
+import { PretestQuestionBackendApiService } from
+  'domain/question/pretest-question-backend-api.service';
 
 describe('Pretest question backend API service', function() {
-  var PretestQuestionBackendApiService = null;
-  var sampleDataResults = null;
-  var $rootScope = null;
-  var $scope = null;
-  var $httpBackend = null;
+  let pretestQuestionBackendApiService:
+    PretestQuestionBackendApiService = null;
+  let httpTestingController: HttpTestingController;
 
-  beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(
-    'oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(angular.mock.module('oppia', function($provide) {
-    var ugs = new UpgradedServices();
-    for (let [key, value] of Object.entries(ugs.getUpgradedServices())) {
-      $provide.value(key, value);
-    }
-  }));
+  var ERROR_STATUS_CODE = 500;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    PretestQuestionBackendApiService = $injector.get(
-      'PretestQuestionBackendApiService');
-    $rootScope = $injector.get('$rootScope');
-    $scope = $rootScope.$new();
-    $httpBackend = $injector.get('$httpBackend');
-
-    // Sample question object returnable from the backend
-    sampleDataResults = {
-      pretest_question_dicts: [{
-        id: '0',
-        question_state_data: {
-          content: {
-            html: 'Question 1'
-          },
-          recorded_voiceovers: {
-            voiceovers_mapping: {}
-          },
-          interaction: {
-            answer_groups: [],
-            confirmed_unclassified_answers: [],
-            customization_args: {},
-            default_outcome: {
-              dest: null,
-              feedback: {
-                html: 'Correct Answer'
-              },
-              param_changes: [],
-              labelled_as_correct: true
-            },
-            hints: [
-              {
-                hint_content: {
-                  html: 'Hint 1'
-                }
-              }
-            ],
-            solution: {
-              correct_answer: 'This is the correct answer',
-              answer_is_exclusive: false,
-              explanation: {
-                html: 'Solution explanation'
-              }
-            },
-            id: 'TextInput'
-          },
-          param_changes: [],
-          solicit_answer_details: false
+  var sampleDataResults = {
+    pretest_question_dicts: [{
+      id: '0',
+      question_state_data: {
+        content: {
+          html: 'Question 1'
         },
-        language_code: 'en',
-        version: 1
-      }],
-      next_start_cursor: null
-    };
-  }));
+        recorded_voiceovers: {
+          voiceovers_mapping: {}
+        },
+        interaction: {
+          answer_groups: [],
+          confirmed_unclassified_answers: [],
+          customization_args: {},
+          default_outcome: {
+            dest: null,
+            feedback: {
+              html: 'Correct Answer'
+            },
+            param_changes: [],
+            labelled_as_correct: true
+          },
+          hints: [
+            {
+              hint_content: {
+                html: 'Hint 1'
+              }
+            }
+          ],
+          solution: {
+            correct_answer: 'This is the correct answer',
+            answer_is_exclusive: false,
+            explanation: {
+              html: 'Solution explanation'
+            }
+          },
+          id: 'TextInput'
+        },
+        param_changes: [],
+        solicit_answer_details: false
+      },
+      language_code: 'en',
+      version: 1
+    }],
+    next_start_cursor: null
+  };
 
-  afterEach(function() {
-    $httpBackend.verifyNoOutstandingExpectation();
-    $httpBackend.verifyNoOutstandingRequest();
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [PretestQuestionBackendApiService]
+    });
+    pretestQuestionBackendApiService = TestBed.get(
+      PretestQuestionBackendApiService);
+    httpTestingController = TestBed.get(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpTestingController.verify();
   });
 
   it('should successfully fetch pretest questions from the backend',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect(
-        'GET', '/pretest_handler/expId?story_id=storyId&cursor=').respond(
-        sampleDataResults);
-      PretestQuestionBackendApiService.fetchPretestQuestions(
+      pretestQuestionBackendApiService.fetchPretestQuestions(
         'expId', 'storyId').then(successHandler, failHandler);
-      $httpBackend.flush();
+
+      var req = httpTestingController.expectOne(
+        '/pretest_handler/expId?story_id=storyId&cursor=');
+      expect(req.request.method).toEqual('GET');
+      req.flush(sampleDataResults);
+
+      flushMicrotasks();
 
       expect(successHandler).toHaveBeenCalledWith(
         sampleDataResults.pretest_question_dicts);
       expect(failHandler).not.toHaveBeenCalled();
-    }
+    })
   );
 
   it('should use the rejection handler if the backend request failed',
-    function() {
+    fakeAsync(() => {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect(
-        'GET', '/pretest_handler/expId?story_id=storyId&cursor=').respond(
-        500, 'Error loading pretest questions.');
-      PretestQuestionBackendApiService.fetchPretestQuestions(
+      pretestQuestionBackendApiService.fetchPretestQuestions(
         'expId', 'storyId').then(successHandler, failHandler);
-      $httpBackend.flush();
+
+      var req = httpTestingController.expectOne(
+        '/pretest_handler/expId?story_id=storyId&cursor=');
+      expect(req.request.method).toEqual('GET');
+      req.flush('Error loading data.', {
+        status: ERROR_STATUS_CODE, statusText: 'Invalid Request'
+      });
+
+      flushMicrotasks();
 
       expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Error loading pretest questions.');
-    }
+      expect(failHandler).toHaveBeenCalled();
+    })
   );
 });

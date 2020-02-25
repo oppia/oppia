@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for Oppia story models."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -51,6 +52,11 @@ class StoryModelTest(test_utils.GenericTestBase):
             story_models.StoryModel.has_reference_to_user_id('committer_id'))
         self.assertFalse(
             story_models.StoryModel.has_reference_to_user_id('x_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            story_models.StoryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_story_model(self):
         """Method to test the StoryModel."""
@@ -112,6 +118,11 @@ class StorySummaryModelTest(test_utils.GenericTestBase):
     def test_has_reference_to_user_id(self):
         self.assertFalse(
             story_models.StorySummaryModel.has_reference_to_user_id('any_id'))
+
+    def test_get_user_id_migration_policy(self):
+        self.assertEqual(
+            story_models.StorySummaryModel.get_user_id_migration_policy(),
+            base_models.USER_ID_MIGRATION_POLICY.NOT_APPLICABLE)
 
     def test_story_summary_model(self):
         """Method to test the StorySummaryModel."""

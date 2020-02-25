@@ -58,11 +58,7 @@ angular.module('oppia').directive('skillsList', [
             EditableTopicBackendApiService, EditableSkillBackendApiService,
             TopicsAndSkillsDashboardBackendApiService,
             EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
-          $scope.SKILL_HEADINGS = [
-            'description', 'worked_examples_count', 'misconception_count'
-          ];
-
-          $scope.highlightedIndex = null;
+          var ctrl = this;
           $scope.highlightColumns = function(index) {
             $scope.highlightedIndex = index;
           };
@@ -158,6 +154,10 @@ angular.module('oppia').directive('skillsList', [
                   }
                 }
               }
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
           };
 
@@ -165,15 +165,14 @@ angular.module('oppia').directive('skillsList', [
             var skillSummaries = $scope.getMergeableSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics-and-skills-dashboard-page/templates/' +
-                'merge-skill-modal.template.html'),
+                '/components/skill-selector/select-skill-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.skillSummaries = skillSummaries;
                   $scope.selectedSkillId = '';
-                  $scope.done = function() {
+                  $scope.save = function() {
                     $uibModalInstance.close(
                       {skill: skill,
                         supersedingSkillId: $scope.selectedSkillId
@@ -199,7 +198,18 @@ angular.module('oppia').directive('skillsList', [
                     EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 }, 100);
               });
+            }, function() {
+              // Note to developers:
+              // This callback is triggered when the Cancel button is clicked.
+              // No further action is needed.
             });
+          };
+
+          ctrl.$onInit = function() {
+            $scope.SKILL_HEADINGS = [
+              'description', 'worked_examples_count', 'misconception_count'
+            ];
+            $scope.highlightedIndex = null;
           };
         }
       ]

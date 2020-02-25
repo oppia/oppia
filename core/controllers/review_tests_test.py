@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Tests for the review tests page."""
+
 from __future__ import absolute_import  # pylint: disable=import-only-modules
 from __future__ import unicode_literals  # pylint: disable=import-only-modules
 
@@ -67,8 +68,8 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             'exploration_id': self.exp_id
         }
 
-        self.save_new_skill('skill_id_1', self.admin_id, 'Skill 1')
-        self.save_new_skill('skill_id_2', self.admin_id, 'Skill 2')
+        self.save_new_skill('skill_id_1', self.admin_id, description='Skill 1')
+        self.save_new_skill('skill_id_2', self.admin_id, description='Skill 2')
 
         self.story = story_domain.Story.create_default_story(
             self.story_id_1, 'Public Story Title', self.topic_id)
@@ -83,8 +84,12 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             self.story_id_2, 'Private Story Title', self.topic_id)
         story_services.save_new_story(self.admin_id, self.story_2)
         self.save_new_topic(
-            self.topic_id, 'user', 'Topic', 'A new topic',
-            [self.story_id_1, self.story_id_3], [], [], [], 0)
+            self.topic_id, 'user', name='Topic',
+            abbreviated_name='abbrev', thumbnail_filename=None,
+            description='A new topic',
+            canonical_story_ids=[self.story_id_1, self.story_id_3],
+            additional_story_ids=[], uncategorized_skill_ids=[],
+            subtopics=[], next_subtopic_id=0)
         topic_services.publish_topic(self.topic_id, self.admin_id)
         topic_services.publish_story(
             self.topic_id, self.story_id_1, self.admin_id)

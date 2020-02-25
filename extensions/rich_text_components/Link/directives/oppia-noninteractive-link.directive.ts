@@ -20,54 +20,54 @@
  * followed by the name of the arg.
  */
 
-require('domain/utilities/url-interpolation.service.ts');
 require('services/context.service.ts');
 require('services/html-escaper.service.ts');
 
 angular.module('oppia').directive('oppiaNoninteractiveLink', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'HtmlEscaperService',
+  function(HtmlEscaperService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
-      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/rich_text_components/Link/directives/link.directive.html'),
+      template: require('./link.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$attrs', 'ContextService',
         function($attrs, ContextService) {
           var ctrl = this;
-          var untrustedUrl = encodeURI(HtmlEscaperService.escapedJsonToObj(
-            $attrs.urlWithValue));
-          if (untrustedUrl.indexOf('http://') !== 0 &&
-              untrustedUrl.indexOf('https://') !== 0) {
-            untrustedUrl = 'https://' + untrustedUrl;
-          }
-          ctrl.url = untrustedUrl;
-
-          ctrl.showUrlInTooltip = false;
-          ctrl.text = ctrl.url;
-          if ($attrs.textWithValue) {
-            // This is done for backward-compatibility; some old explorations
-            // have content parts that don't include a 'text' attribute on
-            // their links.
-            ctrl.text =
-              HtmlEscaperService.escapedJsonToObj($attrs.textWithValue);
-            // Note that this second 'if' condition is needed because a link may
-            // have an empty 'text' value.
-            if (ctrl.text) {
-              ctrl.showUrlInTooltip = true;
-            } else {
-              ctrl.text = ctrl.url;
+          ctrl.$onInit = function() {
+            var untrustedUrl = encodeURI(HtmlEscaperService.escapedJsonToObj(
+              $attrs.urlWithValue));
+            if (untrustedUrl.indexOf('http://') !== 0 &&
+                untrustedUrl.indexOf('https://') !== 0) {
+              untrustedUrl = 'https://' + untrustedUrl;
             }
-          }
+            ctrl.url = untrustedUrl;
 
-          // This following check disbales the link in Editor being caught
-          // by tabbing while in Exploration Editor mode.
-          if (ContextService.isInExplorationEditorMode()) {
-            ctrl.tabIndexVal = -1;
-          }
+            ctrl.showUrlInTooltip = false;
+            ctrl.text = ctrl.url;
+            if ($attrs.textWithValue) {
+              // This is done for backward-compatibility; some old explorations
+              // have content parts that don't include a 'text' attribute on
+              // their links.
+              ctrl.text =
+                HtmlEscaperService.escapedJsonToObj($attrs.textWithValue);
+              // Note that this second 'if' condition is needed because a link
+              // may have an empty 'text' value.
+              if (ctrl.text) {
+                ctrl.showUrlInTooltip = true;
+              } else {
+                ctrl.text = ctrl.url;
+              }
+            }
+
+            // This following check disbales the link in Editor being caught
+            // by tabbing while in Exploration Editor mode.
+            if (ContextService.isInExplorationEditorMode()) {
+              ctrl.tabIndexVal = -1;
+            }
+          };
         }]
     };
   }
