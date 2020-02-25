@@ -93,7 +93,8 @@ angular.module('oppia').directive('feedbackTab', [
               backdrop: true,
               resolve: {},
               controller: [
-                '$scope', '$uibModalInstance', ($scope, $uibModalInstance) => {
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
                   $scope.newThreadSubject = '';
                   $scope.newThreadText = '';
 
