@@ -121,7 +121,7 @@ var ExplorationEditorTranslationTab = function() {
   var uploadAudioButton = element(
     by.css('.protractor-test-upload-audio'));
   var audioUploadInput = element(
-    by.css('.protractor-test-upload-audio'));
+    by.css('.protractor-test-upload-audio-input'));
   var saveUploadedAudioButton = element(
     by.css('.protractor-test-save-uploaded-audio'));
   var deleteRecordButton = element(
@@ -234,6 +234,9 @@ var ExplorationEditorTranslationTab = function() {
       'Audio Record button is not clickable');
     uploadAudioButton.click();
     absPath = path.resolve(__dirname, audioPath);
+    waitFor.visibilityOf(
+      uploadAudioInput,
+      'Audio upload input field is not visible');
     return audioUploadInput.sendKeys(absPath);
   };
 
