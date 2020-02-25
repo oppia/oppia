@@ -836,7 +836,8 @@ def add_dimensions_to_image_tags(is_question, exp_id, html_string):
 
     for image in soup.findAll(name='oppia-noninteractive-image'):
         if (not image.has_attr('filepath-with-value') or
-                image['filepath-with-value'] == ''):
+                image['filepath-with-value'] == '' or
+                image['filepath-with-value'] == '&quot;&quot;'):
             image.decompose()
             continue
 
@@ -868,6 +869,14 @@ def add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks(
             oppia-noninteractive-image tags.
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
+
+    # Remove images with empty filepath.
+    for image in soup.findAll(name='oppia-noninteractive-image'):
+        if (not image.has_attr('filepath-with-value') or
+                image['filepath-with-value'] == '' or
+                image['filepath-with-value'] == '&quot;&quot;'):
+            image.decompose()
+            continue
 
     # To add dimensions to images inside the collapsible component.
     for collapsible_component in soup.findAll(
@@ -916,7 +925,8 @@ def _modify_image_filename(is_question, entity_id, soup):
     """
     for image in soup.findAll(name='oppia-noninteractive-image'):
         if (not image.has_attr('filepath-with-value') or
-                image['filepath-with-value'] == ''):
+                image['filepath-with-value'] == '' or
+                image['filepath-with-value'] == '\\"""\\"'):
             image.decompose()
             continue
 

@@ -1370,6 +1370,25 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
                 'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
                 'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                'quot;\&amp;quot; filepath-with-value=\&quot;&amp;amp;quot;&amp;amp;quot;\&quot;'
+                '&gt;&amp;lt;'
+                '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
+                'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
+                'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
+                '"></oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                u'<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;p&amp;gt;You have opened the collapsible block.'
+                '&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;'
+                'Sample Header&amp;quot;"></oppia-noninteractive-collapsible>'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+                'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+                'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
                 'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
                 'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
                 '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
@@ -1536,6 +1555,30 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'html_content': (
                 '<oppia-noninteractive-image caption-with-value="&amp;quot;'
                 '&amp;quot;" filepath-with-value="">'
+                '</oppia-noninteractive-image>'
+                '<p>Some text.</p><p>Some more text.</p><p>Yet more text.</p>'
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'img.png&amp;quot;"></oppia-noninteractive-image>Hello this'
+                ' is test case to check that dimensions are added to the oppia'
+                ' noninteractive image tags.<oppia-noninteractive-image '
+                'filepath-with-value="&amp;quot;abc3.png&amp;quot;">'
+                '</oppia-noninteractive-image></p>'
+            ),
+            'expected_output': (
+                u'<p>Some text.</p><p>Some more text.</p><p>Yet more text.</p>'
+                '<p><oppia-noninteractive-image filepath-with-value="'
+                '&amp;quot;img_height_32_width_32.png&amp;quot;">'
+                '</oppia-noninteractive-image>Hello this is test case '
+                'to check that dimensions are added to the oppia'
+                ' noninteractive image tags.<oppia-noninteractive-image '
+                'filepath-with-value="&amp;quot;abc3_height_32_width_32.png'
+                '&amp;quot;"></oppia-noninteractive-image></p>'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;'
+                '&amp;quot;" caption-with-value="&amp;quot;&amp;quot;" '
+                'filepath-with-value="&amp;quot;&amp;quot;">'
                 '</oppia-noninteractive-image>'
                 '<p>Some text.</p><p>Some more text.</p><p>Yet more text.</p>'
                 '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
