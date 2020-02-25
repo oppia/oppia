@@ -79,7 +79,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
     def _disable_state_name_validation(self):
         """Context manager that disables exploration state name validation."""
-        def no_op(*args, **kwargs):
+        def no_op(*unused_args, **unused_kwargs):
             """Does nothing."""
             pass
         return self.swap(exp_domain.Exploration, '_validate_state_name', no_op)
