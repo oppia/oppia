@@ -1561,17 +1561,23 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
             'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
             'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
-            'quot;\&amp;quot; filepath-with-value=\&quot;&amp;amp;quot;'
-            '&amp;amp;quot;\&quot;&gt;&amp;lt;'
+            'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+            'quot;abc2.png&amp;amp;amp;quot;\&amp;quot;&amp;gt;&amp;lt;'
             '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
             'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
             'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
             '"></oppia-noninteractive-collapsible>')
         expected_output = (
             u'<oppia-noninteractive-collapsible content-with-value="&amp;'
-            'quot;&amp;lt;p&amp;gt;You have opened the collapsible block.'
-            '&amp;lt;/p&amp;gt;&amp;quot;" heading-with-value="&amp;quot;'
-            'Sample Header&amp;quot;"></oppia-noninteractive-collapsible>')
+            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+            'quot;\&amp;quot; filepath-with-value=\&amp;quot;&amp;amp;amp;'
+            'quot;abc2_height_120_width_120.png&amp;amp;amp;quot;\&amp;quot;'
+            '&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
+            'p&amp;gt;You have opened the collapsible block.&amp;lt;/p'
+            '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;Sample '
+            'Header&amp;quot;"></oppia-noninteractive-collapsible>')
 
         exp_id = 'eid'
 
@@ -1625,6 +1631,40 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             observed_log_messages[0],
             'Exploration exp_id failed to load image: abc1.png')
 
+    def test_add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks_with_invalid_filepath_with_value( # pylint: disable=line-too-long
+            self):
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        assert_raises_context_manager = self.assertRaises(Exception)
+
+        html_content = (
+            '<oppia-noninteractive-collapsible content-with-value="&amp;'
+            'quot;&amp;lt;oppia-noninteractive-image alt-with-value=\&amp;'
+            'quot;&amp;amp;amp;quot;&amp;amp;amp;quot;\&amp;quot; '
+            'caption-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+            'quot;\&amp;quot; filepath-with-value=new.png&amp;gt;&amp;lt;'
+            '/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;You '
+            'have opened the collapsible block.&amp;lt;/p&amp;gt;&amp;'
+            'quot;" heading-with-value="&amp;quot;Sample Header&amp;quot;'
+            '"></oppia-noninteractive-collapsible>')
+
+        exp_id = 'exp_id'
+
+        with python_utils.open_file(
+            os.path.join(feconf.TESTS_DATA_DIR, 'img.png'), 'rb',
+            encoding=None) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.GcsFileSystem(
+                feconf.ENTITY_TYPE_EXPLORATION, exp_id))
+        fs.commit('image/new.png', raw_image, mimetype='image/png')
+
         with assert_raises_context_manager, logging_swap:
             html_validation_service.add_dimensions_to_image_tags_inside_tabs_and_collapsible_blocks( # pylint: disable=line-too-long
                 False, exp_id, html_content)
@@ -1632,7 +1672,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         self.assertEqual(len(observed_log_messages), 1)
         self.assertEqual(
             observed_log_messages[0],
-            'Exploration exp_id failed to load image: abc1.png')
+            'Exploration exp_id failed to load image: new.png')
 
     def test_add_dimensions_to_image_tags_when_no_filepath_specified(self):
         test_cases = [{
