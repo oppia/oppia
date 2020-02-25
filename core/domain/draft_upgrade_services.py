@@ -89,10 +89,26 @@ class DraftUpgradeUtil(python_utils.OBJECT):
     """Wrapper class that contains util functions to upgrade drafts."""
 
     @classmethod
-    def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
+    def _convert_states_v31_dict_to_v32_dict(cls, draft_change_list):
         """Converts draft change list from state version 30 to 31. State
         version 31 adds image dimensions to images inside collapsible
         blocks and tabs, for which there should be no changes to drafts.
+
+        Args:
+            draft_change_list: list(ExplorationChange). The list of
+                ExplorationChange domain objects to upgrade.
+
+        Returns:
+            list(ExplorationChange). The converted draft_change_list.
+        """
+        return draft_change_list
+
+    @classmethod
+    def _convert_states_v30_dict_to_v31_dict(cls, draft_change_list):
+        """Converts from version 30 to 31. Version 31 updates the
+        Voiceover model to have an initialized duration_secs attribute
+        of 0.0. This will be updated when a new mp3 audio file is uploaded
+        for the exploration.
 
         Args:
             draft_change_list: list(ExplorationChange). The list of

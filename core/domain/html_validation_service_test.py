@@ -1478,7 +1478,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             encoding=None) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.DatastoreBackedFileSystem(
+            fs_domain.GcsFileSystem(
                 feconf.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit('image/abc1.png', raw_image, mimetype='image/png')
         fs.commit('image/abc2.png', raw_image, mimetype='image/png')
