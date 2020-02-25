@@ -43,16 +43,13 @@ export class SkillRightsBackendApiService {
     });
 
     this.http.get(skillRightsUrl, { observe: 'response' }).toPromise().then((response) => {
-      var responseData = response.body;
+      let responseData = response.body;
       if (successCallback) {
-        successCallback({
-          skill_id: responseData['skill_id'],
-          can_edit_skill_description: responseData['can_edit_skill_description']
-        });
+        successCallback(responseData);
       }
     }, function (errorResponse) {
       if (errorCallback) {
-        errorCallback(errorResponse.data);
+        errorCallback(errorResponse.body);
       }
     });
   };
