@@ -1679,11 +1679,7 @@ class State(python_utils.OBJECT):
                 raise Exception(
                     'Expected answer group rule specs to be a list, '
                     'received %s' % rule_specs_list)
-            normalized_answer_group = AnswerGroup(
-                answer_group.outcome, [],  # empty rule list
-                answer_group.training_data,
-                answer_group.tagged_skill_misconception_id
-            )
+            answer_group.rule_specs = []
             for rule_spec in rule_specs_list:
                 # Normalize and store the rule params.
                 rule_inputs = rule_spec.inputs
@@ -1711,8 +1707,8 @@ class State(python_utils.OBJECT):
                                 (value, param_type.__name__))
                     rule_inputs[param_name] = normalized_param
 
-                normalized_answer_group.rule_specs.append(rule_spec)
-            interaction_answer_groups.append(normalized_answer_group)
+                answer_group.rule_specs.append(rule_spec)
+            interaction_answer_groups.append(answer_group)
         self.interaction.answer_groups = interaction_answer_groups
 
         new_content_id_list = [
