@@ -140,7 +140,7 @@ angular.module('oppia').directive('questionsList', [
             }
           };
 
-          ctrl.saveAndPublishQuestion = function() {
+          ctrl.saveAndPublishQuestion = function(commitMessage) {
             var validationErrors = ctrl.question.validate(
               ctrl.misconceptionsBySkill);
 
@@ -162,22 +162,27 @@ angular.module('oppia').directive('questionsList', [
               });
             } else {
               if (QuestionUndoRedoService.hasChanges()) {
-                ctrl.questionIsBeingSaved = true;
-                // TODO(tjiang11): Allow user to specify a commit message.
-                EditableQuestionBackendApiService.updateQuestion(
-                  ctrl.questionId, ctrl.question.getVersion(), 'blank',
-                  QuestionUndoRedoService.getCommittableChangeList()).then(
-                  function() {
-                    QuestionUndoRedoService.clearChanges();
-                    ctrl.questionIsBeingSaved = false;
-                    ctrl.getQuestionSummariesAsync(
-                      ctrl.selectedSkillIds, true, true
-                    );
-                  }, function(error) {
-                    AlertsService.addWarning(
-                      error || 'There was an error saving the question.');
-                    ctrl.questionIsBeingSaved = false;
-                  });
+                if (commitMessage) {
+                  ctrl.questionIsBeingSaved = true;
+                  EditableQuestionBackendApiService.updateQuestion(
+                    ctrl.questionId, ctrl.question.getVersion(), commitMessage,
+                    QuestionUndoRedoService.getCommittableChangeList()).then(
+                    function() {
+                      QuestionUndoRedoService.clearChanges();
+                      ctrl.questionIsBeingSaved = false;
+                      ctrl.getQuestionSummariesAsync(
+                        ctrl.selectedSkillIds, true, true
+                      );
+                    }, function(error) {
+                      AlertsService.addWarning(
+                        error || 'There was an error saving the question.');
+                      ctrl.questionIsBeingSaved = false;
+                    });
+                } else {
+                  AlertsService.addWarning(
+                    'Please provide a valid commit message.');
+                  ctrl.questionIsBeingSaved = false;
+                }
               }
             }
           };
@@ -517,7 +522,10 @@ angular.module('oppia').directive('questionsList', [
                 function(
                     $scope, $uibModalInstance, StateEditorService,
                     UndoRedoService) {
-                  var returnArray = [];
+                  var returnModalObject = {
+                    skillLinkageModificationsArray: [],
+                    commitMessage: ''
+                  };
                   $scope.question = question;
                   $scope.questionStateData = questionStateData;
                   $scope.associatedSkillSummaries =
@@ -547,7 +555,7 @@ angular.module('oppia').directive('questionsList', [
                         'A question should be linked to at least one skill.');
                       return;
                     }
-                    returnArray.push({
+                    returnModalObject.skillLinkageModificationsArray.push({
                       id: skillId,
                       task: 'remove'
                     });
@@ -558,7 +566,7 @@ angular.module('oppia').directive('questionsList', [
                   };
                   $scope.undo = function() {
                     $scope.associatedSkillSummaries = associatedSkillSummaries;
-                    returnArray = [];
+                    returnModalObject.skillLinkageModificationsArray = [];
                   };
                   $scope.addSkill = function() {
                     var skillsInSameTopicCount =
@@ -609,12 +617,67 @@ angular.module('oppia').directive('questionsList', [
                       $scope.associatedSkillSummaries.push(
                         SkillSummaryObjectFactory.create(
                           summary.id, summary.description));
-                      returnArray.push({
+                      returnModalObject.skillLinkageModificationsArray.push({
                         id: summary.id,
                         task: 'add'
                       });
                     });
                   };
+
+                  // The saveAndCommit function is called when the contents of
+                  // a question is changed or the skill linkages are modified.
+                  // The user has to enter a commit message if the contents of
+                  // the question is edited but, if only the skill linkages are
+                  // modified then no commit message is required from the user
+                  // as there is already a default commit message present in the
+                  // backend for modification of skill linkages.
+                  $scope.saveAndCommit = function() {
+                    $scope.validationError = $scope.question.validate(
+                      $scope.misconceptionsBySkill);
+                    if ($scope.validationError) {
+                      return;
+                    }
+                    if (!StateEditorService.isCurrentSolutionValid()) {
+                      $scope.validationError =
+                        'The solution is invalid and does not ' +
+                        'correspond to a correct answer';
+                      return;
+                    }
+
+                    if (QuestionUndoRedoService.hasChanges()) {
+                      var modalInstance = $uibModal.open({
+                        templateUrl:
+                               UrlInterpolationService.getDirectiveTemplateUrl(
+                                 '/components/question-directives' +
+                                 '/modal-templates/' +
+                                 'question-editor-save-modal.template.html'),
+                        backdrop: true,
+                        controller: [
+                          '$scope', '$uibModalInstance',
+                          function($scope, $uibModalInstance) {
+                            $scope.save = function(commitMessage) {
+                              $uibModalInstance.close(commitMessage);
+                            };
+                            $scope.cancel = function() {
+                              $uibModalInstance.dismiss('cancel');
+                            };
+                          }
+                        ]
+                      });
+                      modalInstance.result.then(function(commitMessage) {
+                        returnModalObject.commitMessage = commitMessage;
+                        $uibModalInstance.close(returnModalObject);
+                      });
+                    } else {
+                      $uibModalInstance.close(returnModalObject);
+                    }
+                  };
+                  $scope.isSaveAndCommitButtonDisabled = function() {
+                    return !(QuestionUndoRedoService.hasChanges() ||
+                        (returnModalObject.skillLinkageModificationsArray.length
+                        ) > 0);
+                  };
+
 
                   $scope.done = function() {
                     $scope.validationError = $scope.question.validate(
@@ -628,7 +691,7 @@ angular.module('oppia').directive('questionsList', [
                         'correspond to a correct answer';
                       return;
                     }
-                    $uibModalInstance.close(returnArray);
+                    $uibModalInstance.close(returnModalObject);
                   };
                   // Checking if Question contains all requirement to enable
                   // Save and Publish Question
@@ -669,12 +732,13 @@ angular.module('oppia').directive('questionsList', [
               ]
             });
 
-            modalInstance.result.then(function(array) {
+            modalInstance.result.then(function(modalObject) {
               $location.hash(null);
               ctrl.editorIsOpen = false;
-              if (array.length > 0) {
+              if (modalObject.skillLinkageModificationsArray.length > 0) {
                 EditableQuestionBackendApiService.editQuestionSkillLinks(
-                  questionId, array, questionDifficulty).then(
+                  questionId, modalObject.skillLinkageModificationsArray,
+                  questionDifficulty).then(
                   data => {
                     $timeout(function() {
                       QuestionsListService.resetPageNumber();
@@ -682,11 +746,11 @@ angular.module('oppia').directive('questionsList', [
                       ctrl.getQuestionSummariesAsync(
                         ctrl.selectedSkillIds, true, true
                       );
-                      ctrl.saveAndPublishQuestion();
+                      ctrl.saveAndPublishQuestion(modalObject.commitMessage);
                     }, 500);
                   });
               } else {
-                ctrl.saveAndPublishQuestion();
+                ctrl.saveAndPublishQuestion(modalObject.commitMessage);
               }
             }, function() {
               ctrl.editorIsOpen = false;
