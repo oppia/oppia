@@ -1802,13 +1802,10 @@ class State(python_utils.OBJECT):
             old_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
 
+        self.interaction.solution = solution
         if solution is not None:
-            self.interaction.solution = solution
             new_content_id_list.append(
                 self.interaction.solution.explanation.content_id)
-        else:
-            self.interaction.solution = None
-
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 

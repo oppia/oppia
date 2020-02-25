@@ -379,7 +379,7 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     solution = None
-                    if change.new_value:
+                    if change.new_value is not None:
                         solution = state_domain.Solution.from_dict(
                             state.interaction.id, change.new_value
                         )
