@@ -1571,7 +1571,7 @@ tags: []
         question_services.add_question(owner_id, question)
         return question
 
-    def save_new_question_with_state_data_schema_v27(
+    def save_new_question_with_state_data_schema_v31(
             self, question_id, owner_id,
             linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
