@@ -62,9 +62,8 @@ angular.module('oppia').directive('creatorDashboardPage', [
         '/pages/creator-dashboard-page/creator-dashboard-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$log', '$q', '$rootScope', '$window',
-        'AlertsService', 'CreatorDashboardBackendApiService',
-        'DateTimeFormatService',
+        '$http', '$log', '$q', '$rootScope', '$window', 'AlertsService',
+        'CreatorDashboardBackendApiService', 'DateTimeFormatService',
         'ExplorationCreationService', 'RatingComputationService',
         'SuggestionModalForCreatorDashboardService', 'SuggestionObjectFactory',
         'SuggestionThreadObjectFactory', 'ThreadDataService',
@@ -76,9 +75,8 @@ angular.module('oppia').directive('creatorDashboardPage', [
         'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
         'SUBSCRIPTION_SORT_BY_KEYS',
         function(
-            $http, $log, $q, $rootScope, $window,
-            AlertsService, CreatorDashboardBackendApiService,
-            DateTimeFormatService,
+            $http, $log, $q, $rootScope, $window, AlertsService,
+            CreatorDashboardBackendApiService, DateTimeFormatService,
             ExplorationCreationService, RatingComputationService,
             SuggestionModalForCreatorDashboardService, SuggestionObjectFactory,
             SuggestionThreadObjectFactory, ThreadDataService,
@@ -113,14 +111,12 @@ angular.module('oppia').directive('creatorDashboardPage', [
           ctrl.setMyExplorationsView = function(newViewType) {
             $http.post('/creatordashboardhandler/data', {
               display_preference: newViewType,
-            }).then(function() {
-              ctrl.myExplorationsView = newViewType;
-            });
+            }).then(() => ctrl.myExplorationsView = newViewType);
             userDashboardDisplayPreference = newViewType;
           };
 
           ctrl.checkMobileView = function() {
-            return ($window.innerWidth < 500);
+            return $window.innerWidth < 500;
           };
 
           ctrl.showUsernamePopover = function(subscriberUsername) {
@@ -184,7 +180,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
           };
 
           ctrl.setActiveThread = function(threadId) {
-            ctrl.activeThread = ThreadDataService.getThread(threadId);
+            ctrl.activeThread = ctrl.threadsById[threadId];
             ThreadDataService.fetchMessages(ctrl.activeThread);
             ctrl.canReviewActiveThread = ctrl.suggestionsToReviewList.includes(
               ctrl.activeThread);
@@ -225,6 +221,9 @@ angular.module('oppia').directive('creatorDashboardPage', [
           ctrl.getCompleteThumbnailIconUrl = function(iconUrl) {
             return UrlInterpolationService.getStaticImageUrl(iconUrl);
           };
+
+          ctrl.threadsById = {};
+
           ctrl.$onInit = function() {
             ctrl.DEFAULT_EMPTY_TITLE = 'Untitled';
             ctrl.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
@@ -240,15 +239,14 @@ angular.module('oppia').directive('creatorDashboardPage', [
             ctrl.canCreateCollections = null;
             $rootScope.loadingMessage = 'Loading';
             var userInfoPromise = UserService.getUserInfoAsync();
-            userInfoPromise.then(function(userInfo) {
+            userInfoPromise.then(userInfo => {
               ctrl.canCreateCollections = userInfo.canCreateCollections();
             });
 
-            var dashboardDataPromise = $q.all([
-              CreatorDashboardBackendApiService.fetchDashboardData(),
-              ThreadDataService.fetchThreads(),
-            ]).then(
-              joinedResponse => {
+            var dashboardDataPromise = (
+              CreatorDashboardBackendApiService.fetchDashboardData()
+            ).then(
+              response => {
                 // The following condition is required for Karma testing. The
                 // Angular HttpClient returns an Observable which when converted
                 // to a promise does not have the 'data' key but the AngularJS
@@ -258,9 +256,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
                 // 'response.data' which would be the case in AngularJS testing
                 // but assigns 'response' if the former is not present which is
                 // the case with HttpClient.
-                var dashboardDataResponse = allResponses[0];
-                var responseData = dashboardDataResponse.data ?
-                  dashboardDataResponse.data : dashboardDataResponse;
+                var responseData = response.data ? response.data : response;
                 ctrl.currentSortType = EXPLORATIONS_SORT_BY_KEYS.OPEN_FEEDBACK;
                 ctrl.currentSubscribersSortType =
                   SUBSCRIPTION_SORT_BY_KEYS.USERNAME;
@@ -272,14 +268,33 @@ angular.module('oppia').directive('creatorDashboardPage', [
                 ctrl.dashboardStats = responseData.dashboard_stats;
                 ctrl.lastWeekStats = responseData.last_week_stats;
                 ctrl.myExplorationsView = responseData.display_preference;
-                // TODO(#TODO): Stop passing full threads and only pass IDs
-                // through the creator dashboard backend api service.
+
+                let suggestionBackendDictsByThreadId = {};
+                responseData.created_suggestions_list.forEach(backendDict => {
+                  let threadId = backendDict.suggestion_id;
+                  suggestionBackendDictsByThreadId[threadId] = backendDict;
+                });
+                responseData.suggestions_to_review_list.forEach(backendDict => {
+                  let threadId = backendDict.suggestion_id;
+                  suggestionBackendDictsByThreadId[threadId] = backendDict;
+                });
+
                 ctrl.mySuggestionsList =
                   responseData.threads_for_created_suggestions_list.map(
-                    dict => ThreadDataService.getThread(dict.thread_id));
+                    dict => {
+                      let threadId = dict.thread_id;
+                      return ctrl.threadsById[threadId] =
+                        SuggestionThreadObjectFactory.createFromBackendDicts(
+                          dict, suggestionBackendDictsByThreadId[threadId]);
+                    });
                 ctrl.suggestionsToReviewList =
                   responseData.threads_for_suggestions_to_review_list.map(
-                    dict => ThreadDataService.getThread(dict.thread_id));
+                    dict => {
+                      let threadId = dict.thread_id;
+                      return ctrl.threadsById[threadId] =
+                        SuggestionThreadObjectFactory.createFromBackendDicts(
+                          dict, suggestionBackendDictsByThreadId[threadId]);
+                    });
 
                 if (ctrl.dashboardStats && ctrl.lastWeekStats) {
                   ctrl.relativeChangeInTotalPlays = (
@@ -298,7 +313,7 @@ angular.module('oppia').directive('creatorDashboardPage', [
                   ctrl.activeTab = 'myExplorations';
                 }
               },
-              function(errorResponse) {
+              errorResponse => {
                 if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
                   AlertsService.addWarning('Failed to get dashboard data');
                 }

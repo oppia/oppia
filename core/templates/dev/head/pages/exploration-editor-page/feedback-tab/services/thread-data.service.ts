@@ -27,26 +27,26 @@ require(
   'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 angular.module('oppia').factory('ThreadDataService', [
-  '$http', '$q', 'AlertsService', 'ExplorationDataService',
+  '$http', '$q', 'AlertsService', 'ContextService',
   'FeedbackThreadObjectFactory', 'SuggestionThreadObjectFactory',
   'ThreadMessageObjectFactory', 'UrlInterpolationService',
   'ACTION_ACCEPT_SUGGESTION', 'STATUS_FIXED', 'STATUS_IGNORED', 'STATUS_OPEN',
   function(
-      $http, $q, AlertsService, ExplorationDataService,
+      $http, $q, AlertsService, ContextService,
       FeedbackThreadObjectFactory, SuggestionThreadObjectFactory,
       ThreadMessageObjectFactory, UrlInterpolationService,
       ACTION_ACCEPT_SUGGESTION, STATUS_FIXED, STATUS_IGNORED, STATUS_OPEN) {
     let getFeedbackStatsHandlerUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         '/feedbackstatshandler/<exploration_id>', {
-          exploration_id: ExplorationDataService.explorationId + ''
+          exploration_id: ContextService.getExplorationId()
         });
     };
 
     let getThreadListHandlerUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         '/threadlisthandler/<exploration_id>', {
-          exploration_id: ExplorationDataService.explorationId + ''
+          exploration_id: ContextService.getExplorationId()
         });
     };
 
@@ -57,22 +57,22 @@ angular.module('oppia').factory('ThreadDataService', [
     let getSuggestionActionHandlerUrl = function(threadId) {
       return UrlInterpolationService.interpolateUrl(
         '/suggestionactionhandler/exploration/<exploration_id>/<thread_id>', {
-          exploration_id: ExplorationDataService.explorationId + '',
-          thread_id: threadId + ''
+          exploration_id: ContextService.getExplorationId(),
+          thread_id: threadId
         });
     };
 
     let getThreadHandlerUrl = function(threadId) {
       return UrlInterpolationService.interpolateUrl(
         '/threadhandler/<thread_id>', {
-          thread_id: threadId + ''
+          thread_id: threadId
         });
     };
 
     let getFeedbackThreadViewEventUrl = function(threadId) {
       return UrlInterpolationService.interpolateUrl(
         '/feedbackhandler/thread_view_event/<thread_id>', {
-          thread_id: threadId + ''
+          thread_id: threadId
         });
     };
 
@@ -116,7 +116,7 @@ angular.module('oppia').factory('ThreadDataService', [
         let suggestionPromise = $http.get(getSuggestionListHandlerUrl(), {
           params: {
             target_type: 'exploration',
-            target_id: ExplorationDataService.explorationId,
+            target_id: ContextService.getExplorationId(),
           }
         });
         let threadPromise = $http.get(getThreadListHandlerUrl());
@@ -168,12 +168,14 @@ angular.module('oppia').factory('ThreadDataService', [
           state_name: null,
           subject: newSubject,
           text: newText
-        }).then(() => {
-          openThreadsCount += 1;
-          return this.fetchThreads();
-        }, err => {
-          AlertsService.addWarning('Error creating new thread: ' + err + '.');
-        });
+        }).then(
+          () => {
+            openThreadsCount += 1;
+            return this.fetchThreads();
+          },
+          err => {
+            AlertsService.addWarning('Error creating new thread: ' + err + '.');
+          });
       },
 
       markThreadAsSeen: function(thread) {
