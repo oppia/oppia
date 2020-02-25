@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Service used to parse expressions. See
- * oppia/core/templatesexpressions/README.txt for further details.
+ * oppia/core/templates/expressions/README.txt for further details.
  */
 
 import { downgradeInjectable } from '@angular/upgrade/static';
