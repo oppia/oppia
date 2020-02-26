@@ -223,7 +223,7 @@ export class UrlInterpolationService {
     if (Constants.DEV_MODE) {
       return '/templates' + this._getUrlWithSlug(path);
     } else {
-      return '/build/templates/head' + this._getUrlWithSlug(path);
+      return '/build/templates' + this._getUrlWithSlug(path);
     }
   }
 }
