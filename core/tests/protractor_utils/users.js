@@ -54,8 +54,8 @@ var logout = function() {
 // that this will fail if the user already has a username.
 var _completeSignup = function(username) {
   // This is required since there is a redirect which can be considered
-  // as a client side navigation and the tests fail since Angular cannot
-  // be find in this case.
+  // as a client side navigation and the tests fail since Angular is
+  // not found due to the navigation interfering with protractor.
   browser.waitForAngularEnabled(false);
   browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
   browser.waitForAngularEnabled(true);
