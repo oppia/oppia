@@ -40,7 +40,7 @@ class SetInput(base.BaseInteraction):
     # 'element_type'. This has since been removed.
     _customization_arg_specs = [{
         'name': 'buttonText',
-        'description': 'Button label',
+        'description': 'Label for the \'Add Item\' button',
         'schema': {
             'type': 'unicode',
         },

@@ -411,7 +411,7 @@
     "id": "SetInput",
     "customization_arg_specs": [
       {
-        "description": "Button label",
+        "description": "Label for the 'Add Item' button",
         "name": "buttonText",
         "schema": {
           "type": "unicode"

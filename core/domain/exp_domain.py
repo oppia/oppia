@@ -2366,10 +2366,12 @@ class Exploration(python_utils.OBJECT):
         """Converts from version 31 to 32. Version 32 adds a new
         customization arg to SetInput interaction which allows
         creators to add custom text to the "Add" button.
+
         Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+
         Returns:
             dict. The converted states_dict.
         """
@@ -3277,6 +3279,14 @@ class Exploration(python_utils.OBJECT):
         """Converts a v36 exploration dict into a v37 exploration dict.
         Adds a new customization arg to SetInput interactions
         which allows creators to customize the "Add item" button.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v36.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v37.
         """
         exploration_dict['schema_version'] = 37
 

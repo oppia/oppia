@@ -245,10 +245,12 @@ class Question(python_utils.OBJECT):
         """Converts from version 31 to 32. Version 32 adds a new
         customization arg to SetInput interaction which allows
         creators to add custom text to the "Add" button.
+
         Args:
             question_state_dict: dict. A dict where each key-value pair
                 represents respectively, a state name and a dict used to
-                initalize a State domain object.
+                initialize a State domain object.
+
         Returns:
             dict. The converted question_state_dict.
         """

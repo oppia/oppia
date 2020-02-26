@@ -94,9 +94,11 @@ class DraftUpgradeUtil(python_utils.OBJECT):
         version 32 adds a customization arg for the "Add" button text
         in SetInput interaction, for which there should be no changes
         to drafts.
+
         Args:
             draft_change_list: list(ExplorationChange). The list of
                 ExplorationChange domain objects to upgrade.
+
         Returns:
             list(ExplorationChange). The converted draft_change_list.
         """
