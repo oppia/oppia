@@ -21,13 +21,23 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { UrlInterpolationService } from
-  'domain/utilities/url-interpolation.service';
 import { ExplorationOpportunitySummary } from
   'domain/opportunity/ExplorationOpportunitySummaryObjectFactory';
 import { SkillOpportunity } from
   'domain/opportunity/SkillOpportunityObjectFactory';
+import { UrlInterpolationService } from
+  'domain/utilities/url-interpolation.service';
+
 const constants = require('constants.ts');
+
+type OpportunityType = 'skill' | 'voiceover' | 'translation';
+
+// TODO(#7165): Replace any with exact type.
+type ContributionOpportunityParams = {
+  cursor: any;
+  // eslint-disable-next-line camelcase
+  language_code?: string;
+};
 
 @Injectable({
   providedIn: 'root'
@@ -38,9 +48,11 @@ export class ContributionOpportunitiesBackendApiService {
     private urlInterpolationService: UrlInterpolationService,
     private http: HttpClient
   ) {}
+
+  // TODO(#7165): Replace any with exact type.
   _getOpportunityFromDict(
       opportunityType: OpportunityType,
-      opportunityDict
+      opportunityDict: any
   ): ExplorationOpportunitySummary | SkillOpportunity {
     if (
       opportunityType === constants.OPPORTUNITY_TYPE_VOICEOVER ||
@@ -56,9 +68,14 @@ export class ContributionOpportunitiesBackendApiService {
     }
   }
 
+  // TODO(#7165): Replace any with exact type.
   _fetchOpportunities(
       opportunityType: OpportunityType,
-      params, successCallback, errorCallback
+      params: ContributionOpportunityParams,
+      successCallback: (
+        opportunities?: any, nextCursor?: any, more?: any
+        ) => void,
+      errorCallback: (reason?: any) => void
   ): void {
     this.http.get(this.urlInterpolationService.interpolateUrl(
       this.urlTemplate, { opportunityType }
@@ -78,51 +95,52 @@ export class ContributionOpportunitiesBackendApiService {
     });
   }
 
+  // TODO(#7165): Replace any with exact type.
   fetchSkillOpportunities(
-      cursor,
-      successCallback,
-      errorCallback?
-  ): void {
-    const params = {
+      cursor: any
+  ): Promise<object> {
+    const params: ContributionOpportunityParams = {
       cursor: cursor
     };
-    return this._fetchOpportunities(
-      constants.OPPORTUNITY_TYPE_SKILL, params, successCallback, errorCallback);
+    return new Promise((resolve, reject) => {
+      this._fetchOpportunities(
+        constants.OPPORTUNITY_TYPE_SKILL, params, resolve, reject);
+    });
   }
 
+  // TODO(#7165): Replace any with exact type.
   fetchTranslationOpportunities(
-      languageCode: String,
-      cursor,
-      successCallback,
-      errorCallback?
-  ): void {
-    const params = {
+      languageCode: string,
+      cursor: any
+  ): Promise<object> {
+    const params: ContributionOpportunityParams = {
       language_code: languageCode,
       cursor: cursor
     };
-    return this._fetchOpportunities(
-      constants.OPPORTUNITY_TYPE_TRANSLATION,
-      params, successCallback, errorCallback);
+    return new Promise((resolve, reject) => {
+      this._fetchOpportunities(
+        constants.OPPORTUNITY_TYPE_TRANSLATION,
+        params, resolve, reject);
+    });
   }
 
+  // TODO(#7165): Replace any with exact type.
   fetchVoiceoverOpportunities(
-      languageCode: String,
-      cursor,
-      successCallback,
-      errorCallback?
-  ): void {
-    const params = {
+      languageCode: string,
+      cursor: any
+  ): Promise<object> {
+    const params: ContributionOpportunityParams = {
       language_code: languageCode,
       cursor: cursor
     };
-    return this._fetchOpportunities(
-      constants.OPPORTUNITY_TYPE_VOICEOVER,
-      params, successCallback, errorCallback);
+    return new Promise((resolve, reject) => {
+      this._fetchOpportunities(
+        constants.OPPORTUNITY_TYPE_VOICEOVER,
+        params, resolve, reject);
+    });
   }
 }
 
 angular.module('oppia').factory(
   'ContributionOpportunitiesBackendApiService',
   downgradeInjectable(ContributionOpportunitiesBackendApiService));
-
-  type OpportunityType = 'skill' | 'voiceover' | 'translation';
