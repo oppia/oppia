@@ -29,7 +29,7 @@ const objExtend = function(args, obj) {
 module.exports = {
   load: function(resourcePath, args) {
     resourcePath = `/${resourcePath}`;
-    const root = path.resolve(__dirname, 'core/templates/dev/head');
+    const root = path.resolve(__dirname, 'core/templates');
     const argsExpr = args ? `(${objExtend})(arguments,
       ${JSON.stringify(args)})` : 'arguments';
     const resourceURL = JSON.stringify(loaderUtils.urlToRequest(

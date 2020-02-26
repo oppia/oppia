@@ -39,7 +39,7 @@ for path in _PATHS_TO_INSERT:
 import esprima # isort:skip
 # pylint: enable=wrong-import-position
 
-DIRECTORY_NAMES = ['core/templates/dev/head', 'extensions']
+DIRECTORY_NAMES = ['core/templates', 'extensions']
 SERVICE_FILES_SUFFICES = ('.service.ts', 'Service.ts', 'Factory.ts')
 
 

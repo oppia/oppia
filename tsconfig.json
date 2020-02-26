@@ -15,16 +15,16 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "app.constants": ["core/templates/dev/head/app.constants"],
-      "components/*": ["core/templates/dev/head/components/*"],
-      "domain/*": ["core/templates/dev/head/domain/*"],
-      "expressions/*": ["core/templates/dev/head/expressions/*"],
-      "pages/*": ["core/templates/dev/head/pages/*"],
-      "services/*": ["core/templates/dev/head/services/*"],
+      "app.constants": ["core/templates/app.constants"],
+      "components/*": ["core/templates/components/*"],
+      "domain/*": ["core/templates/domain/*"],
+      "expressions/*": ["core/templates/expressions/*"],
+      "pages/*": ["core/templates/pages/*"],
+      "services/*": ["core/templates/services/*"],
       "classifiers/*": ["extensions/classifiers/*"],
       "interactions/*": ["extensions/interactions/*"],
-      "filters/*": ["core/templates/dev/head/filters/*"],
-      "tests/*": ["core/templates/dev/head/tests/*"]
+      "filters/*": ["core/templates/filters/*"],
+      "tests/*": ["core/templates/tests/*"]
     }
   },
   "files": [
@@ -35,6 +35,6 @@
   "include": ["core", "extensions", "typings"],
   "exclude": [
     "core/tests",
-    "core/templates/dev/head/google-analytics.initializer.ts"
+    "core/templates/google-analytics.initializer.ts"
   ]
 }

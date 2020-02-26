@@ -29,7 +29,7 @@ var htmlMinifyConfig = {
     /<\{%[\s\S]*?%\}/,
     /<\[[\s\S]*?\]>/]
 };
-var commonPrefix = './core/templates/dev/head';
+var commonPrefix = './core/templates';
 var defaultMeta = {
   name: 'Personalized Online Learning from Oppia',
   description: 'Oppia is a free, open-source learning platform. Join ' +
@@ -40,7 +40,7 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'assets'),
-      path.resolve(__dirname, 'core/templates/dev/head'),
+      path.resolve(__dirname, 'core/templates'),
       path.resolve(__dirname, 'extensions'),
       path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'third_party')
@@ -660,7 +660,7 @@ module.exports = {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'assets'),
-        path.resolve(__dirname, 'core/templates/dev/head'),
+        path.resolve(__dirname, 'core/templates'),
         path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'typings')
       ],

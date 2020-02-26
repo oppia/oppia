@@ -283,11 +283,11 @@ describe('URL Interpolation Service', () => {
         hashes['/interactions/interTest/static/interTest.png'] + '.png');
 
     expect(uis.getDirectiveTemplateUrl('/test.html')).toBe(
-      '/build/templates/head/test.html');
+      '/build/templates/test.html');
     expect(uis.getDirectiveTemplateUrl('/test_url/test.html')).toBe(
-      '/build/templates/head/test_url/test.html');
+      '/build/templates/test_url/test.html');
     expect(uis.getDirectiveTemplateUrl('/pages_test/hash_test.html')).toBe(
-      '/build/templates/head/pages_test/hash_test.' +
+      '/build/templates/pages_test/hash_test.' +
         hashes['/pages_test/hash_test.html'] + '.html');
 
     expect(uis.getStaticAssetUrl('/test.json')).toBe(
