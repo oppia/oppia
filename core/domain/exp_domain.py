@@ -2361,6 +2361,32 @@ class Exploration(python_utils.OBJECT):
                     audio_metadata['duration_secs'] = 0.0
         return states_dict
 
+    @classmethod
+    def _convert_states_v31_dict_to_v32_dict(cls, states_dict):
+        """Converts from version 31 to 32. Version 32 adds a new
+        customization arg to MultipleChoiceInput which allows
+        answer choices to be shuffled.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            if state_dict['interaction']['id'] == 'MultipleChoiceInput':
+                customization_args = state_dict[
+                    'interaction']['customization_args']
+                customization_args.update({
+                    'showChoicesInShuffledOrder': {
+                        'value': True
+                    }
+                })
+
+        return states_dict
+
 
     @classmethod
     def update_states_from_model(
@@ -2397,7 +2423,7 @@ class Exploration(python_utils.OBJECT):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 36
+    CURRENT_EXP_SCHEMA_VERSION = 37
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3248,6 +3274,19 @@ class Exploration(python_utils.OBJECT):
 
         return exploration_dict
 
+    @classmethod
+    def _convert_v36_dict_to_v37_dict(cls, exploration_dict):
+        """Converts a v36 exploration dict into a v37 exploration dict.
+        adds a new customization arg to MultipleChoiceInput which allows
+        answer choices to be shuffled.
+        """
+        exploration_dict['schema_version'] = 37
+
+        exploration_dict['states'] = cls._convert_states_v31_dict_to_v32_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 32
+
+        return exploration_dict
 
     @classmethod
     def _migrate_to_latest_yaml_version(
@@ -3461,6 +3500,11 @@ class Exploration(python_utils.OBJECT):
             exploration_dict = cls._convert_v35_dict_to_v36_dict(
                 exploration_dict)
             exploration_schema_version = 36
+
+        if exploration_schema_version == 36:
+            exploration_dict = cls._convert_v36_dict_to_v37_dict(
+                exploration_dict)
+            exploration_schema_version = 37
 
         return (exploration_dict, initial_schema_version)
 

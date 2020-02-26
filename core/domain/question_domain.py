@@ -240,6 +240,30 @@ class Question(python_utils.OBJECT):
                 audio_metadata['duration_secs'] = 0.0
         return question_state_dict
 
+    @classmethod
+    def _convert_state_v31_dict_to_v32_dict(cls, question_state_dict):
+        """Converts from version 31 to 32. Version 32 adds a new
+        customization arg to MultipleChoiceInput which allows
+        answer choices to be shuffled.
+
+        Args:
+            question_state_dict: dict. The dict representation of
+                question_state_data.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        if question_state_dict['interaction']['id'] == 'MultipleChoiceInput':
+            customization_args = question_state_dict[
+                'interaction']['customization_args']
+            customization_args.update({
+                'showChoicesInShuffledOrder': {
+                    'value': True
+                }
+            })
+
+        return question_state_dict
+
 
     @classmethod
     def update_state_from_model(
