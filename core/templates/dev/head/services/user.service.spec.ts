@@ -270,4 +270,46 @@ describe('User Service', function() {
       });
     $httpBackend.flush();
   });
+
+  it('should return user community rights data', function() {
+    var sampleUserCommunityRightsDict = {
+      translation: ['hi'],
+      voiceover: [],
+      question: true
+    };
+
+    $httpBackend.expect('GET', '/usercommunityrightsdatahandler').respond(
+      200, sampleUserCommunityRightsDict);
+
+    UserService.getUserCommunityRightsData().then(function(
+        userCommunityRights) {
+      expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
+    });
+
+    $httpBackend.flush();
+  });
+
+  it('should not fetch userCommunityRights if it is was fetched before',
+    function() {
+      var sampleUserCommunityRightsDict = {
+        translation: ['hi'],
+        voiceover: [],
+        question: true
+      };
+
+      $httpBackend.expect('GET', '/usercommunityrightsdatahandler').respond(
+        200, sampleUserCommunityRightsDict);
+
+      UserService.getUserCommunityRightsData().then(
+        function(userCommunityRights) {
+          expect(userCommunityRights).toEqual(sampleUserCommunityRightsDict);
+          // Fetch userInfo again.
+          UserService.getUserInfoAsync().then(function(
+              sameUserCommunityRights) {
+            expect(sameUserCommunityRights).toEqual(
+              sampleUserCommunityRightsDict);
+          });
+        });
+      $httpBackend.flush(1);
+    });
 });

@@ -26,13 +26,13 @@ require('pages/admin-page/services/admin-task-manager.service.ts');
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
 angular.module('oppia').directive('adminRolesTab', [
-  '$http', 'AdminDataService', 'AdminTaskManagerService', 'LanguageUtilService',
-  'UrlInterpolationService', 'ADMIN_ROLE_HANDLER_URL',
+  '$http', '$rootScope', 'AdminDataService', 'AdminTaskManagerService',
+  'LanguageUtilService', 'UrlInterpolationService', 'ADMIN_ROLE_HANDLER_URL',
   'REVIEWABLE_ITEM_QUESTION', 'REVIEWABLE_ITEM_TRANSLATION',
   'REVIEWABLE_ITEM_VOICEOVER',
   function(
-      $http, AdminDataService, AdminTaskManagerService, LanguageUtilService,
-      UrlInterpolationService, ADMIN_ROLE_HANDLER_URL,
+      $http, $rootScope, AdminDataService, AdminTaskManagerService,
+      LanguageUtilService, UrlInterpolationService, ADMIN_ROLE_HANDLER_URL,
       REVIEWABLE_ITEM_QUESTION, REVIEWABLE_ITEM_TRANSLATION,
       REVIEWABLE_ITEM_VOICEOVER) {
     return {
