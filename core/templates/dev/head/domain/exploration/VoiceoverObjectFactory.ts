@@ -19,7 +19,8 @@
 export interface IVoiceoverInterface {
   'filename': string,
   'file_size_bytes': number,
-  'needs_update': boolean
+  'needs_update': boolean,
+  'duration_secs':number
 }
 import { downgradeInjectable } from '@angular/upgrade/static';
 import { Injectable } from '@angular/core';
