@@ -196,8 +196,8 @@
 /core/templates/dev/head/components/forms/ @bansalnitish
 /core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @bansalnitish
 /core/templates/dev/head/components/ck-editor-helpers/customize-rte-component-modal.template.html @bansalnitish
-/core/templates/dev/head/services/schema-default-value.service.ts @bansalnitish
-/core/templates/dev/head/services/schema-undefined-last-element.service.ts @bansalnitish
+/core/templates/dev/head/services/schema-default-value.service*.ts @bansalnitish
+/core/templates/dev/head/services/schema-undefined-last-element.service*.ts @bansalnitish
 
 
 # Google-app-engine configurations
@@ -245,14 +245,14 @@
 /core/templates/dev/head/services/id-generation.service*.ts @ankita240796
 /core/templates/dev/head/services/alerts.service*.ts @ankita240796
 /core/templates/dev/head/services/page-title.service*.ts @ankita240796
-/core/templates/dev/head/services/extension-tag-assembler.service.ts @ankita240796
+/core/templates/dev/head/services/extension-tag-assembler.service*.ts @ankita240796
 /core/templates/dev/head/services/nested-directives*.ts @ankita240796
 /core/templates/dev/head/services/stateful/background-mask.service*.ts @ankita240796
 /core/templates/dev/head/services/stateful/focus-manager.service*.ts @ankita240796
 /core/templates/dev/head/services/contextual/url.service*.ts @ankita240796
 /core/templates/dev/head/services/contextual/device-info.service*.ts @ankita240796
 /core/templates/dev/head/services/contextual/window-dimensions.service*.ts @ankita240796
-/core/templates/dev/head/services/contextual/window-ref.service.ts @ankita240796
+/core/templates/dev/head/services/contextual/window-ref.service*.ts @ankita240796
 
 
 # Global stylesheet.
@@ -304,7 +304,7 @@
 /core/domain/recommendations*.py @aks681
 /core/domain/search_services*.py @aks681
 /core/templates/dev/head/pages/library-page/ @aks681
-/core/templates/dev/head/services/construct-translation-ids.service.ts @aks681
+/core/templates/dev/head/services/construct-translation-ids.service*.ts @aks681
 /core/templates/dev/head/services/search.service*.ts @aks681
 
 
@@ -332,7 +332,7 @@
 /core/templates/dev/head/domain/review_test/ @nishantwrp @sophiewu6 @vinitamurthi
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6 @vinitamurthi
-/core/templates/dev/head/services/questions-list.service.ts @sophiewu6 @vinitamurthi
+/core/templates/dev/head/services/questions-list.service*.ts @sophiewu6 @vinitamurthi
 /core/templates/dev/head/components/question-directives/question-editor/ @aks681 @vinitamurthi
 /core/templates/dev/head/components/question-directives/questions-list/ @aks681 @vinitamurthi
 /core/templates/dev/head/components/question-directives/modal-templates/ @aks681 @vinitamurthi
@@ -415,7 +415,7 @@
 /core/templates/dev/head/I18nFooter.ts @nithusha21
 /core/templates/dev/head/i18n-footer.directive.html @nithusha21
 /core/templates/dev/head/services/contextual/document-attribute-customization.service*.ts @bansalnitish
-/core/templates/dev/head/services/contextual/meta-tag-customization.service.ts @bansalnitish
+/core/templates/dev/head/services/contextual/meta-tag-customization.service*.ts @bansalnitish
 /core/templates/dev/head/services/translation-file-hash-loader.service.ts @nithusha21
 /release_constants.py @ankita240796 @nithusha21 @seanlip
 
@@ -472,7 +472,7 @@
 /core/domain/suggestion*.py @nithusha21
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
-/core/templates/dev/head/services/suggestion-modal.service.ts @nithusha21
+/core/templates/dev/head/services/suggestion-modal.service*.ts @nithusha21
 
 
 # Feedback project.
@@ -515,7 +515,6 @@
 /core/templates/dev/head/pages/header_css_libs.html @jameesjohn @vojtechjelinek
 /core/templates/dev/head/pages/header_js_libs.html @jameesjohn @vojtechjelinek
 /core/templates/dev/head/services/csrf-token.service*.ts @jameesjohn @vojtechjelinek
-/gulpfile.js @jameesjohn @vojtechjelinek
 /jinja_utils*.py @jameesjohn @vojtechjelinek
 /webpack.common.config.ts @jameesjohn @vojtechjelinek
 /webpack.common.macros.ts @jameesjohn @vojtechjelinek
