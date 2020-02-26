@@ -179,6 +179,10 @@ class AdminHandler(base.BaseHandler):
                     self.payload.get('action') ==
                     'generate_dummy_new_structures_data'):
                 self._load_dummy_new_structures_data()
+            elif (
+                    self.payload.get('action') ==
+                    'generate_dummy_new_skill_data'):
+                self._load_dummy_new_skill()
             elif self.payload.get('action') == (
                     'flush_migration_bot_contribution_data'):
                 user_services.flush_migration_bot_contributions_model()
@@ -442,6 +446,33 @@ class AdminHandler(base.BaseHandler):
         else:
             raise Exception('Cannot load new structures data in production.')
 
+    def _load_dummy_new_skill(self):
+        """Loads the database with a skill and 15 questions
+        linked to the skill.
+
+        Raises:
+            Exception: Cannot load new structures data in production mode.
+            Exception: User does not have enough rights to generate data.
+        """
+        if constants.DEV_MODE:
+            if self.user.role != feconf.ROLE_ID_ADMIN:
+                raise Exception(
+                    'User does not have enough rights to generate data.')
+            skill_id = skill_services.get_new_skill_id()
+            skill = self._create_dummy_skill(
+                skill_id, 'Dummy Skill with 15 questions',
+                '<p>Dummy Explanation 1</p>')
+            for i in python_utils.RANGE(15):
+                question_id = question_services.get_new_question_id()
+                question_name = 'Question %s' % python_utils.UNICODE(i)
+                question = self._create_dummy_question(
+                    question_id, question_name, [skill_id])
+                question_services.add_question(self.user_id, question)
+                question_services.create_new_question_skill_link(
+                    self.user_id, question_id, skill_id, 0.3)
+            skill_services.save_new_skill(self.user_id, skill)
+        else:
+            raise Exception('Cannot load dummy skills in production.')
 
     def _reload_collection(self, collection_id):
         """Reloads the collection in dev_mode corresponding to the given
