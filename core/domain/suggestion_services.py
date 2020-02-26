@@ -357,12 +357,22 @@ def get_reviewable_suggestions(user_id, suggestion_type):
         list(Suggestion). A list of suggestions which the given user is allowed
             to review.
     """
-    return ([
+    all_suggestions = ([
         get_suggestion_from_model(s) for s in (
             suggestion_models.GeneralSuggestionModel
             .get_in_review_suggestions_of_suggestion_type(
                 suggestion_type, user_id))
     ])
+    user_reviewable_suggestions = []
+    community_rights = user_services.get_user_community_rights(user_id)
+    if suggestion_type == suggestion_models.SUGGESTION_TYPE_TRANSLATE_CONTENT:
+        language_codes = (
+            community_rights.can_review_translation_for_language_codes)
+        for suggestion in all_suggestions:
+            if suggestion.change.language_code in language_codes:
+                user_reviewable_suggestions.append(suggestion)
+        return user_reviewable_suggestions
+    return all_suggestions
 
 
 def get_submitted_suggestions(user_id, suggestion_type):

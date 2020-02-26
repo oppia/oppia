@@ -205,6 +205,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/admintopicscsvdownloadhandler',
         admin.AdminTopicsCsvFileDownloader),
+    get_redirect_route(
+        r'/addcommunityreviewerhandler', admin.AddCommunityReviewerHandler),
+    get_redirect_route(
+        r'/removecommunityreviewerhandler', admin.RemoveCommunityReviewer),
+    get_redirect_route(
+        r'/getcommunityreviewershandler', admin.CommunityReviewersHandler),
 
     get_redirect_route(
         feconf.NOTIFICATIONS_DASHBOARD_URL,

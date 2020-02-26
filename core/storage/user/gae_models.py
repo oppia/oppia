@@ -2051,6 +2051,83 @@ class UserContributionScoringModel(base_models.BaseModel):
             model.put()
 
 
+class UserCommunityRightsModel(base_models.BaseModel):
+    """Model for storing user's rights on community dashboard.
+
+    Instances of this class are keyed by the user id.
+    """
+    can_review_translation_for_language_codes = ndb.StringProperty(
+        repeated=True, indexed=True)
+    can_review_voiceover_for_language_codes = ndb.StringProperty(
+        repeated=True, indexed=True)
+    can_review_questions = ndb.BooleanProperty(indexed=True)
+
+    @staticmethod
+    def get_deletion_policy():
+        """The model can be deleted since it only contains information relevant
+        to the one user.
+        """
+        return base_models.DELETION_POLICY.DELETE
+
+    @classmethod
+    def has_reference_to_user_id(cls, user_id):
+        """Check whether UserCommunityRightsModel exists for user.
+
+        Args:
+            user_id: str. The ID of the user whose data should be checked.
+
+        Returns:
+            bool. Whether any models refer to the given user ID.
+        """
+        return cls.get_by_id(user_id) is not None
+
+    @classmethod
+    def get_translation_reviewer_user_id(cls, language_code):
+        """Returns the Id of the users who has rights to review translation in
+        the given language code.
+
+        Args:
+            language_code: str. The code of the language.
+
+        Returns:
+            list(str). A list of user's Ids who has rights to review translation
+            in the given language code.
+        """
+        reviewer_models = (
+            cls.query(
+                cls.can_review_translation_for_language_codes == language_code)
+            .fetch())
+        return [reviewer_model.id for reviewer_model in reviewer_models]
+
+    @classmethod
+    def get_voiceover_reviewer_user_id(cls, language_code):
+        """Returns the Id of the users who has rights to review voiceover in
+        the given language code.
+
+        Args:
+            language_code: str. The code of the language.
+
+        Returns:
+            list(str). A list of user's Ids who has rights to review voiceover
+            in the given language code.
+        """
+        reviewer_models = (
+            cls.query(
+                cls.can_review_voiceover_for_language_codes == language_code)
+            .fetch())
+        return [reviewer_model.id for reviewer_model in reviewer_models]
+
+    @classmethod
+    def get_question_reviewer_user_id(cls):
+        """Returns the Id of the users who has rights to review questions.
+
+        Returns:
+            list(str). A list of user's Ids who has rights to review questions.
+        """
+        reviewer_models = cls.query(cls.can_review_questions == True).fetch() # pylint: disable=singleton-comparison
+        return [reviewer_model.id for reviewer_model in reviewer_models]
+
+
 class PendingDeletionRequestModel(base_models.BaseModel):
     """Model for storing pending deletion requests.
 

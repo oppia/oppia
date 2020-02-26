@@ -526,6 +526,59 @@ def get_user_role_from_id(user_id):
     return user_settings.role
 
 
+def get_user_community_rights(user_id):
+    """Returns the UserCommunityRights for the given user_id.
+
+    Args:
+        user_id: str. The unique Id of the user.
+
+    Returns:
+        UserCommunityRights. The UserCommunityRights domain object for the
+        corresponding user.
+    """
+    user_model = (
+        user_models.UserCommunityRightsModel.get_by_id(user_id))
+    if user_model is not None:
+        return user_domain.UserCommunityRights(
+            user_id,
+            user_model.can_review_translation_for_language_codes,
+            user_model.can_review_voiceover_for_language_codes,
+            user_model.can_review_questions)
+    else:
+        return user_domain.UserCommunityRights(user_id, [], [], False)
+
+
+def get_all_community_reviewers():
+    """Returns a list of UserCommunityRights object corresponding to each
+    UserCommunityRightsModel.
+
+    Returns:
+        list(UserCommunityRights). A list of UserCommunityRights objects.
+    """
+    reviewer_models = user_models.UserCommunityRightsModel.get_all()
+    return [user_domain.UserCommunityRights(
+        model.id, model.can_review_translation_for_language_codes,
+        model.can_review_voiceover_for_language_codes,
+        model.can_review_questions) for model in reviewer_models]
+
+
+def _save_user_community_rights(user_community_rights):
+    """Saves the UserCommunityRights object into the datastore.
+
+    Args:
+        user_community_rights: UserCommunityRights. The UserCommunityRights
+            object of the user.
+    """
+    user_community_rights.validate()
+    user_models.UserCommunityRightsModel(
+        id=user_community_rights.id,
+        can_review_translation_for_language_codes=(
+            user_community_rights.can_review_translation_for_language_codes),
+        can_review_voiceover_for_language_codes=(
+            user_community_rights.can_review_voiceover_for_language_codes),
+        can_review_questions=user_community_rights.can_review_questions).put()
+
+
 def get_usernames_by_role(role):
     """Get usernames of all the users with given role ID.
 
@@ -1729,3 +1782,200 @@ def is_topic_manager(user_id):
     if user_role == feconf.ROLE_ID_TOPIC_MANAGER:
         return True
     return False
+
+
+def can_review_translation_suggestions(user_id, language_code=None):
+    """Returns whether the user can review translation suggestions in any
+    language or in the given language.
+
+    NOTE: If the language_code is provided then this method will check whether
+    the user can review translation in the given language code else it will
+    check whether the user can review in any language.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language.
+
+    Returns:
+        bool. Whether the user can review translation suggestions in any
+        language or in the given language.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    reviewable_language_codes = (
+        user_community_rights.can_review_translation_for_language_codes)
+    if language_code is not None:
+        return language_code in reviewable_language_codes
+    else:
+        return True if reviewable_language_codes else None
+
+
+def can_review_voiceover_applications(user_id, language_code=None):
+    """Returns whether the user can review voiceover applications in any
+    language or in the given language.
+
+    NOTE: If the language_code is provided then this method will check whether
+    the user can review voiceover in the given language code else it will
+    check whether the user can review in any language.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language.
+
+    Returns:
+        bool. Whether the user can review voiceover applications in any language
+        or in the given language.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    reviewable_language_codes = (
+        user_community_rights.can_review_voiceover_for_language_codes)
+    if language_code is not None:
+        return language_code in reviewable_language_codes
+    else:
+        return True if reviewable_language_codes else None
+
+
+def can_review_question_suggestions(user_id):
+    """Checks whether the user can review question suggestion.
+
+    Args:
+        user_id: str. The unique ID of the user.
+
+    Returns:
+        bool. Whether the user can review question suggestion.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    return user_community_rights.can_review_questions
+
+
+def allow_user_review_translation_in_language(user_id, language_code):
+    """Allows the user with the given user id to review translation suggestions
+    in the given lanaguge_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    language_list = (
+        user_community_rights.can_review_translation_for_language_codes)
+    language_list.append(language_code)
+    user_community_rights.can_review_translation_for_language_codes = sorted(
+        language_list)
+    _save_user_community_rights(user_community_rights)
+
+
+def remove_translation_review_rights_in_language(user_id, language_code):
+    """Removes the user's review rights to translation suggestions in the given
+    lanaguge_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    user_community_rights.can_review_translation_for_language_codes.remove(
+        language_code)
+    if user_community_rights.can_review_atleast_one_item():
+        _save_user_community_rights(user_community_rights)
+    else:
+        remove_user_from_community_reviewer(user_id)
+
+
+def allow_user_review_voiceover_in_language(user_id, language_code):
+    """Allows the user with the given user id to review voiceover applications
+    in the given lanaguge_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    language_list = (
+        user_community_rights.can_review_voiceover_for_language_codes)
+    language_list.append(language_code)
+    user_community_rights.can_review_voiceover_for_language_codes = sorted(
+        language_list)
+    _save_user_community_rights(user_community_rights)
+
+
+def remove_voiceover_review_rights_in_language(user_id, language_code):
+    """Removes the user's review rights to voiceover applications in the given
+    lanaguge_code.
+
+    Args:
+        user_id: str. The unique ID of the user.
+        language_code: str. The code of the language.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    user_community_rights.can_review_voiceover_for_language_codes.remove(
+        language_code)
+    if user_community_rights.can_review_atleast_one_item():
+        _save_user_community_rights(user_community_rights)
+    else:
+        remove_user_from_community_reviewer(user_id)
+
+
+def allow_user_review_question(user_id):
+    """Allows the user with the given user id to review question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    user_community_rights.can_review_questions = True
+    _save_user_community_rights(user_community_rights)
+
+
+def remove_question_review_rights(user_id):
+    """Removes the user's review rights to question suggestions.
+
+    Args:
+        user_id: str. The unique ID of the user.
+    """
+    user_community_rights = get_user_community_rights(user_id)
+    user_community_rights.can_review_questions = False
+    if user_community_rights.can_review_atleast_one_item():
+        _save_user_community_rights(user_community_rights)
+    else:
+        remove_user_from_community_reviewer(user_id)
+
+
+def remove_user_from_community_reviewer(user_id):
+    """Deletes the UserCommunityRightsModel corresponding to the given user_id.
+
+    Args:
+        user_id: str. The unique ID of the user.
+    """
+    user_community_rights_model = (
+        user_models.UserCommunityRightsModel.get_by_id(user_id))
+    if user_community_rights_model is not None:
+        user_community_rights_model.delete()
+
+
+def get_community_reviewer_usernames(review_type, language_code=None):
+    """Returns a list of usernames of users who has rights to review item of
+    given review type.
+
+    Args:
+        review_type: str. The type of of review item. One of translation,
+            voiceover or question.
+        language_code: None|str. The language code for translation or voiceover
+            review type.
+
+    Returns:
+        list(str.) A list of usernames.
+    """
+    reviewers_id = []
+    if review_type == constants.REVIEWABLE_ITEM_TRANSLATION:
+        reviewers_id = (
+            user_models.UserCommunityRightsModel
+            .get_translation_reviewer_user_id(language_code))
+    elif review_type == constants.REVIEWABLE_ITEM_VOICEOVER:
+        reviewers_id = (
+            user_models.UserCommunityRightsModel.get_voiceover_reviewer_user_id(
+                language_code))
+    elif review_type == constants.REVIEWABLE_ITEM_QUESTION:
+        reviewers_id = (
+            user_models.UserCommunityRightsModel.get_question_reviewer_user_id()
+        )
+    return get_usernames(reviewers_id)

@@ -635,6 +635,166 @@ class DataExtractionQueryHandler(base.BaseHandler):
         self.render_json(response)
 
 
+class AddCommunityReviewerHandler(base.BaseHandler):
+    """Handles adding reviewer for community dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def post(self):
+        new_reviewer_username = self.payload.get('username')
+        new_reviewer_user_id = (
+            user_services.get_user_id_from_username(new_reviewer_username))
+
+        if new_reviewer_user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % new_reviewer_username)
+
+        review_item = self.payload.get('review_item')
+
+        if review_item == constants.REVIEWABLE_ITEM_TRANSLATION:
+            language_code = self.payload.get('language_code')
+            if utils.is_supported_audio_language_code(language_code):
+                if user_services.can_review_translation_suggestions(
+                        new_reviewer_user_id, language_code=language_code):
+                    raise self.InvalidInputException(
+                        'User %s already has rights to review translation in '
+                        'language code %s' % (
+                            new_reviewer_username, language_code))
+                else:
+                    user_services.allow_user_review_translation_in_language(
+                        new_reviewer_user_id, language_code)
+            else:
+                raise self.InvalidInputException(
+                    'Invalid language_code: %s' % language_code)
+        elif review_item == constants.REVIEWABLE_ITEM_VOICEOVER:
+            language_code = self.payload.get('language_code')
+            if utils.is_supported_audio_language_code(language_code):
+                if user_services.can_review_voiceover_applications(
+                        new_reviewer_user_id, language_code=language_code):
+                    raise self.InvalidInputException(
+                        'User %s already has rights to review voiceover in '
+                        'language code %s' % (
+                            new_reviewer_username, language_code))
+                else:
+                    user_services.allow_user_review_voiceover_in_language(
+                        new_reviewer_user_id, language_code)
+            else:
+                raise self.InvalidInputException(
+                    'Invalid language_code: %s' % language_code)
+        elif review_item == constants.REVIEWABLE_ITEM_QUESTION:
+            if user_services.can_review_question_suggestions(
+                    new_reviewer_user_id):
+                raise self.InvalidInputException(
+                    'User %s already has rights to review question.' % (
+                        new_reviewer_username))
+            else:
+                user_services.allow_user_review_question(new_reviewer_user_id)
+        else:
+            raise self.InvalidInputException(
+                'Invalid review_item: %s' % review_item)
+        self.render_json({})
+
+
+class RemoveCommunityReviewer(base.BaseHandler):
+    """Handles removing reviewer for community dashboard."""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def put(self):
+        username = self.payload.get('username')
+        removal_type = self.payload.get('removal_type')
+        user_id = user_services.get_user_id_from_username(username)
+        if user_id is None:
+            raise self.InvalidInputException(
+                'Invalid username: %s' % username)
+        if removal_type == 'all':
+            user_services.remove_user_from_community_reviewer(user_id)
+        elif removal_type == 'specific':
+            review_type = self.payload.get('review_type')
+            if review_type == constants.REVIEWABLE_ITEM_TRANSLATION:
+                language_code = self.payload.get('language_code')
+                if user_services.can_review_translation_suggestions(
+                        user_id, language_code=language_code):
+                    user_services.remove_translation_review_rights_in_language(
+                        user_id, language_code)
+                else:
+                    raise self.InvalidInputException(
+                        '%s does not have rights to review translation in '
+                        'language %s.' % (username, language_code))
+            elif review_type == constants.REVIEWABLE_ITEM_VOICEOVER:
+                language_code = self.payload.get('language_code')
+                if user_services.can_review_voiceover_applications(
+                        user_id, language_code=language_code):
+                    user_services.remove_voiceover_review_rights_in_language(
+                        user_id, language_code)
+                else:
+                    raise self.InvalidInputException(
+                        '%s does not have rights to review voiceover in '
+                        'language %s.' % (username, language_code))
+            elif review_type == constants.REVIEWABLE_ITEM_QUESTION:
+                if user_services.can_review_question_suggestions(user_id):
+                    user_services.remove_user_question_review_rights(
+                        user_id)
+                else:
+                    raise self.InvalidInputException(
+                        '%s does not have rights to review question.' % (
+                            username))
+            else:
+                raise self.InvalidInputException(
+                    'Invalid type: %s' % review_type)
+        else:
+            raise self.InvalidInputException(
+                'Invalid removal_type: %s' % removal_type)
+
+        self.render_json({})
+
+
+class CommunityReviewersHandler(base.BaseHandler):
+    """Handler to show the existing reviewers."""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+        method = self.request.get('method')
+        if method == 'username':
+            username = self.request.get('username')
+            user_id = user_services.get_user_id_from_username(username)
+            if user_id is None:
+                raise self.InvalidInputException(
+                    'Invalid username: %s' % username)
+            user_rights = (
+                user_services.get_user_community_rights(user_id))
+            self.render_json({
+                'can_review_translation_for_language_codes': (
+                    user_rights.can_review_translation_for_language_codes),
+                'can_review_voiceover_for_language_codes': (
+                    user_rights.can_review_voiceover_for_language_codes),
+                'can_review_questions': user_rights.can_review_questions
+            })
+        elif method == 'role':
+            review_type = self.request.get('type')
+            if review_type == constants.REVIEWABLE_ITEM_TRANSLATION or (
+                    review_type == constants.REVIEWABLE_ITEM_VOICEOVER):
+                language_code = self.request.get('language_code')
+                if utils.is_supported_audio_language_code(language_code):
+                    usernames = user_services.get_community_reviewer_usernames(
+                        review_type, language_code=language_code)
+                    self.render_json({'usernames': usernames})
+                else:
+                    raise self.InvalidInputException(
+                        'Invalid language_code: %s' % language_code)
+            elif review_type == constants.REVIEWABLE_ITEM_QUESTION:
+                usernames = user_services.get_community_reviewer_usernames(
+                    review_type)
+                self.render_json({'usernames': usernames})
+            else:
+                raise self.InvalidInputException(
+                    'Invalid type: %s' % review_type)
+        else:
+            raise self.InvalidInputException('Invalid method: %s' % method)
+
+
 class SendDummyMailToAdminHandler(base.BaseHandler):
     """This function handles sending test emails."""
 

@@ -66,6 +66,7 @@ angular.module('oppia').directive('communityDashboardPage', [
             COMMUNITY_DASHBOARD_TABS_DETAILS,
             DEFAULT_OPPORTUNITY_LANGUAGE_CODE) {
           var ctrl = this;
+
           var prevSelectedLanguageCode = (
             LocalStorageService.getLastSelectedTranslationLanguageCode());
           var allAudioLanguageCodes = LanguageUtilService
@@ -87,13 +88,50 @@ angular.module('oppia').directive('communityDashboardPage', [
           ctrl.$onInit = function() {
             ctrl.profilePictureDataUrl = null;
             ctrl.username = null;
+            ctrl.userIsReviewer = false;
+            ctrl.userCanReviewTranslationSuggestionsInLanguages = [];
+            ctrl.userCanReviewVoiceoverSuggestionsInLanguages = [];
+            ctrl.userCanReviewQuestions = false;
 
             UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
               ctrl.profilePictureDataUrl = dataUrl;
             });
 
             UserService.getUserInfoAsync().then(function(userInfo) {
-              ctrl.username = userInfo.getUsername();
+              if (userInfo.isLoggedIn()) {
+                ctrl.username = userInfo.getUsername();
+                UserService.getUserCommunityRightsData().then(
+                  function(userCommunityRights) {
+                    userCommunityRights
+                      .can_review_translation_for_language_codes.forEach(
+                        function(languageCode) {
+                          ctrl.userCanReviewTranslationSuggestionsInLanguages
+                            .push(
+                              LanguageUtilService.getAudioLanguageDescription(
+                                languageCode));
+                        });
+
+                    userCommunityRights
+                      .can_review_voiceover_for_language_codes.forEach(function(
+                          languageCode) {
+                        ctrl.userCanReviewVoiceoverSuggestionsInLanguages.push(
+                          LanguageUtilService.getAudioLanguageDescription(
+                            languageCode));
+                      });
+
+                    ctrl.userCanReviewQuestions = (
+                      userCommunityRights.can_review_questions);
+
+                    if (
+                      ctrl.userCanReviewTranslationSuggestionsInLanguages
+                        .length > 0 ||
+                      ctrl.userCanReviewVoiceoverSuggestionsInLanguages
+                        .length > 0 ||
+                      ctrl.userCanReviewQuestions) {
+                      ctrl.userIsReviewer = true;
+                    }
+                  });
+              }
             });
 
             ctrl.languageCodesAndDescriptions = (

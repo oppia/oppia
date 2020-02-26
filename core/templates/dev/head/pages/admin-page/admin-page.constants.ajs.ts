@@ -22,6 +22,9 @@ import { AdminPageConstants } from 'pages/admin-page/admin-page.constants';
 
 angular.module('oppia').constant(
   'ADMIN_ROLE_HANDLER_URL', AdminPageConstants.ADMIN_ROLE_HANDLER_URL);
+angular.module('oppia').constant(
+  'ADMIN_ADD_REVIEWER_HANDLER_URL',
+  AdminPageConstants.ADMIN_ADD_REVIEWER_HANDLER_URL);
 
 angular.module('oppia').constant(
   'ADMIN_HANDLER_URL', AdminPageConstants.ADMIN_HANDLER_URL);

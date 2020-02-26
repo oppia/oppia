@@ -1592,7 +1592,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Expected content_id value to be a dict, received []')):
             written_translations.validate(None)
 
-    def test_validation_with_invalid_type_langauge_code_raise_error(self):
+    def test_validation_with_invalid_type_language_code_raise_error(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content': {
@@ -1611,7 +1611,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected language_code to be a string, '):
             written_translations.validate(['content'])
 
-    def test_validation_with_unknown_langauge_code_raise_error(self):
+    def test_validation_with_unknown_language_code_raise_error(self):
         written_translations_dict = {
             'translations_mapping': {
                 'content': {
@@ -1882,7 +1882,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             re.escape('Expected content_id value to be a dict, received []')):
             recorded_voiceovers.validate(None)
 
-    def test_validation_with_invalid_type_langauge_code_raise_error(self):
+    def test_validation_with_invalid_type_language_code_raise_error(self):
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {
@@ -1903,7 +1903,7 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected language_code to be a string, '):
             recorded_voiceovers.validate(['content'])
 
-    def test_validation_with_unknown_langauge_code_raise_error(self):
+    def test_validation_with_unknown_language_code_raise_error(self):
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {

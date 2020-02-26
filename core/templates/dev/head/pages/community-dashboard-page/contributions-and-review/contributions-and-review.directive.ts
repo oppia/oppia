@@ -68,6 +68,7 @@ angular.module('oppia').directive('contributionsAndReview', [
               color: '#e76c8c'
             }
           };
+          var userCanReviewTranslationSuggestionsInLanguages = [];
           var getQuestionContributionsSummary = function() {
             var questionContributionsSummaryList = [];
             Object.keys(ctrl.contributions).forEach(function(key) {
@@ -326,6 +327,10 @@ angular.module('oppia').directive('contributionsAndReview', [
             }
           };
 
+          ctrl.canReviewSuggestion = function() {
+            return userCanReviewTranslationSuggestionsInLanguages.length > 0;
+          };
+
           ctrl.switchToReviewTab = function(suggestionType) {
             ctrl.activeContributionTab = '';
             ctrl.contributionsDataLoading = true;
@@ -339,7 +344,8 @@ angular.module('oppia').directive('contributionsAndReview', [
                   ctrl.contributionSummaries = (
                     getQuestionContributionsSummary());
                   ctrl.contributionsDataLoading = false;
-                });
+                }
+              );
             }
             if (suggestionType === ctrl.SUGGESTION_TYPE_TRANSLATE) {
               ContributionAndReviewService
@@ -355,7 +361,6 @@ angular.module('oppia').directive('contributionsAndReview', [
           };
 
           ctrl.$onInit = function() {
-            ctrl.isAdmin = false;
             ctrl.userDetailsLoading = true;
             ctrl.userIsLoggedIn = false;
             ctrl.contributions = {};
@@ -386,13 +391,26 @@ angular.module('oppia').directive('contributionsAndReview', [
               }
             ];
             UserService.getUserInfoAsync().then(function(userInfo) {
-              ctrl.isAdmin = userInfo.isAdmin();
               ctrl.userIsLoggedIn = userInfo.isLoggedIn();
-              ctrl.userDetailsLoading = false;
-              if (ctrl.isAdmin) {
-                ctrl.switchToReviewTab(ctrl.SUGGESTION_TYPE_QUESTION);
-              } else if (ctrl.userIsLoggedIn) {
-                ctrl.switchToContributionsTab(ctrl.SUGGESTION_TYPE_QUESTION);
+              ctrl.userDeatilsLoading = false;
+              if (ctrl.userIsLoggedIn) {
+                UserService.getUserCommunityRightsData().then(
+                  function(UserCommunityRights) {
+                    userCanReviewTranslationSuggestionsInLanguages = (
+                      UserCommunityRights
+                        .can_review_translation_for_language_codes);
+                    if (
+                      userCanReviewTranslationSuggestionsInLanguages
+                        .length > 0) {
+                      ctrl.canReviewTranslation = true;
+                      ctrl.reviewTabActive = false;
+                      ctrl.switchToReviewTab();
+                    } else {
+                      ctrl.canReviewTranslation = false;
+                      ctrl.reviewTabActive = true;
+                      ctrl.switchToContributionsTab();
+                    }
+                  });
               }
             });
           };
